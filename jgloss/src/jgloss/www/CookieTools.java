@@ -54,13 +54,13 @@ public class CookieTools {
         ( "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
 
     /**
-     * Read cookies encapsulated by <CODE>addResponseCookies</CODE> from the client request and
+     * Read cookies encapsulated by <CODE>parseResponseCookies</CODE> from the client request and
      * forward them on the remote url connection. Both Netscape and RFC2965 cookies are supported.
      * 
      * @param connection URL connection on which the cookies will be forwarded. The connect method
      *                   must not have been already called.
      * @param cookies Cookies taken from the client request.
-     * @see #addResponseCookies(URLConnection,HttpServletResponse,String,String,boolean,boolean,boolean)
+     * @see #parseResponseCookies(URLConnection,Map,String,String,boolean,context)
      */
     public static void addRequestCookies( URLConnection connection, Cookie[] cookies,
                                           ServletContext context) {
