@@ -275,7 +275,7 @@ public class JGlossEditor extends JTextPane {
                             int pos = viewToModel( e.getPoint());
                             annotationEditor.makeVisible( pos);
                             annotationEditor.selectAnnotation( pos);
-                            annotationEditor.getContextMenu().show( JGlossEditor.this, e.getX(), e.getY());
+                            annotationEditor.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
                         }
                     }
 
