@@ -399,7 +399,7 @@ public class JGlossEditor extends JTextPane {
             findAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
                         String text = JOptionPane.showInputDialog
-                            ( JGlossEditor.this, 
+                            ( SwingUtilities.getRoot( JGlossEditor.this), 
                               JGloss.messages.getString( "editor.dialog.find"),
                               JGloss.messages.getString( "editor.dialog.find.title"),
                               JOptionPane.PLAIN_MESSAGE);
@@ -610,14 +610,16 @@ public class JGlossEditor extends JTextPane {
             if (from == 0) { 
                 // search in whole document
                 JOptionPane.showMessageDialog
-                    ( this, JGloss.messages.getString( "editor.dialog.find.notfound",
-                                                       new Object[] { text }));
+                    ( SwingUtilities.getRoot( this), 
+                      JGloss.messages.getString( "editor.dialog.find.notfound",
+                                                 new Object[] { text }));
             }
             else {
                 // search in part of the document
                 JOptionPane.showMessageDialog
-                    ( this, JGloss.messages.getString( "editor.dialog.findagain.notfound",
-                                                       new Object[] { text }));
+                    ( SwingUtilities.getRoot( this),
+                      JGloss.messages.getString( "editor.dialog.findagain.notfound",
+                                                 new Object[] { text }));
             }
             return -1;
         }
