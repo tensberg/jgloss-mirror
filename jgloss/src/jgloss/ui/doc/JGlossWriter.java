@@ -79,6 +79,10 @@ public class JGlossWriter extends HTMLWriter {
      * JGloss and of the JGloss file format.
      */
     protected boolean generatorTagExists;
+    /**
+     * Flag if the content meta tag already exists in the document.
+     */
+    protected boolean contentTypeTagExists;
 
     /**
      * Creates a new writer for a JGloss document which outputs to the given writer.
@@ -114,7 +118,10 @@ public class JGlossWriter extends HTMLWriter {
                     doc.setAttribute( (MutableAttributeSet) attr, HTML.Attribute.CONTENT,
                                       getFileVersionString());
                     generatorTagExists = true;
-                    break;
+                } else if (attr.containsAttribute( HTML.Attribute.HTTPEQUIV, "content-type")) {
+                    doc.setAttribute( (MutableAttributeSet) attr, HTML.Attribute.CONTENT,
+                                      "text/html; charset=" + getCharacterEncoding());
+                    contentTypeTagExists = true;
                 }
             }
 
@@ -168,14 +175,6 @@ public class JGlossWriter extends HTMLWriter {
      * @exception java.io.IOException if an error occurs during writing.
      */
     protected void writeAttributes( AttributeSet attr) throws IOException {
-        if (attr.containsAttribute( StyleConstants.NameAttribute, HTML.Tag.META)) {
-            if (attr.containsAttribute( HTML.Attribute.HTTPEQUIV, "content-type")) {
-                // META-Tag, replace the charset with the one of the writer
-                doc.setAttribute( (MutableAttributeSet) attr, HTML.Attribute.CONTENT, 
-                                  "text/html; charset=" + getCharacterEncoding());
-            }
-        }
-
         if (attr.isDefined( JGlossDocument.TEXT_ANNOTATION)) {
             attr = new SimpleAttributeSet( attr);
             doc.encodeAnnotation( (MutableAttributeSet) attr);
@@ -200,12 +199,41 @@ public class JGlossWriter extends HTMLWriter {
 
     /**
      * Writes a start tag. Overridden to suppress the writing of the line separator char
-     * for annotation elements.
+     * for annotation elements, and to normalize the dict_word and dict_reading attributes.
      */
     protected void startTag( Element elem) throws IOException, BadLocationException {
-        if (elem.getAttributes()
-            .getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.ANNOTATION))
+        AttributeSet attr = elem.getAttributes();
+        if (attr.getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.ANNOTATION)) {
             skipLineSeparator = true;
+
+            // Normalize the dict_word and dict_reading attributes.
+            // If the dict_word attribute equals the annotated word, remove it
+            String dictWord = (String) attr.getAttribute( JGlossDocument.DICTIONARY_WORD);
+            if (dictWord != null) {
+                Element wordElement = elem.getElement( 1);
+                try {
+                    String wordText = doc.getText( wordElement.getStartOffset(),
+                                                   wordElement.getEndOffset()-
+                                                   wordElement.getStartOffset());
+                    if (wordText.equals( dictWord))
+                        doc.setAttribute( (MutableAttributeSet) attr, 
+                                          JGlossDocument.DICTIONARY_WORD, null);
+                } catch (BadLocationException ex) {}
+            }
+            // If the dict_reading attribute equals the reading of the word, remove it
+            String dictReading = (String) attr.getAttribute( JGlossDocument.DICTIONARY_READING);
+            if (dictReading != null) {
+                Element readingElement = elem.getElement( 0);
+                try {
+                    String readingText = doc.getText( readingElement.getStartOffset(),
+                                                      readingElement.getEndOffset()-
+                                                      readingElement.getStartOffset());
+                    if (readingText.equals( dictReading))
+                        doc.setAttribute( (MutableAttributeSet) attr, 
+                                          JGlossDocument.DICTIONARY_READING, null);
+                } catch (BadLocationException ex) {}
+            }
+        }
         super.startTag( elem);
         skipLineSeparator = false;
     }

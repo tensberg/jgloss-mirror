@@ -1,12 +1,11 @@
-0.9.2: (2001/08/10)
+0.9.2: (2001/08/13)
 	- Added dialog for looking up words in the dictionaries.
-        - Added a JGloss servlet. The servlet proxies web pages and
-	  annotates them with Japanese translations.
 	- Extreme speedup of EDICT lookups. The old entry match test was
 	  really broken.
 	- Changed EDICT indexing algorithm. The new algorithm is faster
 	  and uses far less RAM.
-	- Added French translation, contributed by Alexandre Beraud.
+	- Added French translation, contributed by Alexandre Beraud
+	  (currently incomplete).
 	- Added paste import window. Text pasted in this window will be
 	  imported in a new JGloss document. This is mainly useful
 	  for working with the X primary selection. It is accessible with
@@ -16,7 +15,7 @@
 	- Added dictionary form node to annotation editor. This allows
 	  greater control over what will be written in LaTeX and
 	  annotation list exports.
-	- Added equalize annotations function.
+	- Added "use for all" function.
 	- HTML export: files now show reading and translation in popup
 	  windows in browsers which support the neccessary JavaScript
 	  functions, and in the status bar.
@@ -30,6 +29,11 @@
 	  overwritten.
 	- An extension will automatically be added to file names if no
 	  extension is given by the user.
+	- Opening an already open document will bring the existing window
+	  to the front.
+	- Added file format version numbering.
+        - Added a JGloss servlet. The servlet proxies web pages and
+	  annotates them with Japanese translations.
 0.9.1: (2001/07/13)
 	- Added support for KANJIDIC dictionaries.
 	- Added support for SKK word-reading dictionaries.

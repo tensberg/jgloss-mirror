@@ -64,7 +64,7 @@ ROOT_SOURCE := src/jgloss/JGloss.java
 WWW_SOURCE := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
-SOURCE_DIST := README COPYING ChangeLog Makefile MANIFEST.MF src doc.src javadoc latex-ruby
+SOURCE_DIST := README COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex-ruby
 # files and directories that go into the binary distribution, either in the JGloss jar file
 # or in the zip file.
 BINARY_DIST := README COPYING ChangeLog jgloss data resources doc latex-ruby
@@ -106,7 +106,7 @@ dist-binary: compile $(RESOURCES) setup doc
 	cd dist && tar -czf $(DISTNAME).tgz $(DISTNAME)
 	rm -r dist/$(DISTNAME)
 
-dist-source: clean gen-javadoc
+dist-source: clean
 	mkdir -p dist/$(DISTNAME)
 	cp -r $(SOURCE_DIST) dist/$(DISTNAME)
 	-cd dist/$(DISTNAME) && find -depth \( -name "CVS" -or -name "*.class" \) -exec rm -r \{\} \;

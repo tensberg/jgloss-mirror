@@ -175,11 +175,14 @@ public class HTMLExporter extends JGlossWriter {
                    elem.getAttributes().getAttribute( StyleConstants.NameAttribute)
                    .equals( HTML.Tag.BODY)) {
             // add the document setup handler
-            ((JGlossDocument) elem.getDocument()).setAttribute
+            doc.setAttribute
                 ( (MutableAttributeSet) elem.getAttributes(),
                   "onLoad", "setupDoc(" + String.valueOf( backwardsCompatible) + ","
                   + String.valueOf( interactive) + ")");
             super.startTag( elem);
+            doc.setAttribute
+                ( (MutableAttributeSet) elem.getAttributes(),
+                  "onLoad", null);
         }
         else
             super.startTag( elem);

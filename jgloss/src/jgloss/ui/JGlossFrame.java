@@ -124,6 +124,17 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                     int r = f.showOpenDialog( target);
                                     if (r == JFileChooser.APPROVE_OPTION) {
                                         JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
+                                        // test if the file is already open
+                                        String path = f.getSelectedFile().getAbsolutePath();
+                                        for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
+                                            JGlossFrame next = (JGlossFrame) i.next();
+                                            if (path.equals( next.documentPath)) {
+                                                next.show();
+                                                return;
+                                            }
+                                        }
+
+                                        // load the file
                                         JGlossFrame which = target==null ||
                                             target.documentLoaded ? new JGlossFrame() : target;
                                         which.loadDocument( f.getSelectedFile().getAbsolutePath());
@@ -267,17 +278,20 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * over an annotation.
      */
     private JCheckBoxMenuItem editorFollowsMouseItem;
+    /**
+     * Listens to changes of the properties.
+     */
+    private PropertyChangeListener prefsListener;
 
     /**
-     * Counts the number of open JGlossFrames. If the count drops to zero, the application
-     * will quit.
+     * List of open JGloss documents.
      */
-    private static int framecount;
+    private static LinkedList jglossFrames = new LinkedList();
 
     /**
      * Returns the number of currently open JGlossFrames.
      */
-    public static int getFrameCount() { return framecount; }
+    public static int getFrameCount() { return jglossFrames.size(); }
 
     /**
      * A file filter which will accept JGloss documents.
@@ -292,7 +306,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
      */
     public JGlossFrame() {
         super( JGloss.messages.getString( "main.title"));
-        framecount++;
+        jglossFrames.add( this);
 
         // set up the frame
         annotationEditor = new AnnotationEditor();
@@ -342,20 +356,20 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 }
 
                 public void windowClosed( WindowEvent e) {
-                    framecount--;
-                    if (framecount == 0) {
+                    if (jglossFrames.size() == 0) {
                         JGloss.exit();
                     }
                 }
             });
         setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
 
-        JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {
+        prefsListener = new PropertyChangeListener() {
                 public void propertyChange( PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( Preferences.EDITOR_ENABLEEDITING))
                         docpane.setEditable( "true".equals( e.getNewValue()));
-                }
-            });
+                };
+            };
+        JGloss.prefs.addPropertyChangeListener( prefsListener);
         
         saveAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
@@ -875,7 +889,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
      */
     private void loadDocument( Reader in, String path, String title, Parser parser, 
                                boolean addAnnotations, int length) 
-        throws Exception {
+        throws IOException {
+        documentLoaded = true;
+
         kit = new JGlossEditorKit( parser, addAnnotations, compactViewItem.isSelected(),
                                    showReadingItem.isSelected(),
                                    showTranslationItem.isSelected());
@@ -950,8 +966,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
         docpane.followMouse( showAnnotationItem.isSelected(),
                              editorFollowsMouseItem.isSelected());
-
-        documentLoaded = true;
 
         doc.addDocumentListener( new DocumentListener() {
                 public void insertUpdate(DocumentEvent e) {
@@ -1593,5 +1607,13 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 }
             }
         }        
+    }
+
+    public void dispose() {
+        super.dispose();
+        jglossFrames.remove( JGlossFrame.this);   
+        JGloss.prefs.removePropertyChangeListener( prefsListener);
+        if (doc != null)
+            StyleDialog.getComponent().removeStyleSheet( doc.getStyleSheet());
     }
 } // class JGlossFrame

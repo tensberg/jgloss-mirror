@@ -75,8 +75,7 @@
     </sect1>
     <sect1><title>License</title>
       <para>
-        &JGloss; is licensed under the terms of the 
-        <ulink url="http://www.gnu.org/gpl.html">GNU General Public License</ulink>.
+        &JGloss; is licensed under the terms of the GNU General Public License.
         It comes with ABSOLUTELY NO WARRANTY. This is free software, and you are
         welcome to redistribute it under certain conditions. Read the 
         license for details.
@@ -207,6 +206,23 @@
               </para>
             </listitem>
           </varlistentry>
+
+          <varlistentry>
+            <term><option>-a</option></term>
+            <term><option>--annotatehtml</option></term>
+            <listitem>
+              <para>
+                Annotate a HTML file with dictionary entries
+                for Japanese words. JavaScript will be used
+                to display the results in a browser. The HTML generation
+                is currenty only designed for <application>Mozilla</application>, 
+                results with other browsers may vary.
+                The parameter format is <option>-a [in [out]]</option>.
+                If in or out are left out or are set to '-'
+                stdin/stdout will be used.
+              </para>
+            </listitem>
+          </varlistentry>
         </variablelist>
       </para>
     </sect1>
@@ -257,7 +273,7 @@
         <para>
           The <filename>font.properties.ja</filename> file of the Linux version of Java is configured for
           fonts contained in the Japanese distribution of Red Hat 6.1 (and the international
-          7.x with Japanese support installed). It seems that these fonts (wadalab-gothic.ttf
+          Red Hat 7.x with Japanese support installed). It seems that these fonts (wadalab-gothic.ttf
           and watanabe-mincho.ttf) are not contained in most other Linux distributions. To make things
           worse, Java only seems to accept TrueType fonts and not the Japanese bitmap fonts commonly
           installed with X11. This means that you will either have to install the mentioned
@@ -266,7 +282,7 @@
         </para>
         <para>
           I won't go in the details of installing a Japanese TrueType font under X11. If you would
-          volunteer to write that part, please contact me.
+          like to volunteer to write that part, please contact me.
         </para>
       </sect2>
     </sect1>
@@ -302,7 +318,7 @@
           <varlistentry><term><command>jgloss-www</command></term>
             <listitem>
               <para>
-                Builds the (experimental) JGloss-WWW servlet. The components will be placed in the
+                Builds the JGloss-WWW servlet. The components will be placed in the
                 <filename>jgloss-www</filename> directory. This is an experimental servlet
                 which rewrites Japanese web pages. Words in the page are looked up and
                 annotated with the dictionary entries. JavaScript is used to display the
@@ -371,10 +387,14 @@
           </mediaobject></screenshot>
         <blockquote>
           <para>
-            The left part of the &JGloss; window shows the annotated document
-            (see <xref linkend="sect.docview">). The right part is the 
+            The right part is the 
             annotation editor (see <xref linkend="sect.annotationeditor">), which is used
             to manipulate the annotations in the document.
+            The left part of the &JGloss; window shows the annotated document
+            (see <xref linkend="sect.docview">). An <emphasis>annotated word</emphasis> is
+            highlighted in light red, a <emphasis>reading annotation</emphasis> in light green
+            and a <emphasis>translation annotation</emphasis> in light blue. The currently
+            selected annotation is highlighted in deep red.
           </para>
         </blockquote>
       </figure>
@@ -667,7 +687,7 @@
           With the <guilabel>write "hidden" annotations</guilabel> you can control how to
           treat annotations which are marked as <link linkend="sect.menu.annotation">
             <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
-          the annotations for the word will not be written to the generated document.
+          the annotations for hidden words will not be written to the generated document.
         </para>
       </sect2>
 
@@ -681,7 +701,7 @@
           With the <guilabel>write "hidden" annotations</guilabel> you can control how to
           treat annotations which are marked as <link linkend="sect.menu.annotation">
             <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
-          the annotations for the word will not be written to the generated document.
+          the annotations for hidden word will not be written to the generated document.
         </para>
       </sect2>
 
@@ -700,7 +720,7 @@
           With the <guilabel>write "hidden" annotations</guilabel> you can control how to
           treat annotations which are marked as <link linkend="sect.menu.annotation">
             <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
-          the annotations for the word will not be written to the generated document.
+          the annotations for hidden words will not be written to the generated document.
         </para>
       </sect2>
 
@@ -714,9 +734,129 @@
         </para>
       </sect2>
     </sect1>
-  </chapter>
 
-  <chapter><title>Reference</title>
+    <sect1 id="sect.userdict"><title>The User Dictionary</title>
+      <para>
+        The user dictionary is a special dictionary to which you can add words from within the
+        annotation editor. The user dictionary will always be shown in the list of dictionaries
+        and cannot be deleted. You can use the user dictionary to add words not in any
+        of the other dictionaries. Another use of the user dictionary is the selection of
+        a preferred reading/translation for a word with several readings/translations. Since
+        during a import the first reading/translation found for a word is choosen and the
+        user dictionary is first in the list, entries in the user dictionary will be
+        preferred.
+      </para>
+      <para>
+        To add an entry to the user dictionary, select an annotation
+        in the annotation editor and choose <guimenuitem>Add to Dictionary</guimenuitem>
+        from the <guimenu>Annotation</guimenu> menu. The dictionary form and current translation
+        will be used for the new entry. There is currently no way to delete
+        or edit an entry from within JGloss, but you can edit the dictionary file.
+        The dictionary is saved in EDICT format to the file
+        <filename>.jgloss-userdictionary</filename> in the user's home directory.
+      </para>
+    </sect1>
+
+    <sect1 id="sect.wordlookup"><title>The Word Lookup Dialog</title>
+      <para>
+        You can look up words in the dictionaries from the word lookup dialog. Enter a Japanese
+        or English word in the <guilabel>Enter Expression</guilabel> text field and hit the
+        <guibutton>Search</guibutton> button. The results will be displayed in the lower area
+        of the dialog window. The expression which matched will be highlighted blue in each
+        matched entry. Hitting the <guibutton>Clear</guibutton> will delete the current search
+        expression. If you select the arrow to the right of the text field, a popup menu listing
+        previous searches will be shown.
+      </para>
+      <para>
+        You can select the search mode from the <guilabel>Search Options</guilabel> part of the
+        dialog. <guilabel>Exact matches</guilabel> will only return entries where the entered
+        word equals the word, reading or one of the translations of the entry. 
+        <guilabel>Starts with Expression</guilabel> and <guilabel>Ends with Expression</guilabel>
+        will find entries where the word, reading or one of the translations have the search
+        word at the beginning/end. <guilabel>Any Match</guilabel> will return entries where the
+        search word appears anywhere within the result. Note that the dictionary formats may not
+        support all of the search options. For example, the EDICT implementation does not do "ends with"
+        searches for readings, and the KANJIDIC only supports exact matches, so you might not get
+        all possible hits when using unsupported search modes.
+      </para>
+      <para>
+        The <guibutton>Use Deinflection</guibutton> enables the use of the verb/adjective
+        deinflection algorithm for the search expression. This might find entries for inflected
+        word forms, but may also yield confusing results.
+      </para>
+      <para>
+        You can limit your search to a single dictionary by selecting the 
+        <guibutton>Search Dictionary</guibutton> radio button and selecting the dictionary from
+        the popup menu to the right. If the <guibutton>Search all Dictionaries</guibutton> radio
+        button is selected, all dictionaries made available to JGloss in the preferences will
+        be searched.
+      </para>
+    </sect1>
+
+    <sect1 id="sect.preferences"><title>The Preferences Dialog</title>
+      <para>
+        The preferences dialog contains four panels, one with general preferences,
+        one for setting the visual appearance
+        of the annotated document, one for selecting the dictionaries and one for managing the list 
+        of words excluded from annotation.
+        You can access the dialog by selecting <guimenuitem>Preferences</guimenuitem>
+        from the <guimenu>Edit</guimenu> menu.
+      </para>
+      <sect2 id="sect.prefs.general"><title>General</title>
+        <para>
+          You can select the window opened on startup with the 
+          <guilabel>Open empty JGloss document</guilabel> and 
+          <guilabel>Open Word Lookup dialog</guilabel> radio buttons.
+          If you select the <guilabel>Enable direct editing</guilabel> checkbox, you can
+          edit the text in the document view like you would in a text editor. Unfortunately
+          this function does not work very well and you should save the document before enabling
+          it. Problems include positioning the cursor, no actualization of the annotation
+          editor for changed annotations and problems if you delete an annotation by removing
+          all characters from it. An alternative to this is to edit the saved &JGloss;
+          document, either as source in a normal text editor or by loading it into an HTML
+          editor.
+        </para>
+      </sect2>
+      <sect2 id="sect.prefs.style"><title>Style</title>
+        <para>
+          Here you can set the appearance of annotated words in the document view.
+          Select a font by using the popup menu. Note that not all fonts in the list
+          can display Japanese characters. The font size can be selected from the
+          popup menu to the right, or you can enter the font size manually if it is not in
+          the list. You can select a different background color by clicking on the button
+          with the color label, or disable the use of a background color by unchecking the
+          <guilabel>set background color</guilabel> checkbox. The 
+          <guilabel>Highlight color ...</guilabel> button lets you select the color
+          which is used for highlighting the currently selected annotation in the document view.
+        </para>
+      </sect2>
+      <sect2 id="sect.prefs.dictionaries"><title>Dictionaries</title>
+        <para>
+          In this dialog you can set the dictionaries which are used when importing a text
+          or adding annotations to a document manually. Click the 
+          <guibutton>Add dictionary file</guibutton> to add one or more new dictionaries to
+          the list. &JGloss; currently supports dictionaries in EDICT, KANJIDIC and SKK format. 
+          Select a dictionary from
+          the list and push <guibutton>Remove entry</guibutton> to remove it.
+        </para>
+        <para>
+          Since the automatic annotation process will search the dictionaries in the sequence
+          in which they are displayed in the list and use the first entry as default annotation, 
+          you should put your favorite dictionary first in the list. Select one of the dictionaries
+          and push <guibutton>Move entry up</guibutton> and <guibutton>Move entry down</guibutton>
+          do move it to the desired position.
+        </para>
+      </sect2>
+      <sect2 id="sect.prefs.exclusions"><title>Exclusions</title>
+        <para>
+          This dialog lets you manage the list of words excluded from automatic annotation.
+          When you import a document, no annotations will be added for the words in
+          this list. You can export and import the list by using the correspondent buttons.
+          The format of the list is simply one word per line.
+        </para>
+      </sect2>
+    </sect1>
+
     <sect1><title>JGloss menus</title>
 
       <sect2><title>File</title>
@@ -851,6 +991,15 @@
             </listitem>
           </varlistentry>
 
+          <varlistentry><term>Word Lookup</term>
+            <listitem>
+              <para>
+                Selecting this item will show the word lookup dialog (see 
+                <xref linkend="sect.wordlookup">).
+              </para>
+            </listitem>
+          </varlistentry>
+
           <varlistentry><term>Preferences</term>
             <listitem>
               <para>
@@ -973,11 +1122,29 @@
             </listitem>
           </varlistentry>
 
+          <varlistentry><term>Use for All</term>
+            <listitem>
+              <para>
+                Changes all annotations with an annotated word identical to the currently
+                selected word to use the same reading, translation and dictionary form.
+              </para>
+            </listitem>
+          </varlistentry>
+
           <varlistentry><term>Add to Exclusions</term>
             <listitem>
               <para>
                 Adds the word of the currently selected annotation to the list of
                 words excluded from automatic annotation. See <xref linkend="sect.prefs.exclusions">.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Add to Dictionary</term>
+            <listitem>
+              <para>
+                Adds the word of the currently selected annotation to the user dictionary.
+                See <xref linkend="sect.userdict">.
               </para>
             </listitem>
           </varlistentry>
@@ -1005,63 +1172,6 @@
       </sect2>
     </sect1>
 
-    <sect1 id="sect.preferences"><title>The Preferences Dialog</title>
-      <para>
-        The preferences dialog contains three tabs, one for setting the visual appearance
-        of the application, one for selecting the dictionaries used when importing
-        a document and one for managing the list of words excluded from annotation.
-        You can access the dialog by selecting <guimenuitem>Preferences</guimenuitem>
-        from the <guimenu>Edit</guimenu> menu.
-      </para>
-      <sect2 id="sect.prefs.general"><title>General</title>
-        <para>
-          Here you can set the appearance for annotated words in the document view.
-          Select the font by using the popup menu. Note that not all fonts in the list
-          can display Japanese characters. The font size can be selected from the
-          popup menu to the right, or you can enter the font size manually if it is not in
-          the list. You can select a different background color by clicking on the button
-          with the color label, or disable the use of a background color by unchecking the
-          <guilabel>set background color</guilabel> checkbox. The 
-          <guilabel>Highlight color ...</guilabel> button lets you select the color
-          which is used for highlighting the currently selected annotation in the document view.
-        </para>
-        <para>
-          If you select the <guilabel>Enable direct editing</guilabel> checkbox, you can
-          edit the text in the document view like you would in a text editor. Unfortunately
-          this function does not work very well and you should save the document before enabling
-          it. Problems include positioning the cursor, no actualization of the annotation
-          editor for changed annotations and problems if you delete an annotation by removing
-          all characters from it. An alternative to this is to edit the saved &JGloss;
-          document, either as source in a normal text editor or by loading it into an HTML
-          editor.
-        </para>
-      </sect2>
-      <sect2 id="sect.prefs.dictionaries"><title>Dictionaries</title>
-        <para>
-          In this dialog you can set the dictionaries which are used when importing a text
-          or adding annotations to a document manually. Click the 
-          <guibutton>Add dictionary file</guibutton> to add one or more new dictionaries to
-          the list. &JGloss; currently supports dictionaries in EDICT, KANJIDIC and SKK format. 
-          Select a dictionary from
-          the list and push <guibutton>Remove entry</guibutton> to remove it.
-        </para>
-        <para>
-          Since the automatic annotation process will search the dictionaries in the sequence
-          in which they are displayed in the list and use the first entry as default annotation, 
-          you should put your favorite dictionary first in the list. Select one of the dictionaries
-          and push <guibutton>Move entry up</guibutton> and <guibutton>Move entry down</guibutton>
-          do move it to the desired position.
-        </para>
-      </sect2>
-      <sect2 id="sect.prefs.exclusions"><title>Exclusions</title>
-        <para>
-          This dialog lets you manage the list of words excluded from automatic annotation.
-          When you import a document, no annotations will be added for the words in
-          this list. You can export and import the list by using the correspondent buttons.
-          The format of the list is simply one word per line.
-        </para>
-      </sect2>
-    </sect1>
   </chapter>
 
   <chapter><title>Links</title>
