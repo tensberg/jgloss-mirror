@@ -277,7 +277,7 @@ public class AnnotationModel extends DefaultTreeModel {
                 elp = el;
                 el = el.getElement( el.getElementIndex( start));
             }
-            end = Math.min( end, elp.getEndOffset());
+            end = Math.min( end, elp.getEndOffset()-1);
 
             // The start and end offsets will move around while we change the document.
             // So wrap them in position objects, which adapt to changes.
@@ -291,10 +291,15 @@ public class AnnotationModel extends DefaultTreeModel {
                 ((AnnotationNode) root.getChildAt( i)).removeAnnotation();
             }
 
-            // The interval now only contains document plain text. Remember it and remove it.
+            // The interval now only contains document plain text.
             start = startp.getOffset();
             end = endp.getOffset();
             String text = doc.getText( start, end-start);
+
+            // look up the new annotation in the dictionaries.
+            List l = doc.getDictionaryParser().findTranslations( trans.translate( text));
+
+            // remove the old text.
             doc.remove( start, end-start);
 
             // If we insert new text directly after an annotation, the new annotation will 
@@ -308,9 +313,6 @@ public class AnnotationModel extends DefaultTreeModel {
                 doc.insertAfterEnd( ae, "&nbsp;");
                 start++;
             }
-
-            // look up the new annotation in the dictionaries.
-            List l = doc.getDictionaryParser().findTranslations( trans.translate( text));
 
             // construct the new annotation and insert it
             text = "<html><body><p>"
@@ -328,8 +330,8 @@ public class AnnotationModel extends DefaultTreeModel {
             // arbitrary location. So we will have to use an editor kit.
             kit.insertHTML( doc, start, text, 0, 0, AnnotationTags.ANNOTATION);
 
-            // remove the '\n' which the HTMLEditorKit insists on inserting
-            doc.remove( endp.getOffset()-1, 1);
+            // remove the '\n\n' which the HTMLEditorKit insists on inserting
+            doc.remove( endp.getOffset()-2, 2);
             if (ae != null) // remove the additional space which we inserted above
                 doc.remove( start-1, 1);
 
