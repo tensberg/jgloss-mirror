@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.JGloss;
+
 import java.lang.ref.SoftReference;
 import java.util.*;
 
@@ -56,7 +58,7 @@ public class Parser {
         public ParsingInterruptedException( String message) {
             super( message);
         }
-    }
+    } // class ParsingInterruptedException
 
     /**
      * The current offset in the parsed text.
@@ -112,6 +114,16 @@ public class Parser {
      * Character which signals the end of a reading annotation for a kanji word.
      */
     private char readingEnd;
+
+    /**
+     * Dummy dictionary which is used for Readings constructed from reading anntoations found in
+     * the document. This is used to return a useful name for the dictionary.
+     */
+    private static final Dictionary documentDictionary = new Dictionary()  {
+            public String getName() { return JGloss.messages.getString( "parser.dictionary.document"); }
+            public List search( String expression, short mode) { return null; }
+            public void dispose() {}
+        };
 
     /**
      * Creates a new parser which will use the given dictionaries, use no reading annotation
@@ -452,13 +464,19 @@ public class Parser {
      * @see Translation
      * @see Conjugation
      */
-    private List findTranslations( int wordStart, String word, String reading,
+    private List findTranslations( int wordStart, String word, final String reading,
                                    String inflection, boolean tryPrefixes,
                                    boolean trySuffixes) throws SearchException {
         //System.out.println( "Looking up " + word + ":" + reading + ":" + inflection);
         List translations = new ArrayList( 6);
-        if (reading!=null && reading.length()>0)
-            translations.add( new Reading( wordStart, word.length(), reading));
+        if (reading!=null && reading.length()>0) {
+            final String fword = word;
+            translations.add( new Reading( wordStart, word.length(), new WordReadingPair() {
+                    public String getWord() { return fword; }
+                    public String getReading() { return reading; }
+                    public Dictionary getDictionary() { return documentDictionary; }
+                }));
+        }
 
         Conjugation[] conjugations = null;
         if (inflection != null)
@@ -471,11 +489,6 @@ public class Parser {
             boolean match = false;
             // try to find exact match with conjugation
             if (conjugations != null) {
-                /*for (int i=0; i<conjugations.length; i++) {
-                    System.out.println( "Using conjugation " + conjugations[i].getConjugatedForm() +
-                                        "/" + conjugations[i].getDictionaryForm());
-                                        }*/
-
                 for ( int j=0; j<dictionaries.length; j++) {
                     for ( int i=0; i<conjugations.length; i++) {
                         List t = search( dictionaries[j], word + conjugations[i].getDictionaryForm(),
@@ -483,10 +496,19 @@ public class Parser {
                         if (t.size() > 0) {
                             match = true;
                             for ( Iterator k=t.iterator(); k.hasNext(); ) {
-                                translations.add( new Translation
-                                    ( wordStart, word.length() + conjugations[i]
-                                      .getConjugatedForm().length(),
-                                      (DictionaryEntry) k.next(), conjugations[i]));
+                                WordReadingPair wrp = (WordReadingPair) k.next();
+                                if (wrp instanceof DictionaryEntry) {
+                                    translations.add( new Translation
+                                        ( wordStart, word.length() + conjugations[i]
+                                          .getConjugatedForm().length(),
+                                          (DictionaryEntry) wrp, conjugations[i]));
+                                }
+                                else {
+                                    translations.add( new Reading
+                                        ( wordStart, word.length() + conjugations[i]
+                                          .getConjugatedForm().length(),
+                                          wrp, conjugations[i]));
+                                }
                             }
                         }
                     }
@@ -500,8 +522,14 @@ public class Parser {
                     if (t.size() > 0) {
                         match = true;
                         for ( Iterator k=t.iterator(); k.hasNext(); ) {
-                            translations.add( new Translation( wordStart, word.length(),
-                                                               (DictionaryEntry) k.next()));
+                            WordReadingPair wrp = (WordReadingPair) k.next();
+                            if (wrp instanceof DictionaryEntry) {
+                                translations.add( new Translation( wordStart, word.length(),
+                                                                   (DictionaryEntry) wrp));
+                            }
+                            else {
+                                translations.add( new Reading( wordStart, word.length(), wrp));
+                            }
                         }
                     }
                 }
@@ -519,32 +547,37 @@ public class Parser {
                                      Dictionary.SEARCH_STARTS_WITH);
                     entries[i] = new LinkedList();
                     for ( Iterator j=r.iterator(); j.hasNext(); ) {
-                        DictionaryEntry de = (DictionaryEntry) j.next();
-                        String deword = de.getWord();
-                        if (deword.length() >= lengths[i]) {
-                            if (word.startsWith( deword)) {
-                                if (deword.length() > lengths[i]) {
+                        WordReadingPair wrp = (WordReadingPair) j.next();
+                        String wrpword = wrp.getWord();
+                        if (wrpword.length() >= lengths[i]) {
+                            if (word.startsWith( wrpword)) {
+                                if (wrpword.length() > lengths[i]) {
                                     // we have a new longest match for this dictionary
                                     // throw previous matches away
-                                    lengths[i] = deword.length();
-                                    maxlength = Math.max( deword.length(), maxlength);
+                                    lengths[i] = wrpword.length();
+                                    maxlength = Math.max( wrpword.length(), maxlength);
                                     entries[i].clear();
                                 }
 
-                                entries[i].add( de);
+                                entries[i].add( wrp);
                             }
                         }
                     }
                 }
 
-                match = (maxlength > 0);
-
-                if (match) {
+                if (maxlength > 0) { // match found
                     for ( int i=0; i<dictionaries.length; i++) {
                         if (entries[i]!=null && lengths[i]==maxlength) {
-                            for ( Iterator j=entries[i].iterator(); j.hasNext(); )
-                                translations.add( new Translation( wordStart, maxlength,
-                                                                   (DictionaryEntry) j.next()));
+                            for ( Iterator j=entries[i].iterator(); j.hasNext(); ) {
+                                WordReadingPair wrp = (WordReadingPair) j.next();
+                                if (wrp instanceof DictionaryEntry) {
+                                    translations.add( new Translation( wordStart, maxlength,
+                                                                       (DictionaryEntry) wrp));
+                                }
+                                else {
+                                    translations.add( new Reading( wordStart, maxlength, wrp));
+                                }
+                            }
                         }
                     }
                     
@@ -624,6 +657,15 @@ public class Parser {
         cacheHits = 0;
         cacheGarbageCollected = 0;
     }
+
+    /**
+     * Returns the character which signals the beginning of a reading annotation for a kanji word.
+     */
+    public char getReadingStart() { return readingStart; }
+    /**
+     * Returns the character which signals the end of a reading annotation for a kanji word.
+     */
+    public char getReadingEnd() { return readingEnd; }
 
     /**
      * Returns the number of dictionary lookups.
