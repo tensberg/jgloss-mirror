@@ -288,10 +288,10 @@ public class HTMLAnnotator {
         String translation = "";
         if (a instanceof Translation) {
             StringBuffer t = new StringBuffer();
-            String[] translations = ((Translation) a).getDictionaryEntry().getTranslations();
-            for ( int j=0; j<translations.length; j++) {
+            for ( Iterator j=((Translation) a).getDictionaryEntry().getTranslations().iterator();
+                  j.hasNext(); ) {
                 t.append( "    ");
-                t.append( translations[j]);
+                t.append( j.next().toString());
                 t.append( "_R");
             }
             translation = t.toString();

@@ -399,7 +399,7 @@ public class JGlossDocument extends HTMLDocument {
                                     StringTools.toHiragana( dr).startsWith( hiraganaReading)) {
                                     // the comparison is startsWith and not equals because it might
                                     // be an inflected verb.
-                                    translation = de.getTranslations()[0];
+                                    translation = (String) de.getTranslations().get( 0);
                                     break;
                                 }
                             }
@@ -412,7 +412,7 @@ public class JGlossDocument extends HTMLDocument {
                         DictionaryEntry de = tr.getDictionaryEntry();
                         reading = de.getReading(); // dictionary form of reading, real reading for
                                                    // inflected verbs will be derived further down
-                        translation = de.getTranslations()[0];
+                        translation = (String) de.getTranslations().get( 0);
                         if (!de.getWord().equals( word)) {
                             dictionaryWord = de.getWord();
                             dictionaryReading = de.getReading();

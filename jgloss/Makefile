@@ -65,7 +65,7 @@ CLASSPATH := $(CLASSPATH):./src
 
 # List main class source file and all other class source files not referenced from main class
 # for compilation
-ROOT_SOURCES := src/jgloss/JGloss.java src/jgloss/JavaPreferences.java
+ROOT_SOURCES := src/jgloss/JGloss.java src/jgloss/JavaPreferences.java src/jgloss/dictionary/GDict.java
 WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution

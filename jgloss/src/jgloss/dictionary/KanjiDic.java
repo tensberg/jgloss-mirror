@@ -580,11 +580,11 @@ public class KanjiDic implements Dictionary {
                                                      String[] translations) {
         int dot = reading.indexOf( '.');
         if (dot == -1)
-            return new DictionaryEntry( kanji, reading, translations, this);
+            return new DefaultDictionaryEntry( kanji, reading, translations, this);
         else
-            return new DictionaryEntry( kanji + reading.substring( dot+1),
-                                        reading.substring( 0, dot) + reading.substring( dot+1),
-                                        translations, this);
+            return new DefaultDictionaryEntry( kanji + reading.substring( dot+1),
+                                               reading.substring( 0, dot) + reading.substring( dot+1),
+                                               translations, this);
     }
 
     /**

@@ -466,23 +466,22 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                 results++;
                 if (keepLastResult)
                     lastResult.add( o);
-                StringBuffer match = new StringBuffer();
                 WordReadingPair wrp = (WordReadingPair) o;
                 if (useHTML) {
-                    match.append( wrp.getWord());
-                    if (wrp.getReading() != null && wrp.getReading().length()>0
-                        && !(wrp.getWord().equals( wrp.getReading()))) {
-                        match.append( " \uff08");
-                        match.append( wrp.getReading());
-                        match.append( '\uff09');
-                    }
-                    if (wrp instanceof DictionaryEntry) {
-                        match.append( ' ');
-                        String[] t = ((DictionaryEntry) wrp).getTranslations();
-                        match.append( t[0]);
-                        for ( int j=1; j<t.length; j++) {
-                            match.append( " / ");
-                            match.append( t[j]);
+                    StringBuffer match = new StringBuffer( wrp.toString());
+
+                    // escape HTML special characters
+                    for ( int j=match.length()-1; j>=0; j--) {
+                        switch (match.charAt( j)) {
+                        case '&':
+                            match.replace( j, j+1, "&amp;");
+                            break;
+                        case '<':
+                            match.replace( j, j+1, "&lt;");
+                            break;
+                        case '>':
+                            match.replace( j, j+1, "&gt;");
+                            break;
                         }
                     }
 
@@ -501,18 +500,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                 }
                 else {
                     // add entry as plain text
-                    resultText.append( wrp.getWord());
-                    if (wrp.getReading() != null)
-                        resultText.append( " \uff08" + wrp.getReading() + "\uff09");
-                    if (wrp instanceof DictionaryEntry) {
-                        resultText.append( ' ');
-                        String[] t = ((DictionaryEntry) wrp).getTranslations();
-                        resultText.append( t[0]);
-                        for ( int j=1; j<t.length; j++) {
-                            resultText.append( " / ");
-                            resultText.append( t[j]);
-                        }
-                    }
+                    resultText.append( wrp.toString());
                     resultText.append('\n');
                 }
             }

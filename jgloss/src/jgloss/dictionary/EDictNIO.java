@@ -26,11 +26,12 @@ package jgloss.dictionary;
 import java.io.*;
 import java.nio.*;
 import java.util.List;
-import java.util.regex.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * Dictionary implementation for dictionaries in EDICT format 
- * based on {@link FileBasedDictionary}. For a documentation of the format see
+ * based on {@link FileBasedDictionary} and using the J2 1.4 NIO API. For a documentation of the format see
  * <a href="http://www.csse.monash.edu.au/~jwb/edict_doc.html">
  * http://www.csse.monash.edu.au/~jwb/edict_doc.html</a>.
  *
@@ -38,12 +39,44 @@ import java.util.regex.*;
  */
 public class EDictNIO extends FileBasedDictionary {
     public static void main( String[] args) throws Exception {
-        //EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
-        EDictNIO en = new EDictNIO( new File( "/usr/share/edict/edict"), true);
-        EDict eo = new EDict( "/usr/share/edict/edict", true);
-        //test( "year", en, eo, SEARCH_ANY_MATCHES);
+        EDictNIO dict = new EDictNIO( new File( "/usr/share/edict/edict"), false);
+        BufferedReader in = new BufferedReader( new InputStreamReader
+            ( new FileInputStream( "/usr/share/edict/edict"), "EUC-JP"));
+        BufferedWriter out = new BufferedWriter( new OutputStreamWriter
+            ( new FileOutputStream( "/home/michael/japan/dictionaries/edict.gdt"), "UTF-8"));
+        out.write( "Japanisch|Lesung|Wortart|Deutsch|Kommentar|Eintragsebene\n");
+        String line;
+        while ((line = in.readLine()) != null) {
+            List l = new java.util.ArrayList( 1);
+            dict.parseEntry( l, line);
+            DictionaryEntry e = (DictionaryEntry) l.get( 0);
+            StringBuffer entry = new StringBuffer( 128);
+            entry.append( e.getWord());
+            entry.append( '|');
+            if (e.getReading() != null)
+                entry.append( e.getReading());
+            entry.append( "||");
+            for ( java.util.Iterator i=e.getTranslations().iterator(); i.hasNext(); ) {
+                entry.append( i.next().toString());
+                if (i.hasNext())
+                    entry.append( "; ");
+            }
+            entry.append( ".||\n");
+            out.write( entry.toString());
+        }
+        in.close();
+        out.close();
+        System.exit( 0);
+
+        //EDict eo = new EDict( "/home/michael/testdic", true);
+        //EDictNIO en = new EDictNIO( new File( "/home/michael/testdic"), true);
+        EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
+        EDict eo = new EDict( "/home/michael/japan/dictionaries/edict2", true);
+        //EDictNIO en = new EDictNIO( new File( "/usr/share/edict/edict"), true);
+        //EDict eo = new EDict( "/usr/share/edict/edict", true);
+        //test( "regular (stops at every station) Jouetsu-line shinkansen", en, eo, SEARCH_ANY_MATCHES);
         
-        Matcher word = Pattern.compile( "^(\\S+)").matcher( "");
+        /*Matcher word = Pattern.compile( "^(\\S+)").matcher( "");
         Matcher reading = Pattern.compile( "\\[(.*?)\\]").matcher( "");
         Matcher translation = Pattern.compile( "/(.*?)/").matcher( "");
         String line;
@@ -64,7 +97,7 @@ public class EDictNIO extends FileBasedDictionary {
                 test( translation.group( 1), en, eo);
         }
         System.err.println( "Time (NIO): " + (t1/1000.0));
-        System.err.println( "Time (old): " + (t2/1000.0));
+        System.err.println( "Time (old): " + (t2/1000.0));*/
     }
 
     private final static void test( String word, Dictionary d1, Dictionary d2) 
@@ -86,6 +119,7 @@ public class EDictNIO extends FileBasedDictionary {
         t = System.currentTimeMillis();
         List r2 = d2.search( word, mode);
         t2 += System.currentTimeMillis() - t;
+        //System.err.println( "Results: " + r1.size() + "/" + r2.size());
         java.util.Set s1 = new java.util.HashSet( r1.size()*2+1);
         for ( java.util.Iterator i=r1.iterator(); i.hasNext(); ) {
             s1.add( i.next().toString());
@@ -144,51 +178,37 @@ public class EDictNIO extends FileBasedDictionary {
      * @see DictionaryFactory
      */
     public final static DictionaryFactory.Implementation implementation = 
-        new DictionaryFactory.Implementation() {
-                public float isInstance( String descriptor) {
-                    try {
-                        BufferedReader r = new BufferedReader( new InputStreamReader( new FileInputStream
-                            ( descriptor), "EUC-JP"));
-                        String l;
-                        int lines = 0;
-                        do {
-                            l = r.readLine();
-                            lines++;
-                            // skip empty lines and comments
-                        } while (l!=null && (l.length()==0 || l.charAt( 0)<128) && lines<100);
-                        r.close();
-                        if (l!=null && lines<100) {
-                            int i = l.indexOf( ' ');
-                            // An entry in EDICT has the form
-                            // word [reading] /translation1/translation2/.../
-                            // ([reading] is optional).
-                            // An entry in the SKK dictionary has the form
-                            // reading /word1/word2/.../
-                            // To distinguish between the two formats I test if the
-                            // first character after the '/' is ISO-8859-1 or not.
-                            if (i!=-1 && i<l.length()-2 && 
-                                (l.charAt( i+1)=='[' ||
-                                 l.charAt( i+1)=='/' && l.charAt( i+2)<256))
-                                return getMaxConfidence();
-                        }
-                    } catch (Exception ex) {}
-                    return ZERO_CONFIDENCE;
-                }
-                
-                public float getMaxConfidence() { return 1.0f; }
-                
-                public Dictionary createInstance( String descriptor) 
-                    throws DictionaryFactory.InstantiationException {
-                    try {
-                        return new EDictNIO( new File( descriptor), true);
-                    } catch (IOException ex) {
-                        throw new DictionaryFactory.InstantiationException( ex.getLocalizedMessage(), ex);
-                    }
-                }
+        initImplementation();
 
-                public String getName() { return "EDICT"; }
-            };
+    /**
+     * Returns a {@link FileBasedDictionary.Implementation FileBasedDictionary.Implementation}
+     * which recognizes EUC-JP encoded EDICT dictionaries. Used to initialize the
+     * {@link #implementation implementation} final member because the constructor has to
+     * be wrapped in a try/catch block.
+     * 
+     */
+    private static DictionaryFactory.Implementation initImplementation() {
+        try {
+            // Explanation of the pattern:
+            // The EDICT format is "word [reading] /translation/translation/.../", with
+            // the reading being optional. The dictionary has to start with a line of this form,
+            // therefore the pattern starts with a \A and ends with $
+            // To distinguish an EDICT dictionary from a SKK dictionary, which uses a similar format,
+            // it is tested that the first char in the translation is not a Kanji
+            // (InCJKUnifiedIdeographs)
+            return new FileBasedDictionary.Implementation
+                ( "EDICT", "EUC-JP", Pattern.compile
+                  ( "\\A\\S+?(\\s\\[.+?\\])?\\s/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
+                  1.0f, 1024, EDictNIO.class.getConstructor( new Class[] { File.class }));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 
+    public EDictNIO( File dicfile) throws IOException {
+        this( dicfile, true);
+    }
 
     public EDictNIO( File dicfile, boolean createindex) throws IOException {
         super( dicfile, createindex);
@@ -222,50 +242,39 @@ public class EDictNIO extends FileBasedDictionary {
         int j, k;
         // word:
         String word;
-        int i = entry.indexOf( ' ');
-        if (i == -1) {
-            System.err.println( "WARNING: " + dicfile +
-                                "\nMalformed dictionary entry: " + entry);
-            return;
-        }
-        else {
+        try {
+            int i = entry.indexOf( ' ');
             word = entry.substring( 0, i);
-        }
-        // reading:
-        String reading = null;
-        i = entry.indexOf( '[');
-        if (i != -1) {
-            j = entry.indexOf( ']', i+1);
-            if (j == -1) {
-                System.err.println( "WARNING: " + dicfile +
-                                    "\nMalformed dictionary entry: " + entry);
-                return;
-            }
-            else
+
+            // reading:
+            String reading = null;
+            i = entry.indexOf( '[');
+            if (i != -1) {
+                j = entry.indexOf( ']', i+1);
                 reading = entry.substring( i+1, j);
-        } // else: no reading
+            } // else: no reading
         
-        // translations
-        i = entry.indexOf( '/', i);
-        if (i == -1) {
-            System.err.println( "WARNING: " + dicfile +
+            // translations
+            i = entry.indexOf( '/', i);
+            // count number of translations
+            int slashes = 1;
+            for ( int x=i+1; x<entry.length(); x++)
+                if (entry.charAt( x)=='/')
+                    slashes++;
+            String[] translation = new String[slashes-1];
+            slashes = 0;
+            j = entry.lastIndexOf( '/');
+            while (i < j) {
+                k = entry.indexOf( '/', i+1);
+                translation[slashes++] = entry.substring( i+1, k);
+                i = k;
+            }
+            result.add( new DefaultDictionaryEntry( word, reading, translation, this));
+        } catch (StringIndexOutOfBoundsException ex) {
+            System.err.println( "EDICT warning: " + dicfile +
                                 "\nMalformed dictionary entry: " + entry);
-            return;
         }
-        // count number of translations
-        int slashes = 1;
-        for ( int x=i+1; x<entry.length(); x++)
-            if (entry.charAt( x)=='/')
-                slashes++;
-        String[] translation = new String[slashes-1];
-        slashes = 0;
-        j = entry.lastIndexOf( '/');
-        while (i < j) {
-            k = entry.indexOf( '/', i+1);
-            translation[slashes++] = entry.substring( i+1, k);
-            i = k;
-        }
-        result.add( new DictionaryEntry( word, reading, translation, this));
+
     }
     
     protected int readNextCharacter( boolean inWord) {

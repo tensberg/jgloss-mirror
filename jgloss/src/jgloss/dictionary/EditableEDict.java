@@ -99,10 +99,10 @@ public class EditableEDict extends EDict {
     }
 
     public void addEntry( String word, String reading, String translation) {
-        addEntry( word, reading, new String[] { translation });
+        addEntry( word, reading, Collections.singletonList( translation));
     }
 
-    public void addEntry( String word, String reading, String[] translations) {
+    public void addEntry( String word, String reading, List translations) {
         try {
             // Replace any special characters in the input
             word = word.replace( ' ', '\u3000'); // japanese space
@@ -117,9 +117,9 @@ public class EditableEDict extends EDict {
                 reading = reading.replace( (char) 0x0d, '_');
                 ra = reading.getBytes( "EUC-JP");
             }
-            byte[][] ta = new byte[translations.length][];
-            for ( int i=0; i<translations.length; i++) {
-                String translation = translations[i].replace( '/', '|');
+            byte[][] ta = new byte[translations.size()][];
+            for ( int i=0; i<translations.size(); i++) {
+                String translation = ((String) translations.get( i)).replace( '/', '|');
                 translation = translation.replace( '/', '|');
                 translation = translation.replace( (char) 0x0a, '_');
                 translation = translation.replace( (char) 0x0d, '_');
@@ -304,7 +304,7 @@ public class EditableEDict extends EDict {
 
     /**
      * Searches for entries in the dictionary. The method will rebuild and write the index if
-     * it was invalidated by a previous edit.
+     * it was invalidated by a previous edit. Overridden to add synchronization on <code>this</code>.
      *
      * @param expression The string to search for.
      * @param mode The search mode. One of <CODE>SEARCH_EXACT_MATCHES, SEARCH_STARTS_WITH,

@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import java.util.List;
+
 /**
  * Single Entry in a dictionary which supports the <CODE>Dictionary</CODE> interface.
  * Only mappings from a single Japanese word to an array of translations is supported.
@@ -30,119 +32,31 @@ package jgloss.dictionary;
  * @author Michael Koch
  * @see Dictionary
  */
-public class DictionaryEntry implements WordReadingPair {
-    /**
-     * The Japanese word of this entry.
-     */
-    private String word;
-    /**
-     * The reading of this word. May be <CODE>null</CODE> if this word contains no
-     * kanji.
-     */
-    private String reading;
-    /**
-     * Array of translations for this entry.
-     */
-    private String[] translation;
-    /**
-     * Dictionary which contains this entry.
-     */
-    private Dictionary dictionary;
-
-    /**
-     * Creates a new dictionary entry.
-     *
-     * @param word The Japanese word of this entry.
-     * @param reading The reading of this word. May be <CODE>null</CODE> if this word contains no
-     *                kanji.
-     * @param translation Array of translations for this entry.
-     * @param dictionary Dictionary which contains this entry.
-     */
-    public DictionaryEntry( String word, String reading, String[] translation, Dictionary dictionary) {
-        this.word = word;
-        this.reading = reading;
-        this.translation = translation;
-        this.dictionary = dictionary;
-    }
-
+public interface DictionaryEntry extends WordReadingPair {
     /**
      * Returns the Japanese word of this entry.
      *
      * @return The Japanese word of this entry.
      */
-    public String getWord() { return word; }
-
+    String getWord();
     /**
      * Returns the reading of this word.
      *
      * @return The reading of this word. May be <CODE>null</CODE> if this word contains no
      *         kanji.
      */
-    public String getReading() { return reading; }
+    String getReading();
     /**
      * Returns the translations of this entry.
      *
-     * @return Array of translations.
+     * @return List of translations.
      */
-    public String[] getTranslations() { return translation; }
+    List getTranslations();
     /**
      * Returns the dictionary which contains this entry.
      *
      * @return The dictionary which contains this entry.
      */
-    public Dictionary getDictionary() { return dictionary; }
+    Dictionary getDictionary();
 
-    /**
-     * Returns a string representation of this entry.
-     *
-     * @return A string representation of this entry.
-     */
-    public String toString() {
-        StringBuffer out = new StringBuffer( 128);
-        out.append( word);
-        if (reading != null) {
-            out.append( " [");
-            out.append( reading);
-            out.append( ']');
-        }
-        out.append( ' ');
-        for ( int i=0; i<translation.length; i++) {
-            out.append( '/');
-            out.append( translation[i]);
-        }
-        out.append( '/');
-
-        return out.toString();
-    }
-
-    /**
-     * Tests for equality with another object. The objects equal if the other object
-     * is an instance of <CODE>DictionaryEntry</CODE>, has identical word, reading
-     * and translations and comes from the same dictionary.
-     */
-    public boolean equals( Object o) {
-        try {
-            DictionaryEntry e = (DictionaryEntry) o;
-            if (!dictionary.equals( e.dictionary))
-                return false;
-            if (!word.equals( e.word))
-                return false;
-            if (reading==null && e.reading!=null)
-                return false;
-            if (reading!=null && e.reading==null)
-                return false;
-            if (!reading.equals( e.reading))
-                return false;
-            if (translation.length != e.translation.length)
-                return false;
-            for ( int i=0; i<translation.length; i++)
-                if (!translation[i].equals( e.translation[i]))
-                    return false;
-
-            return true;
-        } catch (ClassCastException ex) {
-            System.err.println( "classcastexception");
-            return false;
-        }
-    }
-} // class Entry
+} // interface DictionaryEntry

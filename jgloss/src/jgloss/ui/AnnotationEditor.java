@@ -585,7 +585,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     String translation = selection.getTranslationNode().getText();
                     if (translation.length() == 0)
                         return;
-                    LinkedList translations = new LinkedList();
+                    ArrayList translations = new ArrayList( 5);
                     // split translations at '/'
                     int from = 0;
                     int to = translation.indexOf( '/');
@@ -600,15 +600,13 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                             to = translation.length();
                     } while (from < translation.length());
                     if (translations.size() > 0) {
-                        String[] ta = new String[translations.size()];
-                        ta = (String[]) translations.toArray( ta);
                         String word = selection.getDictionaryFormNode().getWord();
                         if (word.length() == 0)
                             return;
                         String reading = selection.getDictionaryFormNode().getReading();
                         if (reading.length() == 0 || reading.equals( word))
                             reading = null;
-                        Dictionaries.getUserDictionary().addEntry( word, reading, ta);
+                        Dictionaries.getUserDictionary().addEntry( word, reading, translations);
                     }
                 }
             };

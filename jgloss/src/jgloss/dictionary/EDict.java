@@ -79,7 +79,8 @@ public class EDict implements Dictionary {
      */
     public final static int JJDX_BIG_ENDIAN = 1;
     /**
-     * Offset in bytes to the first index entry in index version 2001.
+     * Offset in bytes to the first index entry in index version 2001. 4 header entries with
+     * 4 bytes each.
      */
     public final static int INDEX_OFFSET = 4*4;
 
@@ -257,8 +258,8 @@ public class EDict implements Dictionary {
             if (match != -1) {
                 int firstmatch = findFirstMatch( expr_euc, match);
                 int lastmatch = findLastMatch( expr_euc, match);
-                /*System.err.println( "all matches in EDict: " + (lastmatch-firstmatch+1));
-                  System.err.println( "Edict: " + firstmatch + "/" + lastmatch);*/
+                //System.err.println( "all matches in EDict: " + (lastmatch-firstmatch+1));
+                //System.err.println( "Edict: " + firstmatch + "/" + lastmatch);
 
                 // Several index entries can point to the same entry line. For example
                 // if a word contains the same kanji twice, and words with this kanji are looked up,
@@ -367,7 +368,7 @@ public class EDict implements Dictionary {
                         translation[slashes++] = entry.substring( i+1, k);
                         i = k;
                     }
-                    result.add( new DictionaryEntry( word, reading, translation, this));
+                    result.add( new DefaultDictionaryEntry( word, reading, translation, this));
                 }
             }
         } catch (IOException ex) {
@@ -391,20 +392,16 @@ public class EDict implements Dictionary {
         // search matching entry
         do {
             curr = (to-from)/2 + from;
-            
-            // read entry
-            int i = 0;
-            while (i<word.length && index[curr]+i<dictionaryLength)
-                i++;
-            
+
             // A simple compareToIgnoreCase does not work, because Kstrcmp, which was used
             // by the index creation program behaves somewhat differently.
             // It also does not have the overhead of creating a new string for the search.
-            int c = Kstrcmp( word, 0, word.length, dictionary, index[curr], i, xjdxIndex);
-            if (c > 0)
-                from = curr+1;
-            else if (c < 0)
+            int c = Kstrcmp( word, 0, word.length, dictionary, index[curr], 
+                             Math.min( word.length, dictionaryLength-index[curr]), xjdxIndex);
+            if (c < 0)
                 to = curr-1;
+            else if (c > 0 || dictionaryLength-index[curr]<word.length)
+                from = curr+1;
             else
                 match = curr;
         } while (from<=to && match==-1);
@@ -630,21 +627,28 @@ public class EDict implements Dictionary {
                 if (!(alphaoreuc( dictionary[i]) || c=='-' || c=='.')) {
                     inword = false;
                     int len = i - entry;
-                    // save all entries with length >= 3 or kanji/kana entries of length 2 (bytes).
-                    if (byteToUnsignedByte(dictionary[entry])>=127 || len>2) {
+                    // save all entries with length >= 3 or kanji/kana entries of length >= 2 (bytes).
+                    if (dictionary[entry]<0 || len>2) {
                         addIndexEntry( entry);
 
-                        if (byteToUnsignedByte( dictionary[entry]) > 127) {
+                        if (dictionary[entry] < 0) {
                             // add index entry for every kanji in word.
+                            int j = entry + 2;
                             if (byteToUnsignedByte( dictionary[entry]) == 0x8f) // JIS X 0212 3-Byte Kanji
                                 entry++;
-                            for ( int j=entry+2; j<i; j+=2) {
+                            while (j < i) {
                                 int cj = byteToUnsignedByte( dictionary[j]);
                                 if (cj >= 0xb0 || cj == 0x8f) {
                                     addIndexEntry( j);
-                                    
-                                    if (cj == 0x8f) // JIS X 0212 3-Byte Kanji
-                                        j++;
+                                }
+
+                                // increase loop counter according to char length
+                                if (cj == 0x8f) // JIS X 0212 3-Byte Kanji
+                                    j += 3;
+                                else if (cj > 127) // 2-Byte char
+                                    j += 2;
+                                else { // ASCII 1-Byte char
+                                    j++;
                                 }
                             }
                         }
@@ -692,13 +696,11 @@ public class EDict implements Dictionary {
      * @param return <CODE>true</CODE>, if the character is alphanumeric or EUC.
      */
     protected final static boolean alphaoreuc( byte b) {
-        int c = byteToUnsignedByte( b);
-
-        if (c>=65 && c<= 90 || c>=97 && c<=122)
+        if (b>=65 && b<= 90 || b>=97 && b<=122)
             return true;
-        if (c>='0' && c<='9')
+        if (b>='0' && b<='9')
             return true;
-        if ((c & 0x80) > 0)
+        if ((b & 0x80) > 0)
             return true;
 
         return false;
@@ -764,20 +766,21 @@ public class EDict implements Dictionary {
     /**
      * Lexicographic comparison of strings in the dictionary. This is a special comparison
      * which is used when creating the dictionary index with quicksort. Instead of stopping
-     * the comparison and returning equality at word boundaries, the method will compare at
-     * most 20 bytes starting from the index positions. This increases the chance of
-     * inequality even if the indexed words would compare equal. It is done this way because quicksort
+     * the comparison and returning equality at word boundaries, the method will 
+     * continue the comparison until an inequality is found. This is done because quicksort
      * behaves lousy if there are many equalities.
      *
      * @param i1 Index in the dictionary to the first string.
      * @param i2 Index in the dictionary to the second string.
      */
     protected final int Kstrcmp( int i1, int i2) {
+        if (i1 == i2)
+            return 0;
+
         int c1 = 0, c2 = 0;
         byteInChar = 1;
 
-        int i = 0;
-        while (i1<dictionaryLength && i2<dictionaryLength && i<20) {
+        while (i1<dictionaryLength && i2<dictionaryLength) {
             c1 = convertByteInChar( byteToUnsignedByte( dictionary[i1]), false);
             c2 = convertByteInChar( byteToUnsignedByte( dictionary[i2]), true);
 
@@ -785,10 +788,7 @@ public class EDict implements Dictionary {
 
             i1++;
             i2++;
-            i++;
         }
-        if (i == 20)
-            return 0;
 
         if (c1 == c2) { // end of dictionary for one of the strings
             if (i1 < dictionaryLength)
@@ -847,7 +847,7 @@ public class EDict implements Dictionary {
     }
 
     /**
-     * Sorts a part of the index array using randomized quicksort. Call this with
+     * Sorts a subset of the index array using randomized quicksort. Call this with
      * (0, indexLenght-1) to sort the whole index.
      */
     protected void quicksortIndex( int left, int right) {

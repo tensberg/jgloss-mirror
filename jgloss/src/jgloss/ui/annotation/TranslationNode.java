@@ -67,10 +67,9 @@ public class TranslationNode extends InnerNode {
         word = d.getWord();
         if (d.getReading() != null) 
             word += "\uff08" + d.getReading() + "\uff09"; // Japanese brackets
-        String[] translations = d.getTranslations();
-        children = new Vector( translations.length);
-        for ( int i=0; i<translations.length; i++)
-            children.addElement( new TranslationLeafNode( this, translations[i]));
+        children = new Vector( d.getTranslations().size());
+        for ( Iterator i=d.getTranslations().iterator(); i.hasNext(); )
+            children.addElement( new TranslationLeafNode( this, i.next().toString()));
 
         // construct the reading. This is what will be used when selecting this translation as
         // reading annotation.

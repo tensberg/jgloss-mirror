@@ -1,4 +1,8 @@
 1.0.3: (2002/02/21)
+	- Support for GDICT dictionaries (J2SE 1.4 required).
+        - Fixed EDICT index creation and search bugs. To increase search
+	  accuracy you should delete all old .jjdx index files and
+	  recreate them.
         - Rendering of the document pane is now done in the background.
 	- Document rendering speed improvement for J2SE 1.4.
 	- Decreased perceived startup time by deferring dictionary

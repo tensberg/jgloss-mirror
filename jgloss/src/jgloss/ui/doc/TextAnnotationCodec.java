@@ -180,14 +180,14 @@ public abstract class TextAnnotationCodec {
      * @return The annotation encoded as string.
      */
     public static String encode( Parser.TextAnnotation ta) {
-        String code;
+        StringBuffer code = new StringBuffer( 256);
         if (ta.getClass().equals( Reading.class))
-            code = READING_TYPE;
+            code.append( READING_TYPE);
         else if (ta.getClass().equals( Translation.class))
-            code = TRANSLATION_TYPE;
+            code.append( TRANSLATION_TYPE);
         else
-            code = ta.getClass().getName();
-        code += FIELD_SEPARATOR;
+            code.append( ta.getClass().getName());
+        code.append( FIELD_SEPARATOR);
 
         if (ta instanceof Reading) {
             Reading annotation = (Reading) ta;
@@ -195,37 +195,42 @@ public abstract class TextAnnotationCodec {
             String reading = annotation.getReading();
             Conjugation c = annotation.getConjugation();
             jgloss.dictionary.Dictionary d = annotation.getWordReadingPair().getDictionary();
-            String[] translations = null;
+            List translations = null;
             if (ta instanceof Translation)
                 translations = ((Translation) ta).getDictionaryEntry().getTranslations();
 
-            code += escapeField( word) + FIELD_SEPARATOR;
+            code.append( escapeField( word));
+            code.append( FIELD_SEPARATOR);
             if (reading == null)
-                code += NULL_STRING;
+                code.append( NULL_STRING);
             else
-                code += escapeField( reading);
-            code += FIELD_SEPARATOR;
+                code.append( escapeField( reading));
+            code.append( FIELD_SEPARATOR);
 
             if (translations != null) {
-                if (translations.length>0) {
-                    code += escapeField( translations[0]);
-                    for ( int i=1; i<translations.length; i++)
-                        code += TRANSLATION_SEPARATOR + escapeField( translations[i]);
+                for ( Iterator i=translations.iterator(); i.hasNext(); ) {
+                    code.append( escapeField( i.next().toString()));
+                    if (i.hasNext())
+                        code.append( TRANSLATION_SEPARATOR);
                 }
             }
             else
-                code += NULL_STRING;
-        
-            code += FIELD_SEPARATOR + escapeField( d.getName()) + FIELD_SEPARATOR;
+                code.append( NULL_STRING);
+            
+            code.append( FIELD_SEPARATOR);
+            code.append( escapeField( d.getName()));
+            code.append( FIELD_SEPARATOR);
             if (c != null) {
-                code += escapeField( c.getConjugatedForm()) + FIELD_SEPARATOR +
-                    escapeField( c.getDictionaryForm()) + FIELD_SEPARATOR +
-                    escapeField( c.getType());
+                code.append( escapeField( c.getConjugatedForm()));
+                code.append( FIELD_SEPARATOR);
+                code.append( escapeField( c.getDictionaryForm()));
+                code.append( FIELD_SEPARATOR);
+                code.append( escapeField( c.getType()));
             }
-            code += FIELD_SEPARATOR;
+            code.append( FIELD_SEPARATOR);
         }
         else if (ta instanceof UnknownAnnotation) {
-            code = ((UnknownAnnotation) ta).getCode();
+            code = new StringBuffer( ((UnknownAnnotation) ta).getCode());
         }
         else
             System.err.println( JGloss.messages.getString( "error.save.unknownannotation",
@@ -349,8 +354,8 @@ public abstract class TextAnnotationCodec {
             }
 
             if (translations != null) {
-                return new Translation( new DictionaryEntry( word, reading, translations,
-                                                             dictionary),
+                return new Translation( new DefaultDictionaryEntry( word, reading, translations,
+                                                                    dictionary),
                                         conjugation);
             }
             else {
@@ -393,9 +398,7 @@ public abstract class TextAnnotationCodec {
      * @param text The text containing unsafe characters.
      * @return The string containing the text with unsafe characters replaced by named entities.
      */
-    private static String escape( String text) {
-        StringBuffer sb = null; // defer string buffer initialization until it is really needed
-
+    private static String escape( StringBuffer text) {
         for ( int i=text.length()-1; i>=0; i--) {
             String replaceBy = null;
             switch (text.charAt( i)) {
@@ -413,16 +416,11 @@ public abstract class TextAnnotationCodec {
                 break;
             }
             if (replaceBy != null) {
-                if (sb == null) // first occurrence of an escaped character
-                    sb = new StringBuffer( text);
-                sb.replace( i, i+1, replaceBy);
+                text.replace( i, i+1, replaceBy);
             }
         }
 
-        if (sb != null) // a character was escaped
-            return sb.toString();
-        else
-            return text; // string was not changed
+        return text.toString();
     }
 
     /**
