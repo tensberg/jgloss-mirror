@@ -28,7 +28,11 @@ import jgloss.dictionary.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.util.Iterator;
+import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -49,7 +53,8 @@ public class WordLookup extends JFrame {
     static {
         showAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    getFrame().show();
+                    getFrame().tempDisableSearchClipboard();
+                    getFrame().setVisible( true);
                 }
             };
         UIUtilities.initAction( showAction, "main.menu.wordlookup");
@@ -67,9 +72,6 @@ public class WordLookup extends JFrame {
         return instance;
     }
 
-    protected final static String STYLE =
-        "body { font-size: 12pt; color: black; background-color: white; }\n";
-
     protected WordLookupPanel wordlookup;
 
     /**
@@ -77,10 +79,57 @@ public class WordLookup extends JFrame {
      */
     private JMenu openRecent;
 
+    private WindowListener searchClipboardListener = new WindowAdapter() {
+            public void windowActivated( WindowEvent e) {
+                searchClipboardContent();
+            }
+        };
+
+    /**
+     * Maximum character length of clipboard content for automatic search.
+     *
+     * @see #searchClipboardContent()
+     */
+    private final static int MAX_CLIPBOARD_LOOKUP_LENGTH = 50;
+    
+    private String lastClipboardContent;
+
     public WordLookup() {
         super( JGloss.messages.getString( "wordlookup.title"));
 
-        wordlookup = new WordLookupPanel();
+        // don't auto-search the creation-time clipboard content
+        lastClipboardContent = getClipboardContent();
+        if (lastClipboardContent == null)
+            lastClipboardContent = "";
+
+        // create clipboard lookup switch UI element
+        JPanel p = new JPanel( new GridLayout( 1, 1));
+        
+        final JCheckBox clipboard = new JCheckBox( JGloss.messages.getString
+                                                   ( "wordlookup.clipboard.search"));
+        clipboard.setSelected( JGloss.prefs.getBoolean( Preferences.WORDLOOKUP_SEARCHCLIPBOARD, false));
+        if (JGloss.prefs.getBoolean( Preferences.WORDLOOKUP_SEARCHCLIPBOARD, false))
+            addWindowListener( searchClipboardListener);
+
+        clipboard.addActionListener( new ActionListener() {
+                public void actionPerformed( ActionEvent e) {
+                    if (clipboard.isSelected()) {
+                        WordLookup.this.addWindowListener( searchClipboardListener);
+                        searchClipboardContent();
+                    }
+                    else {
+                        WordLookup.this.removeWindowListener( searchClipboardListener);
+                    }
+                    JGloss.prefs.set( Preferences.WORDLOOKUP_SEARCHCLIPBOARD, clipboard.isSelected());
+                }
+            });
+        p.add( clipboard);
+        p.setBorder( BorderFactory.createCompoundBorder
+                    ( BorderFactory.createTitledBorder
+                      ( JGloss.messages.getString( "wordlookup.clipboard")),
+                      BorderFactory.createEmptyBorder( 2, 2, 2, 2)));        
+
+        wordlookup = new WordLookupPanel( p);
         getContentPane().setLayout( new GridLayout( 1, 1));
         getContentPane().add( wordlookup);
 
@@ -165,5 +214,67 @@ public class WordLookup extends JFrame {
         super.dispose();
         JGlossFrame.OPEN_RECENT.removeMenu( openRecent);
         openRecent = null;
+    }
+
+    /**
+     * Get the cliboard content as string. If the clipboard content is not available or can't be
+     * accessed as string, <code>null</code> is returned.
+     */
+    private String getClipboardContent() {
+        Transferable t = getToolkit().getSystemClipboard().getContents( this);
+
+        if (t != null) try {
+            return (String) t.getTransferData( DataFlavor.stringFlavor);
+        } catch (IOException ex) {
+            /* content no longer available */
+        } catch (UnsupportedFlavorException ex) {
+            /* clipboard content not a string */
+        }
+
+        return null;
+    }
+
+    /**
+     * Automatically search the clipboard content. The clipboard content is searched if the
+     * content has changed since the last call and some constraints on the content length and
+     * form are met.
+     */
+    private void searchClipboardContent() {
+        String data = getClipboardContent();
+
+        if (data != null) {
+            if (data.equals( lastClipboardContent))
+                return;
+            lastClipboardContent = data;
+            if (data.length() > MAX_CLIPBOARD_LOOKUP_LENGTH)
+                return;
+            // single kana characters lead to long searches if startsWith is selected, don't use
+            // them for search
+            if (data.length() == 1 && StringTools.isKana( data.charAt( 0)))
+                return;
+            
+            // Line break characters in clipboard content will confuse the 
+            // expression JComboBox. Filter them.
+            for ( int i=0; i<data.length(); i++) {
+                char c = data.charAt( i);
+                if (c=='\r' || c=='\n') {
+                    // discard everything from the line break on
+                    data = data.substring( 0, i);
+                    break;
+                }
+            }
+
+            search( data);
+        }
+    }
+
+    /**
+     * Prevent {@link #searchClipboardContent() searchClipboardContent} from searching the
+     * current content.
+     */
+    private void tempDisableSearchClipboard() {
+        String data = getClipboardContent();
+        if (data != null)
+            lastClipboardContent = data;
     }
 } // class WordLookup

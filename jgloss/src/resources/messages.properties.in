@@ -130,6 +130,7 @@ main.menu.import.ak=control I
 main.menu.import.mk=I
 main.menu.import.tt=Create a new document by importing a file
 main.menu.importclipboard=Import Clipboard
+main.menu.importclipboard.ak=alt I
 main.menu.importclipboard.tt=Create a new document by importing the clipboard content
 main.menu.open=Open...
 main.menu.open.ak=control O
@@ -433,6 +434,7 @@ wordlookup.choice.exact=Exact Matches
 wordlookup.choice.startswith=Starts With Expression
 wordlookup.choice.endswith=Ends With Expression
 wordlookup.choice.any=Any Match
+wordlookup.choice.best=Best Match
 wordlookup.choice.verbdeinflection=Use Deinflection
 wordlookup.dictionaryselection=Dictionary Selection
 wordlookup.choice.dictionary=Search Dictionary
@@ -441,11 +443,14 @@ wordlookup.enterexpression=Enter Expression:
 wordlookup.search=Search
 wordlookup.clear=Clear
 wordlookup.result=Search result:
+
 wordlookup.nodictionary=<none available>
 wordlookup.matches=Matches in\ 
-wordlookup.matchesfor=Found {0,choice,1#1 entry|1<{0} entries} matching {1}:
-wordlookup.nomatches=No matching entries found for {0}
+wordlookup.matchesfor=Found {0,choice,1#1 entry|1<{0} entries} {2,choice,0#exactly matching|1#starting with|2#ending with|3#containing} {1}:
+wordlookup.nomatches=No matching entries found for {0}.
 wordlookup.inflection=Possible inflection: {0}, {1}->{2}
+wordlookup.clipboard=Clipboard
+wordlookup.clipboard.search=automatically search clipboard content
 
 # default location of the chasen binary for different platforms
 chasen.location.unix=/usr/local/bin/chasen

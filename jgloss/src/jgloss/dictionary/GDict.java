@@ -31,8 +31,10 @@ import java.util.ArrayList;
 import java.util.regex.*;
 
 /**
- * Implementation for dictionaries in GDict format. GDict is a Japanese-German dictionary
- * available from <a href="http://www.bibiko.com/dlde.htm">http://www.bibiko.com/dlde.htm</a>.
+ * Implementation for dictionaries in WadokuJT.txt (formerly named GDICT) format. 
+ * WadokuJT is a Japanese-German dictionary directed by Ulrich Apel.
+ * The WadokuJT.txt file of the dictionary is maintained by Hans-Joerg Bibiko and available
+ * from <a href="http://www.bibiko.com/dlde.htm">http://www.bibiko.com/dlde.htm</a>.
  *
  * @author Michael Koch
  */
@@ -40,7 +42,7 @@ public class GDict extends FileBasedDictionary {
     /**
      * Name of the dictionary format.
      */
-    public static final String FORMAT_NAME = "GDICT";
+    public static final String FORMAT_NAME = "WadokuJT";
     /**
      * Encoding used by dictionary instances.
      */
@@ -58,7 +60,7 @@ public class GDict extends FileBasedDictionary {
 
     /**
      * Returns a {@link FileBasedDictionary.Implementation FileBasedDictionary.Implementation}
-     * which recognizes UTF-8 encoded GDICT dictionaries. Used to initialize the
+     * which recognizes UTF-8 encoded WaDoku dictionaries. Used to initialize the
      * {@link #implementation implementation} final member because the constructor has to
      * be wrapped in a try/catch block.
      * 
@@ -315,11 +317,11 @@ public class GDict extends FileBasedDictionary {
                         }
                     }
                 } catch (ArrayIndexOutOfBoundsException ex) {
-                    System.err.println( "GDICT warning: malformed dictionary entry \"" + entry + "\"");
+                    System.err.println( "WadokuJT warning: malformed dictionary entry \"" + entry + "\"");
                 }
             }
         } catch (StringIndexOutOfBoundsException ex) {
-            System.err.println( "GDICT warning: malformed dictionary entry \"" + entry + "\"");
+            System.err.println( "WadokuJT warning: malformed dictionary entry \"" + entry + "\"");
         }
     }
 

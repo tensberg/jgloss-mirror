@@ -125,19 +125,19 @@
           </varlistentry>
 
           <varlistentry>
-            <term><ulink url="http://www.bibiko.com/dlde.htm">GDICT</ulink></term>
+            <term><ulink url="http://www.bibiko.com/dlde.htm">WaDokuJT</ulink></term>
             <listitem>
               <para>
-                The WaDokuJiten/GDICT is an extensive Japanese-German dictionary. 
+                The WaDokuJiten is an extensive Japanese-German dictionary. 
                 To use it, download the file <filename>gdictutf.zip</filename> from
                 <ulink url="http://www.bibiko.com/dlde.htm">this page</ulink>, unzip it
                 and add the resulting file <filename>gdictutf.txt</filename> to the list of
                 dictionaries used by &JGloss; in the dictionary dialog.
               </para>
               <para>
-                The GDICT dictionary format is only supported if you have Java Version 1.4
+                The WaDokuJT dictionary format is only supported if you have Java Version 1.4
                 installed, otherwise &JGloss; will display a "not a dictionary file" error
-                dialog. The GDICT dictionary is also available converted to EDICT format from the same
+                dialog. The WaDoku dictionary is also available converted to EDICT format from the same
                 location. The EDICT format however does not support umlauts and the
                 more detailed entry format of GDICT.
               </para>

@@ -51,6 +51,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
     protected JRadioButton startsWith;
     protected JRadioButton endsWith;
     protected JRadioButton any;
+    protected JRadioButton best;
 
     protected JCheckBox verbDeinflection;
 
@@ -61,6 +62,8 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
     protected JButton search;
 
     private boolean updateListEventScheduled = false;
+
+    private final static int SEARCH_BEST_MATCH = 100;
 
     /**
      * Widget in which the search expression is entered.
@@ -89,10 +92,17 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
 
     protected Dimension preferredSize;
 
+    public WordLookupPanel() {
+        this( null);
+    }
+
     /**
      * Creates a new word lookup panel.
+     *
+     * @param additionalUI An optional compoent with additional UI elements which will be added to
+     *        the panel. Set to <code>null</code> to ignore.
      */
-    public WordLookupPanel() {
+    public WordLookupPanel( Component additionalUI) {
         this.resultLimit = JGloss.prefs.getInt( Preferences.WORDLOOKUP_RESULTLIMIT, 500);
 
         setLayout( new GridBagLayout());
@@ -112,9 +122,14 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         searchType.add( endsWith);
         any = new JRadioButton( JGloss.messages.getString( "wordlookup.choice.any"));
         searchType.add( any);
+        best = new JRadioButton( JGloss.messages.getString( "wordlookup.choice.best"));
+        searchType.add( best);
 
         switch (JGloss.prefs.getInt( Preferences.WORDLOOKUP_SEARCHTYPE, 
                                      Dictionary.SEARCH_EXACT_MATCHES)) {
+        case SEARCH_BEST_MATCH:
+            best.setSelected( true);
+            break;
         case Dictionary.SEARCH_STARTS_WITH:
             startsWith.setSelected( true);
             break;
@@ -132,7 +147,8 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
 
         verbDeinflection = new JCheckBox( JGloss.messages.getString
                                           ( "wordlookup.choice.verbdeinflection"));
-        verbDeinflection.setSelected( JGloss.prefs.getBoolean( Preferences.WORDLOOKUP_DEINFLECTION, false));
+        verbDeinflection.setSelected( JGloss.prefs.getBoolean
+                                      ( Preferences.WORDLOOKUP_DEINFLECTION, false));
 
         JPanel p = new JPanel( new GridLayout( 0, 1));
         p.setBorder( BorderFactory.createCompoundBorder 
@@ -143,6 +159,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         p.add( startsWith);
         p.add( endsWith);
         p.add( any);
+        p.add( best);
         p.add( verbDeinflection);
 
         JPanel p2 = new JPanel( new GridBagLayout());
@@ -151,6 +168,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         c2.fill = GridBagConstraints.BOTH;
         c2.weightx = 1;
         c2.weighty = 1;
+        c2.gridheight = GridBagConstraints.REMAINDER;
         p2.add( p, c2);
 
         dictionaryChoice = new JComboBox();
@@ -184,8 +202,20 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                       ( JGloss.messages.getString( "wordlookup.dictionaryselection")),
                       BorderFactory.createEmptyBorder( 2, 2, 2, 2)));        
 
+        c2 = (GridBagConstraints) c2.clone();
+        c2.gridx = 1;
+        c2.gridheight = 1;
         c2.gridwidth = GridBagConstraints.REMAINDER;
         p2.add( p, c2);
+
+        if (additionalUI != null) {
+            c2 = (GridBagConstraints) c2.clone();
+            c2.gridy = 1;
+            c2.fill = GridBagConstraints.HORIZONTAL;
+            c2.weighty = 0;
+            p2.add( additionalUI, c2);
+        }
+
         add( p2, c);
 
         // create word input part
@@ -399,8 +429,10 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             mode = Dictionary.SEARCH_STARTS_WITH;
         else if (endsWith.isSelected())
             mode = Dictionary.SEARCH_ENDS_WITH;
-        else
+        else if (any.isSelected())
             mode = Dictionary.SEARCH_ANY_MATCHES;
+        else
+            mode = SEARCH_BEST_MATCH;
         
         Conjugation[] conjugations = null;
         String hiragana = null;
@@ -422,19 +454,71 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         }
         
         java.util.List result = new ArrayList( 50);
-        if (allDictionaries.isSelected()) {
-            Dictionary[] d = Dictionaries.getDictionaries( true);
-            for ( int i=0; i<d.length; i++) {
-                if (markDictionaries)
-                    result.add( d[i].getName()); // mark beginning of next dictionary in results
-                lookupAll( d[i], ex, conjugations, hiragana, mode, resultmode, result, markDictionaries);
+        int resultCount = 0;
+        short currentMode = mode;
+        
+        do {
+            result.clear(); // remove dictionary marks added in last iteration
+            // if this is a best match search, cycle through the different modes until a
+            // result is found
+            if (mode == SEARCH_BEST_MATCH) {
+                switch (currentMode) {
+                case SEARCH_BEST_MATCH:
+                    currentMode = Dictionary.SEARCH_EXACT_MATCHES;
+                    break;
+                    
+                case Dictionary.SEARCH_EXACT_MATCHES:
+                    currentMode = Dictionary.SEARCH_STARTS_WITH;
+                    break;
+                    
+                case Dictionary.SEARCH_STARTS_WITH:
+                    currentMode = Dictionary.SEARCH_ENDS_WITH;
+                    break;
+                    
+                case Dictionary.SEARCH_ENDS_WITH:
+                default:
+                    currentMode = Dictionary.SEARCH_ANY_MATCHES;
+                    break;
+                    
+                    //case SEARCH_ANY_MATCHES: ends do/while loop; switch statement is not entered any more
+                }
+            }
+
+            if (allDictionaries.isSelected()) {
+                Dictionary[] d = Dictionaries.getDictionaries( true);
+                for ( int i=0; i<d.length; i++) {
+                    if (markDictionaries)
+                        result.add( d[i].getName()); // mark beginning of next dictionary in results
+                    resultCount += lookupAll( d[i], ex, conjugations, hiragana, 
+                                              currentMode, resultmode, result, markDictionaries);
+                }
+            }
+            else {
+                resultCount += lookupAll( (Dictionary) dictionaryChoice.getSelectedItem(),
+                                          ex, conjugations, hiragana, currentMode, resultmode, result, 
+                                          markDictionaries);
+            }
+
+            // if mode == SEARCH_BEST_MATCH and no result was found, try again with a different
+            // search mode
+        } while (mode==SEARCH_BEST_MATCH && resultCount==0 &&
+                 currentMode!=Dictionary.SEARCH_ANY_MATCHES);
+        
+        // add status to results list
+        if (markDictionaries) {
+            if (resultCount == 0) {
+                result.add( 0, JGloss.messages.getString
+                            ( "wordlookup.nomatches",
+                              new Object[] { expression.getSelectedItem() }));
+            }
+            else {
+                result.add( 0, JGloss.messages.getString( "wordlookup.matchesfor",
+                                                          new Object[] 
+                    { new Integer( resultCount), expression.getSelectedItem(), 
+                      new Integer( currentMode) }));
             }
         }
-        else {
-            lookupAll( (Dictionary) dictionaryChoice.getSelectedItem(),
-                       ex, conjugations, hiragana, mode, resultmode, result, markDictionaries);
-        }
-        
+
         return result;
     }
 
@@ -445,9 +529,14 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         // generate result text
         StringBuffer resultText = new StringBuffer( result.size()*30);
         boolean useHTML = (result.size() < resultLimit);
-        int results = 0; // number of result entries without dictionary names
-        for ( Iterator i=result.iterator(); i.hasNext(); ) {
-            Object o = i.next();
+        Iterator it = result.iterator();
+        // first item in iterator is status text
+        resultText.append( (String) it.next());
+        if (useHTML)
+            resultText.append( "<br>");
+        resultText.append( '\n');
+        while (it.hasNext()) {
+            Object o = it.next();
             if (o instanceof String) { // dictionary name
                 resultText.append( JGloss.messages.getString( "wordlookup.matches"));
                 if (useHTML)
@@ -472,7 +561,6 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                 resultText.append( '\n');
             }
             else { // dictionary entry
-                results++;
                 WordReadingPair wrp = (WordReadingPair) o;
                 if (useHTML) {
                     StringBuffer match = new StringBuffer( wrp.toString());
@@ -511,20 +599,6 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                     resultText.append('\n');
                 }
             }
-        }
-
-        if (results == 0) {
-            resultText = new StringBuffer( JGloss.messages.getString
-                                           ( "wordlookup.nomatches",
-                                             new Object[] { expression.getSelectedItem() }));
-        }
-        else {
-            resultText.insert( 0, '\n');
-            if (useHTML)
-                resultText.insert( 0, "<br>");
-            resultText.insert( 0, JGloss.messages.getString( "wordlookup.matchesfor",
-                                                             new Object[] 
-                { new Integer( results), expression.getSelectedItem() }));
         }
 
         // create new result display pane
@@ -644,8 +718,10 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             mode = Dictionary.SEARCH_STARTS_WITH;
         else if (endsWith.isSelected())
             mode = Dictionary.SEARCH_ENDS_WITH;
-        else
+        else if (any.isSelected())
             mode = Dictionary.SEARCH_ANY_MATCHES;
+        else
+            mode = SEARCH_BEST_MATCH;
         JGloss.prefs.set( Preferences.WORDLOOKUP_SEARCHTYPE, (int) mode);
         
         JGloss.prefs.set( Preferences.WORDLOOKUP_DEINFLECTION, verbDeinflection.isSelected());

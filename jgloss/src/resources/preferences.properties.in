@@ -128,6 +128,7 @@ wordlookup.alldictionaries=true
 # with the HTML renderer, otherwise the plain text renderer
 # is used
 wordlookup.resultlimit=500
+wordlookup.searchclipboard=false
 
 # remember selected annotation in document
 history.selection=
