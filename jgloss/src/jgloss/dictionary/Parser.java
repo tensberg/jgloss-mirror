@@ -61,6 +61,10 @@ public class Parser {
     } // class ParsingInterruptedException
 
     /**
+     * Set of words which should not be annotated.
+     */
+    private Set exclusions;
+    /**
      * The current offset in the parsed text.
      */
     private int parsePosition;
@@ -132,7 +136,18 @@ public class Parser {
      * @param dictionaries The dictionaries used for word lookups.
      */
     public Parser( Dictionary[] dictionaries) {
-        this( dictionaries, '\0', '\0', true);
+        this( dictionaries, null, '\0', '\0', true);
+    }
+
+    /**
+     * Creates a new parser which will use the given dictionaries, use no reading annotation
+     * delimiters and will cache dictionary lookups.
+     *
+     * @param dictionaries The dictionaries used for word lookups.
+     * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
+     */
+    public Parser( Dictionary[] dictionaries, Set exclusions) {
+        this( dictionaries, exclusions, '\0', '\0', true);
     }
 
     /**
@@ -140,10 +155,11 @@ public class Parser {
      * delimiters.
      *
      * @param dictionaries The dictionaries used for word lookups.
+     * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      * @param cacheLookups <CODE>true</CODE> if dictionary lookups should be cached.
      */
-    public Parser( Dictionary[] dictionaries, boolean cacheLookups) {
-        this( dictionaries, '\0', '\0', cacheLookups);
+    public Parser( Dictionary[] dictionaries, Set exclusions, boolean cacheLookups) {
+        this( dictionaries, exclusions, '\0', '\0', cacheLookups);
     }
 
     /**
@@ -151,11 +167,12 @@ public class Parser {
      * Dictionary lookup results will be cached.
      *
      * @param dictionaries The dictionaries used for word lookups.
+     * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      * @param readingStart Character which signals the beginning of a reading annotation.
      * @param readingEnd Character which signals the end of a reading annotation.
      */
-    public Parser( Dictionary[] dictionaries, char readingStart, char readingEnd) {
-        this( dictionaries, readingStart, readingEnd, true);
+    public Parser( Dictionary[] dictionaries, Set exclusions, char readingStart, char readingEnd) {
+        this( dictionaries, exclusions, readingStart, readingEnd, true);
     }
 
     /**
@@ -171,14 +188,17 @@ public class Parser {
      * problematic.
      * 
      * @param dictionaries The dictionaries used for word lookups.
+     * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      * @param readingStart Character which signals the beginning of a reading annotation.
      * @param readingEnd Character which signals the end of a reading annotation.
      * @param cacheLookups <CODE>true</CODE> if dictionary lookups should be cached.
      * @see Reading
      * @see SoftReference
      */
-    public Parser( Dictionary[] dictionaries, char readingStart, char readingEnd, boolean cacheLookups) {
+    public Parser( Dictionary[] dictionaries, Set exclusions, char readingStart, char readingEnd,
+                   boolean cacheLookups) {
         this.dictionaries = dictionaries;
+        this.exclusions = exclusions;
         this.readingStart = readingStart;
         this.readingEnd = readingEnd;
 
@@ -489,25 +509,36 @@ public class Parser {
             boolean match = false;
             // try to find exact match with conjugation
             if (conjugations != null) {
-                for ( int j=0; j<dictionaries.length; j++) {
+                if (exclusions != null) {
                     for ( int i=0; i<conjugations.length; i++) {
-                        List t = search( dictionaries[j], word + conjugations[i].getDictionaryForm(),
-                                         Dictionary.SEARCH_EXACT_MATCHES);
-                        if (t.size() > 0) {
+                        if (exclusions.contains( word + conjugations[i].getDictionaryForm())) {
                             match = true;
-                            for ( Iterator k=t.iterator(); k.hasNext(); ) {
-                                WordReadingPair wrp = (WordReadingPair) k.next();
-                                if (wrp instanceof DictionaryEntry) {
-                                    translations.add( new Translation
-                                        ( wordStart, word.length() + conjugations[i]
-                                          .getConjugatedForm().length(),
-                                          (DictionaryEntry) wrp, conjugations[i]));
-                                }
-                                else {
-                                    translations.add( new Reading
-                                        ( wordStart, word.length() + conjugations[i]
-                                          .getConjugatedForm().length(),
-                                          wrp, conjugations[i]));
+                            break;
+                        }
+                    }
+                }
+                
+                if (!match) { // no exclusion found
+                    for ( int j=0; j<dictionaries.length; j++) {
+                        for ( int i=0; i<conjugations.length; i++) {
+                            List t = search( dictionaries[j], word + conjugations[i].getDictionaryForm(),
+                                             Dictionary.SEARCH_EXACT_MATCHES);
+                            if (t.size() > 0) {
+                                match = true;
+                                for ( Iterator k=t.iterator(); k.hasNext(); ) {
+                                    WordReadingPair wrp = (WordReadingPair) k.next();
+                                    if (wrp instanceof DictionaryEntry) {
+                                        translations.add( new Translation
+                                            ( wordStart, word.length() + conjugations[i]
+                                              .getConjugatedForm().length(),
+                                              (DictionaryEntry) wrp, conjugations[i]));
+                                    }
+                                    else {
+                                        translations.add( new Reading
+                                            ( wordStart, word.length() + conjugations[i]
+                                              .getConjugatedForm().length(),
+                                              wrp, conjugations[i]));
+                                    }
                                 }
                             }
                         }
@@ -517,18 +548,23 @@ public class Parser {
             
             if (!match) {
                 // try to find exact match without conjugation
-                for ( int i=0; i<dictionaries.length; i++) {
-                    List t = search( dictionaries[i], word, Dictionary.SEARCH_EXACT_MATCHES);
-                    if (t.size() > 0) {
-                        match = true;
-                        for ( Iterator k=t.iterator(); k.hasNext(); ) {
-                            WordReadingPair wrp = (WordReadingPair) k.next();
-                            if (wrp instanceof DictionaryEntry) {
-                                translations.add( new Translation( wordStart, word.length(),
-                                                                   (DictionaryEntry) wrp));
-                            }
-                            else {
-                                translations.add( new Reading( wordStart, word.length(), wrp));
+                if (exclusions!=null && exclusions.contains( word)) {
+                    match = true;
+                }
+                else {
+                    for ( int i=0; i<dictionaries.length; i++) {
+                        List t = search( dictionaries[i], word, Dictionary.SEARCH_EXACT_MATCHES);
+                        if (t.size() > 0) {
+                            match = true;
+                            for ( Iterator k=t.iterator(); k.hasNext(); ) {
+                                WordReadingPair wrp = (WordReadingPair) k.next();
+                                if (wrp instanceof DictionaryEntry) {
+                                    translations.add( new Translation( wordStart, word.length(),
+                                                                       (DictionaryEntry) wrp));
+                                }
+                                else {
+                                    translations.add( new Reading( wordStart, word.length(), wrp));
+                                }
                             }
                         }
                     }
@@ -542,24 +578,35 @@ public class Parser {
                 int[] lengths = new int[dictionaries.length];
                 int maxlength = 0;
 
-                for ( int i=0; i<dictionaries.length; i++) {
-                    List r = search( dictionaries[i], word.substring( 0, 1), 
-                                     Dictionary.SEARCH_STARTS_WITH);
-                    entries[i] = new LinkedList();
-                    for ( Iterator j=r.iterator(); j.hasNext(); ) {
-                        WordReadingPair wrp = (WordReadingPair) j.next();
-                        String wrpword = wrp.getWord();
-                        if (wrpword.length() >= lengths[i]) {
-                            if (word.startsWith( wrpword)) {
-                                if (wrpword.length() > lengths[i]) {
-                                    // we have a new longest match for this dictionary
-                                    // throw previous matches away
-                                    lengths[i] = wrpword.length();
-                                    maxlength = Math.max( wrpword.length(), maxlength);
-                                    entries[i].clear();
+                if (exclusions != null) {
+                    // test if one of the prefixes is in the exclusion list
+                    for ( int i=word.length()-1; i>0; i--) {
+                        if (exclusions.contains( word.substring( 0, i))) {
+                            maxlength = i;
+                            break;
+                        }
+                    }
+                }
+                if (maxlength == 0) { // no exclusion found
+                    for ( int i=0; i<dictionaries.length; i++) {
+                        List r = search( dictionaries[i], word.substring( 0, 1), 
+                                         Dictionary.SEARCH_STARTS_WITH);
+                        entries[i] = new LinkedList();
+                        for ( Iterator j=r.iterator(); j.hasNext(); ) {
+                            WordReadingPair wrp = (WordReadingPair) j.next();
+                            String wrpword = wrp.getWord();
+                            if (wrpword.length() >= lengths[i]) {
+                                if (word.startsWith( wrpword)) {
+                                    if (wrpword.length() > lengths[i]) {
+                                        // we have a new longest match for this dictionary
+                                        // throw previous matches away
+                                        lengths[i] = wrpword.length();
+                                        maxlength = Math.max( wrpword.length(), maxlength);
+                                        entries[i].clear();
+                                    }
+                                    
+                                    entries[i].add( wrp);
                                 }
-
-                                entries[i].add( wrp);
                             }
                         }
                     }

@@ -129,6 +129,7 @@ public class PreferencesFrame {
         tab.setBorder( BorderFactory.createEmptyBorder( 0, 0, 10, 0));
         tab.addTab( JGloss.messages.getString( "style.title"), StyleDialog.getComponent());
         tab.addTab( JGloss.messages.getString( "dictionaries.title"), Dictionaries.getComponent());
+        tab.addTab( JGloss.messages.getString( "exclusions.title"), ExclusionList.getComponent());
         main.add( tab, BorderLayout.CENTER);
 
         loadPreferences();
@@ -147,6 +148,7 @@ public class PreferencesFrame {
     public void savePreferences() {
         Dictionaries.getComponent().savePreferences();
         StyleDialog.getComponent().savePreferences();
+        ExclusionList.getComponent().savePreferences();
     }
 
     /**
@@ -155,6 +157,7 @@ public class PreferencesFrame {
     public void loadPreferences() {
         Dictionaries.getComponent().loadPreferences();
         StyleDialog.getComponent().loadPreferences();
+        ExclusionList.getComponent().loadPreferences();
     }
 
     /**
@@ -163,5 +166,6 @@ public class PreferencesFrame {
     public void applyPreferences() {
         Dictionaries.getComponent().applyPreferences();
         StyleDialog.getComponent().applyPreferences();
+        ExclusionList.getComponent().applyPreferences();
     }
 } // class PreferencesFrame
