@@ -1,3 +1,5 @@
+1.0: (2001/07/19)
+	- Added French translation, contributed by Alexandre Beraud.
 0.9.1: (2001/07/13)
 	- Added support for KANJIDIC dictionaries.
 	- Added support for SKK word-reading dictionaries.
