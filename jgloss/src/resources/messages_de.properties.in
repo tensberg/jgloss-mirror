@@ -1,6 +1,6 @@
 # Encoding: ISO-8859-1
 #
-# Default localization for messages in JGloss.
+# German localization of the JGloss messages.
 #
 # Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
 #
@@ -219,15 +219,3 @@ filefilter.html.description=HTML Dokumente (*.html)
 filefilter.latex.description=LaTeX Dokumente (*.tex)
 
 encodings.default=<auto>
-
-dictionary.load=Lade Wörterbuch {0}.
-
-edict.buildindex=Erzeuge Index für Wörterbuch {0}.\nDies kann einige Zeit dauern.
-edict.writejjdx=Schreibe JJDX Index für Wörterbuch {0}.
-edict.warning.jjdxversion=WARNUNG: Die Version der JJDX Indexdatei für {0} ist größer als die von dieser Version\von JGloss unterstützte.
-edict.error.writejjdx=Fehler beim Schreiben der JJDX Indexdatei: {0}, {1}
-
-kanjidic.nanori=(nanori, Namenslesung)
-kanjidic.radicalname=(Name des Radikals)
-
-parser.dictionary.document=Dokument

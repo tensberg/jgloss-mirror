@@ -23,8 +23,6 @@
 #
 # $Id$
 #
-jgloss.mimetype=application/x-jgloss
-
 error.no_message=(aucun message)
 error.initialization.title=Erreur
 error.initialization={0}{1}\n\nL''exception Java était\n{2}: {3}.
@@ -246,43 +244,4 @@ filefilter.html.description=Documents HTML (*.html)
 filefilter.latex.description=Documents LaTeX (*.tex)
 
 encodings.default=<auto>
-
-# conjugation descriptions for the file data/vconj
-vconj.0=infinitif, négatif, non-passé
-vconj.1=poli, non-passé
-vconj.2=conditionnel
-vconj.3=volontaire
-vconj.4=forme en -te
-vconj.5=infinitif, passé
-vconj.6=infinitif, negatif, passé
-vconj.7=passif
-vconj.8=causal
-vconj.9=conditionnel ou impératif
-vconj.10=imperatif
-vconj.11=poli, passé
-vconj.12=poli, negatif, non-passé
-vconj.13=poli, negatif, passé
-vconj.14=poli, volontaire
-vconj.15=adj. -> adverbe
-vconj.16=adj., passé
-vconj.17=poli
-vconj.18=poli, volontaire
-vconj.19=passif ou conditionnel
-vconj.20=passif (ou conditionnel si Grp 2)
-vconj.21=adj., negatif
-vconj.22=adj., negatif, passé
-vconj.23=adj., passé
-vconj.24=verbe infinitif ou adjectif
-
-dictionary.load=Chargement du dictionnaire {0}.
-
-edict.buildindex=Construction de l''index du dictionnaire {0}.\nCela peut prendre un certain temps.
-edict.writejjdx=Écriture de l''index JJDX pour le dictionnaire {0}.
-edict.warning.jjdxversion=WARNING: le numéro de version de l''index JJDX pour {0} est suppérieur à la version supportée par cette version de JGloss.
-edict.error.writejjdx=Erreur lors de l''écriture du fichier JJDX: {0}, {1}
-
-kanjidic.nanori=(nanori, lecture du nom)
-kanjidic.radicalname=(nom du radical)
-
-parser.dictionary.document=document
 
