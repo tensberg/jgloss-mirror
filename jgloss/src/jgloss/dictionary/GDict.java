@@ -98,7 +98,12 @@ public class GDict extends FileBasedDictionary {
      * pattern is matched.
      */
     protected static final Pattern ALTERNATIVES_PATTERN = Pattern.compile
-        ( "((?:[^(]+?|(?:\\(.*?(?:\\)|(?:\\||$))))+?)(\\s\\[\\w+\\])?(?:\\s\\{.+?\\})?(?:;\\s|$)");
+        ( "((?:[^(\\{]+?|" + // normal text
+          "(?:\\(.*?[)|$])|" + // text in (), ignore "; "
+          "(?:\\{.*?[}|$]))+?)" + // text in {}, ignore "; "
+          "(\\s\\[\\w+\\])?" + // optional comment (ignored)
+          "(?:\\s\\{.+?\\})?" + // optional comment (ignored)
+          "(?:;\\s|$)"); // separation marker
     protected static Matcher ALTERNATIVES_MATCHER = ALTERNATIVES_PATTERN.matcher( "");
     /**
      * Matches translation ranges of meaning. Group 1 contains the number of the range written in 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -24,6 +24,7 @@
 package jgloss.ui.doc;
 
 import jgloss.*;
+import jgloss.ui.ShortenedTranslation;
 import jgloss.dictionary.*;
 
 import java.beans.*;
@@ -140,6 +141,12 @@ public class JGlossDocument extends HTMLDocument {
          * Flag if the last closed tag was a <CODE>AnnotationTags.ANNOTATION</CODE> tag.
          */
         private boolean endAnnotation = false;
+        /**
+         * Maximum translation length of first translation of a dictionary entry. If the length
+         * of the first translation exceeds this value, a {@link ShortenedTranslation ShortenedTranslation}
+         * is created for it.
+         */
+        private int maxTranslationLength = JGloss.prefs.getInt( Preferences.VIEW_MAXTRANSLATIONLENGTH, 50);
 
         private char[] EMPTY_CHAR_ARRAY = new char[0];
         
@@ -345,7 +352,7 @@ public class JGlossDocument extends HTMLDocument {
                         readingsindex++;
                     }
 
-                    annotations.add( ta);
+                    ta = addAnnotation( ta, annotations);
                     to = ta.getStart() - 1;
                     int talen = ta.getLength();
                     
@@ -353,7 +360,7 @@ public class JGlossDocument extends HTMLDocument {
                     // the tests above guarantee that there can be no more readings at this position
                     while (resultindex<result.size() && ((Parser.TextAnnotation) result.get( resultindex))
                            .getStart()<ta.getStart()+talen) {
-                        annotations.add( result.get( resultindex));
+                        addAnnotation( (Parser.TextAnnotation) result.get( resultindex), annotations);
                         resultindex++;
                     }
                     
@@ -533,6 +540,24 @@ public class JGlossDocument extends HTMLDocument {
                 
                 super.handleText( data, pos);
             }
+        }
+
+        /**
+         * Add the annotation to the list of annotations, possibly modifying the annotation in
+         * the process.
+         */
+        private Parser.TextAnnotation addAnnotation( Parser.TextAnnotation ta, List annotations) {
+            if (ta instanceof Translation) {
+                Translation t = (Translation) ta;
+                DictionaryEntry d = ShortenedTranslation.create( t.getDictionaryEntry(),
+                                                                 maxTranslationLength);
+                if (d != t.getDictionaryEntry()) // entry was modified
+                    ta = new Translation( t.getStart(), t.getLength(), 
+                                          d, t.getConjugation());
+            }
+
+            annotations.add( ta);
+            return ta;
         }
 
         /**

@@ -59,13 +59,17 @@ public abstract class TemplateExporter {
      * Marks an encoding declaration in a template file 
      * read by {@link #getReader(InputStream) getReader}.
      */
-    public static final String ENCODING_HEADER = "% encoding:";
+    public static final String ENCODING_HEADER = "%encoding:";
     /**
      * The description header is followed by a short description of the template function.
      * It must be the second line in the template, preceeded by the 
      * {@link #ENCODING_HEADER ENCODING_HEADER}.
      */
-    public static final String DESCRIPTION_HEADER = "% description:";
+    public static final String SHORT_DESCRIPTION_HEADER = "%short-description:";
+    /**
+     * Starts block with longer description of template purpose.
+     */
+    public static final String BEGIN_DESCRIPTION = "%description";
 
     /**
      * Character which marks the beginning of a variable.
@@ -155,23 +159,23 @@ public abstract class TemplateExporter {
     /**
      * Pattern name: the pattern is applied to every word/reading pair.
      */
-    public static final String READING_PATTERN = "%reading";
+    public static final String READING_PATTERN = "%reading:";
     /**
      * Pattern name: the pattern is applied to every translation.
      */
-    public static final String TRANSLATION_PATTERN = "%translation";
+    public static final String TRANSLATION_PATTERN = "%translation:";
     /**
      * Pattern name: the pattern is applied to every line break.
      */
-    public static final String LINE_BREAK_PATTERN = "%line-break";
+    public static final String LINE_BREAK_PATTERN = "%line-break:";
     /**
      * Pattern name: the pattern is applied to every paragraph start.
      */
-    public static final String PARAGRAPH_START_PATTERN = "%paragraph-start";
+    public static final String PARAGRAPH_START_PATTERN = "%paragraph-start:";
     /**
      * Pattern name: the pattern is applied to every paragraph end.
      */
-    public static final String PARAGRAPH_END_PATTERN = "%paragraph-end";
+    public static final String PARAGRAPH_END_PATTERN = "%paragraph-end:";
 
     /**
      * Object inserted in the {@link #parsedText parsedText} list for every line
@@ -277,13 +281,15 @@ public abstract class TemplateExporter {
         while ((line = templateLines.readLine()) != null) {
             // don't write description header to output
             if (templateLines.getLineNumber() == 2 &&
-                line.toLowerCase().startsWith( DESCRIPTION_HEADER))
+                line.toLowerCase().startsWith( SHORT_DESCRIPTION_HEADER))
                 continue;
 
             if (line.startsWith( BEGIN_TEXT))
                 handleInsertionSection( templateLines, out, variables, true, true, true, true);
             else if (line.startsWith( BEGIN_ANNOTATION_LIST))
                 handleInsertionSection( templateLines, out, variables, false, false, true, true);
+            else if (line.startsWith( BEGIN_DESCRIPTION)) // skip over description
+                skipSection( templateLines);
             else
                 handleTemplateLine( line, out, variables);
         }
@@ -296,6 +302,12 @@ public abstract class TemplateExporter {
     protected void handleTemplateLine( String line, Writer out, Map variables) throws IOException {
         out.write( substituteVariables( line, variables));
         out.write( '\n');
+    }
+
+    protected void skipSection( LineNumberReader template) throws IOException {
+        String line;
+        while (!(line = template.readLine()).startsWith( END))
+            ; // skip lines until END
     }
 
     /**
@@ -703,6 +715,46 @@ public abstract class TemplateExporter {
 
         in.unread( buf, 0, length);
         return CharacterEncodingDetector.getReader( in);
+    }
+
+    public static String readShortDescription( Reader template) throws IOException {
+        BufferedReader linereader = new BufferedReader( template);
+        String line = linereader.readLine();
+        if (line.toLowerCase().startsWith( TemplateExporter.SHORT_DESCRIPTION_HEADER))
+            return line.substring( TemplateExporter.SHORT_DESCRIPTION_HEADER.length()).trim();
+        else
+            return null;
+    }
+
+    public static String readDescription( Reader template) throws IOException {
+        BufferedReader linereader = new BufferedReader( template);
+        String line;
+        StringBuffer description = new StringBuffer();
+        boolean inDescription = false;
+        while ((line=linereader.readLine()) != null) {
+            if (inDescription) {
+                if (line.startsWith( END)) // end of description
+                    break;
+                if (line.startsWith( "%"))
+                    line = line.substring( 1);
+                line = line.trim();
+                if (line.length() == 0)
+                    description.append( "\n\n");
+                else {
+                    description.append( line);
+                    description.append( ' ');
+                }
+            }
+            else {
+                if (line.startsWith( BEGIN_DESCRIPTION))
+                    inDescription = true;
+            }
+        }
+
+        if (description.length() > 0)
+            return description.toString();
+        else // no description in template file
+            return null;
     }
 
     /**

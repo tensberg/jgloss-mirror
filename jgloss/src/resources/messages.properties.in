@@ -364,6 +364,7 @@ export.templates=Template:
 export.template.unmatchedbegin=No matching end marker for {0} in export template, line {1,number}.
 export.template.patternredefined=Redefined pattern in export template, line {0,number}.
 export.template.unknownline=Unrecognized line {0,number} in export template.
+export.template.nodescription=No template description available.
 export.choosetemplate=Choose a template
 export.annotationlist.title=Export annotation list
 export.annotationlist.header=\# annotation list for {0}\n\# Encoding: {1}\n

@@ -122,8 +122,10 @@ wordlookup.height=0
 wordlookup.searchtype=0
 wordlookup.deinflection=true
 wordlookup.alldictionaries=true
-# Limit for the number of results the word lookup panel will show.
-wordlookup.resultlimit=1000
+# Limit for the number of results the word lookup panel will show
+# with the HTML renderer, otherwise the plain text renderer
+# is used
+wordlookup.resultlimit=500
 
 # remember selected annotation in document
 history.selection=

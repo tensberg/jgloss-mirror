@@ -1,5 +1,12 @@
-% Encoding: EUC-JP
-% Description: platex - translations at end
+%encoding: EUC-JP
+%short-description: platex - translations at end
+%description
+% Generate a platex input file
+% with the list of translations
+% placed after the main text.
+% The translation list will be
+% separated by paragraphs.
+%end description
 % This is a EUC-JP encoded Japanese LaTeX document generated
 % by JGloss from %document-filename% on %generation-time%.
 % Use platex to process this file.
@@ -22,8 +29,8 @@
 \markright{%document-title%}
     
 %document-text
-%reading \\ruby{%word%}{%reading%}
-%paragraph-end \n\n\\bigskip\n\n
+%reading: \\ruby{%word%}{%reading%}
+%paragraph-end: \n\n\\bigskip\n\n
 %end document-text
 
 \newpage
@@ -43,9 +50,9 @@
 \newcommand{\para}[1]{\noindent \textbf{Paragraph #1}}
 
 %annotation-list
-%paragraph-start \\para{%paragraph-number%}\n\n
-%paragraph-end \n\n\\bigskip\n\n
-%translation \\fn{%word%}{%reading%}{%translation%}\n
+%paragraph-start: \\para{%paragraph-number%}\n\n
+%paragraph-end: \n\n\\bigskip\n\n
+%translation: \\fn{%word%}{%reading%}{%translation%}\n
 %end annotation-list
 
 \end{document}

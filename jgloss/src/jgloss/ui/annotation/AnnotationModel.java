@@ -23,6 +23,7 @@
 
 package jgloss.ui.annotation;
 
+import jgloss.*;
 import jgloss.ui.*;
 import jgloss.ui.doc.*;
 import jgloss.dictionary.*;
@@ -303,8 +304,12 @@ public class AnnotationModel extends DefaultTreeModel {
             // create Reading/Translation wrappers for WordReadingPair/DictionaryEntry objects
             for ( ListIterator i=annotations.listIterator(); i.hasNext(); ) {
                 Object o = i.next();
-                if (o instanceof DictionaryEntry)
-                    i.set( new Translation( (DictionaryEntry) o));
+                if (o instanceof DictionaryEntry) {
+                    DictionaryEntry e = (DictionaryEntry) o;
+                    e = ShortenedTranslation.create( e, JGloss.prefs.getInt
+                                                     ( Preferences.VIEW_MAXTRANSLATIONLENGTH, 50));
+                    i.set( new Translation( e));
+                }
                 else if (o instanceof WordReadingPair)
                     i.set( new Reading( (WordReadingPair) o));
             }

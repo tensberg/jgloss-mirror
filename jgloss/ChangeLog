@@ -1,7 +1,8 @@
-1.0.4: (2002/04/12)
+1.0.4: (2002/04/17)
 	- Added template-based LaTeX-export.
+	- For long translations, a shorter translation entry is
+	  automatically added (mainly noticeable with GDICT).
 	- Font and font size of word lookup result is now configurable.
-	- Custom user interface font size is no longer increased by 2pt.
 	- Added font auto-configuration option to style settings.
 	- Fixed reading generation for mixed Katakana-Kanji words.
 	- Fixed handling of infix ke which is read as ka in new annotation

@@ -123,6 +123,9 @@ public class LaTeXExporter extends TemplateExporter {
             case '\u00d4':
                 replacement = "\\={O}";
                 break;
+            case '\u00db':
+                replacement = "\\={U}";
+                break;
             case '\u00e2':
                 replacement = "\\={a}";
                 break;
@@ -131,6 +134,9 @@ public class LaTeXExporter extends TemplateExporter {
                 break;
             case '\u00f4':
                 replacement = "\\={o}";
+                break;
+            case '\u00fb':
+                replacement = "\\={u}";
                 break;
             }
 

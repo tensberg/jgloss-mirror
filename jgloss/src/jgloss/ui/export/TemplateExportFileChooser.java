@@ -50,6 +50,7 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
      * to return a user-level description of the template.
      */
     protected static abstract class Template {
+        protected String shortDescription;
         protected String description;
 
         /**
@@ -57,29 +58,55 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
          */
         protected abstract InputStreamReader getReader() throws IOException;
         /**
-         * Read the description line from the template.
+         * Read the short description line from the template.
          *
          * @return The description, or <code>null</code> if there is no description.
          */
-        protected String readDescription() {
-            BufferedReader reader = null;
+        protected String readShortDescription() {
+            Reader reader = null;
+            String description = null;
             try {
-                reader = new BufferedReader( getReader());
-                String line = reader.readLine();
-                if (line.toLowerCase().startsWith( TemplateExporter.DESCRIPTION_HEADER))
-                    return line.substring( TemplateExporter.DESCRIPTION_HEADER.length()).trim();
+                reader = getReader();
+                description = TemplateExporter.readShortDescription( reader);
             } catch (IOException ex) {
             } finally {
                 if (reader != null) try {
                     reader.close();
                 } catch (IOException ex) {}
             }
-
-            return null; // no description
+            return description;
         }
 
-        public String getDescription() { return description; }
-        public String toString() { return description; }
+        /**
+         * Read the long description from the template.
+         *
+         * @return The description, or <code>null</code> if there is no description.
+         */
+        protected String readDescription() {
+            Reader reader = null;
+            String description = null;
+            try {
+                reader = getReader();
+                description = TemplateExporter.readDescription( reader);
+            } catch (IOException ex) {
+            } finally {
+                if (reader != null) try {
+                    reader.close();
+                } catch (IOException ex) {}
+            }
+            return description;
+        }
+
+        public String getShortDescription() { return shortDescription; }
+        public String getDescription() { 
+            if (description == null) {
+                description = readDescription();
+                if (description == null) // no description or read error
+                    description = "";
+            }
+            return description;
+        }
+        public String toString() { return shortDescription; }
     }
 
     /**
@@ -90,9 +117,9 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
 
         public ResourceTemplate( String path) {
             this.path = path;
-            this.description = readDescription();
-            if (description == null)
-                description = path.substring( path.lastIndexOf( '/')+1);
+            this.shortDescription = readShortDescription();
+            if (shortDescription == null)
+                shortDescription = path.substring( path.lastIndexOf( '/')+1);
         }
 
         public String getPath() { return path; }
@@ -116,9 +143,9 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
 
         public FileTemplate( String path) {
             file = new File( path);
-            description = readDescription();
-            if (description == null)
-                description = file.getName();
+            shortDescription = readShortDescription();
+            if (shortDescription == null)
+                shortDescription = file.getName();
         }
 
         public File getFile() { return file; }
@@ -139,6 +166,8 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
     private static String ADD = JGloss.messages.getString( "button.add");
     
     private JComboBox templateChooser;
+
+    private JTextArea templateDescription;
 
     public TemplateExportFileChooser( String path, String title) {
         super( path, title);
@@ -180,7 +209,8 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
                 templateDeleted = true;
         }
         // if any template files were deleted, write new preferences
-        JGloss.prefs.set( fileTemplatesPrefsKey, paths.toString());
+        if (templateDeleted)
+            JGloss.prefs.set( fileTemplatesPrefsKey, paths.toString());
 
         comboBoxItems.add( ADD);
 
@@ -203,7 +233,21 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
         b.add( new JLabel( JGloss.messages.getString( "export.templates")));
         b.add( Box.createHorizontalStrut( 5));
         b.add( templateChooser);
-        addCustomElement( b);
+
+        templateDescription = new JTextArea( 4, 30);
+        java.awt.Font ta = templateDescription.getFont();
+        templateDescription.setFont( ta.deriveFont( (float) ta.getSize()-1));
+        templateDescription.setEditable( false);
+        templateDescription.setLineWrap( true);
+        templateDescription.setWrapStyleWord( true);
+
+        Box b2 = Box.createVerticalBox();
+        b2.add( b);
+        b2.add( Box.createVerticalStrut( 3));
+        b2.add( new JScrollPane( templateDescription));
+        addCustomElement( b2);
+        
+        updateTemplateDescriptionText();
     }
 
     /**
@@ -211,37 +255,48 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
      */
     public void actionPerformed( ActionEvent event) {
         // fired from templateChooser
-        if (templateChooser.getSelectedItem() != ADD)
-            return;
 
-        // add a new template file
-        JFileChooser chooser = new JFileChooser( JGloss.getCurrentDir());
-        chooser.setDialogTitle( JGloss.messages.getString( "export.choosetemplate"));
-        chooser.setFileView( CustomFileView.getFileView());
-        chooser.setFileHidingEnabled( true);
-        chooser.setFileFilter( new ExtensionFileFilter( "tmpl", 
-                                                        JGloss.messages.getString
-                                                        ( "filefilter.description.template")));
-        int result = chooser.showOpenDialog( this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            JGloss.setCurrentDir( chooser.getCurrentDirectory().getAbsolutePath());
-            FileTemplate template = new FileTemplate( chooser.getSelectedFile().getAbsolutePath());
-            int index = ((DefaultComboBoxModel) templateChooser.getModel()).getIndexOf( template);
-            if (index<0 || index>=templateChooser.getItemCount()) {
-                // insert new template before ADD item
-                index = templateChooser.getItemCount() - 1;
-                templateChooser.insertItemAt( template, index);
-                // save selection in resources
-                String paths = JGloss.prefs.getString( (String) templateChooser.getClientProperty
-                                                       ( TEMPLATE_LIST_PREFERENCES_KEY));
-                if (paths.length() > 0)
-                    paths += File.pathSeparator;
-                paths += chooser.getSelectedFile().getAbsolutePath();
-                JGloss.prefs.set( (String) templateChooser.getClientProperty
-                                  ( TEMPLATE_LIST_PREFERENCES_KEY), paths);
+        if (templateChooser.getSelectedItem() == ADD) {
+            // add a new template file
+            JFileChooser chooser = new JFileChooser( JGloss.getCurrentDir());
+            chooser.setDialogTitle( JGloss.messages.getString( "export.choosetemplate"));
+            chooser.setFileView( CustomFileView.getFileView());
+            chooser.setFileHidingEnabled( true);
+            chooser.setFileFilter( new ExtensionFileFilter( "tmpl", 
+                                                            JGloss.messages.getString
+                                                            ( "filefilter.description.template")));
+            int result = chooser.showOpenDialog( this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                JGloss.setCurrentDir( chooser.getCurrentDirectory().getAbsolutePath());
+                FileTemplate template = new FileTemplate( chooser.getSelectedFile().getAbsolutePath());
+                int index = ((DefaultComboBoxModel) templateChooser.getModel()).getIndexOf( template);
+                if (index<0 || index>=templateChooser.getItemCount()) {
+                    // insert new template before ADD item
+                    index = templateChooser.getItemCount() - 1;
+                    templateChooser.insertItemAt( template, index);
+                    // save selection in resources
+                    String paths = JGloss.prefs.getString( (String) templateChooser.getClientProperty
+                                                           ( TEMPLATE_LIST_PREFERENCES_KEY));
+                    if (paths.length() > 0)
+                        paths += File.pathSeparator;
+                    paths += chooser.getSelectedFile().getAbsolutePath();
+                    JGloss.prefs.set( (String) templateChooser.getClientProperty
+                                      ( TEMPLATE_LIST_PREFERENCES_KEY), paths);
+                }
+                templateChooser.setSelectedIndex( index);
             }
-            templateChooser.setSelectedIndex( index);
+            else
+                templateChooser.setSelectedIndex( templateChooser.getItemCount() - 2);
         }
+
+        updateTemplateDescriptionText();
+    }
+
+    protected void updateTemplateDescriptionText() {
+        String description = ((Template) templateChooser.getSelectedItem()).getDescription();
+        if (description==null || description.length()==0)
+            description = JGloss.messages.getString( "export.template.nodescription");
+        templateDescription.setText( description);
     }
 
     /**
