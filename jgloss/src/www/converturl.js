@@ -107,7 +107,10 @@ function toBaseURL( url) {
 /*
  * Functions specific to the JGloss-WWW index page.
  */
-function baseToJGloss( servletURL) {
+function baseToJGloss() {
+    var servletURL = document.URL.substring( 0, document.URL.lastIndexOf( '/')+1)
+        + "jgloss-www";
+    
     document.urlconverter.jglossurl.value = toJGlossURL
         ( document.urlconverter.baseurl.value, servletURL,
           document.urlconverter.forwardcookies.checked, document.urlconverter.forwardformdata.checked);
