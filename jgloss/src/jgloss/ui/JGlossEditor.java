@@ -349,7 +349,7 @@ public class JGlossEditor extends JTextPane {
                     }
                     
                     public void mouseClicked( MouseEvent e) {
-                        if (!checkPopupTrigger( e)) {
+                        if (!(checkPopupTrigger( e) || annotationEditor.getContextMenu().isVisible())) {
                             int tooltipButtonMask;
                             int selectButtonMask;
                             if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP)) {
@@ -516,6 +516,15 @@ public class JGlossEditor extends JTextPane {
         } catch (BadLocationException ex) {
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Remove a previously set highlight.
+     */
+    public void removeHighlight() {
+        if (highlightTag != null)
+            getHighlighter().removeHighlight( highlightTag);
+        highlightTag = null;
     }
 
     /**

@@ -28,6 +28,9 @@
 	- Fixed treatment of special characters /, @ and | in annotations
 	  when saving and loading documents.
 	- Changed default font sizes.
+	- Added Use Reading/Translation entry to annotation context menu.
+	- Clicking in unannotated text now deselects the current annotation.
+	- Delete key on a reading or translation node now clears the text.
 0.9.4: (2001/11/07)
 	- Improved handling of reading annotations in imported text;
 	  ChaSen parser can now be used with texts with reading annotations.

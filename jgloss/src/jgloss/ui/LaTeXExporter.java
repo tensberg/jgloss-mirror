@@ -107,25 +107,23 @@ public class LaTeXExporter {
                 String nb = annotation.getDictionaryFormNode().getWord();
                 String nr = annotation.getDictionaryFormNode().getReading();
 
+                StringBuffer footnote = new StringBuffer( 32);
+                footnote.append( "\\fn{");
+                footnote.append( nb);
+                footnote.append( "}{");
+                if (nr != null)
+                    footnote.append( nr);
+                footnote.append( "}{");
+                footnote.append( translation);
+                footnote.append( "}");
                 if (translationsOnPage) {
                     // place translation as footnote on the current page
-                    outtext.append( "\\fn{");
-                    outtext.append( nb);
-                    outtext.append( "}{");
-                    if (nr != null)
-                        outtext.append( nr);
-                    outtext.append( "}{");
-                    outtext.append( translation);
-                    outtext.append( "}");
+                    outtext.append( footnote);
                 }
                 else {
                     // place translation in separate list
-                    if (translations.length() > 0)
-                        translations.append( " \\\\\n");
-                    translations.append( nb + " \\> ");
-                    if (nr!=null && !nr.equals( " "))
-                        translations.append( nr);
-                    translations.append( " \\> " + translation);
+                    translations.append( footnote);
+                    translations.append( '\n');
                 }
 
                 // The longest word and reading are used for proper alignment
@@ -176,31 +174,44 @@ public class LaTeXExporter {
         out.write( preamble);
         out.write( "\\begin{document}\n\n");
 
+        StringBuffer lengths = new StringBuffer( 256);
+        // generate length calculation for size of the longest word and reading
+        lengths.append( "\\newlength{\\ww}\n\\settowidth{\\ww}{");
+        lengths.append( longestword);
+        lengths.append( "--}\n");
+        
+        lengths.append( "\\newlength{\\rw}\n\\settowidth{\\rw}{");
+        lengths.append( longestreading);
+        lengths.append( "--}\n\n");
+        
+        // length calculation for the translation text
+        lengths.append( "\\newlength{\\tw}\n");
+        lengths.append( "\\setlength{\\tw}{\\textwidth}\n");
+        lengths.append( "\\addtolength{\\tw}{-1.0\\ww}\n");
+        lengths.append( "\\addtolength{\\tw}{-1.0\\rw}\n");
+        
         if (translationsOnPage) {
-            // generate length calculation for size of the longest word and reading
-            out.write( "\\newlength{\\ww}\n\\settowidth{\\ww}{");
-            out.write( longestword);
-            out.write( "---}\n");
-
-            out.write( "\\newlength{\\rw}\n\\settowidth{\\rw}{");
-            out.write( longestreading);
-            out.write( "---}\n\n");
-
+            out.write( lengths.toString());
+            out.write( "\\addtolength{\\tw}{-20pt}\n"); // I'm not sure where the 20pt come from
             // define footnote command for annotations
-            out.write( "\\newcommand{\\fn}[3]{\\footnotetext{\\noindent \\makebox[\\ww][l]{#1}" + 
-                       " \\makebox[\\rw][l]{#2} #3}}\n\n");
+            out.write( "\\newcommand{\\fn}[3]{\\footnotetext{\\makebox[\\ww][l]{#1}" + 
+                       " \\makebox[\\rw][l]{#2} \\parbox[t]{\\tw}{#3}}}\n\n");
+
         }
 
         out.write( outtext.toString());
 
         if (!translationsOnPage && translations.length() > 0) {
             // append translation list to the end of the document
-            out.write( "\n\n\\newpage\n\\small\\begin{tabbing}\n");
-            // place tab stops by using the longest word and reading as measure
-            out.write( longestword + "---\\=" + longestreading + "---\\=\\kill\n");
+            out.write( "\n\n\\newpage\n\\small\n");
+            out.write( lengths.toString());
+            out.write( "\\addtolength{\\tw}{-4pt}\n"); // I'm not sure where the 4pt come from
+            // define footnote command for annotations
+            out.write( "\\newcommand{\\fn}[3]{\\noindent \\makebox[\\ww][l]{#1}" + 
+                       " \\makebox[\\rw][l]{#2} \\parbox[t]{\\tw}{#3}}\n\n");
 
             out.write( translations.toString());
-            out.write( "\n\\end{tabbing}\n");
+            out.write( "\n");
         }
 
         out.write( "\n\\end{document}\n");

@@ -280,6 +280,8 @@ annotationeditor.menu.hideduplicates=Hide all Duplicates
 annotationeditor.menu.unhide=Show all Annotations
 annotationeditor.entry.hidden=\ (hidden)
 
+annotationeditor.action.cleartranslation=Clear Translation
+annotationeditor.action.cleartranslation.ak=DELETE
 annotationeditor.action.next=Next Annotation
 annotationeditor.action.next.ak=N
 annotationeditor.action.previous=Previous Annotation

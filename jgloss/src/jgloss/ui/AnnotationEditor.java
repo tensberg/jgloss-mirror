@@ -205,6 +205,10 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * Action which will un-hide all annotations.
      */
     private Action unhideAction;
+    /**
+     * Action which will set the current reading/translation text to the empty string.
+     */
+    private Action clearTranslationAction;
 
     /**
      * Menu which contains the annotation-specific actions.
@@ -214,6 +218,14 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * Popup menu which contains annotation-specific actions.
      */
     private JPopupMenu pmenu;
+    /**
+     * Flag if the use translation action is currently added to the popup menu.
+     */
+    private boolean pmenuTranslationAdded = false;
+    /**
+     * Flag if the use reading action is currently added to the popup menu.
+     */
+    private boolean pmenuReadingAdded = false; 
 
     /**
      * An Enumeration containing no elements.
@@ -609,6 +621,16 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         addMouseListener( this);
 
         // add keyboard shortcuts for editing the tree
+        // set reading/translation text to the empty string
+        clearTranslationAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
+                    if (tn instanceof ReadingTranslationNode)
+                        ((ReadingTranslationNode) tn).setText( "");
+                }
+            };
+        UIUtilities.initAction( clearTranslationAction, "annotationeditor.action.cleartranslation");
+        clearTranslationAction.setEnabled( false);
         // select the following annotation
         Action nextAnnotationAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
@@ -740,6 +762,11 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         am.put( previousAnnotationAction.getValue( Action.NAME), previousAnnotationAction);
         im.put( metaStroke, metaAction.getValue( Action.NAME));
         am.put( metaAction.getValue( Action.NAME), metaAction);
+
+        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
+                                        ( "annotationeditor.action.cleartranslation.ak")),
+                clearTranslationAction.getValue( Action.NAME));
+        am.put( clearTranslationAction.getValue( Action.NAME), clearTranslationAction);
         im.put( KeyStroke.getKeyStroke( JGloss.messages.getString( "annotationeditor.action.remove.ak")),
                 removeAction.getValue( Action.NAME));
         am.put( removeAction.getValue( Action.NAME), removeAction);
@@ -885,38 +912,54 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * @param e The tree selection event.
      */
     public void valueChanged( TreeSelectionEvent e) {
-        if (e.getNewLeadSelectionPath() != null &&
-            e.getNewLeadSelectionPath() != e.getOldLeadSelectionPath()) {
-            TreeNode tn = (TreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
-
-            updateActions( tn);
-
-            TreeNode selection = tn;
-            while (!(selection instanceof AnnotationNode)) {
-                selection = selection.getParent();
-            }
-
-            if (selection != annotationSelection) {
-                if (annotationSelection != null) {
-                    // collapse old selection
-                    collapsePath( new TreePath( new Object[] { model.getRoot(), annotationSelection }));
-                    // the whole tree is collapsed now, clear the cache of toggled paths to conserve memory
-                    clearToggledPaths();
+        if (e.getNewLeadSelectionPath() != null) {
+            if (e.getNewLeadSelectionPath() != e.getOldLeadSelectionPath()) {
+                TreeNode tn = (TreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
+                
+                updateActions( tn);
+                
+                TreeNode selection = tn;
+                while (!(selection instanceof AnnotationNode)) {
+                    selection = selection.getParent();
                 }
-                // expand new selection
-                annotationSelection = (AnnotationNode) selection;
-                expandAll( annotationSelection);
-                makeVisible( annotationSelection);
+                
+                if (selection != annotationSelection) {
+                    if (annotationSelection != null) {
+                        // collapse old selection
+                        collapsePath( new TreePath( new Object[] { model.getRoot(), annotationSelection }));
+                        // the whole tree is collapsed now, clear the cache of toggled 
+                        // paths to conserve memory
+                        clearToggledPaths();
+                    }
+                    // expand new selection
+                    annotationSelection = (AnnotationNode) selection;
+                    expandAll( annotationSelection);
+                    makeVisible( annotationSelection);
+                    
+                    int start = annotationSelection.getAnnotationElement().getStartOffset();
+                    int end = annotationSelection.getAnnotationElement().getEndOffset();
+                    docpane.makeVisible( start, end);
+                    docpane.highlightText( start, end);
+                    // Move the position of the caret to the start of the annotation. This
+                    // works around the problem where the document scrolls to a different
+                    // location if some text is changed, which happens because the DefaultCaret 
+                    // will scroll to the caret location after document changes.
+                    docpane.setCaretPosition( start);
+                }
+            }
+        }
+        else if (e.getOldLeadSelectionPath() != null) {
+            // clear selection
+            updateActions( null);
+            if (annotationSelection != null) {
+                // collapse old selection
+                collapsePath( new TreePath( new Object[] { model.getRoot(), annotationSelection }));
+                // the whole tree is collapsed now, clear the cache of toggled 
+                // paths to conserve memory
+                clearToggledPaths();
+                annotationSelection = null;
 
-                int start = annotationSelection.getAnnotationElement().getStartOffset();
-                int end = annotationSelection.getAnnotationElement().getEndOffset();
-                docpane.makeVisible( start, end);
-                docpane.highlightText( start, end);
-                // Move the position of the caret to the start of the annotation. This
-                // works around the problem where the document scrolls to a different
-                // location if some text is changed, which happens because the DefaultCaret 
-                // will scroll to the caret location after document changes.
-                docpane.setCaretPosition( start);
+                docpane.removeHighlight();
             }
         }
     }
@@ -936,10 +979,19 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             equalizeAnnotationsAction.setEnabled( false);
             addToExclusionsAction.setEnabled( false);
             addToDictionaryAction.setEnabled( false);
+            clearTranslationAction.setEnabled( false);
+
+            // update context sensitive popup menu
+            if (pmenuReadingAdded || pmenuTranslationAdded) {
+                pmenu.remove( 0);
+                pmenu.remove( 0); // separator
+                pmenuReadingAdded = false;
+                pmenuTranslationAdded = false;
+            }
         }
         else {
             useReadingAction.setEnabled(tn instanceof ReadingAnnotationNode ||
-                                     tn instanceof TranslationNode);
+                                        tn instanceof TranslationNode);
             useTranslationAction.setEnabled(tn instanceof TranslationLeafNode);
             hideAction.setEnabled( true);
             removeAction.setEnabled( true);
@@ -947,8 +999,31 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             equalizeAnnotationsAction.setEnabled( true);
             addToExclusionsAction.setEnabled( true);
             addToDictionaryAction.setEnabled( Dictionaries.getUserDictionary() != null);
+            clearTranslationAction.setEnabled( tn instanceof ReadingTranslationNode);
 
             updateHideAction( tn);
+
+            // update context sensitive popup menu
+            if (pmenuReadingAdded && !(tn instanceof ReadingAnnotationNode ||
+                                       tn instanceof TranslationNode) ||
+                pmenuTranslationAdded && !(tn instanceof TranslationLeafNode)) {
+                pmenu.remove( 0);
+                pmenu.remove( 0); // separator
+                pmenuReadingAdded = false;
+                pmenuTranslationAdded = false;
+            }
+
+            if (!pmenuReadingAdded && (tn instanceof ReadingAnnotationNode||
+                                       tn instanceof TranslationNode)) {
+                pmenu.insert( useReadingAction, 0);
+                pmenu.insert( new JPopupMenu.Separator(), 1);
+                pmenuReadingAdded = true;
+            }
+            else if (!pmenuTranslationAdded && tn instanceof TranslationLeafNode) {
+                pmenu.insert( useTranslationAction, 0);
+                pmenu.insert( new JPopupMenu.Separator(), 1);
+                pmenuTranslationAdded = true;
+            }
         }
     }
 
@@ -1045,6 +1120,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         AnnotationNode annotation = model.findAnnotation( pos);
         if (annotation != null)
             selectNode( annotation);
+        else {
+            clearSelection();
+        }
         return annotation;
     }
 

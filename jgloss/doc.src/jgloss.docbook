@@ -586,6 +586,11 @@
               <entry><keycap>h</keycap></entry>
               <entry>Hide/show annotation</entry>
             </row>
+            <row>
+              <entry><keycap>del</keycap></entry>
+              <entry>Clear reading/translation annotation text (only when a reading/translation node
+                is selected)</entry>
+            </row>
           </tbody>
         </tgroup>
       </table>

@@ -250,11 +250,11 @@ public class GeneralDialog extends Box {
                 private Icon CHASEN_ICON = 
                     new ImageIcon( CustomFileView.class.getResource( "/resources/icons/chasen.png"));
                 public Icon getIcon( java.io.File f) {
-                    if (f.isFile()) {
-                        String name = f.getName().toLowerCase();
-                        if (name.equals( "chasen") || name.equals( "chasen.exe"))
-                            return CHASEN_ICON;
-                    }
+                    String name = f.getName().toLowerCase();
+                    if ((name.equals( "chasen") || name.equals( "chasen.exe")) &&
+                        f.isFile())
+                        return CHASEN_ICON;
+                    
                     return super.getIcon( f);
                 }
             });
