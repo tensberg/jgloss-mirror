@@ -27,24 +27,25 @@ import java.net.*;
 import java.util.Set;
 
 public class JGlossURLRewriter implements URLRewriter {
-    protected String cgiBase;
+    protected String servletBase;
     protected URL docBase;
     protected Set protocols;
     protected boolean forwardFormData;
 
-    public JGlossURLRewriter( String cgiBase, URL docBase, Set protocols,
+    public JGlossURLRewriter( String servletBase, URL docBase, Set protocols,
                               boolean allowCookieForwarding, boolean allowFormDataForwarding) {
-        this.cgiBase = cgiBase;
+        this.servletBase = servletBase;
         this.docBase = docBase;
         this.protocols = protocols;
         this.forwardFormData = allowFormDataForwarding;
 
-        this.cgiBase += "/" + 
+        this.servletBase += "/" + 
             (allowCookieForwarding ? "1" : "0") +
             (allowFormDataForwarding ? "1": "0") + "/"; 
     }
 
-    public String rewrite( String in, String tag) throws MalformedURLException {
+    protected String rewrite( String in, String tag, boolean forceServletRelative)
+        throws MalformedURLException {
         try {
             if (in.length() == 0)
                 // rewriting an empty URL makes no sense
@@ -52,10 +53,11 @@ public class JGlossURLRewriter implements URLRewriter {
 
             URL target = new URL( docBase, in);
 
-            if ((tag==null || tag.equalsIgnoreCase( "a") || tag.equalsIgnoreCase( "area")
+            if (forceServletRelative ||
+                ((tag==null || tag.equalsIgnoreCase( "a") || tag.equalsIgnoreCase( "area")
                  || forwardFormData && tag.equalsIgnoreCase( "form"))
-                && protocols.contains( target.getProtocol()))
-                return cgiBase + escapeURL( target.toExternalForm());
+                && protocols.contains( target.getProtocol())))
+                return servletBase + escapeURL( target.toExternalForm());
             else
                 return target.toExternalForm();
         } catch (MalformedURLException ex) {
@@ -64,8 +66,16 @@ public class JGlossURLRewriter implements URLRewriter {
         }
     }
 
+    public String rewrite( String in, String tag) throws MalformedURLException {
+        return rewrite( in, tag, false);
+    }
+
+    public String rewrite( String in, boolean forceServletRelative) throws MalformedURLException {
+        return rewrite( in, null, forceServletRelative);
+    }
+
     public String rewrite( String in) throws MalformedURLException {
-        return rewrite( in, null);
+        return rewrite( in, null, false);
     }
 
     /**
