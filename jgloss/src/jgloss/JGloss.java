@@ -32,7 +32,7 @@ import java.text.MessageFormat;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.UIManager;
+import javax.swing.*;
 
 /**
  * Entry point for the JGloss application. Does the initialisation and manages access to
@@ -50,6 +50,11 @@ public class JGloss {
      * Path to the directory last used.
      */
     private static String currentDir;
+
+    /**
+     * Flag if a paste frame is opened.
+     */
+    private static boolean pasteFrameActive;
 
     /**
      * Ties together ResourceBundles and MessageFormat to access localizable,
@@ -156,6 +161,9 @@ public class JGloss {
                     }
                     System.exit( 0);
                 }
+                else if (args[0].equals( "-p") || args[0].equals( "--pastewindow")) {
+                    pasteFrameActive = true;
+                }
                 else if (args[0].startsWith( "-") || args[0].startsWith( "/")) {
                     System.err.println( messages.getString( "main.unknownoption",
                                                             new String[] { args[0] }));
@@ -178,13 +186,24 @@ public class JGloss {
             // Initialize the preferences at startup. This includes loading the dictionaries.
             PreferencesFrame.getFrame();
             splash.setInfo( messages.getString( "splashscreen.initMain"));
-            if (args.length == 0)
-                new JGlossFrame();
-            else
-                for ( int i=0; i<args.length; i++) {
-                    JGlossFrame f = new JGlossFrame();
-                    f.loadDocument( args[i]);
-                }
+            if (pasteFrameActive) {
+                PasteImportFrame frame = new PasteImportFrame();
+                frame.addWindowListener( new WindowAdapter() {
+                        public void windowClosed( WindowEvent e) {
+                            pasteFrameActive = false;
+                            exit();
+                        }
+                    });
+            }
+            else {
+                if (args.length == 0)
+                    new JGlossFrame();
+                else
+                    for ( int i=0; i<args.length; i++) {
+                        JGlossFrame f = new JGlossFrame();
+                        f.loadDocument( args[i]);
+                    }
+            }
             splash.close();
         } catch (NoClassDefFoundError ex) {
             displayError( messages.getString( "error.noclassdef"), ex, true);
@@ -206,8 +225,13 @@ public class JGloss {
      * This method will be called when the last JGloss frame is closed. The method may return
      * before the application quits to allow event processing to take place if it triggers an
      * error dialog.
+     *
+     * @return <CODE>false</CODE>, if the application will not quit.
      */
-    public static void exit() {
+    public static boolean exit() {
+        if (JGlossFrame.getFrameCount()>0 || pasteFrameActive)
+            return false;
+
         // Instantiate a new Thread because the exit() method may have been called from
         // an event dispatch thread (for example a window close event). The displayError method which might
         // be called needs the event dispatch thread to work, so the exit() method has to return.
@@ -226,6 +250,8 @@ public class JGloss {
                     System.exit( 0);
                 }
             }.start();
+
+        return true;
     }
 
     /**
