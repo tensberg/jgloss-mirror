@@ -88,18 +88,14 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             Container c = (Container) super.getTreeCellEditorComponent( tree, value, isSelected, expanded,
                                                                         leaf, row);
 
-            canEdit = canEdit && (value instanceof ReadingTranslationNode);
+            canEdit = canEdit && (value instanceof EditableTextNode);
             if (canEdit) {
-                ReadingTranslationNode node = (ReadingTranslationNode) value;
+                EditableTextNode node = (EditableTextNode) value;
                 label.setFont( c.getFont());
                 label.setForeground( c.getForeground());
                 label.setText( node.getDescription());
                 String text = node.getText();
 
-                // replace the single whitespace which is only there for layout purposes with 
-                // the empty string.
-                if (text.equals( " "))
-                    text = "";
                 ((JTextField) editingComponent).setText( text);
                 
                 box.removeAll();
@@ -201,7 +197,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     public AnnotationEditor() {
         model = new AnnotationModel() {
                 public void valueForPathChanged( TreePath path, Object newValue) {
-                    ((ReadingTranslationNode) path.getLastPathComponent()).setText( newValue.toString());
+                    ((EditableTextNode) path.getLastPathComponent()).setText( newValue.toString());
                 }
             };
         setModel( model);
@@ -281,6 +277,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
 
                     while (!(tn instanceof AnnotationNode))
                         tn = tn.getParent();
+
                     ((AnnotationNode) tn).getReadingNode().setText( reading);
                     ((AnnotationNode) tn).setLinkedAnnotation( annotation);
                 }
@@ -398,10 +395,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     while (!(tn instanceof AnnotationNode))
                         tn = tn.getParent();
                     AnnotationNode selection = (AnnotationNode) tn;
-                    String word = selection.getKanjiText();
-                    Parser.TextAnnotation link = selection.getLinkedAnnotation();
-                    if (link!=null && link instanceof AbstractAnnotation)
-                        word = ((AbstractAnnotation) link).getWord();
+                    String word = selection.getDictionaryFormNode().getWord();
                     ExclusionList.addWord( word);
                 }
             };
@@ -564,8 +558,14 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                             useReadingAction.actionPerformed( e);
                         else if (node instanceof TranslationLeafNode)
                             useTranslationAction.actionPerformed( e);
-                        else if (node instanceof ReadingTranslationNode)
+                        else if (node instanceof EditableTextNode)
                             startEditingAtPath( tp);
+                        else if (node instanceof DictionaryFormNode) {
+                            if (isExpanded( tp))
+                                collapsePath( tp);
+                            else
+                                expandPath( tp);
+                        }
                     }
                 }
             };
@@ -682,26 +682,19 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
 
     /**
      * Expands all paths in the tree passing through the node which is last in the path.
+     * This method has one exception: DictionaryFormNodes will not be expanded.
      *
      * @param path Contains the path from root to the node inclusive.
      */
     private void expandAll( TreePath path) {
         this.expandPath( path);
 
-        boolean childrenAreLeaves = true;
         TreeNode child = null;
         for ( Enumeration e=((TreeNode) path.getLastPathComponent()).children(); e.hasMoreElements(); ) {
             child = (TreeNode) e.nextElement();
-            if (!child.isLeaf()) {
-                childrenAreLeaves = false;
+            if (!(child.isLeaf() || child instanceof DictionaryFormNode)) {
                 expandAll( path.pathByAddingChild( child));
             }
-        }
-
-        // child is never null since this method will not be called for leaves.
-        // It doesn't matter which child we use for the expansion since they are all leaves.
-        if (childrenAreLeaves) {
-            this.expandPath( path.pathByAddingChild( child));
         }
     }
 
@@ -931,7 +924,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             TreePath path = getPathForLocation( e.getX(), e.getY());
             if (path != null) {
                 setSelectionPath( path);
-                pmenu.show( this, e.getX(), e.getY());
+                showContextMenu( this, e.getX(), e.getY());
             }
         }
     }
@@ -945,5 +938,34 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      */
     public JPopupMenu getContextMenu() {
         return pmenu;
+    }
+
+    /**
+     * Shows the context menu with annotation-specific actions. The coordinates are given in the
+     * coordinate system of the invoker and are changed such that the menu will fit on the screen.
+     */
+    public void showContextMenu( Component invoker, int x, int y) {
+        Point sc = invoker.getLocationOnScreen();
+        x += sc.x;
+        y += sc.y;
+        Dimension size = pmenu.getSize();
+        Rectangle screen = invoker.getGraphicsConfiguration().getBounds();
+        // If the menu has not been shown yet, the size will be 0, even if validate()
+        // and pack() were called.
+        if (size.width == 0 && size.height == 0) {
+            // move the menu off-screen
+            pmenu.setLocation( screen.x + screen.width + 1, 0);
+            pmenu.setVisible( true);
+            size = pmenu.getSize();
+            pmenu.setVisible( false);
+        }
+
+        // fit menu on the screen
+        if (x + size.width > screen.x + screen.width)
+            x = screen.x + screen.width - size.width;
+        if (y + size.height > screen.y + screen.height)
+            y = screen.y + screen.height - size.height;
+
+        pmenu.show( invoker, x - sc.x, y - sc.y);
     }
 } // class AnnotationEditor
