@@ -166,29 +166,32 @@ public class CookieTools {
         if (cookietext.length() > 0) { // == 0 if StringIndexOutOfBoundsExeption for all cookies
             cookietext.insert( 0, "$Version=" + maxVersion);
             connection.setRequestProperty( "Cookie", cookietext.toString());
+            context.log( "sending Cookie: " + cookietext.toString());
         }
     }
     
     /**
      * Read the cookie headers from a url connection, encapsulate the cookies and add them
-     * to the response. Both Netscape (Set-Cookie) and RFC2965 (Set-Cookie2) cookies are supported.
+     * to a map of cookies. Both Netscape (Set-Cookie) and RFC2965 (Set-Cookie2) cookies are supported.
+     * The cookie map uses the cookie name (after encapsulation) as key and a <CODE>Cookie</CODE>
+     * object as value. Since the domain/path/portlist/original name is encoded in the name,
+     * this serves as a simple equality test on cookies, with new cookies replacing older ones.
      *
      * @param connection URL connection from which the cookies will be read.
-     * @param resp Response on which the cookies will be forwarded.
+     * @param cookies Map from cookie name to cookies. The map may already contain cookies.
      * @param servletDomain Domain name of the servlet container.
      * @param servletPath Path to the servlet on the servlet container.
      * @param secure <CODE>true</CODE> if the connection between servlet and client is secure.
-     * @return Map of cookies added to the response in encoded form, with the cookie name as key.
+     * @return The cookies map passed into the method.
      */
-    public static Map addResponseCookies( URLConnection connection, HttpServletResponse resp,
-                                               String servletDomain, String servletPath, boolean secure,
-                                               ServletContext context) {
-        Map newCookies = new HashMap( 50);
-        context.log( "adding response cookies");
+    public static Map parseResponseCookies( URLConnection connection, Map cookies,
+                                            String servletDomain, String servletPath, boolean secure,
+                                            ServletContext context) {
+        context.log( "parsing response cookies");
         URL url = connection.getURL();
         String host = url.getHost();
         if (host==null || host.length()==0)
-            return newCookies;
+            return cookies;
         String path = url.getPath();
         if (path==null || path.length()==0)
             path = "/";
@@ -332,12 +335,12 @@ public class CookieTools {
                     if (cookie.containsKey( "comment"))
                         c.setComment( (String) cookie.get( "comment"));
                 }
-                resp.addCookie( c);
-                newCookies.put( c.getName(), c);
+
+                cookies.put( c.getName(), c);
             }
         }
 
-        return newCookies;
+        return cookies;
     }
         
     /**
