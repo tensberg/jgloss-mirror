@@ -32,7 +32,7 @@ package jgloss.dictionary;
 import java.io.*;
 
 /**
- * Try to detect the character encoding of an input stream reading japanese
+ * Try to detect the character encoding of an input stream reading Japanese
  * text. Detected encodings are ISO-2022-JP, EUC-JP and Shift-JIS. If none of
  * these encodings match and the analyzed byte array contains 8 bit characters,
  * UTF-8 is assumed. (TODO: replace this with real UTF-8 detection).<BR>
@@ -112,7 +112,7 @@ public class CharacterEncodingDetector {
      * Creates a reader for the input stream with a character encoding guessed by looking at
      * the beginning of the stream.
      *
-     * @param in An input stream for japanese characters.
+     * @param in An input stream for Japanese characters.
      * @return Reader for the input stream.
      * @exception IOException if an error occurs while reading from the stream.
      */
@@ -124,7 +124,7 @@ public class CharacterEncodingDetector {
      * Creates a reader for the input stream with a character encoding guessed by looking at
      * the beginning of the stream.
      *
-     * @param in An input stream for japanese characters.
+     * @param in An input stream for Japanese characters.
      * @param defaultencoding The encoding to use when the input stream encoding could not be
      *                        determined (currently unused).
      * @return Reader for the input stream.
@@ -169,12 +169,12 @@ public class CharacterEncodingDetector {
      *
      * @param dlength Length in bytes of an array of encoded characters.
      * @param encoding Encoding used.
-     * @return A wild approximation of the number of encoded japanese characters.
+     * @return A wild approximation of the number of encoded Japanese characters.
      */
     public static int guessLength( int dlength, String encoding) {
         encoding = encoding.toUpperCase();
         if (encoding.startsWith( ENC_UTF_8))
-            return dlength/3; // japanese characters take 3 bytes in UTF-8
+            return dlength/3; // Japanese characters take 3 bytes in UTF-8
         else
             return dlength/2;
     }
@@ -183,7 +183,7 @@ public class CharacterEncodingDetector {
      * Detects the character encoding used for a byte array. The flags set in the return value
      * can be one or more of NONASCII, JIS, EUC, SJIS or JIS8. The detection is not always unambiguous.
      *
-     * @param data An array with encoded japanese characters.
+     * @param data An array with encoded Japanese characters.
      * @return Result of the detection as a number of flags.
      */
     public static int guessEncoding( byte[] data) {

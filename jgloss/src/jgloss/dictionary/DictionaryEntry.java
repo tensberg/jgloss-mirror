@@ -25,14 +25,14 @@ package jgloss.dictionary;
 
 /**
  * Single Entry in a dictionary which supports the <CODE>Dictionary</CODE> interface.
- * Only mappings from a single japanese word to an array of translations is supported.
+ * Only mappings from a single Japanese word to an array of translations is supported.
  *
  * @author Michael Koch
  * @see Dictionary
  */
 public class DictionaryEntry implements WordReadingPair {
     /**
-     * The japanese word of this entry.
+     * The Japanese word of this entry.
      */
     private String word;
     /**
@@ -52,7 +52,7 @@ public class DictionaryEntry implements WordReadingPair {
     /**
      * Creates a new dictionary entry.
      *
-     * @param word The japanese word of this entry.
+     * @param word The Japanese word of this entry.
      * @param reading The reading of this word. May be <CODE>null</CODE> if this word contains no
      *                kanji.
      * @param translation Array of translations for this entry.
@@ -66,9 +66,9 @@ public class DictionaryEntry implements WordReadingPair {
     }
 
     /**
-     * Returns the japanese word of this entry.
+     * Returns the Japanese word of this entry.
      *
-     * @return The japanese word of this entry.
+     * @return The Japanese word of this entry.
      */
     public String getWord() { return word; }
 
