@@ -856,8 +856,20 @@
     <itemizedlist>
       <listitem>
         <para>
-          <ulink url="http://www.dgs.monash.edu.au/~jwb/japanese.html">Jim Breen's Japanese Page
-          </ulink>
+          The <ulink url="http://jgloss.sourceforge.net/">&JGloss; Homepage</ulink>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The <ulink url="http://sourceforge.net/projects/jgloss/">&JGloss; project page</ulink>
+          at <ulink url="http://sourceforge.net/">SourceForge</ulink>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="http://www.dgs.monash.edu.au/~jwb/japanese.html">Jim Breen's Japanese Page</ulink>.
+          Here you will find lots of interesting links, among them links to dictionaries
+          in EDict format.
         </para>
       </listitem>
       <listitem>
@@ -867,7 +879,8 @@
       </listitem>
       <listitem>
         <para>
-          <ulink url="http://www.csse.monash.edu.au/~jwb/xjdic/"><application>XJDIC</application></ulink>
+          The <ulink url="http://www.csse.monash.edu.au/~jwb/xjdic/"><application>XJDIC
+            </application></ulink> application.
         </para>
       </listitem>
       <listitem>
@@ -878,7 +891,7 @@
       </listitem>
       <listitem>
         <para>
-          The <ulink url="http://www.aozora.gr.jp/">Aozora Internet Library</ulink>.
+          The <ulink url="http://www.aozora.gr.jp/">Blue Sky Collection</ulink> of electronic books.
         </para>
       </listitem>
     </itemizedlist>
