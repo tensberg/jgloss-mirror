@@ -278,7 +278,6 @@ export.latex.header=\
 % installiert sein muss.\n\n
 
 about.frame.title=Über JGloss
-about.title=JGloss
 about.text=Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Lizenz anzeigen
 about.license.title=GNU General Public License

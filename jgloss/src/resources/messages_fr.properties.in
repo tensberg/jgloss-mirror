@@ -231,7 +231,6 @@ export.html.backwardscompatible=Compatibilité Ascendante
 export.latex.title=Exporter vers LaTeX
 
 about.frame.title=À propos de JGloss
-about.title=JGloss
 about.text=Un outil  pour faciliter la lectureet la compréhension de textes japonais.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss n'est livré avec AUCUNE GARANTIE.\nCeci est un Logiciel Libre, et vous êtes libre de le redistribuer\nsous certaines conditions; "Voir License" pour plus de détails.
 about.showlicense=Voir License
 about.license.title=GNU General Public License

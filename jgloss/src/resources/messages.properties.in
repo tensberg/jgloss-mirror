@@ -314,7 +314,7 @@ export.latex.header=\
 % must be installed.\n\n
 
 about.frame.title=About JGloss
-about.title=JGloss
+about.title=JGloss 1.0
 about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
