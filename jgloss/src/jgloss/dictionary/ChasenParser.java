@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -39,13 +39,10 @@ public class ChasenParser extends AbstractParser {
     private final static String PARSER_NAME = 
         messages.getString( "parser.chasen.name");
 
-    private static String defaultChasenExecutable = "/usr/local/bin/chasen";
-
     /**
-     * Cache used by {@link #isChasenExecutable(String) isChasenExecutable} to store the
-     * name of the last succesfully tested chasen executable. 
+     * Command line parameter passed to chasen. Detemines the output format.
      */
-    private static String lastChasenExecutable = null;
+    private final static String CHASEN_ARGS = "-F %m\\t%H\\t%Tn\\t%Fn\\t%?T/%M/n/\\t%Y1\\n";
 
     /**
      * Dummy dictionary which is used for Readings returned by chasen.
@@ -72,36 +69,24 @@ public class ChasenParser extends AbstractParser {
     } // class ChasenWordReading
     
     /**
-     * Path to chasen program.
+     * Chasen instance used to parse text.
+     */
+    private Chasen chasen;
+    /**
+     * Path to the chasen executable, or <code>null</code> if the default executable is to be used.
      */
     private String chasenExecutable;
-    /**
-     * Name of the character encoding ChaSen uses on this computer.
-     */
-    private static String platformEncoding;
-    /**
-     * Chasen process used to parse the text.
-     */
-    private Process chasen;
-    /**
-     * Reader for stdout of chasen process.
-     */
-    private BufferedReader chasenOut;
-    /**
-     * Reader for stdin of chasen process.
-     */
-    private BufferedWriter chasenIn;
     /**
      * Cache of words looked up in the dictionaries.
      */
     private Map lookupCache;
 
     public ChasenParser( Dictionary[] dictionaries, Set exclusions) {
-        this( defaultChasenExecutable, dictionaries, exclusions, true, false);
+        this( null, dictionaries, exclusions, true, false);
     }
 
     public ChasenParser( Dictionary[] dictionaries, Set exclusions, boolean cacheLookups) {
-        this( defaultChasenExecutable, dictionaries, exclusions, cacheLookups, false);
+        this( null, dictionaries, exclusions, cacheLookups, false);
     }
 
     public ChasenParser( String chasenExecutable, Dictionary[] dictionaries, Set exclusions) {
@@ -114,82 +99,6 @@ public class ChasenParser extends AbstractParser {
         this.chasenExecutable = chasenExecutable;
         if (cacheLookups)
             lookupCache = new HashMap( 5000);
-    }
-
-    /**
-     * Sets the path to the default ChaSen executable. This executable will be used when the
-     * executable path is not passed in with the constructor.
-     */
-    public static void setDefaultExecutable( String chasenExecutable) {
-        defaultChasenExecutable = chasenExecutable;
-    }
-
-    /**
-     * Returns the path to the default ChaSen executable.
-     */
-    public static String getDefaultExecutable() {
-        return defaultChasenExecutable;
-    }
-
-    /**
-     * Test if the chasen program is available at the specified path. The test is done by
-     * calling the program with the "-V" (for version) option. If the path to the executable
-     * is the same as in the previous test, and this test was successfull, the test will not be
-     * repeated.
-     *
-     * @param chasenExecutable Full path to the chasen executable.
-     */
-    public static boolean isChasenExecutable( String chasenExecutable) {
-        // If the last call to isChasenExecutable was successful, the name of the
-        // executable is stored in "lastChasenExecutable".
-        if (lastChasenExecutable != null &&
-            lastChasenExecutable.equals( chasenExecutable))
-            return true;
-
-        try {
-            final Process p = Runtime.getRuntime().exec( chasenExecutable + " -V");
-            Thread wait = new Thread() {
-                    public void run() {
-                        try {
-                            p.waitFor();
-                        } catch (InterruptedException ex) {
-                            // destroy process if it didn't terminate normally in time
-                            p.destroy();
-                        }
-                    }
-                };
-            wait.start();
-
-            try {
-                // give executed process 3 seconds to terminate normally
-                wait.join( 3000);
-            } catch (InterruptedException ex) {}
-            if (wait.isAlive()) {
-                // something went wrong
-                wait.interrupt();
-                try {
-                    wait.join();
-                } catch (InterruptedException ex) {}
-                return false;
-            }
-            else {
-                // normal termination
-                if (p.exitValue() != 0)
-                    return false;
-                BufferedReader out = new BufferedReader
-                    ( new InputStreamReader( p.getInputStream()));
-                String line = out.readLine();
-                out.close();
-                if (line==null || !line.startsWith( "ChaSen"))
-                    return false;
-
-                lastChasenExecutable = chasenExecutable;
-                return true;
-            }
-        } catch (IOException ex) {
-            // specified program probably doesn't exist
-            return false;
-        }
     }
 
     public String getName() { return PARSER_NAME; }
@@ -206,58 +115,47 @@ public class ChasenParser extends AbstractParser {
      */
     public synchronized List parse( char[] text) throws SearchException {
         parsePosition = 0;
-        if (chasen == null)
-            startChasen();
-
         List annotations = new ArrayList( text.length/3);
+
         try {
-            // replace Dos or Mac line ends with unix line ends to make sure EOS is
-            // treated correctly
-            for ( int i=0; i<text.length; i++) {
-                if (text[i] == 0x0d)
-                    text[i] = 0x0a;
+            if (chasen == null) {
+                // start chasen process
+                if (chasenExecutable != null)
+                    chasen = new Chasen( chasenExecutable, CHASEN_ARGS, '\t');
+                else // use default executable
+                    chasen = new Chasen( CHASEN_ARGS, '\t');
             }
-            chasenIn.write( text);
-            chasenIn.write( (char) 0x0a); // chasen will start parsing when end of line is encountered
-            chasenIn.flush();
 
-            String line;
-            while (parsePosition<=text.length && (line=chasenOut.readLine())!=null) {
+            Chasen.Result result = chasen.parse( text);
+            while (parsePosition<=text.length && result.hasNext()) {
                 // test for outside interruption
-                if (Thread.currentThread().interrupted())
+                if (Thread.currentThread().interrupted()) {
+                    result.discard();
                     throw new ParsingInterruptedException();
-
+                }
+                
                 // chasen skips spaces, so we have to adjust parsePosition here
                 while (parsePosition<text.length && text[parsePosition]==' ')
                     parsePosition++;
-
-                //System.out.println( line);
-                if (line.equals( "EOS")) { // end of line in input text
+                
+                Object resultLine = result.next();
+                //System.err.println( resultLine);
+                if (resultLine.equals( Chasen.EOS)) { // end of line in input text
                     parsePosition++;
                 }
                 else {
-                    int s;
-                    int t = line.indexOf( '\t');
-                    String surfaceInflected = line.substring( 0, t);
+                    List resultList = (List) resultLine;
+                    String surfaceInflected = (String) resultList.get( 0);
                     // don't annotate romaji (may be interpreted as meishi by chasen)
                     if (surfaceInflected.charAt( 0) < 256) {
                         parsePosition += surfaceInflected.length();
                         continue;
                     }
-                    s = t + 1;
-                    t = line.indexOf( '\t', s);
-                    String partOfSpeech = line.substring( s, t);
-                    s = t + 1;
-                    t = line.indexOf( '\t', s);
-                    String inflectionType = line.substring( s, t);
-                    s = t + 1;
-                    t = line.indexOf( '\t', s);
-                    String inflectedForm = line.substring( s, t);
-                    s = t + 1;
-                    t = line.indexOf( '\t', s);
-                    String surfaceBase = line.substring( s, t);
-                    s = t + 1;
-                    String readingBase = line.substring( s);
+                    String partOfSpeech = (String) resultList.get( 1);
+                    String inflectionType = (String) resultList.get( 2);
+                    String inflectedForm = (String) resultList.get( 3);
+                    String surfaceBase = (String) resultList.get( 4);
+                    String readingBase = (String) resultList.get( 5);
                     
                     if (partOfSpeech.equals( "\u540d\u8a5e") || // meishi (noun)
                         partOfSpeech.equals( "\u5f62\u5bb9\u52d5\u8a5e") || // keiyoudoushi (adjectival noun)
@@ -390,7 +288,7 @@ public class ChasenParser extends AbstractParser {
         } catch (IOException ex) {
             throw new SearchException( ex);
         }
-        
+
         return annotations;
     }
 
@@ -398,81 +296,13 @@ public class ChasenParser extends AbstractParser {
      * Ends the chasen application and clears the lookup cache.
      */
     public void reset() {
-        stopChasen();
+        if (chasen != null)
+            chasen.dispose();
 
         if (lookupCache != null)
             lookupCache.clear();
 
         super.reset();
-    }
-
-    /**
-     * Starts the chasen process.
-     */
-    protected void startChasen() throws SearchException {
-        // Initialize platform encoding if not done already. This avoids running chasen
-        // twice at the same time.
-        getChasenPlatformEncoding();
-        try {
-            chasen = Runtime.getRuntime().exec( chasenExecutable +
-                                                " -F %m\\t%H\\t%Tn\\t%Fn\\t%?T/%M/n/\\t%Y1\\n",
-                                                new String[] { "LANG=ja", "LC_ALL=ja_JP" });
-            chasenOut = new BufferedReader( new InputStreamReader
-                ( chasen.getInputStream(), getChasenPlatformEncoding()));
-            chasenIn = new BufferedWriter( new OutputStreamWriter
-                ( chasen.getOutputStream(), getChasenPlatformEncoding()));
-        } catch (IOException ex) {
-            throw new SearchException( "error starting chasen: " + ex.getClass().getName() + ", " 
-                                       + ex.getLocalizedMessage());
-        }
-    }
-
-    /**
-     * Terminates the chasen process.
-     */
-    protected synchronized void stopChasen() {
-        if (chasen != null) {
-            // terminate chasen process by writing EOT on its input stream
-            try {
-                chasenIn.flush(); // should be empty
-                chasen.getOutputStream().close(); // this should terminate the executable
-                // read remaining input (should be empty)
-                byte[] buf = new byte[512];
-                while (chasen.getInputStream().available() > 0)
-                    chasen.getInputStream().read( buf);
-                while (chasen.getErrorStream().available() > 0)
-                    chasen.getErrorStream().read( buf);
-                Thread wait = new Thread() {
-                        public void run() {
-                            try {
-                                chasen.waitFor();
-                            } catch (InterruptedException ex) {
-                                System.err.println( "abnormal termination of chasen");
-                                chasen.destroy();
-                            }
-                            chasen = null;
-                        }
-                    };
-                wait.start();
-
-                // clear lingering interruption flag just to be sure
-                Thread.currentThread().interrupted();
-
-                try {
-                    // give chasen process 5 seconds to terminate normally
-                    wait.join( 5000);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
-                if (wait.isAlive()) {
-                    System.err.println( "chasen did not terminate");
-                    // something went wrong
-                    wait.interrupt();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -529,40 +359,5 @@ public class ChasenParser extends AbstractParser {
      */
     protected void finalize() {
         reset();
-    }
-
-    /**
-     * Test which character encoding ChaSen uses for its input and output streams. On
-     * Linux this will probably be EUC-JP and Shift-JIS on Windows. The test is done by running
-     * chasen with the -lf option, which makes it list the conjugation forms, and checking the encoding
-     * of the output. The test is only done the first time the method is called, the result is
-     * cached and reused on further calls.
-     *
-     * @return Canonical name of the encoding, or <CODE>null</CODE> if the test failed.
-     */
-    protected String getChasenPlatformEncoding() {
-        if (platformEncoding != null)
-            return platformEncoding;
-
-        try {
-            Process chasen = Runtime.getRuntime().exec( chasenExecutable + " -lf");
-            InputStreamReader reader = CharacterEncodingDetector.getReader( chasen.getInputStream());
-            platformEncoding = reader.getEncoding();
-
-            // skip all input lines
-            char[] buf = new char[512];
-            while (reader.ready())
-                reader.read(buf);
-            try {
-                chasen.waitFor();
-            } catch (InterruptedException ex) {}
-            reader.close();
-            chasen.getInputStream().close();
-            chasen.getErrorStream().close();
-            return platformEncoding;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
     }
 } // class ChasenParser

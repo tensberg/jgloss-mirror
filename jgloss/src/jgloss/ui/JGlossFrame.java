@@ -980,48 +980,38 @@ public class JGlossFrame extends JFrame implements ActionListener {
         documentName = title;
 
         final StopableReader stin = new StopableReader( in);
-        // run import in own thread so we can monitor progress
-        final EditorKit tkit = kit;
-        final Document tdoc = doc;
-        final String tpath = path;
-        Thread t = new Thread() {
-                public void run() {
-                    try {
-                        tkit.read( stin, tdoc, 0);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showConfirmDialog
-                            ( JGlossFrame.this, JGloss.messages.getString
-                              ( "error.import.exception", new Object[] 
-                                  { tpath, ex.getClass().getName(), ex.getLocalizedMessage() }),
-                              JGloss.messages.getString( "error.import.title"),
-                              JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            };
-        t.start();
 
         final ProgressMonitor pm = new ProgressMonitor
             ( this, JGloss.messages.getString( "load.progress", 
                                                new Object[] { path }),
               null, 0, length);
-        while (t.isAlive()) {
-            try {
-                t.join( 1000);
-                Runnable worker = new Runnable() {
-                        public void run() {
-                            pm.setProgress( ((JGlossDocument) doc).getParsePosition());
-                        }
-                    };
-                EventQueue.invokeLater( worker);
-                if (pm.isCanceled() || // cancel button of progress bar pressed
-                    !deferWindowClosing) { // close button of document frame pressed
-                    t.interrupt();
-                    stin.stop();
-                    t.join();
+        final Thread currentThread = Thread.currentThread(); // needed to interrupt parsing if user cancels
+        javax.swing.Timer progressUpdater = new javax.swing.Timer( 1000, new ActionListener() {
+                public void actionPerformed( ActionEvent e) {
+                    // this handler called from the event dispatching thread
+                    pm.setProgress( ((JGlossDocument) doc).getParsePosition());
+                    if (pm.isCanceled() || // cancel button of progress bar pressed
+                        !deferWindowClosing) { // close button of document frame pressed
+                        stin.stop();
+                        currentThread.interrupt();
+                    }
                 }
-            } catch (InterruptedException ex) {}
+            });
+        progressUpdater.start();
+
+        try {
+            kit.read( stin, doc, 0);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showConfirmDialog
+                ( JGlossFrame.this, JGloss.messages.getString
+                  ( "error.import.exception", new Object[] 
+                      { path, ex.getClass().getName(), ex.getLocalizedMessage() }),
+                  JGloss.messages.getString( "error.import.title"),
+                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
+
+        progressUpdater.stop();
         in.close();
         pm.close();
 
@@ -1098,22 +1088,27 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                 // has to be done in the event dispatch thread
                                 Runnable installer = new Runnable() {
                                         public void run() {
-                                            JScrollPane ds = docpaneScroller;
-                                            JGlossEditor dp2 = docpane;
-                                            AnnotationEditor ae = annotationEditor;
-                                            if (ds!=null && dp2!=null && ae!=null) {
-                                                ds.setViewport( port);
-                                                validate();
-                                                dp2.followMouse( showAnnotationItem.isSelected(), false);
-                                                // scroll to selected annotation
-                                                AnnotationNode current = ae.getSelectedAnnotation();
-                                                if (current != null) {
-                                                    dp2.makeVisible( current.getAnnotationElement().
-                                                                     getStartOffset(),
-                                                                     current.getAnnotationElement().
-                                                                     getEndOffset());
+                                            synchronized (JGlossFrame.this) {
+                                                // dispose might already have been called, test if
+                                                // member variables still exist
+                                                if (docpaneScroller!=null && 
+                                                    docpane!=null && 
+                                                    annotationEditor!=null) {
+                                                    docpaneScroller.setViewport( port);
+                                                    validate();
+                                                    docpane.followMouse( showAnnotationItem.isSelected(),
+                                                                         false);
+                                                    // scroll to selected annotation
+                                                    AnnotationNode current = annotationEditor
+                                                        .getSelectedAnnotation();
+                                                    if (current != null) {
+                                                        docpane.makeVisible( current.getAnnotationElement().
+                                                                             getStartOffset(),
+                                                                             current.getAnnotationElement().
+                                                                             getEndOffset());
+                                                    }
+                                                    setCursor( currentCursor);
                                                 }
-                                                setCursor( currentCursor);
                                             }
                                         }
                                     };
@@ -1829,7 +1824,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
     /**
      * Dispose resources associated with the JGloss document.
      */
-    public void dispose() {
+    public synchronized void dispose() {
         // dump as many references as possible to ensure that the objects are garbage collected
         jglossFrames.remove( this);   
         JGloss.prefs.removePropertyChangeListener( prefsListener);

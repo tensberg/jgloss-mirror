@@ -217,12 +217,12 @@ public class ImportDialog extends JDialog implements TextListener {
             parserSelector.setReadingBrackets( brackets.charAt( 0), brackets.charAt( 1));
         else
             parserSelector.setNoReadingBrackets();
-        parserSelector.setEnabled( ChasenParser.class, ChasenParser.isChasenExecutable
-                                   ( ChasenParser.getDefaultExecutable()));
+        parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
+                                   ( Chasen.getDefaultExecutable()));
         JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {
                 public void propertyChange( PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( Preferences.CHASEN_LOCATION))
-                        parserSelector.setEnabled( ChasenParser.class, ChasenParser.isChasenExecutable
+                        parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
                                                    ( (String) e.getNewValue()));
                 };
             });

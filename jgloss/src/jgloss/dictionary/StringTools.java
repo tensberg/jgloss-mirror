@@ -87,13 +87,19 @@ public class StringTools {
      * hiragana.
      */
     public static String toHiragana( String s) {
-        StringBuffer out = new StringBuffer( s);
-        for ( int i=0; i<out.length(); i++) {
-            char c = out.charAt( i);
-            if (isKatakana( c))
+        StringBuffer out = null; // create only if needed
+        for ( int i=0; i<s.length(); i++) {
+            char c = s.charAt( i);
+            if (isKatakana( c)) {
+                if (out == null)
+                    out = new StringBuffer( s);
                 out.setCharAt( i, (char) (c-96));
+            }
         }
-        return out.toString();
+        if (out == null) // no changes to original string
+            return s;
+        else // some katakana characters were converted
+            return out.toString();
     }
 
     /**
@@ -101,13 +107,19 @@ public class StringTools {
      * katakana.
      */
     public static String toKatakana( String s) {
-        StringBuffer out = new StringBuffer( s);
-        for ( int i=0; i<out.length(); i++) {
-            char c = out.charAt( i);
-            if (isHiragana( c))
+        StringBuffer out = null; // create only if needed
+        for ( int i=0; i<s.length(); i++) {
+            char c = s.charAt( i);
+            if (isHiragana( c)) {
+                if (out == null)
+                    out = new StringBuffer( s);
                 out.setCharAt( i, (char) (c+96));
+            }
         }
-        return out.toString();
+        if (out == null) // no changes to original string
+            return s;
+        else // some katakana characters were converted
+            return out.toString();
     }
 
     /**
@@ -123,6 +135,10 @@ public class StringTools {
         return false;
     }
 
+    /**
+     * Split a kanji/kana compound word in kanji and kana parts. Calls 
+     * {@link #splitWordReading(String,String,String) splitWordReading( word, word, reading)}.
+     */
     public static String[][] splitWordReading( String word, String reading) {
         return splitWordReading( word, word, reading);
     }

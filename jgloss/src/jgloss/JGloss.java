@@ -276,7 +276,7 @@ public class JGloss {
                              "chasen.location.unix"));
 
             splash.setInfo( messages.getString( "splashscreen.initPreferences"));
-            ChasenParser.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+            Chasen.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
 
             // automatically set the fonts the first time JGloss is run
             if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED, false)) {

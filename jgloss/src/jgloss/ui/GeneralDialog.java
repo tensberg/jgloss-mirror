@@ -180,7 +180,7 @@ public class GeneralDialog extends Box {
             enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
         chasenLocation.setText( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
         importClipboardParserSelector.setEnabled( ChasenParser.class,
-                                                  ChasenParser.isChasenExecutable
+                                                  Chasen.isChasenExecutable
                                                   ( chasenLocation.getText()));
         try {
             importClipboardParserSelector.setSelected( Class.forName
@@ -221,7 +221,7 @@ public class GeneralDialog extends Box {
     }
 
     public void applyPreferences() {
-        ChasenParser.setDefaultExecutable( chasenLocation.getText());
+        Chasen.setDefaultExecutable( chasenLocation.getText());
         importClipboardParser = importClipboardParserSelector.getSelectedParser();
         firstOccurrenceOnly = importClipboardParserSelector.isFirstOccurrenceOnly();
         readingStart = importClipboardParserSelector.getReadingStart();
@@ -268,7 +268,7 @@ public class GeneralDialog extends Box {
     }
 
     private void testChasenLocation() {
-        if (!ChasenParser.isChasenExecutable( chasenLocation.getText())) {
+        if (!Chasen.isChasenExecutable( chasenLocation.getText())) {
             JOptionPane.showMessageDialog( this, JGloss.messages.getString
                                            ( "warning.chasen"), JGloss.messages.getString
                                            ( "warning.chasen.title"),
