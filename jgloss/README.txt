@@ -1,4 +1,4 @@
-JGloss 2 Alpha 2
+JGloss 2 Alpha 3
 ================
 
 JGloss homepage: http://jgloss.sourceforge.net/
@@ -20,7 +20,7 @@ executable JAR file by typing "make jgloss", create the documentation by
 executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
-About Alpha 2
+About Alpha 3
 -------------
 This is a preview of the new JGloss version, mainly to show that I am still
 working on the program. It should give you an opportunity to try out the

@@ -144,7 +144,12 @@ public class Chasen {
                     nextBuffer.add( currentLine.substring( from, to));
                     from = to + 1;
                 } while (from < currentLine.length());
-            }
+                if (from == currentLine.length()) {
+                   // special case: ChaSen output ends with separator char
+                   // last field of output is the empty string
+                   nextBuffer.add("");
+               }
+           }
             else
                 nextBuffer.add( currentLine);
 

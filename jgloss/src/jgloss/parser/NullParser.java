@@ -33,7 +33,7 @@ import jgloss.dictionary.SearchException;
 /**
  * Parser which does not add annotations to the parsed text.
  *
- * @author 
+ * @author Michael Koch
  */
 public class NullParser implements Parser {
     private final static String PARSER_NAME = 

@@ -184,7 +184,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         /**
          * Creates a new dictionary instance using 
-         * {@link #dictionaryConstructor dictionaryConstructor}.
+         * {@link FileBasedDictionary.Instance#dictionaryConstructor dictionaryConstructor}.
          * The constructor is passed a <code>File</code> wrapping the <code>descriptor</code> as only
          * argument.
          */
@@ -247,7 +247,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     protected CharsetDecoder decoder;
     /**
      * Stores the character handler created by a call to 
-     * {@link #createCharacterHandler() createCharacterHandler} and used thorough this class.
+     * {@link #createCharacterHandler(String) createCharacterHandler} and used thorough this class.
      */
     protected EncodedCharacterHandler characterHandler;
     /**

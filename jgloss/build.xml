@@ -80,7 +80,7 @@
 
   <!-- distribution filesets -->
   <zipfileset id="dist.source" dir="." prefix="${distname.source}"
-    includes="README.txt COPYING ChangeLog Makefile
+    includes="README.txt COPYING ChangeLog build.xml
               MANIFEST.MF MANIFEST.MF.jdictionary MANIFEST.MF.kanaim
               src/** doc.src/** latex/**" />
   <zipfileset id="dist.binary.jgloss" dir="." prefix="${distname.binary.jgloss}"
@@ -90,7 +90,7 @@
     
   <!-- additional task definitions -->
   <!-- define the FOP task -->
-  <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" />
+  <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" onerror="report" />
 
   <!-- targets -->
 

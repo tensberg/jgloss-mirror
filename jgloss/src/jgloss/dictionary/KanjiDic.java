@@ -28,7 +28,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import jgloss.dictionary.attribute.Attribute;
+import jgloss.util.CharacterEncodingDetector;
 import jgloss.util.NullIterator;
 import jgloss.util.StringTools;
 
@@ -84,8 +84,8 @@ public class KanjiDic implements Dictionary {
                     float confidence = ZERO_CONFIDENCE;
                     String reason = "";
                     try {
-                        BufferedReader r = new BufferedReader( new InputStreamReader( new FileInputStream
-                            ( descriptor), "EUC-JP"));
+                        BufferedReader r = new BufferedReader( CharacterEncodingDetector.getReader( new FileInputStream
+                            ( descriptor)));
                         String l = null;
                         int lines = 0;
                         do {
@@ -372,8 +372,8 @@ public class KanjiDic implements Dictionary {
         File dic = new File( dicfile);
         name = dic.getName();
 
-        BufferedReader in = new BufferedReader( new InputStreamReader
-            ( new BufferedInputStream( new FileInputStream( dic)), "EUC-JP"));
+        BufferedReader in = new BufferedReader( CharacterEncodingDetector.getReader
+            ( new BufferedInputStream( new FileInputStream( dic))));
         String line;
         while ((line = in.readLine()) != null) {
             // an ASCII character at the beginning of the line is treated as start of a comment
