@@ -199,8 +199,8 @@ public class GDict extends FileBasedDictionary {
             String translations = entry.substring( start, end);
 
             GDictEntry out; 
-            // split words
             synchronized (WORD_MATCHER) {
+                // split words
                 WORD_MATCHER.reset( words);
                 wordlist.clear(); // list of lists of word with alternatives
                 while (WORD_MATCHER.find()) {
@@ -297,7 +297,7 @@ public class GDict extends FileBasedDictionary {
                         // Create dictionary entry only for the matching word
                         // If there would be more than one matching word, the others are ignored.
                         if (out.getWord( word, alternative).equals( reading))
-                            wordMatches = false;
+                            wordMatches = false; // reading matches, add all words
                         else
                             result.add( out.getDictionaryEntry( word, alternative));
                     }

@@ -31,6 +31,10 @@ import java.util.*;
  * @author Michael Koch
  */
 public class StringTools {
+    public static void main( String[] args) throws Exception {
+        print( splitWordReading( args[0], args[1]));
+    }
+
     /**
      * Returns the unicode block of a character. The test is optimized to work faster than
      * <CODE>Character.UnicodeBlock.of</CODE> for Japanese characters, but will work slower
@@ -224,7 +228,9 @@ public class StringTools {
 
     /**
      * Return the unicode escape string for a character. The unicode escape string is
-     * \\u followed by a 4-digit hexadecimal string representing the unicode value of the character.
+     * Backslash-u, followed by a 4-digit hexadecimal string representing the unicode value of the character.
+     *
+     * @see #unicodeUnescape(String)
      */
     public static String unicodeEscape( char c) {
         int v = (int) c;
@@ -243,9 +249,11 @@ public class StringTools {
     /**
      * Returns a new string with all unicode escape sequences replaced with the character
      * represented by the sequence.
+     *
+     * @see #unicodeEscape(char)
      */
     public static String unicodeUnescape( String str) {
-        StringBuffer buf = null; // only create if needed
+        StringBuffer buf = null; // create only if needed
         for ( int i=str.length()-6; i>=0; i--) {
             if (str.charAt( i)=='\\' && str.charAt( i+1)=='u') {
                 // Possible unicode escape sequence.

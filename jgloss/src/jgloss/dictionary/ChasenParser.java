@@ -348,7 +348,7 @@ public class ChasenParser extends AbstractParser {
                             }
                         } while (from<to && from<surfaceInflected.length());
                     }
-                    else if (partOfSpeech.equals( "\u52d5\u8a5e") ||  // douji (verb)
+                    else if (partOfSpeech.equals( "\u52d5\u8a5e") ||  // doushi (verb)
                              partOfSpeech.equals( "\u5f62\u5bb9\u8a5e") // keiyoushi ("true" adjective)
                              ) {
                         if (ignoreWord( surfaceBase)) {
