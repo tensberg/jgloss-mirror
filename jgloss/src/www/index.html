@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <!-- (c) 2001 Michael Koch (tensberg@gmx.net)
  Documentation/example html start page for use with the jgloss.www.JGlossServlet
@@ -9,14 +9,14 @@
 -->
 <head>
 <title>JGloss-WWW</title>
-
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <style type="text/css">
 <!--
 body { margin: 0px; }
 
 td.toc { width: 14%; font-size: 80%; }
 div.toc { position: fixed; padding: 5px; }
-td.content { width: 86%; }
+td.content { width: 88%; }
 
 //-->
 </style>
@@ -38,7 +38,7 @@ td.content { width: 86%; }
 <a href="#cookieforwarding">Cookie forwarding</a><br>
 <a href="#formdataforwarding">Form data forwarding</a><br>
 <a href="#rewriting">The rewriting process</a><br>
-<a href="#security">Security/Privacy considerations</a><br>
+<a href="#security">Security/Privacy<br>considerations</a><br>
 <a href="#whyservlet">Why a servlet?</a><br>
 </div>
 </td>
@@ -46,7 +46,7 @@ td.content { width: 86%; }
 <!-- content -->
 <td valign="top" class="content">
 
-<a name="title"><h2>JGloss-WWW</h2></a>
+<h2><a name="title">JGloss-WWW</a></h2>
 <p>
 JGloss-WWW is a Java servlet which proxies web content. Words in a Japanese HTML document
 are annotated on the fly with their readings and translations. These annotations are
@@ -64,14 +64,16 @@ servlet. This assumes that the the servlet is registered with the servlet contai
 the name "jgloss-www" at the same location as this page.
 </p>
 
-<a name="form1"><h3>Enter a URL</h3></a>
+<h3><a name="form1">Enter a URL</a></h3>
 <form action="jgloss-www" method="get">
+<p>
 URL: <input type="text" name="jgurl" size="80"> <input type="submit" value="Go!"><br><br>
 <input type="checkbox" name="jgforwardcookies" value="true">forward cookies<br>
 <input type="checkbox" name="jgforwardforms" value="true">forward form data<br>
+</p>
 </form>
 
-<a name="urlformat"><h4>URL format</h4>
+<h4><a name="urlformat">URL format</a></h4>
 <p>
 The CGI query parameters will be converted by the servlet to a URL of the form
 "<code>path to servlet/flags/base url</code>". There are two flags: 
@@ -87,8 +89,9 @@ the remote document through JGloss-WWW. The following form does the URL encoding
 via JavaScript. The JavaScript source is <a href="converturl.js">here</a>.
 </p>
 
-<a name="form2"><h3>URL-Converter</h3></a>
-<form name="urlconverter" onSubmit="return false">
+<h3><a name="form2">URL-Converter</a></h3>
+<form id="urlconverter" action="" onSubmit="return false">
+<p>
 JGloss-WWW URL: <br><input type="text" name="jglossurl" size="80">
           <input type="button" value="Convert" onClick="jglossToBase()"> <br>
 Base URL: <br><input type="text" name="baseurl" size="80">
@@ -96,9 +99,10 @@ Base URL: <br><input type="text" name="baseurl" size="80">
                  onClick="baseToJGloss()"> <br>
 <input type="checkbox" name="forwardcookies">forward cookies<br>
 <input type="checkbox" name="forwardformdata">forward form data<br>
+</p>
 </form>
 
-<a name="cookieforwarding"><h4>Cookie forwarding</h4></a>
+<h4><a name="cookieforwarding">Cookie forwarding</a></h4>
 <p>
 JGloss-WWW can forward cookies from client to remote server and back. This feature has
 to be enabled globally on the JGloss-WWW server by setting the initialization parameters
@@ -132,7 +136,7 @@ The cookie forwarding mechanism will not work with cookies set by a JavaScript i
 page transmitted to the client.
 </p>
 
-<a name="formdataforwarding"><h4>Form data forwarding</h4></a>
+<h4><a name="formdataforwarding">Form data forwarding</a></h4>
 <p>
 Form data from both GET and POST forms can be forwarded by the JGloss-WWW servlet. This
 feature has to be enabled globally on the JGloss-WWW server by setting the initialization
@@ -151,7 +155,7 @@ the connection. If POST is used, the body of the client request will be copied
 verbatim to the remote server connection.
 </p>
 
-<a name="rewriting"><h4>The rewriting process</h4></a>
+<h4><a name="rewriting">The rewriting process</a></h4>
 <p>
 What follows is an (incomplete) description of how the servlet processes a request. 
 </p><p>
@@ -185,7 +189,7 @@ otherwise the <CODE>action</CODE> link will point to the original location and a
 of the form will open a direct connection from the client to the remote server.
 </p>
 
-<a name="security"><h4>Security/Privacy considerations</h4></a>
+<h4><a name="security">Security/Privacy considerations</a></h4>
 <p>
 This section describes the security and privacy implications of using the JGloss-WWW servlet.
 I tried to cover all aspects, but don't claim completeness. The main consequence
@@ -293,7 +297,7 @@ To aid debugging, the servlet currently logs a lot of data which can be consider
 relevant, including remote URLs and cookies.
 </p>
 
-<a name="whyservlet"><h4>Why is it implemented as a servlet?</h4></a>
+<h4><a name="whyservlet">Why is it implemented as a servlet?</a></h4>
 <p>
 JGloss-WWW is implemented as servlet, but it functions as a rewriting proxy. So why is it
 not implemented as a proxy in the first place? A proxy would be more transparent to the user,
@@ -319,8 +323,9 @@ I don't think this is possible with the current plugin APIs.
 
 <hr>
 (C) 2001 <a href="mailto:tensberg@gmx.net">Michael Koch &lt;tensberg@gmx.net&gt;</a>;
-    last updated: $Date$<br>
+    last updated: 2001/09/21<br>
     Any part of this document may be freely copied, modified and redistributed.
+
 </td>
 
 </tr>

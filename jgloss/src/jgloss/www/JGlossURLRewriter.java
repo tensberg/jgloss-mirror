@@ -87,29 +87,31 @@ public class JGlossURLRewriter implements URLRewriter {
      */
     protected String rewrite( String in, String tag, boolean forceServletRelative)
         throws MalformedURLException {
-        try {
-            if (in.length() == 0)
-                // rewriting an empty URL makes no sense
-                return in;
-
-            URL target = new URL( docBase, in);
-
-            if (tag != null)
-                tag = tag.toLowerCase();
-            if (forceServletRelative ||
-                ((tag==null || 
-                  tag.equals( "a") || 
-                  tag.equals( "area") ||
-                  tag.equals( "frame") ||
-                  forwardFormData && tag.equals( "form"))
-                && protocols.contains( target.getProtocol())))
-                return servletBase + escapeURL( target.toExternalForm());
-            else
-                return target.toExternalForm();
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
+        if (in.length() == 0)
+            // rewriting an empty URL makes no sense
             return in;
+
+        if (tag != null) {
+            tag = tag.toLowerCase();
+            
+            if (tag.equals( "base"))
+                // ignore BASE tags
+                return in;
         }
+
+        // make URL absolute using document base URL
+        URL target = new URL( docBase, in);
+        
+        if (forceServletRelative ||
+            ((tag==null || 
+              tag.equals( "a") || 
+              tag.equals( "area") ||
+              tag.equals( "frame") ||
+              forwardFormData && tag.equals( "form"))
+             && protocols.contains( target.getProtocol())))
+            return servletBase + escapeURL( target.toExternalForm());
+        else
+            return target.toExternalForm();
     }
 
     public String rewrite( String in, String tag) throws MalformedURLException {
@@ -122,6 +124,25 @@ public class JGlossURLRewriter implements URLRewriter {
 
     public String rewrite( String in) throws MalformedURLException {
         return rewrite( in, null, false);
+    }
+
+    /**
+     * Sets the base URL of the document from which the URLs to rewrite originate. Relative URLs should
+     * be interpreted relative to this URL.
+     */
+    public void setDocumentBase( String docBase) {
+        try {
+            synchronized (this.docBase) {
+                this.docBase = new URL( docBase);
+            }
+        } catch (MalformedURLException ex) {}
+    }
+
+    /**
+     * Returns the base URL of the document from which the URLs to rewrite originate. 
+     */
+    public String getDocumentBase() {
+        return docBase.toString();
     }
 
     /**

@@ -64,7 +64,7 @@
         <param-name>rewritten_types</param-name>
         <param-value>text/html</param-value>
         <description>
-           List of MIME types which will be rewritten.
+           Comma-separated list of MIME types which will be rewritten.
         </description>
       </init-param>
 

@@ -47,4 +47,15 @@ public interface URLRewriter {
      *            is malformed.
      */
     String rewrite( String in, String tag) throws java.net.MalformedURLException;
+
+    /**
+     * Sets the base URL of the document from which the URLs to rewrite originate. Relative URLs should
+     * be interpreted relative to this URL.
+     */
+    void setDocumentBase( String docBase);
+
+    /**
+     * Returns the base URL of the document from which the URLs to rewrite originate. 
+     */
+    String getDocumentBase();
 } // interface URLRewriter

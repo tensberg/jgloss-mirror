@@ -83,7 +83,9 @@ public class HTMLAnnotator {
      * Reads an HTML document from <CODE>in</CODE>, annotates Japanese words with dictionary lookup results
      * and writes the resulting HTML page to <CODE>out</CODE>. 
      */
-    public void annotate( Reader in, Writer out, URLRewriter rewriter) throws IOException {
+    public void annotate( String docBase, Reader in, Writer out, 
+                          URLRewriter rewriter) throws IOException {
+        rewriter.setDocumentBase( docBase);
         in = new BufferedReader( in);
         
         StringBuffer text = new StringBuffer();
@@ -92,10 +94,10 @@ public class HTMLAnnotator {
         boolean scriptWritten = false;
         boolean inBody = false;
         boolean inTag = false;
-        boolean inString = false;
         char quote = '\0';
         int commentchar = 0;
         boolean inComment = false;
+        boolean expectQuote = false;
 
         int i = in.read();
         while (i != -1) {
@@ -123,7 +125,7 @@ public class HTMLAnnotator {
                     break;
                 }
 
-                if (c=='>' && !inString && 
+                if (c=='>' &&
                     (!inComment || text.substring( text.length()-3).equals( "-->"))) {
                     inTag = false;
                     inComment = false;
@@ -151,12 +153,6 @@ public class HTMLAnnotator {
 
                     out.write( text.toString());
                     text.delete( 0, text.length());
-                }
-                if (!inString && (c=='"' || c=='\'')) {
-                    inString = true;
-                    quote = c;
-                } else if (inString && c==quote) {
-                    inString = false;
                 }
             }
             else {
@@ -343,10 +339,13 @@ public class HTMLAnnotator {
      * <table><tr align="center"><th>Tag</th><th>Attribute</th></tr>
      * <tr align="center"><td><CODE>a</CODE></td><td><CODE>href</CODE></td></tr>
      * <tr align="center"><td><CODE>area</CODE></td><td><CODE>href</CODE></td></tr>
+     * <tr align="center"><td><CODE>base</CODE></td><td><CODE>href</CODE></td></tr>
      * <tr align="center"><td><CODE>img</CODE></td><td><CODE>src</CODE></td></tr>
      * <tr align="center"><td><CODE>frame</CODE></td><td><CODE>src</CODE></td></tr>
      * <tr align="center"><td><CODE>form</CODE></td><td><CODE>action</CODE></td></tr>
      * </table>
+     * Additionally, this method handles <CODE>BASE</CODE> tags by changing the document
+     * base of the URL rewriter to the URL of the HREF attribute.
      *
      * @param name Name of the tag.
      * @param tag Complete tag, including the leading &lt; and trailing &gt;.
@@ -355,7 +354,7 @@ public class HTMLAnnotator {
     protected StringBuffer rewriteURL( String name, StringBuffer tag, URLRewriter rewriter) {
         String target = null;
         
-        if (name.equals( "a") || name.equals( "area"))
+        if (name.equals( "a") || name.equals( "area") || name.equals( "base"))
             target = "href";
         else if (name.equals( "img") || name.equals( "frame"))
             target = "src";
@@ -391,6 +390,14 @@ public class HTMLAnnotator {
                             tag.deleteCharAt( end);
                         if (quote == '\0')
                             quote = '"';
+
+                        if (name.equals( "base")) {
+                            // change the document base of the URL rewriter to the value of
+                            // the HREF attribute of the BASE tag.
+                            rewriter.setDocumentBase( ts.substring( start, end));
+                        }
+
+                        // replace the URL in the tag attribute with the rewritten URL.
                         tag.replace( eq+1, end, quote + 
                                      rewriter.rewrite( ts.substring( start, end), name) + quote);
                     } catch (MalformedURLException ex) {

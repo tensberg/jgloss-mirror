@@ -208,9 +208,11 @@ public class JGloss {
                         for ( int i=0; i<fs.length; i++)
                             d[i] = DictionaryFactory.createDictionary( fs[i]);                        
                         Parser p = new KanjiParser( d, null);
-                        new HTMLAnnotator( p).annotate( in, out, new URLRewriter() {
+                        new HTMLAnnotator( p).annotate( "", in, out, new URLRewriter() {
                                 public String rewrite( String url) { return url; }
                                 public String rewrite( String url, String tag) { return url; }
+                                public String getDocumentBase() { return ""; }
+                                public void setDocumentBase( String docBase) {}
                             });
                         in.close();
                         out.close();

@@ -188,18 +188,18 @@ public class JGlossServlet extends HttpServlet {
             jgloss.dictionary.Dictionary dic = null;
             try {
                 dic = DictionaryFactory.createDictionary( d);
-            } catch (Exception ex) {
+            } catch (DictionaryFactory.InstantiationException ex) {
                 throw new ServletException( MessageFormat.format
                                             ( ResourceBundle.getBundle( MESSAGES)
                                               .getString( "error.loaddictionary"),
                                               new Object[] { d })
                                             , ex);
-            }
-            if (dic == null) // unrecognized dictionary format
+            } catch (DictionaryFactory.NotSupportedException ex) {
                 throw new ServletException( MessageFormat.format
                                             ( ResourceBundle.getBundle( MESSAGES)
                                               .getString( "error.unknowndictionary"),
                                               new Object[] { d }));
+            }
             diclist.add( dic);
         }
         dictionaries = new jgloss.dictionary.Dictionary[diclist.size()];
@@ -284,6 +284,7 @@ public class JGlossServlet extends HttpServlet {
         noForwardHeaders.add( "cookie");
         noForwardHeaders.add( "cookie2");
         noForwardHeaders.add( "proxy-connection");
+        noForwardHeaders.add( "refresh");
 
         // read supported types
         rewrittenContentTypes = new String[0];
@@ -471,7 +472,8 @@ public class JGlossServlet extends HttpServlet {
         }
 
         JGlossURLRewriter rewriter = new JGlossURLRewriter
-            ( req.getContextPath() + req.getServletPath(),
+            ( new URL( req.getScheme(), req.getServerName(), req.getServerPort(), 
+                       req.getContextPath() + req.getServletPath()).toExternalForm(),
               url, connectionAllowedProtocols,
               allowCookieForwarding, allowFormDataForwarding);
         
@@ -562,6 +564,7 @@ public class JGlossServlet extends HttpServlet {
         String type = connection.getContentType();
         getServletContext().log( "content type " + type + " url " +
                                  connection.getURL().toString());
+        // check if the response content type is supported
         boolean supported = false;
         if (type != null) {
             for ( int i=0; i<rewrittenContentTypes.length; i++)
@@ -631,7 +634,7 @@ public class JGlossServlet extends HttpServlet {
             resp.setContentType( "text/html; charset=" + reader.getEncoding());
 
             // due to performance reasons, the servlet-client connection never uses compression
-            annotator.annotate( reader, resp.getWriter(), rewriter);
+            annotator.annotate( rewriter.getDocumentBase(), reader, resp.getWriter(), rewriter);
         } finally {
             in.close();
         }
@@ -703,6 +706,25 @@ public class JGlossServlet extends HttpServlet {
             req.getServerName() + ":" + req.getServerPort();
         resp.setHeader( "Via", via);
 
+        // rewrite Refresh URL location; Refresh is not standardized but interpreted by all browsers
+        // example refresh header: Refresh: 2; URL=http://edit.my.yahoo.co.jp/config/mail?.src=ym
+        String refresh = connection.getHeaderField( "refresh");
+        if (refresh != null) {
+            getServletContext().log( "new refresh header: " + refresh);
+            int urlstart = refresh.toLowerCase().indexOf( "URL=");
+            int urlend = refresh.indexOf( ';', urlstart);
+            if (urlend == -1)
+                urlend = refresh.length();
+            try {
+                refresh = refresh.substring( 0, urlstart) + rewriter.rewrite
+                    ( refresh.substring( urlstart, urlend)) + refresh.substring( urlend);
+            } catch (MalformedURLException ex) {
+                getServletContext().log( ex.getMessage());
+            }
+            resp.setHeader( "Refresh", refresh);
+            getServletContext().log( "new refresh header: " + refresh);
+        }
+
         // HTTP response headers
         if (connection.getURL().getProtocol().startsWith( "http")) { // http and https
             // change the location header from a redirect response to point to the servlet
@@ -719,7 +741,7 @@ public class JGlossServlet extends HttpServlet {
             }
 
             // forward all other headers
-            int i = 1; // header fields are 1-based
+            int i = 1; // header field indexes are 1-based
             String name;
             while ((name = connection.getHeaderFieldKey( i)) != null) {
                 if (!noForwardHeaders.contains( name.toLowerCase())) {
