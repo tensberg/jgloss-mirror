@@ -21,7 +21,7 @@ div.popup { display: none; position: absolute; left: 0px; top: 0px;
 //-->
 </STYLE>
 
-<SCRIPT language="JavaScript1.3">
+<SCRIPT language="JavaScript">
 <!--
 
 var popup = null;
