@@ -63,7 +63,7 @@ button.discard=Abandonner
 button.close=Fermer
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9.2
+jgloss.version=Version 0.9.3
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<création de la fenêtre d'application>
@@ -186,14 +186,16 @@ import.title=Importer fichier
 import.urlorfile=Entrez l'URL, ou spécifiez le fichier à importer.
 import.button.choosefile=Choisissez le fichier...
 import.encodings=Encodage de caractères pour le fichier:
-import.readingbrackets=Crochets délimitant les annotations de lecture:
 
 import.clipboard=clipboard
 load.progress=Chargement de {0}
 
+parserselector.readingbrackets=Crochets délimitant les annotations de lecture:
+
 print.title=Inmprimer le document
 
 annotationeditor.reading=Lecture:\ 
+annotationeditor.readings=Lectures:\ 
 annotationeditor.translation=Traduction:\ 
 annotationeditor.readingannotation=Lecture du {0}: {1}
 annotationeditor.menu.title=Annotation

@@ -94,7 +94,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                             ( d.getSelection(),
                                               d.createParser( Dictionaries.getDictionaries(),
                                                               ExclusionList.getExclusions()),
-                                                              d.getEncoding());
+                                              d.getEncoding());
                                         which.documentChanged = true;
                                     }
                                 }
@@ -136,7 +136,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                                 return;
                                             }
                                         }
-
+                                        
                                         // load the file
                                         JGlossFrame which = target==null ||
                                             target.documentLoaded ? new JGlossFrame() : target;
@@ -144,7 +144,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                     }
                                 }
                             }.start();
-                        }
+                    }
                 };
             open.setEnabled( true);
             UIUtilities.initAction( open, "main.menu.open"); 
@@ -258,6 +258,14 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Exports the annotations to a file.
      */
     private Action exportAnnotationListAction;
+    /**
+     * Menu item which holds the show preferences action.
+     */
+    private JMenuItem preferencesItem;
+    /**
+     * Menu item which holds the show about box action.
+     */
+    private JMenuItem aboutItem;
 
     /**
      * Toggles compact view.
@@ -310,7 +318,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
     public JGlossFrame() {
         super( JGloss.messages.getString( "main.title"));
         jglossFrames.add( this);
-
+        
         // set up the frame
         annotationEditor = new AnnotationEditor();
         annotationEditorScroller = new JScrollPane( annotationEditor,
@@ -476,7 +484,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
         UIUtilities.initAction( wordLookupAction, "main.menu.wordlookup");
         menu.add( UIUtilities.createMenuItem( wordLookupAction));
         menu.addSeparator();
-        menu.add( UIUtilities.createMenuItem( PreferencesFrame.showAction));
+        preferencesItem = UIUtilities.createMenuItem( PreferencesFrame.showAction);
+        menu.add( preferencesItem);
         bar.add( menu);
 
         compactViewItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.compactview"));
@@ -496,9 +505,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                         ( Preferences.VIEW_SHOWANNOTATION));
         showAnnotationItem.addActionListener( this);
         editorFollowsMouseItem = new JCheckBoxMenuItem( JGloss.messages.getString
-                                                    ( "main.menu.editorfollowsmouse"));
+                                                        ( "main.menu.editorfollowsmouse"));
         editorFollowsMouseItem.setSelected( JGloss.prefs.getBoolean
-                                        ( Preferences.VIEW_EDITORFOLLOWSMOUSE));
+                                            ( Preferences.VIEW_EDITORFOLLOWSMOUSE));
         editorFollowsMouseItem.addActionListener( this);
 
         menu = new JMenu( JGloss.messages.getString( "main.menu.view"));
@@ -510,11 +519,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
         bar.add( menu);
 
         bar.add( annotationEditor.getMenu());
-
+        
         menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
-        menu.add( UIUtilities.createMenuItem( AboutFrame.showAction));
+        aboutItem = UIUtilities.createMenuItem( AboutFrame.showAction);
+        menu.add( aboutItem);
         bar.add( menu);
-
+        
         setJMenuBar( bar);
 
         show();
@@ -862,8 +872,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
         exportHTMLAction.setEnabled( true);
         exportAnnotationListAction.setEnabled( true);
         printAction.setEnabled( true);
-        if (documentPath == null) // this means that the document is imported, save will behave like
-                                  // save as
+        if (documentPath == null) 
+            // this means that the document is imported, save will behave like save as
             saveAction.setEnabled( true);
         saveAsAction.setEnabled( true);
 
@@ -1340,7 +1350,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox backwardsCompatible = 
             new JCheckBox( JGloss.messages.getString( "export.html.backwardscompatible"));        
         backwardsCompatible.setSelected( JGloss.prefs.getBoolean
-                                       ( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE));
+                                         ( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( backwardsCompatible, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1502,10 +1512,22 @@ public class JGlossFrame extends JFrame implements ActionListener {
     }
 
     public void dispose() {
-        super.dispose();
-        jglossFrames.remove( JGlossFrame.this);   
+        // try to dump as many references as possible to ensure that the objects are garbage collected
+        jglossFrames.remove( this);   
         JGloss.prefs.removePropertyChangeListener( prefsListener);
         if (doc != null)
             StyleDialog.getComponent().removeStyleSheet( doc.getStyleSheet());
+        docpane.dispose();
+        preferencesItem.setAction( null);
+        aboutItem.setAction( null);
+        docpane = null;
+        doc = null;
+        kit = null;
+        annotationEditor = null;
+        split = null;
+        docpaneScroller = null;
+        annotationEditorScroller = null;
+        getContentPane().removeAll();
+        super.dispose();
     }
 } // class JGlossFrame

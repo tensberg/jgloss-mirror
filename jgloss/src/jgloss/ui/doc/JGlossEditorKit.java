@@ -589,7 +589,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * normal text to be correctly aligned with annotation views.
      */
     class VAdjustedView extends InlineView {
-        public static final float BASE_TEXT_ALIGNMENT = -0.15f;
+        public static final float BASE_TEXT_ALIGNMENT = -0.17f;
         public static final float ANNOTATED_TEXT_ALIGNMENT = 1f;
         public static final float DEFAULT_ALIGNMENT = Float.MAX_VALUE;
 

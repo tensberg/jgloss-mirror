@@ -81,7 +81,10 @@ public class UIUtilities {
 
     /**
      * Creates a JMenuItem from an action. All properties from the action, including the
-     * accelerator key, will be taken from the action.
+     * accelerator key, will be taken from the action. CAUTION: the created menu item adds a
+     * <CODE>propertyChangeListener</CODE> to the action. Thus the item can't be garbage collected
+     * while the action object is still alive. If the menu item is no longer used, the action must be
+     * removed through a call of <CODE>item.setAction( null)</CODE>.
      *
      * @param a The action for which to create the menu item.
      * @return The newly created menu item.

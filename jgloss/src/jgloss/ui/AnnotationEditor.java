@@ -67,7 +67,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         public Dimension getPreferredSize() {
             Dimension preferred = super.getPreferredSize();
             if (modifyWidth && preferred!=null)
-                preferred.width += 80;
+                preferred.width += 60;
             return preferred;
         }
 
@@ -111,13 +111,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
          */
         protected Container createContainer() {
             Container c = super.createContainer();
-            box = Box.createHorizontalBox();/*new Box( BoxLayout.X_AXIS) {
-                    public Dimension getPreferredSize() {
-                        Dimension preferred = super.getPreferredSize();
-                        preferred.width += 60;
-                        return preferred;
-                    }
-                    };*/
+            box = Box.createHorizontalBox();
             label = new JLabel();
             return c;
         }

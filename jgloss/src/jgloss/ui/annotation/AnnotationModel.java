@@ -248,6 +248,9 @@ public class AnnotationModel extends DefaultTreeModel {
      * @param trackChanges <CODE>true</CODE> if changes to the document should be tracked.
      */
     public void trackChanges( boolean trackChanges) {
+        if (doc == null)
+            return;
+
         this.trackChanges = trackChanges;
         if (trackChanges)
             doc.addDocumentListener( documentListener);
@@ -351,11 +354,11 @@ public class AnnotationModel extends DefaultTreeModel {
             String wordhtml = "";
             int baseStart = 0;
             boolean hasReading = false;
-            boolean inKanji = StringTools.isCJKUnifiedIdeographs( text.charAt( 0));
+            boolean inKanji = StringTools.isKanji( text.charAt( 0));
             for ( int baseEnd=1; baseEnd<=text.length(); baseEnd++) {
                 if (inKanji) {
                     if (baseEnd == text.length() ||
-                        !StringTools.isCJKUnifiedIdeographs( text.charAt( baseEnd))) {
+                        !StringTools.isKanji( text.charAt( baseEnd))) {
                         hasReading = true;
                         wordhtml += "<" + AnnotationTags.READING_BASETEXT.getId() + "><"
                             + AnnotationTags.READING.getId() + "> </" + AnnotationTags.READING.getId()
@@ -367,7 +370,7 @@ public class AnnotationModel extends DefaultTreeModel {
                     }
                 }
                 else if (baseEnd == text.length() ||
-                         StringTools.isCJKUnifiedIdeographs( text.charAt( baseEnd))) {
+                         StringTools.isKanji( text.charAt( baseEnd))) {
                     wordhtml += "<" + AnnotationTags.BASETEXT + ">" + text.substring( baseStart, baseEnd)
                         + "</" + AnnotationTags.BASETEXT + ">";
                     inKanji = true;

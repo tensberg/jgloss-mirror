@@ -58,6 +58,8 @@ public class ReadingAnnotationNode extends LeafNode {
         super( parent);
         this.reading = reading;
         readingText = reading.getReading();
+        if (readingText == null)
+            readingText = reading.getWord();
         if (reading.getConjugation() != null) {
             // cut off inflection
             readingText = readingText.substring( 0, readingText.length() - 

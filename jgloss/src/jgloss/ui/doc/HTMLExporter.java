@@ -224,7 +224,7 @@ public class HTMLExporter extends JGlossWriter {
 
             // skip all output until this element is closed
             skipAll = true;
-        } else if ((writeReading || writeTranslations) &&
+        } else if (backwardsCompatible && (writeReading || writeTranslations) &&
                    elem.getAttributes().getAttribute( StyleConstants.NameAttribute)
                    .equals( HTML.Tag.BODY)) {
             // add the document setup handler

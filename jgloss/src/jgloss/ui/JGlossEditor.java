@@ -115,6 +115,14 @@ public class JGlossEditor extends JTextPane {
         }
 
         public void mouseDragged( MouseEvent e) {}
+
+        public void haltThread() {
+            halt = true;
+            this.interrupt();
+            try {
+                this.join();
+            } catch (InterruptedException ex) {}
+        }
     }
 
     /**
@@ -174,7 +182,7 @@ public class JGlossEditor extends JTextPane {
             wordlookup.search( text);
             annotateButton.requestFocus();
             WordLookupDialog.this.show();
-            dispose(); // works around a bug in the Java/KDE window manager interaction
+            WordLookupDialog.this.dispose(); // works around a bug in the Java/KDE window manager interaction
             if (accepted)
                 return wordlookup.getLastResult();
             else
@@ -285,7 +293,6 @@ public class JGlossEditor extends JTextPane {
         editMenu.add( UIUtilities.createMenuItem( xcvManager.getCopyAction()));
         editMenu.add( UIUtilities.createMenuItem( xcvManager.getPasteAction()));
         editMenu.addMenuListener( xcvManager.getEditMenuListener());
-
         if (source != null) {
             annotationEditor = source;
 
@@ -515,5 +522,12 @@ public class JGlossEditor extends JTextPane {
     public void setEditorKit( JGlossEditorKit kit) {
         super.setEditorKit( kit);
         xcvManager.updateActions( this);
+    }
+
+    public void dispose() {
+        editMenu.removeAll();
+        editMenu.removeMenuListener( xcvManager.getEditMenuListener());
+        if (annotationEditor != null)
+            mouseFollower.haltThread();
     }
 } // class JEditorPane

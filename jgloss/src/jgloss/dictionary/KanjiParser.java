@@ -169,7 +169,7 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
                     if (ub == Character.UnicodeBlock.HIRAGANA) {
                         // catch possible composite verb
                         if (!compverb && mode!=END_READING && word.length()==1 && i<text.length-1 &&
-                            StringTools.isCJKUnifiedIdeographs( text[i+1]) &&
+                            StringTools.isKanji( text[i+1]) &&
                             (i == text.length-2 ||
                              StringTools.isHiragana( text[i+2]))) {
                             compverb = true;
@@ -431,7 +431,7 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
                 }
             }
 
-            if (!match && tryPrefixes && StringTools.isCJKUnifiedIdeographs( word.charAt( 0)) &&
+            if (!match && tryPrefixes && StringTools.isKanji( word.charAt( 0)) &&
                 word.length()>1) {
                 // Still no luck? If this is a kanji compound, try prefixes of the word.
                 List[] entries = new List[dictionaries.length]; // stores lookup results of prefix

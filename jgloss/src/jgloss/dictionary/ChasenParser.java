@@ -65,6 +65,8 @@ public class ChasenParser extends AbstractParser {
         private String reading;
         public ChasenWordReading( String word, String reading) {
             this.word = word;
+            if (reading!=null && reading.equals( word))
+                reading = null; // allowed per definition of WordReadingPair
             this.reading = reading;
         }
 
@@ -265,7 +267,7 @@ public class ChasenParser extends AbstractParser {
                                 from = to;
                                 // only try kanji suffixes
                                 while (from<surfaceInflected.length() &&
-                                       !StringTools.isCJKUnifiedIdeographs
+                                       !StringTools.isKanji
                                        ( surfaceInflected.charAt( from)))
                                     from++;
                                 to = surfaceInflected.length();
@@ -278,10 +280,13 @@ public class ChasenParser extends AbstractParser {
                                 if (firstOccurrenceOnly)
                                     annotatedWords.add( word);
                                 if (readingBase != null) {
-                                    annotations.add( new Reading
-                                        ( parsePosition + from, to-from,
-                                          new ChasenWordReading( word, 
-                                                                 StringTools.toHiragana( readingBase))));
+                                    readingBase = StringTools.toHiragana( readingBase);
+                                    if (!readingBase.equals( word)) {
+                                        // don't add reading for hiragana
+                                        annotations.add( new Reading
+                                            ( parsePosition + from, to-from,
+                                              new ChasenWordReading( word, readingBase)));
+                                    }
                                 }
                                                                       
                                 for ( Iterator i=translations.iterator(); i.hasNext(); ) {
@@ -302,7 +307,7 @@ public class ChasenParser extends AbstractParser {
                                 from = to;
                                 // only try kanji suffixes
                                 while (from<surfaceInflected.length() &&
-                                       !StringTools.isCJKUnifiedIdeographs
+                                       !StringTools.isKanji
                                        ( surfaceInflected.charAt( from)))
                                     from++;
                                 to = surfaceInflected.length();
@@ -317,7 +322,7 @@ public class ChasenParser extends AbstractParser {
                                     to = to - 1;
                                 } while (to>from &&
                                          // only try kanji prefixes
-                                         !StringTools.isCJKUnifiedIdeographs
+                                         !StringTools.isKanji
                                          ( surfaceInflected.charAt( to-1)));
                                 if (to == from) {
                                     // no match found for prefix, try next suffix
@@ -325,7 +330,7 @@ public class ChasenParser extends AbstractParser {
                                         from++;
                                     } while (from<surfaceInflected.length() &&
                                              // only try kanji suffixes
-                                             !StringTools.isCJKUnifiedIdeographs
+                                             !StringTools.isKanji
                                              ( surfaceInflected.charAt( from)));
                                     to = surfaceInflected.length();
                                 }
@@ -346,10 +351,13 @@ public class ChasenParser extends AbstractParser {
                                 annotatedWords.add( surfaceBase);
                             Conjugation c = getConjugation( surfaceInflected, surfaceBase,
                                                             partOfSpeech + "\u3001" + inflectedForm);
-                            annotations.add( new Reading
-                                ( parsePosition, surfaceInflected.length(),
-                                  new ChasenWordReading( surfaceBase,
-                                                         StringTools.toHiragana( readingBase)), c));
+                            readingBase = StringTools.toHiragana( readingBase);
+                            if (!readingBase.equals( surfaceBase)) {
+                                // don't add reading for hiragana
+                                annotations.add( new Reading
+                                    ( parsePosition, surfaceInflected.length(),
+                                      new ChasenWordReading( surfaceBase, readingBase), c));
+                            }
                             for ( Iterator i=translations.iterator(); i.hasNext(); ) {
                                 WordReadingPair wrp = (WordReadingPair) i.next();
                                 if (wrp instanceof DictionaryEntry) {
@@ -466,7 +474,7 @@ public class ChasenParser extends AbstractParser {
     private Conjugation getConjugation( String inflected, String base, String type) {
         // search last kanji in inflected form, everything after it is inflection
         int i = inflected.length();
-        while (i>0 && !StringTools.isCJKUnifiedIdeographs( inflected.charAt( i-1))) {
+        while (i>0 && !StringTools.isKanji( inflected.charAt( i-1))) {
             i--;
         }
         if (i == 0) {

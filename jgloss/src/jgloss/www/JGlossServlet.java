@@ -205,7 +205,7 @@ public class JGlossServlet extends HttpServlet {
         dictionaries = new jgloss.dictionary.Dictionary[diclist.size()];
         dictionaries = (jgloss.dictionary.Dictionary[]) diclist.toArray( dictionaries);
 
-        parser = new KanjiParser( dictionaries);
+        parser = new KanjiParser( dictionaries, null);
         parser.setIgnoreNewlines( true);
         try {
             annotator = new HTMLAnnotator( parser);

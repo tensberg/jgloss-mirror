@@ -266,6 +266,11 @@ public class JGlossDocument extends HTMLDocument {
                         Reading r = (Reading) ta;
                         reading = r.getReading(); // dictionary form of reading, real reading for
                                                   // inflected verbs will be derived further down
+                        if (reading == null)
+                            // this happens if the annotated word is hiragana and an inflected form.
+                            // In this case, the Reading contains the base reading as word, and
+                            // r.getReading() returns null
+                            reading = r.getWord();
                         if (!r.getWord().equals( word)) {
                             dictionaryWord = r.getWord();
                             dictionaryReading= r.getReading();
@@ -549,9 +554,18 @@ public class JGlossDocument extends HTMLDocument {
         this.parser = parser;
         this.addAnnotations = addAnnotations;
 
-        jglossVersion = -1;
-        fileFormatMinorVersion = -1;
-        fileFormatMajorVersion = -1;
+        if (addAnnotations) {
+            // creates new JGloss file
+            jglossVersion = JGlossWriter.JGLOSS_VERSION;
+            fileFormatMajorVersion = JGlossWriter.FILE_FORMAT_MAJOR_VERSION;
+            fileFormatMinorVersion = JGlossWriter.FILE_FORMAT_MINOR_VERSION;
+        }
+        else {
+            // read version from existing JGloss file
+            jglossVersion = -1;
+            fileFormatMajorVersion = -1;
+            fileFormatMinorVersion = -1;
+        }
     }
 
     /**

@@ -73,8 +73,6 @@ public class ReadingTextNode extends ReadingTranslationNode {
             return ((AnnotationNode) parent.getParent()).getAnnotationElement()
                 .getElement( 0).getElement( elementNumber).getElement( 0);
         } catch (ArrayIndexOutOfBoundsException ex) {
-            System.out.println( elementNumber);
-            ((AbstractDocument.AbstractElement) ((AnnotationNode) parent.getParent()).getAnnotationElement()).dump( System.out, 2);
             ex.printStackTrace();
             return null;
         }

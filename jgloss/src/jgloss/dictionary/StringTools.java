@@ -94,6 +94,14 @@ public class StringTools {
     }
 
     /**
+     * Test if c is either in the character class of CJK unified ideographs or is the kanji repeat mark.
+     */
+    public static boolean isKanji( char c) {
+        return (c>=0x4e00 && c<0xa000) || // CJK unified ideographs
+            c == '\u3005'; // kanji repeat mark
+    }
+
+    /**
      * Returns a new string with all katakana characters in the original string converted to
      * hiragana.
      */
