@@ -38,5 +38,13 @@ public interface URLRewriter {
      */
     String rewrite( String in) throws java.net.MalformedURLException;
 
+    /**
+     * Changes a URL in some way.
+     *
+     * @param in The original URL.
+     * @param tag Name of the tag in which the URL will be placed.
+     * @exception java.net.MalformedURLException if the given URL string or a newly constructed URL
+     *            is malformed.
+     */
     String rewrite( String in, String tag) throws java.net.MalformedURLException;
 } // interface URLRewriter
