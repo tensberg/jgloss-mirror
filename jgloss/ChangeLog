@@ -1,5 +1,7 @@
 2.0 Alpha 3:
 	- new option to import text without adding annotations.
+	- changed JGloss documentation format to XML Docbook
+	- Docbook XSL and FOP is now used for generation of documentation
 2.0 Alpha 2: (2004/02/23)
 	- changed dictionary format detection to work with more EDICT
 	  and WadokuJT versions.

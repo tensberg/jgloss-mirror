@@ -165,6 +165,11 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
         else
             return CharacterClass.OTHER; // not in word
     }
+    
+    public boolean canEncode(char c) {
+        // TODO: check encoding range of UTF-8
+        return true;
+    }
 
     public String getEncodingName() { return "UTF-8"; }
 } // class UTF8EncodingConverter

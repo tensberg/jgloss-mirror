@@ -109,6 +109,13 @@ public interface EncodedCharacterHandler {
     CharacterClass getCharacterClass( int character, boolean inWord);
 
     /**
+     * Returns whether or not the character encoding can encode the given
+     * character. 
+     */
+    boolean canEncode(char c);
+    
+
+    /**
      * Return the name of the encoding supported by this handler. The name must be compatible
      * with class <code>java.nio.charset.Charset</code>.
      */

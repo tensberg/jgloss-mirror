@@ -109,5 +109,11 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
         }
     }
 
+    public boolean canEncode(char c) {
+        // ASCII and Kanji/Kana characters can be encoded
+        // TODO: look up the real supported range, the given range also includes chinese and korean chars
+        return (c<128 || c>=0x2e80 && c<0xa000);
+    }
+
     public String getEncodingName() { return "EUC-JP"; }
 } // class EUCJPCharacterHandler

@@ -755,6 +755,6 @@ public class WadokuJT extends FileBasedDictionary {
             return true;
         }
 
-        return false;
+        return !characterHandler.canEncode(c);
     }
 } // class WadokuJT

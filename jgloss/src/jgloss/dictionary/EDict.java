@@ -407,19 +407,13 @@ public class EDict extends FileBasedDictionary {
     }
 
     /**
-     * Escape LF/CR, '/' and all characters except ASCII, kanji and kana.
+     * Escape LF/CR, '/' and all characters not supported by the encoding.
      */
     protected boolean escapeChar( char c) {
         // some special characters need escaping
         if (c==10 || c==13 || c=='/')
             return true;
 
-        // ASCII and Kanji/Kana characters don't need escaping
-        // (BUG: The range covered may be too large)
-        if (c<128 || c>=0x2e80 && c<0xa000)
-            return false;
-
-        // escape all other characters
-        return true;
+        return !characterHandler.canEncode(c);
     }
 } // class EDict
