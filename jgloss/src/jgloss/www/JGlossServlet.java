@@ -33,6 +33,13 @@ import java.text.MessageFormat;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+/**
+ * Servlet which annotates an HTML page with the dictionary entries for
+ * Japanese words. The servlet takes an URL, loads the specified page, annotates it
+ * and forwards it to the client. The annotations will be displayed via JavaScript.
+ *
+ * @author Michael Koch
+ */
 public class JGlossServlet extends HttpServlet {
     public final static String MESSAGES = "resources/messages-www";
 
@@ -45,6 +52,7 @@ public class JGlossServlet extends HttpServlet {
     private Parser parser;
     private HTMLAnnotator annotator;
     private Set allowedProtocols;
+    private CgiUrlRewriter rewriter;
 
     public JGlossServlet() {}
 
@@ -94,12 +102,16 @@ public class JGlossServlet extends HttpServlet {
         }
 
         // read allowed protocols
-        allowedProtocols = new TreeSet();
+        allowedProtocols = new HashSet( 5);
         String p = config.getInitParameter( ALLOWED_PROTOCOLS);
         if (p==null || p.length()==0)
             throw new ServletException( ResourceBundle.getBundle( MESSAGES)
                                         .getString( "error.noprotocols"));
         allowedProtocols.addAll( split( p, ':'));
+
+        Set tags = new HashSet( 3);
+        tags.add( "a");
+        rewriter = new CgiUrlRewriter( "", null, REMOTE_URL, allowedProtocols, tags);
     }
 
     public void destroy() {
@@ -192,7 +204,8 @@ public class JGlossServlet extends HttpServlet {
             ( connection.getInputStream(), connection.getContentEncoding());
         try {
             resp.setContentType( "text/html; charset=" + in.getEncoding());
-            annotator.annotate( in, resp.getWriter());
+            rewriter.setDocBase( connection.getURL());
+            annotator.annotate( in, resp.getWriter(), rewriter);
         } finally {
             in.close();
         }

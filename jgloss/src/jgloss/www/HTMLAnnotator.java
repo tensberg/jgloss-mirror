@@ -54,7 +54,7 @@ public class HTMLAnnotator {
         script = scriptbuf.toString();
     }
 
-    public void annotate( Reader in, Writer out) throws IOException {
+    public void annotate( Reader in, Writer out, URLRewriter rewriter) throws IOException {
         in = new BufferedReader( in);
         
         StringBuffer text = new StringBuffer();
@@ -64,15 +64,40 @@ public class HTMLAnnotator {
         boolean inBody = false;
         boolean inTag = false;
         boolean inString = false;
-        
+        char quote = '\0';
+        int commentchar = 0;
+        boolean inComment = false;
+
         int i = in.read();
         while (i != -1) {
             char c = (char) i;
             
             if (inTag) {
                 text.append( c);
-                if (c=='>' && !inString) {
+                switch (commentchar) {
+                case 1:
+                    if (c == '!')
+                        commentchar++;
+                    else
+                        commentchar = 0;
+                    break;
+                case 2:
+                    if (c == '-')
+                        commentchar++;
+                    else
+                        commentchar = 0;
+                    break;
+                case 3:
+                    if (c == '-')
+                        inComment = true;
+                    commentchar = 0;
+                    break;
+                }
+
+                if (c=='>' && !inString && 
+                    (!inComment || text.substring( text.length()-3).equals( "-->"))) {
                     inTag = false;
+                    inComment = false;
 
                     // handle special tags
                     String tag = getTagName( text).toLowerCase();
@@ -88,15 +113,22 @@ public class HTMLAnnotator {
                         inBody = false;
                     else if (tag.equals( "/body")) {
                         inBody = false;
-                        out.write( "\n<div id=\"popup\" class=\"popup\">" + 
-                                   "<pre id=\"annotation\"> </pre></div>\n");
+                        // Konqueror 2.1 needs an inline style definition for the element.style
+                        // attribute to work. Stupid Konqueror.
+                        out.write( "\n<div id=\"popup\" class=\"popup\" style=\"position: absolute;\">" + 
+                                   "<pre id=\"annotation\"></pre></div>\n");
                     }
+                    rewriteURL( tag, text, rewriter);
 
                     out.write( text.toString());
                     text.delete( 0, text.length());
                 }
-                if (c == '"')
-                    inString = !inString;
+                if (!inString && (c=='"' || c=='\'')) {
+                    inString = true;
+                    quote = c;
+                } else if (inString && c==quote) {
+                    inString = false;
+                }
             }
             else {
                 if (c=='<' || c=='\n') {
@@ -105,8 +137,10 @@ public class HTMLAnnotator {
                     }
                     out.write( text.toString());
                     text.delete( 0, text.length());
-                    if (c=='<')
+                    if (c=='<') {
                         inTag = true;
+                        commentchar = 1;
+                    }
                 }
                 text.append( c);
             }
@@ -178,30 +212,27 @@ public class HTMLAnnotator {
     }
 
     protected String getAnnotationText( List annotations) {
-        // List of annotations from a single dictionary, in the order in which they appear in
-        // the annotations list
-        List dictionaries = new LinkedList();
-        // Map with StringBuffers for each distinct Dictionary
-        Map dicmap = new TreeMap();
+        StringBuffer text = new StringBuffer();
+        String lastdictionary = "";
+        String lastword = "";
+        String lasttranslation = "";
 
         for ( Iterator i=annotations.iterator(); i.hasNext(); ) {
             Parser.TextAnnotation a = (Parser.TextAnnotation) i.next();
 
-            String d = null;
+            String dictionary = null;
             if (a instanceof Reading)
-                d = ((Reading) a).getWordReadingPair().getDictionary().getName();
+                dictionary = ((Reading) a).getWordReadingPair().getDictionary().getName();
             else if (a instanceof Translation)
-                d = ((Translation) a).getDictionaryEntry().getDictionary().getName();
-
-            StringBuffer text = (StringBuffer) dicmap.get( d);
-            if (text == null) {
-                text = new StringBuffer( d);
-                text.append( ":\\n");
-                dicmap.put( d, text);
-                dictionaries.add( text);
+                dictionary = ((Translation) a).getDictionaryEntry().getDictionary().getName();
+            if (!dictionary.equals( lastdictionary)) {
+                text.append( dictionary + ":\\n");
+                lastdictionary = dictionary;
+                lastword = "";
+                lasttranslation = "";
             }
-            
-            int insertAt = text.length();
+
+            String translation = "";
             if (a instanceof Translation) {
                 StringBuffer t = new StringBuffer();
                 String[] translations = ((Translation) a).getDictionaryEntry().getTranslations();
@@ -210,42 +241,52 @@ public class HTMLAnnotator {
                     t.append( translations[j]);
                     t.append( "\\n");
                 }
-                String translation = t.toString();
-                if (text.length()>translation.length() &&
-                    text.substring( text.length()-translation.length()).equals( translation)) {
-                    // The new word has the same translations as the last word.
-                    // Combine the two entries.
-                    insertAt = text.length()-translation.length();
-                }
-                else
-                    text.append( translation);
+                translation = t.toString();
             }
+
             if (a instanceof AbstractAnnotation) {
                 AbstractAnnotation aa = (AbstractAnnotation) a;
-                text.insert( insertAt, "\\n");
-                if (aa.getReading() != null && !aa.getReading().equals( aa.getWord()))
-                    text.insert( insertAt, " [" + aa.getReading() + "]");
-                text.insert( insertAt, "  " + aa.getWord());
+                String word = aa.getWord();
+                String reading = aa.getReading();
+                if (word.equals( lastword) && translation.equals( lasttranslation)) {
+                    // merge two word entries if reading and translation are equal
+                    // insert new reading
+                    int pos = text.length() - lasttranslation.length() - 3;
+                    if (reading != null) {
+                        if (text.charAt( pos) != ']')
+                                // last word had no reading
+                                text.insert( pos, " []");
+                        else {
+                            text.insert( pos, '\u3001');
+                            pos++;
+                        }
+                        text.insert( pos, reading);
+                    }
+                }
+                else {
+                    text.append( "  " + word);
+                    if (reading != null)
+                        text.append( " [" + reading + "]");
+                    text.append( "\\n" + translation);
+                    lastword = word;
+                    lasttranslation = translation;
+                }
             }
         }
-
-        StringBuffer out = new StringBuffer();
-        for ( Iterator i=dictionaries.iterator(); i.hasNext(); )
-            out.append( i.next().toString());
 
         // escape special characters
-        for ( int i=out.length()-1; i>=0; i--) {
-            switch (out.charAt( i)) {
+        for ( int i=text.length()-1; i>=0; i--) {
+            switch (text.charAt( i)) {
             case '"':
-                out.replace( i, i+1, "\\&quot;");
+                text.replace( i, i+1, "\\&quot;");
                 break;
             case '&':
-                out.insert( i+1, "amp;");
+                text.insert( i+1, "amp;");
                 break;
             }
         }
 
-        return out.toString();
+        return text.toString();
     }
 
     protected String getTagName( StringBuffer text) {
@@ -254,5 +295,56 @@ public class HTMLAnnotator {
             end++;
         
         return text.substring( 1, end);
+    }
+
+    protected StringBuffer rewriteURL( String name, StringBuffer tag, URLRewriter rewriter) {
+        String target = null;
+        
+        if (name.equals( "a"))
+            target = "href";
+        else if (name.equals( "img"))
+            target = "src";
+        else if (name.equals( "form"))
+            target = "action";
+
+        if (target != null) {
+            String ts = tag.toString().toLowerCase();
+            int start = ts.indexOf( target);
+            if (start != -1) {
+                start += target.length();
+                // tag is guaranteed to end with a '>'
+                while (ts.charAt( start) == ' ')
+                    start++;
+                if (ts.charAt( start) == '=') {
+                    int eq = start;
+                    start++;
+                    while (ts.charAt( start) <= 0x20)
+                        start++;
+                    char quote = ts.charAt( start);
+                    if (quote=='"' || quote=='\'')
+                        start++;
+                    else
+                        quote = '\0';
+                    int end = start;
+                    while (end<ts.length()-1 && 
+                           ts.charAt( end)!=quote &&
+                           ts.charAt( end)>0x20)
+                        end++;
+                    
+                    try {
+                        if (ts.charAt( end) == quote)
+                            tag.deleteCharAt( end);
+                        if (quote == '\0')
+                            quote = '"';
+                        tag.replace( eq+1, end, quote + 
+                                     rewriter.rewrite( ts.substring( start, end), name) + quote);
+                    } catch (MalformedURLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        return tag;
     }
 } // class HTMLAnnotator
