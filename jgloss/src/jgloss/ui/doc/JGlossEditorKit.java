@@ -632,7 +632,10 @@ public class JGlossEditorKit extends HTMLEditorKit {
             
             AttributeList al = new AttributeList( JGlossDocument.HIDDEN_ATTRIBUTE, DTD.CDATA, 
                                                   0, null, null, null);
+            // LINKED_ANNOTATION is only kept for compatibility with JGloss 0.9.1 documents
             al = new AttributeList( JGlossDocument.LINKED_ANNOTATION, DTD.CDATA, 0, null, null, al);
+            al = new AttributeList( JGlossDocument.DICTIONARY_WORD, DTD.CDATA, 0, null, null, al);
+            al = new AttributeList( JGlossDocument.DICTIONARY_READING, DTD.CDATA, 0, null, null, al);
             al = new AttributeList( JGlossDocument.TEXT_ANNOTATION, DTD.CDATA, 0, null, null, al);
             
             // The content model of <anno> should really be (reading & kanji & translation),

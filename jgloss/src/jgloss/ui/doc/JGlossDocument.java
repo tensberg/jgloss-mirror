@@ -47,8 +47,22 @@ public class JGlossDocument extends HTMLDocument {
     /**
      * Name of the attribute of an annotation element which contains
      * the text annotation from the annotations list this element currently links to.
+     * This attribute is now deprecated and kept only for compatibility with
+     * documents created by JGloss 0.9.1 or earlier.
      */
     public static final String LINKED_ANNOTATION = "linked_annotation";
+    /**
+     * Name of the attribute of an annotation element which contains the dictionary form
+     * of the annotated word. If the attribute is not set, the dictionary form is per
+     * definition equal to the annotated word.
+     */
+    public static final String DICTIONARY_WORD = "dict_word";
+    /**
+     * Name of the attribute of an annotation element which contains the dictionary form
+     * of the reading of the annotated word. If the attribute is not set, the dictionary form is per
+     * definition equal to the reading of annotated word.
+     */
+    public static final String DICTIONARY_READING = "dict_reading";
     /**
      * Key of the attribute of an annotation element which controls if the
      * annotation is hidden.
@@ -190,7 +204,6 @@ public class JGlossDocument extends HTMLDocument {
                 while (i < result.size()) {
                     // get start of next annotation
                     Parser.TextAnnotation ta = (Parser.TextAnnotation) result.get( i);
-                    Parser.TextAnnotation linked = ta;
                     to = ta.getStart() - 1;
 
                     int talen = ta.getLength();
@@ -224,6 +237,10 @@ public class JGlossDocument extends HTMLDocument {
                     char[] word = new char[talen];
                     System.arraycopy( data, ta.getStart(), word, 0, word.length);
                     
+                    String dictionaryWord = null; // null means same as word
+                    // the difference between dictionaryReading and reading is that
+                    // the conjugated part will be cut off the reading.
+                    String dictionaryReading = null; // null means same as reading
                     String reading = null;
                     String translation = null;
                     if (ta instanceof Reading) {
@@ -231,9 +248,12 @@ public class JGlossDocument extends HTMLDocument {
                         Reading r = (Reading) ta;
                         reading = r.getReading();
                         Conjugation c = r.getConjugation();
-                        if (c != null)
+                        if (c != null) {
                             reading = reading.substring( 0, reading.length() - c
                                                          .getDictionaryForm().length());
+                            dictionaryWord = r.getWord();
+                            dictionaryReading = r.getReading();
+                        }
 
                         // try to find matching translation
                         for ( int j=1; j<annotations.size(); j++) {
@@ -243,8 +263,13 @@ public class JGlossDocument extends HTMLDocument {
                                 if (de.getReading()!=null && de.getReading().startsWith( reading)) {
                                     // the comparison is startsWith and not equals because it might
                                     // be an inflected verb.
-                                    linked = annotation;
                                     translation = de.getTranslations()[0];
+                                    // the dictionary entry may contain an inflected form the
+                                    // document reading didn't
+                                    if (((Translation) annotation).getConjugation() != null) {
+                                        dictionaryWord = de.getWord();
+                                        dictionaryReading = de.getReading();
+                                    }
                                     break;
                                 }
                             }
@@ -257,11 +282,17 @@ public class JGlossDocument extends HTMLDocument {
                         DictionaryEntry de = tr.getDictionaryEntry();
                         reading = de.getReading();
                         // if this is a inflected verb, cut off the conjugation part
-                        if (tr.getConjugation() != null)
+                        if (tr.getConjugation() != null) {
                             reading = reading.substring( 0, reading.length() - tr.getConjugation()
                                                    .getDictionaryForm().length());
+
+                            dictionaryWord = de.getWord();
+                            dictionaryReading = de.getReading();
+                        }
                         translation = de.getTranslations()[0];
                     }
+                    if (dictionaryReading!=null && dictionaryReading.equals( dictionaryWord))
+                        dictionaryReading = null;
                     if (reading == null) // there has to be at least 1 character for the layout to work
                         reading = " ";
                     if (translation == null)
@@ -271,7 +302,10 @@ public class JGlossDocument extends HTMLDocument {
                     SimpleAttributeSet a = new SimpleAttributeSet();
                     SimpleAttributeSet ana = new SimpleAttributeSet();
                     ana.addAttribute( TEXT_ANNOTATION, annotations);
-                    ana.addAttribute( LINKED_ANNOTATION, linked);
+                    if (dictionaryWord != null)
+                        ana.addAttribute( DICTIONARY_WORD, dictionaryWord);
+                    if (dictionaryReading != null)
+                        ana.addAttribute( DICTIONARY_READING, dictionaryReading);
 
                     handleStartTag( AnnotationTags.ANNOTATION, ana, pos);
 
@@ -518,18 +552,8 @@ public class JGlossDocument extends HTMLDocument {
     public void encodeAnnotation( MutableAttributeSet attr) {
         writeLock();
         List annotations = (List) attr.getAttribute( TEXT_ANNOTATION);
-        int linkedIndex = -1;
-        if (attr.isDefined( LINKED_ANNOTATION))
-            linkedIndex = annotations.indexOf( attr.getAttribute( LINKED_ANNOTATION));
-
         attr.addAttribute( TEXT_ANNOTATION,
                            TextAnnotationCodec.encode( annotations));
-        if (linkedIndex != -1)
-            attr.addAttribute( LINKED_ANNOTATION,
-                               String.valueOf( linkedIndex));
-        else // no linked annotation or linked annotation not found
-            attr.removeAttribute( LINKED_ANNOTATION);
-            
         writeUnlock();
     }
 
@@ -544,47 +568,48 @@ public class JGlossDocument extends HTMLDocument {
         writeLock();
         List annotations = TextAnnotationCodec.decodeList( (String) attr.getAttribute( TEXT_ANNOTATION));
         attr.addAttribute( TEXT_ANNOTATION, annotations);
+
+        // import linked annotation from JGloss 0.9.1 documents
         if (attr.isDefined( LINKED_ANNOTATION)) {
             try {
-                attr.addAttribute( LINKED_ANNOTATION, annotations.get
-                                   ( Integer.parseInt( (String) attr.getAttribute( LINKED_ANNOTATION))));
-            } catch (Exception ex) {
+                int i = Integer.parseInt( (String) attr.getAttribute( LINKED_ANNOTATION));
+                if (i>=0 && i<annotations.size()) {
+                    Object o = annotations.get( i);
+                    if (o instanceof AbstractAnnotation) {
+                        String word = ((AbstractAnnotation) o).getWord();
+                        if (word != null)
+                            attr.addAttribute( DICTIONARY_WORD, word);
+                        String reading = ((AbstractAnnotation) o).getReading();
+                        if (reading!=null && !reading.equals( word))
+                            attr.addAttribute( DICTIONARY_READING, reading);
+                    }
+                }
+            } catch (NumberFormatException ex) {
                 ex.printStackTrace();
             }
+            attr.removeAttribute( LINKED_ANNOTATION);
         }
+
         writeUnlock();
     }
 
     /**
-     * Sets an attribute to a new value.
+     * Sets an attribute to a new value. This method is used because writeLock must be called
+     * and this method is not public.
      *
      * @param attr The attribute set to change.
      * @param key Key of the attribute.
-     * @param value New value of the attribute.
+     * @param value New value of the attribute; or <CODE>null</CODE> to remove the attribute.
      */
     public void setAttribute( MutableAttributeSet attr, Object key, Object value) {
         writeLock();
-        attr.addAttribute( key, value);
-        writeUnlock();
-    }
-
-    /**
-     * Sets the linked annotation of an annotation element. The linked annotation is one
-     * of the text annotations from the list of annotations for this element.
-     * This method is needed because a write lock is needed for the
-     * attribute set to be changed and the method has protected access.
-     *
-     * @param annotation The element for which to set the attribute.
-     * @param linkedAnnotation The annotation the element should be linked to.
-     */
-    public void setLinkedAnnotation( Element annotation, Parser.TextAnnotation linkedAnnotation) {
-        writeLock();
-        MutableAttributeSet attr = (MutableAttributeSet) annotation.getAttributes();
-
-        if (linkedAnnotation != null)
-            attr.addAttribute( LINKED_ANNOTATION, linkedAnnotation);
+        if (value != null)
+            attr.addAttribute( key, value);
         else
-            attr.removeAttribute( LINKED_ANNOTATION);
+            attr.removeAttribute( key);
         writeUnlock();
+
+        fireChangedUpdate( new DefaultDocumentEvent
+            ( 0, 0, javax.swing.event.DocumentEvent.EventType.CHANGE));
     }
 } // class JGlossDocument
