@@ -38,6 +38,10 @@ error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufget
 error.dictionary.title=Fehler beim Öffnen des Wörterbuchs
 error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei {1}\n existiert und lesbar ist.
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.
+error.exclusions.save.title=Fehler beim Schreiben der Ausschluss-Liste
+error.exclusions.save=Beim Schreiben der Ausschluss-Liste nach\{0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1}, {2}.
+error.exclusions.load.title=Fehler beim Lesen der Ausschluß-Liste
+error.exclusions.load=Beim Lesen der Ausschluss-Liste von\n{0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1}, {2}.
 error.import.title=Fehler beim Importieren
 error.import.exception=Beim Import von {0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1} ({2}).
 error.export.title=Fehler beim Exportieren
@@ -65,7 +69,7 @@ splashscreen.loadingPreferences=Lade Voreinstellungen
 splashscreen.initPreferences=Lade Wörterbücher
 splashscreen.initMain=Erstelle Anwendungsfenster
 
-main.usage=Benutzung: jgloss.JGloss [Optionen] Datei ...\n\
+main.usage=Benutzung: jgloss.JGloss [Option] Datei ...\n\
 Optionen:\n\
 \  -h, --help, /?  Zeigt diese Nachricht\n\
 \  -i, --createindex Erzeugt Indexdateien für die in der Kommandozeile\n\
@@ -128,24 +132,14 @@ editor.addannotation.text=Bitte geben sie das Wort ein das für\ndie neue Annotat
 editor.addannotation.title=Auswahl annotieren
 
 prefs.title=Voreinstellungen
-prefs.button.up=Eintrag nach oben
-prefs.button.down=Eintrag nach unten
-prefs.button.add=Wörterbuch hinzufügen...
-prefs.button.remove=Eintrag entfernen
-prefs.editor.enableediting=Direktes Editieren ermöglichen (fehlerhaft)
 
 dictionaries.title=Wörterbücher
 dictionaries.chooser.title=Wörterbücher hinzufügen
 dictionaries.chooser.button.add=Hinzufügen
-
-import.title=Datei importieren
-import.urlorfile=Geben sie eine URL ein, oder wählen sie die Datei, die sie importieren möchten.
-import.button.choosefile=Datei auswählen...
-import.encodings=Zeichensatz der Datei:
-import.readingbrackets=Klammern für Lesungs-Anmerkungen:
-
-import.clipboard=Zwischenablage
-load.progress=Öffne {0}
+dictionaries.button.up=Eintrag nach oben
+dictionaries.button.down=Eintrag nach unten
+dictionaries.button.add=Wörterbuch hinzufügen...
+dictionaries.button.remove=Eintrag entfernen
 
 style.title=Allgemein
 style.text=Text
@@ -157,6 +151,26 @@ style.text.usecolor=Hintergrundfarbe:
 style.text.colorchooser.title=Hintergrundfarbe auswählen
 style.highlight.color=Auswahlfarbe für Annotationen:
 style.highlight.colorchooser.title=Auswahlfarbe für Annotationen
+style.editor.enableediting=Direktes Editieren ermöglichen (fehlerhaft)
+
+exclusions.title=Ausschlüsse
+exclusions.button.add=Wort hinzufügen...
+exclusions.button.remove=Wort entfernen
+exclusions.button.export=Liste exportieren...
+exclusions.button.import=Liste importieren...
+exclusions.add.title=Wort hinzufügen
+exclusions.add=Geben sie das Wort ein, das zur Ausschluss-\nListe hinzugefügt werden soll.
+exclusions.export.title=Ausschluss-Liste exportieren
+exclusions.import.title=Ausschluss-Liste importieren
+
+import.title=Datei importieren
+import.urlorfile=Geben sie eine URL ein, oder wählen sie die Datei, die sie importieren möchten.
+import.button.choosefile=Datei auswählen...
+import.encodings=Zeichensatz der Datei:
+import.readingbrackets=Klammern für Lesungs-Anmerkungen:
+
+import.clipboard=Zwischenablage
+load.progress=Öffne {0}
 
 print.title=Dokument drucken
 
@@ -169,8 +183,10 @@ annotationeditor.menu.usetranslation=Diese Übersetzung benutzen
 annotationeditor.menu.hide=Annotation ausblenden
 annotationeditor.menu.show=Annotation einblenden
 annotationeditor.menu.remove=Annotation entfernen
+annotationeditor.menu.removeduplicates=Entferne Anno. & Duplikate
+annotationeditor.menu.addtoexclusions=Zu Ausschlüssen hinzufügen
 annotationeditor.menu.add=Annotation hinzufügen
-annotationeditor.menu.hideduplicates=Duplikate ausblenden
+annotationeditor.menu.hideduplicates=Alle Duplikate ausblenden
 annotationeditor.menu.unhide=Alle Annotationen einblenden
 annotationeditor.entry.hidden=\ (ausgeblendet)
 
