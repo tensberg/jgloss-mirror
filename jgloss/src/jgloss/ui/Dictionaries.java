@@ -279,7 +279,7 @@ public class Dictionaries extends Box {
         Preferences p = JGloss.prefs;
         synchronized (p) {
             ListModel m = dictionaries.getModel();
-            String paths = null;
+            String paths = "";
 
             // construct a string which consists of the paths to the dictionary files
             if (m.getSize() > 0) {
@@ -299,7 +299,7 @@ public class Dictionaries extends Box {
     }
 
     /**
-     * Initialized the list of displayed dictionaries from the preferences setting.
+     * Initializes the list of displayed dictionaries from the preferences setting.
      */
     public void loadPreferences() {
         Preferences p = JGloss.prefs;
