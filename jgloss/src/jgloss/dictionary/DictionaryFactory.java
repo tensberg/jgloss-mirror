@@ -68,7 +68,7 @@ public abstract class DictionaryFactory {
         public InstantiationException( String message) {
             super( message);
         }
-        public InstantiationException( Exception rootCause) {
+        public InstantiationException( java.lang.Exception rootCause) {
             super();
             this.rootCause = rootCause;
         }
