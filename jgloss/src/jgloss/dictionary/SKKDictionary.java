@@ -23,10 +23,9 @@
 
 package jgloss.dictionary;
 
-import jgloss.JGloss;
-
 import java.io.*;
 import java.util.*;
+import java.text.MessageFormat;
 
 /**
  * Dictionary which uses SKK dictionary files to match kanji words to their readings.
@@ -36,17 +35,11 @@ import java.util.*;
  * This implementation uses it in the other direction.
  */
 public class SKKDictionary implements Dictionary {
-    public static void main( String args[]) throws Exception {
-        System.out.println( "start loading " + args[0]);
-        long time = System.currentTimeMillis();
-        Dictionary d = new SKKDictionary( args[0]);
-        System.out.println( (System.currentTimeMillis()-time)/1000.0);
-        time = System.currentTimeMillis();
-        List r = d.search( args[1], Dictionary.SEARCH_EXACT_MATCHES);
-        System.out.println( (System.currentTimeMillis()-time)/1000.0);
-        for ( Iterator i=r.iterator(); i.hasNext(); )
-            System.out.println( i.next());
-    }
+    /**
+     * Localizable message resource.
+     */
+    private final static ResourceBundle messages = 
+        ResourceBundle.getBundle( "resources/messages-dictionary");
 
     /**
      * Path to the dictionary file.
@@ -157,8 +150,8 @@ public class SKKDictionary implements Dictionary {
         this.dicfile = dicfile;
         File dic = new File( dicfile);
         name = dic.getName();
-        System.err.println( JGloss.messages.getString( "dictionary.load",
-                                                       new String[] { name }));
+        System.err.println( MessageFormat.format( messages.getString( "dictionary.load"),
+                                                  new String[] { name }));
 
         BufferedReader in = new BufferedReader( new InputStreamReader
             ( new FileInputStream( dic), "EUC-JP"));

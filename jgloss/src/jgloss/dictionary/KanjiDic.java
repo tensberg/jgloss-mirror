@@ -23,10 +23,9 @@
 
 package jgloss.dictionary;
 
-import jgloss.JGloss;
-
 import java.io.*;
 import java.util.*;
+import java.text.MessageFormat;
 
 /**
  * Dictionary implementation for KANJIDIC-style dictionary files. For a documentation
@@ -34,17 +33,11 @@ import java.util.*;
  * http://ftp.cc.monash.edu.au/pub/nihongo/kanjidic_doc.html</a>.
  */
 public class KanjiDic implements Dictionary {
-    public static void main( String args[]) throws Exception {
-        System.out.println( "start loading " + args[0]);
-        long time = System.currentTimeMillis();
-        Dictionary d = new KanjiDic( args[0]);
-        System.out.println( (System.currentTimeMillis()-time)/1000.0);
-        time = System.currentTimeMillis();
-        List r = d.search( args[1], Dictionary.SEARCH_EXACT_MATCHES);
-        System.out.println( (System.currentTimeMillis()-time)/1000.0);
-        for ( Iterator i=r.iterator(); i.hasNext(); )
-            System.out.println( i.next());
-    }
+    /**
+     * Localizable message resource.
+     */
+    private final static ResourceBundle messages = 
+        ResourceBundle.getBundle( "resources/messages-dictionary");
 
     /**
      * Pathname to the dictionary file.
@@ -340,8 +333,8 @@ public class KanjiDic implements Dictionary {
         this.dicfile = dicfile;
         File dic = new File( dicfile);
         name = dic.getName();
-        System.err.println( JGloss.messages.getString( "dictionary.load",
-                                                       new String[] { name }));
+        System.err.println( MessageFormat.format( messages.getString( "dictionary.load"),
+                                                  new String[] { name }));
 
         BufferedReader in = new BufferedReader( new InputStreamReader
             ( new FileInputStream( dic), "EUC-JP"));
@@ -537,7 +530,7 @@ public class KanjiDic implements Dictionary {
 
         if (e.getNanoriReadings() != null) {
             String[] readings = e.getNanoriReadings();
-            String[] nanori = new String[] { JGloss.messages.getString( "kanjidic.nanori") };
+            String[] nanori = new String[] { messages.getString( "kanjidic.nanori") };
             for ( int i=0; i<readings.length; i++) {
                 DictionaryEntry de = createDictionaryEntry( kanji, readings[i], nanori);
                 boolean readingMatches = false;
@@ -551,7 +544,7 @@ public class KanjiDic implements Dictionary {
         }
         if (e.getRadicalName() != null) {
             DictionaryEntry de = createDictionaryEntry( kanji, e.getRadicalName(),
-                                                        new String[] { JGloss.messages.getString
+                                                        new String[] { messages.getString
                                                         ( "kanjidic.radicalname") });
             boolean readingMatches = false;
             if (!kanjiMatches)

@@ -23,8 +23,6 @@
 
 package jgloss.dictionary;
 
-import jgloss.JGloss;
-
 import java.io.*;
 import java.util.*;
 
@@ -46,6 +44,12 @@ public class Conjugation {
      * Prefix used when constructing keys for resource lookups.
      */
     private final static String RESOURCE_PREFIX = "vconj.";
+
+    /**
+     * Localizable message resource.
+     */
+    private final static ResourceBundle messages = 
+        ResourceBundle.getBundle( "resources/messages-dictionary");
 
     /**
      * Ending of the conjugated verb/adjective.
@@ -214,7 +218,7 @@ public class Conjugation {
                     int i = line.indexOf( '\t');
                     if (i != -1) {
                         String label = line.substring( 0, i).trim();
-                        labels.put( label, JGloss.messages.getString( RESOURCE_PREFIX + label));
+                        labels.put( label, messages.getString( RESOURCE_PREFIX + label));
                     }
                 }
                 else { // read conjugations
