@@ -28,10 +28,65 @@ import jgloss.util.NullIterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 public class DefaultAttributeSet implements AttributeSet {
+    protected class MutableValueList implements ValueList {
+        private List values = new ArrayList( 2);
+
+        public MutableValueList() {}
+
+        public int size() { return values.size(); }
+        public AttributeValue get( int index) { return (AttributeValue) values.get( index); }
+        public void add( AttributeValue value) { values.add( value); }
+        public void addAll( ValueList _values) {
+            if (_values instanceof MutableValueList) {
+                values.addAll( ((MutableValueList) _values).values);
+            }
+            else {
+                for ( int i=0; i<_values.size(); i++)
+                    values.add( _values.get( i));
+            }
+        }
+        public String toString() {
+            StringBuffer out = new StringBuffer();
+            out.append( '[');
+            for ( Iterator i=values.iterator(); i.hasNext(); ) {
+                out.append( i.next().toString());
+                if (i.hasNext())
+                    out.append( ',');
+            }
+            out.append( ']');
+            return out.toString();
+        }
+    } // class MutableValueList
+
+    protected class SingleValueList implements ValueList {
+        private AttributeValue value;
+
+        public SingleValueList( AttributeValue _value) {
+            this.value = _value;
+        }
+
+        public SingleValueList set( AttributeValue _value) {
+            this.value = _value;
+            return this;
+        }
+
+        public AttributeValue get( int index) {
+            if (index != 0)
+                throw new IllegalArgumentException();
+            return value;
+        }
+
+        public int size() { return 1; }
+        public String toString() { return "[_" + value.toString() + ']'; }
+    }
+
     protected AttributeSet parent = null;
     protected Map attributes = null;
+    protected SingleValueList singleList = new SingleValueList( null);
 
     public DefaultAttributeSet() {
     }
@@ -51,8 +106,13 @@ public class DefaultAttributeSet implements AttributeSet {
 
     public ValueList getAttribute( Attribute key, boolean resolveInherited) 
         throws AttributeNotSetException {
-        if (attributes!=null && attributes.containsKey( key))
-            return (ValueList) attributes.get( key);
+        if (attributes!=null && attributes.containsKey( key)) {
+            Object v =  attributes.get( key);
+            if (v instanceof ValueList)
+                return (ValueList) v;
+            else
+                return singleList.set( (AttributeValue) v);
+        }
         else if (resolveInherited && parent!=null)
             return parent.getAttribute( key, true);
         else
@@ -92,13 +152,17 @@ public class DefaultAttributeSet implements AttributeSet {
     public void putAttribute( Attribute key, AttributeValue value) {
         if (attributes == null)
             attributes = new HashMap( 11);
-        attributes.put( key, value);
-    }
-
-    public void putAttributes( Attribute key, ValueList values) {
-        if (attributes == null)
-            attributes = new HashMap( 11);
-        if (!attributes.containsKey( 
+        Object v = attributes.get( key);
+        if (v == null)
+            attributes.put( key, value);
+        else if (v instanceof MutableValueList)
+            ((MutableValueList) v).add( value);
+        else { // AttributeValue
+            MutableValueList list = new MutableValueList();
+            list.add( (AttributeValue) v);
+            list.add( value);
+            attributes.put( key, list);
+        }
     }
 
     public boolean isEmpty() {

@@ -274,6 +274,7 @@ public class EDict extends FileBasedDictionary {
 
             BRACKET_MATCHER.reset( translation);
             int matchend = 0;
+            StringBuffer unrecognized = null;
 
             while (BRACKET_MATCHER.find()) {
                 matchend = BRACKET_MATCHER.end();
@@ -301,11 +302,13 @@ public class EDict extends FileBasedDictionary {
                 else {
                     // attribute list separated by ','
                     int startc = 0;
+                    boolean hasUnrecognized = false;
                     do {
                         int endc = att.indexOf( ',', startc);
                         if (endc == -1)
                             endc = att.length();
-                        AttributeMapper.Mapping mapping = mapper.getMapping( att.substring( startc, endc));
+                        String attsub = att.substring( startc, endc);
+                        AttributeMapper.Mapping mapping = mapper.getMapping( attsub);
                         if (mapping != null) {
                             Attribute a = mapping.getAttribute();
                             if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
@@ -327,14 +330,32 @@ public class EDict extends FileBasedDictionary {
                                 System.err.println( "illegal attribute type");
                             }
                         }
+                        else {
+                            // Not a recognized attribute. Since the whole bracket expression
+                            // will be cut off from the translation, store it seperately and
+                            // prepend it.
+                            if (unrecognized == null)
+                                unrecognized = new StringBuffer();
+                            if (!hasUnrecognized) {
+                                unrecognized.append( '(');
+                                hasUnrecognized = true;
+                            }
+                            unrecognized.append( attsub);
+                        }
                         
                         startc = endc + 1;
                     } while (startc < att.length());
+                    if (hasUnrecognized)
+                        unrecognized.append( ") ");
                 }
             }
 
             if (matchend > 0)
                 translation = translation.substring( matchend, translation.length());
+            if (unrecognized != null) {
+                unrecognized.append( translation);
+                translation = unrecognized.toString();
+            }
 
             crm.add( translation);
 
