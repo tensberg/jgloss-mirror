@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # Default localization for messages in jgloss.parser.
 #
@@ -56,3 +56,4 @@ parser.dictionary.document=document
 
 parser.kanji.name=Kanji
 parser.chasen.name=ChaSen
+parser.null.name=No annotations

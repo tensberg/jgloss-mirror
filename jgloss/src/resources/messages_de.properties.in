@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # German localization of the JGloss messages.
 #
@@ -31,68 +31,68 @@ error.noclassdef=\
 Eine Java-Klasse wurde nicht gefunden. Dies bedeutet das entweder\n\
 ihre Java-Version nicht mit Java 2 Version 1.3 kompatibel ist\n\
 oder das die JGloss JAR Datei fehlerhaft ist.\n\
-Sie können eine kompatible Java-Version von\n\
+Sie kÃ¶nnen eine kompatible Java-Version von\n\
 http://java.sun.com/j2se/1.3/jre/ herunterladen.
 error.loadPreferences=Beim Laden der Voreinstellungen ist ein Fehler aufgetreten.
 error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufgetreten.
-error.dictionary.title=Fehler beim Öffnen des Wörterbuchs
-error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei {1}\n existiert und lesbar ist.
+error.dictionary.title=Fehler beim Ã–ffnen des WÃ¶rterbuchs
+error.dictionary.filenotfound=Das WÃ¶rterbuch {0} konnte nicht geÃ¶ffnet werden.\nPrÃ¼fen sie, ob die WÃ¶rterbuchdatei {1}\n existiert und lesbar ist.
 error.dictionary.indexnotavailable=\
-Die Indexdatei für das Wörterbuch {0} konnte\n\
-nicht geöffnet oder erzeugt werden. Überprüfen sie, ob das Verzeichnis\n\
+Die Indexdatei fÃ¼r das WÃ¶rterbuch {0} konnte\n\
+nicht geÃ¶ffnet oder erzeugt werden. ÃœberprÃ¼fen sie, ob das Verzeichnis\n\
 "{1}" zum Schreiben freigegeben ist.\n\
-Das Wörterbuch wird nicht verfügbar sein.
-error.dictionary.exception=Beim Öffnen des Wörterbuchs {0} ist ein Fehler aufgetreten.\nDas Wörterbuch wird nicht verfügbar sein.
-error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.\nDas Wörterbuch wird nicht verfügbar sein.
-error.dictionary.format=Die Datei {0} ist keine\nWörterbuchdatei in einem unterstützten Format.
+Das WÃ¶rterbuch wird nicht verfÃ¼gbar sein.
+error.dictionary.exception=Beim Ã–ffnen des WÃ¶rterbuchs {0} ist ein Fehler aufgetreten.\nDas WÃ¶rterbuch wird nicht verfÃ¼gbar sein.
+error.dictionary.ioerror=Beim Laden des WÃ¶rterbuchs {0}\nist ein Fehler aufgetreten.\nDas WÃ¶rterbuch wird nicht verfÃ¼gbar sein.
+error.dictionary.format=Die Datei {0} ist keine\nWÃ¶rterbuchdatei in einem unterstÃ¼tzten Format.
 error.dictionary.reason=\
-Die Datei {0} wurde mit jedem eingebauten Wörterbuch-Format getestet.\n\
+Die Datei {0} wurde mit jedem eingebauten WÃ¶rterbuch-Format getestet.\n\
 Nachfolgend ist eine Liste mit allen Formaten und dem Grund, warum das Format nicht erkannt wurde:\n\n\
 {1}\n\n\
-Mögliche Lösungen:\n\
-- Die Datei ist möglicherweise komprimiert. Dekomprimieren Sie sie mit zip oder gzip.\n\
-- Das Format hat sich möglicherweise geändert. Downloaden Sie die aktuelle Version der Wörterbuchdatei und von JGloss.\n\
-- Wenn die Wörterbuchdatei aktuell ist, unterstützt JGloss möglicherweise nicht das Wörterbuchformat. Bitte benachrichtigen Sie den Autor von JGloss.
+MÃ¶gliche LÃ¶sungen:\n\
+- Die Datei ist mÃ¶glicherweise komprimiert. Dekomprimieren Sie sie mit zip oder gzip.\n\
+- Das Format hat sich mÃ¶glicherweise geÃ¤ndert. Downloaden Sie die aktuelle Version der WÃ¶rterbuchdatei und von JGloss.\n\
+- Wenn die WÃ¶rterbuchdatei aktuell ist, unterstÃ¼tzt JGloss mÃ¶glicherweise nicht das WÃ¶rterbuchformat. Bitte benachrichtigen Sie den Autor von JGloss.
 error.exclusions.save.title=Fehler beim Schreiben der Ausschluss-Liste
 error.exclusions.save=Beim Schreiben der Ausschluss-Liste nach\{0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1}, {2}.
-error.exclusions.load.title=Fehler beim Lesen der Ausschluß-Liste
+error.exclusions.load.title=Fehler beim Lesen der AusschluÃŸ-Liste
 error.exclusions.load=Beim Lesen der Ausschluss-Liste von\n{0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1}, {2}.
 error.import.title=Fehler beim Importieren
 error.import.exception=Beim Import von {0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1} ({2}).
 error.import.htmlwarning=\
 Das importierte Dokument ist HTML-formatiert. JGloss kann nur einfache HTML-\n\
-Dateien verarbeiten; wenn das Dokument fehlerhaft angezeigt wird, öffnen sie\n\
-die ursprüngliche Datei in einem Web-Browser, kopieren sie den Text in die\n\
-Zwischenablage und öffnen sie ihn in JGloss durch Auswählen des "Importiere\n\
-Zwischenablage"-Menüeintrags.
+Dateien verarbeiten; wenn das Dokument fehlerhaft angezeigt wird, Ã¶ffnen sie\n\
+die ursprÃ¼ngliche Datei in einem Web-Browser, kopieren sie den Text in die\n\
+Zwischenablage und Ã¶ffnen sie ihn in JGloss durch AuswÃ¤hlen des "Importiere\n\
+Zwischenablage"-MenÃ¼eintrags.
 error.import.htmlwarning.title=HTML Information
 error.export.title=Fehler beim Exportieren
 error.export.exception=Beim Exportieren ist ein Fehler aufgetreten.\nDie Java-Exception war {0} ({1}).
-error.load.title=Fehler beim Öffnen
-error.load.exception=Beim Öffnen von {0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1} ({2}).
+error.load.title=Fehler beim Ã–ffnen
+error.load.exception=Beim Ã–ffnen von {0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1} ({2}).
 error.save.title=Fehler beim Speichern
 error.save.exception=Beim Speichern von {0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1} ({2}).
 error.save.unknownannotation=Lasse unbekannten Annotationstyp {0} aus
 
 warning.load.title=Warnung
 warning.load.version.larger.major=\
-Die geöffnete Datei wurde von JGloss {0}.{1} erzeugt. Das Dateiformat\n\
-hat sich geändert und die Datei wird mit dieser Version von JGloss\n\
-nicht richtig funktionieren. Sie finden Informationen über die\n\
+Die geÃ¶ffnete Datei wurde von JGloss {0}.{1} erzeugt. Das Dateiformat\n\
+hat sich geÃ¤ndert und die Datei wird mit dieser Version von JGloss\n\
+nicht richtig funktionieren. Sie finden Informationen Ã¼ber die\n\
 neue Version bei http://jgloss.sourceforge.net.
 warning.load.version.larger.minor=\
-Die geöffnete Datei wurde von JGloss {0}.{1} erzeugt. Das Dateiformat\n\
-hat sich geändert und nicht alle Informationen aus der Datei werden\n\
-in dieser Version von JGloss benutzt. Sie finden Informationen über die\n\
+Die geÃ¶ffnete Datei wurde von JGloss {0}.{1} erzeugt. Das Dateiformat\n\
+hat sich geÃ¤ndert und nicht alle Informationen aus der Datei werden\n\
+in dieser Version von JGloss benutzt. Sie finden Informationen Ã¼ber die\n\
 neue Version bei http://jgloss.sourceforge.net.
 warning.load.version.smaller=\
-Die geöffnete Datei wurde von einer früheren Version von JGloss\n\
-erzeugt. Das Dateiformat hat sich seit dieser Version geändert\n\
+Die geÃ¶ffnete Datei wurde von einer frÃ¼heren Version von JGloss\n\
+erzeugt. Das Dateiformat hat sich seit dieser Version geÃ¤ndert\n\
 und die Information in dieser Datei wurde in das neue Format\n\
 konvertiert. Beim Speichern wird das neue Format benutzt.
-warning.load.notjgloss=Die geöffnete Datei scheint keine\nJGloss-Datei zu sein.
+warning.load.notjgloss=Die geÃ¶ffnete Datei scheint keine\nJGloss-Datei zu sein.
 warning.chasen.title=ChaSen Auswahl Warnung
-warning.chasen=Die ausgewählte Datei wurde nicht als ChaSen-Programm\nerkannt. Der ChaSen-Parser ist deshalb nicht verfügbar.
+warning.chasen=Die ausgewÃ¤hlte Datei wurde nicht als ChaSen-Programm\nerkannt. Der ChaSen-Parser ist deshalb nicht verfÃ¼gbar.
 
 button.ok=OK
 button.ok.mk=O
@@ -101,39 +101,39 @@ button.apply=Anwenden
 button.apply.mk=A
 button.import=Importieren
 button.import.mk=I
-button.import.tt=Ausgewählte Datei/Text importieren
+button.import.tt=AusgewÃ¤hlte Datei/Text importieren
 button.save=Speichern
 button.save.mk=S
 button.discard=Verwerfen
 button.discard.mk=V
-button.close=Schließen
-button.overwrite=Überschreiben
+button.close=SchlieÃŸen
+button.overwrite=Ãœberschreiben
 button.overwrite.mk=b
-button.choose=Auswählen...
+button.choose=AuswÃ¤hlen...
 button.choose.mk=A
-button.select=Auswählen
+button.select=AuswÃ¤hlen
 button.select.mk=A
 button.annotate=Annotieren
 button.annotate.mk=A
-button.annotate.tt=Das ausgewählte Wort mit den angezeigten Ergebnissen annotieren
-button.add=Hinzufügen...
+button.annotate.tt=Das ausgewÃ¤hlte Wort mit den angezeigten Ergebnissen annotieren
+button.add=HinzufÃ¼gen...
 button.add.mk=H
 button.why=Warum?
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<Erstelle Anwendungsfenster>
-splashscreen.initPreferences=Lade Wörterbücher
+splashscreen.initPreferences=Lade WÃ¶rterbÃ¼cher
 splashscreen.initMain=Erstelle Anwendungsfenster
 
 main.usage=Benutzung: java -jar jgloss.jar [Option] Datei ...\n\
 Optionen:\n\
 \  -h, --help, /?     Zeigt diese Nachricht\n\
-\  -i, --createindex  Erzeugt Indexdateien für die in der Kommandozeile\n\
-\                     angegebenen Wörterbuchdateien\n\
+\  -i, --createindex  Erzeugt Indexdateien fÃ¼r die in der Kommandozeile\n\
+\                     angegebenen WÃ¶rterbuchdateien\n\
 \  -f, --format       Gibt das Format der in der Kommandozeile angegebenen\n\
-\                     Wörterbuchdateien aus\n\
-\  -a, --annotatehtml Annotiert eine HTML-Datei mit Wörterbucheinträgen für\n\
-\                     japanische Wörter. Die Annotationen werden im Browser\n\
+\                     WÃ¶rterbuchdateien aus\n\
+\  -a, --annotatehtml Annotiert eine HTML-Datei mit WÃ¶rterbucheintrÃ¤gen fÃ¼r\n\
+\                     japanische WÃ¶rter. Die Annotationen werden im Browser\n\
 \                     mit Hilfe von JavaScript dargestellt.\n\
 \                     Parameterformat: -a [in [out]]\n\
 \                     Falls in und out ausgelassen werden oder zu '-'\n\
@@ -142,9 +142,9 @@ Optionen:\n\
 main.unknownoption=Unbekannte Option {0}
 main.format=Das Format von {0} scheint {1} zu sein.
 main.format.unrecognized=Das Format von {0} wurde nicht erkannt.
-main.createindex=Erzeuge Index für Wörterbuch {0}. Dies kann einige Zeit dauern.
-main.createindex.noindex=Für das Wörterbuch {0} muß kein Index erstellt werden.
-main.createindex.exception=Die Indexdatei für {0} konnte nicht erstellt werden:\n{1} {2}
+main.createindex=Erzeuge Index fÃ¼r WÃ¶rterbuch {0}. Dies kann einige Zeit dauern.
+main.createindex.noindex=FÃ¼r das WÃ¶rterbuch {0} muÃŸ kein Index erstellt werden.
+main.createindex.exception=Die Indexdatei fÃ¼r {0} konnte nicht erstellt werden:\n{1} {2}
 main.title=JGloss
 main.renderingdocument=Erstelle Dokumentansicht...
 
@@ -154,10 +154,10 @@ main.menu.import.mk=I
 main.menu.import.tt=Erzeugt ein neues Dokument durch Importieren einer Datei
 main.menu.importclipboard=Importiere Zwischenablage
 main.menu.importclipboard.tt=Erzeugt ein neues Dokument durch Importieren der Zwischenablage
-main.menu.open=Öffnen...
+main.menu.open=Ã–ffnen...
 main.menu.open.mk=O
-main.menu.open.tt=Öffnet ein JGloss-Dokument
-main.menu.openrecent=Zuletzt geöffnete Dateien
+main.menu.open.tt=Ã–ffnet ein JGloss-Dokument
+main.menu.openrecent=Zuletzt geÃ¶ffnete Dateien
 main.menu.save=Speichern
 main.menu.save.tt=Speichert das Dokument
 main.menu.save.mk=S
@@ -168,52 +168,52 @@ main.menu.export.mk=E
 main.menu.print=Drucken...
 main.menu.print.mk=D
 main.menu.print.tt=Druckt das Dokument
-main.menu.close=Schließen
+main.menu.close=SchlieÃŸen
 main.menu.close.mk=S
-main.menu.close.tt=Schließt das Dokument
+main.menu.close.tt=SchlieÃŸt das Dokument
 main.menu.edit=Bearbeiten
-main.menu.wordlookup=Wörterbuch
-main.menu.wordlookup.tt=Öffnet den Wörterbuch-Dialog
+main.menu.wordlookup=WÃ¶rterbuch
+main.menu.wordlookup.tt=Ã–ffnet den WÃ¶rterbuch-Dialog
 main.menu.preferences=Voreinstellungen
 main.menu.preferences.mk=V
-main.menu.preferences.tt=Öffnet den Voreinstellungs-Dialog
+main.menu.preferences.tt=Ã–ffnet den Voreinstellungs-Dialog
 main.menu.view=Ansicht
 main.menu.compactview=Kompakte Anzeige
 main.menu.compactview.tt=Schaltet die Anzeigeart der Annotationen um
 main.menu.showreading=Lesungen anzeigen
 main.menu.showreading.tt=Schaltet die Anzeige der Lesungen ein/aus
-main.menu.showtranslation=Übersetzungen anzeigen
-main.menu.showtranslation.tt=Schaltet die Anzeige der Übersetzungen ein/aus
+main.menu.showtranslation=Ãœbersetzungen anzeigen
+main.menu.showtranslation.tt=Schaltet die Anzeige der Ãœbersetzungen ein/aus
 main.menu.showannotation=Zeige Annotations-Tooltips
 main.menu.showannotation.tt=Schaltet die Anzeige der Annotations-Tooltips ein/aus
 main.menu.help=Hilfe
 main.menu.addannotation=Auswahl annotieren...
 main.menu.addannotation.mk=u
-main.menu.addannotation.tt=Annotatiert den ausgewählten Text
+main.menu.addannotation.tt=Annotatiert den ausgewÃ¤hlten Text
 main.menu.doctitle=Dokumenttitel...
 main.menu.doctitle.mk=D
 main.menu.doctitle.tt=Anzeige und Editieren des Dokumenttitels
 
-jgloss.main.menu.about=Über JGloss
+jgloss.main.menu.about=Ãœber JGloss
 jgloss.main.menu.about.mk=U
-jgloss.main.menu.about.tt=Zeigt einen Dialog mit Informationen über JGloss
+jgloss.main.menu.about.tt=Zeigt einen Dialog mit Informationen Ã¼ber JGloss
 
-jdictionary.main.menu.about=Über JDictionary
+jdictionary.main.menu.about=Ãœber JDictionary
 jdictionary.main.menu.about.mk=U
-jdictionary.main.menu.about.tt=Zeigt einen Dialog mit Informationen über JDictionary
+jdictionary.main.menu.about.tt=Zeigt einen Dialog mit Informationen Ã¼ber JDictionary
 
-main.dialog.close.title=Änderungen speichern
-main.dialog.close.message=Änderungen an {0} speichern?
+main.dialog.close.title=Ã„nderungen speichern
+main.dialog.close.message=Ã„nderungen an {0} speichern?
 main.dialog.addannotation.title=Auswahl annotieren
 main.dialog.doctitle.title=Dokumenttitel
 main.dialog.doctitle=Titel des Dokumentes:
 
-filter.mainentry.name=Nur Haupteinträge
-filter.mainentry.desc=Zeigt nur als Haupteinträge markierte Einträge (WadokuJT)
+filter.mainentry.name=Nur HaupteintrÃ¤ge
+filter.mainentry.desc=Zeigt nur als HaupteintrÃ¤ge markierte EintrÃ¤ge (WadokuJT)
 filter.example.name=Nur Beispiele
-filter.example.desc=Zeigt nur als Beispiel markierte Einträge
-filter.priority.name=Nur Prioritätseinträge
-filter.priority.desc=Zeigt nur als Prioritätseinträge markierte Einträge (EDICT)
+filter.example.desc=Zeigt nur als Beispiel markierte EintrÃ¤ge
+filter.priority.name=Nur PrioritÃ¤tseintrÃ¤ge
+filter.priority.desc=Zeigt nur als PrioritÃ¤tseintrÃ¤ge markierte EintrÃ¤ge (EDICT)
 
 xcv.menu.cut=Ausschneiden
 xcv.menu.cut.mk=A
@@ -221,9 +221,9 @@ xcv.menu.cut.tt=Verschiebt die Auswahl in die Zwischenablage
 xcv.menu.copy=Kopieren
 xcv.menu.copy.mk=K
 xcv.menu.copy.tt=Kopiert die Auswahl in die Zwischenablage
-xcv.menu.paste=Einfügen
+xcv.menu.paste=EinfÃ¼gen
 xcv.menu.paste.mk=E
-xcv.menu.paste.tt=Fügt den Inhalt der Zwischenablage an der Cursorposition ein
+xcv.menu.paste.tt=FÃ¼gt den Inhalt der Zwischenablage an der Cursorposition ein
 
 editor.menu.find=Suchen...
 editor.menu.find.mk=S
@@ -239,85 +239,85 @@ editor.dialog.findagain.notfound=Kein weiteres Vorkommen von "{0}" wurde gefunde
 
 prefs.title=Voreinstellungen
 
-dictionaries.title=Wörterbücher
-dictionaries.chooser.title=Wörterbücher hinzufügen
-dictionaries.chooser.button.add=Hinzufügen
-dictionaries.loading.title=Lade Wörterbücher...
-dictionaries.loading=Lade Wörterbuch {0}/Erzeuge Index...
+dictionaries.title=WÃ¶rterbÃ¼cher
+dictionaries.chooser.title=WÃ¶rterbÃ¼cher hinzufÃ¼gen
+dictionaries.chooser.button.add=HinzufÃ¼gen
+dictionaries.loading.title=Lade WÃ¶rterbÃ¼cher...
+dictionaries.loading=Lade WÃ¶rterbuch {0}/Erzeuge Index...
 dictionaries.button.up=Eintrag nach oben
 dictionaries.button.down=Eintrag nach unten
-dictionaries.button.add=Wörterbuch hinzufügen...
+dictionaries.button.add=WÃ¶rterbuch hinzufÃ¼gen...
 dictionaries.button.remove=Eintrag entfernen
 
 general.title=Allgemein
 general.startup=Beim Start
-general.startup.jglossframe=Öffne leeres JGloss-Dokument
-general.startup.wordlookup=Öffne Wörterbuch-Dialog
+general.startup.jglossframe=Ã–ffne leeres JGloss-Dokument
+general.startup.wordlookup=Ã–ffne WÃ¶rterbuch-Dialog
 general.leftclick=Links-Klick auf ein annotiertes Wort
-general.leftclick.select=Annotation auswählen
+general.leftclick.select=Annotation auswÃ¤hlen
 general.leftclick.tooltip=Annotations-Tooltip zeigen
-general.editor.enableediting=Direktes Editieren ermöglichen (fehlerhaft)
+general.editor.enableediting=Direktes Editieren ermÃ¶glichen (fehlerhaft)
 general.chasen.label=ChaSen-Programm:
-general.chasen.chooser.title=ChaSen-Programm auswählen
+general.chasen.chooser.title=ChaSen-Programm auswÃ¤hlen
 general.parserselector=Zwischenablage Importieren Parser
 
 style.title=Darstellung
 style.fontsize_pt=pt
-style.autodetect=Zeichensätze automatisch konfigurieren
+style.autodetect=ZeichensÃ¤tze automatisch konfigurieren
 style.autodetect.title=Zeichensatz Auto-Konfiguration
-style.autodetect.progress.description=Teste alle verfügbaren Zeichensätze.
+style.autodetect.progress.description=Teste alle verfÃ¼gbaren ZeichensÃ¤tze.
 style.autodetect.progress.font=Teste Zeichensatz {0}.
 style.autodetect.nochange=\
-Alle ausgewählten Zeichensätze können japanische Zeichen darstellen.\n\
-Die Zeichensatz-Einstellungen wurden nicht geändert.
+Alle ausgewÃ¤hlten ZeichensÃ¤tze kÃ¶nnen japanische Zeichen darstellen.\n\
+Die Zeichensatz-Einstellungen wurden nicht geÃ¤ndert.
 style.autodetect.selectedfont=\
-Der Zeichensatz {0} wurde als japanischer Zeichensatz ausgewählt,\n\
-und wurde konfiguriert. Klicken sie OK oder Anwenden, um die Änderungen\n\
-zu übernehmen. Einige Änderungen werden erst nach einem Neustart von\n\
-JGloss übernommen.
+Der Zeichensatz {0} wurde als japanischer Zeichensatz ausgewÃ¤hlt,\n\
+und wurde konfiguriert. Klicken sie OK oder Anwenden, um die Ã„nderungen\n\
+zu Ã¼bernehmen. Einige Ã„nderungen werden erst nach einem Neustart von\n\
+JGloss Ã¼bernommen.
 style.autodetect.nofont=\
 Es wurde kein passender Zeichensatz gefunden. Die Einstellungen\n\
-wurden nicht geändert. Japanischer Text wird möglicherweise nicht\n\
+wurden nicht geÃ¤ndert. Japanischer Text wird mÃ¶glicherweise nicht\n\
 korrekt dargestellt.
 style.general=Japanischer Zeichensatz
 style.general.default=Default Java-Zeichensatz benutzen
 style.general.custom=Diesen Zeichensatz benutzen:
-style.wordlookup=Wörterbuch-Ergebnisse
+style.wordlookup=WÃ¶rterbuch-Ergebnisse
 style.text=Text
 style.reading=Lesung
-style.translation=Übersetzung
+style.translation=Ãœbersetzung
 style.text.font=Zeichensatz:
-style.text.size=Größe:
+style.text.size=GrÃ¶ÃŸe:
 style.text.usecolor=Hintergrundfarbe:
-style.text.colorchooser.title=Hintergrundfarbe auswählen
-style.highlight.color=Auswahlfarbe für Annotationen:
-style.highlight.colorchooser.title=Auswahlfarbe für Annotationen
+style.text.colorchooser.title=Hintergrundfarbe auswÃ¤hlen
+style.highlight.color=Auswahlfarbe fÃ¼r Annotationen:
+style.highlight.colorchooser.title=Auswahlfarbe fÃ¼r Annotationen
 
-exclusions.title=Ausschlüsse
-exclusions.button.add=Wort hinzufügen...
+exclusions.title=AusschlÃ¼sse
+exclusions.button.add=Wort hinzufÃ¼gen...
 exclusions.button.remove=Wort entfernen
 exclusions.button.export=Liste exportieren...
 exclusions.button.import=Liste importieren...
-exclusions.add.title=Wort hinzufügen
-exclusions.add=Geben sie das Wort ein, das zur Ausschluss-\nListe hinzugefügt werden soll.
+exclusions.add.title=Wort hinzufÃ¼gen
+exclusions.add=Geben sie das Wort ein, das zur Ausschluss-\nListe hinzugefÃ¼gt werden soll.
 exclusions.export.title=Ausschluss-Liste exportieren
 exclusions.import.title=Ausschluss-Liste importieren
 
 import.title=Datei importieren
-import.urlorfile=Geben sie eine URL ein, oder wählen sie die Datei, die sie importieren möchten:
+import.urlorfile=Geben sie eine URL ein, oder wÃ¤hlen sie die Datei, die sie importieren mÃ¶chten:
 import.file=Datei
 import.text=Text
 import.pastetext=Kopieren sie den japanischen Text hierhin:
-import.button.choosefile=Datei auswählen...
+import.button.choosefile=Datei auswÃ¤hlen...
 import.button.choosefile.mk=D
 import.encodings=Zeichensatz der Datei:
 import.parserselector=Text-Parser
 
 import.clipboard=Zwischenablage
 import.textarea=importierter Text
-load.progress=Öffne {0}
+load.progress=Ã–ffne {0}
 
-parserselector.readingbrackets=Klammern für Lesungs-Anmerkungen:
+parserselector.readingbrackets=Klammern fÃ¼r Lesungs-Anmerkungen:
 parserselector.noreadings=keine
 parserselector.firstoccurrence=Nur das erste Vorkommen eines Wortes annotieren
 parserselector.firstoccurrence.mk=N
@@ -328,8 +328,8 @@ print.title=JGloss-Dokument
 
 annotationeditor.reading.base={0}:\ 
 annotationeditor.readings=Lesungen:
-annotationeditor.translation=Übersetzung:\ 
-annotationeditor.dictionaryform=Wörterbuchform:\ 
+annotationeditor.translation=Ãœbersetzung:\ 
+annotationeditor.dictionaryform=WÃ¶rterbuchform:\ 
 annotationeditor.dictionaryform.none=(keine)
 annotationeditor.dictionaryform.word=Wort:\ 
 annotationeditor.dictionaryform.reading=Lesung:\ 
@@ -337,44 +337,44 @@ annotationeditor.grammaticaltype=Gramm. Typ:\
 annotationeditor.readingannotation=Lesung aus {0}: {1}
 annotationeditor.menu.title=Annotation
 annotationeditor.menu.usereading=Diese Lesung benutzen
-annotationeditor.menu.usereading.tt=Macht die ausgewählte Lesung zur Lesung der Annotation
-annotationeditor.menu.usetranslation=Diese Übersetzung benutzen
-annotationeditor.menu.usetranslation.tt=Macht die ausgewählte Übersetzung zur Übersetzung der Annotation
+annotationeditor.menu.usereading.tt=Macht die ausgewÃ¤hlte Lesung zur Lesung der Annotation
+annotationeditor.menu.usetranslation=Diese Ãœbersetzung benutzen
+annotationeditor.menu.usetranslation.tt=Macht die ausgewÃ¤hlte Ãœbersetzung zur Ãœbersetzung der Annotation
 annotationeditor.menu.hide=Annotation ausblenden
-annotationeditor.menu.hide.tt=Blendet die Lesung und Übersetzung der Annotation aus
+annotationeditor.menu.hide.tt=Blendet die Lesung und Ãœbersetzung der Annotation aus
 annotationeditor.menu.show=Annotation einblenden
-annotationeditor.menu.show.tt=Blendet die Lesung und Übersetzung der Annotation ein
+annotationeditor.menu.show.tt=Blendet die Lesung und Ãœbersetzung der Annotation ein
 annotationeditor.menu.remove=Annotation entfernen
-annotationeditor.menu.remove.tt=Löscht die ausgewählte Annotation
+annotationeditor.menu.remove.tt=LÃ¶scht die ausgewÃ¤hlte Annotation
 annotationeditor.menu.removeduplicates=Entferne Anno. & Duplikate
-annotationeditor.menu.removeduplicates.tt=Entfernt die Annotation und alle Duplikate mit gleichem Wort, gleicher Lesung und Übersetzung
-annotationeditor.menu.equalize=Für Alle benutzen
-annotationeditor.menu.equalize.tt=Benutzt die Lesung und Übersetzung der Annotation für alle Annotationen mit gleichem Wort
-annotationeditor.menu.addtoexclusions=Zu Ausschlüssen hinzufügen
-annotationeditor.menu.addtoexclusions.tt=Fügt das Wort der ausgewählten Annotation zur Liste der vom Annotieren ausgeschlossenen Wörter hinzu
-annotationeditor.menu.addtodictionary=Zu Wörterbuch hinzufügen
-annotationeditor.menu.addtodictionary.tt=Erzeugt einen Eintrag im Benuzterwörterbuch aus der Wörterbuchform und Übersetzung
+annotationeditor.menu.removeduplicates.tt=Entfernt die Annotation und alle Duplikate mit gleichem Wort, gleicher Lesung und Ãœbersetzung
+annotationeditor.menu.equalize=FÃ¼r Alle benutzen
+annotationeditor.menu.equalize.tt=Benutzt die Lesung und Ãœbersetzung der Annotation fÃ¼r alle Annotationen mit gleichem Wort
+annotationeditor.menu.addtoexclusions=Zu AusschlÃ¼ssen hinzufÃ¼gen
+annotationeditor.menu.addtoexclusions.tt=FÃ¼gt das Wort der ausgewÃ¤hlten Annotation zur Liste der vom Annotieren ausgeschlossenen WÃ¶rter hinzu
+annotationeditor.menu.addtodictionary=Zu WÃ¶rterbuch hinzufÃ¼gen
+annotationeditor.menu.addtodictionary.tt=Erzeugt einen Eintrag im BenuzterwÃ¶rterbuch aus der WÃ¶rterbuchform und Ãœbersetzung
 annotationeditor.menu.hideduplicates=Alle Duplikate ausblenden
 annotationeditor.menu.hideduplicates.tt=Blendet alle Annotationen aus, die Duplikate vorhergehender Annotationen sind
 annotationeditor.menu.unhide=Alle Annotationen einblenden
 annotationeditor.menu.unhide.tt=Blendet alle Annotationen im Dokument ein
 annotationeditor.entry.hidden=\ (ausgeblendet)
 
-annotationeditor.action.cleartranslation=Lösche Übersetzung
-annotationeditor.action.next=Nächste Annotation
+annotationeditor.action.cleartranslation=LÃ¶sche Ãœbersetzung
+annotationeditor.action.next=NÃ¤chste Annotation
 annotationeditor.action.previous=Vorherige Annotation
 
 export.encodings=Zeichensatz:
 export.templates=Format:
-export.template.unmatchedbegin=Kein Ende-Marker für {0} in Export-Format gefunden, Zeile {1,number}.
+export.template.unmatchedbegin=Kein Ende-Marker fÃ¼r {0} in Export-Format gefunden, Zeile {1,number}.
 export.template.patternredefined=Pattern erneut definiert in Export-Format, Zeile {0,number}.
 export.template.unknownline=Die Zeile {0,number} ist an dieser Stelle nicht im Export-Format erlaubt.
-export.template.nodescription=Keine Beschreibung verfügbar.
-export.choosetemplate=Wählen sie eine Vorlage
+export.template.nodescription=Keine Beschreibung verfÃ¼gbar.
+export.choosetemplate=WÃ¤hlen sie eine Vorlage
 export.annotationlist.title=Annotationsliste exportieren
 export.annotationlist.header=\# Annotationsliste fuer {0}\n\# Zeichensatz: {1}\n
 export.writereadings=Lesungen schreiben
-export.writetranslations=Übersetzungen schreiben
+export.writetranslations=Ãœbersetzungen schreiben
 export.writehidden=Ausgeblendete Annotationen schreiben
 
 export.text.title=Text exportieren
@@ -392,14 +392,14 @@ export.latex.menu=LaTeX...
 export.latex.menu.mk=L
 export.latex.menu.tt=Exportiert das Dokument als LaTeX-Quelldatei
 export.latex.title=LaTeX exportieren
-export.latex.fontsize=Fontgröße:
+export.latex.fontsize=FontgrÃ¶ÃŸe:
 export.latex.fontsize_pt=pt
 
 export.annotationlist.menu=Annotationsliste...
 export.annotationlist.menu.mk=A
 export.annotationlist.menu.tt=Exportiert die Liste der Annotationen in eine Textdatei
 
-jgloss.about.frame.title=Über JGloss
+jgloss.about.frame.title=Ãœber JGloss
 jgloss.about.text=\
 Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\
 \nCopyright (c) 2001-2004 Michael Koch (tensberg@gmx.net)\n\
@@ -409,15 +409,15 @@ This is free software, and you are welcome to redistribute it\n\
 under certain conditions; select "Show License" for details.
 about.showlicense=Lizenz anzeigen
 about.license.title=GNU General Public License
-jdictionary.about.frame.title=Über JDictionary
-jdictionary.about.text=Ein Front-end für japanische Wörterbücher.\n\nCopyright (c) 2002-2004 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+jdictionary.about.frame.title=Ãœber JDictionary
+jdictionary.about.text=Ein Front-end fÃ¼r japanische WÃ¶rterbÃ¼cher.\n\nCopyright (c) 2002-2004 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 
-preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
+preferences.header=Diese Datei enthÃ¤lt die Voreinstellungen fÃ¼r die Anwendung JGloss.
 preferences.header.obsolete=\
- Diese Datei enthielt die Voreinstellungen für die Anwendung JGloss.\n\
+ Diese Datei enthielt die Voreinstellungen fÃ¼r die Anwendung JGloss.\n\
 # Seit JGloss 1.0.3 werden die Voreinstellungen an einem anderen Ort\n\
 # gespeichert (Registry unter Windows, .java/.userPrefs/jgloss unter\n\
-# Unix). Diese Datei kann problemlos gelöscht werden.
+# Unix). Diese Datei kann problemlos gelÃ¶scht werden.
 
 filefilter.description.jgloss=JGloss Dokumente (*.jgloss)
 filefilter.description.xml=XML Dokumente (*.xml)
@@ -432,29 +432,29 @@ fileview.description.tex=LaTeX-Dokument
 fileview.description.text=Textdokument
 fileview.description.template=Export-Format
 
-filechooser.overwrite.title=Datei überschreiben?
-filechooser.overwrite=Die ausgewählte Datei {0} existiert\nbereits. Überschreiben?
+filechooser.overwrite.title=Datei Ã¼berschreiben?
+filechooser.overwrite=Die ausgewÃ¤hlte Datei {0} existiert\nbereits. Ãœberschreiben?
 
 encodings.default=<auto>
 
-userdictionary.name=Benutzerwörterbuch
-userdictionary.instance.name=Benutzerwörterbuch (editierbares EDICT)
+userdictionary.name=BenutzerwÃ¶rterbuch
+userdictionary.instance.name=BenutzerwÃ¶rterbuch (editierbares EDICT)
 
-wordlookup.title=JGloss Wörterbuch
+wordlookup.title=JGloss WÃ¶rterbuch
 wordlookup.searchoptions=Suchoptionen
-wordlookup.choice.best=Beste Übereinstimmung
+wordlookup.choice.best=Beste Ãœbereinstimmung
 wordlookup.choice.best.mk=t
 wordlookup.choice.best.tt=Versuche jede der obigen Suchoptionen, bis ein Treffer gefunden wurde
 wordlookup.choice.verbdeinflection=Benutze De-Inflektion
 wordlookup.choice.verbdeinflection.mk=D
 wordlookup.choice.verbdeinflection.tt=Ermittle die Grundform des Suchworts mit dem De-Inflektions-Algorithmus
-wordlookup.dictionaryselection=Wörterbuch-Auswahl
-wordlookup.choice.dictionary=Suche in Wörterbuch
+wordlookup.dictionaryselection=WÃ¶rterbuch-Auswahl
+wordlookup.choice.dictionary=Suche in WÃ¶rterbuch
 wordlookup.choice.dictionary.mk=r
-wordlookup.choice.dictionary.tt=Beschränke Suche auf ein Wörterbuch
-wordlookup.choice.alldictionaries=Suche in allen Wörterbüchern
+wordlookup.choice.dictionary.tt=BeschrÃ¤nke Suche auf ein WÃ¶rterbuch
+wordlookup.choice.alldictionaries=Suche in allen WÃ¶rterbÃ¼chern
 wordlookup.choice.alldictionaries.mk=c
-wordlookup.choice.alldictionaries.tt=Suche in allen Wörterbüchern
+wordlookup.choice.alldictionaries.tt=Suche in allen WÃ¶rterbÃ¼chern
 wordlookup.enterexpression=Suchwort:
 wordlookup.enterexpression.mk=w
 wordlookup.enterexpression.tt=Suchwort hier eingeben
@@ -463,49 +463,49 @@ wordlookup.enterdistance.mk=t
 wordlookup.enterdistance.tt=Erlaubter Abstand zwischen Suchwort und Treffer
 wordlookup.search=Suchen
 wordlookup.search.mk=S
-wordlookup.search.tt=Finde Wörterbucheinträge, die den Suchwort enthalten
-wordlookup.clear=Löschen
+wordlookup.search.tt=Finde WÃ¶rterbucheintrÃ¤ge, die den Suchwort enthalten
+wordlookup.clear=LÃ¶schen
 wordlookup.clear.mk=L
-wordlookup.clear.tt=Lösche das Suchwort-Eingabefeld
+wordlookup.clear.tt=LÃ¶sche das Suchwort-Eingabefeld
 wordlookup.result=Suchergebnis:
 
 wordlookup.searchfield=Suchfelder
 wordlookup.searchfield.word=Japanisch
 wordlookup.searchfield.reading=Lesung
-wordlookup.searchfield.translation=Übersetzung
+wordlookup.searchfield.translation=Ãœbersetzung
 wordlookup.matchmode=Feldsuchmodus
 wordlookup.matchmode.field=Vergleiche Felder
-wordlookup.matchmode.word=Vergleiche Wörter
+wordlookup.matchmode.word=Vergleiche WÃ¶rter
 wordlookup.filter=Resultate filtern
 wordlookup.status.searching=Suche... (bisher {0,number,integer} Treffer)
-wordlookup.status.matches={0,choice,0#Kein Eintrag|1#1 Eintrag|1<{0} Einträge} gefunden.
+wordlookup.status.matches={0,choice,0#Kein Eintrag|1#1 Eintrag|1<{0} EintrÃ¤ge} gefunden.
 
-wordlookup.nodictionary=<keine verfügbar>
+wordlookup.nodictionary=<keine verfÃ¼gbar>
 wordlookup.matches=Treffer in {0}:
 wordlookup.nomatches_dictionary=(keine Treffer)
-wordlookup.unsupportedsearchmode=(der ausgewählte Suchmodus wird nicht unterstützt)
-wordlookup.exception=(das Wörterbuch hat einen Fehler zurückgegeben: {1}, {0})
-wordlookup.inflection=Mögliche Inflektion: {0}, {1}->{2}
+wordlookup.unsupportedsearchmode=(der ausgewÃ¤hlte Suchmodus wird nicht unterstÃ¼tzt)
+wordlookup.exception=(das WÃ¶rterbuch hat einen Fehler zurÃ¼ckgegeben: {1}, {0})
+wordlookup.inflection=MÃ¶gliche Inflektion: {0}, {1}->{2}
 wordlookup.clipboard=Zwischenablage
 wordlookup.clipboard.search=Inhalt der Zwischenablage automatisch suchen
-wordlookup.history.forward=Vorwärts
+wordlookup.history.forward=VorwÃ¤rts
 wordlookup.history.forward.tt=zur folgenden Suche wechseln
-wordlookup.history.back=Zurück
+wordlookup.history.back=ZurÃ¼ck
 wordlookup.history.back.tt=zur vorherigen Suche wechseln
 wordlookup.reference=Referenz
 wordlookup.showlegend=Legende zeigen
-wordlookup.showlegend.tt=Zeigt eine Legende der von den Wörterbüchern benutzten Attribute
-wordlookup.legendframe.title=Wörterbuch-Attribut-Legende
+wordlookup.showlegend.tt=Zeigt eine Legende der von den WÃ¶rterbÃ¼chern benutzten Attribute
+wordlookup.legendframe.title=WÃ¶rterbuch-Attribut-Legende
 
-legend.dictionarychoice=Zeige Legende für\ 
+legend.dictionarychoice=Zeige Legende fÃ¼r\ 
 legend.dictionary=Von {0} benutzte Attribute
 legend.noattributes=(keine Attribute)
 legend.attribute={1}
 legend.attributeexample=Anzeigestil:\ 
 legend.values=Werte dieses Attributs:
 
-abbr.word=Abk. für "{0}"
-abbr.lang_and_word=Abk. für {0} "{1}"
+abbr.word=Abk. fÃ¼r "{0}"
+abbr.lang_and_word=Abk. fÃ¼r {0} "{1}"
 gairaigo.lang=aus dem {0}
 gairaigo.lang_and_word=von {0} "{1}"
 

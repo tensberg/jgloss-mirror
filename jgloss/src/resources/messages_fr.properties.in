@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # French localization of the JGloss messages.
 #
@@ -25,33 +25,33 @@
 #
 error.no_message=(aucun message)
 error.initialization.title=Erreur
-error.initialization={0}{1}\n\nL''exception Java était\n{2}: {3}.
-error.initialization.fatal=JGloss ne peut pas démarrer.\n\n
+error.initialization={0}{1}\n\nL''exception Java Ã©tait\n{2}: {3}.
+error.initialization.fatal=JGloss ne peut pas dÃ©marrer.\n\n
 error.initialization.generic=Une erreur a eu lieu durant l'initialisation.
 error.noclassdef=\
-Une classe Java n'a pas été trouvée. Cela signifie que soit votre installation\n\
+Une classe Java n'a pas Ã©tÃ© trouvÃ©e. Cela signifie que soit votre installation\n\
 de Java n'est pas compatible avec Java 2 version 1.3 ou que le fichier JAR de\n\
-JGloss est défecteux.\n\
-Vous pouvez télécharger une version compatible de Java à:\n\
+JGloss est dÃ©fecteux.\n\
+Vous pouvez tÃ©lÃ©charger une version compatible de Java Ã :\n\
 http://java.sun.com/j2se/1.3/jre/.
-error.loadPreferences=Une erreur a eu lieu pendant le chargement des préférences:
-error.storePreferences=Une erreur a eu lieu pendant la sauvegarde des préférences:
+error.loadPreferences=Une erreur a eu lieu pendant le chargement des prÃ©fÃ©rences:
+error.storePreferences=Une erreur a eu lieu pendant la sauvegarde des prÃ©fÃ©rences:
 error.dictionary.title=Erreur lors de l'ouverture du dictionnaire
-error.dictionary.filenotfound=Le dictionnaire {0} n''a pas pu être ouvert.\nVérifiez que le dictionnaire{1} existe et est lisible.
+error.dictionary.filenotfound=Le dictionnaire {0} n''a pas pu Ãªtre ouvert.\nVÃ©rifiez que le dictionnaire{1} existe et est lisible.
 error.dictionary.ioerror=Une erreur a eu lieu lors de l''ouverture\ndu dictionnaire {0}.
-error.dictionary.format=Le fichier {0} n''est pas\nun dictionnaire dans un format supporté.
-error.exclusions.save.title=Erreur lors de l'écriture de la liste d'exclusion
-error.exclusions.save=Une arreur a eu lieu lors de l''écriture de la\nliste d''exclusion dans {0}.\nL''exception  Java était {1}, {2}.
-error.exclusions.load.title=Erreur à la lecture de la liste d'exclusion
-error.exclusions.load=Une erreur a eu lieu à la lecture de la\nliste d''exclusion dans {0}.\nL''exclusion Java était {1}, {2}.
+error.dictionary.format=Le fichier {0} n''est pas\nun dictionnaire dans un format supportÃ©.
+error.exclusions.save.title=Erreur lors de l'Ã©criture de la liste d'exclusion
+error.exclusions.save=Une arreur a eu lieu lors de l''Ã©criture de la\nliste d''exclusion dans {0}.\nL''exception  Java Ã©tait {1}, {2}.
+error.exclusions.load.title=Erreur Ã  la lecture de la liste d'exclusion
+error.exclusions.load=Une erreur a eu lieu Ã  la lecture de la\nliste d''exclusion dans {0}.\nL''exclusion Java Ã©tait {1}, {2}.
 error.import.title=Erreur lors de l'import du fichier
-error.import.exception=Une erreur a eu lieu durant l''import de {0}.\nL''exclusion Java était {1}, {2}.
+error.import.exception=Une erreur a eu lieu durant l''import de {0}.\nL''exclusion Java Ã©tait {1}, {2}.
 error.export.title=Erreur lors de l'export du fichier
-error.export.exception=Une erreur a eu lieu durant l''export.\nL''exclusion Java était {1}, {2}.
+error.export.exception=Une erreur a eu lieu durant l''export.\nL''exclusion Java Ã©tait {1}, {2}.
 error.load.title=Erreur de chargement de fichier
-error.load.exception=Une erreur a eu lieu durant le chargement de {0}.\nL''exclusion Java était {1}, {2}.
+error.load.exception=Une erreur a eu lieu durant le chargement de {0}.\nL''exclusion Java Ã©tait {1}, {2}.
 error.save.title=Erreur de sauvegarde de gichier
-error.save.exception=Une erreur a eu lieu durant la sauvegarde de {0}.\nL''exclusion Java était {1}, {2}.
+error.save.exception=Une erreur a eu lieu durant la sauvegarde de {0}.\nL''exclusion Java Ã©tait {1}, {2}.
 error.save.unknownannotation=Abandon du type d''annotation inconnu {0}
 
 button.ok=OK
@@ -63,18 +63,18 @@ button.discard=Abandonner
 button.close=Fermer
 
 # reserve space in info label with dummy entry:
-splashscreen.dummyinfo=<création de la fenêtre d'application>
-splashscreen.loadingPreferences=chargement des préférences
+splashscreen.dummyinfo=<crÃ©ation de la fenÃªtre d'application>
+splashscreen.loadingPreferences=chargement des prÃ©fÃ©rences
 splashscreen.initPreferences=chargement des dictionnaires
-splashscreen.initMain=création de la fenêtre d'application
+splashscreen.initMain=crÃ©ation de la fenÃªtre d'application
 
 main.usage=Utilisation: jgloss.JGloss [option] fichier ...\n\
 Options:\n\
 \  -h, --help, /?     Affiche ce message\n\
-\  -i, --createindex  Crée des fichiers index pour le dictionnaire\n\
-\                     donné en ligne de commande\n\
+\  -i, --createindex  CrÃ©e des fichiers index pour le dictionnaire\n\
+\                     donnÃ© en ligne de commande\n\
 \  -f, --format       Imprime le format de dictionnaire des fichiers\n\
-\                     donnés en ligne de commande\n\
+\                     donnÃ©s en ligne de commande\n\
 \  -a, --annotatehtml Annotate a HTML file with dictionary entries\n\
 \                     for Japanese words. JavaScript will be used\n\
 \                     to display the results in a browser.\n\
@@ -85,14 +85,14 @@ Options:\n\
 \                    a window in which you can paste text which\n\
 \                    will be imported.
 main.unknownoption=Option inconnue {0}
-main.format=Le format de {0} semble être {1}.
+main.format=Le format de {0} semble Ãªtre {1}.
 main.format.unrecognized={0} n''est pas un format de dictionnaire connu.
 main.title=JGloss
 
 main.menu.file=Fichier
 main.menu.import=Importer...
 main.menu.import.mk=I
-main.menu.import.tt=Créer un nouveau document en important un fichier
+main.menu.import.tt=CrÃ©er un nouveau document en important un fichier
 main.menu.importclipboard=Importer Clipboard
 main.menu.open=Ouvrir...
 main.menu.open.mk=O
@@ -118,11 +118,11 @@ main.menu.print.mk=P
 main.menu.close=Fermer
 main.menu.close.mk=C
 main.menu.close.tt=Fermer le Document
-main.menu.preferences=Préférences
+main.menu.preferences=PrÃ©fÃ©rences
 main.menu.preferences.mk=P
 main.menu.view=Vue
 main.menu.compactview=Vue Compacte
-main.menu.showreading=Voir Écrits
+main.menu.showreading=Voir Ã‰crits
 main.menu.showtranslation=Voir Traductions
 main.menu.showannotation=Voir Conseils
 main.menu.help=Aide
@@ -139,24 +139,24 @@ editor.menu.copy=Copier
 editor.menu.copy.mk=O
 editor.menu.paste=Coller
 editor.menu.paste.mk=P
-editor.menu.addannotation=Annoter la Sélection...
+editor.menu.addannotation=Annoter la SÃ©lection...
 editor.menu.addannotation.mk=A
-editor.menu.addannotation.tt=Ajoute une annotation à la sélection actuelle
-editor.addannotation.text=SVP entrez le mot à chercher dans\nles dictionnaires pour la nouvelle annotation:
-editor.addannotation.title=Annoter la sélection
+editor.menu.addannotation.tt=Ajoute une annotation Ã  la sÃ©lection actuelle
+editor.addannotation.text=SVP entrez le mot Ã  chercher dans\nles dictionnaires pour la nouvelle annotation:
+editor.addannotation.title=Annoter la sÃ©lection
 
-prefs.title=Préférences
+prefs.title=PrÃ©fÃ©rences
 
 dictionaries.title=Dictionnaires
 dictionaries.chooser.title=Ajouter des fichiers de dictionnaire
 dictionaries.chooser.button.add=Ajouter
-dictionaries.button.up=Monter la sélection
-dictionaries.button.down=Descendre la sélection
+dictionaries.button.up=Monter la sÃ©lection
+dictionaries.button.down=Descendre la sÃ©lection
 dictionaries.button.add=Ajouter un fichier de dictionnaire...
-dictionaries.button.remove=Enlever la sélection
+dictionaries.button.remove=Enlever la sÃ©lection
 
-general.title=Général
-general.editor.enableediting=Autoriser l'édition directe (buggué)
+general.title=GÃ©nÃ©ral
+general.editor.enableediting=Autoriser l'Ã©dition directe (bugguÃ©)
 
 style.text=Texte
 style.reading=Lecture
@@ -174,19 +174,19 @@ exclusions.button.remove=Retirer un mot
 exclusions.button.export=Exporter la liste...
 exclusions.button.import=Importer la liste...
 exclusions.add.title=Ajouter un mot
-exclusions.add=Entrer le mot à ajouter à la liste d'exclusion.
+exclusions.add=Entrer le mot Ã  ajouter Ã  la liste d'exclusion.
 exclusions.export.title=Exporter la liste d'exclusion
 exclusions.import.title=Importer la liste d'exclusion
 
 import.title=Importer fichier
-import.urlorfile=Entrez l'URL, ou spécifiez le fichier à importer.
+import.urlorfile=Entrez l'URL, ou spÃ©cifiez le fichier Ã  importer.
 import.button.choosefile=Choisissez le fichier...
-import.encodings=Encodage de caractères pour le fichier:
+import.encodings=Encodage de caractÃ¨res pour le fichier:
 
 import.clipboard=clipboard
 load.progress=Chargement de {0}
 
-parserselector.readingbrackets=Crochets délimitant les annotations de lecture:
+parserselector.readingbrackets=Crochets dÃ©limitant les annotations de lecture:
 
 print.title=Inmprimer le document
 
@@ -205,11 +205,11 @@ annotationeditor.menu.addtoexclusions=Ajouter aux Exclusions
 annotationeditor.menu.add=Ajouter Annotation
 annotationeditor.menu.hideduplicates=Masquer toutes les Doubles
 annotationeditor.menu.unhide=Montrer toutes les Annotations
-annotationeditor.entry.hidden=\ (masqué)
+annotationeditor.entry.hidden=\ (masquÃ©)
 
 annotationeditor.action.next=Annotation Suivante
 annotationeditor.action.next.ak=N
-annotationeditor.action.previous=Annotation Précédente
+annotationeditor.action.previous=Annotation PrÃ©cÃ©dente
 annotationeditor.action.previous.ak=P
 annotationeditor.action.meta=Faire quelque-chose d'utile
 annotationeditor.action.meta.ak=SPACE
@@ -221,21 +221,21 @@ annotationeditor.action.hide.ak=H
 export.encodings=Encodage:
 export.annotationlist.title=Exporter la liste d'annotation
 export.annotationlist.header=\# la liste d''annotation pour {0}\n\# Encodage: {1}\n
-export.writereading=Écrire lectures
-export.writetranslations=Écrire traductions
-export.writehidden=écrire les annotations "masquées"
+export.writereading=Ã‰crire lectures
+export.writetranslations=Ã‰crire traductions
+export.writehidden=Ã©crire les annotations "masquÃ©es"
 export.plaintext.title=Exporter du texte brut
 export.html.title=Exporter de l'HTML
 export.html.interactive=HTML interactif
-export.html.backwardscompatible=Compatibilité Ascendante
+export.html.backwardscompatible=CompatibilitÃ© Ascendante
 export.latex.title=Exporter vers LaTeX
 
-about.frame.title=À propos de JGloss
-about.text=Un outil  pour faciliter la lectureet la compréhension de textes japonais.\n\nCopyright (c) 2001-2004 Michael Koch (tensberg@gmx.net)\n\nJGloss n'est livré avec AUCUNE GARANTIE.\nCeci est un Logiciel Libre, et vous êtes libre de le redistribuer\nsous certaines conditions; "Voir License" pour plus de détails.
+about.frame.title=Ã€ propos de JGloss
+about.text=Un outil  pour faciliter la lectureet la comprÃ©hension de textes japonais.\n\nCopyright (c) 2001-2004 Michael Koch (tensberg@gmx.net)\n\nJGloss n'est livrÃ© avec AUCUNE GARANTIE.\nCeci est un Logiciel Libre, et vous Ãªtes libre de le redistribuer\nsous certaines conditions; "Voir License" pour plus de dÃ©tails.
 about.showlicense=Voir License
 about.license.title=GNU General Public License
 
-preferences.header=Ce fichier contient les préférences pour l'application JGloss.
+preferences.header=Ce fichier contient les prÃ©fÃ©rences pour l'application JGloss.
 
 filefilter.jgloss.description=Documents JGloss (*.jgloss)
 filefilter.html.description=Documents HTML (*.html)

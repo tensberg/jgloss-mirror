@@ -1,4 +1,4 @@
-# Encoding: EUC-JP
+# Encoding: UTF-8
 #
 # Default preferences. All keys not found in the user preferences will be
 # taken from this file.
@@ -39,7 +39,7 @@ dictionaries=
 openrecent.files=
 
 # Delimiters for reading annotations
-reading.bracket.chars=�ԡաΡϡڡ�
+reading.bracket.chars=《》［］【】
 
 encodings=SHIFT_JIS,EUC-JP,ISO-2022-JP,UTF-8,UTF-16,UTF-16BE,UTF-16LE
 fontsizes.wordlookup=9,11,12,13,14,15,16,18

@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # French localization of the messages from jgloss.parser
 #
@@ -25,30 +25,30 @@
 #
 
 # conjugation descriptions for the file data/vconj
-vconj.0=infinitif, négatif, non-passé
-vconj.1=poli, non-passé
+vconj.0=infinitif, nÃ©gatif, non-passÃ©
+vconj.1=poli, non-passÃ©
 vconj.2=conditionnel
 vconj.3=volontaire
 vconj.4=forme en -te
-vconj.5=infinitif, passé
-vconj.6=infinitif, negatif, passé
+vconj.5=infinitif, passÃ©
+vconj.6=infinitif, negatif, passÃ©
 vconj.7=passif
 vconj.8=causal
-vconj.9=conditionnel ou impératif
+vconj.9=conditionnel ou impÃ©ratif
 vconj.10=imperatif
-vconj.11=poli, passé
-vconj.12=poli, negatif, non-passé
-vconj.13=poli, negatif, passé
+vconj.11=poli, passÃ©
+vconj.12=poli, negatif, non-passÃ©
+vconj.13=poli, negatif, passÃ©
 vconj.14=poli, volontaire
 vconj.15=adj. -> adverbe
-vconj.16=adj., passé
+vconj.16=adj., passÃ©
 vconj.17=poli
 vconj.18=poli, volontaire
 vconj.19=passif ou conditionnel
 vconj.20=passif (ou conditionnel si Grp 2)
 vconj.21=adj., negatif
-vconj.22=adj., negatif, passé
-vconj.23=adj., passé
+vconj.22=adj., negatif, passÃ©
+vconj.23=adj., passÃ©
 vconj.24=verbe infinitif ou adjectif
 
 parser.dictionary.document=document

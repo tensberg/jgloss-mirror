@@ -1,4 +1,4 @@
-# Encoding: EUC-JP
+# Encoding: UTF-8
 #
 # Customization strings for the jgloss.ui.JGlossifyReader class.
 #
@@ -24,9 +24,9 @@
 #
 
 # Characters which, if they appear last on a line, do not mark the end of a paragraph.
-no_paragraph_end=,¡¤¡¢¡Ä
+no_paragraph_end=,ï¼Œã€â€¦
 
 # Characters which, if they appear first on a line, do not mark the beginning of a paragraph.
 # This is only tested if the last line ended with a letter, digit or one of the no_paragraph_end
 # chars.
-no_paragraph_start=,.¡¥¡¤¡¢¡£¡ª¡©¡Ä
+no_paragraph_start=,.ï¼ï¼Œã€ã€‚ï¼ï¼Ÿâ€¦

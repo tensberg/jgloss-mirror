@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # French localization of the messages from jgloss.dictionary
 #
@@ -27,9 +27,9 @@
 dictionary.load=Chargement du dictionnaire {0}.
 
 edict.buildindex=Construction de l''index du dictionnaire {0}.\nCela peut prendre un certain temps.
-edict.writejjdx=Écriture de l''index JJDX pour le dictionnaire {0}.
-edict.warning.jjdxversion=WARNING: le numéro de version de l''index JJDX pour {0} est suppérieur à la version supportée par cette version de JGloss.
-edict.error.writejjdx=Erreur lors de l''écriture du fichier JJDX: {0}, {1}
+edict.writejjdx=Ã‰criture de l''index JJDX pour le dictionnaire {0}.
+edict.warning.jjdxversion=WARNING: le numÃ©ro de version de l''index JJDX pour {0} est suppÃ©rieur Ã  la version supportÃ©e par cette version de JGloss.
+edict.error.writejjdx=Erreur lors de l''Ã©criture du fichier JJDX: {0}, {1}
 
 kanjidic.nanori=(nanori, lecture du nom)
 kanjidic.radicalname=(nom du radical)

@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # German localization
 #
@@ -31,5 +31,5 @@ pt=Port.
 ru=Russ.
 sa=Sanskrit
 sv=Schwed.
-tr=Türk.
+tr=TÃ¼rk.
 zh=Chin.

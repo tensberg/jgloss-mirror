@@ -184,10 +184,10 @@ public class ParserSelector extends JPanel {
         // parameter combinations with the parameters in "parameters[][0]" and the
         // corresponding type classes in "parameters[][1]".
         Object[][] parameters = 
-            new Object[][] { { dictionaries, exclusions }, { exclusions } };
+            new Object[][] { { dictionaries, exclusions }, { exclusions }, {} };
         Class[][] paramClasses =
             new Class[][] { { jgloss.dictionary.Dictionary[].class, Set.class},
-                            { Set.class } };
+                            { Set.class }, {} };
 
         // loop over the sets of parameters until a matching constructor is found.
         for ( int i=0; i<parameters.length; i++) try {

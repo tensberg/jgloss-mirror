@@ -28,6 +28,7 @@ import java.io.File;
 import jgloss.parser.Chasen;
 import jgloss.parser.ChasenParser;
 import jgloss.parser.KanjiParser;
+import jgloss.parser.NullParser;
 import jgloss.ui.Dictionaries;
 import jgloss.ui.DocumentStyleDialog;
 import jgloss.ui.ExclusionList;
@@ -75,6 +76,7 @@ public class JGlossApp extends JGloss {
         ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null, true).getName());
         ParserSelector.registerParser( ChasenParser.class, 
                                        new ChasenParser( null, false).getName());
+        ParserSelector.registerParser( NullParser.class, new NullParser().getName());
 
         // set default location of the chasen executable if this is the first start of JGloss
         String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
