@@ -21,7 +21,7 @@ div.popup { display: none; position: absolute; left: 0px; top: 0px;
 //-->
 </STYLE>
 
-<SCRIPT language="javascript">
+<SCRIPT language="JavaScript1.3">
 <!--
 
 var popup = null;
@@ -32,7 +32,8 @@ function sp( el, text) {
     if (el.style)
         el.style.color = "blue";
     
-    if (popup == null) {
+    if (!popup) {
+        // Browser with DOM-Support
         popup = document.getElementById( "popup");
         annotation = document.getElementById( "annotation");
         for ( j=0; j<annotation.childNodes.length; j++) {
@@ -51,19 +52,32 @@ function sp( el, text) {
     // calculate position of element
     var posX = 0;
     var posY = 0;
-    var width = el.offsetWidth;
-    var height = el.offsetHeight;
+    var width = 40;
+    var height = 20;
+    if (el.offsetWidth)
+        width = el.offsetWidth;
+    if (el.offsetHeight)
+        height = el.offsetHeight;
     var e = el;
-    while (e!=null && el!=window.document) {
+    while (e!=null && e!=window.document) {
+        if (e.offsetLeft)
             posX += e.offsetLeft;
+        if (e.offsetTop)
             posY += e.offsetTop;
-            e = e.offsetParent;
+        e = e.offsetParent;
     }
-     
-    annotation_text.nodeValue = text;
-    popup.style.left = posX;
-    popup.style.top = posY + width + 2;
+    
+    // With Konqueror 2.1, simply setting annotation_text.nodeValue=text does not work.
+    var annotation_text_n = document.createTextNode( text);
+    annotation.replaceChild( annotation_text_n, annotation_text);
+    annotation_text = annotation_text_n;
+    popup.style.top = posY + height;
+    popup.style.left = 0;
     popup.style.display = "inline";
+    if (posX+popup.offsetWidth <= window.innerWidth)
+        popup.style.left = posX;
+    else
+        popup.style.left = window.innerWidth - popup.offsetWidth;
 }
 
 function hp( el) {
