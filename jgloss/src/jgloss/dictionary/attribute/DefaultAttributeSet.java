@@ -49,6 +49,9 @@ public class DefaultAttributeSet implements AttributeSet {
                     values.add( _values.get( i));
             }
         }
+        public boolean contains( AttributeValue value) {
+            return values.contains( value);
+        }
         public String toString() {
             StringBuffer out = new StringBuffer();
             out.append( '[');
@@ -104,6 +107,20 @@ public class DefaultAttributeSet implements AttributeSet {
             return false;
     }
 
+    public boolean contains( Attribute key, AttributeValue value, boolean resolveInherited) {
+        if (attributes!=null && attributes.containsKey( key)) {
+            Object v = attributes.get( key);
+            if (v instanceof MutableValueList)
+                return ((MutableValueList) v).contains( value);
+            else // v is AttributeValue
+                return v.equals( value);
+        }
+        else if (resolveInherited && parent!=null)
+            return parent.contains( key, value, true);
+        else
+            return false;
+    }
+
     public ValueList getAttribute( Attribute key, boolean resolveInherited) 
         throws AttributeNotSetException {
         if (attributes!=null && attributes.containsKey( key)) {
@@ -143,6 +160,9 @@ public class DefaultAttributeSet implements AttributeSet {
      * @return This attribute set.
      */
     public DefaultAttributeSet setParent( AttributeSet _parent) {
+        if (_parent == this)
+            throw new IllegalArgumentException();
+
         this.parent = _parent;
         return this;
     }

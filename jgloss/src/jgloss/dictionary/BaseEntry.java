@@ -29,8 +29,7 @@ import jgloss.dictionary.attribute.DefaultAttributeSet;
 import java.util.Iterator;
 import java.util.List;
 
-public class EDictEntry implements DictionaryEntry {
-    protected String word;
+abstract class BaseEntry implements DictionaryEntry {
     protected String reading;
     protected String[][] translations;
     protected Dictionary dictionary;
@@ -40,45 +39,36 @@ public class EDictEntry implements DictionaryEntry {
     protected AttributeSet[] translationRomA;
     protected DefaultAttributeSet emptySet = new DefaultAttributeSet( null);
 
-    public EDictEntry( String _word, String _reading, List _translations,
-                       AttributeSet _generalA, AttributeSet _wordA, AttributeSet _translationA,
-                       List _translationRomA, Dictionary _dictionary) {
-        this.word = _word;
-        this.reading = _reading;
-        this.translations = new String[_translations.size()][];
+    public BaseEntry( String _reading, List _translations,
+                      AttributeSet _generalA, AttributeSet _wordA,
+                      AttributeSet _translationA,
+                      List _translationRomA, Dictionary _dictionary) {
+        reading = _reading;
+        translations = new String[_translations.size()][];
         int rom = 0;
         for ( Iterator i=_translations.iterator(); i.hasNext(); ) {
             List crm = (List) i.next();
             translations[rom++] = (String[]) crm.toArray( new String[crm.size()]);
         }
 
-        this.generalA = _generalA;
-        this.wordA = _wordA;
-        this.translationA = _translationA;
+        generalA = _generalA;
+        wordA = _wordA;
+        translationA = _translationA;
         translationRomA = new AttributeSet[_translationRomA.size()];
         translationRomA = (AttributeSet[]) _translationRomA.toArray( translationRomA);
 
-        this.dictionary = _dictionary;
+        dictionary = _dictionary;
     }
 
     public AttributeSet getGeneralAttributes() {
         return generalA;
     }
  
-    public String getWord( int alternative) {
-        if (alternative != 0)
-            throw new IllegalArgumentException();
-        return word;
-    }
+    public abstract String getWord( int alternative);
 
-    public int getWordAlternativeCount() { return 1; }
+    public abstract int getWordAlternativeCount();
 
-    public AttributeSet getWordAttributes( int alternative) {
-        if (alternative != 0)
-            throw new IllegalArgumentException();
-
-        return emptySet.setParent( wordA);
-    }
+    public abstract AttributeSet getWordAttributes( int alternative);
 
     public AttributeSet getWordAttributes() {
         return wordA;
@@ -96,7 +86,7 @@ public class EDictEntry implements DictionaryEntry {
         if (alternative != 0)
             throw new IllegalArgumentException();
 
-        return emptySet.setParent( getReadingAttributes());
+        return emptySet.setParent( generalA);
     }
 
     public AttributeSet getReadingAttributes() {
@@ -161,33 +151,4 @@ public class EDictEntry implements DictionaryEntry {
 
     public Dictionary getDictionary() { return dictionary; }
 
-    public String toString() {
-        StringBuffer out = new StringBuffer( 30);
-        out.append( generalA.toString());
-        out.append( ' ');
-        out.append( wordA.toString());
-        out.append( ' ');
-        out.append( word);
-        out.append( " [");
-        out.append( reading);
-        out.append( "] ");
-        out.append( translationA);
-        for ( int i=0; i<translations.length; i++) {
-            out.append( ' ');
-            if (translations.length > 1) {
-                out.append( '(');
-                out.append( i+1);
-                out.append( ") ");
-            }
-            out.append( translationRomA[i]);
-            out.append( ' ');
-            for ( int j=0; j<translations[i].length; j++) {
-                if (j > 0)
-                    out.append( "; ");
-                out.append( translations[i][j]);
-            }
-        }
-        
-        return out.toString();
-    }
-} // class EDictEntry
+} // class BaseEntry

@@ -130,6 +130,19 @@ public class EDict extends FileBasedDictionary {
     protected final Pattern BRACKET_PATTERN = Pattern.compile( "\\G\\((.+?)\\)\\s");
     protected final Matcher BRACKET_MATCHER = BRACKET_PATTERN.matcher( "");
 
+    protected final static String PRIORITY_MARKER = "(P)";
+
+    protected final Priority PRIORITY_VALUE = new Priority() {
+            public String getPriority() { return "_P_"; }
+            public int compareTo( Priority p) {
+                if (p == PRIORITY_VALUE)
+                    return 0;
+                else
+                    throw new IllegalArgumentException();
+            }
+            public String toString() { return "_P_"; }
+        };
+
     public EDict( File dicfile) throws IOException {
         super( dicfile);
     }
@@ -208,7 +221,8 @@ public class EDict extends FileBasedDictionary {
         return field;
     }
 
-    protected DictionaryEntryField getFieldType( ByteBuffer buf, int location) {
+    protected DictionaryEntryField getFieldType( ByteBuffer buf, int entryStart, int entryEnd,
+                                                 int location) {
         buf.position( location);
         byte b;
         try {
@@ -271,98 +285,102 @@ public class EDict extends FileBasedDictionary {
                 end = translations.length();
 
             String translation = translations.substring( start, end);
-
-            BRACKET_MATCHER.reset( translation);
-            int matchend = 0;
-            StringBuffer unrecognized = null;
-
-            while (BRACKET_MATCHER.find()) {
-                matchend = BRACKET_MATCHER.end();
-
-                String att = BRACKET_MATCHER.group( 1);
+            if (translation.equals( PRIORITY_MARKER)) {
+                generalA.putAttribute( Attributes.PRIORITY, PRIORITY_VALUE);
+            }
+            else {
+                BRACKET_MATCHER.reset( translation);
+                int matchend = 0;
+                StringBuffer unrecognized = null;
                 
-                boolean isNumber = true;
-                for ( int i=0; i<att.length(); i++) {
-                    if (att.charAt( i)<'1' ||
-                        att.charAt( i)>'9') {
-                        isNumber = false;
-                        break;
+                while (BRACKET_MATCHER.find()) {
+                    matchend = BRACKET_MATCHER.end();
+                    
+                    String att = BRACKET_MATCHER.group( 1);
+                    
+                    boolean isNumber = true;
+                    for ( int i=0; i<att.length(); i++) {
+                        if (att.charAt( i)<'1' ||
+                            att.charAt( i)>'9') {
+                            isNumber = false;
+                            break;
+                        }
                     }
-                }
-                if (isNumber) {
-                    // ROM marker, start new ROM unless this is the first ROM
-                    if (crm.size() > 0) {
-                        crm = new ArrayList( 10);
-                        rom.add( crm);
-                        translationromA = new DefaultAttributeSet( translationA);
-                        roma.add( translationromA);
+                    if (isNumber) {
+                        // ROM marker, start new ROM unless this is the first ROM
+                        if (crm.size() > 0) {
+                            crm = new ArrayList( 10);
+                            rom.add( crm);
+                            translationromA = new DefaultAttributeSet( translationA);
+                            roma.add( translationromA);
+                        }
+                        seenROM = true;
                     }
-                    seenROM = true;
-                }
-                else {
-                    // attribute list separated by ','
-                    int startc = 0;
-                    boolean hasUnrecognized = false;
-                    do {
-                        int endc = att.indexOf( ',', startc);
-                        if (endc == -1)
-                            endc = att.length();
-                        String attsub = att.substring( startc, endc);
-                        AttributeMapper.Mapping mapping = mapper.getMapping( attsub);
-                        if (mapping != null) {
-                            Attribute a = mapping.getAttribute();
-                            if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
-                                (!seenROM || 
-                                 !a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION))) {
-                                generalA.putAttribute( a, mapping.getValue());
-                            }
-                            else if (a.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
-                                wordA.putAttribute( a, mapping.getValue());
-                            }
-                            else if (a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
-                                if (seenROM)
-                                    translationromA.putAttribute( a, mapping.getValue());
-                                else
-                                    translationA.putAttribute( a, mapping.getValue());
+                    else {
+                        // attribute list separated by ','
+                        int startc = 0;
+                        boolean hasUnrecognized = false;
+                        do {
+                            int endc = att.indexOf( ',', startc);
+                            if (endc == -1)
+                                endc = att.length();
+                            String attsub = att.substring( startc, endc);
+                            AttributeMapper.Mapping mapping = mapper.getMapping( attsub);
+                            if (mapping != null) {
+                                Attribute a = mapping.getAttribute();
+                                if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
+                                    (!seenROM || 
+                                     !a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION))) {
+                                    generalA.putAttribute( a, mapping.getValue());
+                                }
+                                else if (a.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
+                                    wordA.putAttribute( a, mapping.getValue());
+                                }
+                                else if (a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
+                                    if (seenROM)
+                                        translationromA.putAttribute( a, mapping.getValue());
+                                    else
+                                        translationA.putAttribute( a, mapping.getValue());
+                                }
+                                else {
+                                    // should not happen, edict does not support READING attributes
+                                    System.err.println( "illegal attribute type");
+                                }
                             }
                             else {
-                                // should not happen, edict does not support READING attributes
-                                System.err.println( "illegal attribute type");
+                                // Not a recognized attribute. Since the whole bracket expression
+                                // will be cut off from the translation, store it seperately and
+                                // prepend it.
+                                if (unrecognized == null)
+                                    unrecognized = new StringBuffer();
+                                if (!hasUnrecognized) {
+                                    unrecognized.append( '(');
+                                    hasUnrecognized = true;
+                                }
+                                unrecognized.append( attsub);
                             }
-                        }
-                        else {
-                            // Not a recognized attribute. Since the whole bracket expression
-                            // will be cut off from the translation, store it seperately and
-                            // prepend it.
-                            if (unrecognized == null)
-                                unrecognized = new StringBuffer();
-                            if (!hasUnrecognized) {
-                                unrecognized.append( '(');
-                                hasUnrecognized = true;
-                            }
-                            unrecognized.append( attsub);
-                        }
-                        
-                        startc = endc + 1;
-                    } while (startc < att.length());
-                    if (hasUnrecognized)
-                        unrecognized.append( ") ");
+                            
+                            startc = endc + 1;
+                        } while (startc < att.length());
+                        if (hasUnrecognized)
+                            unrecognized.append( ") ");
+                    }
                 }
-            }
 
-            if (matchend > 0)
-                translation = translation.substring( matchend, translation.length());
-            if (unrecognized != null) {
-                unrecognized.append( translation);
-                translation = unrecognized.toString();
-            }
+                if (matchend > 0)
+                    translation = translation.substring( matchend, translation.length());
+                if (unrecognized != null) {
+                    unrecognized.append( translation);
+                    translation = unrecognized.toString();
+                }
 
-            crm.add( translation);
+                crm.add( translation);
+            }
 
             start = end+1;
         } while (start < translations.length());
 
-        return new EDictEntry( word, reading, rom, generalA, wordA, translationA, roma, this);
+        return new SingleWordEntry( word, reading, rom, generalA, wordA, translationA, roma, this);
     }
     
     public String toString() {

@@ -43,13 +43,13 @@ public class Attributes implements Attribute {
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.WORD });
 
-    /*public static final Attribute PRIORITY = new Attributes
+    public static final Attribute PRIORITY = new Attributes
         ( NAMES.getString( "att.priority.name"),
           NAMES.getString( "att.priority.desc"),
           true, true, Priority.class, 
           new DictionaryEntry.AttributeGroup[] 
           { DictionaryEntry.AttributeGroup.GENERAL,
-            DictionaryEntry.AttributeGroup.TRANSLATION });*/
+            DictionaryEntry.AttributeGroup.TRANSLATION });
 
     public static final Attribute EXAMPLE = new Attributes
         ( NAMES.getString( "att.example.name"),

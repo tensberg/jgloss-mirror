@@ -41,6 +41,10 @@ public interface AttributeSet {
      */
     boolean containsKey( Attribute key, boolean resolveInherited);
     /**
+     * Test if the attribute is set and has the specified value.
+     */
+    boolean contains( Attribute key, AttributeValue value, boolean resolveInherited);
+    /**
      * Returns the attribute for a given key. The type of the attribute depends on the key.
      *
      * @param key Attribute key for which the attribute is requested.

@@ -773,7 +773,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Return the type of the entry field at the given location.
      */
-    protected abstract DictionaryEntryField getFieldType( ByteBuffer buf, int location);
+    protected abstract DictionaryEntryField getFieldType( ByteBuffer buf, int entryStart,
+                                                          int entryEnd, int location);
 
     public int compare( int pos1, int pos2) throws IndexException {
         try {
@@ -900,7 +901,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                     continue;
 
                 match = entry.position(); // location of match in entry buffer
-                DictionaryEntryField field = getFieldType( entry, match);
+                DictionaryEntryField field = getFieldType( entry, 0, entry.limit(), match);
                 try {
                     if (!fields.isSelected( field))
                         continue; // field is not selected by the user

@@ -24,16 +24,18 @@
 package jgloss.dictionary;
 
 import jgloss.util.StringTools;
+import jgloss.dictionary.attribute.*;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.BufferUnderflowException;
+import java.nio.*;
+import java.nio.charset.CharacterCodingException;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.regex.*;
 
 /**
- * Implementation for dictionaries in WadokuJT.txt (formerly named GDICT) format. 
+ * Implementation for dictionaries in WadokuJT.txt format. 
  * WadokuJT is a Japanese-German dictionary directed by Ulrich Apel.
  * The WadokuJT.txt file of the dictionary is maintained by Hans-Joerg Bibiko and available
  * from <a href="http://www.bibiko.com/dlde.htm">http://www.bibiko.com/dlde.htm</a>.
@@ -55,10 +57,20 @@ public class WaDokuJT extends FileBasedDictionary {
      * Name of the dictionary format.
      */
     public static final String FORMAT_NAME = "WadokuJT";
-    /**
-     * Encoding used by dictionary instances.
-     */
-    public static final String ENCODING = "UTF-8";
+
+    protected final static AttributeMapper mapper = initMapper();
+
+    private static AttributeMapper initMapper() {
+        try {
+            Reader r = new InputStreamReader( EDict.class.getResourceAsStream( "/resources/wadokujt.map"));
+            AttributeMapper mapper = new AttributeMapper( new LineNumberReader( r));
+            r.close();
+            return mapper;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * Object describing this implementation of the <CODE>Dictionary</CODE> interface. The
@@ -85,9 +97,9 @@ public class WaDokuJT extends FileBasedDictionary {
             // At least four of the fields must be present in the first line of the file for
             // the match to be successful.
             return new FileBasedDictionary.Implementation
-                ( FORMAT_NAME, ENCODING, true, Pattern.compile
+                ( FORMAT_NAME, "UTF-8", true, Pattern.compile
                   ( "\\A([^\\|]*\\|){3,}[^\\|]*$", Pattern.MULTILINE),
-                  1.0f, 4096, GDict.class.getConstructor( new Class[] { File.class }));
+                  1.0f, 4096, WaDokuJT.class.getConstructor( new Class[] { File.class }));
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -128,74 +140,166 @@ public class WaDokuJT extends FileBasedDictionary {
         ( "(?:\\[(\\d+)\\]\\s|//\\s)?(.+?)\\.?\\s?(?=\\[\\d+\\]|//|$)");
     protected static Matcher TRANSLATIONS_MATCHER = TRANSLATIONS_PATTERN.matcher( "");
 
-    /**
-     * Used for {@link GDictEntry GDictEntry} creation if there are no groups of meanings.
-     */
-    protected static final int[] NO_GROUPS = new int[0];
-    /**
-     * List of words used in find. Since the list is copied in the {@link GDictEntry GDictEntry}
-     * constructor, it is safe (and faster) to recycle the same list.
-     */
-    protected final List wordlist = new ArrayList( 10);
-
     public WaDokuJT( File dicfile) throws IOException {
         super( dicfile);
     }
 
-    public String getEncoding() { return "UTF-8"; }
+    protected EncodedCharacterHandler createCharacterHandler() {
+        return new UTF8CharacterHandler();
+    }
 
-    protected boolean isWordStart( int offset) {
+    protected boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field) {
+        if (location == 0)
+            return true;
+
         try {
-            byte b = dictionary.get( offset-1);
+            byte b = entry.get( location-1);
             if (b==';' || b=='|' || b==10 || b==13)
                 return true;
             if (b == ' ') {
-                byte b2 = dictionary.get( offset-2);
+                byte b2 = entry.get( location-2);
                 return (b2 == ';' || b2 == ']');
             }
-            if (b=='(' && 
-                (dictionary.get( offset)&0xf0)==0xe0)
+            if (b=='(' && field==DictionaryEntryField.WORD)
                 // ( followed by a 3-byte encoded character is assumed to be an alternative
                 // spelling in the word field
                 return true;
+
             return false;
         } catch (IndexOutOfBoundsException ex) {
             return true;
         }
     }
 
-    protected boolean isWordEnd( int offset) {
+    protected boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
-            byte b = dictionary.get( offset);
+            byte b = entry.get( location);
             if (b==';' || b=='|' || b==10 || b==13)
                 return true;
             if (b == '.') {
                 // end of translation if followed by field end marker '|' or new range of meaning " [..."
-                byte b2 = dictionary.get( offset+1);
+                byte b2 = entry.get( location+1);
                 if (b2 == '|')
                     return true;
                 else if (b2 == ' ') 
-                    return (dictionary.get( offset+2) == '[');
+                    return (entry.get( location+2) == '[');
             }
-            else if (b==' ' || b==')') // only end marker if not in translation
-                return (dictionary.get( offset-1)&0x80) != 0; // test for non-ASCII character
+            else if ((b==' ' || b==')') && 
+                     field==DictionaryEntryField.WORD)
+                return true;
             return false;
         } catch (IndexOutOfBoundsException ex) {
             return true;
         }
     }
 
-    protected DictionaryEntry parseEntry( String entry) {
+    protected DictionaryEntryField moveToNextField( ByteBuffer buf, int character,
+                                                    DictionaryEntryField field) {
+        if (field == null) {
+            // first call to moveToNextField
+            // skip first (comment) line
+            while (!isEntrySeparator( buf.get()))
+                ; // buf.get() advances the loop
+            return DictionaryEntryField.WORD;
+        }
+
+        if (character == '|') {
+            if (field==DictionaryEntryField.WORD) {
+                field = DictionaryEntryField.READING;
+            } 
+            else if (field==DictionaryEntryField.READING) {
+                // skip to translation field
+                field = DictionaryEntryField.TRANSLATION;
+                byte c;
+                do {
+                    c = buf.get();
+                    if (isEntrySeparator( c)) { // fallback for error in dictionary
+                        field = DictionaryEntryField.WORD;
+                        break;
+                    }
+                } while (c != '|');
+            } 
+            else if (field==DictionaryEntryField.TRANSLATION) {
+                // skip fields to next entry
+                while (!isEntrySeparator( buf.get()))
+                    ; // buf.get() advances the loop
+                field = DictionaryEntryField.WORD;
+            }
+            else
+                throw new IllegalArgumentException();
+        } else if (character==10 || character==13) {
+            // broken dictionary entry; reset for error recovery
+            field = DictionaryEntryField.WORD;
+        }
+
+        return field;
+    }
+
+    protected DictionaryEntryField getFieldType( ByteBuffer buf, int entryStart, int entryEnd,
+                                                 int position) {
+        // count field delimiters from location to entry start or end (whatever is closer)
+        // note: entryEnd is the first position not to be read
+        int fields = 0;
+        byte c;
+        if (position-entryStart <= entryEnd-position-1) {
+            // read from start to location
+            buf.position( entryStart);
+            while (buf.position() <= position) {
+                if (buf.get() == '|')
+                    fields++;
+            }
+            switch (fields) {
+            case 0:
+                return DictionaryEntryField.WORD;
+            case 1:
+                return DictionaryEntryField.READING;
+            case 3:
+                return DictionaryEntryField.TRANSLATION;
+            default:
+                return DictionaryEntryField.OTHER;
+            }
+        }
+        else {
+            // read from location to end
+            buf.position( position);
+            while (buf.position() < entryEnd) {
+                if (buf.get() == '|')
+                    fields++;
+            }
+            switch (fields) {
+            case 2:
+                return DictionaryEntryField.TRANSLATION;
+            case 4:
+                return DictionaryEntryField.READING;
+            case 5:
+                return DictionaryEntryField.WORD;
+            default:
+                return DictionaryEntryField.OTHER;
+            }
+        }
+    }
+
+    protected DictionaryEntry parseEntry( String entry) throws SearchException {
         try {
+            DictionaryEntry out = null; 
+            List wordlist = new ArrayList( 10);
+            String reading;
+            List rom = new ArrayList( 10);
+            DefaultAttributeSet generalA = new DefaultAttributeSet( null);
+            DefaultAttributeSet wordA = new DefaultAttributeSet( generalA);
+            List wordsa = new ArrayList( 10);
+            DefaultAttributeSet translationA = new DefaultAttributeSet( generalA);
+            List roma = new ArrayList( 10);
+
             int start = 0;
             int end = entry.indexOf( '|');
             String words = entry.substring( start, end);
 
             start = end+1;
             end = entry.indexOf( '|', start);
-            String reading = entry.substring( start, end);
+            reading = entry.substring( start, end);
             // cut off [n] marker
-            int bracket = reading.indexOf( '[');
+            int bracket = reading.lastIndexOf( '[');
             if (bracket != -1)
                 // the [ must always be preceeded by a single space, therefore bracket-1
                 reading = unescape( reading.substring( 0, bracket-1));
@@ -211,176 +315,43 @@ public class WaDokuJT extends FileBasedDictionary {
             end = entry.indexOf( '|', start);
             String translations = entry.substring( start, end);
 
-            GDictEntry out; 
             synchronized (WORD_MATCHER) {
                 // split words
                 WORD_MATCHER.reset( words);
-                wordlist.clear(); // list of lists of word with alternatives
                 while (WORD_MATCHER.find()) {
-                    if (WORD_MATCHER.group( 2) == null) {
-                        // word without alternative spellings
-                        wordlist.add( unescape( WORD_MATCHER.group( 1)));
-                    }
-                    else {
+                    wordlist.add( unescape( WORD_MATCHER.group( 1)));
+                    if (WORD_MATCHER.group( 2) != null) {
                         // word with alternatives
-                        List alternatives = new ArrayList( 3);
-                        alternatives.add( unescape( WORD_MATCHER.group( 1)));
                         ALTERNATIVES_MATCHER.reset( WORD_MATCHER.group( 2));
                         while (ALTERNATIVES_MATCHER.find())
-                            alternatives.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
-                        wordlist.add( alternatives);
+                            wordlist.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
                     }
                 }
                 
                 // split translations
                 TRANSLATIONS_MATCHER.reset( translations);
-                ArrayList translationlist = new ArrayList( 10);
-                List grouplist = null;
                 while (TRANSLATIONS_MATCHER.find()) {
-                    // put group start marker in grouplist, if a group indicator was found by the matcher
-                    // in group 1 and this is not the first group.
-                    if (TRANSLATIONS_MATCHER.group( 1) != null &&
-                        translationlist.size() > 0) {
-                        if (grouplist == null)
-                            grouplist = new ArrayList( 2);
-                        grouplist.add( new Integer( translationlist.size()));
-                    }
-                    
+                    List crm = new ArrayList( 10);
+                    rom.add( crm);
                     ALTERNATIVES_MATCHER.reset( TRANSLATIONS_MATCHER.group( 2));
                     while (ALTERNATIVES_MATCHER.find()) {
-                        translationlist.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
+                        crm.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
                     }
                 }
-                translationlist.trimToSize();
-
-                int[] groups;
-                if (grouplist == null)
-                    groups = NO_GROUPS;
-                else {
-                    groups = new int[grouplist.size()];
-                    for ( int i=0; i<grouplist.size(); i++)
-                        groups[i] = ((Integer) grouplist.get( i)).intValue();
-                }
-                out = new GDictEntry( wordlist, reading, translationlist, groups, null,
-                                      null, null, this);
             }
 
-            if (resultmode == RESULT_NATIVE)
-                result.add( out);
-            else { // create dictionary entries
-                // Only add dictionary entries for words or alternative spellings where the
-                // word matches the expression. If the match is in the reading or translation,
-                // use all words and alternatives.
-                
-                // find out which word matches
-                boolean wordMatches = true;
-                int word = 0;
-                int alternative = 0;
-                boolean inAlternative = false;
-                int off = entrystart;
-                do {
-                    byte b = dictionary.get( off++);
-                    if (b == '|') {
-                        // field separator; word field ended before match was reached, the match must
-                        // be in reading or translation
-                        wordMatches = false;
-                        break;
-                    }
-                    if (inAlternative) {
-                        if (b == ')') {
-                            inAlternative = false;
-                            alternative = 0;
-                        }
-                        else if (b == ';')
-                            alternative++;
-                    }
-                    else {
-                        if (b == '(') {
-                            inAlternative = true;
-                            alternative = 1;
-                        }
-                        else if (b == ';') {
-                            word++;
-                        }
-                    }
-                } while (off < where);
-                
-                try {
-                    if (wordMatches) {
-                        // Create dictionary entry only for the matching word
-                        // If there would be more than one matching word, the others are ignored.
-                        if (out.getWord( word, alternative).equals( reading))
-                            wordMatches = false; // reading matches, add all words
-                        else
-                            result.add( out.getDictionaryEntry( word, alternative));
-                    }
-                    if (!wordMatches) {
-                        // Reading or translation matches, add all words
-                        for ( int i=0; i<out.getWordCount(); i++) {
-                            result.add( out.getDictionaryEntry( i, 0));
-                            for ( int j=0; j<out.getAlternativesCount( i); j++)
-                                result.add( out.getDictionaryEntry( i, j+1));
-                        }
-                    }
-                } catch (ArrayIndexOutOfBoundsException ex) {
-                    System.err.println( "WadokuJT warning: malformed dictionary entry \"" + entry + "\"");
-                }
+            if (wordlist.size() == 1) {
+                out = new SingleWordEntry( (String) wordlist.get( 1), reading, rom, generalA,
+                                           wordA, translationA, roma, this);
             }
+            else {
+                out = new MultiWordEntry( wordlist, reading, rom, generalA,
+                                          wordA, wordsA, translationA, roma, this);
+            }
+
+            return out;
         } catch (StringIndexOutOfBoundsException ex) {
-            System.err.println( "WadokuJT warning: malformed dictionary entry \"" + entry + "\"");
-        }
-    }
-
-    private final static int INDEX_FIRST_LINE = 0;
-    private final static int INDEX_IN_WORD = 1;
-    private final static int INDEX_IN_READING = 2;
-    private final static int INDEX_IN_TRANSLATION = 3;
-
-    /**
-     * Character position type used during index creation.
-     */
-    private int indexPosition = INDEX_FIRST_LINE;
-
-    protected void skipEntries( ByteBuffer buf, int c) {
-        // skip the first line in the dictionary since it is a description of the index format and
-        // not an entry
-        if (indexPosition == INDEX_FIRST_LINE) {
-            byte c2;
-            do {
-                c2 = buf.get();
-            } while (!isEntrySeparator( c2)); // search end of line
-            indexPosition = INDEX_IN_WORD;
-            return;
-        }
-        
-        // adjust index position
-        if (c == '|') {
-            switch (indexPosition) {
-            case INDEX_IN_WORD:
-                indexPosition = INDEX_IN_READING;
-                break;
-                
-            case INDEX_IN_READING:
-                // skip over part of speech
-                do {
-                    c = buf.get();
-                } while (c!='|' && !isEntrySeparator( (byte) c));
-                indexPosition = INDEX_IN_TRANSLATION;
-                break;
-                
-            case INDEX_IN_TRANSLATION:
-                // skip to next entry
-                do {
-                    c = buf.get();
-                } while (!isEntrySeparator( (byte) c));
-                // indexPosition will be adjusted in the following if statement
-                break;
-            }
-            
-            // adjust for new entry
-            if (isEntrySeparator( (byte) c)) // note that c might have been changed while skipping 
-                // in previous switch block
-                indexPosition = INDEX_IN_WORD;
+            throw new SearchException( "WadokuJT warning: malformed dictionary entry \"" + entry + "\"");
         }
     }
 
