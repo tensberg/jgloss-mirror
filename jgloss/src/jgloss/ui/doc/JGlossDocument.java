@@ -364,7 +364,7 @@ public class JGlossDocument extends HTMLDocument {
          * @param pos Position at which the error occured.
          */
         public void handleError( String errorMsg, int pos) {
-            System.err.println( errorMsg + " at " + pos);
+            //System.err.println( errorMsg + " at " + pos);
         }
 
         /**
