@@ -360,7 +360,8 @@ public class JGlossEditor extends JTextPane {
     public void makeVisible( int start, int end) {
         try {
             Rectangle r1 = modelToView( start);
-            Rectangle r2 = modelToView( end);
+            // end-1 selects the last character of the annotation element
+            Rectangle r2 = modelToView( end-1);
             if (r1 != null) {
                 if (r2 != null)
                     r1 = r1.createUnion( r2).getBounds();

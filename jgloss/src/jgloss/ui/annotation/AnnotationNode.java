@@ -300,7 +300,16 @@ public class AnnotationNode extends InnerNode {
      */
     private void updateNodeText() {
         nodeText = kanjiText + ":";
-        if (isHidden())
+        if (isHidden()) {
             nodeText += JGloss.messages.getString( "annotationeditor.entry.hidden");
+            String reading = getReadingNode().getText();
+            if (reading!=null && reading.length()>0 && 
+                (reading.length()>1 || reading.charAt( 0)!=' '))
+                nodeText += " " + reading;
+            String translation = getTranslationNode().getText();
+            if (translation!=null && translation.length()>0 && 
+                (translation.length()>1 || translation.charAt( 0)!=' '))
+                nodeText += " " + translation;
+        }
     }
 } // class AnnotationNode

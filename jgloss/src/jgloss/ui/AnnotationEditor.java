@@ -351,17 +351,19 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     while (!(tn instanceof AnnotationNode))
                         tn = tn.getParent();
                     AnnotationNode selection = (AnnotationNode) tn;
-                    int index = model.getIndexOfChild( model.getRoot(), selection);
 
                     String kanji = selection.getKanjiText();
                     String reading = selection.getReadingNode().getText();
                     String translation = selection.getTranslationNode().getText();
 
-                    // removing annotations while iterating will throw a ConcurrentModificationException
+                    // Remove all duplicates except the current selection. We can't delete the
+                    // current selection now because we need to calculate the new selection later.
+                    // Removing annotations while iterating will throw a ConcurrentModificationException.
                     LinkedList duplicates = new LinkedList();
                     for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
                         AnnotationNode node = (AnnotationNode) i.next();
-                        if (kanji.equals( node.getKanjiText()) &&
+                        if (node!=selection &&
+                            kanji.equals( node.getKanjiText()) &&
                             reading.equals( node.getReadingNode().getText()) &&
                             translation.equals( node.getTranslationNode().getText()))
                             duplicates.add( node);
@@ -369,7 +371,10 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     for ( Iterator i=duplicates.iterator(); i.hasNext(); )
                         ((AnnotationNode) i.next()).removeAnnotation();
 
-                    // select the following annotation node (or previous if it was the last)
+                    int index = model.getIndexOfChild( model.getRoot(), selection);
+                    // remove the selected node
+                    selection.removeAnnotation();
+                    // Select the following annotation node (or previous if it was the last)
                     if (index >= model.getChildCount( model.getRoot()))
                         index--;
                     if (index >= 0) {
@@ -381,6 +386,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     else {
                         updateActions( null);
                     }
+
                 }
             };
         JGlossFrame.initAction( removeDuplicatesAction, "annotationeditor.menu.removeduplicates");
@@ -505,6 +511,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                         tn[1] = annotation;
                         tp = new TreePath( tn);
                         setSelectionPath( tp);
+                        scrollPathToVisible( tp);
                         // make sure the viewport view is at x position 0 so the selected node is
                         // fully visible
                         ((JViewport) getParent()).setViewPosition( new Point
@@ -717,13 +724,13 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
 
             updateActions( tn);
 
-            TreeNode tn2 = tn;
-            while (!(tn2 instanceof AnnotationNode)) {
-                tn2 = tn2.getParent();
+            TreeNode selection = tn;
+            while (!(selection instanceof AnnotationNode)) {
+                selection = selection.getParent();
             }
 
-            if (tn2 != annotationSelection) {
-                annotationSelection = (AnnotationNode) tn2;
+            if (selection != annotationSelection) {
+                annotationSelection = (AnnotationNode) selection;
                 int start = annotationSelection.getAnnotationElement().getStartOffset();
                 int end = annotationSelection.getAnnotationElement().getEndOffset();
                 docpane.makeVisible( start, end);

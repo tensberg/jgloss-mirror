@@ -52,6 +52,10 @@ public class HTMLifyReader extends BufferedReader {
      * values strings with the entities used to replace the chars.
      */
     private static Map funnyChars;
+    /** 
+     * Flag if a &lt;p&gt; has been opened.
+     */
+    private boolean inParagraph;
 
     /**
      * Constructs a new reader without inserting a HTML title for an underlying reader.
@@ -72,6 +76,8 @@ public class HTMLifyReader extends BufferedReader {
      */
     public HTMLifyReader( Reader in, String title) throws IOException {
         super( in);
+
+        inParagraph = false;
 
         if (funnyChars == null) {
             funnyChars = new HashMap( 10);
@@ -95,7 +101,7 @@ public class HTMLifyReader extends BufferedReader {
         // It will be replaced with the correct encoding when the document is written.
         line += "<META http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" >\n";
 
-        line +="</HEAD>\n<BODY>\n<P>";
+        line +="</HEAD>\n<BODY>\n";
     }
 
     public int read() throws IOException {
@@ -109,17 +115,26 @@ public class HTMLifyReader extends BufferedReader {
             if (eof)
                 line = null;
             else {
-                String next = replaceFunnyChars( super.readLine());
-                if (next == null) {
+                line = replaceFunnyChars( super.readLine());
+                if (line == null) {
                     // End of underlying stream encountered. Generate the line closing the document.
-                    line = "</P>\n</BODY>\n</HTML>";
+                    line = "";
+                    if (inParagraph)
+                        line = "</P>";
+                    line += "\n</BODY>\n</HTML>";
                     eof = true;
                 }
                 else {
-                    if (next.trim().length() == 0)
-                        line = "</P><P>\n";
-                    else
-                        line = "" + next + "</P>\n<P>";
+                    if (paragraphStart( line)) {
+                        line = "\n<P>" + line;
+                        if (inParagraph)
+                            line = "</P>" + line;
+                        inParagraph = true;
+                    }
+                    if (paragraphEnd( line)) {
+                        line += "</P>";
+                        inParagraph = false;
+                    }
                 }
             }
         }
@@ -182,5 +197,33 @@ public class HTMLifyReader extends BufferedReader {
         }
 
         return line.toString();
+    }
+
+    /**
+     * Tests if the line starts a new paragraph.
+     *
+     * @param line The line to test.
+     * @return <CODE>true</CODE> if the line is the beginning of a paragraph.
+     */
+    protected boolean paragraphStart( String line) {
+        // an empty line creates an empty paragraph
+        if (line.length() == 0)
+            return true;
+
+        return true;
+    }
+
+    /**
+     * Tests if the line ends a paragraph.
+     *
+     * @param line The line to test.
+     * @return <CODE>true</CODE> if the line ends the paragraph.
+     */
+    protected boolean paragraphEnd( String line) {
+        // an empty line creates an empty paragraph
+        if (line.length() == 0)
+            return true;
+
+        return true;
     }
 } // class HTMLifyReader
