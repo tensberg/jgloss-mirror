@@ -51,24 +51,10 @@ public class JGlossWriter extends HTMLWriter {
     protected String encoding;
 
     /**
-     * Element used as the annotation wrapper. The annotation wrapper element is inserted
-     * around an annotation element and the HTML DTD is modified so that it allows an
-     * annotation element as child. The purpose of this is to allow an annotation element
-     * anywhere in the HTML document where the wrapper element is allowed. The wrapper element
-     * will be removed from the document when it is loaded.
+     * Flag if the writing of the line separator should be suppressed.
      */
-    public static final HTML.Tag ANNOTATION_WRAPPER = HTML.Tag.P;
+    protected boolean skipLineSeparator;
     
-    /**
-     * Value of the class attribute of the wrapper element.
-     */
-    public static final String ANNOTATION_WRAPPER_CLASS = "_aw_";
-
-    private final static char[] annotationWrapperStart = ("<" + ANNOTATION_WRAPPER.toString() +
-        " class=\"" + ANNOTATION_WRAPPER_CLASS + "\">").toCharArray();
-    private final static char[] annotationWrapperEnd = ("</" + ANNOTATION_WRAPPER.toString() +
-        ">").toCharArray();
-
     /**
      * Creates a new writer for a JGloss document which outputs to the given writer.
      * The writer must support the full charset of the characters used in the document.
@@ -162,26 +148,29 @@ public class JGlossWriter extends HTMLWriter {
     }
 
     /**
-     * Write a start tag. Overridden to insert an annotation wrapper tag.
+     * Writes a start tag. Overridden to suppress the writing of the line separator char
+     * for annotation elements.
      */
     protected void startTag( Element elem) throws IOException, BadLocationException {
-        if (matchNameAttribute( elem.getAttributes(), AnnotationTags.ANNOTATION)) {
-            nonEscapedOutput( annotationWrapperStart, 0, annotationWrapperStart.length);
-        }
-        
+        if (elem.getAttributes()
+            .getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.ANNOTATION))
+            skipLineSeparator = true;
         super.startTag( elem);
+        skipLineSeparator = false;
     }
 
+
     /**
-     * Write an end tag. Overridden to insert an annotation wrapper tag.
+     * Writes an end tag. Overridden to suppress the writing of the line separator char
+     * for annotation elements.
      */
     protected void endTag( Element elem) throws IOException {
+        if (elem.getAttributes()
+            .getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.ANNOTATION))
+            skipLineSeparator = true;
         super.endTag( elem);
-
-        if (matchNameAttribute( elem.getAttributes(), AnnotationTags.ANNOTATION)) {
-            nonEscapedOutput( annotationWrapperEnd, 0, annotationWrapperEnd.length);
-        }
-    }    
+        skipLineSeparator = false;
+    }
 
     /**
      * Prevent linebreaks. This method always returns false to prevent line breaks, which would
@@ -212,4 +201,12 @@ public class JGlossWriter extends HTMLWriter {
         return encoding;
     }
 
+    /**
+     * Write the line separator. Overridden to allow the suppression of the line separator
+     * for annotation elements because this can break the layout when the document is loaded.
+     */
+    protected void writeLineSeparator() throws IOException {
+        if (!skipLineSeparator)
+            super.writeLineSeparator();
+    }
 } // class JGlossWriter
