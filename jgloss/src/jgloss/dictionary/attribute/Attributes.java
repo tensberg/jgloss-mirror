@@ -87,6 +87,14 @@ public class Attributes implements Attribute {
             { DictionaryEntry.AttributeGroup.GENERAL,
               DictionaryEntry.AttributeGroup.TRANSLATION });
 
+    public static final Attribute CATEGORY = new Attributes
+        ( NAMES.getString( "att.category.name"),
+          NAMES.getString( "att.category.desc"),
+          true, true, Category.class, 
+          new DictionaryEntry.AttributeGroup[] 
+            { DictionaryEntry.AttributeGroup.GENERAL,
+              DictionaryEntry.AttributeGroup.TRANSLATION });
+
     protected String name;
     protected String description;
     protected boolean canHaveValue;

@@ -34,7 +34,7 @@ public interface IndexedDictionary extends Dictionary {
      *
      * @return <code>true</code> if the index was loaded successfully, <code>false</code> if
      *         the index does not exist, does not contain all needed index data or is
-     *         damaged. In this case, call {@link #buildIndex() buildIndex}.
+     *         damaged. In this case, {@link #buildIndex() buildIndex} must be called.
      * @exeption IndexException if reading the index failed for an unforeseeable reason.
      *           In this case, calling {@link #buildIndex() buildIndex} will likely also fail
      *           and the dictionary object can't be used.
@@ -44,9 +44,10 @@ public interface IndexedDictionary extends Dictionary {
     /**
      * Rebuild the index or add missing index data to an already existing index file.
      * Building indexes may take a long time, so the user should be informed what is happening
-     * before this method is invoked. If the index is damaged, it must be removed before this
+     * before this method is invoked. If the index is damaged, it must be deleted before this
      * method is called in order to be successfully rebuilt. This method will also load the
-     * newly created index, calling {@link #loadIndex() loadIndex} is not neccessary.
+     * newly created index, calling {@link #loadIndex() loadIndex} after 
+     * <code>buildIndex</code> is not neccessary.
      *
      * @exception IndexException if the index creation failed.
      */

@@ -286,7 +286,7 @@ public class EDict extends FileBasedDictionary {
 
             String translation = translations.substring( start, end);
             if (translation.equals( PRIORITY_MARKER)) {
-                generalA.putAttribute( Attributes.PRIORITY, PRIORITY_VALUE);
+                generalA.addAttribute( Attributes.PRIORITY, PRIORITY_VALUE);
             }
             else {
                 BRACKET_MATCHER.reset( translation);
@@ -331,16 +331,16 @@ public class EDict extends FileBasedDictionary {
                                 if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
                                     (!seenROM || 
                                      !a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION))) {
-                                    generalA.putAttribute( a, mapping.getValue());
+                                    generalA.addAttribute( a, mapping.getValue());
                                 }
                                 else if (a.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
-                                    wordA.putAttribute( a, mapping.getValue());
+                                    wordA.addAttribute( a, mapping.getValue());
                                 }
                                 else if (a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
                                     if (seenROM)
-                                        translationromA.putAttribute( a, mapping.getValue());
+                                        translationromA.addAttribute( a, mapping.getValue());
                                     else
-                                        translationA.putAttribute( a, mapping.getValue());
+                                        translationA.addAttribute( a, mapping.getValue());
                                 }
                                 else {
                                     // should not happen, edict does not support READING attributes

@@ -58,3 +58,6 @@ att.antonym.desc=antonym (opposite meaning)
 
 att.usage.name=usage
 att.usage.desc=usage hint
+
+att.category.name=category
+att.category.desc=category of the entry

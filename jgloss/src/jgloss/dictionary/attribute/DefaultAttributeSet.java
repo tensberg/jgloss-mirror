@@ -169,7 +169,7 @@ public class DefaultAttributeSet implements AttributeSet {
 
     public AttributeSet getParent() { return parent; }
 
-    public void putAttribute( Attribute key, AttributeValue value) {
+    public void addAttribute( Attribute key, AttributeValue value) {
         if (attributes == null)
             attributes = new HashMap( 11);
         Object v = attributes.get( key);
@@ -198,8 +198,10 @@ public class DefaultAttributeSet implements AttributeSet {
         for ( Iterator i=attributes.entrySet().iterator(); i.hasNext(); ) {
             Map.Entry entry = (Map.Entry) i.next();
             out.append( entry.getKey().toString());
-            out.append( ':');
-            out.append( entry.getValue().toString());
+            if (entry.getValue() != null) {
+                out.append( ':');
+                out.append( entry.getValue().toString());
+            }
             if (i.hasNext())
                 out.append( ',');
         }

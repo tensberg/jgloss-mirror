@@ -40,7 +40,7 @@ ifndef NATIVE2ASCII
   NATIVE2ASCII := native2ascii
 endif
 
-RELEASE := 1.0.6
+RELEASE := 1.1
 DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.parser jgloss.util \
@@ -53,6 +53,8 @@ ICONS := jgloss.png html.png tex.png txt.png chasen.png template.png
 
 RESOURCES := $(basename $(notdir $(wildcard src/resources/*.in)))
 
+DICTIONARY_MAPS := edict.map wadokujt.map
+
 RESOURCES_WWW := messages-www.properties messages-dictionary.properties \
                  messages-dictionary_de.properties \
                  messages-dictionary_fr.properties
@@ -64,9 +66,7 @@ CLASSPATH := $(CLASSPATH):./src
 # List main class source file and all other class source files not referenced from main class
 # for compilation
 ROOT_SOURCES := src/jgloss/JGloss.java \
-                src/jgloss/JavaPreferences.java \
-                src/jgloss/dictionary/GDict.java \
-                src/jgloss/dictionary/EDictNIO.java
+                src/jgloss/JavaPreferences.java
 WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
@@ -136,6 +136,7 @@ gen-javadoc:
                 $(PACKAGES)
 
 setup:
+	cp $(addprefix src/resources/, $(DICTIONARY_MAPS)) resources
 	mkdir -p resources/icons
 	cp $(addprefix src/resources/icons/, $(ICONS)) resources/icons
 	mkdir -p data

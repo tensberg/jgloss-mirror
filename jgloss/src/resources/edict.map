@@ -1,6 +1,7 @@
 # Mapping from edict tag markers to attributes
 #
 # Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+# $Id$
 
 #abbr       abbreviation
 abbr    ABBREVIATION

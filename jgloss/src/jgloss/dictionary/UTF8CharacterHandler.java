@@ -119,16 +119,22 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
     protected int decode( int[] charData, int offset, int length) throws CharacterCodingException {
         // catch overlong UTF-8 sequences 
         // (sequences that are longer than necessary to encode a character)
-        if (length==2 && charData[offset]==0 ||
-            length==3 && (charData[offset+1]&0x20)==0 ||
-            length==4 && (charData[offset+1]&0x30)==0 ||
-            length==5 && (charData[offset+1]&0x38)==0 ||
-            length==6 && (charData[offset+1]&0x3c)==0)
+        if (length==2 && (charData[offset]&0xfe)==0 ||
+            charData[offset]==0 &&
+            (length==3 && (charData[offset+1]&0x20)==0 ||
+             length==4 && (charData[offset+1]&0x30)==0 ||
+             length==5 && (charData[offset+1]&0x38)==0 ||
+             length==6 && (charData[offset+1]&0x3c)==0))
             throw new CharacterCodingException();
 
         int c = charData[offset];
         for ( int i=1; i<length; i++)
             c = c<<6 | charData[offset+i];
+
+        // catch illegal data ranges
+        if (c>=0xd800 && c<=0xdfff ||
+            c==0xfffe || c==0xffff)
+            throw new CharacterCodingException();
 
         return c;
     }

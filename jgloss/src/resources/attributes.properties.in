@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # Attribute id to short (.s) and long (.l) name mapping used by
 # jgloss.dictionary.attribute.DefaultCategoryAttributeValue 
@@ -6,6 +6,8 @@
 # taken from the EDICT dictionary file format definition (Copyright
 # 2001 The Electronic Dictionary Research and Development Group, Monash
 # University)
+
+# parts of speech
 
 pos.adj.s=adj
 pos.adj.l=adjective (keiyoushi)
@@ -115,6 +117,8 @@ pos.vk.l=Kuru verb - special class
 pos.vt.s=vt
 pos.vt.l=transitive verb
 
+# usage
+
 usage.arch.s=arch
 usage.arch.l=archaism
 
@@ -159,3 +163,35 @@ usage.vulg.l=vulgar expression or word
 
 usage.X.s=X
 usage.X.l=rude or X-rated term
+
+# categories
+
+cat.nengo.s=nengô
+cat.nengo.l=nengô (era name)
+
+cat.pers.s=pers
+cat.pers.l=personage
+
+cat.comp.s=comp
+cat.comp.l=computer term
+
+cat.rel.s=rel
+cat.rel.l=religious
+
+cat.bibl.s=bibl
+cat.bibl.l=bible
+
+cat.psych.s=psych
+cat.psych.l=psychological term
+
+cat.christ.s=christ
+cat.christ.l=Christianity
+
+cat.anat.s=anat
+cat.anat.l=anatomy term
+
+cat.med.s=med
+cat.med.l=medical term
+
+cat.pharm.s=pharm
+cat.pharm.l=pharmaceutical term

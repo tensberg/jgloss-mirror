@@ -1,0 +1,18 @@
+# Mapping from WadokuJT tag markers to attributes
+# Encoding: UTF-8
+#
+# Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+# $Id$
+
+Bsp.            EXAMPLE
+
+Anat.           CATEGORY        Category        anat
+Bibel           CATEGORY        Category        bibl
+Christent.      CATEGORY        Category        christ
+EDV             CATEGORY        Category        comp
+Med.            CATEGORY        Category        med
+Nengô           CATEGORY        Category        nengo
+Persönlichk.    CATEGORY        Category        pers
+Pharm.          CATEGORY        Category        pharm
+Psych.          CATEGORY        Category        psych
+Rel.            CATEGORY        Category        rel

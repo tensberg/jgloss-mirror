@@ -492,7 +492,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         // NIO decoder is faster than new String(), but NIO character encoding support is limited
         if (decoder != null) {
             try {
-                entrystring = unescape( decoder.decode( entry).toString());
+                entrystring = unescape( decoder.decode( (ByteBuffer) entry.rewind()).toString());
             } catch (CharacterCodingException ex) {
                 throw new SearchException( ex);
             }
