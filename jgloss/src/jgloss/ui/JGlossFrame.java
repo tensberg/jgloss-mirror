@@ -489,6 +489,7 @@ public class JGlossFrame implements ActionListener {
             a.putValue( Action.MNEMONIC_KEY, KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
                         .get( null));
         } catch (Exception ex) {
+            System.out.println( "Mnemonic Key " + s);
             ex.printStackTrace();
         }
         
@@ -1148,7 +1149,6 @@ public class JGlossFrame implements ActionListener {
         b.add( createSpaceEater( writeReading, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
-        b2.add( Box.createVerticalStrut( 3));
 
         b = Box.createHorizontalBox();
         JCheckBox writeTranslations = 
@@ -1251,7 +1251,6 @@ public class JGlossFrame implements ActionListener {
         b.add( createSpaceEater( writeReading, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
-        b2.add( Box.createVerticalStrut( 3));
 
         b = Box.createHorizontalBox();
         JCheckBox writeTranslations = 
