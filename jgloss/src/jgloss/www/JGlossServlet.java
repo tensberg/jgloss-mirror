@@ -45,14 +45,26 @@ public class JGlossServlet extends HttpServlet {
 
     public final static String DICTIONARIES = "dictionaries";
     public final static String ALLOWED_PROTOCOLS = "allowed_protocols";
+    public final static String ENABLE_COOKIE_FORWARDING = "enable_cookie_forwarding";
+    public final static String ENABLE_SECURE_INSECURE_COOKIE_FORWARDING =
+        "enable_secure-to-insecure_cookie_forwarding";
+    public final static String ENABLE_FORM_DATA_FORWARDING = "enable_form_data_forwarding";
+    public final static String ENABLE_SECURE_INSECURE_FORM_DATA_FORWARDING =
+        "enable_secure-to-insecure_form_data_forwarding";
 
-    public final static String REMOTE_URL = "url";
+    public final static String REMOTE_URL = "jgurl";
+    public final static String ALLOW_COOKIE_FORWARDING = "jgforwardcookies";
+    public final static String ALLOW_FORM_DATA_FORWARDING = "jgforwardforms";
 
     private jgloss.dictionary.Dictionary[] dictionaries;
     private Parser parser;
     private HTMLAnnotator annotator;
     private Set allowedProtocols;
-    private CgiUrlRewriter rewriter;
+
+    private boolean enableCookieForwarding;
+    private boolean enableCookieSecureInsecureForwarding;
+    private boolean enableFormDataForwarding;
+    private boolean enableFormDataSecureInsecureForwarding;
 
     public JGlossServlet() {}
 
@@ -70,8 +82,10 @@ public class JGlossServlet extends HttpServlet {
         List diclist = new LinkedList();
         String d = config.getInitParameter( DICTIONARIES);
         if (d==null || d.length()==0)
-            throw new ServletException( ResourceBundle.getBundle( MESSAGES)
-                                        .getString( "error.nodictionary"));
+            throw new ServletException( MessageFormat.format
+                                        ( ResourceBundle.getBundle( MESSAGES)
+                                          .getString( "error.nodictionary"),
+                                          new Object[] { DICTIONARIES }));
         for ( Iterator i=split( d, File.pathSeparatorChar).iterator(); i.hasNext(); ) {
             d = (String) i.next();
             jgloss.dictionary.Dictionary dic = null;
@@ -106,14 +120,27 @@ public class JGlossServlet extends HttpServlet {
         allowedProtocols = new HashSet( 5);
         String p = config.getInitParameter( ALLOWED_PROTOCOLS);
         if (p==null || p.length()==0)
-            throw new ServletException( ResourceBundle.getBundle( MESSAGES)
-                                        .getString( "error.noprotocols"));
+            throw new ServletException( MessageFormat.format
+                                        ( ResourceBundle.getBundle( MESSAGES)
+                                          .getString( "error.noprotocols"),
+                                          new Object[] { ALLOWED_PROTOCOLS}));
         allowedProtocols.addAll( split( p, ':'));
 
-        Set tags = new HashSet( 3);
-        tags.add( "a");
-        tags.add( "area");
-        rewriter = new CgiUrlRewriter( "", null, REMOTE_URL, allowedProtocols, tags);
+        p = config.getInitParameter( ENABLE_COOKIE_FORWARDING);
+        enableCookieForwarding = "true".equals( p);
+        getServletContext().log( "cookie forwarding " + (enableCookieForwarding ? "enabled" : "disabled"));
+        p = config.getInitParameter( ENABLE_SECURE_INSECURE_COOKIE_FORWARDING);
+        enableCookieSecureInsecureForwarding = "true".equals( p);
+        getServletContext().log( "secure-to-insecure cookie forwarding " + 
+                                 (enableCookieSecureInsecureForwarding ? "enabled" : "disabled"));
+        p = config.getInitParameter( ENABLE_SECURE_INSECURE_FORM_DATA_FORWARDING);
+        enableFormDataSecureInsecureForwarding = "true".equals( p);
+        getServletContext().log( "secure-to-insecure form data forwarding " + 
+                                 (enableFormDataSecureInsecureForwarding ? "enabled" : "disabled"));
+        p = config.getInitParameter( ENABLE_FORM_DATA_FORWARDING);
+        enableFormDataForwarding = "true".equals( p);
+        getServletContext().log( "form data forwarding " + 
+                                 (enableFormDataForwarding ? "enabled" : "disabled"));
     }
 
     public void destroy() {
@@ -123,16 +150,53 @@ public class JGlossServlet extends HttpServlet {
             dictionaries[i].dispose();
     }
 
-    protected void doGet( HttpServletRequest req, HttpServletResponse resp) 
+    protected void doGet( HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
-        String urlstring = req.getParameter( REMOTE_URL);
-        if (urlstring == null) {
-            resp.sendError( HttpServletResponse.SC_BAD_REQUEST,
-                            ResourceBundle.getBundle( MESSAGES, req.getLocale())
-                            .getString( "error.nourl"));
+        doGetPost( req, resp, false);
+    }
+
+    protected void doPost( HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+        doGetPost( req, resp, true);
+    }
+
+    protected void doGetPost( HttpServletRequest req, HttpServletResponse resp,
+                              boolean post) 
+        throws ServletException, IOException {
+        String pathinfo = req.getPathInfo();
+        if (pathinfo == null) {
+            String urlstring = req.getParameter( REMOTE_URL);
+            if (urlstring == null) {
+                resp.sendError( HttpServletResponse.SC_BAD_REQUEST,
+                                ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                                .getString( "error.nourl"));
+                return;
+            }
+            boolean allowCookieForwarding = "true".equals( req.getParameter( ALLOW_COOKIE_FORWARDING));
+            boolean allowFormDataForwarding = 
+                "true".equals( req.getParameter( ALLOW_FORM_DATA_FORWARDING));
+            String target = new JGlossURLRewriter
+                ( req.getContextPath() + req.getServletPath(),
+                  new URL( HttpUtils.getRequestURL( req).toString()), allowedProtocols,
+                  allowCookieForwarding, allowFormDataForwarding).rewrite( urlstring);
+            resp.sendRedirect( target);
             return;
         }
 
+        Object[] oa = JGlossURLRewriter.parseEncodedPath( pathinfo);
+        // pathinfo includes the leading '/'
+        if (oa == null) {
+            resp.sendError( HttpServletResponse.SC_BAD_REQUEST,
+                            MessageFormat.format
+                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                              .getString( "error.malformedrequest"),
+                              new Object[] { pathinfo } ));
+            return;
+        }
+        boolean allowCookieForwarding = ((Boolean) oa[0]).booleanValue();
+        boolean allowFormDataForwarding = ((Boolean) oa[1]).booleanValue();
+        String urlstring = (String) oa[2];
+            
         // don't allow the servlet to call itself
         if (urlstring.toLowerCase().indexOf( req.getServletPath().toLowerCase()) != -1) {
             resp.sendError( HttpServletResponse.SC_FORBIDDEN,
@@ -161,27 +225,95 @@ public class JGlossServlet extends HttpServlet {
             return;
         }
 
-        if (!allowedProtocols.contains( url.getProtocol())) {
+        String protocol = url.getProtocol();
+        if (!allowedProtocols.contains( protocol)) {
             resp.sendError( HttpServletResponse.SC_FORBIDDEN,
                             MessageFormat.format
                             ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
                               .getString( "error.protocolnotallowed"),
-                              new Object[] { url.getProtocol()} ));
+                              new Object[] { protocol } ));
             return;
         }
 
+        boolean forwardCookies = (protocol.equals( "http") || protocol.equals( "https")) &&
+            enableCookieForwarding && allowCookieForwarding &&
+            (enableCookieSecureInsecureForwarding ||
+             !"https".equalsIgnoreCase( url.getProtocol()) 
+             || req.isSecure());
+        boolean forwardFormData = (protocol.equals( "http") || protocol.equals( "https")) &&
+            enableFormDataForwarding && allowFormDataForwarding &&
+            (enableFormDataSecureInsecureForwarding ||
+             !req.isSecure() || "https".equalsIgnoreCase( url.getProtocol()));
+
+        // add query parameters which may have been appended by a GET form
+        if (forwardFormData) {
+            String query = req.getQueryString();
+            if (query!=null && query.length()>0) {
+                if (url.getQuery()==null || url.getQuery().length()==0)
+                    url = new URL( url.toExternalForm() + "?" + query);
+                else
+                    url = new URL( url.toExternalForm() + "&" + query);
+            }
+        }
+            
         URLConnection connection = url.openConnection();
-        connection.connect();
+
+        if (forwardFormData && post && connection instanceof HttpURLConnection) {
+            ((HttpURLConnection) connection).setRequestMethod( "POST");
+            connection.setDoInput( true);
+            connection.setDoOutput( true);
+        }
+
+        forwardRequestHeaders( connection, req);
+        if (forwardCookies)
+            CookieTools.addRequestCookies( connection, req.getCookies(), getServletContext());
+
+        try {
+            connection.connect();
+        } catch (UnknownHostException ex) {
+            resp.sendError( HttpServletResponse.SC_BAD_GATEWAY,
+                            MessageFormat.format
+                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                              .getString( "error.unknownhost"),
+                              new Object[] { url.toExternalForm(), url.getHost() } ));
+            return;
+        } catch (IOException ex) {
+            resp.sendError( HttpServletResponse.SC_BAD_GATEWAY,
+                            MessageFormat.format
+                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                              .getString( "error.connect"),
+                              new Object[] { url.toExternalForm(), ex.getClass().getName(),
+                                             ex.getMessage() } ));
+            return;
+        }
+
+        if (forwardFormData && post && connection instanceof HttpURLConnection) {
+            InputStream is = req.getInputStream();
+            OutputStream os = connection.getOutputStream();
+            byte[] buf = new byte[512];
+            int len;
+            while ((len=is.read( buf)) != -1)
+                os.write( buf, 0, len);
+            is.close();
+            os.close();
+        }
+
+        if (forwardCookies)
+            CookieTools.addResponseCookies( connection, resp, req.getServerName(),
+                                            req.getContextPath() + req.getServletPath(),
+                                            req.isSecure(), getServletContext());
+        forwardResponseHeaders( connection, resp);
+
         String type = connection.getContentType();
         if (!type.startsWith( "text/html"))
             tunnel( connection, req, resp);
         else
-            rewrite( connection, req, resp);
+            rewrite( connection, req, resp, allowCookieForwarding, allowFormDataForwarding);
     }
 
     protected void tunnel( URLConnection connection, HttpServletRequest req, HttpServletResponse resp) 
         throws ServletException, IOException {
-        byte[] buf = new byte[4096];
+        byte[] buf = new byte[1024];
         
         if (connection.getContentType() != null)
             resp.setContentType( connection.getContentType());
@@ -200,22 +332,27 @@ public class JGlossServlet extends HttpServlet {
         }
     }
 
-    protected void rewrite( URLConnection connection, HttpServletRequest req, HttpServletResponse resp) 
+    protected void rewrite( URLConnection connection, HttpServletRequest req, HttpServletResponse resp,
+                            boolean allowCookieForwarding, boolean allowFormDataForwarding) 
         throws ServletException, IOException {
         InputStreamReader in = CharacterEncodingDetector.getReader
             ( new BufferedInputStream( connection.getInputStream()), connection.getContentEncoding());
         try {
             resp.setContentType( "text/html; charset=" + in.getEncoding());
-            String requrl = HttpUtils.getRequestURL( req).toString();
-            int end = requrl.indexOf( '?');
-            if (end == -1)
-                end = requrl.length();
-            rewriter.setCgiBase( requrl.substring( 0, end));
-            rewriter.setDocBase( connection.getURL());
-            annotator.annotate( in, resp.getWriter(), rewriter);
+
+            annotator.annotate( in, resp.getWriter(), new JGlossURLRewriter
+                                ( req.getContextPath() + req.getServletPath(),
+                                  connection.getURL(), allowedProtocols,
+                                  allowCookieForwarding, allowFormDataForwarding));
         } finally {
             in.close();
         }
+    }
+
+    protected void forwardRequestHeaders( URLConnection connection, HttpServletRequest req) {
+    }
+
+    protected void forwardResponseHeaders( URLConnection connection, HttpServletResponse resp) {
     }
 
     protected List split( String s, char c) {
@@ -236,4 +373,5 @@ public class JGlossServlet extends HttpServlet {
 
         return out;
     }
+
 } // class JGlossServlet

@@ -47,10 +47,64 @@
             servlet will send an error page. The separator character is a ':'.
         </description>
       </init-param>
+
+      <init-param>
+        <param-name>enable_cookie_forwarding</param-name>
+        <param-value>true</param-value>
+        <description>
+            If this is set to 'true', the servlet will forward cookies received
+            from the remote web server to the client and vice-versa. Since the 
+            PATH value of the cookie has to be changed by the servlet,
+            this only works with cookies set by http response headers, not with cookies
+            set with JavaScript in the client browser.
+            In addition to this parameter, cookie forwarding will also have to be enabled
+            on a per-request basis by setting the query parameter jgforwardcookies to 'true'.
+            This allows privacy/security-conscious users to disable the feature.
+        </description>
+      </init-param>
+
+      <init-param>
+        <param-name>enable_secure-to-insecure_cookie_forwarding</param-name>
+        <param-value>true</param-value>
+        <description>
+            If this (and enable_cookie_forwarding) is set to 'true', cookies will be forwarded
+            from client to server even if the client-servlet connection is https but the
+            servlet-remote server connection is not; and from server to client if the 
+            remote server-servlet connection is https but the servlet-client connection is not.
+            Regardless of the setting of this parameter, a cookie is never forwarded by the 
+            servlet over a non-https connection if the 'secure' attribute of the cookie is set.
+        </description>
+      </init-param>
+    
+      <init-param>
+        <param-name>enable_form_data_forwarding</param-name>
+        <param-value>true</param-value>
+        <description>
+            If this is set to 'true', the servlet will forward form data which the user
+            enters in a servlet-rewritten HTML form through JGloss-WWW, such that the
+            form response will be annotated. If this is not enabled, the form data will be sent
+            directly to the originating server.
+            In addition to this parameter, form data forwarding will also have to be enabled
+            on a per-request basis by setting the query parameter jgforwardforms to 'true'.
+            This allows privacy/security-conscious users to disable the feature.
+        </description>
+      </init-param>
+
+      <init-param>
+        <param-name>enable_secure-to-insecure_form_data_forwarding</param-name>
+        <param-value>true</param-value>
+        <description>
+            If this (and enable_form_data_forwarding) is set to 'true', form data will be forwarded
+            from client to server even if the client-servlet connection is https but the
+            servlet-remote server connection is not. This applies to both GET url parameters
+            and POST method bodies.
+        </description>
+      </init-param>
+    
     </servlet>
 
     <servlet-mapping>
        <servlet-name>jgloss-www</servlet-name>
-       <url-pattern>/jgloss-www</url-pattern>
+       <url-pattern>/jgloss-www/*</url-pattern>
     </servlet-mapping>      
 </web-app>
