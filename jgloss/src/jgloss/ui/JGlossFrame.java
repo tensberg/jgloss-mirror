@@ -71,6 +71,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
          * Opens a document created by JGloss in an empty JGlossFrame.
          */
         public final Action open;
+        /**
+         * Listens to open recent selections. Use with 
+         * {@link OpenRecentMenu#createDocumentMenu(File,FileSelectionListener) 
+         *  OpenRecentMenu.createDocumentMenu}.
+         */
+        public final OpenRecentMenu.FileSelectedListener openRecentListener;
 
         /**
          * Creates a new instance of the actions which will invoke the methods
@@ -141,15 +147,29 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                         // load the file
                                         JGlossFrame which = target==null ||
                                             target.documentLoaded ? new JGlossFrame() : target;
-                                        which.loadDocument( f.getSelectedFile().getAbsolutePath());
+                                        which.loadDocument( f.getSelectedFile());
                                     }
                                 }
                             }.start();
                     }
                 };
             open.setEnabled( true);
-            UIUtilities.initAction( open, "main.menu.open"); 
+            UIUtilities.initAction( open, "main.menu.open");
             
+            openRecentListener = new OpenRecentMenu.FileSelectedListener() {
+                    public void fileSelected( final File file) {
+                        new Thread() {
+                                public void run() {
+                                    // load the file
+                                    JGlossFrame which = target==null ||
+                                        target.documentLoaded ? new JGlossFrame() : target;
+                                    which.loadDocument( file);
+                                    OPEN_RECENT.addDocument( file);
+                                }
+                            }.start();
+                    }
+                };
+
             importClipboardListener = new MenuListener() {
                     public void menuSelected( MenuEvent e) {
                         Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard()
@@ -174,6 +194,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * action.
      */
     public final static Actions actions = new Actions( null);
+
+    /**
+     * Open recent menu used for JGloss documents. The instance is shared between instances of
+     * <CODE>JGlossFrame</CODE> and <CODE>WordLookup</CODE>.
+     */
+    public final static OpenRecentMenu OPEN_RECENT = new OpenRecentMenu( 4);
 
     /**
      * Scrollpane which wraps the document editor.
@@ -239,6 +265,10 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Closes this JGlossFrame.
      */
     private Action closeAction;
+    /**
+     * Open recent menu for this instance of <CODE>JGlossFrame</CODE>.
+     */
+    private JMenu openRecentMenu;
     /**
      * Submenu containing the export actions.
      */
@@ -454,6 +484,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
         menu.add( UIUtilities.createMenuItem( actions.importClipboard));
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( actions.open));
+        openRecentMenu = OPEN_RECENT.createMenu( actions.openRecentListener);
+        menu.add( openRecentMenu);
         menu.add( UIUtilities.createMenuItem( saveAction));
         menu.add( UIUtilities.createMenuItem( saveAsAction));
         exportMenu = new JMenu( JGloss.messages.getString( "main.menu.export"));
@@ -733,11 +765,10 @@ public class JGlossFrame extends JFrame implements ActionListener {
     /**
      * Loads a JGloss document from a local file.
      *
-     * @param path The path of the file to load.
+     * @param f File to load.
      */
-    public void loadDocument( String path) {
+    public void loadDocument( File f) {
         try {
-            File f = new File( path);
             Reader in = new InputStreamReader( new FileInputStream( f), "UTF-8");
             documentPath = f.getAbsolutePath();
             loadDocument( in, documentPath, f.getName(), 
@@ -783,7 +814,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
             JOptionPane.showConfirmDialog
                 ( this, JGloss.messages.getString
                   ( "error.load.exception", new Object[] 
-                      { path, ex.getClass().getName(), ex.getLocalizedMessage() }),
+                      { documentPath, ex.getClass().getName(), ex.getLocalizedMessage() }),
                   JGloss.messages.getString( "error.load.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
@@ -1521,6 +1552,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
         docpaneScroller = null;
         annotationEditorScroller = null;
         getContentPane().removeAll();
+        OPEN_RECENT.removeMenu( openRecentMenu);
+        openRecentMenu = null;
         super.dispose();
     }
 } // class JGlossFrame

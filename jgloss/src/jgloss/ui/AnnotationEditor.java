@@ -130,7 +130,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 label.setText( node.getDescription());
                 String text = node.getText();
 
-                ((JTextField) editingComponent).setText( text);
+                JTextField textfield = ((JTextField) editingComponent);
+                textfield.setText( text);
+                textfield.setColumns( text.length() + 5); // leave space for editing
                 
                 box.removeAll();
                 box.add( label);

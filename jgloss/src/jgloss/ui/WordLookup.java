@@ -72,6 +72,11 @@ public class WordLookup extends JFrame {
 
     protected WordLookupPanel wordlookup;
 
+    /**
+     * Open recent JGloss document menu item.
+     */
+    private JMenu openRecent;
+
     public WordLookup() {
         super( JGloss.messages.getString( "wordlookup.title"));
 
@@ -110,6 +115,8 @@ public class WordLookup extends JFrame {
         menu.addMenuListener( JGlossFrame.actions.importClipboardListener);
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.open));
+        openRecent = JGlossFrame.OPEN_RECENT.createMenu( JGlossFrame.actions.openRecentListener);
+        menu.add( openRecent);
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( printAction));
         menu.addSeparator();
@@ -153,5 +160,11 @@ public class WordLookup extends JFrame {
         super.hide();
 
         wordlookup.savePreferences();
+    }
+
+    public void dispose() {
+        super.dispose();
+        JGlossFrame.OPEN_RECENT.removeMenu( openRecent);
+        openRecent = null;
     }
 } // class WordLookup

@@ -250,11 +250,9 @@ public class JGlossDocument extends HTMLDocument {
                     List annotations = new ArrayList( 5);
                     if (resultindex < result.size()) {
                         ta = (Parser.TextAnnotation) result.get( resultindex);
-                        //System.out.println( "ta:" + ta.getStart() + " " + ta.getLength());
                         resultindex++;
                         if (readingsindex < readings.size()) {
                             Reading r = (Reading) readings.get( readingsindex);
-                            //System.out.println( "r:" + r.getStart() + " " + r.getLength());
                             readingsindex++;
                             if (r.getStart() < ta.getStart()) { 
                                 // reading comes first, skip parser annotation for this iteration
@@ -329,8 +327,10 @@ public class JGlossDocument extends HTMLDocument {
 
                                 // now r.start==ta.start && r.length==ta.length
                                 // add new reading to annotation list
-                                annotations.add( r);
-                                // ta will be added further down
+                                ta = r; // ta must refer to first annotation
+                                resultindex--;
+                                // current parser annotation will be re-added to annotation list
+                                // when all annotations for this position in the text are added
                             }
                         }
                     }
@@ -340,7 +340,6 @@ public class JGlossDocument extends HTMLDocument {
                         readingsindex++;
                     }
 
-                    // ta now contains the next annotation
                     annotations.add( ta);
                     to = ta.getStart() - 1;
                     int talen = ta.getLength();

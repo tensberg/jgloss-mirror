@@ -348,16 +348,17 @@ public class KanjiDic implements Dictionary {
             // an ASCII character at the beginning of the line is treated as start of a comment
             if (line.length()>0 && line.charAt( 0)>127) {
                 Entry e = new Entry( line);
-                entries.put( new String( new char[] { e.getKanji() }), e);
+                // storing strings in the hashmap instead of entries decreases ram usage
+                entries.put( new String( new char[] { e.getKanji() }), line);
                 
-                addReadings( e, e.getReadings());
-                addReadings( e, e.getNanoriReadings());
+                addReadings( line, e, e.getReadings());
+                addReadings( line, e, e.getNanoriReadings());
                 if (e.getRadicalName() != null)
-                    addEntry( e.getRadicalName(), e);
+                    addEntry( e.getRadicalName(), line);
                 String[] translations = e.getTranslations();
                 if (translations != null) {
                     for ( int i=0; i<translations.length; i++) {
-                        addEntry( translations[i], e);
+                        addEntry( translations[i], line);
                     }
                 }
             }
@@ -373,7 +374,7 @@ public class KanjiDic implements Dictionary {
      * @param key The key under which to store the entry.
      * @param entry The entry which will be stored.
      */
-    protected void addEntry( String key, Entry entry) {
+    protected void addEntry( String key, Object entry) {
         Object o = entries.get( key);
         if (o == entry)
             return;
@@ -386,7 +387,7 @@ public class KanjiDic implements Dictionary {
                 l.add( entry);
         }
         else {
-            List l = new LinkedList();
+            List l = new ArrayList( 2);
             l.add( o);
             l.add( entry);
             entries.put( key, l);
@@ -401,18 +402,18 @@ public class KanjiDic implements Dictionary {
      * @param e The entry to add.
      * @param readings List of readings. This can be normal or nanori readings.
      */
-    protected void addReadings( Entry e, String[] readings) {
+    protected void addReadings( Object line, Entry e, String[] readings) {
         if (readings != null) {
             for ( int i=0; i<readings.length; i++) {
                 int dot = readings[i].indexOf( '.');
                 if (dot == -1)
-                    addEntry( readings[i], e);
+                    addEntry( readings[i], line);
                 else {
                     String k = readings[i].substring( 0, dot) +
                         readings[i].substring( dot+1);
-                    addEntry( k, e);
+                    addEntry( k, line);
                     k = e.getKanji() + readings[i].substring( dot+1);
-                    addEntry( k, e);
+                    addEntry( k, line);
                 }
             }
         }
@@ -428,18 +429,23 @@ public class KanjiDic implements Dictionary {
     /**
      * Returns a list of <CODE>KanjiDic.Entry</CODE> objects for the given key.
      * The key can be a kanji, a reading or a
-     * translation. If no match is found, <CODE>null</CODE> will be returned.
+     * translation. If no match is found, the empty list will be returned.
      */
     public List lookup( String key) {
         List r = null;
         Object o = entries.get( key);
         if (o == null)
-            return null;
-        else if (o instanceof List)
-            r = (List) o;
+            return Collections.EMPTY_LIST;
+        else if (o instanceof List) {
+            // create list of entries from list of strings
+            List original = (List) o;
+            r = new ArrayList( original.size());
+            for ( Iterator i=original.iterator(); i.hasNext(); )
+                r.add( new Entry( (String) i.next()));
+        }
         else {
-            r = new LinkedList();
-            r.add( o);
+            r = new ArrayList( 1);
+            r.add( new Entry( (String) o));
         }
         return r;
     }
@@ -462,12 +468,12 @@ public class KanjiDic implements Dictionary {
 
         Object o = entries.get( expression);
         if (o != null) {
-            if (o instanceof Entry)
-                constructResult( expression, result, (Entry) o, mode);
-            else { // list of entries
+            if (o instanceof List) // list of entries
                 for ( Iterator i=((List) o).iterator(); i.hasNext(); ) {
-                    constructResult( expression, result, (Entry) i.next(), mode);
+                    constructResult( expression, result, (String) i.next(), mode);
                 }
+            else { // single entry
+                constructResult( expression, result, (String) o, mode);
             }
         }
 
@@ -483,7 +489,8 @@ public class KanjiDic implements Dictionary {
      * @param e The entry for which the objects will be created.
      * @param mode The search mode.
      */
-    protected void constructResult( String expression, List r, Entry e, short mode) {
+    protected void constructResult( String expression, List r, String entry, short mode) {
+        Entry e = new Entry( entry);
         final String kanji = new String( new char[] { e.getKanji() });
         boolean kanjiMatches = kanji.equals( expression);
         

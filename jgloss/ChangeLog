@@ -5,7 +5,9 @@
 	- Changed annotation editor to only expand tree for selected
 	  annotation. This speeds up document display and decreases
 	  memory usage.
+	- Added open recent menu.
 	- Fixed escaping of special characters in LaTeX export.
+	- Enlarged text input fields in annotation editor.
 	- Fixes to JGloss-WWW.
 0.9.3: (2001/09/14)
 	- Annotations can now have more than one reading. In a word with

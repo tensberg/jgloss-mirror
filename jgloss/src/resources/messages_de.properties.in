@@ -122,6 +122,7 @@ main.menu.import.mk=I
 main.menu.importclipboard=Importiere Zwischenablage
 main.menu.open=Öffnen...
 main.menu.open.mk=O
+main.menu.openrecent=Zuletzt geöffnete Dateien
 main.menu.save=Speichern
 main.menu.save.mk=S
 main.menu.saveAs=Speichern unter...

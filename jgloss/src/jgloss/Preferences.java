@@ -125,6 +125,8 @@ public class Preferences {
     public static final String WORDLOOKUP_ALLDICTIONARIES = "wordlookup.alldictionaries";
 
     public static final String CHASEN_LOCATION = "chasen.location";
+
+    public static final String OPENRECENT_FILES = "openrecent.files";
     
     /**
      * Path to the user preferences file.

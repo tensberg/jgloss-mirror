@@ -33,6 +33,8 @@ frame.height=400
 # List of dictionaries
 dictionaries=
 
+openrecent.files=
+
 # Delimiters for reading annotations
 reading.bracket.chars=�ԡաΡϡڡ�
 
@@ -67,10 +69,10 @@ editor.enableediting=false
 annotation.highlight.color=16743034
 
 import.parser=jgloss.dictionary.KanjiParser
-import.firstoccurrence=false
+import.firstoccurrence=true
 import.readingbrackets=
 importclipboard.parser=jgloss.dictionary.KanjiParser
-importclipboard.firstoccurrence=false
+importclipboard.firstoccurrence=true
 importclipboard.readingbrackets=
 
 export.plaintext.writereading=true

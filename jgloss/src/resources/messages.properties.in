@@ -127,6 +127,7 @@ main.menu.open=Open...
 main.menu.open.ak=control O
 main.menu.open.mk=O
 main.menu.open.tt=Open a JGloss document
+main.menu.openrecent=Open Recent
 main.menu.save=Save
 main.menu.save.ak=control S
 main.menu.save.mk=S

@@ -276,7 +276,7 @@ public class JGloss {
             else {
                 for ( int i=0; i<args.length; i++) {
                     JGlossFrame f = new JGlossFrame();
-                    f.loadDocument( args[i]);
+                    f.loadDocument( new File( args[i]));
                 }
             }
 
