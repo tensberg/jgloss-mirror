@@ -128,7 +128,6 @@ public class EditableEDict extends EDict {
 
             synchronized (this) {
                 // merge new entry with already existing entry and delete it
-                updateIndex();
                 int match = findExistingEntry( wa, ra);
                 if (match != -1) {
                     LinkedList translationlist = new LinkedList();
@@ -227,6 +226,7 @@ public class EditableEDict extends EDict {
                 }
 
                 // copy entry
+                int entryStart = dictionaryLength;
                 System.arraycopy( wa, 0, dictionary, dictionaryLength, wa.length);
                 dictionaryLength += wa.length;
                 dictionary[dictionaryLength++] = (byte) ' ';
@@ -245,9 +245,17 @@ public class EditableEDict extends EDict {
                 dictionary[dictionaryLength++] = (byte) '/';
                 dictionary[dictionaryLength++] = (byte) '\n';
 
-                // invalidate index
                 dictionaryChanged = true;
-                index = null;
+                // rebuild index
+                if (match != -1) {
+                    // an old entry was deleted, the index must be completely rebuilt
+                    buildIndex( false);
+                }
+                else {
+                    // add new entry to index
+                    addIndexRange( entryStart, dictionaryLength);
+                    postBuildIndex();
+                }
             }
         } catch (UnsupportedEncodingException ex) {}
     }
@@ -269,7 +277,6 @@ public class EditableEDict extends EDict {
             }
 
             synchronized (this) {
-                updateIndex();
                 int match = findExistingEntry( wa, ra);
                 if (match != -1) {
                     int i = index[match];
@@ -289,7 +296,7 @@ public class EditableEDict extends EDict {
                     dictionaryLength -= j-i;
 
                     dictionaryChanged = true;
-                    index = null;
+                    buildIndex( false);
                 }
             }
         } catch (UnsupportedEncodingException ex) {}
@@ -309,11 +316,8 @@ public class EditableEDict extends EDict {
      * @see Dictionary
      * @see DictionaryEntry
      */
-    public List search( String expression, short mode) throws SearchException {
-        synchronized (this) {
-            updateIndex();
-            return super.search( expression, mode);
-        }
+    public synchronized List search( String expression, short mode) throws SearchException {
+        return super.search( expression, mode);
     }
 
     /**
@@ -375,14 +379,6 @@ public class EditableEDict extends EDict {
     }
 
     /**
-     * Makes sure that the index structure is valid. This will rebuild the index if neccessary.
-     */
-    protected void updateIndex() {
-        if (index == null)
-            buildIndex( false);
-    }
-
-    /**
      * Saves the index to the file derived from the dictionary file name + ".jjdx". Errors
      * will be written to <CODE>System.err</CODE>.
      */
@@ -423,9 +419,8 @@ public class EditableEDict extends EDict {
     /**
      * This will write the dictionary file and index if they were changed.
      */
-    public void dispose() {
+    public synchronized void dispose() {
         if (dictionaryChanged) {
-            updateIndex();
             saveDictionary();
             saveIndex();
         }
