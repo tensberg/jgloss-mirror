@@ -96,16 +96,8 @@ public class LaTeXExporter {
                 String footnote;
                 // if the linked annotation entry is an inflected verb or adjective,
                 // output the full verb instead of just the kanji part
-                String nb = word;
-                String nr = reading;
-                Parser.TextAnnotation ta = node.getLinkedAnnotation();
-                if (ta != null) {
-                    if (ta instanceof Translation) {
-                        DictionaryEntry de = ((Translation) ta).getDictionaryEntry();
-                        nb = de.getWord();
-                        nr = de.getReading();
-                    }
-                }
+                String nb = node.getDictionaryFormNode().getWord();
+                String nr = node.getDictionaryFormNode().getReading();
                 footnote = "\\footnotetext{" + nb;
                 if (nr!=null && !nr.equals( " "))
                     footnote += " " + nr;

@@ -1532,29 +1532,14 @@ public class JGlossFrame implements ActionListener {
                       i.hasNext(); ) {
                     AnnotationNode an = (AnnotationNode) i.next();
                     if (!an.isHidden()) {
-                        String word = null;
-                        String reading = null;
-                        String translation = null;
-                        // if the linked annotation entry is an inflected verb or adjective,
-                        // output the full verb instead of just the kanji part
-                        Parser.TextAnnotation ta = an.getLinkedAnnotation();
-                        if (ta != null) {
-                            if (ta instanceof Translation) {
-                                DictionaryEntry de = ((Translation) ta).getDictionaryEntry();
-                                word = de.getWord();
-                                reading = de.getReading();
-                            }
-                        }
-                        if (word == null) { // no verb or adjective, just use the annotation text
-                            word = an.getKanjiText();
-                            reading = an.getReadingNode().getText();
-                        }
-                        translation = an.getTranslationNode().getText();
+                        String word = an.getDictionaryFormNode().getWord();
+                        String reading = an.getDictionaryFormNode().getReading();
+                        String translation = an.getTranslationNode().getText();
 
                         String line = word;
-                        if (reading!=null && !reading.equals( " "))
+                        if (reading!=null && reading.length()>0)
                             line += " [" + reading + "]";
-                        if (translation!=null && !translation.equals( " "))
+                        if (translation!=null && translation.length()>0)
                             line += " /" + translation + "/";
                         
                         if (!seenAnnotations.contains( line)) {
