@@ -88,7 +88,7 @@ public class Chasen {
          */
         protected void init( int expectedEOS) throws IOException {
             this.expectedEOS = expectedEOS;
-            nextLine = chasenOut.readLine();
+            prefetchNextLine();
         }
 
         /**
@@ -113,31 +113,10 @@ public class Chasen {
                 throw new NoSuchElementException();
 
             String currentLine = nextLine; // line returned by this call to next()
-
             // read line for next call to next() now
             // caching the next line now guarantees that the current call to next() will always
             // succeed, and any error when reading the next line will be visible with hasNext()
-            if (expectedEOS == 0) {
-                // no more output expected
-                nextLine = null;
-                try {
-                    if (chasenOut.ready()) {
-                        System.err.println( "Chasen.java WARNING: unexpected chasen process output");
-                        discard();
-                    }
-                } catch (IOException ex) {}
-            }
-            else { 
-                try {
-                    nextLine = chasenOut.readLine();
-                    if (EOS.equals( nextLine))
-                        expectedEOS--;
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    nextLine = null;
-                    expectedEOS = 0;
-                }
-            }
+            prefetchNextLine();
 
             nextBuffer.clear();
 
@@ -162,6 +141,33 @@ public class Chasen {
                 nextBuffer.add( currentLine);
 
             return nextBuffer;
+        }
+
+        /**
+         * Store the next line of Chasen output in the variable {@link #nextLine nextLine}.
+         */
+        private void prefetchNextLine() {
+            if (expectedEOS == 0) {
+                // no more output expected
+                nextLine = null;
+                try {
+                    if (chasenOut.ready()) {
+                        System.err.println( "Chasen.java WARNING: unexpected chasen process output");
+                        discard();
+                    }
+                } catch (IOException ex) {}
+            }
+            else { 
+                try {
+                    nextLine = chasenOut.readLine();
+                    if (EOS.equals( nextLine))
+                        expectedEOS--;
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    nextLine = null;
+                    expectedEOS = 0;
+                }
+            }
         }
 
         /**
@@ -344,7 +350,7 @@ public class Chasen {
         if (result == null)
             result = new Result();
 
-        // clear old result
+        // clear previous chasen output
         if (result.hasNext())
             result.discard();
 
@@ -366,7 +372,7 @@ public class Chasen {
         chasenIn.write( (char) 0x0a); // chasen will start parsing when end of line is encountered
         expectedEOS++; // for the previous 0x0a
         chasenIn.flush();
-
+        
         result.init( expectedEOS);
 
         return result;

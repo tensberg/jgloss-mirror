@@ -20,10 +20,6 @@ executable JAR file by typing "make jgloss", create the documentation by
 executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
-JGloss 1.0.3 fixed some bugs in the EDICT implementation. To improve dictionary
-lookup accuracy, you should delete any old .jjdx index files created by
-versions of JGloss before 1.0.3.
-
 About Alpha 0
 -------------
 This is a preview of the new JGloss version, mainly to show that I am still
@@ -31,9 +27,10 @@ working on the program. It should give you an opportunity to try out the
 new user interface and expanded dictionary functions. You are welcome to
 send comments about the features and write your ideas, but it is
 unneccessary to send bug reports, since the program is still being heavily
-worked on. There are many features which where in the previous JGloss
-versions but are not in this Alpha version. They will eventually make their
-reappearance.
+worked on (replacing old bugs with all new ones). There are many features
+which where in the previous JGloss versions but are not in this Alpha
+version. They will eventually make their reappearance when I find the time
+to reimplement them.
 
 Some of the greater issues of JGloss 2 Alpha 0:
 - The file format of the .jgloss files has incompatibly changed, opening
@@ -43,19 +40,15 @@ Some of the greater issues of JGloss 2 Alpha 0:
 - The user dictionary is not implemented yet
 - LaTeX export is not implemented yet
 - The dictionary implementations do not yet support all planned features
+  (particularly EDICT).
 - Documentation of the source code is incomplete.
 
 Tip for keyboard navigation:
 use cursor up/down to switch between annotations; cursor left/right to
 switch between readings/translations, space to select a
-reading/translation; and Alt-A to annotate the currently selected text.
+reading/translation; use Alt-A to annotate the currently selected text.
 
 Known problems (JGloss 1.0.6):
-  - When the ChaSen parser is used with JRE 1.3 on Windows 98/ME/XP, a window
-    pops up while ChaSen runs. This does not happen with JRE 1.4.
-  - On Windows 98/ME when using JRE 1.3 the ChaSen window does not close 
-    automatically after a document is imported. You will have to close it by
-    hand. Use JRE 1.4 instead.
   - On Linux force-quitting JGloss by typing Control-C or using kill -HUP
     sometimes doesn't work.
   - The custom user interface font chosen in the style dialog is applied

@@ -82,6 +82,17 @@ public class KanjiParser extends AbstractParser {
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      */
+    public KanjiParser( Dictionary[] dictionaries, Set exclusions) {
+        this( dictionaries, exclusions, true, false, true);
+    }
+
+    /**
+     * Creates a new parser which will use the given dictionaries, use no reading annotation
+     * delimiters and will cache dictionary lookups and not ignore newlines.
+     *
+     * @param dictionaries The dictionaries used for word lookups.
+     * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
+     */
     public KanjiParser( Dictionary[] dictionaries, Set exclusions, boolean firstOccurrenceOnly) {
         this( dictionaries, exclusions, true, false, firstOccurrenceOnly);
     }

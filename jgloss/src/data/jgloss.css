@@ -1,0 +1,14 @@
+body {
+  color: black;
+  background-color: white;
+}
+
+p {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+div {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

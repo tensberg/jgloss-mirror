@@ -47,6 +47,7 @@ public class JGlossDocument {
         String P = "p";
         String ANNOTATION = "anno";
         String RBASE = "rbase";
+        String BR = "br";
     } // class Elements
 
     public interface Attributes {

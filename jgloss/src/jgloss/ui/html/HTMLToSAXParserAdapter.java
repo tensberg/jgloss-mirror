@@ -29,12 +29,16 @@ import jgloss.ui.xml.JGlossDocument;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTML;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+/**
+ * Create the JGloss XML document structure from a {@link JGlossHTMLDoc JGlossHTMLDoc}.
+ */
 public class HTMLToSAXParserAdapter {
     private Segment segment;
     private ContentHandler saxContentHandler;
@@ -104,11 +108,14 @@ public class HTMLToSAXParserAdapter {
         saxContentHandler.startElement( null, null, JGlossDocument.Elements.P,
                                         EMPTY_ATTRIBUTES);
 
-        // content model of p is (#PCDATA | anno)
+        // content model of p is (#PCDATA | anno | br)
         for ( int i=0; i<p.getElementCount(); i++) {
             Element child = p.getElement( i);
-            if (child.getName().equals( AnnotationTags.ANNOTATION.getId()))
+            String name = child.getName();
+            if (name.equals( AnnotationTags.ANNOTATION.getId()))
                 handleAnnotation( child);
+            else if (name.equals( HTML.Tag.BR.toString()))
+                handleBR( child);
             else
                 handleText( child);
         }
@@ -170,6 +177,12 @@ public class HTMLToSAXParserAdapter {
         saxContentHandler.startElement( null, null, JGlossDocument.Elements.RBASE, a);
         handleText( rb.getElement( 1));
         saxContentHandler.endElement( null, null, JGlossDocument.Elements.RBASE);
+    }
+
+    private void handleBR( Element leaf) throws SAXException {
+        // BR tag is always empty
+        saxContentHandler.startElement( null, null, JGlossDocument.Elements.BR, EMPTY_ATTRIBUTES);
+        saxContentHandler.endElement( null, null, JGlossDocument.Elements.BR);
     }
 
     private void handleText( Element leaf) throws SAXException {

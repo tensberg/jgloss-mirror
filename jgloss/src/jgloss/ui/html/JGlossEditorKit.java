@@ -60,6 +60,8 @@ import javax.swing.text.html.parser.TagElement;
  * @author Michael Koch
  */
 public class JGlossEditorKit extends HTMLEditorKit {
+    private static final String JGLOSS_STYLE_SHEET = "/data/jgloss.css";
+
     /**
      * The factory used to create views for document elements.
      */
@@ -83,6 +85,10 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * the {@link AnnotationTags AnnotationTags}.
      */
     private static DTD dtd = null;
+    /**
+     * Standard style for rendering JGloss documents. Used instead of the usual HTML style sheet.
+     */
+    private static StyleSheet jglossStyleSheet = null;
 
     /**
      * TagElements are used by the HTML parser to inquire properties of an element. This class
@@ -264,7 +270,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
             }
             else {
                 View v = super.create( elem);
-                if (v instanceof InlineView) {
+                if (v instanceof InlineView && !name.equals( HTML.Tag.BR)) {
                     // The inline views do not have the text aligned to work properly with the
                     // annotation view. Replace it with a vertically adjusted view.
                     return new VAdjustedView( elem, VAdjustedView.BASE_TEXT_ALIGNMENT);
@@ -782,7 +788,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * @return The new document.
      */
     public Document createDefaultDocument() {
-        JGlossHTMLDoc doc = new JGlossHTMLDoc( getParser());
+        StyleSheet styles = new StyleSheet();
+        styles.addStyleSheet(getStyleSheet());
+        JGlossHTMLDoc doc = new JGlossHTMLDoc( styles, getParser());
         return doc;
     }
 
@@ -916,5 +924,25 @@ public class JGlossEditorKit extends HTMLEditorKit {
             cm = cm.next;
         } while (cm != null);
         return changed;
+    }
+
+    public void setStyleSheet(StyleSheet _jglossStyleSheet) {
+        jglossStyleSheet = jglossStyleSheet;
+    }
+
+    public StyleSheet getStyleSheet() {
+	if (jglossStyleSheet == null) {
+	    jglossStyleSheet = new StyleSheet();
+	    try {
+		InputStream is = JGlossEditorKit.class.getResourceAsStream(JGLOSS_STYLE_SHEET);
+		Reader r = new BufferedReader(new InputStreamReader(is));
+		jglossStyleSheet.loadRules(r, null);
+		r.close();
+	    } catch (IOException ex) {
+                ex.printStackTrace();
+	    }
+	}
+
+	return jglossStyleSheet;
     }
 } // class JGlossEditorKit

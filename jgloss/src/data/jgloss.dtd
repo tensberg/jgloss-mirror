@@ -24,9 +24,10 @@
 
 -->
 
-<!-- DTD of the JGloss file format -->
+<!-- DTD of the JGloss file format; JGloss takes some basic elements of HTML and adds
+     an element for annotations. -->
 
-<!-- root element, structured in head and body similar to HTML -->
+<!-- root element, structured in head and body -->
 <!ELEMENT jgloss (head,body)>
 
 <!-- head contains meta information about the document -->
@@ -34,11 +35,15 @@
 <!ELEMENT generator (#PCDATA)>
 <!ELEMENT title (#PCDATA)>
 
-<!-- The body consists of several paragraphs of annotated text -->
-<!ELEMENT body (p)+>
+<!-- The body consists of divisions of several paragraphs of annotated text -->
+<!ELEMENT body (div)+>
+
+<!-- Divisions of text, which may be nested to group paragraphs.
+     Currently, divs may not be nested. -->
+<!ELEMENT div (p)+>
 
 <!-- paragraph element -->
-<!ELEMENT p (#PCDATA | anno)*>
+<!ELEMENT p (#PCDATA | anno | br)*>
 
 <!-- text annotated with readings and a translation
      Attributes:

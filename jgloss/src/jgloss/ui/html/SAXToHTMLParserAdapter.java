@@ -35,6 +35,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Adapt a SAX XML parser callback to the <code>HTMLEditorKit.ParserCallback</code> interface.
+ *
+ * @author Michael Koch
+ */
 class SAXToHTMLParserAdapter extends DefaultHandler {
     private HTMLEditorKit.ParserCallback htmlHandler;
     private DTD dtd;

@@ -28,6 +28,15 @@
     </html>
   </xsl:template>
 
+  <xsl:template match="head">
+    <head>
+      <xsl:apply-templates />
+      <style type="text/css">
+        p { margin: 0px 0px 0px 0px }
+      </style>
+    </head>
+  </xsl:template>
+
   <xsl:template match="generator">
     <meta name="generator" value="{.}" />
   </xsl:template>

@@ -65,6 +65,7 @@ class JGlossifyReader extends FilterReader {
      * Flag if a &lt;p&gt; has been opened.
      */
     private boolean inParagraph;
+    private boolean inDivision;
     /**
      * If <code>true</code>, try to detect paragraph breaks. Otherwise, each line from the
      * underlying stream is made to a single paragraph.
@@ -81,9 +82,10 @@ class JGlossifyReader extends FilterReader {
     private final static char[] NO_PARAGRAPH_END;
 
     private final static char[] END_HTML = "</body>\n</jgloss>\n".toCharArray();
+    private final static char[] START_DIVISION = "<div>\n".toCharArray();
+    private final static char[] END_DIVISION = "</div>\n".toCharArray();
     private final static char[] START_PARAGRAPH = "<p>".toCharArray();
     private final static char[] END_PARAGRAPH = "</p>\n".toCharArray();
-    private final static char[] EMPTY_PARAGRAPH = "<p></p>\n".toCharArray();
 
     static {
         funnyChars = new HashMap( 11);
@@ -161,24 +163,31 @@ class JGlossifyReader extends FilterReader {
          * line[position] does not exist, read the next char from the underlying reader and interpret it.
          */
 
-        if (position >= line.length) {
+        while (line==null || position>=line.length) {
             if (eof) {
                 // eof at underlying reader and all additional HTML already returned
                 return -1;
             }
 
             position = 0;
+            line = null;
 
             int next = super.read();
             if (next == -1) {
                 // eof at underlying reader. Generate HTML document end tags.
                 eof = true;
                 line = END_HTML;
+                StringBuffer lastLine = new StringBuffer(32);
                 if (inParagraph) {
-                    line = new StringBuffer( 32).append( END_PARAGRAPH).append( END_HTML).toString()
-                        .toCharArray();
+                    lastLine.append(END_PARAGRAPH);
                     inParagraph = false;
                 }
+                if (inDivision) {
+                    lastLine.append(END_DIVISION);
+                    inDivision = false;
+                }
+                lastLine.append(END_HTML);
+                line = lastLine.toString().toCharArray();
             }
             else {
                 if (isLineBreak( (char) next)) {
@@ -194,7 +203,7 @@ class JGlossifyReader extends FilterReader {
                                 if (next != -1) {
                                     char c = (char) next;
                                     if (!startsParagraph( c)) {
-                                        // no paragraph break
+                                        // no paragraph break; skip newline
                                         line = escape( c);
                                         closeParagraph = false;
                                     }
@@ -210,14 +219,28 @@ class JGlossifyReader extends FilterReader {
                         }
                     }
                     else {
-                        // two adjacent line breaks: empty line; generate empty paragraph
-                        line = EMPTY_PARAGRAPH;
+                        // two adjacent line breaks: empty line separates divisions
+                        if (inDivision) {
+                            line = END_DIVISION;
+                            inDivision = false;
+                        }
+                        else {
+                            // ignore further empty lines
+                            continue;
+                        }
                     }
                 }
                 else {
                     if (!inParagraph) {
-                        line = START_PARAGRAPH;
-                        inParagraph = true;
+                        if (!inDivision) {
+                            // division must be opened before paragraph
+                            line = START_DIVISION;
+                            inDivision = true;
+                        }
+                        else {
+                            line = START_PARAGRAPH;
+                            inParagraph = true;
+                        }
                         ((PushbackReader) in).unread( next);
                     }
                     else {
@@ -228,6 +251,7 @@ class JGlossifyReader extends FilterReader {
         }
 
         lastChar = line[position++];
+
         return lastChar;
     }
 

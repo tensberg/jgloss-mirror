@@ -236,7 +236,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
          * @param pos Position at which the error occured.
          */
         public void handleError( String errorMsg, int pos) {
-            System.err.println( errorMsg + " at " + pos);
+            System.err.println( "HTML Parser: " + errorMsg + " at " + pos);
         }
 
         /**
@@ -249,8 +249,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
         }
     }
 
-    public JGlossHTMLDoc( HTMLEditorKit.Parser _htmlparser) {
-        setParser( _htmlparser);
+    public JGlossHTMLDoc( StyleSheet _styles, HTMLEditorKit.Parser _htmlparser) {
+        super(_styles);
+        setParser(_htmlparser);
     }
 
     /**
@@ -415,7 +416,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
     }
 
     /**
-     * Currently not implemented, don't use.
+     * Returns only the base text of the selected span, not reading and translation annotations.
      */
     public String getUnannotatedText( int start, int end) {
         return new UnannotatedTextFetcher().getText(start, end).toString();
@@ -454,7 +455,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
     /**
      * Adds a new annotation for a part of the document. Since it is not possible to nest
      * annotation elements, all annotations lying in that interval will be removed first. The
-     * annotation also cannot span paragraphs, so the interval will be shortened as needed.
+     * annotation also cannot span paragraphs or hard line breaks, so the interval will be
+     * shortened as needed.
      *
      * @param start Start offset of the interval to annotate.
      * @param end End offset of the interval to annotate.
@@ -466,6 +468,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
             // cross it.
             Element paragraph = getParagraphElement( start);
             end = Math.min( end, paragraph.getEndOffset()-1);
+            if (end == start)
+                // no annotation area left
+                return;
 
             // The start and end offsets will move around while we change the document.
             // So wrap them in position objects, which adapt to changes.
