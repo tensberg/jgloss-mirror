@@ -1,6 +1,7 @@
 # Encoding: EUC_JP
 #
-# Default preferences.
+# Default preferences. All keys not found in the user preferences file will be
+# taken from this file.
 #
 # Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
 #
@@ -82,6 +83,7 @@ export.latex.preamble=\\usepackage{pslatex}\n\\renewcommand{\\thefootnote}{}\n
 export.latex.ruby.options=overlap,CJK
 
 exclusions.file=.jgloss-exclusions
+userdictionary.file=.jgloss-userdictionary
 
 # Name of the DTD the javax.swing.text.html.parser.ParserDelegator uses. Found in the
 # Swing source code. There is no way to inquire this programatically. 
