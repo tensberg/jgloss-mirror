@@ -124,6 +124,7 @@ public class Preferences {
         "export.latex.writehidden";    
 
     public static final String EXCLUSIONS_FILE = "exclusions.file";
+    public static final String EXCLUSIONS_ENCODING = "exclusions.encoding";
     public static final String USERDICTIONARY_FILE = "userdictionary.file";
 
     public static final String STARTUP_WORDLOOKUP = "startup.wordlookup";

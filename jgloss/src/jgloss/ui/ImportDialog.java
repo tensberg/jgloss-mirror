@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -33,7 +33,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.*;
-
+import javax.swing.event.*;
 
 /**
  * Dialog which allows the user to select a file to import. The user can also specify the
@@ -43,9 +43,9 @@ import javax.swing.*;
  */
 public class ImportDialog extends JDialog implements TextListener {
     /**
-     * Path to the selected file.
+     * Path to the selected file or a URL.
      */
-    private JTextField selection;
+    private JTextField filename;
     /**
      * Area in which the user can enter some text, which should be imported if no filename is specified.
      */
@@ -54,7 +54,10 @@ public class ImportDialog extends JDialog implements TextListener {
      * Remember if the text area was empty prior to a text changed event.
      */
     private boolean pasteareaWasEmpty = true;
-
+    /**
+     * Pane which lets the user choose between entering a file name and the text itself.
+     */
+    private JTabbedPane selectionPane;
     /**
      * Widget to select the character encoding of the file.
      */
@@ -82,7 +85,7 @@ public class ImportDialog extends JDialog implements TextListener {
         b.add( Box.createHorizontalGlue());
         final Action ok = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    if (getFilename().length()>0 || getPastedText().length()>0) {
+                    if (getSelection().length() > 0) {
                         result = true;
                         ImportDialog.this.hide();
                         JGloss.prefs.set( Preferences.IMPORT_PARSER, 
@@ -124,15 +127,18 @@ public class ImportDialog extends JDialog implements TextListener {
             });        
 
         b = Box.createVerticalBox();
-        Box b2 = Box.createHorizontalBox();
+
+        selectionPane = new JTabbedPane( JTabbedPane.TOP);
+        Box b2 = Box.createVerticalBox();
+        Box b3 = Box.createHorizontalBox();
         JLabel l = new JLabel( JGloss.messages.getString( "import.urlorfile"));
-        b2.add( l);
-        b2.add( Box.createHorizontalGlue());
-        b.add( b2);
-        b.add( Box.createVerticalStrut( 10));
-        b2 = Box.createHorizontalBox();
-        selection = new JTextField();
-        b2.add( selection);
+        b3.add( l);
+        b3.add( Box.createHorizontalGlue());
+        b2.add( b3);
+        b2.add( Box.createVerticalStrut( 10));
+        b3 = Box.createHorizontalBox();
+        filename = new JTextField();
+        b3.add( filename);
         
         final Action choosefile = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
@@ -141,16 +147,16 @@ public class ImportDialog extends JDialog implements TextListener {
                     f.setFileView( CustomFileView.getFileView());
                     int r = f.showOpenDialog( ImportDialog.this);
                     if (r == JFileChooser.APPROVE_OPTION) {
-                        selection.setText( f.getSelectedFile().getAbsolutePath());
+                        filename.setText( f.getSelectedFile().getAbsolutePath());
                         JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
                     }
                 }
             };
         choosefile.setEnabled( true);
         UIUtilities.initAction( choosefile, "import.button.choosefile");
-        b2.add( new JButton( choosefile));
-        b.add( b2);
-        b.add( Box.createVerticalStrut( 10));
+        b3.add( new JButton( choosefile));
+        b2.add( b3);
+        b2.add( Box.createVerticalStrut( 10));
 
         java.util.Vector v = new java.util.Vector();
         v.add( JGloss.messages.getString( "encodings.default"));
@@ -160,29 +166,43 @@ public class ImportDialog extends JDialog implements TextListener {
         encodings = new JComboBox( v);
         encodings.setEditable( true);
 
-        b2 = Box.createHorizontalBox();
-        b2.add( new JLabel( JGloss.messages.getString( "import.encodings")));
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( encodings);
-        b2.add( Box.createHorizontalGlue());
-        b.add( b2);
-        b.add( Box.createVerticalStrut( 20));
+        b3 = Box.createHorizontalBox();
+        b3.add( new JLabel( JGloss.messages.getString( "import.encodings")));
+        b3.add( Box.createHorizontalStrut( 3));
+        b3.add( encodings);
+        b3.add( Box.createHorizontalGlue());
+        b2.add( b3);
+        selectionPane.add( JGloss.messages.getString( "import.file"), b2);
 
-        b2 = Box.createHorizontalBox();
+        final Box b4 = Box.createVerticalBox();
+        b3 = Box.createHorizontalBox();
         l = new JLabel( JGloss.messages.getString( "import.pastetext"));
-        b2.add( l);
-        b2.add( Box.createHorizontalGlue());
-        b.add( b2);
-        pastearea = new TextArea( 5, 50);
+        b3.add( l);
+        b3.add( Box.createHorizontalGlue());
+        b4.add( b3);
+        // An AWT TextArea is used because cut&paste is implemented differently than Swing cut&paste
+        // and works with X11 primary selection copying and MacOSX.
+        pastearea = new TextArea( 3, 50);
         pastearea.setEditable( true);
-        pastearea.setFont( selection.getFont());
-        // use SWING colors
-        pastearea.setBackground( selection.getBackground());
-        pastearea.setForeground( selection.getForeground());
+        pastearea.setFont( filename.getFont());
+        // use Swing colors
+        pastearea.setBackground( filename.getBackground());
+        pastearea.setForeground( filename.getForeground());
+        b4.add( pastearea);
         pastearea.addTextListener( this);
+        b4.add( Box.createVerticalStrut( 5));
+        selectionPane.addTab( JGloss.messages.getString( "import.text"), b4);
 
-        b.add( pastearea);
-        b.add( Box.createVerticalStrut( 5));
+        // Mixing AWT "heavyweight" and Swing "lightweight" components is nasty.
+        // To get the layering in the tabbed pane correct, I have to remove the paste area
+        // if the tab is not selected.
+        selectionPane.addChangeListener( new ChangeListener() {
+                public void stateChanged( ChangeEvent e) {
+                    pastearea.setVisible( selectionPane.getSelectedIndex() == 1);
+                }
+            });
+        b.add( selectionPane);
+        b.add( Box.createVerticalStrut( 10));
 
         parserSelector = new ParserSelector( true);
         parserSelector.setBorder( BorderFactory.createTitledBorder 
@@ -217,6 +237,7 @@ public class ImportDialog extends JDialog implements TextListener {
 
         this.pack();
         this.setResizable( false);
+        pastearea.setVisible( false);
     }
 
     /**
@@ -237,15 +258,19 @@ public class ImportDialog extends JDialog implements TextListener {
      *
      * @return The filename or url.
      */
-    public String getFilename() {
-        return selection.getText();
+    public String getSelection() {
+        if (selectionIsFilename())
+            return filename.getText();
+        else
+            return pastearea.getText();
     }
 
     /**
-     * Returns the text from the area where the user can paste the text to import.
+     * Returns if the selection returned by {@link #getSelection() getSelection} should be as URL or
+     * filename, or if it is the text which is to be imported.
      */
-    public String getPastedText() {
-        return pastearea.getText();
+    public boolean selectionIsFilename() {
+        return selectionPane.getSelectedIndex() == 0;
     }
 
     /**
@@ -307,6 +332,7 @@ public class ImportDialog extends JDialog implements TextListener {
             if (!enc.equals( CharacterEncodingDetector.ENC_UTF_8)) { // don't trust UTF-8 detection
                 try {
                     pastearea.setText( new String( tb, enc));
+                    pastearea.setCaretPosition( pastearea.getText().length());
                     // the text changed event triggered by this setText is ignored because
                     // pasteareaWasEmpty is already set to false
                 } catch (java.io.UnsupportedEncodingException ex) {}

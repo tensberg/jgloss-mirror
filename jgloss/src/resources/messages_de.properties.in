@@ -45,6 +45,12 @@ error.exclusions.load.title=Fehler beim Lesen der Ausschluß-Liste
 error.exclusions.load=Beim Lesen der Ausschluss-Liste von\n{0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1}, {2}.
 error.import.title=Fehler beim Importieren
 error.import.exception=Beim Import von {0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1} ({2}).
+error.import.htmlwarning=\
+Das importierte Dokument ist HTML-formatiert. JGloss kann nur einfache HTML-\n\
+Dateien verarbeiten; wenn das Dokument fehlerhaft angezeigt wird, öffnen sie\n\
+die ursprüngliche Datei in einem Web-Browser, kopieren sie den Text in die\n\
+Zwischenablage und öffnen sie ihn in JGloss durch Auswählen des "Importiere\n\
+Zwischenablage"-Menüeintrags.
 error.export.title=Fehler beim Exportieren
 error.export.exception=Beim Exportieren ist ein Fehler aufgetreten.\nDie Java-Exception war {0} ({1}).
 error.load.title=Fehler beim Öffnen
@@ -222,13 +228,15 @@ exclusions.import.title=Ausschluss-Liste importieren
 
 import.title=Datei importieren
 import.urlorfile=Geben sie eine URL ein, oder wählen sie die Datei, die sie importieren möchten:
-import.pastetext=Oder kopieren sie den japanischen Text hierhin:
+import.file=Datei
+import.text=Text
+import.pastetext=Kopieren sie den japanischen Text hierhin:
 import.button.choosefile=Datei auswählen...
 import.encodings=Zeichensatz der Datei:
 import.parserselector=Text-Parser
 
 import.clipboard=Zwischenablage
-import.textarea=Importierter Text
+import.textarea=importierter Text
 load.progress=Öffne {0}
 
 parserselector.readingbrackets=Klammern für Lesungs-Anmerkungen:

@@ -96,16 +96,16 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                         else
                                             which = target;
                                         
-                                        if (d.getFilename().length() > 0)
+                                        if (d.selectionIsFilename())
                                             which.importDocument
-                                                ( d.getFilename(),
+                                                ( d.getSelection(),
                                                   d.createParser( Dictionaries.getDictionaries(),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
                                                   d.getEncoding());
                                         else
                                             which.importString
-                                                ( d.getPastedText(), 
+                                                ( d.getSelection(), 
                                                   d.createParser( Dictionaries.getDictionaries(),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
@@ -723,8 +723,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                  String encoding) {
         try {
             Reader in = null;
-            int contentlength = 0;
             String contenttype = "text/plain";
+            int contentlength = 0;
             if (JGloss.messages.getString( "encodings.default").equals( encoding))
                 encoding = null; // autodetect the encoding
             String title = "";
@@ -762,11 +762,16 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 }
             }
 
-            if (!contenttype.equals( "text/html"))
+            if (!contenttype.startsWith( "text/html"))
                 in = new HTMLifyReader( in);
 
             loadDocument( in, path, title, parser, filter, true,
                           CharacterEncodingDetector.guessLength( contentlength, encoding));
+            if (contenttype.startsWith( "text/html")) {
+                JOptionPane.showMessageDialog( this, JGloss.messages.getString( "error.import.htmlwarning"),
+                                               JGloss.messages.getString( "error.import.htmlwarning.title"),
+                                               JOptionPane.INFORMATION_MESSAGE);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
@@ -776,6 +781,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
                         ex.getLocalizedMessage() }),
                   JGloss.messages.getString( "error.import.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            if (documentName == null)
+                // error before document was opened, close window
+                this.dispose();
         }
     }
 
@@ -1252,7 +1260,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
         b.add( Box.createHorizontalStrut( 3));
         b.add( new JLabel( JGloss.messages.getString( "export.encodings")));
         b.add( Box.createHorizontalStrut( 3));
-        Vector v = new Vector( 5);
         JComboBox encodings = new JComboBox( JGloss.prefs.getList( Preferences.ENCODINGS, ','));
         encodings.setSelectedItem( JGloss.prefs.getString( Preferences.EXPORT_ENCODING));
         encodings.setEditable( true);

@@ -46,6 +46,12 @@ error.exclusions.load.title=Error reading exclusion list
 error.exclusions.load=An error occurred while reading the\nexclusion list from {0}.\nThe Java exception was {1}, {2}.
 error.import.title=Error while importing file
 error.import.exception=An error occurred while importing {0}.\nThe Java exception was {1}, {2}.
+error.import.htmlwarning=\
+The imported document is HTML-formatted. JGloss can only render simple\n\
+HTML files; if the document is displayed incorrectly, open the original file\n\
+file in a web browser, copy the text to the clipboard and open it in JGloss\n\
+by selecting the "Import Clipboard" menu item.
+error.import.htmlwarning.title=HTML Information
 error.export.title=Error while exporting file
 error.export.exception=An error occurred while exporting.\nThe Java exception was {0}, {1}.
 error.load.title=Error while loading file
@@ -87,7 +93,7 @@ button.select=Select
 button.annotate=Annotate
 
 jgloss.title=JGloss
-jgloss.version=Version 1.0.1b3
+jgloss.version=Version 1.0.1
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -243,15 +249,17 @@ exclusions.add=Enter the word to add to the exclusion list.
 exclusions.export.title=Export exclusion list
 exclusions.import.title=Import exclusion list
 
-import.title=Import file
-import.urlorfile=Enter the URL, or specify the file you want to import:
-import.pastetext=Or paste some Japanese text here:
+import.title=Import
+import.urlorfile=Enter the URL, or choose the file you want to import:
+import.file=File
+import.text=Text
+import.pastetext=Paste some Japanese text here:
 import.button.choosefile=Choose file...
 import.encodings=Character encoding of file:
 import.parserselector=Text Parser
 
 import.clipboard=clipboard
-import.textarea=Imported Text
+import.textarea=imported text
 load.progress=Loading {0}
 
 parserselector.readingbrackets=Brackets delimiting reading annotations:

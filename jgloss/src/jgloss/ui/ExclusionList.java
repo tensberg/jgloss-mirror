@@ -261,8 +261,9 @@ public class ExclusionList extends JPanel {
      */
     private void loadExclusionList( String filename) {
         try {
-            BufferedReader r = new BufferedReader( CharacterEncodingDetector.getReader
-                ( new FileInputStream( filename)));
+            BufferedReader r = new BufferedReader( new InputStreamReader
+                ( new FileInputStream( filename), 
+                  JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
             Set newExclusions = new HashSet( 1000);
             String line;
             while ((line=r.readLine()) != null) {
@@ -282,15 +283,15 @@ public class ExclusionList extends JPanel {
     }
 
     /**
-     * Saves the exclusion list to a file. The character encoding used is
-     * UTF-8.
+     * Saves the exclusion list to a file.
      *
      * @param filename Name of the file.
      */
     private void saveExclusionList( String filename) {
         try {
             BufferedWriter w = new BufferedWriter( new OutputStreamWriter
-                ( new FileOutputStream( filename), "UTF-8"));
+                ( new FileOutputStream( filename), 
+                  JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
             for ( Iterator i=exclusions.iterator(); i.hasNext(); ) {
                 String word = i.next().toString();
                 w.write( word, 0, word.length());
@@ -415,7 +416,8 @@ public class ExclusionList extends JPanel {
                 String filename = getExclusionListFile();
                 try {
                     BufferedWriter w = new BufferedWriter( new OutputStreamWriter
-                        ( new FileOutputStream( filename, true), "UTF-8"));
+                        ( new FileOutputStream( filename, true), 
+                          JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
                     w.write( word, 0, word.length());
                     w.newLine();
                     w.close();

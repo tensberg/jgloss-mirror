@@ -7,6 +7,7 @@
 	- Added a text field to the document window in which Japanese
 	  text can be pasted. This obsoletes the -p command line option,
 	  which is removed.
+	- Added UTF-16 encodings to import encoding selection.
 	- Keyboard shortcut: typing delete while an annotation node
 	  is selected clears the translation.
 	- Katakana words are no longer annotated with hiragana readings

@@ -38,7 +38,7 @@ openrecent.files=
 # Delimiters for reading annotations
 reading.bracket.chars=�ԡաΡϡڡ�
 
-encodings=ISO-2022-JP,EUC-JP,SHIFT_JIS,UTF-8
+encodings=ISO-2022-JP,EUC-JP,SHIFT_JIS,UTF-8,UTF-16,UTF-16BE,UTF-16LE
 export.encoding=SHIFT_JIS
 fontsizes.kanji=9,11,12,13,14,15,16,18,20,24
 fontsizes.reading=6,7,8,9,10,11,12,13,14,15,16,18
@@ -99,6 +99,7 @@ export.latex.preamble=\\usepackage{pslatex}\n\\renewcommand{\\thefootnote}{}\n
 export.latex.ruby.options=overlap,CJK
 
 exclusions.file=.jgloss-exclusions
+exclusions.encoding=UTF-8
 userdictionary.file=.jgloss-userdictionary
 
 startup.wordlookup=false

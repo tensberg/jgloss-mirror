@@ -28,7 +28,9 @@ Known problems:
     know how to fix.
   - On Linux force-quitting JGloss by typing Control-C or using kill -HUP
     sometimes doesn't work.
-  - The custom user interface font chosen in the style dialog is applied thorough
-    the whole application only after JGloss is restarted.
+  - The custom user interface font chosen in the style dialog is applied
+    thorough the application only after JGloss is restarted.
+  - Pasting text in the text field of the input dialog does not work with non-
+    Japanese Windows. Use Import Clipboard instead.
 
-(c) 2001/2002 Michael Koch <tensberg@gmx.net>
+(c) 2001,2002 Michael Koch <tensberg@gmx.net>
