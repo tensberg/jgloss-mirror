@@ -739,7 +739,7 @@ public class JGlossFrame implements ActionListener {
      *
      * @param path The path of the file to load.
      */
-    private void loadDocument( String path) {
+    public void loadDocument( String path) {
         try {
             File f = new File( path);
             Reader in = new InputStreamReader( new FileInputStream( f), "UTF-8");
@@ -922,7 +922,7 @@ public class JGlossFrame implements ActionListener {
             PageAttributes pa = new PageAttributes();
             pa.setOrigin( PageAttributes.OriginType.PRINTABLE);
             PrintJob job = frame.getToolkit().getPrintJob
-                ( frame, JGloss.messages.getString( "print.title"), ja, pa);
+                ( frame, documentName, ja, pa);
 
             if (job != null) {
                 // do the printing
