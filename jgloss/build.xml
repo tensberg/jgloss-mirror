@@ -27,10 +27,11 @@
     Build file for the JGloss project
   </description>
 
-  <!-- system-specific properties -->
-  <property name="build.compiler" value="jikes" />
+  <!-- environment-specific properties -->
   <property name="xsl.docbook.html" value="/usr/share/sgml/docbook/xsl-stylesheets/html/docbook.xsl" />
   <property name="xsl.docbook.pdf" value="/usr/share/sgml/docbook/xsl-stylesheets/fo/docbook.xsl" />
+  <property name="fop.userconfig" value="/usr/local/fop/conf/userconfig.xml" />
+  <property name="fop.japanesefont" value="Gothic" />
 
   <!-- build-specific properties -->
   <property name="release" value="2.0a3" />
@@ -129,7 +130,10 @@
   <xsl:import href="${xsl.docbook.pdf}" />
 </xsl:stylesheet>
 ]]></echo>
-    <xslt in="${source.doc}/jgloss.docbook.xml" out="${build}/jgloss.fo" style="${source.doc}/stylesheet.pdf.xsl" />
-    <fop fofile="${build}/jgloss.fo" outfile="${dest.doc}/jgloss.pdf" format="application/pdf" />
+    <xslt in="${source.doc}/jgloss.docbook.xml" out="${build}/jgloss.fo" style="${source.doc}/stylesheet.pdf.xsl">
+      <param name="japanesefont" expression="${fop.japanesefont}" />
+    </xslt>
+    <fop fofile="${build}/jgloss.fo" outfile="${dest.doc}/jgloss.pdf" format="application/pdf" messagelevel="warn" 
+      userconfig="${fop.userconfig}" />
   </target>
 </project>

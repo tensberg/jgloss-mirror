@@ -442,8 +442,10 @@
       </para>
       <para>
         The heuristics used for generating the annotations are not perfect.
-        For example, if you import a text using the edict dictionary file, 来る is assigned the reading きたる
-        instead of くる and 一人 is assigned the reading いちにん instead of the more common ひとり.
+        For example, if you import a text using the edict dictionary file, <foreignphrase lang="ja">来る</foreignphrase>
+        is assigned the reading <foreignphrase lang="ja">きたる</foreignphrase>
+        instead of <foreignphrase lang="ja">くる</foreignphrase> and <foreignphrase lang="ja">一人</foreignphrase> is assigned the reading 
+        <foreignphrase lang="ja">いちにん</foreignphrase> instead of the more common <foreignphrase lang="ja">ひとり</foreignphrase>.
         This happens because the application picks the first reading and translation 
         found in the dictionary. Also, the algorithm used for verb/adjective deinflection can produce
         false results. What follows is that you should not trust the automatic annotations too much
