@@ -179,7 +179,8 @@ public abstract class FileBasedDictionary implements Dictionary {
         public String getName() { return name; }
 
         /**
-         * Creates a new dictionary instance using {@link #dictionaryConstructor dictionaryConstructor}.
+         * Creates a new dictionary instance using 
+         * {@link dictionaryConstructor dictionaryConstructor}.
          * The constructor is passed a <code>File</code> wrapping the <code>descriptor</code> as only
          * argument.
          */

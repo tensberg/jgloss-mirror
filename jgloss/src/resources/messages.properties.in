@@ -155,6 +155,9 @@ main.menu.export.latex.tt=Export the document as LaTeX source file
 main.menu.export.html=HTML...
 main.menu.export.html.mk=H
 main.menu.export.html.tt=Export the document as HTML-formatted file
+main.menu.export.xml=XML...
+main.menu.export.xml.mk=X
+main.menu.export.xml.tt=Export the document as XML-formatted file
 main.menu.export.annotationlist=Annotation List...
 main.menu.export.annotationlist.mk=A
 main.menu.export.annotationlist.tt=Write the annotations to a text file
@@ -375,6 +378,7 @@ export.plaintext.title=Export plain text
 export.html.title=Export HTML
 export.html.interactive=Interactive HTML
 export.html.backwardscompatible=Backwards Compatible
+export.xml.title=Export XML
 export.latex.title=Export LaTeX
 export.latex.fontsize=Font Size:
 export.latex.fontsize_pt=pt
@@ -403,6 +407,7 @@ preferences.header.obsolete=\
 
 filefilter.description.jgloss=JGloss documents (*.jgloss)
 filefilter.description.html=HTML documents (*.html)
+filefilter.description.xml=XML documents (*.xml)
 filefilter.description.latex=LaTeX documents (*.tex)
 filefilter.description.template=Export template (*.tmpl)
 

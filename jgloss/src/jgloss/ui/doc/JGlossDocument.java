@@ -722,7 +722,7 @@ public class JGlossDocument extends HTMLDocument {
 
     /**
      * Returns a reader for a document at the given position. This will return a new instance
-     * of {@link JGlossDocument.JGlossReader JGlossReader}.
+     * of {@link JGlossReader JGlossReader}.
      *
      * @param pos Position in the document.
      * @return A reader for a document.

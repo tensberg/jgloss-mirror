@@ -1,3 +1,5 @@
+1.0.5: (2002/05/13)
+	- Added XML export.
 1.0.4: (2002/05/06)
 	- Added template-based LaTeX-export.
 	- For long translations, a shorter translation entry is

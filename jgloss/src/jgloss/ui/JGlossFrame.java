@@ -319,6 +319,10 @@ public class JGlossFrame extends JFrame implements ActionListener {
      */
     private Action exportHTMLAction;
     /**
+     * Exports the document as XML.
+     */
+    private Action exportXMLAction;
+    /**
      * Exports the annotations to a file.
      */
     private Action exportAnnotationListAction;
@@ -490,6 +494,13 @@ public class JGlossFrame extends JFrame implements ActionListener {
             };
         exportHTMLAction.setEnabled( false);
         UIUtilities.initAction( exportHTMLAction, "main.menu.export.html"); 
+        exportXMLAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    doExportXML();
+                }
+            };
+        exportXMLAction.setEnabled( false);
+        UIUtilities.initAction( exportXMLAction, "main.menu.export.xml"); 
         exportAnnotationListAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doExportAnnotationList();
@@ -530,6 +541,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         exportMenu = new JMenu( JGloss.messages.getString( "main.menu.export"));
         exportMenu.setMnemonic( JGloss.messages.getString( "main.menu.export.mk").charAt( 0));
         exportMenu.setEnabled( false);
+        exportMenu.add( UIUtilities.createMenuItem( exportXMLAction));
         exportMenu.add( UIUtilities.createMenuItem( exportHTMLAction));
         exportMenu.add( UIUtilities.createMenuItem( exportPlainTextAction));
         exportMenu.add( UIUtilities.createMenuItem( exportLaTeXAction));
@@ -1132,6 +1144,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     exportPlainTextAction.setEnabled( true);
                     exportLaTeXAction.setEnabled( true);
                     exportHTMLAction.setEnabled( true);
+                    exportXMLAction.setEnabled( true);
                     exportAnnotationListAction.setEnabled( true);
                     printAction.setEnabled( true);
                     if (documentPath == null) 
@@ -1550,6 +1563,50 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                   f.getWriteReading(), f.getWriteTranslations(),
                                   backwardsCompatible.isSelected(),
                                   f.getWriteHidden()).write();
+                // restore document changed state
+                if (originalDocumentChanged == false) {
+                    documentChanged = false;
+                    saveAction.setEnabled( false);
+                }   
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showConfirmDialog
+                    ( this, JGloss.messages.getString
+                      ( "error.export.exception", new Object[] 
+                          { documentPath, ex.getClass().getName(),
+                            ex.getLocalizedMessage() }),
+                      JGloss.messages.getString( "error.export.title"),
+                      JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            } finally {
+                if (out != null) try {
+                    out.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }        
+    }
+
+    /**
+     * Exports the document as XML to a user-specified file.
+     */
+    private void doExportXML() {
+        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
+                                                     JGloss.messages.getString( "export.xml.title"));
+
+        f.setFileFilter( new ExtensionFileFilter
+            ( "xml", JGloss.messages.getString( "filefilter.description.xml")));
+
+        int r = f.showSaveDialog( this);
+        if (r == JFileChooser.APPROVE_OPTION) {
+            Writer out = null;
+
+            // The document is modified during export. Save the original changed state.
+            boolean originalDocumentChanged = documentChanged;
+            try {
+                out = new BufferedWriter( new OutputStreamWriter
+                    ( new FileOutputStream( f.getSelectedFile()), XMLExporter.ENCODING_UTF8));
+                new XMLExporter( out, doc).write();
                 // restore document changed state
                 if (originalDocumentChanged == false) {
                     documentChanged = false;

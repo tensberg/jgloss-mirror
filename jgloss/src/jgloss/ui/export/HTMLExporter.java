@@ -23,9 +23,7 @@
 
 package jgloss.ui.export;
 
-import jgloss.ui.*;
 import jgloss.ui.doc.*;
-import jgloss.dictionary.*;
 
 import java.io.*;
 import java.util.*;
@@ -321,8 +319,7 @@ public class HTMLExporter extends JGlossWriter {
      * @return <CODE>true</CODE> if the element is an annotation element.
      */
     protected boolean isAnnotationElement( Element elem) {
-        return elem.getAttributes().getAttribute( StyleConstants.NameAttribute)
-            .equals( AnnotationTags.ANNOTATION);
+        return matchNameAttribute( elem.getAttributes(), AnnotationTags.ANNOTATION);
     }
 
     /**

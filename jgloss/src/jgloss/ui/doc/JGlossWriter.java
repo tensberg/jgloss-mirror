@@ -33,7 +33,7 @@ import javax.swing.text.html.*;
 
 /**
  * Write a JGloss document. The standard HTMLWriter will encode all characters
- * not in the ASCII range as character entities, even if the writers charset supports
+ * not in the ASCII range as character entities, even if the writer's charset supports
  * the characters. Since this Writer is always used with UTF-8 encoding, it modifies the
  * behavior of the superclass to directly write these characters. 
  *
@@ -44,19 +44,19 @@ public class JGlossWriter extends HTMLWriter {
      * Current version of JGloss. Will be written to the generator meta-tag
      * of the generated file.
      */
-    public static int JGLOSS_VERSION = 104;
+    public static final int JGLOSS_VERSION = 104;
     
     /**
      * Major version of the JGloss file format. The major version is changed if a
      * new file format revision has changes incompatible to previous versions.
      */
-    public static int FILE_FORMAT_MAJOR_VERSION = 2;
+    public static final int FILE_FORMAT_MAJOR_VERSION = 2;
     /**
      * Minor version of the JGloss file format. The minor version is changed if a new
      * file format revision is changed in a way that still is compatible to earlier
      * formats.
      */
-    public static int FILE_FORMAT_MINOR_VERSION = 2;
+    public static final int FILE_FORMAT_MINOR_VERSION = 2;
 
     /**
      * Document which will be written.
@@ -140,6 +140,14 @@ public class JGlossWriter extends HTMLWriter {
     }
 
     /**
+     * Outputs a string by calling {@link #output(char[],int,int) output} with the string's character
+     * array.
+     */
+    protected void output( String text) throws IOException {
+        output( text.toCharArray(), 0, text.length());
+    }
+
+    /**
      * Outputs a range of characters. Overridden to prevent the substitution of non-ASCII characters
      * with character entities. HTML special characters will still be substituted.
      *
@@ -213,7 +221,7 @@ public class JGlossWriter extends HTMLWriter {
      */
     protected void startTag( Element elem) throws IOException, BadLocationException {
         AttributeSet attr = elem.getAttributes();
-        if (attr.getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.ANNOTATION)) {
+        if (matchNameAttribute( attr, AnnotationTags.ANNOTATION)) {
             skipLineSeparator = true;
 
             // Normalize the dict_word and dict_reading attributes.
@@ -270,9 +278,8 @@ public class JGlossWriter extends HTMLWriter {
                 nonEscapedOutput( contentType.toCharArray(), 0, contentType.length());
             }
         }
-
-        if (elem.getAttributes()
-            .getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.ANNOTATION))
+        
+        if (matchNameAttribute( elem.getAttributes(), AnnotationTags.ANNOTATION))
             skipLineSeparator = true;
 
         super.endTag( elem);
@@ -326,9 +333,16 @@ public class JGlossWriter extends HTMLWriter {
      *         the JGloss file format.
      */
     public static String getFileVersionString() {
-        return "JGloss " + (JGLOSS_VERSION/100) + "." + (JGLOSS_VERSION/10%10) +
-            + (JGLOSS_VERSION%100) + "; file format version " +
+        return getJGlossVersionString() + "; file format version " +
             FILE_FORMAT_MAJOR_VERSION + "." + FILE_FORMAT_MINOR_VERSION;
+    }
+
+    /**
+     * Returns the JGloss version.
+     */
+    public static String getJGlossVersionString() {
+        return "JGloss " + (JGLOSS_VERSION/100) + "." + (JGLOSS_VERSION/10%10)
+            + (JGLOSS_VERSION%100);
     }
 
     /**

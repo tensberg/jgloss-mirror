@@ -677,7 +677,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
         }
 
         /**
-         * Return the text in the given span, possibly shortened to {@link #MAX_TRANSLATION_LENGTH}.
+         * Return the text in the given span, possibly shortened to 
+         * {@link JGlossEditorKit#MAX_TRANSLATION_LENGTH MAX_TRANSLATION_LENGTH}.
          */
         public Segment getText( int p0, int p1) {
             if (p1-p0 <= MAX_TRANSLATION_LENGTH)
