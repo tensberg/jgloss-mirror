@@ -2,7 +2,7 @@
 <!ENTITY JGloss "<application>JGloss</application>">
 ]>
 
-<!-- JGloss User's Guide (c) 2001,2002 Michael Koch
+<!-- JGloss User's Guide Copyright (C) 2001-2004 Michael Koch
 
  This file is part of JGloss.
 
@@ -29,9 +29,9 @@
     <author>
       <firstname>Michael</firstname><surname>Koch</surname>
     </author>
-    <edition>1.0.6</edition>
-    <copyright><year>2001,2002</year><holder>Michael Koch</holder></copyright>
-    <pubdate>2002</pubdate>
+    <edition>1.0.7</edition>
+    <copyright><year>2001-2004</year><holder>Michael Koch</holder></copyright>
+    <pubdate>2004</pubdate>
   </bookinfo>
 
   <chapter><title>Introduction</title>
@@ -130,7 +130,7 @@
               <para>
                 The WadokuJiten is an extensive Japanese-German dictionary. 
                 To use it, download the file <filename>WadokuJT.zip</filename> from
-                <ulink url="http://www.bibiko.com/dlde.htm">this page</ulink>, unzip it
+                <ulink url="http://www.bibiko.com/dlen.htm">this page</ulink>, unzip it
                 and add the resulting file <filename>WadokuJT.txt</filename> to the list of
                 dictionaries used by &JGloss; in the dictionary dialog.
               </para>
@@ -138,7 +138,7 @@
                 The WadokuJT dictionary format is only supported if you have Java Version 1.4
                 installed, otherwise &JGloss; will display a "not a dictionary file" error
                 dialog. The WadokuJT dictionary is also available converted to EDICT format from the same
-                location. The EDICT format however does not support umlauts and the
+                location. The EDICT format however does not support the
                 more detailed entry format of WadokuJT.
               </para>
               <para>
@@ -222,22 +222,6 @@
             </listitem>
           </varlistentry>
 
-          <varlistentry>
-            <term><option>-a</option></term>
-            <term><option>--annotatehtml</option></term>
-            <listitem>
-              <para>
-                Annotate a HTML file with dictionary entries
-                for Japanese words. JavaScript will be used
-                to display the results in a browser. The HTML generation
-                is currenty only written for <application>Mozilla</application>, 
-                results with other browsers may vary.
-                The parameter format is <option>-a [in [out]]</option>.
-                If in or out are left out or are set to '-'
-                stdin/stdout will be used.
-              </para>
-            </listitem>
-          </varlistentry>
         </variablelist>
       </para>
     </sect1>

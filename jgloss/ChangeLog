@@ -1,4 +1,9 @@
-2.0 Alpha 1 (2003/02/23):
+2.0 Alpha 2: (2004/02/23)
+	- changed dictionary format detection to work with more EDICT
+	  and WadokuJT versions.
+	- support for UTF-8 encoded EDICT files.
+	- explanation dialog for unrecognized dictionary formats.
+2.0 Alpha 1: (2003/02/23)
 	- fixed JGloss startup with uninitialized prefs.
 	- Fixed HTML export.
 	- Added LaTeX export.
@@ -10,6 +15,12 @@
 	- Redesign and rewrite of many internals.
 	- Java2 1.3 is no longer supported, minimum version is 1.4.
 	- Some features from JGloss 1.0.x are missing in this release.
+1.0.7: (2004/02/23)
+	- changed dictionary format detection to work with more EDICT
+	  and WadokuJT versions.
+	- support for UTF-8 encoded EDICT files (only with Java2 1.4).
+	- explanation dialog for unrecognized dictionary formats.
+	- removed annotatehml startup option.
 1.0.6: (2002/08/02)
 	- Improved keyboard navigation.
 	- Added best match search option to word lookup.

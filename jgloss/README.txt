@@ -1,4 +1,4 @@
-JGloss 2 Alpha 1
+JGloss 2 Alpha 2
 ================
 
 JGloss homepage: http://jgloss.sourceforge.net/
@@ -20,7 +20,7 @@ executable JAR file by typing "make jgloss", create the documentation by
 executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
-About Alpha 1
+About Alpha 2
 -------------
 This is a preview of the new JGloss version, mainly to show that I am still
 working on the program. It should give you an opportunity to try out the
@@ -32,7 +32,7 @@ which were in the previous JGloss versions but are not in this alpha
 version. They will eventually make their reappearance when I find the time
 to reimplement them.
 
-Some of the greater issues of JGloss 2 Alpha 1:
+Some of the greater issues of JGloss 2 Alpha 2:
 - The file format of the .jgloss files has incompatibly changed, opening
   older files is not (yet) possible
 - The handbook is out of date
@@ -48,7 +48,7 @@ use cursor up/down to switch between annotations; cursor left/right to
 switch between readings/translations, space to select a
 reading/translation; use Alt-A to annotate the currently selected text.
 
-Known problems (JGloss 1.0.6):
+Known problems (JGloss 1.0.7):
 ------------------------------
   - On Linux force-quitting JGloss by typing Control-C or using kill -HUP
     sometimes doesn't work.
@@ -60,6 +60,6 @@ Known problems (JGloss 1.0.6):
     set to Japanese. Paste the text in the text field of the import dialog
     instead.
 
-(c) 2001-2003 Michael Koch <tensberg@gmx.net>
+(c) 2001-2004 Michael Koch <tensberg@gmx.net>
 
 Parts of JGloss code (C) 2002 Eric Crahen
