@@ -77,24 +77,24 @@ public class ShortenedTranslation implements DictionaryEntry {
     
     private static String shorten( String translation) {
         int i = translation.indexOf( '(');
-        if (i < 1) { // not found (-1) or first char (0)
-            i = translation.indexOf( '{');
-            if (i < 1) {
-                i = translation.indexOf( '.');
-                if (i < 1 
-                    || i==translation.length()-1 // last char in string
-                    || translation.charAt( i+1)!=' ') { // . marks abbrev., not end of sentence
-                    i = translation.indexOf( ',');
-                    if (i < 1
-                        || i==translation.length()-1 // last char in string
-                        || translation.charAt( i+1)!=' ') { // , not end of sentence
-                        return null;
-                    }
-                }
-            }
+        if (i > 0)
+            return translation.substring( 0, i).trim();
+        else if (i == 0) {
+            int j = translation.indexOf( ')', 1);
+            if (j != -1)
+                return translation.substring( j+1).trim();
         }
 
-        return translation.substring( 0, i).trim();
+        i = translation.indexOf( '{');
+        if (i > 0)
+            return translation.substring( 0, i).trim();
+        else if (i == 0) {
+            int j = translation.indexOf( '}', 1);
+            if (j != -1)
+                return translation.substring( j+1).trim();
+        }
+
+        return null;
     }
 
     private ShortenedTranslation( DictionaryEntry entry, List translations) {

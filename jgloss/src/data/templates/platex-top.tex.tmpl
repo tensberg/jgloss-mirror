@@ -1,8 +1,7 @@
 %encoding: EUC-JP
 %short-description: platex - translations on page
 %description
-% Generate a platex input file
-% with translations placed on
+% Generate a platex input file with translations placed on
 % the page where the word appears.
 %end description
 % This is a EUC-JP encoded Japanese LaTeX document generated
@@ -21,10 +20,6 @@
 \usepackage{pslatex}
 \renewcommand{\thefootnote}{}
 
-\begin{document}
-
-\pagestyle{myheadings}
-\markright{%document-title%}
 \newlength{\ww}
 \settowidth{\ww}{%longest-word%--}
 \newlength{\rw}
@@ -37,6 +32,11 @@
 % I don't know where the -20pt come from, but they have to be there for
 % the layout to work.
 \addtolength{\tw}{-20pt}
+
+\begin{document}
+
+\pagestyle{myheadings}
+\markright{%document-title%}
 \newcommand{\fn}[3]{\footnotetext{\makebox[\ww][l]{#1} \makebox[\rw][l]{#2} \parbox[t]{\tw}{#3}}}
 
 %document-text

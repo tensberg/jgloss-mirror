@@ -380,7 +380,13 @@ export.latex.fontsize=Font Size:
 export.latex.fontsize_pt=pt
 
 # List of templates stored in jgloss.jar and accessible as resource
-export.latex.templates=/data/templates/platex-top.tex:/data/templates/platex-list.tex:/data/templates/platex-ruby.tex
+export.latex.templates=\
+/data/templates/platex-top.tex.tmpl:\
+/data/templates/platex-top-wide.tex.tmpl:\
+/data/templates/platex-list.tex.tmpl:\
+/data/templates/platex-list-wide.tex.tmpl:\
+/data/templates/platex-ruby.tex.tmpl:\
+/data/templates/platex-ruby-wide.tex.tmpl
 
 about.frame.title=About JGloss
 about.title=JGloss 1.0.4pre2

@@ -1,11 +1,9 @@
 %encoding: EUC-JP
-%short-description: platex - translations at end
+%short-description: platex - transl. at end/wide
 %description
-% Generate a platex input file
-% with the list of translations
-% placed after the main text.
-% The translation list will be
-% separated by paragraphs.
+% Generate a platex input file with the list of translations
+% placed after the main text. The translation list will be
+% separated by paragraphs. The document has small margins.
 %end description
 % This is a EUC-JP encoded Japanese LaTeX document generated
 % by JGloss from %document-filename% on %generation-time%.
@@ -22,6 +20,14 @@
 \usepackage[overlap,CJK]{ruby-annotation}
 \usepackage{pslatex}
 \renewcommand{\thefootnote}{}
+
+\setlength{\voffset}{-1in}
+\setlength{\hoffset}{-1in}
+\setlength{\evensidemargin}{40pt}
+\setlength{\oddsidemargin}{40pt}
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-2.1\evensidemargin}
+\setlength{\textheight}{0.9\paperheight}
 
 \begin{document}
 
