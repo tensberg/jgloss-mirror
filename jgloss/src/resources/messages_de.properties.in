@@ -355,8 +355,6 @@ export.html.backwardscompatible=Abwärtskompatibel
 export.latex.title=LaTeX exportieren
 export.latex.fontsize=Fontgröße:
 
-export.latex.templates=/data/templates/platex-top.tex:/data/templates/platex-list.tex:/data/templates/platex-ruby.tex
-
 about.frame.title=Über JGloss
 about.text=\
 Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\

@@ -475,7 +475,6 @@ public class JGloss {
                 } catch (IOException ex) {}
                 prefs.set( Preferences.PREFERENCES_MIGRATED, true);
             }
-            return prefs;
         } catch (NoClassDefFoundError ex) {
             // this is normal on J2SE 1.3. Fall through and return a PropertiesPreferences
         } catch (ClassNotFoundException ex1) {

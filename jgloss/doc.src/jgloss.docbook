@@ -72,7 +72,9 @@
         The character encoding detection uses code from Yasuhiro Tonooka's 
         <application>kcc</application> (Kanji Code Converter).
         The French localization is contributed by Alexandre Beraud.
-        The file chooser icons are taken from <ulink url="http://artists.kde.org">the KDE project</ulink>.
+        Heinrich Künsting helped with the LaTeX export function.
+        Some of the file chooser icons are taken from 
+        <ulink url="http://artists.kde.org">the KDE project</ulink>.
       </para>
     </sect1>
     <sect1><title>License</title>
@@ -585,7 +587,7 @@
         should not always be trusted.
       </para>
       <table><title>Annotation Editor Shortcut Keys</title>
-        <tgroup cols=2>
+        <tgroup cols="2">
           <colspec colname="key" align="center">
           <colspec colname="function" align="left" colwidth="5*">
           <thead><row><entry>Key</entry><entry>Function</entry></row></thead>
@@ -731,28 +733,48 @@
         </para>
       </sect2>
 
-      <sect2><title>LaTeX</title>
+      <sect2 id="sect.export.latex"><title>LaTeX</title>
         <para>
-          The LaTeX export function will generate a text document in LaTeX format. 
-          Since normal LaTeX can't handle Japanese text, you will have to use 
-          <application>platex</application> to process the file. <application>platex</application>
-          is an extension to LaTeX for typesetting Japanese documents, it comes as part of the
-          standard TeTeX installation and may be available with other TeX implementations.
+          The LaTeX export function will generate a text document in LaTeX format.
+          There are several document style variants you can choose from by selecting
+          the corresponding template from the template chooser. A description of the
+          currently selected template is shown below the template chooser.
+          You can add new or
+          modified templates by selecting <guilabel>Add...</guilabel> from the template
+          chooser menu. A file selector dialog will be shown where you can select the new 
+          template file.
+          See <xref linkend="app.templateformat"> for the template format description.
+          You can choose the document font size from the <guilabel>Font size</guilabel>
+          menu.
+        </para>
+        <para>
+          Standard LaTeX can't handle Japanese documents. There are two ways of adding
+          support for Japanese: using pLaTeX, a LaTeX variant modified to handle Japanese,
+          or the CJK macro package, which adds support for far eastern scripts to standard
+          LaTeX. &JGloss; has templates for generating input files for both variants.
+          Choose whatever option is easier for you to install and set up.
+        </para>
+        <para>
+          pTeX/pLaTeX is a modification of TeX/LaTeX, which can handle Japanese typesetting.
+          To process a Japanese LaTeX document, you have to run the <application>platex</application>
+          program instead of the normal <application>latex</application> command. pTeX is part
+          of a standard TeTeX installation on Red Hat Linux, and may be available with other
+          TeX distributions.
           You will also need some Japanese fonts for displaying the generated file.
           Ghostscript can supply fonts to TeX, Japanese fonts for Ghostscript are available
           at <ulink url="http://www.enel.ucalgary.ca/People/far/howto/gs-ttf.html">
             http://www.enel.ucalgary.ca/People/far/howto/gs-ttf.html</ulink>. 
           <application>dvips</application> will also have to be configured to know about the Japanese
           fonts if you want to convert the generated dvi file to Postscript.
-          The exported document uses the ruby macro <filename>ruby-annotation.sty</filename>
-          for reading annotations.
-          You can find it in the <filename>latex-ruby</filename> folder of &JGloss;.
-          The document title set in JGloss will be used as page header.
+          To display ruby for reading anntations, the macro <filename>ruby-annotation.sty</filename>
+          (in the folder <filename>latex</filename> of the JGloss distribution) must be installed.
         </para>
         <para>
-          If you select the <guilabel>Place translation on same page as word</guilabel> option,
-          translation annotations will be generated as footnotes on the page on which the word appears.
-          Otherwise, the list of translations will be placed at the end of the document.
+          CJK is a macro package for adding Chinese/Japanese/Korean script support to standard LaTeX.
+          In order to use it, you will have to download and install the macro package and the
+          corresponding font package. Once the package is installed, you can process the files
+          generated from JGloss with the <guilabel>LaTeX-CJK</guilabel> templates with the
+          commands <application>latex</application> or <application>pdflatex</application>.
         </para>
       </sect2>
 
@@ -1315,7 +1337,7 @@
 
   </chapter>
 
-  <chapter><title>Links</title>
+  <appendix><title>Links</title>
     <para>
       <itemizedlist>
         <listitem>
@@ -1363,5 +1385,232 @@
         </listitem>
       </itemizedlist>
     </para>
-  </chapter>
+  </appendix>
+
+  <appendix id="app.templateformat"><title>LaTeX export template format</title>
+    <para>
+      The documents generated by the <link linkend="sect.export.latex">LaTeX export function</link>
+      can be customized by creating template files. A template file is a text file containing
+      special sections which are replaced by JGloss with the document content. Per convention,
+      template files use the <filename>.tmpl</filename> file ending. Example template files
+      can be found in the <filename>latex/templates</filename> folder of the JGloss distribution.
+    </para>
+    <para>
+      The first line in the template file is the <emphasis>encoding declaration</emphasis>.
+      <programlisting>%encoding: encoding_name</programlisting>
+      Valid encoding names are all encodings supported by the Java Runtime which is used. 
+      (Not all encodings can represent Japanese characters or are supported by LaTeX-CJK/pLaTeX).
+      Some useful encodings are <literal>EUC-JP</literal>, <literal>SJIS</literal> or
+      <literal>UTF-8</literal>. The encoding declaration determines both the character encoding
+      of the template file itself and the encoding used for the file generated from the template.
+      The encoding declaration line will not be copied to the generated file.
+    </para>
+    <para>
+      The second line gives a short description of the template. This line is optional.
+      <programlisting>%short-description: Text describing the template</programlisting>
+      The description will be displayed in the export dialog template chooser. The description
+      line will not be copied to the generated file.
+    </para>
+    <para>
+      A longer description of the template can be given in a description block.
+      <programlisting>
+        %description
+        Template description line 1
+        Template description line 2
+        ...
+        %end description
+      </programlisting>
+      The description can appear once anywhere in the template, but it is suggested to place it
+      after the short description. The text will be displayed in the export dialog below the
+      template chooser when the template is selected. <literal>%</literal> and whitespace are stripped
+      from the beginning of a description line. Normal line breaks are ignored, to force a line break,
+      insert an empty line in the description block. The description block will not be copied to the
+      generated file.
+    </para>
+    <para>
+      The rest of the template is made of normal text, <emphasis>variables</emphasis> and
+      <emphasis>insertion sections</emphasis>. Normal text is copied unchanged from the template file
+      to the generated file. Variables have the form <emphasis>%variable-name%</emphasis>. In the
+      generated file, variables are replaced by their values. A variable may appear anywhere in
+      normal text and in <emphasis>pattern definitions</emphasis> (see below).
+      In all text generated through variable substitution and for insertion sections, LaTeX special
+      characters are properly escaped.
+    </para>
+    <para>
+      In the generated file, an <emphasis>insertion section</emphasis> in the template file 
+      is replaced by the document
+      content. Insertion sections contain <emphasis>pattern definitions</emphasis>,
+      which control the text generated for document elements like annotations or paragraphs.
+      An insertion section has the following form:
+      <programlisting>
+        %insertion-section-name
+        %pattern-name1: pattern definition text
+        %pattern-name2: pattern definition text
+        ...
+        %end insertion-section-name
+      </programlisting>
+      The two insertion section types are <varname>document-text</varname>, which inserts
+      the text of the document with reading and translation annotations, and 
+      <varname>annotation-list</varname>, which inserts the list of annotations.
+    </para>
+    <para>
+      The <emphasis>pattern definitions</emphasis> control the text generation in insertion
+      sections. Pattern definitions can be given for readings, translations or paragraphs.
+      The pattern definition text is inserted for every occurrence of a pattern in the 
+      insertion section, and special variables have different values for every application of
+      the pattern. To support insertion of line breaks and other special characters,
+      the pattern definition text may contain C-string-style escape sequences:
+      <literal>\n</literal> inserts a line break, <literal>\t</literal> a tabulator and
+      <literal>\\</literal> a single backslash.
+    </para>
+    <para>
+      For example, a pattern for occurrences of reading annotations may be defined
+      in a <varname>document-text</varname> insertion section.
+      <programlisting>
+        %document-text
+        %reading: \\ruby{%word%}{%reading%}
+        ... more pattern definitions ...
+        %end document text
+      </programlisting>
+      When the document text is inserted in the generated file, for every occurrence
+      of a reading annotation in the document, the variable <varname>%word%</varname>
+      is set to the annotated word and <varname>%reading%</varname> is set to the reading
+      annotation. The pattern is then applied, and the pattern text with variables
+      substituted is written to the generated file.
+    </para>
+    <table><title>Pattern definitions</title>
+      <tgroup cols="4">
+        <colspec colname="name" align="left">
+        <colspec colname="function" align="left" colwidth="3*">
+        <colspec colname="appearance" align="left" colwidth="2*">
+        <colspec colname="default" align="left">
+        <thead>
+          <row>
+            <entry>Name</entry>
+            <entry>Function</entry>
+            <entry>Appears in</entry>
+            <entry>Default</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry><varname>reading</varname></entry>
+            <entry>Applied to every reading annotation in the document.</entry>
+            <entry><varname>document-text</varname></entry>
+            <entry>(none)</entry>
+          </row>
+          <row>
+            <entry><varname>translation</varname></entry>
+            <entry>Applied to every translation annotation in the document.</entry>
+            <entry><varname>document-text</varname>, <varname>annotation-list</varname></entry>
+            <entry>(none)</entry>
+          </row>
+          <row>
+            <entry><varname>line-break</varname></entry>
+            <entry>Applied to every line break in the document which is not a paragraph break.</entry>
+            <entry><varname>document-text</varname></entry>
+            <entry><literal>\\\\\n</literal></entry>
+          </row>
+          <row>
+            <entry><varname>paragraph-start</varname></entry>
+            <entry>
+              Inserted at the start of every paragraph. Paragraphs in a JGloss document
+              are assumed to be seperated by one or more empty lines.
+            </entry>
+            <entry><varname>document-text</varname>, <varname>annotation-list</varname></entry>
+            <entry>(none)</entry>
+          </row>
+          <row>
+            <entry><varname>paragraph-end</varname></entry>
+            <entry>
+              Inserted at the end of every paragraph.  Paragraphs in a JGloss document
+              are assumed to be seperated by one or more empty lines.
+            </entry>
+            <entry><varname>document-text</varname>, <varname>annotation-list</varname></entry>
+            <entry><literal>\n\n</literal></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <table><title>Variables</title>
+      <tgroup cols="3">
+        <colspec colname="name" align="left">
+        <colspec colname="description" align="left" colwidth="2*">
+        <colspec colname="appearance" align="left">
+        <thead>
+          <row>
+            <entry>Name</entry>
+            <entry>Description</entry>
+            <entry>Defined in pattern</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry><varname>document-filename</varname></entry>
+            <entry>Replaced by the file name of the exported JGloss document.</entry>
+            <entry>(global)</entry>
+          </row>
+          <row>
+            <entry><varname>generation-time</varname></entry>
+            <entry>Replaced by the current time and date.</entry>
+            <entry>(global)</entry>
+          </row>
+          <row>
+            <entry><varname>document-title</varname></entry>
+            <entry>Replaced by title of the JGloss document.</entry>
+            <entry>(global)</entry>
+          </row>
+          <row>
+            <entry><varname>font-size</varname></entry>
+            <entry>Replaced by the font size selected in the export dialog.</entry>
+            <entry>(global)</entry>
+          </row>
+          <row>
+            <entry><varname>longest-word</varname></entry>
+            <entry>
+              Replaced by the longest annotated Japanese word (dictionary form)
+              in the JGloss document.
+            </entry>
+            <entry>(global)</entry>
+          </row>
+          <row>
+            <entry><varname>longest-reading</varname></entry>
+            <entry>Replaced by the longest reading (dictionary form) in the JGloss document.</entry>
+            <entry>(global)</entry>
+          </row>
+          <row>
+            <entry><varname>word</varname></entry>
+            <entry>Replaced by the annotated word.</entry>
+            <entry><varname>reading</varname></entry>
+          </row>
+          <row>
+            <entry><varname>reading</varname></entry>
+            <entry>Replaced by the reading annotation of an annotated word.</entry>
+            <entry><varname>reading</varname></entry>
+          </row>
+          <row>
+            <entry><varname>dictionary-word</varname></entry>
+            <entry>Replaced by the dictionary form of an annotated word.</entry>
+            <entry><varname>translation</varname></entry>
+          </row>
+          <row>
+            <entry><varname>dictionary-reading</varname></entry>
+            <entry>Replaced by the dictionary form of the reading of an annotated word.</entry>
+            <entry><varname>translation</varname></entry>
+          </row>
+          <row>
+            <entry><varname>translation</varname></entry>
+            <entry>Replaced by the translation text of an annotated word.</entry>
+            <entry><varname>translation</varname></entry>
+          </row>
+          <row>
+            <entry><varname>paragraph-number</varname></entry>
+            <entry>Replaced by the current paragraph number.</entry>
+            <entry><varname>paragraph-start</varname></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </appendix>
+
 </book>

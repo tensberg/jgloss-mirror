@@ -400,6 +400,7 @@ public class JGlossEditor extends JTextPane {
 
             tooltip = new JTextArea();
             JToolTip tt = createToolTip();
+            tooltip.setEditable( false);
             tooltip.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2));
             tooltip.setBackground( tt.getBackground());
             tooltip.setForeground( tt.getForeground());
