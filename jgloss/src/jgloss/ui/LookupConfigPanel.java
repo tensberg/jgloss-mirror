@@ -56,7 +56,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     protected JComboBox dictionaryChoice;
     protected final static String DICTIONARY_CHOICE_ACTION_COMMAND = "dictionaryChoice";
 
-    protected JTextField expression;
+    protected AutoSearchComboBox expression;
     protected JTextField distance;
 
     protected boolean enableActionEvents = false;
@@ -243,7 +243,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         c3.fill = GridBagConstraints.NONE;
         c3.weightx = 0;
 
-        expression = new JTextField();
+        expression = new AutoSearchComboBox( model, 50);
         JLabel expressionDescription = 
             new JLabel( JGloss.messages.getString( "wordlookup.enterexpression"));
         expressionDescription.setDisplayedMnemonic
@@ -330,9 +330,6 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
     public JButton getSearchButton() { return search; }
 
-    public JTextField getSearchExpressionField() { return expression; }
-    public JTextField getDistanceField() { return distance; }
-
     /**
      * Update the list of dictionaries. This method is called after the dictionary list has
      * been changed in the preferences window.
@@ -396,7 +393,6 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     }
 
     protected void updateSearchModeAvailability() {
-        System.err.println( "searchmode");
         for ( int i=0; i<searchModes.length; i++) {
             searchModes[i].setEnabled( model.isSearchModeEnabled( i));
         }
@@ -434,7 +430,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     }
 
     protected void updateInputSelection() {
-        expression.setText( model.getSearchExpression());
+        expression.setSelectedItem( model.getSearchExpression());
         distance.setText( String.valueOf( model.getDistance()));
     }
 
@@ -478,6 +474,14 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         enableActionEvents = true;
     }
 
+    public JComboBox getSearchExpressionField() {
+        return expression;
+    }
+
+    public JTextField getDistanceField() {
+        return distance;
+    }
+
     public void actionPerformed( ActionEvent action) {
         if (!enableActionEvents)
             // ignore action events during panel setup phase
@@ -488,7 +492,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         enableStateChangeEvents = false;
 
         if (action.getSource() == search) {
-            model.setSearchExpression( expression.getText());
+            model.setSearchExpression( expression.getSelectedItem().toString());
             try {
                 model.setDistance( Integer.parseInt( distance.getText()));
             } catch (NumberFormatException ex) {}
@@ -499,7 +503,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         if (action.getActionCommand().equals( SEARCH_MODE_ACTION_COMMAND)) {
             for ( int i=0; i<searchModes.length; i++) {
                 if (searchModes[i] == action.getSource()) {
-                    model.setSelectedSearchMode( i);
+                    model.selectSearchMode( i);
                     break;
                 }
             }

@@ -459,7 +459,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         String [] objects;
 
         if (ex instanceof DictionaryFactory.InstantiationException) {
-            ex = ((DictionaryFactory.InstantiationException) ex).getRootCause();
+            ex = (Exception) ((DictionaryFactory.InstantiationException) ex).getCause();
         }
 
         File f = new File( file);

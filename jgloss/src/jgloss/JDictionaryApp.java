@@ -34,6 +34,7 @@ import jgloss.ui.*;
 public class JDictionaryApp extends JGloss {
     public static void main( String args[]) {
         application = new JDictionaryApp();
+
         try {
             registerDictionaries();
 

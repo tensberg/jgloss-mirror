@@ -664,7 +664,7 @@ public class WadokuJT extends FileBasedDictionary {
             }
 
             return out;
-        } catch (StringIndexOutOfBoundsException ex) {
+        } catch (Exception ex) {
             throw new SearchException( "WadokuJT WARNING: malformed dictionary entry \"" + entry + "\"");
         }
     }

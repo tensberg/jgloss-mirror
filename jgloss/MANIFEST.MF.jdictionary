@@ -1,10 +1,2 @@
 Manifest-Version: 1.0
 Main-Class: jgloss.JDictionaryApp
-
-Name: jgloss/
-Package-Title: jgloss
-Specification-Title: JGloss
-Specification-Version: 1.0
-Specification-Vendor: Michael Koch
-Implementation-Version: 1.0
-Implementation-Vendor: Michael Koch

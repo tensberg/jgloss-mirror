@@ -48,7 +48,8 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author Michael Koch
  */
-public abstract class FileBasedDictionary implements IndexedDictionary, Indexable {
+public abstract class FileBasedDictionary implements IndexedDictionary, Indexable,
+                                                     BaseEntry.MarkerDictionary {
     /**
      * Generic implementation for file-based dictionaries. The {@link #isInstance(String) isInstance}
      * test reads some bytes from the file to test, converts them to a string using the
@@ -476,6 +477,19 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     }
 
     /**
+     * Create a dictionary entry from a marker, which is the start offset of the entry.
+     * Used from {@link BaseEntry#BaseEntryRef BaseEntryRef} to recreate a dictionary entry.
+     */
+    public DictionaryEntry createEntryFromMarker( int marker) throws SearchException {
+        dictionary.position( marker);
+        ByteBuffer entry = dictionary.slice();
+        while (!isEntrySeparator( entry.get()))
+            ; // entry.get() advances the loop
+        entry.limit( entry.position()-1);
+        return createEntryFrom( entry, marker);
+    }
+
+    /**
      * Create a {@link DictionaryEntry DictionaryEntry} object from the data stored in the byte
      * buffer. The method converts the byte buffer data to a string and invokes
      * {@link #parseEntry(String) parseEntry}.
@@ -494,8 +508,16 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         }
         else { // NIO does not support the required encoding
             try {
-                entrystring = unescape( new String( entry.array(), entry.arrayOffset(), entry.limit(), 
-                                                    characterHandler.getEncodingName()));
+                if (entry.hasArray()) {
+                    entrystring = unescape( new String( entry.array(), entry.arrayOffset(), entry.limit(), 
+                                                        characterHandler.getEncodingName()));
+                } else {
+                    entry.rewind();
+                    byte[] bytes = new byte[entry.limit()];
+                    entry.get( bytes);
+                    entrystring = unescape( new String( bytes, 0, bytes.length,
+                                                        characterHandler.getEncodingName()));
+                }
             } catch (UnsupportedEncodingException ex) {
                 throw new SearchException( ex);
             }

@@ -69,6 +69,7 @@ CLASSPATH := $(CLASSPATH):./src
 # for compilation
 JGLOSS_SOURCES := src/jgloss/JGlossApp.java
 JDICTIONARY_SOURCES := src/jgloss/JDictionaryApp.java
+IM_SOURCES := src/jgloss/ui/im/KanaInputMethodDescriptor.java
 WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
@@ -107,6 +108,11 @@ jgloss: compile-jgloss $(RESOURCES) setup
 
 jdictionary: compile-jdictionary $(RESOURCES) setup
 	$(JAR) cfm jdictionary.jar MANIFEST.MF.jdictionary $(JDICTIONARY_BINARY_JAR)
+
+im: compile-im
+	mkdir -p META-INF/services
+	cp src/jgloss/ui/im/InputMethodDescriptor META-INF/services/java.awt.im.spi.InputMethodDescriptor
+	$(JAR) cfm kanaim.jar MANIFEST.MF.kanaim jgloss META-INF
 
 jgloss-www: compile-www $(RESOURCES_WWW) setup_www
 	mkdir -p jgloss-www/WEB-INF/classes
@@ -178,6 +184,9 @@ compile-jgloss:
 compile-jdictionary:
 	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(JDICTIONARY_SOURCES)
 
+compile-im:
+	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(IM_SOURCES)
+
 compile-www:
 	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(WWW_SOURCES)
 
@@ -202,4 +211,4 @@ index.html: jgloss.docbook doc.src/stylesheet.dsl
 resources: $(RESOURCES)
 
 clean:
-	-rm -r jgloss resources data dist doc javadoc jgloss.jar jgloss-www
+	-rm -r jgloss resources data dist doc javadoc jgloss.jar jgloss-www META-INF

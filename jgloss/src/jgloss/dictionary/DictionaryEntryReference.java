@@ -21,20 +21,23 @@
  *
  */
 
-package jgloss.ui;
-
-import java.awt.Component;
+package jgloss.dictionary;
 
 /**
- * Interface for preference configuration panels. Panels implementing this interface can
- * be added to a {@link PreferencesFrame PreferencesFrame}.
+ * Reference to a dictionary entry. Implementations of this interface may use a more memory-
+ * efficient way of storing the dictionary entry than keeping the dictionary entry object in memory.
+ * For example, if it is possible to recreate the dictionary entry object from permanent storage,
+ * the dictionary object could be cached using a <code>SoftReference</code>, and if it has
+ * been garbage collected by the time {@link #getEntry() getEntry()} is called, it will be
+ * recreated.
  *
  * @author Michael Koch
  */
-public interface PreferencesPanel {
-    void savePreferences();
-    void loadPreferences();
-    void applyPreferences();
-    String getTitle();
-    Component getComponent();
-} // interface PreferencesPanel
+public interface DictionaryEntryReference {
+    /**
+     * Returns the referenced dictionary entry.
+     *
+     * @exception SearchException if the construction of the dictionary entry fails.
+     */
+    public DictionaryEntry getEntry() throws SearchException;
+} // interface DictionaryEntryReference

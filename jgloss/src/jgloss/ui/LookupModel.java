@@ -129,7 +129,18 @@ public class LookupModel implements Cloneable {
         return ((StateWrapper) searchModes.get( index)).isEnabled();
     }
 
-    public void setSelectedSearchMode( int index) {
+    public boolean selectSearchMode( SearchMode mode) {
+        for ( ListIterator i=searchModes.listIterator(); i.hasNext(); ) {
+            StateWrapper wrapper = (StateWrapper) i.next();
+            if (wrapper.getObject() == mode) {
+                selectSearchMode( i.previousIndex());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void selectSearchMode( int index) {
         StateWrapper newModeWrapper = (StateWrapper) searchModes.get( index);
         if (newModeWrapper.isSelected())
             return; // nothing to do
@@ -588,14 +599,22 @@ public class LookupModel implements Cloneable {
         try {
             LookupModel out = (LookupModel) super.clone();
             // clone fields
-            out.searchModes = new ArrayList( searchModes);
-            out.dictionaries = new ArrayList( dictionaries);
-            out.filters = new ArrayList( filters);
+            out.searchModes = cloneStateList( searchModes);
+            out.dictionaries = cloneStateList( dictionaries);
+            out.filters = cloneStateList( filters);
             out.searchFields = (SearchFieldSelection) searchFields.clone();
             out.searchFieldsEnabled = (SearchFieldSelection) searchFieldsEnabled.clone();
             out.listeners = new ArrayList( 5);
 
             return out;
         } catch (CloneNotSupportedException ex) { return null; }
+    }
+    
+    private List cloneStateList( List in) {
+        List out = new ArrayList( in.size());
+        for ( Iterator i=in.iterator(); i.hasNext(); ) {
+            out.add( ((StateWrapper) i.next()).clone());
+        }
+        return out;
     }
 } // class LookupModel

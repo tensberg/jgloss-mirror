@@ -170,4 +170,9 @@ public interface DictionaryEntry {
      * Returns the dictionary from which this entry originated.
      */
     Dictionary getDictionary();
+
+    /**
+     * Get a reference to this entry.
+     */
+    DictionaryEntryReference getReference();
 } // interface DictionaryEntry

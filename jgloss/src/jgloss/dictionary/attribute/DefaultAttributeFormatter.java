@@ -64,12 +64,16 @@ public class DefaultAttributeFormatter implements AttributeFormatter {
 
             valueFormat.newList( out, val.size());
             for ( int i=0; i<val.size(); i++) {
-                valueFormat.addItem( String.valueOf( val.get( i)));
+                valueFormat.addItem( formatValue( val.get( i)));
             }
             valueFormat.endList();
         }
         out.append( printAfter);
 
         return out;
+    }
+
+    protected String formatValue( AttributeValue val) {
+        return String.valueOf( val);
     }
 } // class DefaultAttributeFormatter

@@ -26,6 +26,7 @@ package jgloss.dictionary;
 import jgloss.dictionary.attribute.AttributeSet;
 import jgloss.dictionary.attribute.DefaultAttributeSet;
 
+import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,8 +48,50 @@ abstract class BaseEntry implements DictionaryEntry {
      * position where the entry is found in the dictionary, since this is unique.
      */
     protected int entryMarker;
+    protected DictionaryEntryReference reference;
 
     protected DefaultAttributeSet emptySet = new DefaultAttributeSet( null);
+
+    /**
+     * Interface implemented by dictionaries which support creating dictionary entries from
+     * markers as used in this class. Used to create dictionary entries from references.
+     * Dictionaries using <code>BaseEntry</code> objects for their entries should implement
+     * this interface.
+     *
+     * @see BaseEntryRef
+     * @see BaseEntry#getReference()
+     */
+    public interface MarkerDictionary {
+        DictionaryEntry createEntryFromMarker( int entryMarker) throws SearchException;
+    } // interface MarkerDictionary
+
+    /**
+     * Reference to a base dictionary entry. The dictionary entry object which is referenced
+     * is stored using a <code>WeakReference</code>. If the object is garbage collected when
+     * {@link #getEntry() getEntry} is called, it will be recreated by calling 
+     * {@link MarkerDictionary#createEntryFromMarker(int) createEntryFromMarker} on the entry's
+     * dictionary.
+     */
+    protected static class BaseEntryRef implements DictionaryEntryReference {
+        protected SoftReference entryRef;
+        protected int entryMarker;
+        protected Dictionary dictionary;
+
+        public BaseEntryRef( BaseEntry entry) {
+            entryRef = new SoftReference( entry);
+            entryMarker = entry.entryMarker;
+            dictionary = entry.getDictionary();
+        }
+
+        public DictionaryEntry getEntry() throws SearchException {
+            DictionaryEntry out = (DictionaryEntry) entryRef.get();
+            if (out == null) { // garbage collected
+                out = ((MarkerDictionary) dictionary).createEntryFromMarker( entryMarker);
+                entryRef = new SoftReference( out);
+            }
+            return out;
+        }
+    } // class BaseEntryRef
 
     public BaseEntry( int _entryMarker, String _reading, List _translations,
                       AttributeSet _generalA, AttributeSet _wordA,
@@ -167,5 +210,23 @@ abstract class BaseEntry implements DictionaryEntry {
         return (o instanceof BaseEntry &&
                 ((BaseEntry) o).dictionary == dictionary &&
                 ((BaseEntry) o).entryMarker == entryMarker);
+    }
+
+    /**
+     * Creates a new reference to this entry. If the dictionary from which the entry
+     * originated implements the {@link MarkerDictionary MarkerDictionary} interface, a
+     * {@link BaseEntryRef BaseEntryRef} is created, otherwise a reference which simply stores
+     * and returns the reference to this entry is returned.
+     */
+    public DictionaryEntryReference getReference() {
+        if (reference == null) {
+            if (dictionary instanceof MarkerDictionary)
+                reference = new BaseEntryRef( this);
+            else 
+                reference = new DictionaryEntryReference() {
+                        public DictionaryEntry getEntry() { return BaseEntry.this; }
+                    };
+        }
+        return reference;
     }
 } // class BaseEntry

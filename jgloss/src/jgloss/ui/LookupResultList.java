@@ -58,10 +58,10 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected boolean previousDictionaryHasMatch;
     protected JLabel status;
 
-    protected final static int BUFFER_LIMIT = 500;
+    protected final static int BUFFER_LIMIT = 1000;
 
     public LookupResultList() {
-        this( 200);
+        this( 1000);
     }
 
     public LookupResultList( int _fancyLimit) {
@@ -205,9 +205,13 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
     protected void format( DictionaryEntry de, boolean fancy) {
         previousDictionaryHasMatch = true;
-        resultTextBuffer.append( de.toString());
-        if (fancy)
+        if (fancy) {
+            DictionaryEntryFormat.getHTMLFormatter().format( de, resultTextBuffer);
             resultTextBuffer.append( "<br>");
+        }
+        else
+            DictionaryEntryFormat.getFormatter().format( de, resultTextBuffer);
+
         resultTextBuffer.append( '\n');
         dictionaryEntries++;
     }
@@ -280,7 +284,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                     if (fancy) {
                         HTMLDocument doc = (HTMLDocument) resultFancy.getEditorKit()
                             .createDefaultDocument();
-                        doc.setTokenThreshold( 50);
+                        doc.setTokenThreshold( 150);
                         resultFancy.setDocument( doc);
 
                         if (resultScroller.getViewport().getView() != resultFancy) {

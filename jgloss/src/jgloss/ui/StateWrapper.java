@@ -23,7 +23,7 @@
 
 package jgloss.ui;
 
-class StateWrapper {
+class StateWrapper implements Cloneable {
     private Object obj;
     private boolean selected;
     private boolean enabled;
@@ -44,4 +44,10 @@ class StateWrapper {
 
     public void setSelected( boolean _selected) { selected = _selected; }
     public void setEnabled( boolean _enabled) { enabled = _enabled; }
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException ex) { return null; }
+    }
 } // class StateWrapper

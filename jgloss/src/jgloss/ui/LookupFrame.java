@@ -36,69 +36,20 @@ import javax.swing.*;
 public class LookupFrame extends JFrame implements ActionListener {
     protected LookupConfigPanel config;
     protected LookupModel model;
-    protected LookupEngine engine;
+    protected AsynchronousLookupEngine engine;
     protected LookupResultList list;
     
     protected Dimension preferredSize;
 
-    private class SearchThread extends Thread {
-        private Object THREAD_LOCK = new Object();
-        private boolean terminateThread = false;
-
-        public SearchThread() {
-            super( "lookup frame search thread");
-            setDaemon( true);
-        }
-
-        public void run() {
-            synchronized (THREAD_LOCK) {
-                while (!terminateThread) try {
-                    THREAD_LOCK.wait();
-                    
-                    if (terminateThread)
-                        break;
-                    
-                    // clear lingering interrupted flag
-                    Thread.interrupted();
-                    
-                    engine.doLookup( (LookupModel) model.clone());
-                } catch (InterruptedException ex) { ex.printStackTrace(); }
-            }
-        }
-
-        public void newSearch() {
-            // abort current search (if any)
-            SearchThread.this.interrupt();
-            // start new search
-            synchronized (THREAD_LOCK) {
-                THREAD_LOCK.notify();
-            }
-        }
-
-        public void dispose() {
-            terminateThread = true;
-            SearchThread.this.interrupt();
-            try {
-                SearchThread.this.join( 3000);
-            } catch (InterruptedException ex) {}
-            if (SearchThread.this.isAlive())
-                System.err.println( "WARNING: LookupFrame search thread still alive");
-        }
-    } // class SearchThread
-    
-    private SearchThread searchThread;
-
     public LookupFrame( LookupModel _model) {
         super( JGloss.messages.getString( "wordlookup.title"));
+
         getContentPane().setLayout( new BorderLayout());
 
         model = _model;
         config = new LookupConfigPanel( model, this);
         list = new LookupResultList();
-        engine = new LookupEngine( list);
-
-        searchThread = new SearchThread();
-        searchThread.start();
+        engine = new AsynchronousLookupEngine( list);
 
         config.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2));
         getContentPane().add( config, BorderLayout.NORTH);
@@ -154,7 +105,6 @@ public class LookupFrame extends JFrame implements ActionListener {
         final JMenu editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
         XCVManager xcv = new XCVManager( config.getSearchExpressionField());
         xcv.addManagedComponent( config.getDistanceField());
-        list.addToXCVManager( xcv);
 
         editMenu.add( xcv.getCutAction());
         editMenu.add( xcv.getCopyAction());
@@ -190,12 +140,12 @@ public class LookupFrame extends JFrame implements ActionListener {
     }
 
     public void actionPerformed( ActionEvent event) {
-        searchThread.newSearch();
+        engine.doLookup( (LookupModel) model.clone());
     }
 
     public void dispose() {
         super.dispose();
-        searchThread.dispose();
+        engine.dispose();
     }
 
     public Dimension getPreferredSize() {
