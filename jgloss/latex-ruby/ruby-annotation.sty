@@ -4,10 +4,13 @@
 % created by Werner Lemberg <wl@gnu.org>
 %
 % changes by Michael Koch <tensberg@gmx.net>:
-%   Removed dependency on CJK.sty to use ruby.sty independent of the CJK package
-%   (this only involved copying the CJKglue definition from CJK.sty).
-%   Renamed the file ruby-annotation.sty to avoid name conflicts with the original
-%   file. Added (standalone) to the version and changed the filedate.
+%   2001/07/12:
+%     Changed \rubysize from 0.4 to 0.5.
+%   2001/06/11:
+%     Removed dependency on CJK.sty to use ruby.sty independent of the CJK package
+%     (this only involved copying the CJKglue definition from CJK.sty).
+%     Renamed the file ruby-annotation.sty to avoid name conflicts with the original
+%     file. Added (standalone) to the version and changed the file date.
 %
 % Version 4.2.0(standalone) (11-Jun-2001)
 
@@ -47,7 +50,7 @@
 \newdimen\ruby@width
 \edef\ruby@kern{\kern 3sp}
 
-\newcommand{\rubysize}{0.4}
+\newcommand{\rubysize}{0.5}
 \newcommand{\rubysep}{-0.5ex}
 \newcommand{\rubyoverlap}{\ruby@overlap@true}
 \newcommand{\rubynooverlap}{\ruby@overlap@false}
