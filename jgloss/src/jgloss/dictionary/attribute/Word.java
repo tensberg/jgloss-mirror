@@ -23,30 +23,32 @@
 
 package jgloss.dictionary.attribute;
 
+import java.util.ResourceBundle;
+import java.util.Locale;
+
 /**
- * Attribute formatter which only prints the name of the attribute, not its values.
+ * Word and code of originating language. This class can't be instantiated directly
+ * because subclasses use different policies on which field (either word or langCode)
+ * is optional.
  *
  * @author Michael Koch
  */
-public class AttributeNameFormatter implements AttributeFormatter {
-    private String before;
-    private String after;
+public abstract class Word implements AttributeValue {
+    public static final String JAPANESE_ENGLISH = "je";
+    public static final String JAPANESE_FRENCH = "jf";
+    public static final String AINU = "ai";
 
-    public AttributeNameFormatter() {
-        this( null, null);
-    }
-    
-    public AttributeNameFormatter( String _before, String _after) {
-        before = _before;
-        after = _after;
+    protected String word;
+    protected String langCode;
+
+    protected Word( String _word, String _langCode) {
+        word = _word;
+        langCode = _langCode;
     }
 
-    public StringBuffer format( Attribute att, ValueList val, StringBuffer buf) {
-        if (before != null)
-            buf.append( before);
-        buf.append( att.getName());
-        if (after != null)
-            buf.append( after);
-        return buf;
-    }
-} // class AttributeNameFormatter
+    public String getWord() { return word; }
+
+    public String getLanguageCode() { return langCode; }
+
+    public String toString() { return word + "(" + langCode + ")"; }
+} // class Word

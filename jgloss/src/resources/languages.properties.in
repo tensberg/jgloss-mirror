@@ -6,20 +6,28 @@
 # Author: Michael Koch <tensberg@gmx.net>
 # $Id$
 
-format.short=from {0}
-format.long=from {0} "{1}"
-
 ai=Ainu
 ar=Arab.
 de=Ger.
 el=Greek
 en=Engl.
+en_US=Amer. Engl.
 es=Span.
+fi=Fin.
 fr=Fr.
 it=Ital.
+ja=Jap.
 je=Jap.-Engl.
+jf=Jap.-Fr.
+km=Cambodian
+ko=Korean
 lt=Lat.
+ms=Malay
 nl=Dutch
+no=Norw.
 pt=Port.
 ru=Russ.
+sa=Sanskrit
+sv=Swed.
+tr=Turk.
 zh=Chin.

@@ -26,28 +26,15 @@ package jgloss.dictionary.attribute;
 import java.util.ResourceBundle;
 import java.util.Locale;
 
-public class Gairaigo implements AttributeValue {
-    public static final String JAPANESE_ENGLISH = "je";
-    public static final String AINU = "ai";
-
-    protected static final ResourceBundle MESSAGES =
-        ResourceBundle.getBundle( "resources/messages-dictionary");
-
-    protected String code;
-    protected String originalWord;
-
-    public Gairaigo( String _code) {
-        this( _code, null);
+/**
+ * Language code with optional word. Used as value of the gairaigo attribute.
+ */
+public class Gairaigo extends Word {
+    public Gairaigo( String _langCode) {
+        this( null, _langCode);
     }
 
-    public Gairaigo( String _code, String _originalWord) {
-        code = _code;
-        originalWord = _originalWord;
+    public Gairaigo( String _originalWord, String _langCode) {
+        super( _originalWord, _langCode);
     }
-
-    public String getLanguageCode() { return code; }
-
-    public String getOriginalWord() { return originalWord; }
-
-    public String toString() { return code + ":\"" + getOriginalWord() + "\""; }
 } // class Gairaigo

@@ -47,6 +47,10 @@ public interface Attribute {
      */
     boolean canHaveValue();
     /**
+     * Returns <code>true</code> if the attribute must have a value.
+     */
+    boolean alwaysHasValue();
+    /**
      * Returns the class of attribute values this attribute uses.
      */
     Class getAttributeValueClass();

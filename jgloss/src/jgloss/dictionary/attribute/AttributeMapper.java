@@ -61,7 +61,7 @@ public class AttributeMapper {
     protected Map allAttributes;
     
     /**
-     * Initializes a new mapping from dictionary-specific id's to attribute/value objects by
+     * Initializes a new mapping from dictionary-specific names to attribute/value objects by
      * reading the configuration from a reader.
      */
     public AttributeMapper( LineNumberReader mapping) throws IOException {
@@ -81,8 +81,8 @@ public class AttributeMapper {
             if (line.trim().length()>0 && line.charAt( 0) != COMMENT_CHAR) {
                 lineMatcher.reset( line);
                 if (lineMatcher.matches()) {
-                    String id = lineMatcher.group( 1);
-                    id = id.replace( '~', ' ');
+                    String name = lineMatcher.group( 1);
+                    name = name.toLowerCase().replace( '~', ' ');
 
                     String attributeS = lineMatcher.group( 2);
                     Class attClass = Attributes.class;
@@ -135,7 +135,7 @@ public class AttributeMapper {
                         }
                     }
 
-                    mappings.put( id, new Mapping( attribute, attValue));
+                    mappings.put( name, new Mapping( attribute, attValue));
                     Set attValues = (Set) allAttributes.get( attribute);
                     if (attValues == null) {
                         attValues = new HashSet( 11);
@@ -150,11 +150,11 @@ public class AttributeMapper {
     }
 
     /**
-     * Return the mapping for the dictionary-specific id. Returns <code>null</code> if there
+     * Return the mapping for the dictionary-specific name. Returns <code>null</code> if there
      * is no such mapping.
      */
-    public Mapping getMapping( String id) {
-        return (Mapping) mappings.get( id);
+    public Mapping getMapping( String name) {
+        return (Mapping) mappings.get( name.toLowerCase());
     }
 
     public Map getAttributes() { return Collections.unmodifiableMap( allAttributes); }

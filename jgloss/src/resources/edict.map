@@ -2,6 +2,13 @@
 #
 # Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
 # $Id$
+#
+# Format:
+# "attribute name" ATTRIBUTE_TYPE AttributeClass "att id (see attributes.properties.in)"
+# a ~ in the attribute name is replaced by a space
+# Case in the attribute name does not matter
+# For every attribute id used in this file, the attribute definition must be present in
+# attributes.properties.in
 
 abbr    ABBREVIATION
 
@@ -43,7 +50,6 @@ vs      PART_OF_SPEECH  PartOfSpeech    vs #noun or participle which takes the a
 vs-s    PART_OF_SPEECH  PartOfSpeech    vs-s #suru verb - special class
 vt      PART_OF_SPEECH  PartOfSpeech    vt #transitive verb
 
-MA      USAGE           Usage           MA #martial arts term
 X       USAGE           Usage           X #rude or X-rated term (not displayed in educational software)
 arch    USAGE           Usage           arch #archaism
 col     USAGE           Usage           col #colloquialism
@@ -51,7 +57,6 @@ fam     USAGE           Usage           fam #familiar language
 fem     USAGE           Usage           fem #female term or language
 hon     USAGE           Usage           hon #honorific or respectful (sonkeigo) language 
 hum     USAGE           Usage           hum #humble (kenjougo) language
-m-sl    USAGE           Usage           m-sl #manga slang
 male    USAGE           Usage           male #male term or language
 obs     USAGE           Usage           obs #obsolete term
 obsc    USAGE           Usage           obsc #obscure term
@@ -59,10 +64,13 @@ pol     USAGE           Usage           pol #polite (teineigo) language
 sl      USAGE           Usage           sl #slang
 vulg    USAGE           Usage           vulg #vulgar expression or word
 
+gram    CATEGORY        Category        gram #grammatical term
+MA      CATEGORY        Category        budo #martial arts term
+m-sl    CATEGORY        Category        m-sl #manga slang
+
 #exp        Expressions (phrases, clauses, etc.)
 #ek         exclusively kanji, rarely just in kana
 #gikun      gikun (meaning) reading
-#gram       grammatical term
 #id         idiomatic expression 
 #iK         word containing irregular kanji usage
 #ik         word containing irregular kana usage

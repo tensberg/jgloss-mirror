@@ -140,10 +140,17 @@ public class AttributeLegend extends JPanel {
                                                                   att.getDescription() }));
             buf.append( "</b><br>\n");
             buf.append( JGloss.messages.getString( "legend.attributeexample"));
-            formatter.format( att, att.canHaveValue() ?
-                              new SingletonValueList( att.getExampleValue()) : null, buf);
-            if (att.canHaveValue())
+            if (att.canHaveValue()) {
+                if (!att.alwaysHasValue()) {
+                    DictionaryEntryFormat.getAttributeFormatter( att, true).format
+                        ( att, null, buf);
+                    buf.append( " / ");
+                }
+                formatter.format( att, new SingletonValueList( att.getExampleValue()), buf);
                 createLegendForValue( dic, att, buf);
+            }
+            else
+                formatter.format( att, null, buf);
             buf.append( "</p>\n");
         }
 

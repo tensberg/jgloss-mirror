@@ -23,6 +23,7 @@
 
 package jgloss.ui;
 
+import jgloss.JGloss;
 import jgloss.dictionary.*;
 import jgloss.dictionary.attribute.*;
 import jgloss.util.ListFormatter;
@@ -52,21 +53,31 @@ class DictionaryEntryFormat {
     public static ListFormatter getReadingFormatter() { return new ListFormatter( reading); }
     public static ListFormatter getTranslationRomFormatter() { return new ListFormatter( rom); }
     public static ListFormatter getTranslationCrmFormatter() { return new ListFormatter( crm); }
-    public static ListFormatter getTranslationSynonymFormatter() { return new ListFormatter(  syn); }
+    public static ListFormatter getTranslationSynonymFormatter() { return new ListFormatter( syn); }
 
     public static AttributeFormatter getAttributeFormatter( Attribute att) {
+        return getAttributeFormatter( att, false);
+    }
+
+    public static AttributeFormatter getAttributeFormatter( Attribute att, boolean nameOnly) {
+        if (nameOnly || att==Attributes.EXAMPLE)
+            return new AttributeNameFormatter( " {", "}");
+
         if (att == Attributes.PART_OF_SPEECH ||
             att == Attributes.USAGE ||
             att == Attributes.CATEGORY)
             return new DefaultAttributeFormatter
                 ( " (", ")", "", false, new ListFormatter( ","));
 
-        if (att == Attributes.ABBREVIATION ||
-            att == Attributes.EXAMPLE)
-            return new AttributeNameFormatter( " {", "}");
+        if (att == Attributes.ABBREVIATION)
+            return new WordFormatter( JGloss.messages.getString( "abbr.word"),
+                                      "", JGloss.messages.getString( "abbr.lang_and_word"),
+                                      new ListFormatter( " (", ",", ")"));
 
         if (att == Attributes.GAIRAIGO)
-            return new GairaigoFormatter( new ListFormatter( " (", ",", ")"));
+            return new WordFormatter( "", JGloss.messages.getString( "gairaigo.lang"),
+                                      JGloss.messages.getString( "gairaigo.lang_and_word"),
+                                      new ListFormatter( " (", ",", ")"));
 
         if (att == Attributes.REFERENCE)
             return new ReferenceAttributeFormatter
@@ -99,7 +110,7 @@ class DictionaryEntryFormat {
         out.addTranslationFormat( new ListFormatter( rom), new ListFormatter( crm),
                                   new ListFormatter( syn));
 
-        addAttributeFormats( out);
+        addBeforeAttributeFormats( out);
 
         out.addAttributeFormat( Attributes.EXPLANATION, 
                                 getAttributeFormatter( Attributes.EXPLANATION), false);
@@ -112,6 +123,8 @@ class DictionaryEntryFormat {
         out.addAttributeFormat( WadokuJT.ALT_READING,
                                 getAttributeFormatter( WadokuJT.ALT_READING), false);
 
+        addAfterAttributeFormats( out);
+        
         return out;
     }
 
@@ -125,7 +138,7 @@ class DictionaryEntryFormat {
                                   new ListFormatter( crm),
                                   new MarkerListFormatter( group, syn));
 
-        addAttributeFormats( out);
+        addBeforeAttributeFormats( out);
 
         ListFormatter commaList = new ListFormatter( ",");
 
@@ -148,18 +161,23 @@ class DictionaryEntryFormat {
         out.addAttributeFormat( WadokuJT.ALT_READING,
                                 new HTMLReferenceAttributeFormatter
                                 ( PROTOCOL_ALT_READING, " \u2192", "", commaList,
-                                  references), false);
+                                references), false);
+
+        addAfterAttributeFormats( out);
 
         return out;
     }
 
-    private static void addAttributeFormats( DictionaryEntryFormatter out) {
+    private static void addBeforeAttributeFormats( DictionaryEntryFormatter out) {
         out.addAttributeFormat( Attributes.PART_OF_SPEECH, 
                                 getAttributeFormatter( Attributes.PART_OF_SPEECH),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         out.addAttributeFormat( Attributes.ABBREVIATION,
-                                getAttributeFormatter( Attributes.ABBREVIATION),
+                                getAttributeFormatter( Attributes.ABBREVIATION, true),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3);
+        out.addAttributeFormat( Attributes.ABBREVIATION,
+                                getAttributeFormatter( Attributes.ABBREVIATION, true),
+                                true);
         out.addAttributeFormat( Attributes.EXAMPLE,
                                 getAttributeFormatter( Attributes.EXAMPLE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3);
@@ -172,5 +190,14 @@ class DictionaryEntryFormat {
         out.addAttributeFormat( Attributes.GAIRAIGO, 
                                 getAttributeFormatter( Attributes.GAIRAIGO),
                                 false);
+    }
+
+    private static void addAfterAttributeFormats( DictionaryEntryFormatter out) {
+        out.addAttributeFormat( Attributes.ABBREVIATION,
+                                getAttributeFormatter( Attributes.ABBREVIATION, false),
+                                false);
+        out.addAttributeFormat( Attributes.ABBREVIATION,
+                                getAttributeFormatter( Attributes.ABBREVIATION, false),
+                                DictionaryEntryFormatter.Position.AFTER_ENTRY);
     }
 } // class DictionaryEntryFormat

@@ -23,30 +23,20 @@
 
 package jgloss.dictionary.attribute;
 
+import java.util.ResourceBundle;
+import java.util.Locale;
+
 /**
- * Attribute formatter which only prints the name of the attribute, not its values.
+ * Word with an optional language code. Used as value of the abbreviation attribute.
  *
  * @author Michael Koch
  */
-public class AttributeNameFormatter implements AttributeFormatter {
-    private String before;
-    private String after;
-
-    public AttributeNameFormatter() {
-        this( null, null);
-    }
-    
-    public AttributeNameFormatter( String _before, String _after) {
-        before = _before;
-        after = _after;
+public class Abbreviation extends Word {
+    public Abbreviation( String _word) {
+        super( _word, null);
     }
 
-    public StringBuffer format( Attribute att, ValueList val, StringBuffer buf) {
-        if (before != null)
-            buf.append( before);
-        buf.append( att.getName());
-        if (after != null)
-            buf.append( after);
-        return buf;
+    public Abbreviation( String _word, String _langCode) {
+        super( _word, _langCode);
     }
-} // class AttributeNameFormatter
+} // class Word

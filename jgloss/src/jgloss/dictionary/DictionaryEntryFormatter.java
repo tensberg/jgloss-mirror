@@ -123,13 +123,12 @@ public class DictionaryEntryFormatter {
     }
 
     public void addAttributeFormat( Attribute att, AttributeFormatter format, boolean before) {
-        addAttributeFormat( att, format, before ? Position.BEFORE_ENTRY : Position.AFTER_ENTRY,
-                            before);
+        addAttributeFormat( att, format, null, before);
     }
 
     public void addAttributeFormat( Attribute att, AttributeFormatter format,
                                     Position generalAttributePosition, boolean before) {
-        if (att.appliesTo( DictionaryEntry.AttributeGroup.GENERAL)) {
+        if (generalAttributePosition!=null && att.appliesTo( DictionaryEntry.AttributeGroup.GENERAL)) {
             addAttributeFormat( att, format, generalAttributePosition);
         }
 
@@ -290,9 +289,8 @@ public class DictionaryEntryFormatter {
         for ( int i=0; i<formats.size(); i++) {
             Object[] o = (Object[]) formats.get( i);
             Attribute att = (Attribute) o[0];
-            ValueList l = atts.getAttribute( att, false);
-            if (l != null) {
-                ((AttributeFormatter) o[1]).format( att, l, buf);
+            if (atts.containsKey( att, false)) {
+                ((AttributeFormatter) o[1]).format( att, atts.getAttribute( att, false), buf);
             }
         }
 

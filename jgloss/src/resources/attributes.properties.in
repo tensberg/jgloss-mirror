@@ -152,9 +152,6 @@ usage.hon.l=honorific or respectful (sonkeigo) language
 usage.hum.s=hum
 usage.hum.l=humble (kenjougo) language
 
-usage.MA.s=MA
-usage.MA.l=martial arts term
-
 usage.male.s=male
 usage.male.l=male term or language
 
@@ -211,11 +208,17 @@ cat.bot.l=botany
 cat.buddh.s=buddh
 cat.buddh.l=Buddhism
 
+cat.budo.s=MA
+cat.budo.l=budô (martial arts)
+
 cat.business.s=business
 cat.business.l=business-related
 
 cat.chem.s=chem
 cat.chem.l=chemistry
+
+cat.chist.s=chist
+cat.chist.l=Chinese history
 
 cat.christ.s=christ
 cat.christ.l=Christianity
@@ -265,6 +268,9 @@ cat.inst.l=musical instrument
 cat.island.s=island
 cat.island.l=island name
 
+cat.jhist.s=jhist
+cat.jhist.l=Japanese history
+
 cat.kabuki.s=kabuki
 cat.kabuki.l=kabuki-related
 
@@ -276,6 +282,9 @@ cat.law.l=law-related
 
 cat.loc.s=loc
 cat.loc.l=location name
+
+cat.m-sl.s=m-sl
+cat.m-sl.l=manga slang
 
 cat.math.s=math
 cat.math.l=mathematics

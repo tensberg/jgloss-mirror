@@ -449,7 +449,7 @@ encodings.default=<auto>
 userdictionary.name=user dictionary
 userdictionary.instance.name=User dictionary (editable EDICT)
 
-wordlookup.title=JGloss Word Lookup
+wordlookup.title=Dictionary Lookup
 wordlookup.searchoptions=Search Options
 wordlookup.choice.best=Best Match
 wordlookup.choice.best.mk=B
@@ -513,6 +513,11 @@ legend.noattributes=(no attributes)
 legend.attribute={1}
 legend.attributeexample=Display style:\ 
 legend.values=values of this attribute:
+
+abbr.word=abbr. for "{0}"
+abbr.lang_and_word=abbr. for {0} "{1}"
+gairaigo.lang=from the {0}
+gairaigo.lang_and_word=from {0} "{1}"
 
 # default location of the chasen binary for different platforms
 chasen.location.unix=/usr/local/bin/chasen

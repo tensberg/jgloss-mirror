@@ -8,6 +8,9 @@
 # Format:
 # "attribute name" ATTRIBUTE_TYPE AttributeClass "att id (see attributes.properties.in)"
 # a ~ in the attribute name is replaced by a space
+# Case in the attribute name does not matter
+# For every attribute id used in this file, the attribute definition must be present in
+# attributes.properties.in
 
 Bsp.            EXAMPLE
 
@@ -20,7 +23,9 @@ bild.~Kunst     CATEGORY        Category        art
 Biol.           CATEGORY        Category        biol
 Bot.            CATEGORY        Category        bot
 Buddh.          CATEGORY        Category        buddh
+Budô            CATEGORY        Category        budo
 Chem.           CATEGORY        Category        chem
+chin.~Gesch.    CATEGORY        Category        chist
 Christent.      CATEGORY        Category        christ
 Druckw.         CATEGORY        Category        print
 EDV             CATEGORY        Category        comp
@@ -37,6 +42,7 @@ Gramm.          CATEGORY        Category        gram
 Griech.~Mythol. CATEGORY        Category        gmyth
 Insektenk.      CATEGORY        Category        ento
 Inseln.         CATEGORY        Category        island
+jap.~Gesch.     CATEGORY        Category        jhist
 Kabuki          CATEGORY        Category        kabuki
 Kleidung        CATEGORY        Category        cloth
 Kochk.          CATEGORY        Category        cook

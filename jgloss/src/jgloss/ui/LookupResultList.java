@@ -272,7 +272,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                                                             ex.getLocalizedMessage() }));
         }
         if (fancy)
-            resultTextBuffer.append( "</font></p>>");
+            resultTextBuffer.append( "</font></p>");
         resultTextBuffer.append( "\n\n");
     }
 

@@ -88,9 +88,11 @@ att.explanation.desc=longer explanation
 # attribute value examples
 example.priority=high
 example.reference=example
+example.abbreviation.lang=en
+example.abbreviation.word=example
 example.gairaigo.lang=en
 example.gairaigo.word=example
-example.information=example information
+example.information=some example information
 
 # WadokuJT specific attributes
 

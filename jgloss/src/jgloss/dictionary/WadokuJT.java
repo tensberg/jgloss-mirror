@@ -106,14 +106,14 @@ public class WadokuJT extends FileBasedDictionary {
     public static final Attribute MAIN_ENTRY_REF = new Attributes
         ( NAMES.getString( "wadoku.att.main_entry_ref.name"),
           NAMES.getString( "wadoku.att.main_entry_ref.desc"),
-          ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
+          true, ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute ALT_READING = new Attributes
         ( NAMES.getString( "wadoku.att.alt_reading.name"),
           NAMES.getString( "wadoku.att.alt_reading.desc"),
-          ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
+          true, ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
@@ -255,8 +255,12 @@ public class WadokuJT extends FileBasedDictionary {
     protected final Matcher REFERENCE_MATCHER = REFERENCE_PATTERN.matcher( "");
 
     protected final static Pattern GAIRAIGO_PATTERN = Pattern.compile
-        ( "(?:; )?(?:von (\\S+) \"(.+)?\")|(?:aus d(?:em|\\.) (\\S+\\.))(?:; )?");
+        ( "(?:\\A|; )(?:(?:von (\\S+?)\\.? \"([^\"]+)\")|(?:aus d(?:em|\\.) (\\S+?)\\.?))(?:; |\\Z)");
     protected final static Matcher GAIRAIGO_MATCHER = GAIRAIGO_PATTERN.matcher( "");
+
+    protected final static Pattern ABBR_PATTERN = Pattern.compile
+        ( "(?:\\A|; )Abk\\.?(?: (?:f\u00fcr |v(?:on|\\.) )?(?:(\\S+?)\\.?)? ?\"([^\"]+)\")?(?:; |\\Z)");
+    protected final static Matcher ABBR_MATCHER = ABBR_PATTERN.matcher( "");
 
     public WadokuJT( File dicfile) throws IOException {
         super( dicfile);
@@ -266,6 +270,7 @@ public class WadokuJT extends FileBasedDictionary {
         super.initSupportedAttributes();
         
         supportedAttributes.putAll( mapper.getAttributes());
+        supportedAttributes.put( Attributes.ABBREVIATION, null);
         supportedAttributes.put( Attributes.GAIRAIGO, null);
         supportedAttributes.put( Attributes.EXPLANATION, null);
         supportedAttributes.put( Attributes.REFERENCE, null);
@@ -482,16 +487,58 @@ public class WadokuJT extends FileBasedDictionary {
             // split translations; translationsMatcher matches each ROM
             Matcher translationsMatcher = TRANSLATIONS_PATTERN.matcher( translations);
             while (translationsMatcher.find()) {
-                String crm = translationsMatcher.group( 2); // one ROM of CRMs
-                // attributes of this rom, create only if needed
-                DefaultAttributeSet thisRomA = null;
+                // Test if the attributes apply to all translations. This is the case if
+                // they are written before the first ROM marker, or if there are no ROM
+                // markers. In both cases, group(1) is null. If allTranslations is
+                // false, attributes apply only to the current ROM.
+                boolean allTranslations = translationsMatcher.group( 1) == null;
 
-                // handle gairaigo/explanation (always in () brackets at end of rom)
+                String crm = translationsMatcher.group( 2); // one ROM of CRMs
+                // attributes of this rom
+                DefaultAttributeSet thisRomA = new DefaultAttributeSet( translationA);
+
+                // handle abbreviation/gairaigo/explanation (always in () brackets at end of rom)
                 if (crm.charAt( crm.length()-1) == ')') try {
                     int openb = crm.lastIndexOf( '(');
                     String ex = crm.substring( openb+1, crm.length()-1);
                     // cut off comment (last char before ( is a space)
                     crm = crm.substring( 0, openb-1);
+
+                    ABBR_MATCHER.reset( ex);
+                    if (ABBR_MATCHER.find()) {
+                        String lang = ABBR_MATCHER.group( 1);
+                        String code = null;
+                        if (lang != null) {
+                            code = (String) gairaigoMap.get( lang.toLowerCase());
+                            if (code == null) {
+                                System.err.println( "WadokuJT warning: unrecognized language " +
+                                                    lang + " (" + ex + ")");
+                                code = lang;
+                            } 
+                        }
+                        String word = ABBR_MATCHER.group( 2);
+                        Abbreviation abbr = null;
+                        if (word != null)
+                            abbr = new Abbreviation( word, code);
+                        if (allTranslations)
+                            generalA.addAttribute( Attributes.ABBREVIATION, abbr);
+                        else
+                            thisRomA.addAttribute( Attributes.ABBREVIATION, abbr);
+
+                        // strip abbr comment from crm
+                        if (ABBR_MATCHER.start() > 0) {
+                            if (ABBR_MATCHER.end() < ex.length()) {
+                                ex = ex.substring( 0, ABBR_MATCHER.start()) + "; " +
+                                    ex.substring( ABBR_MATCHER.end());
+                            }
+                            else {
+                                ex = ex.substring( 0, ABBR_MATCHER.start());
+                            }
+                        }
+                        else
+                            ex = ex.substring( ABBR_MATCHER.end());
+                    }
+
                     GAIRAIGO_MATCHER.reset( ex);
                     if (GAIRAIGO_MATCHER.find()) {
                         String lang;
@@ -508,24 +555,32 @@ public class WadokuJT extends FileBasedDictionary {
 			    
                         String code = (String) gairaigoMap.get( lang.toLowerCase());
                         if (code != null) {
-                            generalA.addAttribute( Attributes.GAIRAIGO,
-                                                   new Gairaigo( code, word));
+                            Gairaigo gairaigo = new Gairaigo( word, code);
+                            if (allTranslations)
+                                generalA.addAttribute( Attributes.GAIRAIGO, gairaigo);
+                            else
+                                thisRomA.addAttribute( Attributes.GAIRAIGO, gairaigo);
 
                             // strip gairaigo comment from crm
-                            ex = ex.substring( 0, GAIRAIGO_MATCHER.start()) +
-                                ex.substring( GAIRAIGO_MATCHER.end());
+                            if (GAIRAIGO_MATCHER.start() > 0) {
+                                if (GAIRAIGO_MATCHER.end() < ex.length()) {
+                                    ex = ex.substring( 0, GAIRAIGO_MATCHER.start()) + "; " +
+                                        ex.substring( GAIRAIGO_MATCHER.end());
+                                }
+                                else {
+                                    ex = ex.substring( 0, GAIRAIGO_MATCHER.start());
+                                }
+                            }
+                            else
+                                ex = ex.substring( GAIRAIGO_MATCHER.end());
                         }
                         else {
                             System.err.println( "WadokuJT warning: unrecognized language " +
-                                                lang);
+                                                lang + " (" + ex + ")");
                         }
                     }
 
                     if (ex.length() > EXPLANATION_MIN_LENGTH) {
-                        if (thisRomA == null) {
-                            thisRomA = new DefaultAttributeSet( translationA);
-                            romA.add( thisRomA);
-                        }
                         thisRomA.addAttribute( Attributes.EXPLANATION,
                                                new InformationAttributeValue( ex));
                         ex = "";
@@ -543,11 +598,6 @@ public class WadokuJT extends FileBasedDictionary {
                 // handle categories (marked at beginning of translation enclosed in {})
                 if (crm.charAt( 0) == '{') try {
                     int endb = crm.indexOf( '}');
-                    // Test if the attributes apply to all translations. This is the case if
-                    // they are written before the first ROM marker, or if there are no ROM
-                    // markers. In both cases, group(1) is null. If allTranslations is
-                    // false, attributes apply only to the current ROM.
-                    boolean allTranslations = translationsMatcher.group( 1) == null;
                     // attribute strings unrecognized by mapping
                     StringBuffer unrecognized = null;
 
@@ -571,10 +621,6 @@ public class WadokuJT extends FileBasedDictionary {
                             else {
                                 if (att.appliesTo
                                     ( DictionaryEntry.AttributeGroup.TRANSLATION)) {
-                                    if (thisRomA == null) {
-                                        thisRomA = new DefaultAttributeSet( translationA);
-                                        romA.add( thisRomA);
-                                    }
                                     thisRomA.addAttribute( att, mapping.getValue());
                                 }
                                 else if (att.appliesTo
@@ -600,7 +646,7 @@ public class WadokuJT extends FileBasedDictionary {
                     }
 
                     // cut off categories
-                    if (crm.charAt( endb + 1) == ' ')
+                    if (crm.length()>endb+1 && crm.charAt( endb + 1) == ' ')
                         endb++;
                     crm = crm.substring( endb + 1);
                     if (crm.length() == 0) {
@@ -624,11 +670,12 @@ public class WadokuJT extends FileBasedDictionary {
                 ALTERNATIVES_MATCHER.reset( crm);
                 while (ALTERNATIVES_MATCHER.find()) {
                     crml.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
-                    if (romA.size() < rom.size()) {
-                        // no rom-specific attributes found previously
-                        romA.add( null);
-                    }
                 }
+
+                if (thisRomA.isEmpty())
+                    romA.add( null);
+                else
+                    romA.add( thisRomA);
             }
 
             // parse comment/reference field
@@ -658,7 +705,7 @@ public class WadokuJT extends FileBasedDictionary {
             String mainEntry = entry.substring( end+1);
             if (mainEntry.startsWith( "HE")) {
                 generalA.addAttribute( MAIN_ENTRY, null);
-                if (mainEntry.length() == 2)
+                if (mainEntry.length() <= 4)
                     mainEntry = "";
                 else // cut off "HE; " part of mainEntry
                     mainEntry = mainEntry.substring( 4);
