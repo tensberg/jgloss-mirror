@@ -45,9 +45,10 @@ DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation
 
+RESOURCES := messages.properties messages_de.properties preferences.properties
+
 CLASSPATH := $(CLASSPATH):./src
 ROOT_SOURCE := src/jgloss/JGloss.java
-RESOURCES := messages.properties messages_de.properties preferences.properties
 # files and directories that go into the source distribution
 SOURCE_DIST := README COPYING Makefile MANIFEST.MF src doc.src javadoc latex-ruby
 # files and directories that go into the binary distribution, either in the JGloss jar file
