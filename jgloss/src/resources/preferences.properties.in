@@ -45,11 +45,11 @@ fontsizes.reading=6,7,8,9,10,11,12,13,14,15,16,18
 fontsizes.translation=4,5,6,7,8,9,10,11,12,13,14,15,16
 
 font.text=Serif
-font.text.size=18
+font.text.size=15
 font.text.bgcolor=16764108
 font.text.usecolor=true
 font.reading=SansSerif
-font.reading.size=12
+font.reading.size=11
 font.reading.bgcolor=10092492
 font.reading.usecolor=true
 font.translation=SansSerif
@@ -108,7 +108,8 @@ wordlookup.alldictionaries=true
 # Limit for the number of results the word lookup panel will show.
 wordlookup.resultlimit=1000
 
-chasen.location=/usr/local/bin/chasen
+# location of the chasen executable
+chasen.location=
 
 # Name of the DTD the javax.swing.text.html.parser.ParserDelegator uses. Found in the
 # Swing source code. There is no way to inquire this programatically. 

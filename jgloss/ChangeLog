@@ -1,4 +1,4 @@
-0.9.5: (2001/12/09)
+0.9.5: (2001/12/11)
 	- Improved handling of long result lists in word lookup dialog.
 	- Removed the dummy print menu item from the word lookup dialog.
 	- Fixed exception thrown if the document window is closed while
@@ -15,16 +15,19 @@
 	- LaTeX export can now alternatively put translations at the end of
 	  the document.
 	- Improved LaTeX translation formatting.
+	- Removed character set selection from LaTeX export dialog, since
+	  platex does not work with all charsets. LaTeX export defaults to
+	  EUC-JP encoded files.
 	- Word lookup window now remembers its size.
 	- Left-clicking an annotated word now selects the annotation. This
 	  behavior can be changed in the preferences.
-	- Style changes in the preferences are only applied once.
-	- When annotating a word, the first reading and translation are now
-	  automatically selected.
+	- Style changes in the preferences are only applied once to open
+	  documents.
+	- When annotating a word manually, the first reading and translation
+	  are now automatically selected.
 	- Fixed treatment of special characters /, @ and | in annotations
 	  when saving and loading documents.
-	- Add to exclusions now adds the word as it appears in the document
-	  as well as the dictionary form of the word to the exclusion list.
+	- Changed default font sizes.
 0.9.4: (2001/11/07)
 	- Improved handling of reading annotations in imported text;
 	  ChaSen parser can now be used with texts with reading annotations.

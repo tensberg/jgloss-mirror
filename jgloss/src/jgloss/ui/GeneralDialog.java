@@ -246,7 +246,18 @@ public class GeneralDialog extends Box {
         chooser.setFileHidingEnabled( true);
         chooser.setMultiSelectionEnabled( false);
         chooser.setFileSelectionMode( JFileChooser.FILES_ONLY);
-        chooser.setFileView( CustomFileView.getFileView());
+        chooser.setFileView( new CustomFileView() {
+                private Icon CHASEN_ICON = 
+                    new ImageIcon( CustomFileView.class.getResource( "/resources/icons/chasen.png"));
+                public Icon getIcon( java.io.File f) {
+                    if (f.isFile()) {
+                        String name = f.getName().toLowerCase();
+                        if (name.equals( "chasen") || name.equals( "chasen.exe"))
+                            return CHASEN_ICON;
+                    }
+                    return super.getIcon( f);
+                }
+            });
         int r = chooser.showDialog( this, JGloss.messages.getString( "button.select"));
         if (r == JFileChooser.APPROVE_OPTION) {
             chasenLocation.setText( chooser.getSelectedFile().getAbsolutePath());

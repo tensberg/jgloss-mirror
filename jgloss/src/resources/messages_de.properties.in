@@ -320,3 +320,5 @@ wordlookup.matches=Treffer in\
 wordlookup.matchesfor={0,choice,1#1 Eintrag|1<{0} Einträge} für {1} gefunden:
 wordlookup.nomatches=Keine Einträge für {0} gefunden
 wordlookup.inflection=Mögliche Inflektion: {0}, {1}->{2}
+
+chasen.location.windows=C:\\Programme\\chasen21\\chasen.exe

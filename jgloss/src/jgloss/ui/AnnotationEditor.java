@@ -470,17 +470,31 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                         tn = tn.getParent();
                     AnnotationNode selection = (AnnotationNode) tn;
                     String word = selection.getWordNode().getWord();
-                    ExclusionList.addWord( word);
-                    // if the annotated word is all hiragana, add the dictionary reading,
+                    String dictionaryWord = selection.getDictionaryFormNode().getWord();
+
+                    // Some words are written as hiragana in the text and appear as katakana
+                    // in the dictionary or vice versa. In this case add the word as it appears
+                    // in the text as well as the dictionary form.
+                    if (dictionaryWord.length() > 0) {
+                        if (StringTools.isHiragana( word.charAt( 0)) &&
+                            StringTools.isKatakana( dictionaryWord.charAt( 0)) ||
+                            StringTools.isKatakana( word.charAt( 0)) &&
+                            StringTools.isHiragana( dictionaryWord.charAt( 0)))
+                            ExclusionList.addWord( word);
+                    }
+
+                    // if the annotated word is all kana, add the dictionary reading,
                     // else add the dictionary word.
-                    boolean isHiragana = true;
+                    boolean isKana = true;
                     for ( int i=0; i<word.length(); i++) {
-                        if (!StringTools.isHiragana( word.charAt( i))) {
-                            isHiragana = false;
+                        if (!(StringTools.isHiragana( word.charAt( i)) ||
+                              StringTools.isKatakana( word.charAt( i)))) {
+                            isKana = false;
                             break;
                         }
                     }
-                    if (!isHiragana || selection.getDictionaryFormNode().getReading().length()==0)
+
+                    if (!isKana || selection.getDictionaryFormNode().getReading().length()==0)
                         ExclusionList.addWord( selection.getDictionaryFormNode().getWord());
                     else
                         ExclusionList.addWord( selection.getDictionaryFormNode().getReading());

@@ -242,6 +242,14 @@ public class JGloss {
                 displayError( messages.getString( "error.loadPreferences"), ex, false);
             }
             
+            // set default location of the chasen executable if this is the first start of JGloss
+            String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
+            if (chasen==null || chasen.length()==0)
+                prefs.set( Preferences.CHASEN_LOCATION, messages.getString
+                           ( File.separatorChar=='\\' ? 
+                             "chasen.location.windows" :
+                             "chasen.location.unix"));
+
             splash.setInfo( messages.getString( "splashscreen.initPreferences"));
             ChasenParser.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
             // Initialize the preferences at startup. This includes loading the dictionaries.
