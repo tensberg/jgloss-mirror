@@ -16,8 +16,9 @@ $Id$
 
 <STYLE type="text/css">
 <!--
-div.popup { display: none; position: absolute; left: 0px; top: 0px; 
-            font-size: 80%; background-color: yellow; }
+div.popup { display: none; position: absolute; left: 0px; top: 0px;
+            text-align: left;
+            font-size: 80%; color: black; background-color: yellow; }
 //-->
 </STYLE>
 

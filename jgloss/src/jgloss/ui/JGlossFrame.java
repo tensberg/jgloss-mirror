@@ -617,8 +617,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
         }
-        else // method was called with empty clipboard
-            System.err.println( "Somebody stole my clipboard content");
     }
 
     /**
@@ -809,7 +807,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                    showReadingItem.isSelected(),
                                    showTranslationItem.isSelected());
         doc = (JGlossDocument) kit.createDefaultDocument();
-        StyleDialog.getComponent().addStyleSheet( doc.getStyleSheet(), getAdditionalStyles());
+        StyleDialog.getComponent().addStyleSheet( doc.getStyleSheet(), Collections.EMPTY_MAP);
 
         documentName = title;
         setTitle( title + ":" + JGloss.messages.getString( "main.title"));
@@ -927,18 +925,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                      editorFollowsMouseItem.isSelected());
             }
         }
-    }
-
-    /**
-     * Returns styles to be used in the style sheet specific to this document.
-     * This is currenty unused.
-     *
-     * @return A map from html tag names to CSS styles.
-     */
-    private java.util.Map getAdditionalStyles() {
-        java.util.Map out = new HashMap();
-
-        return out;
     }
 
     /**

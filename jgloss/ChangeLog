@@ -1,3 +1,6 @@
+0.9.4: (2001/11/01)
+	- Fixed escaping of special characters in LaTeX export.
+	- Fixes to JGloss-WWW.
 0.9.3: (2001/09/14)
 	- Annotations can now have more than one reading. In a word with
 	  more than one kanji substring, a reading is added for every

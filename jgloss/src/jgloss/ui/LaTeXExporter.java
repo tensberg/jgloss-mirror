@@ -167,10 +167,10 @@ public class LaTeXExporter {
                 buf.replace( i, i+1, "$\\backslash$");
                 break;
             case '~':
-                buf.replace( i, i+1, "\\verb/~/");
+                buf.replace( i, i+1, "\\~{}");
                 break;
             case '^':
-                buf.replace( i, i+1, "\\verb/^/");
+                buf.replace( i, i+1, "\\^{}");
                 break;
             }
         }
