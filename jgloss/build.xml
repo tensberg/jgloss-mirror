@@ -27,22 +27,31 @@
     Build file for the JGloss project
   </description>
 
-  <!-- global properties -->
+  <!-- system-specific properties -->
+  <property name="build.compiler" value="jikes" />
+  <property name="xsl.docbook.html" value="/usr/share/sgml/docbook/xsl-stylesheets/html/docbook.xsl" />
+  <property name="xsl.docbook.pdf" value="/usr/share/sgml/docbook/xsl-stylesheets/fo/docbook.xsl" />
+
+  <!-- build-specific properties -->
   <property name="release" value="2.0a3" />
   
   <property name="jgloss-distname" value="jgloss-${release}" />
   <property name="jdictionary-distname" value="jdictionary-${release}" />
 
   <property name="source" value="src" />
+  <property name="source.doc" value="doc.src" />
   <property name="build" value="build" />
   <property name="dist" value="dist" />
-  
+  <property name="dest.doc" value="doc" />  
+  <property name="dest.doc.html" value="doc/html" />  
+
   <property name="jgloss-sources"
     value="jgloss/JGlossApp.java
     jgloss/ui/export/XSLTExporter.java
     jgloss/ui/export/LaTeXExporter.java" />
 
-  <property name="build.compiler" value="jikes" />
+  <!-- tasks -->
+  <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" />
 
   <!-- targets -->
   <target name="jgloss" depends="compile-jgloss,resources,data">
@@ -89,5 +98,38 @@
     <delete>
       <fileset dir="." includes="*.jar" />
     </delete>
+    <delete dir="dependencies" />
+    <delete dir="doc" />
+  </target>
+
+  <target name="doc" depends="doc-html,doc-pdf" />
+  
+  <target name="doc-html">
+    <mkdir dir="doc/html" />
+    <mkdir dir="${build}" />
+    <echo file="${build}/stylesheet.html.xsl" append="false"><![CDATA[<?xml version="1.0" ?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                version="1.0"
+                xmlns="http://www.w3.org/TR/xhtml1/transitional"
+                exclude-result-prefixes="#default">
+  <xsl:import href="${xsl.docbook.html}" />
+</xsl:stylesheet>
+]]></echo>
+    <xslt in="${source.doc}/jgloss.docbook.xml" out="${dest.doc.html}/index.html" style="${source.doc}/stylesheet.html.xsl" />
+  </target>
+
+  <target name="doc-pdf">
+    <mkdir dir="doc" />
+    <mkdir dir="${build}" />
+    <echo file="${build}/stylesheet.pdf.xsl" append="false"><![CDATA[<?xml version="1.0" ?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                version="1.0"
+                xmlns="http://www.w3.org/TR/xhtml1/transitional"
+                exclude-result-prefixes="#default">
+  <xsl:import href="${xsl.docbook.pdf}" />
+</xsl:stylesheet>
+]]></echo>
+    <xslt in="${source.doc}/jgloss.docbook.xml" out="${build}/jgloss.fo" style="${source.doc}/stylesheet.pdf.xsl" />
+    <fop fofile="${build}/jgloss.fo" outfile="${dest.doc}/jgloss.pdf" format="application/pdf" />
   </target>
 </project>

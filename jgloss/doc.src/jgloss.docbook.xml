@@ -1,4 +1,6 @@
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
 <!ENTITY JGloss "<application>JGloss</application>">
 ]>
 
@@ -29,7 +31,7 @@
     <author>
       <firstname>Michael</firstname><surname>Koch</surname>
     </author>
-    <edition>1.0.7</edition>
+    <edition>2</edition>
     <copyright><year>2001-2004</year><holder>Michael Koch</holder></copyright>
     <pubdate>2004</pubdate>
   </bookinfo>
@@ -72,7 +74,7 @@
         The character encoding detection uses code from Yasuhiro Tonooka's 
         <application>kcc</application> (Kanji Code Converter).
         The French localization is contributed by Alexandre Beraud.
-        Heinrich K�nsting helped with the LaTeX export template design and wrote the LaTeX-CJK list
+        Heinrich Künsting helped with the LaTeX export template design and wrote the LaTeX-CJK list
         template.
         Some of the file chooser icons are taken from 
         <ulink url="http://artists.kde.org">the KDE project</ulink>.
@@ -102,7 +104,7 @@
         Your computer system should already be configured to work with Japanese text. You must
         have a Japanese font installed. Having a Japanese input method installed is not absolutely
         necessary, but very useful. As a test, if your web browser can display Japanese text, it should
-        be possible to set up Java do do the same. See also <xref linkend="sect.Japanesejava">.
+        be possible to set up Java do do the same. See also <xref linkend="sect.Japanesejava" />.
       </para>
       <para>
         To use &JGloss;, you will need some dictionaries.
@@ -244,7 +246,7 @@
         <emphasis>Osaka</emphasis> is available and configures itself to use it.
         If none of the fonts work, no configuration is done and the default settings are kept. In this
         case Japanese characters will not display correctly.
-        Read <xref linkend="sect.prefs.style"> for information on how to select fonts manually,
+        Read <xref linkend="sect.prefs.style" /> for information on how to select fonts manually,
         or read on for information on how to change the Java default fonts.
       </para>
       <para>
@@ -409,17 +411,17 @@
       </para>
       <figure id="figure.main" float="1"><title>JGloss Main Window</title>
         <screenshot><mediaobject><imageobject>
-              <imagedata align="center" fileref="img/main.png" scale="50">
+              <imagedata align="center" fileref="img/main.png" scale="50" />
             </imageobject>
             <textobject><phrase>&JGloss; main window</phrase></textobject>
           </mediaobject></screenshot>
         <blockquote>
           <para>
             The right part of the &JGloss; window shows the 
-            annotation editor (see <xref linkend="sect.annotationeditor">), which is used
+            annotation editor (see <xref linkend="sect.annotationeditor" />), which is used
             to manipulate the annotations in the document.
             The left part shows the annotated document
-            (see <xref linkend="sect.docview">). An <emphasis>annotated word</emphasis> is
+            (see <xref linkend="sect.docview" />). An <emphasis>annotated word</emphasis> is
             highlighted in red, a <emphasis>reading annotation</emphasis> in green
             and a <emphasis>translation annotation</emphasis> in blue. The currently
             selected annotation is highlighted in deep red.
@@ -427,7 +429,7 @@
         </blockquote>
       </figure>
       <para>
-        <xref linkend="figure.main"> shows the &JGloss; window after some text is imported.
+        <xref linkend="figure.main" /> shows the &JGloss; window after some text is imported.
         The left part of the window shows the annotated document. An annotated word is shown
         in light red, with the reading annotation above and the translation annotation below the
         word. The right part of the window contains the annotation editor. For every annotated word,
@@ -440,37 +442,9 @@
       </para>
       <para>
         The heuristics used for generating the annotations are not perfect.
-        For example, if you import a text using the edict dictionary file, 
-        <inlinemediaobject><imageobject><imagedata fileref="img/kuru_kanji.png" scale="50">
-          </imageobject><textobject><phrase>kuru (written with kanji)</phrase>
-          </textobject>
-        </inlinemediaobject>
-        is assigned the reading
-        <inlinemediaobject><imageobject><imagedata fileref="img/kitaru.png" scale="50">
-          </imageobject><textobject><phrase>kitaru</phrase>
-          </textobject>
-        </inlinemediaobject>
-        instead of 
-        <inlinemediaobject><imageobject><imagedata fileref="img/kuru.png" scale="50">
-          </imageobject><textobject><phrase>kuru</phrase>
-          </textobject>
-        </inlinemediaobject>
-        and 
-        <inlinemediaobject><imageobject><imagedata fileref="img/hitori_kanji.png" scale="50">
-          </imageobject><textobject><phrase>hitori (written with kanji)</phrase>
-          </textobject>
-        </inlinemediaobject>
-        is assigned the reading
-        <inlinemediaobject><imageobject><imagedata fileref="img/ichinin.png" scale="50">
-          </imageobject><textobject><phrase>ichinin</phrase>
-          </textobject>
-        </inlinemediaobject>
-        instead of the more common 
-        <inlinemediaobject><imageobject><imagedata fileref="img/hitori.png" scale="50">
-          </imageobject><textobject><phrase>hitori</phrase>
-          </textobject>
-        </inlinemediaobject>
-        . This happens because the application picks the first reading and translation 
+        For example, if you import a text using the edict dictionary file, 来る is assigned the reading きたる
+        instead of くる and 一人 is assigned the reading いちにん instead of the more common ひとり.
+        This happens because the application picks the first reading and translation 
         found in the dictionary. Also, the algorithm used for verb/adjective deinflection can produce
         false results. What follows is that you should not trust the automatic annotations too much
         and that the document will require some editing. 
@@ -506,10 +480,10 @@
         If you left-click on an annotated word, the annotation will be selected in the annotation
         editor. A right-click will select the word and pop up
         a context menu with options for this annotation (see 
-        <xref linkend="sect.menu.annotation">). To look up the currently selected text in the dictionaries,
+        <xref linkend="sect.menu.annotation" />). To look up the currently selected text in the dictionaries,
         select <guimenuitem>Word Lookup</guimenuitem>. To add an annotation, select some text
         and use <guimenuitem>Annotate Selection</guimenuitem> in the <guimenu>Edit</guimenu> menu
-        (see <xref linkend="sect.menu.edit">).
+        (see <xref linkend="sect.menu.edit" />).
       </para>
     </sect1>
 
@@ -517,7 +491,7 @@
       <para>
         The annotation editor is used to edit the reading and translation annotations of annotated
         words in the document. It is displayed in the right half of the &JGloss; window
-        (see <xref linkend="figure.main">). Each annotated word has an entry in the editor, ordered
+        (see <xref linkend="figure.main" />). Each annotated word has an entry in the editor, ordered
         by its appearance in the document. The entries are displayed as a list, with the currently
         selected annotation expanded to show the dictionary search results.
         If an entry is selected, the annotation will be highlighted in the document view.
@@ -529,7 +503,7 @@
         Pressing <keycap>space</keycap> will do something useful, depending on what kind of item is
         currently selected. Look at the table below for the full list of keyboard commands.
         Right-clicking an entry with the mouse will show a context menu for
-        the chosen item (see <xref linkend="sect.menu.annotation">).
+        the chosen item (see <xref linkend="sect.menu.annotation" />).
       </para>
       <para>
         Each annotated word has one or more readings. If a word has no kanji characters,
@@ -573,8 +547,8 @@
       </para>
       <table><title>Annotation Editor Shortcut Keys</title>
         <tgroup cols="2">
-          <colspec colname="key" align="center">
-          <colspec colname="function" align="left" colwidth="5*">
+          <colspec colname="key" align="center" />
+          <colspec colname="function" align="left" colwidth="5*" />
           <thead><row><entry>Key</entry><entry>Function</entry></row></thead>
           <tbody>
             <row>
@@ -644,7 +618,7 @@
         leave it on the <guilabel>&lt;auto&gt;</guilabel> setting, which will make &JGloss;
         auto-detect the encoding of the file. If the auto-detection fails for a file, you can
         select the encoding manually. You can choose the text parser for the automatic annotation in
-        the <guilabel>Text Parser</guilabel> part of the dialog (see <xref linkend="sect.parser">). 
+        the <guilabel>Text Parser</guilabel> part of the dialog (see <xref linkend="sect.parser" />). 
         Clicking the <guibutton>Import</guibutton> button will import the selected file.
       </para>
       <para>
@@ -729,7 +703,7 @@
           modified templates by selecting <guilabel>Add...</guilabel> from the template
           chooser menu. A file selector dialog will be shown where you can select the new 
           template file.
-          See <xref linkend="app.templateformat"> for the template format description.
+          See <xref linkend="app.templateformat" /> for the template format description.
           You can choose the document font size from the <guilabel>Font size</guilabel>
           menu.
         </para>
@@ -952,7 +926,7 @@
           click on a word. Otherwise, the annotation will be selected in the annotation editor.
           The text parser used when importing the clipboard content can be selected in the 
           <guilabel>Import Clipboard Parser</guilabel> section of the dialog. See 
-          <xref linkend="sect.parser"> for details. You can set the location of the
+          <xref linkend="sect.parser" /> for details. You can set the location of the
           ChaSen parser program in the <guilabel>ChaSen executable</guilabel> text field.
           It usually is <filename>/usr/local/bin/chasen</filename> under Unix or 
           <filename>c:\Program Files\chasen21\chasen.exe</filename> under Windows.
@@ -1026,7 +1000,7 @@
             <listitem>
               <para>
                 Creates a new document by importing a text file, annotating it on
-                the fly. See <xref linkend="sect.import"> for details.
+                the fly. See <xref linkend="sect.import" /> for details.
               </para>
             </listitem>
           </varlistentry>
@@ -1035,7 +1009,7 @@
             <listitem>
               <para>
                 Creates a new document by importing the content of the clipboard.
-                See <xref linkend="sect.import"> for details.
+                See <xref linkend="sect.import" /> for details.
                 This item will only be enabled if the clipboard currently contains some
                 text.
               </para>
@@ -1093,7 +1067,7 @@
             <listitem>
               <para>
                 The entries in this submenu let you export the current annotated document in several
-                formats. See <xref linkend="sect.export"> for details.
+                formats. See <xref linkend="sect.export" /> for details.
               </para>
             </listitem>
           </varlistentry>
@@ -1186,7 +1160,7 @@
             <listitem>
               <para>
                 Selecting this item will show the Word Lookup dialog (see 
-                <xref linkend="sect.wordlookup">). If some text is selected in the current
+                <xref linkend="sect.wordlookup" />). If some text is selected in the current
                 document, this text will be automatically searched using the current dialog 
                 settings.
               </para>
@@ -1197,7 +1171,7 @@
             <listitem>
               <para>
                 Selecting this item will show the preferences dialog (see 
-                <xref linkend="sect.preferences">).
+                <xref linkend="sect.preferences" />).
               </para>
             </listitem>
           </varlistentry>
@@ -1276,7 +1250,7 @@
                 Toggles the visibility of the reading and translation of this annotation.
                 If an annotation is hidden, the document view will only display the word,
                 but not the reading and annotation. This also influences how this annotation
-                is treated when the document is exported (see <xref linkend="sect.export">).
+                is treated when the document is exported (see <xref linkend="sect.export" />).
               </para>
             </listitem>
           </varlistentry>
@@ -1314,7 +1288,7 @@
             <listitem>
               <para>
                 Adds the word of the currently selected annotation to the list of
-                words excluded from automatic annotation (see <xref linkend="sect.prefs.exclusions">).
+                words excluded from automatic annotation (see <xref linkend="sect.prefs.exclusions" />).
               </para>
             </listitem>
           </varlistentry>
@@ -1323,7 +1297,7 @@
             <listitem>
               <para>
                 Adds the word of the currently selected annotation to the user dictionary
-                (see <xref linkend="sect.userdict">).
+                (see <xref linkend="sect.userdict" />).
               </para>
             </listitem>
           </varlistentry>
@@ -1496,10 +1470,10 @@
     </para>
     <table><title>Pattern definitions</title>
       <tgroup cols="4">
-        <colspec colname="name" align="left">
-        <colspec colname="function" align="left" colwidth="3*">
-        <colspec colname="appearance" align="left" colwidth="2*">
-        <colspec colname="default" align="left">
+        <colspec colname="name" align="left" />
+        <colspec colname="function" align="left" colwidth="3*" />
+        <colspec colname="appearance" align="left" colwidth="2*" />
+        <colspec colname="default" align="left" />
         <thead>
           <row>
             <entry>Name</entry>
@@ -1550,9 +1524,9 @@
     </table>
     <table><title>Variables</title>
       <tgroup cols="3">
-        <colspec colname="name" align="left">
-        <colspec colname="description" align="left" colwidth="2*">
-        <colspec colname="appearance" align="left">
+        <colspec colname="name" align="left" />
+        <colspec colname="description" align="left" colwidth="2*" />
+        <colspec colname="appearance" align="left" />
         <thead>
           <row>
             <entry>Name</entry>
