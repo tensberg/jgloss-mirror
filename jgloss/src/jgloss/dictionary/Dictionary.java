@@ -71,4 +71,11 @@ public interface Dictionary {
      * @see WordReadingPair
      */
     List search( String expression, short mode) throws SearchException;
+
+    /**
+     * Called when the dictionary is no longer needed. This gives the dictionary the
+     * opportunity to dispose of used resources like open files or TCP/IP connections.
+     * After a call to this method the dictionary can no longer be used.
+     */
+    void dispose();
 } // interface Dictionary
