@@ -99,13 +99,6 @@ public class JGlossDocument extends HTMLDocument {
          */
         private boolean endAnnotation = false;
 
-        /**
-         * Flag if the parser is in an annotation wrapper element. The annotation wrapper element
-         * is inserted by the JGlossWriter to allow an annotation element anywhere in the
-         * document where the wrapper element is allowed by the HTML DTD.
-         */
-        private boolean inAnnotationWrapper = false;
-
         private char[] EMPTY_CHAR_ARRAY = new char[0];
         
         /**
@@ -315,14 +308,7 @@ public class JGlossDocument extends HTMLDocument {
          * @param a Attributes of the tag.
          * @param pos Position in the document.
          */
-        public void handleStartTag( HTML.Tag t, MutableAttributeSet a, int pos) {
-            // Skip an annotation wrapper element.
-            if (t.equals( JGlossWriter.ANNOTATION_WRAPPER) &&
-                a.containsAttribute( HTML.Attribute.CLASS, JGlossWriter.ANNOTATION_WRAPPER_CLASS)) {
-                inAnnotationWrapper = true;
-                return;
-            }
-            
+        public void handleStartTag( HTML.Tag t, MutableAttributeSet a, int pos) {           
             // In a JGloss document the annotation attribute will be encoded as a
             // string. Decode it here.
             if (a.isDefined( TEXT_ANNOTATION) && 
@@ -340,12 +326,6 @@ public class JGlossDocument extends HTMLDocument {
          * @param pos Position in the document.
          */
         public void handleEndTag(HTML.Tag t, int pos) {
-            // Skip an annotation wrapper element.
-            if (inAnnotationWrapper && t.equals( JGlossWriter.ANNOTATION_WRAPPER)) {
-                inAnnotationWrapper = false;
-                return;
-            }
-
             if (t.equals( HTML.Tag.P)) {
                 // make sure end of lines are handled correctly in layout by inserting a '\n'
                 // This is needed when an annotation at the end of a paragraph is removed.
