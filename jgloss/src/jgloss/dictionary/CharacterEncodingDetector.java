@@ -45,7 +45,7 @@ public class CharacterEncodingDetector {
     /**
      * Number of bytes which are read from the stream and looked at for detection.
      */
-    private final static int LOOK_AT_LENGTH = 1000;
+    private final static int LOOK_AT_LENGTH = 10000;
     
     private final static String ENC_ISO_2022_JP = "ISO-2022-JP";
     private final static String ENC_EUC_JP = "EUC-JP";
