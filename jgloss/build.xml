@@ -21,50 +21,158 @@
 
  $Id$
 
+ Requirements:
+
+ For compilation you only need a working installation of the Java Development Kit 1.4 or later
+ and a recent version of ant (http://ant.apache.org/)
+
+ To create the JGloss documentation files from the DocBook XML file jgloss.docbook.xml
+ you need to install Norman Walsh's DocBook XSL stylesheets (http://docbook.sourceforge.net/projects/xsl/)
+ and FOP (http://xml.apache.org/fop/).
+
 -->
 <project name="JGloss" default="jgloss" basedir=".">
   <description>
     Build file for the JGloss project
   </description>
 
-  <!-- environment-specific properties -->
-  <property name="xsl.docbook.html" value="/usr/share/sgml/docbook/xsl-stylesheets/html/docbook.xsl" />
+  <!-- environment-specific properties - change these settings to fit your system -->
+  <!-- Norman Walsh's DocBook XSL stylesheets are used to convert the JGloss documentation to HTML and PDF -->
+  <property name="xsl.docbook.html" value="/usr/share/sgml/docbook/xsl-stylesheets/html/chunk.xsl" />
   <property name="xsl.docbook.pdf" value="/usr/share/sgml/docbook/xsl-stylesheets/fo/docbook.xsl" />
+  <!-- FOP is used to convert the XSL-FO JGloss documentation file to PDF
+       You need to specify a Japanese font which is used in the created PDF. Define the font in the FOP userconfig.xml
+       and set the property fop.japanesefont to the font name.
+    -->
   <property name="fop.userconfig" value="/usr/local/fop/conf/userconfig.xml" />
   <property name="fop.japanesefont" value="Gothic" />
 
   <!-- build-specific properties -->
   <property name="release" value="2.0a3" />
+  <property name="distname.source" value="jgloss-${release}-src" />
+  <property name="distname.binary.jgloss" value="jgloss-${release}" />
+  <property name="distname.binary.jdictionary" value="jdictionary-${release}" />
   
-  <property name="jgloss-distname" value="jgloss-${release}" />
-  <property name="jdictionary-distname" value="jdictionary-${release}" />
-
   <property name="source" value="src" />
   <property name="source.doc" value="doc.src" />
   <property name="build" value="build" />
   <property name="dist" value="dist" />
+  <property name="dest.www" value="jgloss-www" />  
   <property name="dest.doc" value="doc" />  
   <property name="dest.doc.html" value="doc/html" />  
+  <property name="dest.javadoc" value="javadoc" />  
 
-  <property name="jgloss-sources"
+  <!-- root source files -->
+  <!-- jgloss -->
+  <property name="sources.jgloss"
     value="jgloss/JGlossApp.java
     jgloss/ui/export/XSLTExporter.java
     jgloss/ui/export/LaTeXExporter.java" />
+  <!-- jdictionary -->
+  <property name="sources.jdictionary"
+    value="jgloss/JDictionaryApp.java" />
+  <!-- kanaim -->
+  <property name="sources.im"
+    value="jgloss/ui/im/KanaInputMethodDescriptor.java" />
+  <!-- jgloss-www -->
+  <property name="sources.www"
+    value="jgloss/www/JGlossServlet.java" />
 
-  <!-- tasks -->
+  <!-- distribution filesets -->
+  <zipfileset id="dist.source" dir="." prefix="${distname.source}"
+    includes="README.txt COPYING ChangeLog Makefile
+              MANIFEST.MF MANIFEST.MF.jdictionary MANIFEST.MF.kanaim
+              src/** doc.src/** latex/**" />
+  <zipfileset id="dist.binary.jgloss" dir="." prefix="${distname.binary.jgloss}"
+    includes="jgloss.jar README.txt COPYING ChangeLog doc/** latex/**" />
+  <zipfileset id="dist.binary.jdictionary" dir="." prefix="${distname.binary.jdictionary}"
+    includes="jdictionary.jar README.txt COPYING ChangeLog doc/**" />
+    
+  <!-- additional task definitions -->
+  <!-- define the FOP task -->
   <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" />
 
   <!-- targets -->
-  <target name="jgloss" depends="compile-jgloss,resources,data">
+
+  <!-- JAR generation -->
+  <target name="jgloss" depends="compile.jgloss,resources,data">
     <jar destfile="jgloss.jar" basedir="${build}" manifest="MANIFEST.MF" />
   </target>
 
-  <target name="compile-jgloss">
-    <mkdir dir="${build}" />
-    <depend srcdir="${source}" destdir="${build}" cache="dependencies" closure="yes" />
-    <javac srcdir="${source}" destdir="${build}" includes="${jgloss-sources}" />
+  <target name="jdictionary" depends="compile.jdictionary,resources,data">
+    <jar destfile="jdictionary.jar" basedir="${build}" manifest="MANIFEST.MF.jdictionary" />
   </target>
 
+  <target name="im" depends="compile.im">
+    <mkdir dir="${build}/META-INF/services" />
+    <copy file="${source}/jgloss/ui/im/InputMethodDescriptor" tofile="${build}/META-INF/services/java.awt.im.spi.InputMethodDescriptor" />
+    <jar destfile="jdictionary.jar" basedir="${build}" manifest="MANIFEST.MF.kanaim" />
+  </target>
+
+  <target name="www" depends="compile.www,resources,data">
+    <mkdir dir="${dest.www}" />
+    <mkdir dir="${dest.www}/WEB-INF" />
+    <mkdir dir="${dest.www}/WEB-INF/classes" />
+    <copy todir="${dest.www}">
+      <fileset dir="${source}/www">
+        <include name="*.html" />
+        <include name="*.css" />
+        <include name="*.js" />
+      </fileset>
+    </copy>
+    <copy todir="${dest.www}/WEB-INF" file="${source}/www/web.xml" />
+    <copy todir="${dest.www}/WEB-INF/classes" >
+      <fileset dir="${build}" />
+    </copy>
+  </target>
+
+  <!-- distribution -->
+  <target name="dist" depends="clean,dist.source,dist.binary.jdictionary,dist.binary.jgloss" />
+
+  <target name="dist.source">
+    <mkdir dir="${dist}" />
+    <zip destfile="${dist}/${distname.source}.zip">
+      <zipfileset refid="dist.source" />
+    </zip>
+  </target>
+
+  <target name="dist.binary.jdictionary" depends="jdictionary,doc">
+    <mkdir dir="${dist}" />
+    <zip destfile="${dist}/${distname.binary.jdictionary}.zip">
+      <zipfileset refid="dist.binary.jdictionary" />
+    </zip>
+  </target>
+    
+  <target name="dist.binary.jgloss" depends="jgloss,doc">
+    <mkdir dir="${dist}" />
+    <zip destfile="${dist}/${distname.binary.jgloss}.zip">
+      <zipfileset refid="dist.binary.jgloss" />
+    </zip>
+  </target>
+
+  <!-- compilation -->
+  <target name="prepare-compile">
+    <mkdir dir="${build}" />
+    <depend srcdir="${source}" destdir="${build}" cache="dependencies" closure="yes" />
+  </target>
+
+  <target name="compile.jgloss" depends="prepare-compile">
+    <javac srcdir="${source}" destdir="${build}" includes="${sources.jgloss}" />
+  </target>
+
+  <target name="compile.jdictionary" depends="prepare-compile">
+    <javac srcdir="${source}" destdir="${build}" includes="${sources.jdictionary}" />
+  </target>
+
+  <target name="compile.im" depends="prepare-compile">
+    <javac srcdir="${source}" destdir="${build}" includes="${sources.im}" />
+  </target>
+
+  <target name="compile.www" depends="prepare-compile">
+    <javac srcdir="${source}" destdir="${build}" includes="${sources.www}" />
+  </target>
+
+  <!-- additional source handling -->
   <target name="resources" depends="properties,maps,icons" />
 
   <target name="properties">
@@ -93,21 +201,14 @@
     </copy>
   </target>
 
-  <target name="clean">
-    <delete dir="${build}" />
-    <delete dir="${dist}" />
-    <delete>
-      <fileset dir="." includes="*.jar" />
-    </delete>
-    <delete dir="dependencies" />
-    <delete dir="doc" />
-  </target>
-
-  <target name="doc" depends="doc-html,doc-pdf" />
+  <!-- documentation -->
+  <target name="doc" depends="doc.html,doc.pdf" />
   
-  <target name="doc-html">
-    <mkdir dir="doc/html" />
+  <target name="doc.html">
+    <mkdir dir="${dest.doc.html}" />
     <mkdir dir="${build}" />
+    <!-- It is not possible to directly pass the location of the docbook.xsl file from the buildfile to the custom xsl stylesheet.
+         So I am writing the location to a temporary file, which is included by the custom stylesheet. -->
     <echo file="${build}/stylesheet.html.xsl" append="false"><![CDATA[<?xml version="1.0" ?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="1.0"
@@ -119,9 +220,11 @@
     <xslt in="${source.doc}/jgloss.docbook.xml" out="${dest.doc.html}/index.html" style="${source.doc}/stylesheet.html.xsl" />
   </target>
 
-  <target name="doc-pdf">
-    <mkdir dir="doc" />
+  <target name="doc.pdf">
+    <mkdir dir="${dest.doc}" />
     <mkdir dir="${build}" />
+    <!-- It is not possible to directly pass the location of the docbook.xsl file from the buildfile to the custom xsl stylesheet.
+         So I am writing the location to a temporary file, which is included by the custom stylesheet. -->
     <echo file="${build}/stylesheet.pdf.xsl" append="false"><![CDATA[<?xml version="1.0" ?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="1.0"
@@ -135,5 +238,26 @@
     </xslt>
     <fop fofile="${build}/jgloss.fo" outfile="${dest.doc}/jgloss.pdf" format="application/pdf" messagelevel="warn" 
       userconfig="${fop.userconfig}" />
+  </target>
+
+  <!-- misc -->
+  <target name="clean">
+    <delete dir="${build}" />
+    <delete dir="${dist}" />
+    <delete>
+      <fileset dir="." includes="*.jar" />
+    </delete>
+    <delete dir="dependencies" />
+    <delete dir="${dest.doc.html}" />
+    <delete dir="${dest.doc}" />
+    <delete dir="${dest.javadoc}" />
+  </target>
+
+  <target name="javadoc">
+    <javadoc sourcepath="${source}" destdir="${dest.javadoc}"
+      access="package" windowtitle="JGloss documentation" doctitle="JGloss documentation" use="true">
+      <package name="jgloss.*" />
+      <excludepackage name="jgloss.www" />
+    </javadoc>
   </target>
 </project>
