@@ -56,7 +56,8 @@ dictionary.load=Loading dictionary {0}.
 
 edict.buildindex=Building index for dictionary {0}.\nThis can take some time.
 edict.writejjdx=Writing JJDX index for dictionary {0}.
-edict.warning.jjdxversion=WARNING: the version number of the JJDX index for {0} is higher than the version supported by this version of JGloss.
+edict.warning.jjdxversion=WARNING: the version number of the JJDX index for {0} is higher than\nthe version supported by this version of JGloss.
+edict.warning.jjdxsize=WARNING: the JJDX index file size for {0} does not match the size\ngiven in the index header.
 edict.error.writejjdx=Error while writing the JJDX file: {0}, {1}
 edict.error.writedictionary=Error while writing the dicionary file: {0}, {1}
 edict.editable.name=EDICT (editable)

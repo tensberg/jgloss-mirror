@@ -36,30 +36,6 @@ import java.text.MessageFormat;
  * @author Michael Koch
  */
 public class EDict implements Dictionary {
-    public static void main( String[] args) throws Exception {
-        //EDict e = new EDict( "/usr/share/edict/edict", true);
-        //EDict e = new EDict( "/home/michael/japan/dictionaries/edict2", true);
-        EDict e = new EDict( "/home/michael/yeardic", true);
-        String line;        
-        BufferedReader in = new BufferedReader( new InputStreamReader
-            ( new FileInputStream( "/home/michael/yeardic"), "EUC-JP"));
-        Set s = new HashSet(401);
-        while ((line=in.readLine()) != null) {
-            s.add( line);
-        }
-        System.err.println( "Lines read: " + s.size());
-        List l = e.search( "year", SEARCH_ANY_MATCHES, RESULT_DICTIONARY_ENTRIES);
-        System.err.println( "Matches found: " + l.size());
-        for ( Iterator i=l.iterator(); i.hasNext(); ) {
-            String next = i.next().toString();
-            //System.err.println( next);
-            s.remove( next);
-        }
-        System.err.println( "Entries remaining: " + s.size());
-        for ( Iterator i=s.iterator(); i.hasNext(); )
-            System.err.println( i.next());
-    }
-
     /**
      * Filename extension of an XJDX-format index. Will be added to the filename of the
      * dictionary.
@@ -355,20 +331,13 @@ public class EDict implements Dictionary {
                                             "\nMalformed dictionary entry: " + entry);
                         continue;
                     }
-                    // count number of translations
-                    int slashes = 1;
-                    for ( int x=i+1; x<entry.length(); x++)
-                        if (entry.charAt( x)=='/')
-                            slashes++;
-                    String[] translation = new String[slashes-1];
-                    slashes = 0;
-                    j = entry.lastIndexOf( '/');
-                    while (i < j) {
-                        k = entry.indexOf( '/', i+1);
-                        translation[slashes++] = entry.substring( i+1, k);
+                    ArrayList translations = new ArrayList( 10);
+                    while ((k=entry.indexOf( '/', i+1)) != -1) {
+                        translations.add( entry.substring( i+1, k));
                         i = k;
                     }
-                    result.add( new DefaultDictionaryEntry( word, reading, translation, this));
+                    translations.trimToSize();
+                    result.add( new DefaultDictionaryEntry( word, reading, translations, this));
                 }
             }
         } catch (IOException ex) {
@@ -597,6 +566,7 @@ public class EDict implements Dictionary {
         preBuildIndex();
         addIndexRange( 0, dictionaryLength);
         postBuildIndex();
+        System.out.println( indexLength + " entries");
     }
 
     /**

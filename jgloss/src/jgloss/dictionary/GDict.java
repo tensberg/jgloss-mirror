@@ -24,6 +24,7 @@
 package jgloss.dictionary;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
 import java.util.List;
 import java.util.ArrayList;
@@ -40,22 +41,6 @@ public class GDict extends FileBasedDictionary {
         GDict g = new GDict( new File( "/home/michael/japan/dictionaries/gdict/gdictutf.txt"), true);
         //g.search( "\u6f22\u5b57", SEARCH_ANY_MATCHES);
         g.search( args[0], SEARCH_ANY_MATCHES, RESULT_DICTIONARY_ENTRIES);
-        /*test( TRANSLATIONS_PATTERN, "sentence 1.");
-        test( TRANSLATIONS_PATTERN, "[1] sentence 1. [2] sentence 2.");
-        test( TRANSLATIONS_PATTERN, "[1] sentence 1; sentence 3. [2] sentence 2.");
-        test( TRANSLATIONS_PATTERN, "[1] ...-Theater; ...-Schauspieltruppe. [2] Sternbild; Sternzeichen.");*/
-    }
-
-    private static void test( Pattern p, String test) throws Exception {
-        System.err.println( "Testing " + test);
-        Matcher m = p.matcher( test);
-        int c = m.groupCount();
-        //System.err.println( c + " groups");
-        while (m.find()) {
-            System.err.println( "Found one");
-            for ( int i=1; i<=c; i++)
-                System.err.println( m.group( i));
-        }
     }
 
     /**
@@ -144,7 +129,7 @@ public class GDict extends FileBasedDictionary {
     }
 
     protected void parseEntry( List result, String entry, int entrystart, int where, 
-                               String expression, byte[] exprBytes,
+                               String expression, ByteBuffer exprbuf,
                                short searchmode, short resultmode) {
         //System.err.println( entry);
         try {
@@ -278,18 +263,51 @@ public class GDict extends FileBasedDictionary {
      */
     private int indexPosition = INDEX_FIRST_LINE;
 
-    protected int readNextCharacter( boolean inWord) throws BufferUnderflowException {
+    protected void skipEntries( ByteBuffer buf, int c) {
         // skip the first line in the dictionary since it is a description of the index format and
         // not an entry
         if (indexPosition == INDEX_FIRST_LINE) {
-            byte c;
+            byte c2;
             do {
-                c = dictionary.get();
-            } while (!isEntrySeparator( c)); // search end of line
+                c2 = buf.get();
+            } while (!isEntrySeparator( c2)); // search end of line
             indexPosition = INDEX_IN_WORD;
+            return;
         }
+        
+        // adjust index position
+        if (c == '|') {
+            switch (indexPosition) {
+            case INDEX_IN_WORD:
+                indexPosition = INDEX_IN_READING;
+                break;
+                
+            case INDEX_IN_READING:
+                // skip over part of speech
+                do {
+                    c = buf.get();
+                } while (c!='|' && !isEntrySeparator( (byte) c));
+                indexPosition = INDEX_IN_TRANSLATION;
+                break;
+                
+            case INDEX_IN_TRANSLATION:
+                // skip to next entry
+                do {
+                    c = buf.get();
+                } while (!isEntrySeparator( (byte) c));
+                // indexPosition will be adjusted in the following if statement
+                break;
+            }
+            
+            // adjust for new entry
+            if (isEntrySeparator( (byte) c)) // note that c might have been changed while skipping 
+                // in previous switch block
+                indexPosition = INDEX_IN_WORD;
+        }
+    }
 
-        byte b = dictionary.get();
+    protected int readCharacter( ByteBuffer buf) throws BufferUnderflowException {
+        byte b = buf.get();
         int c;
         // the dictionary is UTF-8 encoded; if the highest bit is set, more than one byte must be read
         if ((b&0x80) == 0) {
@@ -297,7 +315,7 @@ public class GDict extends FileBasedDictionary {
             c = b;
         }
         else if ((b&0xe0) == 0xc0) { // 2-byte encoded char
-            byte b2 = dictionary.get();
+            byte b2 = buf.get();
             if ((b2&0xc0) == 0x80) // valid second byte
                 c = ((b&0x1f) << 6) | (b&0x3f);
             else {
@@ -306,8 +324,8 @@ public class GDict extends FileBasedDictionary {
             }
         }
         else if ((b&0xf0) == 0xe0) { // 3-byte encoded char
-            byte b2 = dictionary.get();
-            byte b3 = dictionary.get();
+            byte b2 = buf.get();
+            byte b3 = buf.get();
             if (((b2&0xc0) == 0x80) &&
                 ((b3&0xc0) == 0x80)) { // valid second and third byte
                 c = ((b&0x0f) << 12) | ((b2&0x3f) << 6) | (b3&0x3f);
@@ -322,36 +340,16 @@ public class GDict extends FileBasedDictionary {
             c = '?';
         }
 
-        // adjust index position
-        if (c == '|') {
-            switch (indexPosition) {
-            case INDEX_IN_WORD:
-                indexPosition = INDEX_IN_READING;
-                break;
-                
-            case INDEX_IN_READING:
-                // skip over part of speech
-                do {
-                    c = dictionary.get();
-                } while (c!='|' && !isEntrySeparator( (byte) c));
-                indexPosition = INDEX_IN_TRANSLATION;
-                break;
-            
-            case INDEX_IN_TRANSLATION:
-                // skip to next entry
-                do {
-                    c = dictionary.get();
-                } while (!isEntrySeparator( (byte) c));
-                // indexPosition will be adjusted in the following if statement
-                break;
-            }
-        }
+        // convert katakana->hiragana
+        if (StringTools.isKatakana( (char) c))
+            c -= 96; // katakana-hiragana difference is 96 code points
+        else
+            c = Character.toLowerCase( (char) c);
 
-        // adjust for new entry
-        if (isEntrySeparator( (byte) c)) // note that c might have been changed while skipping 
-                                         // in previous switch block
-            indexPosition = INDEX_IN_WORD;
+        return c;
+    }
 
+    protected int isWordCharacter( int c, boolean inWord) {
         if (c>=0x4e00 && c<0xa000)
             return 0; // kanji
         else if (c>=3000 && c<3100)

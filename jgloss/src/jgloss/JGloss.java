@@ -113,18 +113,22 @@ public class JGloss {
     public static void main( String args[]) {
         try {
             // register dictionaries
-            DictionaryFactory.registerImplementation( EDictNIO.class, EDictNIO.implementation);
             DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
             DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
-            // Register GDict. This has to be done extra carefully, because it is not supported under
-            // J2SE 1.3
+            // Register GDict and EDictNIO. This has to be done extra carefully, because it is 
+            // not supported under J2SE 1.3
             try {
                 Class gdict = Class.forName( "jgloss.dictionary.GDict");
                 DictionaryFactory.registerImplementation
                     ( gdict, (DictionaryFactory.Implementation)
                       gdict.getField( "implementation").get( null));
+                Class edictnio = Class.forName( "jgloss.dictionary.EDictNIO");
+                DictionaryFactory.registerImplementation
+                    ( edictnio, (DictionaryFactory.Implementation)
+                      edictnio.getField( "implementation").get( null));
             } catch (NoClassDefFoundError ex) {
                 // this is normal on J2SE 1.3. In this case, GDict is not available.
+                DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
             }
 
             // register text parsers

@@ -26,6 +26,7 @@ package jgloss.dictionary;
 import java.io.*;
 import java.nio.*;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -39,7 +40,7 @@ import java.util.regex.Matcher;
  */
 public class EDictNIO extends FileBasedDictionary {
     public static void main( String[] args) throws Exception {
-        EDictNIO dict = new EDictNIO( new File( "/usr/share/edict/edict"), false);
+        /*EDictNIO dict = new EDictNIO( new File( "/usr/share/edict/edict"), false);
         BufferedReader in = new BufferedReader( new InputStreamReader
             ( new FileInputStream( "/usr/share/edict/edict"), "EUC-JP"));
         BufferedWriter out = new BufferedWriter( new OutputStreamWriter
@@ -66,17 +67,18 @@ public class EDictNIO extends FileBasedDictionary {
         }
         in.close();
         out.close();
-        System.exit( 0);
+        System.exit( 0);*/
 
         //EDict eo = new EDict( "/home/michael/testdic", true);
         //EDictNIO en = new EDictNIO( new File( "/home/michael/testdic"), true);
         EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
+        //EDictNIO eo = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
         EDict eo = new EDict( "/home/michael/japan/dictionaries/edict2", true);
         //EDictNIO en = new EDictNIO( new File( "/usr/share/edict/edict"), true);
         //EDict eo = new EDict( "/usr/share/edict/edict", true);
         //test( "regular (stops at every station) Jouetsu-line shinkansen", en, eo, SEARCH_ANY_MATCHES);
         
-        /*Matcher word = Pattern.compile( "^(\\S+)").matcher( "");
+        Matcher word = Pattern.compile( "^(\\S+)").matcher( "");
         Matcher reading = Pattern.compile( "\\[(.*?)\\]").matcher( "");
         Matcher translation = Pattern.compile( "/(.*?)/").matcher( "");
         String line;
@@ -97,7 +99,7 @@ public class EDictNIO extends FileBasedDictionary {
                 test( translation.group( 1), en, eo);
         }
         System.err.println( "Time (NIO): " + (t1/1000.0));
-        System.err.println( "Time (old): " + (t2/1000.0));*/
+        System.err.println( "Time (old): " + (t2/1000.0));
     }
 
     private final static void test( String word, Dictionary d1, Dictionary d2) 
@@ -235,11 +237,11 @@ public class EDictNIO extends FileBasedDictionary {
 
     /**
      * Parses an EDICT formatted entry. The format is
-     * <CODE>word [reading] /translation 1/translation2/...</CODE> with the reading
+     * <CODE>word [reading] /translation 1/translation 2/...</CODE> with the reading
      * being optional.
      */
     protected void parseEntry( List result, String entry, int entrystart, int where, String expression,
-                               byte[] exprBytes, short searchmode, short resultmode) {
+                               ByteBuffer exprbuf, short searchmode, short resultmode) {
         int j, k;
         // word:
         String word;
@@ -257,20 +259,13 @@ public class EDictNIO extends FileBasedDictionary {
         
             // translations
             i = entry.indexOf( '/', i);
-            // count number of translations
-            int slashes = 1;
-            for ( int x=i+1; x<entry.length(); x++)
-                if (entry.charAt( x)=='/')
-                    slashes++;
-            String[] translation = new String[slashes-1];
-            slashes = 0;
-            j = entry.lastIndexOf( '/');
-            while (i < j) {
-                k = entry.indexOf( '/', i+1);
-                translation[slashes++] = entry.substring( i+1, k);
+            ArrayList translations = new ArrayList( 10);
+            while ((k=entry.indexOf( '/', i+1)) != -1) {
+                translations.add( entry.substring( i+1, k));
                 i = k;
             }
-            result.add( new DefaultDictionaryEntry( word, reading, translation, this));
+            translations.trimToSize();
+            result.add( new DefaultDictionaryEntry( word, reading, translations, this));
         } catch (StringIndexOutOfBoundsException ex) {
             System.err.println( "EDICT warning: " + dicfile +
                                 "\nMalformed dictionary entry: " + entry);
@@ -278,17 +273,41 @@ public class EDictNIO extends FileBasedDictionary {
 
     }
     
-    protected int readNextCharacter( boolean inWord) {
-        int c = byteToUnsignedByte( dictionary.get());
+    /**
+     * Reads a EUC-JP encoded character from the buffer. ASCII uppercase is converted to lowercase,
+     * Katakana is converted to hiragana. The value returned is the 1-3 bytes long EUC-JP encoded
+     * character.
+     */
+    protected int readCharacter( ByteBuffer buf) throws BufferUnderflowException {
+        int c = byteToUnsignedByte( buf.get());
+        if (c < 128) { // 1-Byte ASCII
+            // uppercase -> lowercase conversion
+            if ((c >= 'A') && (c <= 'Z')) c |= 0x20;
+        }
+        else { // 2/3-Byte Japanese
+            boolean threebyte = false;
+            if (c == 0xA5) // convert katakana to hiragana
+                c = 0xA4;
+            else if (c == 0x8f) // JIS X 0212 3-Byte Kanji
+                threebyte = true;
+            // read second byte
+            c = (c<<8) | byteToUnsignedByte( buf.get());
+            if (threebyte) // read third byte
+                c = (c<<8) | byteToUnsignedByte( buf.get());
+        }
+
+        return c;
+    }
+
+    /**
+     * Decide how a character should be treated for index creation.
+     *
+     * @param c EUC-JP encoded, 1-3 bytes long character.
+     */
+    protected int isWordCharacter( int c, boolean inWord) {
         if (c > 127) { // multibyte character in EUC-JP encoding
-            // skip second byte
-            dictionary.get();
-            if (c >= 0xb0) // kanji
+            if (c >= 0xb000) // 2- or 3-byte kanji
                 return 0;
-            if (c == 0x8f) { // JIS X 0212 3-Byte kanji {
-                dictionary.get(); // skip third byte
-                return 0;
-            }
             // otherwise kana
             return 1;
         }
@@ -301,68 +320,6 @@ public class EDictNIO extends FileBasedDictionary {
             else
                 return -1; // not in index word
         }
-    }
-
-    protected static class EDictState implements ByteConverterState {
-        /**
-         * Multibyte char is 1 byte long.
-         */
-        public final static int ONE_BYTE = 1;
-        /**
-         * Multibyte char is 2 bytes long.
-         */
-        public final static int TWO_BYTES = 2;
-        /**
-         * Multibyte char is 3 bytes long.
-         */
-        public final static int THREE_BYTES = 3;
-        /**
-         * Byte in multibyte character
-         */
-        public int byteInChar;
-        /**
-         * Number of bytes in multibyte character
-         */
-        public int type;
-
-        public EDictState() {
-            reset();
-        }
-
-        public void reset() {
-            byteInChar = 1;
-            type = ONE_BYTE;
-        }
-    }
-
-    protected int convertByteInChar( int c, boolean last, ByteConverterState bstate) {
-        EDictState state = (EDictState) bstate;
-        if (state.byteInChar == 1) { // first byte in multibyte character
-            if (c < 128) { // ASCII char
-                state.type = EDictState.ONE_BYTE;
-                // uppercase -> lowercase conversion
-                if ((c >= 'A') && (c <= 'Z')) c |= 0x20;
-            }
-            else {
-                // convert katakana to hiragana
-                if (c == 0xA5)
-                    c = 0xA4;
-                state.type = EDictState.TWO_BYTES;
-                if (c == 0x8f) // JIS X 0212 3-Byte Kanji
-                    state.type = EDictState.THREE_BYTES;
-            }
-        }
-        if (last) {
-            state.byteInChar++;
-            if (state.byteInChar > state.type)
-                state.byteInChar = 1;
-        }
-
-        return c;
-    }
-
-    protected ByteConverterState newByteConverterState() {
-        return new EDictState();
     }
 
     public String toString() {
