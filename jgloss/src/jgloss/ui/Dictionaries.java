@@ -289,7 +289,7 @@ public class Dictionaries extends Box {
 
     /**
      * Apply the new preference setting to already opened document. Does nothing since
-     * no changed need to be applied.
+     * there are no changes which will apply instantly.
      */
     public void applyPreferences() {}
 } // class Dictionaries
