@@ -349,7 +349,7 @@ public class StyleDialog extends Box {
         // enable editing
         b = Box.createHorizontalBox();
         b.add( Box.createHorizontalStrut( 3));
-        enableEditing = new JCheckBox( JGloss.messages.getString( "prefs.editor.enableediting"));
+        enableEditing = new JCheckBox( JGloss.messages.getString( "style.editor.enableediting"));
         b.add( enableEditing);
         b.add( Box.createHorizontalGlue());
         this.add( b);
