@@ -27,32 +27,34 @@ import javax.swing.text.html.HTML;
 
 /**
  * Class enumerating the custom HTML tags used for modelling annotations in a document.
- * An {@link #ANNOTATION ANNOTATION} element does not contain text itself and has exactly three children:
- * <UL>
- * <LI>A {@link #READING READING} element the text of which it spans the reading annotation.</LI>
- * <LI>A {@link #KANJI KANJI} element. This element contains the text of the original document 
- *     and represents the text which is annotated.</LI>
- * <LI>A {@link #TRANSLATION TRANSLATION} element which contains the translation of the annotated text.</LI>
- * </UL>
  *
  * @author Michael Koch
  */
 public class AnnotationTags extends HTML.Tag {
     /**
-     * Tag which is used to model an annotation. An annotation element
-     * has exactly one reading, one kanji and one translation element as children.
+     * Tag which is used to model an annotation. Content-model: WORD & TRANSLATION
      */
     public final static AnnotationTags ANNOTATION = new AnnotationTags( "anno", true, true);
     /**
-     * A tag which contains the reading annotation.
+     * A tag which contains the annotated word with reading annotations.
+     * Content-model: (BASE | READING_KANJI)*
+     */
+    public final static AnnotationTags WORD = new AnnotationTags( "word", true, true);
+    /**
+     * A tag which contains a word fragment with a reading annotation.
+     * Content-model: READING & KANJI
+     */
+    public final static AnnotationTags READING_BASETEXT = new AnnotationTags( "rb", true, true);
+    /**
+     * A tag which contains the reading annotation. Content-model: #pcdata*
      */
     public final static AnnotationTags READING = new AnnotationTags( "reading", false, false);
     /**
-     * A tag which contains the annotated text.
+     * A tag which contains the annotated text. Content-model: #pcdata*
      */
-    public final static AnnotationTags KANJI = new AnnotationTags( "kanji", false, false);
+    public final static AnnotationTags BASETEXT = new AnnotationTags( "bt", false, false);
     /**
-     * A tag which contains the translation of the annotated text.
+     * A tag which contains the translation of the annotated text. Content-model: #pcdata*
      */
     public final static AnnotationTags TRANSLATION = new AnnotationTags( "trans", false, false);
 
@@ -102,10 +104,14 @@ public class AnnotationTags extends HTML.Tag {
     public static HTML.Tag getAnnotationTagEqualTo( HTML.Tag htmlTag) {
         if (ANNOTATION.equals( htmlTag))
             return ANNOTATION;
+        if (WORD.equals( htmlTag))
+            return WORD;
+        if (READING_BASETEXT.equals( htmlTag))
+            return READING_BASETEXT;
         if (READING.equals( htmlTag))
             return READING;
-        if (KANJI.equals( htmlTag))
-            return KANJI;
+        if (BASETEXT.equals( htmlTag))
+            return BASETEXT;
         if (TRANSLATION.equals( htmlTag))
             return TRANSLATION;
         return htmlTag;

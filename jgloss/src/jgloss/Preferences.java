@@ -96,8 +96,6 @@ public class Preferences {
         "export.html.writetranslations";
     public static final String EXPORT_HTML_BACKWARDSCOMPATIBLE = 
         "export.html.backwardscompatible";
-    public static final String EXPORT_HTML_INTERACTIVE = 
-        "export.html.interactive";
     public static final String EXPORT_HTML_WRITEHIDDEN = 
         "export.html.writehidden";
 

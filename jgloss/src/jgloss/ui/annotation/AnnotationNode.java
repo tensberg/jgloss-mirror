@@ -50,18 +50,11 @@ public class AnnotationNode extends InnerNode {
      * The annotation element this node wraps.
      */
     private Element annotation;
-    /**
-     * The document text contained in the word element.
-     */
-    private String wordText;
-    /**
-     * The child which displays the current reading annotation.
-     */
-    private ReadingTranslationNode reading;
+    private WordNode word;
     /**
      * The child which displays the current translation annotation.
      */
-    private ReadingTranslationNode translation;
+    private TranslationTextNode translation;
     /**
      * Child which displays the dictionary form of the anntated word.
      */
@@ -73,6 +66,20 @@ public class AnnotationNode extends InnerNode {
     private String nodeText;
 
     /**
+     * Returns the text of the reading/annotation node.
+     */
+    public static String getElementText( Element element) {
+        try {
+            return element.getDocument().getText( element.getStartOffset(),
+                                                  element.getEndOffset()-
+                                                  element.getStartOffset());
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Creates a new annotation node for an annotation element. This will also create all
      * child nodes of the annotation.
      *
@@ -81,34 +88,33 @@ public class AnnotationNode extends InnerNode {
      */
     public AnnotationNode( InnerNode parent, Element annotation) {
         super( parent, new Vector( ((List) annotation.getAttributes().getAttribute
-                                   ( JGlossDocument.TEXT_ANNOTATION)).size()+2));
+                                   ( JGlossDocument.TEXT_ANNOTATION)).size()+3));
         // Note that the child elements are guraranteed to exist by the way the element is constructed
         // in JGlossDocument.JGlossReader.
         this.annotation = annotation;
-        Element wordElement = annotation.getElement( 1);
-        try {
-            this.wordText = wordElement.getDocument().getText( wordElement.getStartOffset(),
-                                                                 wordElement.getEndOffset()-
-                                                                 wordElement.getStartOffset());
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
-        }
+
+        word = new WordNode( this, annotation.getElement( 0)) {
+                public void updateReadingText() {
+                    super.updateReadingText();
+                    if (AnnotationNode.this != null) // is null while still in constructor
+                        AnnotationNode.this.updateNodeText();
+                }
+            };
+        if (word.getReadingCount() == 1)
+            // add single reading directly to tree
+            children.add( word.getReadings()[0]);
+        else
+            // add reading subtree
+            children.add( word);
         
-        reading = new ReadingTranslationNode( this, true) {
+        translation = new TranslationTextNode( this) {
                 public void setText( String text) {
                     super.setText( text);
                     updateNodeText();
                 }
             };
-        translation = new ReadingTranslationNode( this, false) {
-                public void setText( String text) {
-                    super.setText( text);
-                    updateNodeText();
-                }
-            };
-        dictionaryform = new DictionaryFormNode( this);
-        children.add( reading);
         children.add( translation);
+        dictionaryform = new DictionaryFormNode( this);
         children.add( dictionaryform);
 
         List annotations = (java.util.List) annotation.getAttributes().getAttribute
@@ -176,7 +182,7 @@ public class AnnotationNode extends InnerNode {
      * @return The text of the annotation.
      */
     public String getAnnotationText() {
-        String out = reading.toString() + "\n" + translation.toString();
+        String out = word.getReading() + "\n" + translation.toString();
         for ( int i=2; i<children.size(); i++) {
             Object child = children.elementAt( i);
             if (child instanceof DictionaryNode) {
@@ -197,25 +203,13 @@ public class AnnotationNode extends InnerNode {
         return nodeText;
     }
 
-    /**
-     * Returns the text of the word part of this annotation.
-     *
-     * @return The text of the word part.
-     */
-    public String getWordText() { return wordText; }
-
-    /**
-     * Returns the child node which manages the current reading annotation.
-     *
-     * @return The reading annotation child.
-     */
-    public ReadingTranslationNode getReadingNode() { return reading; }
+    public WordNode getWordNode() { return word; }
     /**
      * Returns the child node which manages the current translation annotation.
      *
      * @return The translation annotation child.
      */
-    public ReadingTranslationNode getTranslationNode() { return translation; }
+    public TranslationTextNode getTranslationNode() { return translation; }
 
     /**
      * Returns the node which displays the dictionary form of the annotated word.
@@ -271,7 +265,7 @@ public class AnnotationNode extends InnerNode {
     public void removeAnnotation() {
         try {
             JGlossDocument doc = ((JGlossDocument) annotation.getDocument());
-            doc.setOuterHTML( annotation, wordText);
+            doc.setOuterHTML( annotation, word.getWord());
             // remove the newline which the stupid HTMLDocument.insertHTML insists on adding
             doc.remove( annotation.getEndOffset()-1, 1);
         } catch (Exception ex) {
@@ -298,6 +292,7 @@ public class AnnotationNode extends InnerNode {
                 reading = "";
             dictionaryform.setWord( word);
             dictionaryform.setReading( reading);
+            this.word.setReading( word, reading);
         }
     }
 
@@ -306,10 +301,10 @@ public class AnnotationNode extends InnerNode {
      * have changed (for example after being hidden).
      */
     private void updateNodeText() {
-        String newNodeText = wordText + ":";
+        String newNodeText = word.getWord() + ":";
         if (isHidden()) {
             newNodeText += JGloss.messages.getString( "annotationeditor.entry.hidden");
-            String reading = getReadingNode().getText();
+            String reading = word.getReading();
             if (reading.length() > 0)
                 newNodeText += " " + reading;
             String translation = getTranslationNode().getText();

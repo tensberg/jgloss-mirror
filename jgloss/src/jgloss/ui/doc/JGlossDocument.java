@@ -106,7 +106,11 @@ public class JGlossDocument extends HTMLDocument {
      * Stores a newline character as a char array. Used by the <CODE>JGlossReader</CODE>.
      */
     private final static char[] NEWLINE = new char[] { '\n' };
-
+    /**
+     * Single space character as char array.
+     */
+    private final static char[] SINGLE_SPACE = new char[] { ' ' };
+    
     /**
      * Extends the <CODE>HTMLDocument.HTMLReader</CODE> to support the JGloss extensions
      * to HTML and the addition of annotations while loading a document.
@@ -137,11 +141,19 @@ public class JGlossDocument extends HTMLDocument {
          * but explicit or implied paragraphs are not interrupted.
          */
         private class AnnotationAction extends HTMLDocument.HTMLReader.TagAction {
+            private boolean forceParagraph;
+            
+            public AnnotationAction( boolean forceParagraph) {
+                this.forceParagraph = forceParagraph;
+            }
+
             public void start(HTML.Tag t, MutableAttributeSet a) {
-                // Force the creation of an implied paragraph if needed.
-                // An annotation element must always be enclosed by an explicit or
-                // implied paragraph.
-                addContent( EMPTY_CHAR_ARRAY, pos, 0, true);
+                if (forceParagraph) {
+                    // Force the creation of an implied paragraph if needed.
+                    // An annotation element must always be enclosed by an explicit or
+                    // implied paragraph.
+                    addContent( EMPTY_CHAR_ARRAY, pos, 0, true);
+                }
 
                 a.addAttribute( StyleConstants.NameAttribute, t);
                 ElementSpec es = new ElementSpec
@@ -184,9 +196,11 @@ public class JGlossDocument extends HTMLDocument {
             if (blockCompatible)
                 registerTag( AnnotationTags.ANNOTATION, new BlockAction());
             else
-                registerTag( AnnotationTags.ANNOTATION, new AnnotationAction());
+                registerTag( AnnotationTags.ANNOTATION, new AnnotationAction( true));
+            registerTag( AnnotationTags.WORD, new AnnotationAction( false));
+            registerTag( AnnotationTags.READING_BASETEXT, new AnnotationAction( false));
             registerTag( AnnotationTags.READING, new HTMLDocument.HTMLReader.CharacterAction());
-            registerTag( AnnotationTags.KANJI, new HTMLDocument.HTMLReader.CharacterAction());
+            registerTag( AnnotationTags.BASETEXT, new HTMLDocument.HTMLReader.CharacterAction());
             registerTag( AnnotationTags.TRANSLATION,
                          new HTMLDocument.HTMLReader.CharacterAction());
         }
@@ -208,29 +222,21 @@ public class JGlossDocument extends HTMLDocument {
                 super.handleText( data, pos);
                 return;
             }
-
+            
             try {
                 int from = 0; // from offset of the data currently worked on
                 int to = 0; // to offset of the data currently worked on
-                int i = 0; // index in the list of returned annotations
-
+                int resultindex = 0; // index in the list of returned annotations
+                
                 List result = parser.parse( data);
-
-                while (i < result.size()) {
+                
+                while (resultindex < result.size()) {
                     // get start of next annotation
-                    Parser.TextAnnotation ta = (Parser.TextAnnotation) result.get( i);
+                    Parser.TextAnnotation ta = (Parser.TextAnnotation) result.get( resultindex);
                     to = ta.getStart() - 1;
-
+                    
                     int talen = ta.getLength();
-                    // if this is a conjugated verb, cut off the non-kanji part
-                    if (ta instanceof AbstractAnnotation) {
-                        AbstractAnnotation tr = (AbstractAnnotation) ta;
-                        if (tr.getConjugation()!=null &&
-                            talen>tr.getConjugation().getConjugatedForm().length()) {
-                            talen -= tr.getConjugation().getConjugatedForm().length();
-                        }
-                    }
-
+                    
                     // handle text between annotations
                     if (to >= from) {
                         char[] d = new char[to-from+1];
@@ -238,37 +244,31 @@ public class JGlossDocument extends HTMLDocument {
                         super.handleText( d, pos);
                         pos += d.length;
                     }
-
+                    
                     // handle annotation
                     // get all annotations for this position in the text
                     List annotations = new ArrayList( 5);
                     annotations.add( ta);
-                    i++;
-                    while (i<result.size() && ((Parser.TextAnnotation) result.get( i))
+                    resultindex++;
+                    while (resultindex<result.size() && ((Parser.TextAnnotation) result.get( resultindex))
                            .getStart()<ta.getStart()+talen) {
-                        annotations.add( result.get( i));
-                        i++;
+                        annotations.add( result.get( resultindex));
+                        resultindex++;
                     }
-
-                    char[] word = new char[talen];
-                    System.arraycopy( data, ta.getStart(), word, 0, word.length);
                     
+                    String word = new String( data, ta.getStart(), talen);
                     String dictionaryWord = null; // null means same as word
-                    // the difference between dictionaryReading and reading is that
-                    // the conjugated part will be cut off the reading.
                     String dictionaryReading = null; // null means same as reading
                     String reading = null;
                     String translation = null;
                     if (ta instanceof Reading && !(ta instanceof Translation)) {
                         // get reading from annotations
                         Reading r = (Reading) ta;
-                        reading = r.getReading();
-                        Conjugation c = r.getConjugation();
-                        if (c!=null && reading!=null) {
-                            reading = reading.substring( 0, reading.length() - c
-                                                         .getDictionaryForm().length());
+                        reading = r.getReading(); // dictionary form of reading, real reading for
+                                                  // inflected verbs will be derived further down
+                        if (!r.getWord().equals( word)) {
                             dictionaryWord = r.getWord();
-                            dictionaryReading = r.getReading();
+                            dictionaryReading= r.getReading();
                         }
 
                         // try to find matching translation
@@ -285,12 +285,6 @@ public class JGlossDocument extends HTMLDocument {
                                     // the comparison is startsWith and not equals because it might
                                     // be an inflected verb.
                                     translation = de.getTranslations()[0];
-                                    // the dictionary entry may contain an inflected form the
-                                    // document reading didn't
-                                    if (((Translation) annotation).getConjugation() != null) {
-                                        dictionaryWord = de.getWord();
-                                        dictionaryReading = de.getReading();
-                                    }
                                     break;
                                 }
                             }
@@ -301,27 +295,20 @@ public class JGlossDocument extends HTMLDocument {
                         // pick the first reading and translation
                         Translation tr = (Translation) ta;
                         DictionaryEntry de = tr.getDictionaryEntry();
-                        reading = de.getReading();
-                        // if this is a inflected verb, cut off the conjugation part
-                        if (tr.getConjugation()!=null && reading!=null) {
-                            reading = reading.substring( 0, reading.length() - tr.getConjugation()
-                                                         .getDictionaryForm().length());
-
+                        reading = de.getReading(); // dictionary form of reading, real reading for
+                                                   // inflected verbs will be derived further down
+                        translation = de.getTranslations()[0];
+                        if (!de.getWord().equals( word)) {
                             dictionaryWord = de.getWord();
                             dictionaryReading = de.getReading();
                         }
-                        translation = de.getTranslations()[0];
                     }
-                    if (dictionaryReading!=null && dictionaryReading.equals( dictionaryWord))
-                        dictionaryReading = null;
-                    if (reading==null || reading.length()==0) 
-                        // there has to be at least 1 character for the layout to work
-                        reading = " ";
-                    else if (reading.equals( StringTools.toHiragana( new String( word))))
-                        // can happpen if hiragana is annotated
-                        reading = " ";
+
+                    if (reading!=null && reading.equals( StringTools.toHiragana( word)))
+                        // can happen if katakana or hiragana is annotated
+                        reading = null;
                     if (translation == null)
-                        translation = " ";
+                        translation = " "; // translation must always be set to a non-empty string
 
                     // insert the appropriate elements
                     SimpleAttributeSet a = new SimpleAttributeSet();
@@ -334,15 +321,58 @@ public class JGlossDocument extends HTMLDocument {
 
                     handleStartTag( AnnotationTags.ANNOTATION, ana, pos);
 
-                    handleStartTag( AnnotationTags.READING, a, pos);
-                    super.handleText( reading.toCharArray(), pos);
-                    pos += reading.length();
-                    handleEndTag( AnnotationTags.READING, pos);
+                    handleStartTag( AnnotationTags.WORD, a, pos);
 
-                    handleStartTag( AnnotationTags.KANJI, a, pos);
-                    super.handleText( word, pos);
-                    pos += word.length;
-                    handleEndTag( AnnotationTags.KANJI, pos);
+                    if (reading == null) {
+                        // There has to always be at least one reading.
+                        // Insert word with a single reading/base pair with an empty reading.
+                        handleStartTag( AnnotationTags.READING_BASETEXT, a, pos);
+                        handleStartTag( AnnotationTags.READING, a, pos);
+                        super.handleText( SINGLE_SPACE, pos);
+                        pos++;
+                        handleEndTag( AnnotationTags.READING, pos);
+                        handleStartTag( AnnotationTags.BASETEXT, a, pos);
+                        super.handleText( word.toCharArray(), pos);
+                        pos += word.length();
+                        handleEndTag( AnnotationTags.BASETEXT, pos);
+                        handleEndTag( AnnotationTags.READING_BASETEXT, pos);
+                    }
+                    else {
+                        // wr already contains the word/reading pairs
+                        String base = dictionaryWord;
+                        if (base == null)
+                            base = word;
+                        String[][] wr = StringTools.splitWordReading( word, base, reading);
+                        if (wr.length==1 && wr[0].length==1) {
+                            // Single word without reading. Since there has to be at least one
+                            // reading, use an empty string as reading.
+                            wr[0] = new String[] { wr[0][0], " " };
+                        }
+                        for ( int j=0; j<wr.length; j++) {
+                            if (wr[j].length == 1) {
+                                // word without reading, don't generate annotation
+                                handleStartTag( AnnotationTags.BASETEXT, a, pos);
+                                super.handleText( wr[j][0].toCharArray(), pos);
+                                pos += wr[j][0].length();
+                                handleEndTag( AnnotationTags.BASETEXT, pos);
+                            }
+                            else {
+                                // word with reading, create reading annotation
+                                handleStartTag( AnnotationTags.READING_BASETEXT, a, pos);
+                                handleStartTag( AnnotationTags.READING, a, pos);
+                                super.handleText( wr[j][1].toCharArray(), pos);
+                                pos += wr[j][1].length();
+                                handleEndTag( AnnotationTags.READING, pos);
+                                handleStartTag( AnnotationTags.BASETEXT, a, pos);
+                                super.handleText( wr[j][0].toCharArray(), pos);
+                                pos += wr[j][0].length();
+                                handleEndTag( AnnotationTags.BASETEXT, pos);
+                                handleEndTag( AnnotationTags.READING_BASETEXT, pos);
+                            }
+                        }
+                    }
+
+                    handleEndTag( AnnotationTags.WORD, pos);
 
                     handleStartTag( AnnotationTags.TRANSLATION, a, pos);
                     super.handleText( translation.toCharArray(), pos);
@@ -350,7 +380,7 @@ public class JGlossDocument extends HTMLDocument {
                     handleEndTag( AnnotationTags.TRANSLATION, pos);
 
                     handleEndTag( AnnotationTags.ANNOTATION, pos);
-
+                    
                     from = ta.getStart() + talen;
                     if (ta instanceof Reading && from<data.length &&
                         parser instanceof ReadingAnnotationParser &&

@@ -61,10 +61,10 @@ public class DictionaryFormNode extends InnerNode {
         AttributeSet attr = parent.getAnnotationElement().getAttributes();
         String word = (String) attr.getAttribute( JGlossDocument.DICTIONARY_WORD);
         if (word == null)
-            word = parent.getWordText(); // per definition
+            word = parent.getWordNode().getWord(); // per definition
         String reading = (String) attr.getAttribute( JGlossDocument.DICTIONARY_READING);
         if (reading == null)
-            reading = parent.getReadingNode().getText(); // per definition
+            reading = parent.getWordNode().getReading(); // per definition
 
         wordNode = new EditableTextNode( this, JGloss.messages.getString
                                          ( "annotationeditor.dictionaryform.word"), word) {
@@ -76,7 +76,7 @@ public class DictionaryFormNode extends InnerNode {
                     // The attribute will only be set if the dictionary form is different from
                     // the form in the document.
                     AnnotationNode anno = (AnnotationNode) DictionaryFormNode.this.getParent();
-                    if (text.equals( anno.getWordText()))
+                    if (text.equals( anno.getWordNode().getWord()))
                         text = null; // delete attribute
                     Element ae = anno.getAnnotationElement();
                     ((JGlossDocument) ae.getDocument()).setAttribute

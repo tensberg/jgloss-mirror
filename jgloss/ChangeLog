@@ -1,7 +1,12 @@
-0.9.3: (2001/08/31)
-	- Added new text parser infrastructure. There are now two parsers,
-	  the previous "Kanji" parser and a parser which uses the ChaSen
-	  morphological analysis tool.
+0.9.3: (2001/09/07)
+	- Annotations can now have more than one reading. In a word with
+	  more than one kanji substring, a reading is added for every
+	  substring. Non-kanji substrings don't get a reading annotation.
+	- Changed HTML generation. The generated HTML is now simpler, but
+	  may not work as well as previously with browsers which don't
+	  support ruby elements.
+	- There are now two text parsers, the previous "Kanji" parser and
+	  a parser which uses the ChaSen morphological analysis tool.
 	- Manual annotation addition now displays a dialog which lets you
 	  look up the annotation in the dictionaries before you add it.
 	- Fixed document name setting in save as.

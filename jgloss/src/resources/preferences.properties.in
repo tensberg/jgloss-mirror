@@ -76,7 +76,6 @@ export.plaintext.writehidden=false
 export.html.writereading=true
 export.html.writetranslations=true
 export.html.backwardscompatible=true
-export.html.interactive=true
 export.html.writehidden=false
 export.latex.writereading=true
 export.latex.writetranslations=false

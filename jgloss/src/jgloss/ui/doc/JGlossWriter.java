@@ -44,13 +44,13 @@ public class JGlossWriter extends HTMLWriter {
      * Current version of JGloss. Will be written to the generator meta-tag
      * of the generated file.
      */
-    public static int JGLOSS_VERSION = 92;
+    public static int JGLOSS_VERSION = 93;
     
     /**
      * Major version of the JGloss file format. The major version is changed if a
      * new file format revision has changes incompatible to previous versions.
      */
-    public static int FORMAT_MAJOR_VERSION = 1;
+    public static int FORMAT_MAJOR_VERSION = 2;
     /**
      * Minor version of the JGloss file format. The minor version is changed if a new
      * file format revision is changed in a way that it still is compatible to earlier
@@ -106,7 +106,7 @@ public class JGlossWriter extends HTMLWriter {
             Element ec = e.getElement( i);
             if (ec.getName().equalsIgnoreCase( HTML.Tag.HEAD.toString()) || 
                 ec.getName().equalsIgnoreCase( HTML.Tag.IMPLIED.toString())) {
-                // poor man's recursion
+                // poor man's recursion: iterate over children of ec
                 e = ec;
                 i = 0;
                 continue;

@@ -480,17 +480,17 @@ public class StyleDialog extends Box {
             style += additionalStyles.get( "body").toString();
         style += "}\n";
         
-        style += AnnotationTags.KANJI.getId() + " { ";
+        style += AnnotationTags.BASETEXT.getId() + " { ";
         if (JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR)) {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff)) + "; ";
         }
         else {
             // this removes, among other settings, the current background color settings
-            s.removeStyle( AnnotationTags.KANJI.getId());
+            s.removeStyle( AnnotationTags.BASETEXT.getId());
         }
-        if (additionalStyles.containsKey( AnnotationTags.KANJI.getId()))
-            style += additionalStyles.get( AnnotationTags.KANJI.getId()).toString();
+        if (additionalStyles.containsKey( AnnotationTags.BASETEXT.getId()))
+            style += additionalStyles.get( AnnotationTags.BASETEXT.getId()).toString();
         style += "}\n";
 
         style += AnnotationTags.READING.getId() + " { ";

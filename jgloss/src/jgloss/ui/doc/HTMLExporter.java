@@ -34,8 +34,7 @@ import javax.swing.text.html.*;
 /**
  * Exports the JGloss document as HTML file. The writer uses the Ruby Annotation
  * W3C recommendation (see <A HREF="http://www.w3.org/TR/ruby/">http://www.w3.org/TR/ruby/</A>
- * for the markup of the annotations. Optionally, the exported HTML will be made interactive
- * by only displaying the annotation when the mouse hovers over the text.
+ * for the markup of the annotations.
  *
  * @author Michael Koch
  */
@@ -61,14 +60,9 @@ public class HTMLExporter extends JGlossWriter {
      */
     private boolean writeTranslations;
     /**
-     * Flag if the the generated HTML should be more backwards
-     * compatible.
+     * Flag if the the generated HTML should be backwards compatible.
      */
     private boolean backwardsCompatible;
-    /**
-     * Flag if the generated HTML document should display popups for annotations.
-     */
-    private boolean interactive;
     /**
      * Flag if annotations marked as hidden should be written.
      */
@@ -83,25 +77,20 @@ public class HTMLExporter extends JGlossWriter {
      *
      * @param out The writer to which the document will be written.
      * @param encoding Character encoding the writer uses.
+     * @param doc The document to write.
      * @param writeReading Flag if reading annotations should be written in the HTML document.
      * @param writeTranslations Flag if translation annotations should be written in the HTML document.
-     * @param backwardsCompatible Flag if the the generated HTML should be more backwards
-     *        compatible. This mainly adds parentheses around the annotations, which will have
-     *        to be removed with javascript on browsers which support HTML Ruby Annotations.
-     * @param interactive Flag if the generated HTML document should display popups for annotations.
+     * @param backwardsCompatible Flag if the the generated HTML should be backwards compatible.
      * @param writeHidden Flag if annotations marked as hidden should be written.
-     * @param doc The document to write.
      */
     public HTMLExporter( Writer out, String encoding, JGlossDocument doc,
                          boolean writeReading, boolean writeTranslations,
-                         boolean backwardsCompatible,
-                         boolean interactive, boolean writeHidden) {
+                         boolean backwardsCompatible, boolean writeHidden) {
         super( out, encoding, doc);
         skipAll = false;
         this.writeReading = writeReading;
         this.writeTranslations = writeTranslations;
         this.backwardsCompatible = backwardsCompatible;
-        this.interactive = interactive;
         this.writeHidden = writeHidden;
     }
 
@@ -112,62 +101,126 @@ public class HTMLExporter extends JGlossWriter {
      */
     protected void startTag( Element elem)
         throws IOException, BadLocationException {
-        if (skipAll)
+        if (skipAll) // don't write descendants of an annotation element
             return;
 
         if (isAnnotationElement( elem)) {
             // construct an HTML element which will contain the reading and translation
             // annotations as attributes and enclose the kanji text.
+            Element wordelement = elem.getElement( 0);
+            StringBuffer word = new StringBuffer( 20); // base text including <rb> markup
+            StringBuffer base = new StringBuffer( 10); // base text without <rb> markup
 
-            String word = doc.getText( elem.getElement( 1).getStartOffset(),
-                                       elem.getElement( 1).getEndOffset()-
-                                       elem.getElement( 1).getStartOffset());
-            if ((writeReading || writeTranslations) && (writeHidden ||
-                !JGlossDocument.HIDDEN_ATTRIBUTE_TRUE.equals( elem.getAttributes().getAttribute
-                                                              ( JGlossDocument.HIDDEN_ATTRIBUTE)))) {
-                word = "<rbc><rb>" + word + "</rb></rbc>";
-                String reading = doc.getText( elem.getElement( 0).getStartOffset(),
-                                           elem.getElement( 0).getEndOffset()-
-                                           elem.getElement( 0).getStartOffset());
-                if (!reading.equals( " ")) {
-                    if (backwardsCompatible)
-                        reading = "\u300a" + reading + "\u300b";
-                    reading = "<rtc><rt class=\"re\">" + reading + "</rt></rtc>";
+            String translation = "";
+            boolean writeThisTranslation = writeTranslations && (writeHidden || !isHidden( elem));
+            if (writeThisTranslation) {
+                translation = doc.getText( elem.getElement( 1).getStartOffset(),
+                                           elem.getElement( 1).getEndOffset()-
+                                           elem.getElement( 1).getStartOffset());
+                writeThisTranslation &= !" ".equals( translation);
+            }
+
+            StringBuffer reading = new StringBuffer( 10);
+            boolean writeThisReading = writeReading && (writeHidden || !isHidden( elem));
+
+            // if useSimpleRuby is set, ruby annotations of the form
+            // <ruby><rb>base text</rb><rt>reading</rt></ruby> will be generated for every
+            // READING_BASETEXT element, and a BASETEXT without reading will be inserted as plain text.
+            // If not set, a complex ruby annotation of the form
+            // <ruby><rbc><rb>base<rb><rb...</rbc><rtc><rt>reading...</rtc>
+            // <rtc span=...><rt>translation</rt></rtc></ruby> will be generated for the
+            // whole annotation element.
+            boolean useSimpleRuby = backwardsCompatible || !writeThisTranslation;
+            StringBuffer rtc = null; // reading including <rt> markup
+            if (!useSimpleRuby)
+                rtc = new StringBuffer( 30);
+
+            for ( int i=0; i<wordelement.getElementCount(); i++) {
+                Element child = wordelement.getElement( i);
+                if (child.getElementCount() == 2) { // READING_BASETEXT element
+                    // extract BASETEXT text
+                    String thisbase = doc.getText( child.getElement( 1).getStartOffset(),
+                                                   child.getElement( 1).getEndOffset() -
+                                                   child.getElement( 1).getStartOffset());
+                    base.append( thisbase);
+                    String thisreading = " ";
+                    if (writeThisReading) {
+                        thisreading = doc.getText( child.getElement( 0).getStartOffset(),
+                                                   child.getElement( 0).getEndOffset() -
+                                                   child.getElement( 0).getStartOffset());
+                    }
+                    if (!" ".equals( thisreading)) {
+                        reading.append( thisreading);
+                        if (useSimpleRuby)
+                            word.append( "<ruby><rb>" + thisbase + "</rb><rp>\u300a</rp><rt>"
+                                         + thisreading + "</rt><rp>\u300b</rp></ruby>");
+                        else {
+                            word.append( "<rb>" + thisbase + "</rb>");
+                            rtc.append( "<rt>" + thisreading + "</rt>");
+                        }
+                    }
+                    else if (useSimpleRuby)
+                        word.append( thisbase);
+                    else {
+                        word.append( "<rb>" + thisbase + "</rb>");
+                        rtc.append( "<rt></rt>");
+                    }
                 }
-                String translation = doc.getText( elem.getElement( 2).getStartOffset(),
-                                                  elem.getElement( 2).getEndOffset()-
-                                                  elem.getElement( 2).getStartOffset());
-                if (!translation.equals( " ")) {
-                    if (backwardsCompatible)
-                        translation = "{" + translation + "}";
-                    translation = "<rtc><rt class=\"tr\">" + translation + "</rt></rtc>";
+                else { // BASETEXT element
+                    String thisbase = doc.getText( child.getStartOffset(),
+                                                   child.getEndOffset() -
+                                                   child.getStartOffset());
+                    base.append( thisbase);
+                    if (i < wordelement.getElementCount()-1) // don't include inflection
+                        reading.append( thisbase);
+                    if (useSimpleRuby)
+                        word.append( thisbase);
+                    else {
+                        word.append( "<rb>" + thisbase + "</rb>");
+                        rtc.append( "<rt></rt>");
+                    }
                 }
+            }
+
+            if (writeThisReading || writeThisTranslation) {
+                if (backwardsCompatible) {
+                    // Write a span tag with a mouseover trigger which shows the reading and
+                    // translation as popup.
+                    MutableAttributeSet attr = new SimpleAttributeSet();
                 
-                // construct a new attribute set with special attributes removed
-                MutableAttributeSet attr = new SimpleAttributeSet( elem.getAttributes());
-                attr.removeAttribute( JGlossDocument.TEXT_ANNOTATION);
-                attr.removeAttribute( JGlossDocument.LINKED_ANNOTATION);
-                attr.removeAttribute( JGlossDocument.HIDDEN_ATTRIBUTE);
-                
-                attr.addAttribute( "class", "an");
-                if (interactive) {
-                    attr.addAttribute( "onClick", "tp(this)");
-                    attr.addAttribute( "onMouseover", "sp(this)");
+                    attr.addAttribute( "class", "an");
+                    attr.addAttribute( "onMouseover", "sp(this,&quot;" + reading.toString() + 
+                                       "&quot;,&quot;" + translation + "&quot;)");
                     attr.addAttribute( "onMouseout", "hp(this)");
+                    write( "<span");
+                    writeAttributes( attr);
+                    write( ">");
                 }
-                write( "<span ");
-                writeAttributes( attr);
-                write( ">");
                 
-                write( "<ruby>" + word);
-                
-                if (writeReading && !reading.equals( " "))
-                    write( reading);
-                if (writeTranslations && !translation.equals( " "))
-                    write( translation);
+                if (useSimpleRuby)
+                    write( word.toString());
+                else {
+                    write( "<ruby><rbc>");
+                    write( word.toString());
+                    write( "</rbc><rtc>");
+                    write( rtc.toString());
+                    write( "</rtc>");
+                    if (writeThisTranslation) {
+                        write( "<rtc");
+                        if (wordelement.getElementCount() > 1)
+                            write( " span=\"" + wordelement.getElementCount() + "\"");
+                        write( "><rt>");
+                        write( translation);
+                        write( "</rt></rtc></ruby>");
+                    }
+                }
+
+                if (backwardsCompatible) {
+                    write( "</span>");
+                }
             }
             else
-                write( word);
+                write( base.toString()); // write unannotated word
 
             // skip all output until this element is closed
             skipAll = true;
@@ -177,12 +230,10 @@ public class HTMLExporter extends JGlossWriter {
             // add the document setup handler
             doc.setAttribute
                 ( (MutableAttributeSet) elem.getAttributes(),
-                  "onLoad", "setupDoc(" + String.valueOf( backwardsCompatible) + ","
-                  + String.valueOf( interactive) + ")");
+                  "onLoad", "setupDoc()");
             super.startTag( elem);
             doc.setAttribute
-                ( (MutableAttributeSet) elem.getAttributes(),
-                  "onLoad", null);
+                ( (MutableAttributeSet) elem.getAttributes(), "onLoad", null);
         }
         else
             super.startTag( elem);
@@ -191,15 +242,13 @@ public class HTMLExporter extends JGlossWriter {
     protected void endTag( Element elem) throws IOException {
         if (isAnnotationElement( elem)) {
             skipAll = false;
-            if ((writeReading || writeTranslations) && (writeHidden ||
-                !JGlossDocument.HIDDEN_ATTRIBUTE_TRUE.equals( elem.getAttributes().getAttribute
-                                                              ( JGlossDocument.HIDDEN_ATTRIBUTE)))) {
-                write( "</ruby></span>");
-            }
             return;
         }
 
-        if ((writeReading || writeTranslations) &&
+        if (skipAll)
+            return;
+
+        if (backwardsCompatible && writeTranslations &&
             elem.getAttributes().getAttribute( StyleConstants.NameAttribute)
             .equals( HTML.Tag.HEAD)) {
             try {
@@ -219,12 +268,12 @@ public class HTMLExporter extends JGlossWriter {
             }
         }            
 
-        if ((writeReading || writeTranslations) &&
+        if (backwardsCompatible && writeTranslations &&
             elem.getAttributes().getAttribute( StyleConstants.NameAttribute)
             .equals( HTML.Tag.BODY)) {
             // write DIV for floating popup
-            write( "<div id=\"reading-popup\" class=\"popup\">placeholder</div>\n");
-            write( "<div id=\"translation-popup\" class=\"popup\">placeholder</div>\n");
+            write( "<div id=\"reading-popup\" class=\"popup\">&nbsp;</div>\n");
+            write( "<div id=\"translation-popup\" class=\"popup\">&nbsp;</div>\n");
         }
 
         super.endTag( elem);
@@ -272,5 +321,13 @@ public class HTMLExporter extends JGlossWriter {
     protected boolean isAnnotationElement( Element elem) {
         return elem.getAttributes().getAttribute( StyleConstants.NameAttribute)
             .equals( AnnotationTags.ANNOTATION);
+    }
+
+    /**
+     * Tests if the HIDDEN attribute of an annotation element is set.
+     */
+    protected boolean isHidden( Element elem) {
+        return JGlossDocument.HIDDEN_ATTRIBUTE_TRUE.equals( elem.getAttributes().getAttribute
+                                                            ( JGlossDocument.HIDDEN_ATTRIBUTE));
     }
 } // class HTMLExporter

@@ -35,32 +35,9 @@ import javax.swing.text.*;
  *
  * @author Michael Koch
  */
-public class ReadingTranslationNode extends EditableTextNode {
-    /**
-     * Flag if this models a reading or translation annotation.
-     */
-    private boolean isReading;
-
-    /**
-     * Creates a new reading or annotation annotation node which wraps the given element.
-     *
-     * @param parent Parent of this node. Usually a {@link AnnotationNode AnnotationNode}.
-     * @param reading Element in the document which this node wraps.
-     * @param isReading <CODE>true</CODE> if this is a reading, <CODE>false</CODE> if this is a
-     *               translation annotation.
-     */
-    public ReadingTranslationNode( InnerNode parent, boolean isReading) {
-        super( parent, JGloss.messages.getString( isReading ? "annotationeditor.reading" :
-                                                  "annotationeditor.translation"), "");
-        this.isReading = isReading; // must be set before calling getElement()
-        Element reading = getElement();
-        try {
-            this.text = reading.getDocument().getText( reading.getStartOffset(),
-                                                       reading.getEndOffset()-
-                                                       reading.getStartOffset());
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
-        }
+public abstract class ReadingTranslationNode extends EditableTextNode {
+    public ReadingTranslationNode( InnerNode parent, String description, String text) {
+        super( parent, description, text);
     }
 
     /**
@@ -106,10 +83,5 @@ public class ReadingTranslationNode extends EditableTextNode {
      * The element object may change if the annotations are manipulated, so you should not
      * use it over longer intervals.
      */
-    private Element getElement() {
-        if (isReading)
-            return ((AnnotationNode) parent).getAnnotationElement().getElement( 0);
-        else // translation
-            return ((AnnotationNode) parent).getAnnotationElement().getElement( 2);
-    }
+    protected abstract Element getElement();
 } // class ReadingTranslationNode

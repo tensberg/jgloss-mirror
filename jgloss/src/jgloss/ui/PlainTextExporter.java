@@ -54,10 +54,7 @@ public class PlainTextExporter {
         StringBuffer text = null;
         try {
             text = new StringBuffer( doc.getText( 0, doc.getLength()));
-        } catch (BadLocationException ex) {
-            // What ?
-            ex.printStackTrace();
-        }
+        } catch (BadLocationException ex) {}
 
         // The reading and translation annotations are embedded in text.
         // They will be removed and depending on the settings of writeReading and 
@@ -65,29 +62,36 @@ public class PlainTextExporter {
         // Iterate over all annotations. We have to do that from back to front because the index
         // in the text changes.
         for ( int i=model.getAnnotationCount()-1; i>=0; i--) {
-            AnnotationNode node = model.getAnnotationNode( i);
-            Element ae = node.getAnnotationElement();
+            AnnotationNode annotation = model.getAnnotationNode( i);
+            Element ae = annotation.getAnnotationElement();
             // handle translation text
-            int tstart = ae.getElement( 2).getStartOffset();
-            int tend = ae.getElement( 2).getEndOffset();
+            int tstart = ae.getElement( 1).getStartOffset();
+            int tend = ae.getElement( 1).getEndOffset();
             String translation = text.substring( tstart, tend);
             if (writeTranslations && !translation.equals( " ") && 
-                (writeHidden || !node.isHidden()))
+                (writeHidden || !annotation.isHidden()))
                 translation = "(" + translation + ")";
             else
                 translation = ""; // remove translation
             text.replace( tstart, tend, translation);
 
-            // handle reading text
-            int rstart = ae.getElement( 0).getStartOffset();
-            int rend = ae.getElement( 0).getEndOffset();
-            String reading = text.substring( rstart, rend);
-            if (writeReading && !reading.equals( " ") &&
-                (writeHidden || !node.isHidden()))
-                // insert after kanji and before translation
-                text.insert( tstart, "\u300a" + reading + "\u300b");
-            // remove the old reading text
-            text.replace( rstart, rend, "");
+            // handle reading text in WORD element
+            Element wordelement = ae.getElement( 0);
+            for ( int j=wordelement.getElementCount()-1; j>=0; j--) {
+                Element child = wordelement.getElement( j);
+                if (child.getElementCount() == 2) { // READING_BASETEXT element
+                    int rstart = child.getElement( 0).getStartOffset();
+                    int rend = child.getElement( 0).getEndOffset();
+                    String reading = text.substring( rstart, rend);
+                    if (writeReading && !reading.equals( " ") &&
+                        (writeHidden || !annotation.isHidden()))
+                        // insert after kanji and before translation
+                        text.insert( child.getElement( 1).getEndOffset(), "\u300a" + reading + "\u300b");
+                    // remove the old reading text
+                    text.replace( rstart, rend, "");
+                }
+                // else: BASETEXT element, nothing to do
+            }
         }
 
         // Replace the two &nbsp;'s (non-breakable spaces) which were inserted 

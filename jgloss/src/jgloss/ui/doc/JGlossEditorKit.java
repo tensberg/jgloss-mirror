@@ -42,10 +42,17 @@ import javax.swing.text.html.parser.TagElement;
 /**
  * The <CODE>JGlossEditorKit</CODE> is an extension of the <CODE>HTMLEditorKit</CODE> 
  * with several additions to manage the generation and display of JGloss documents.
- * It also has to work around the shortcomings in the HTML document API.<BR>
+ * It also has to work around the shortcomings in the HTML document API.
  * It contains the views for the annotation
  * elements and its subelements as subclasses, since they share some view attribute state with the
  * <CODE>JGlossEditorKit</CODE> instance.
+ * <P>
+ * The DTD element definition for an annotation element is 
+ * <CODE>(#PCDATA|READING|BASETEXT|TRANSLATION)*</CODE>. Additional constraints which are
+ * not enforceable through the DTD but used throughout JGloss is that each reading element
+ * is followed by a kanji element, and there is exactly one translation element which is the
+ * last child of the annotation element.
+ * </P>
  *
  * @author Michael Koch
  */
@@ -85,8 +92,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
     /**
      * TagElements are used by the HTML parser to inquire properties of an element. This class
      * adds support for the annotation elements of JGloss.
-     *
-     * @author Michael Koch
      */
     private static class JGlossTagElement extends TagElement {
         /**
@@ -127,8 +132,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * {@link JGlossEditorKit.JGlossParser JGlossParser}. <CODE>JGlossParser</CODE> is derived from
      * <CODE>DocumentParser</CODE>, which prevents it from also being a 
      * <CODE>HTMLEditorKit.Parser</CODE>.
-     *
-     * @author Michael Koch
      */
     private class JGlossParserWrapper extends HTMLEditorKit.Parser {
         /**
@@ -154,8 +157,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
     /**
      * Parser for JGloss documents.
-     *
-     * @author Michael Koch
      */
     private class JGlossParser extends DocumentParser {
         /**
@@ -208,8 +209,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
     /**
      * Factory which creates views for elements in the JGloss document.
-     *
-     * @author Michael Koch
      */
     private class JGlossFactory extends HTMLEditorKit.HTMLFactory {
         /**
@@ -229,8 +228,20 @@ public class JGlossEditorKit extends HTMLEditorKit {
             AttributeSet a = elem.getAttributes();
             if (name.equals( AnnotationTags.ANNOTATION))
                 return new AnnotationView( elem);
-            else if (a.isDefined( AnnotationTags.KANJI) || a.isDefined( AnnotationTags.KANJI.getId()))
-                return new KanjiView( elem);
+            else if (name.equals( AnnotationTags.WORD))
+                return new WordView( elem);
+            else if (name.equals( AnnotationTags.READING_BASETEXT))
+                return new ReadingBaseView( elem);
+            else if (a.isDefined( AnnotationTags.BASETEXT) ||
+                     a.isDefined( AnnotationTags.BASETEXT.getId())) {
+                // If this is an annotated base, the parent is a READING_BASETEXT, otherwise it is
+                // a WORD. The two views must be aligned differently.
+                if (elem.getParentElement().getAttributes().getAttribute( StyleConstants.NameAttribute)
+                    .equals( AnnotationTags.WORD))
+                    return new BaseView( elem, VAdjustedView.ANNOTATED_TEXT_ALIGNMENT);
+                else
+                    return new BaseView( elem);
+            }
             else if (a.isDefined( AnnotationTags.TRANSLATION) || 
                      a.isDefined( AnnotationTags.TRANSLATION.getId()))
                 return new ReadingTranslationView( elem, AnnotationTags.TRANSLATION);
@@ -239,10 +250,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
             }
             else {
                 View v = super.create( elem);
-                if (v instanceof InlineView)
+                if (v instanceof InlineView) {
                     // The inline views do not have the text aligned to work properly with the
                     // annotation view. Replace it with a vertically adjusted view.
-                    return new VAdjustedView( elem);
+                    return new VAdjustedView( elem, VAdjustedView.BASE_TEXT_ALIGNMENT);
+                }
                 else
                     return v;
             }
@@ -251,11 +263,14 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
     /**
      * A view which renders an annotation. The view is a block, but will not cause a
-     * break in the flow.
-     *
-     * @author Michael Koch
+     * break in the flow. Child views are laid out vertically.
      */
     public class AnnotationView extends BlockView {
+        /**
+         * Flag if the first child of the word of this annotation has a reading (is a READING_BASETEXT).
+         */
+        private boolean startsAnnotated;
+
         /**
          * Creates a new view for an annotation element.
          *
@@ -263,42 +278,32 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         public AnnotationView( Element elem) {
             super( elem, View.Y_AXIS);
+            startsAnnotated = elem.getElement( 0).getElement( 0).getAttributes()
+                .getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.READING_BASETEXT);
         }
 
         /**
-         * Returns the minimum span of the view. Overridden to take into account the
-         * state of <CODE>compactView</CODE>.
+         * Returns the minimum span of the view. If compact view is set, the width of the
+         * translation view is ignored and only the width of the word is returned.
          */
         public float getMinimumSpan( int axis) {
-            if (compactView && axis==View.X_AXIS) {
-                // Only take enough space for the kanji subelement.
-                for ( int i=0; i<getViewCount(); i++) {
-                    if (getView( i) instanceof KanjiView) {
-                        return getView( i).getMinimumSpan( axis);
-                    }
-                }
-            }
-
-            return super.getMinimumSpan( axis);
+            if (axis==View.X_AXIS && compactView)
+                // view 0 is the view for the WORD element
+                return getView( 0).getMinimumSpan( axis);
+            else
+                return super.getMinimumSpan( axis);
         }
 
         /**
-         * Returns the preferred span of the view. Overridden to take into account the
-         * state of <CODE>compactView</CODE>.
+         * Returns the preferred span of the view. If compact view is set, the width of the
+         * translation view is ignored and only the width of the word is returned.
          */
         public float getPreferredSpan( int axis) {
-            if (compactView && axis==View.X_AXIS) {
-                // Only take enough space for the kanji subelement. The reading and annotation
-                // will still draw even outside of the allocated space, but if two annotations
-                // are close to eachother, the annotations can overlap.
-                for ( int i=0; i<getViewCount(); i++) {
-                    if (getView( i) instanceof KanjiView) {
-                        return getView( i).getPreferredSpan( axis);
-                    }
-                }
-            }
-
-            return super.getPreferredSpan( axis);
+            if (axis==View.X_AXIS && compactView)
+                // view 0 is the view for the WORD element
+                return getView( 0).getPreferredSpan( axis);
+            else
+                return super.getPreferredSpan( axis);
         }
 
         /**
@@ -306,7 +311,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * the preferred span.
          */
         public float getMaximumSpan( int axis) {
-            // Prevent the view from filling the whole line by not allowing it to grow
             return getPreferredSpan( axis);
         }
 
@@ -314,7 +318,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the state of the {@link JGlossDocument#HIDDEN_ATTRIBUTE hidden attribute}
          * of the annotation element rendered by this view.
          *
-         * @return <CODE>true</CODE> if the hidden attribute is set
+         * @return <CODE>true</CODE> if the hidden attribute is set.
          */
         public boolean isAnnotationHidden() {
             if (JGlossDocument.HIDDEN_ATTRIBUTE_TRUE.equals
@@ -330,19 +334,162 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * has to be changed if the annotation is hidden.
          */
         public float getAlignment( int axis) {
-            if ((!showReading || isAnnotationHidden()) && axis==View.Y_AXIS)
-                return -0.15f;
+            if (axis == View.Y_AXIS) {
+                if (!showReading || isAnnotationHidden())
+                    return VAdjustedView.BASE_TEXT_ALIGNMENT;
+                else if (!startsAnnotated) {
+                    // yet another ugly alignment hack for annotations that start with
+                    // an unannotated character.
+                    if (showTranslation)
+                        return 0.27f;
+                    else
+                        return 0.38f;
+                }
+            }
+            
+            return super.getAlignment( axis);
+        }
+    } // class AnnotationView
+
+    /**
+     * A view which renders a reading/kanji element. The view is a block, but will not cause a
+     * break in the flow. Child views are laid out vertically.
+     */
+    class ReadingBaseView extends BlockView {
+        /**
+         * Creates a new view for a reading/kanji element.
+         *
+         * @param elem The element rendered by the view.
+         */
+        public ReadingBaseView( Element elem) {
+            super( elem, View.Y_AXIS);
+        }
+
+        /**
+         * Returns the minimum span of the view.
+         */
+        public float getMinimumSpan( int axis) {
+            if (axis == View.X_AXIS)
+                // view 1 is the view for the BASETEXT element
+                return getView( 1).getMinimumSpan( axis);
+            else
+                return super.getMinimumSpan( axis);
+        }
+
+        /**
+         * Returns the preferred span of the view. For the x axis, the width of the base
+         * is returned and the width of the reading ignored. This allows bases to align properly.
+         */
+        public float getPreferredSpan( int axis) {
+            if (axis == View.X_AXIS)
+                // view 1 is the view for the BASETEXT element
+                return getView( 1).getPreferredSpan( axis);
+            else
+                return super.getPreferredSpan( axis);
+        }
+
+        /**
+         * Returns the maximum span of the view. Overridden to prevent it to grow beyond
+         * the preferred span.
+         */
+        public float getMaximumSpan( int axis) {
+            return getPreferredSpan( axis);
+        }
+
+        /**
+         * Returns the real horizontal span. This is the maximum of the span of the reading and
+         * the base.
+         */
+        public float getRealXSpan() {
+            return super.getPreferredSpan( View.X_AXIS);
+        }
+
+        /**
+         * Returns the state of the {@link JGlossDocument#HIDDEN_ATTRIBUTE hidden attribute}
+         * of the annotation element rendered by this view.
+         *
+         * @return <CODE>true</CODE> if the hidden attribute is set.
+         */
+        public boolean isAnnotationHidden() {
+            return ((AnnotationView) getParent().getParent()).isAnnotationHidden();
+        }
+
+        /**
+         * Returns the alignment of this view. Overridden because the alignment
+         * has to be changed if the annotation is hidden.
+         */
+        public float getAlignment( int axis) {
+            if (axis == View.Y_AXIS) {
+                if (!showReading || isAnnotationHidden())
+                    return VAdjustedView.BASE_TEXT_ALIGNMENT;
+            }
+            
+            return super.getAlignment( axis);
+        }
+    } // class ReadingBaseView
+
+    /**
+     * A view displaying a word with reading annotations. The view is a block, but will not cause
+     * a break in the flow. Child views are laid out horizontally.
+     */
+    class WordView extends BlockView {
+        public WordView( Element elem) {
+            super( elem, View.X_AXIS);
+        }
+
+        /**
+         * Centers the view along the x-axis.
+         */
+        public float getAlignment( int axis) {
+            if (axis == View.X_AXIS)
+                return 0.5f;
             else
                 return super.getAlignment( axis);
         }
-    } // class AnnotationView
+
+        public float getMinimumSpan( int axis) {
+            if (axis == X_AXIS) {
+                float span = 0;
+                for ( int i=0; i<getViewCount(); i++) {
+                    View v = getView( i);
+                    if (!compactView && v instanceof ReadingBaseView)
+                        span += ((ReadingBaseView) v).getRealXSpan();
+                    else
+                        span += v.getMinimumSpan( axis);
+                }
+                return span;
+            }
+            else
+                return super.getPreferredSpan( axis);
+        }
+
+        /**
+         * Calculates the preferred span by summing up the preferred span of all child views.
+         * For reading/base views, the {@link ReadingBaseView#getRealXSpan() real horizontal
+         * span} is used instead of the one returned by <CODE>getPreferredSpan</CODE> so that
+         * the word will always have enough space to display the whole reading.
+         */
+        public float getPreferredSpan( int axis) {
+            if (axis == X_AXIS) {
+                float span = 0;
+                for ( int i=0; i<getViewCount(); i++) {
+                    View v = getView( i);
+                    if (!compactView && v instanceof ReadingBaseView)
+                        span += ((ReadingBaseView) v).getRealXSpan();
+                    else
+                        span += v.getPreferredSpan( axis);
+                }
+                return span;
+            }
+            else
+                return super.getPreferredSpan( axis);
+        }
+    } // class WordView
 
     /**
      * A view which renders a reading or a translation element. These views are placed
      * above or below the normal flow of text and centered vertically on the annotated text
      * fragment.
-     *
-     * @author Michael Koch
      */
     class ReadingTranslationView extends InlineView {
         /**
@@ -365,7 +512,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
         /**
          * Paint this view. Overridden to change the allocation so that the view
-         * is vertically centered on the annotated text fragment. This means the view
+         * is horizontally centered on the annotated text fragment. This means the view
          * will draw outside of its allocated space, but this is usually not a problem.
          * If the annotation parent is currently hidden, the method will do nothing.
          *
@@ -378,7 +525,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
             if (allocation instanceof Rectangle) {
                 Rectangle a = (Rectangle) allocation;
-                float xs = getParent().getMinimumSpan( View.X_AXIS);
+                float xs;
+                // center on annotated word
+                xs = getParent().getMinimumSpan( View.X_AXIS);
                 if (a.getWidth() > xs) {
                     a.setRect( a.getX() + (xs - a.getWidth())/2, a.getY(),
                                a.getWidth(), a.getHeight());
@@ -424,51 +573,37 @@ public class JGlossEditorKit extends HTMLEditorKit {
             if ((type==AnnotationTags.READING)&&!showReading ||
                 (type==AnnotationTags.TRANSLATION)&&!showTranslation)
                 return true;
-
-            if (!(getParent() instanceof AnnotationView)) {
-                // The parent of a ReadingTranslationView should always be
-                // an AnnotationView. Nevertheless I got exceptions where
-                // the parent was a javax.swing.text.ParagraphView$Row.
+            
+            View parent = getParent();
+            if (parent instanceof AnnotationView)
+                return ((AnnotationView) parent).isAnnotationHidden();
+            else if (parent instanceof ReadingBaseView)
+                return ((ReadingBaseView) parent).isAnnotationHidden();
+            else
                 return false;
-            }
-
-            return ((AnnotationView) getParent()).isAnnotationHidden();
         }
     } // class ReadingTranslationView
 
     /**
-     * The KanjiView renders the part of the annotation element which contains the original text
-     * which is annotated. This class currently does not change the behavior of the superclass
-     * but makes the view easily recognizable.
-     * with the <CODE>instanceof</CODE> operator.
-     *
-     * @author Michael Koch
-     */
-    class KanjiView extends InlineView {
-        /**
-         * Creates a new view for a kanji element.
-         *
-         * @param elem The kanji element which is rendered by this view.
-         */
-        public KanjiView( Element elem) {
-            super( elem);
-        }
-    } // class KanjiView
-
-    /**
      * Creates a view in which the vertical alignment of text is changed. This is neccessary for
      * normal text to be correctly aligned with annotation views.
-     *
-     * @author Michael Koch
      */
     class VAdjustedView extends InlineView {
+        public static final float BASE_TEXT_ALIGNMENT = -0.15f;
+        public static final float ANNOTATED_TEXT_ALIGNMENT = 1f;
+        public static final float DEFAULT_ALIGNMENT = Float.MAX_VALUE;
+
+        private float alignment;
+
         /**
          * Creates a new view for the element.
          *
          * @param elem The element rendered by this view.
+         * @param alignment The vertical alignment of the view.
          */
-        public VAdjustedView( Element elem) {
+        public VAdjustedView( Element elem, float alignment) {
             super( elem);
+            this.alignment = alignment;
         }
         
         /**
@@ -479,14 +614,33 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @return The alignment.
          */
         public float getAlignment( int axis) {
-            if (axis == View.Y_AXIS)
-                return -0.15f;
-            else
+            if (axis!=View.Y_AXIS || alignment == DEFAULT_ALIGNMENT)
                 return super.getAlignment( axis);
+            else
+                return alignment;
         }
         
     } // class VAdjustedView
 
+    /**
+     * The BaseView renders the part of the annotation element which contains the original text
+     * which is annotated. This class currently does not change the behavior of the superclass
+     * but makes the view easily recognizable using the <CODE>instanceof</CODE> operator.
+     */
+    class BaseView extends VAdjustedView {
+        /**
+         * Creates a new view for a kanji element.
+         *
+         * @param elem The kanji element which is rendered by this view.
+         */
+        public BaseView( Element elem) {
+            super( elem, DEFAULT_ALIGNMENT);
+        }
+
+        public BaseView( Element elem, float alignment) {
+            super( elem, alignment);
+        }
+    } // class BaseView
 
     /**
      * Creates a new editor kit for JGloss documents.
@@ -511,7 +665,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
     /**
      * Sets the compact view mode. In compact view, each annotation element gets only enough 
-     * horizontal space. This means that the normal text part of the annotation will align with
+     * horizontal space for the annotated word, and not neccessarily for the annotations.
+     * This means that the normal text part of the annotation will align with
      * the rest of the rest of the text, but also that annotations could overlap if they need
      * more space.
      *
@@ -629,8 +784,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
             javax.swing.text.html.parser.Element reading = 
                 dtd.defineElement( AnnotationTags.READING.getId(),
                                    DTD.MODEL, false, false, pcdata, null, null, null);
-            javax.swing.text.html.parser.Element kanji = 
-                dtd.defineElement( AnnotationTags.KANJI.getId(),
+            javax.swing.text.html.parser.Element base = 
+                dtd.defineElement( AnnotationTags.BASETEXT.getId(),
                                    DTD.MODEL, false, false, pcdata, null, null, null);
             javax.swing.text.html.parser.Element translation = 
                 dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
@@ -643,29 +798,40 @@ public class JGlossEditorKit extends HTMLEditorKit {
             al = new AttributeList( JGlossDocument.DICTIONARY_WORD, DTD.CDATA, 0, null, null, al);
             al = new AttributeList( JGlossDocument.DICTIONARY_READING, DTD.CDATA, 0, null, null, al);
             al = new AttributeList( JGlossDocument.TEXT_ANNOTATION, DTD.CDATA, 0, null, null, al);
-            
-            // The content model of <anno> should really be (reading & kanji & translation),
+
+            // The content model of <anno> should really be (word & translation)*,
             // but character level attributes created by a <font> or <a href> tag can be embedded
             // in an annotation element when the document is written by the HTMLWriter,
             // so we have to use DTD.ANY.
             dtd.defineElement( AnnotationTags.ANNOTATION.getId(),
                                DTD.ANY, false, false, null, null, null, al);
+            dtd.defineElement( AnnotationTags.WORD.getId(),
+                               DTD.ANY, false, false, null, null, null, null);
+            dtd.defineElement( AnnotationTags.READING_BASETEXT.getId(),
+                               DTD.ANY, false, false, null, null, null, null);
 
             javax.swing.text.html.parser.Element annotation = dtd.getElement
                 ( AnnotationTags.ANNOTATION.getId());
+            javax.swing.text.html.parser.Element word = dtd.getElement
+                ( AnnotationTags.WORD.getId());
+            javax.swing.text.html.parser.Element reading_base = dtd.getElement
+                ( AnnotationTags.READING_BASETEXT.getId());
 
-            // (anno | reading | kanji | translation | #pcdata*)
+            // (anno | word | reading_base | reading | base | translation | #pcdata*)
             ContentModel annotationmodel = new ContentModel( '|', new ContentModel
-                ( 0, annotation,
-                  new ContentModel( 0, reading, new ContentModel
-                      ( 0, kanji, new ContentModel
-                          ( 0, translation, new ContentModel( '*',
-                                                              new ContentModel( dtd.pcdata), null))))));
+                ( 0, annotation, new ContentModel
+                    ( 0, word, new ContentModel
+                        ( 0, reading_base, new ContentModel
+                            ( 0, reading, new ContentModel
+                                ( 0, base, new ContentModel
+                                    ( 0, translation, new ContentModel
+                                        ( '*', new ContentModel( dtd.pcdata), null))))))));
             // allow an annotation element or any of its subelements anywhere the DTD allows #pcdata
             for ( Iterator i=dtd.elements.iterator(); i.hasNext(); ) {
                 javax.swing.text.html.parser.Element e =
                     (javax.swing.text.html.parser.Element) i.next();
-                if (e!=annotation && e!=reading && e!=kanji && e!=translation) {
+                if (e!=annotation && e!=word && e!=reading_base && e!=reading && e!=base 
+                    && e!=translation) {
                     updateContentModel( dtd, e.getContent(), annotationmodel);
                 }
             }

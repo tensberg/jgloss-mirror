@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * $Id$
- *
  */
 
 package jgloss.dictionary;
@@ -28,8 +27,7 @@ import java.io.*;
 
 /**
  * Parses Japanese text using the ChaSen morphological analyzer program.
- * ChaSen must be installed to use this parser. You can find information
- * about ChaSen at 
+ * ChaSen must be installed to use this parser. The ChaSen homepage is located at
  * <a href="http://chasen.aist-nara.ac.jp/">http://chasen.aist-nara.ac.jp/</a>.
  *
  * @author Michael Koch
@@ -42,6 +40,12 @@ public class ChasenParser implements Parser {
         messages.getString( "parser.chasen.name");
 
     private static String defaultChasenExecutable = "/usr/local/bin/chasen";
+
+    /**
+     * Cache used by {@link #isChasenExecutable(String) isChasenExecutable} to store the
+     * name of the last succesfully tested chasen executable. 
+     */
+    private static String lastChasenExecutable = null;
 
     /**
      * Dummy dictionary which is used for Readings returned by chasen.
@@ -136,6 +140,12 @@ public class ChasenParser implements Parser {
      * @param chasenExecutable Full path to the chasen binary.
      */
     public static boolean isChasenExecutable( String chasenExecutable) {
+        // If the last call to isChasenExecutable was successful, the name of the
+        // executable is stored in "lastChasenExecutable".
+        if (lastChasenExecutable != null &&
+            lastChasenExecutable.equals( chasenExecutable))
+            return true;
+
         try {
             final Process p = Runtime.getRuntime().exec( chasenExecutable + " -V");
             Thread wait = new Thread() {
@@ -173,6 +183,7 @@ public class ChasenParser implements Parser {
                 if (line==null || !line.startsWith( "ChaSen"))
                     return false;
 
+                lastChasenExecutable = chasenExecutable;
                 return true;
             }
         } catch (IOException ex) {
@@ -215,7 +226,7 @@ public class ChasenParser implements Parser {
 
             String line;
             while (parsePosition<=text.length && (line=chasenOut.readLine())!=null) {
-                System.out.println( line + " " + parsePosition + " " + text.length);
+                System.out.println( line);
                 if (line.equals( "EOS")) { // end of line in input text
                     parsePosition++;
                 }
@@ -266,15 +277,18 @@ public class ChasenParser implements Parser {
                                        ( surfaceInflected.charAt( from)))
                                     from++;
                                 to = surfaceInflected.length();
+                                readingBase = null;
                                 continue;
                             }
 
                             List translations = search( word);
                             if (translations.size() != 0) {
-                                annotations.add( new Reading
-                                    ( parsePosition + from, to-from,
-                                      new ChasenWordReading( word, 
-                                                             StringTools.toHiragana( readingBase))));
+                                if (readingBase != null) {
+                                    annotations.add( new Reading
+                                        ( parsePosition + from, to-from,
+                                          new ChasenWordReading( word, 
+                                                                 StringTools.toHiragana( readingBase))));
+                                }
                                                                       
                                 for ( Iterator i=translations.iterator(); i.hasNext(); ) {
                                     WordReadingPair wrp = (WordReadingPair) i.next();
@@ -298,16 +312,12 @@ public class ChasenParser implements Parser {
                                        ( surfaceInflected.charAt( from)))
                                     from++;
                                 to = surfaceInflected.length();
-                                // Shorten readingBase if matching entry found.
-                                // If matching entry exists, search() has moved it to position 0.
-                                WordReadingPair wrp = (WordReadingPair) translations.get( 0);
-                                String reading = wrp.getReading();
-                                if (reading == null)
-                                    reading = wrp.getWord();
-                                if (readingBase.startsWith( StringTools.toKatakana( reading)))
-                                    readingBase = readingBase.substring( reading.length());
+                                // There is no way to determine how much of the reading belongs
+                                // to the annotated substring, so readingBase becomes invalid
+                                readingBase = null;
                             }
                             else {
+                                readingBase = null; // invalid for substrings
                                 // no match found, try shorter prefix
                                 do {
                                     to = to - 1;
@@ -362,7 +372,6 @@ public class ChasenParser implements Parser {
                     parsePosition += surfaceInflected.length();
                 }
             }
-            System.out.println( "finished iteration");
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new SearchException( ex);
@@ -401,7 +410,6 @@ public class ChasenParser implements Parser {
                                 System.err.println( "abnormal termination of chasen");
                                 chasen.destroy();
                             }
-                            System.err.println( "chasen termiator finished");
                         }
                     };
                 try {
@@ -463,7 +471,6 @@ public class ChasenParser implements Parser {
     private List search( String word) throws SearchException {
         List result = null;
 
-        System.out.println( "looking up " + word);
         if (lookupCache != null)
             result = (List) lookupCache.get( word);
 
@@ -499,7 +506,6 @@ public class ChasenParser implements Parser {
         inflected = inflected.substring( i);
         base = base.substring( i);
         
-        System.out.println( "conjugation " + inflected + " " + base + " " + type);
         return new Conjugation( inflected, base, type);
     }
 

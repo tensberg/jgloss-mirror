@@ -240,6 +240,8 @@ parserselector.readingbrackets=Brackets delimiting reading annotations:
 print.title=Print document
 
 annotationeditor.reading=Reading:\ 
+annotationeditor.reading.kanji={0}:\ 
+annotationeditor.readings=Readings:
 annotationeditor.translation=Translation:\ 
 annotationeditor.dictionaryform=Dictionary Form:\ 
 annotationeditor.dictionaryform.none=(none)

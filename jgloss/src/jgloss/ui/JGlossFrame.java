@@ -800,7 +800,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                    showTranslationItem.isSelected());
         doc = (JGlossDocument) kit.createDefaultDocument();
         StyleDialog.getComponent().addStyleSheet( doc.getStyleSheet(), getAdditionalStyles());
-            
+
         documentName = title;
         setTitle( title + ":" + JGloss.messages.getString( "main.title"));
 
@@ -1337,16 +1337,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
         b2.add( Box.createVerticalStrut( 3));
 
         b = Box.createHorizontalBox();
-        JCheckBox interactive = 
-            new JCheckBox( JGloss.messages.getString( "export.html.interactive"));        
-        interactive.setSelected( JGloss.prefs.getBoolean
-                                       ( Preferences.EXPORT_HTML_INTERACTIVE));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( interactive, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        b = Box.createHorizontalBox();
         JCheckBox backwardsCompatible = 
             new JCheckBox( JGloss.messages.getString( "export.html.backwardscompatible"));        
         backwardsCompatible.setSelected( JGloss.prefs.getBoolean
@@ -1403,14 +1393,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                   writeTranslations.isSelected());
                 JGloss.prefs.set( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE,
                                   backwardsCompatible.isSelected());
-                JGloss.prefs.set( Preferences.EXPORT_HTML_INTERACTIVE,
-                                  interactive.isSelected());
                 JGloss.prefs.set( Preferences.EXPORT_HTML_WRITEHIDDEN,
                                   writeHidden.isSelected());
                 new HTMLExporter( out, (String) encodings.getSelectedItem(), doc,
                                   writeReading.isSelected(), writeTranslations.isSelected(),
                                   backwardsCompatible.isSelected(),
-                                  interactive.isSelected(), writeHidden.isSelected()).write();
+                                  writeHidden.isSelected()).write();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog

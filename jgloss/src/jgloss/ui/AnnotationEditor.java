@@ -48,6 +48,40 @@ import javax.swing.plaf.basic.BasicTreeUI;
  */
 public class AnnotationEditor extends JTree implements TreeSelectionListener, MouseListener {
     /**
+     * Variant of the default tree cell editor which returns an increased preferred width
+     * for {@link jgloss.ui.annoation.EditableTextNode editable text nodes}. This is neccessary
+     * because otherwise readings and translations won't display if the text length is increased.
+     */
+    private class AnnotationTreeCellRenderer extends DefaultTreeCellRenderer {
+        /**
+         * This is set to <CODE>true</CODE> for editable text nodes to signal a change
+         * of the preferred width.
+         */
+        boolean modifyWidth;
+
+        public AnnotationTreeCellRenderer() {
+            super();
+            modifyWidth = false;
+        }
+
+        public Dimension getPreferredSize() {
+            Dimension preferred = super.getPreferredSize();
+            if (modifyWidth && preferred!=null)
+                preferred.width += 80;
+            return preferred;
+        }
+
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+                                                      boolean sel,
+                                                      boolean expanded,
+                                                      boolean leaf, int row,
+                                                      boolean hasFocus) {
+            modifyWidth = (value instanceof EditableTextNode);
+            return super.getTreeCellRendererComponent( tree, value, sel, expanded, leaf, row, hasFocus);
+        }
+    } // class AnnotationTreeCellRenderer
+
+    /**
      * Editor for the reading or translation for a specific annotation. The editor consist of a
      * static label which describes the type of entry and an editable component for the
      * actual entry.
@@ -77,7 +111,13 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
          */
         protected Container createContainer() {
             Container c = super.createContainer();
-            box = Box.createHorizontalBox();
+            box = Box.createHorizontalBox();/*new Box( BoxLayout.X_AXIS) {
+                    public Dimension getPreferredSize() {
+                        Dimension preferred = super.getPreferredSize();
+                        preferred.width += 60;
+                        return preferred;
+                    }
+                    };*/
             label = new JLabel();
             return c;
         }
@@ -101,8 +141,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 box.removeAll();
                 box.add( label);
                 box.add( editingComponent); // editingComponent was reset by superclass
-                box.setSize( Math.min( box.getPreferredSize().width, 200),
-                             box.getPreferredSize().height);
                 editingComponent = box; // will be added to container by superclass
             }
 
@@ -250,7 +288,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 public int getIconHeight() { return 0; }
                 public void paintIcon( java.awt.Component c, java.awt.Graphics g, int x, int y) {}
             };
-        DefaultTreeCellRenderer r = new DefaultTreeCellRenderer();
+        DefaultTreeCellRenderer r = new AnnotationTreeCellRenderer();
         r.setLeafIcon( nullIcon);
         r.setOpenIcon( nullIcon);
         r.setClosedIcon( nullIcon);
@@ -286,7 +324,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     while (!(tn instanceof AnnotationNode))
                         tn = tn.getParent();
 
-                    ((AnnotationNode) tn).getReadingNode().setText( reading);
                     ((AnnotationNode) tn).setLinkedAnnotation( annotation);
                 }
             };
@@ -356,8 +393,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                         tn = tn.getParent();
                     AnnotationNode selection = (AnnotationNode) tn;
 
-                    String kanji = selection.getWordText();
-                    String reading = selection.getReadingNode().getText();
+                    String kanji = selection.getWordNode().getWord();
+                    String reading = selection.getWordNode().getReading();
                     String translation = selection.getTranslationNode().getText();
 
                     // Remove all duplicates except the current selection. We can't delete the
@@ -367,8 +404,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
                         AnnotationNode node = (AnnotationNode) i.next();
                         if (node!=selection &&
-                            kanji.equals( node.getWordText()) &&
-                            reading.equals( node.getReadingNode().getText()) &&
+                            kanji.equals( node.getWordNode().getWord()) &&
+                            reading.equals( node.getWordNode().getReading()) &&
                             translation.equals( node.getTranslationNode().getText()))
                             duplicates.add( node);
                     }
@@ -404,8 +441,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                         tn = tn.getParent();
                     AnnotationNode selection = (AnnotationNode) tn;
 
-                    String word = selection.getWordText();
-                    String reading = selection.getReadingNode().getText();
+                    String word = selection.getWordNode().getWord();
+                    String reading = selection.getWordNode().getReading();
                     String translation = selection.getTranslationNode().getText();
                     String dfword = selection.getDictionaryFormNode().getWord();
                     String dfreading = selection.getDictionaryFormNode().getReading();
@@ -415,8 +452,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
                         AnnotationNode node = (AnnotationNode) i.next();
                         if (node != selection &&
-                            word.equals( node.getWordText())) {
-                            node.getReadingNode().setText( reading);
+                            word.equals( node.getWordNode().getWord())) {
+                            node.getWordNode().setReading( reading);
                             node.getTranslationNode().setText( translation);
                             node.getDictionaryFormNode().setWord( dfword);
                             node.getDictionaryFormNode().setReading( dfreading);
@@ -435,7 +472,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     AnnotationNode selection = (AnnotationNode) tn;
                     // if the annotated word is all hiragana, add the dictionary reading,
                     // else add the dictionary word.
-                    String word = selection.getWordText();
+                    String word = selection.getWordNode().getWord();
                     boolean isHiragana = true;
                     for ( int i=0; i<word.length(); i++) {
                         if (!StringTools.isHiragana( word.charAt( i))) {
@@ -499,8 +536,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
                         AnnotationNode node = (AnnotationNode) i.next();
                         if (!node.isHidden()) {
-                            String key = node.getWordText() + "%" +
-                                node.getReadingNode().getText() + "%" +
+                            String key = node.getWordNode().getWord() + "%" +
+                                node.getWordNode().getReading() + "%" +
                                 node.getTranslationNode().getText();
                             if (nodes.contains( key))
                                 node.setHidden( true, false);

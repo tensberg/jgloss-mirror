@@ -57,47 +57,50 @@ public class LaTeXExporter {
         String text = null;
         try {
             text = doc.getText( 0, doc.getLength());
-        } catch (BadLocationException ex) {
-            // What ?
-            ex.printStackTrace();
-        }
-        StringBuffer outtext = new StringBuffer();
+        } catch (BadLocationException ex) {}
+        StringBuffer outtext = new StringBuffer( text.length());
         
         int prevend = 0; // end offset of the previous annotation
         for ( int i=0; i<model.getAnnotationCount(); i++) {
-            AnnotationNode node = model.getAnnotationNode( i);
-            Element ae = node.getAnnotationElement();
-            int tstart = ae.getElement( 2).getStartOffset();
-            int tend = ae.getElement( 2).getEndOffset();
-            String translation = escape( text.substring( tstart, tend));
-            int rstart = ae.getElement( 0).getStartOffset();
-            int rend = ae.getElement( 0).getEndOffset();
-            String reading = escape( text.substring( rstart, rend));
-            String word = escape( text.substring( rend, tstart));
+            AnnotationNode annotation = model.getAnnotationNode( i);
+            Element ae = annotation.getAnnotationElement();
 
             // add text between annotations
-            if (prevend < rstart)
-                outtext.append( escape( text.substring( prevend, rstart)));
-            prevend = tend;
+            if (prevend < ae.getStartOffset())
+                outtext.append( escape( text.substring( prevend, ae.getStartOffset())));
+            prevend = ae.getEndOffset();
 
-            // handle reading text
-            if (writeReading && !reading.equals( " ") &&
-                (writeHidden || !node.isHidden())) {
-                outtext.append( "\\ruby{" + word + "}{" + reading + "}");
-            }
-            else {
-                // discard the reading
-                outtext.append( word);
+            // handle reading and word text
+            boolean discardReadings = !writeReading || (!writeHidden && annotation.isHidden());
+            Element wordelement = ae.getElement( 0);
+            for ( int j=0; j<wordelement.getElementCount(); j++) {
+                Element child = wordelement.getElement( j);
+                if (child.getElementCount() == 2) { // READING_BASETEXT element
+                    String word = text.substring( child.getElement( 1).getStartOffset(),
+                                                  child.getElement( 1).getEndOffset());
+                    String reading = text.substring( child.getElement( 0).getStartOffset(),
+                                                     child.getElement( 0).getEndOffset());
+                    if (discardReadings || " ".equals( reading))
+                        outtext.append( escape( word));
+                    else
+                        outtext.append( "\\ruby{" + escape( word) + "}{" + escape( reading) + "}");
+                }
+                else { // BASETEXT element
+                    outtext.append( escape( text.substring( child.getStartOffset(),
+                                                            child.getEndOffset())));
+                }
             }
 
             // handle translation text
+            String translation = escape( text.substring( ae.getElement( 1).getStartOffset(), 
+                                                         ae.getElement( 1).getEndOffset()));
             if (writeTranslations && !translation.equals( " ") && 
-                (writeHidden || !node.isHidden())) {
+                (writeHidden || !annotation.isHidden())) {
                 String footnote;
                 // if the linked annotation entry is an inflected verb or adjective,
                 // output the full verb instead of just the kanji part
-                String nb = node.getDictionaryFormNode().getWord();
-                String nr = node.getDictionaryFormNode().getReading();
+                String nb = annotation.getDictionaryFormNode().getWord();
+                String nr = annotation.getDictionaryFormNode().getReading();
                 footnote = "\\footnotetext{" + nb;
                 if (nr!=null && !nr.equals( " "))
                     footnote += " " + nr;

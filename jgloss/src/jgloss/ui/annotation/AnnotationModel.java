@@ -306,6 +306,7 @@ public class AnnotationModel extends DefaultTreeModel {
                     i.set( new Reading( (WordReadingPair) o));
             }
 
+            // work around Document construction quirks
             boolean paragraphSpaceInserted = false;
             if (start == paragraph.getStartOffset()) {
                 doc.insertAfterStart( paragraph, "&nbsp;");
@@ -325,13 +326,13 @@ public class AnnotationModel extends DefaultTreeModel {
             Element sae = null;
             if (ann != null) {
                 sae = ann.getAnnotationElement();
-                doc.insertAfterEnd( sae, "s");
+                doc.insertAfterEnd( sae, "&nbsp;");
             }
             ann = findAnnotation( endp.getOffset());
             Element eae = null;
             if (ann != null) {
                 eae = ann.getAnnotationElement();
-                doc.insertBeforeStart( eae, "e");
+                doc.insertBeforeStart( eae, "&nbsp");
                 start = startp.getOffset()-1;
                 startp = doc.createPosition( start);
                 end = endp.getOffset()-1;
@@ -339,12 +340,46 @@ public class AnnotationModel extends DefaultTreeModel {
             }
 
             // construct the new annotation and insert it
-            text = "<html><body><p>"
+            String html = "<html><body><p>"
                 + "<" + AnnotationTags.ANNOTATION.getId() + " " + JGlossDocument.TEXT_ANNOTATION
-                + "=\"" + TextAnnotationCodec.encode( annotations) + "\"><"
-                + AnnotationTags.READING.getId() + "> </"
-                + AnnotationTags.READING.getId() + "><" + AnnotationTags.KANJI.getId() + ">"  
-                + text + "</" + AnnotationTags.KANJI.getId() + "><" + AnnotationTags.TRANSLATION.getId()
+                + "=\"" + TextAnnotationCodec.encode( annotations) + "\">"
+                + "<" + AnnotationTags.WORD.getId() + ">";
+
+            // Split word in base/readings. Add a reading/base pair for every kanji substring of the
+            // word and a base element for every other substring. If there is no kanji substring, add
+            // a reading for the whole string since there has to be at least one reading.
+            String wordhtml = "";
+            int baseStart = 0;
+            boolean hasReading = false;
+            boolean inKanji = StringTools.isCJKUnifiedIdeographs( text.charAt( 0));
+            for ( int baseEnd=1; baseEnd<=text.length(); baseEnd++) {
+                if (inKanji) {
+                    if (baseEnd == text.length() ||
+                        !StringTools.isCJKUnifiedIdeographs( text.charAt( baseEnd))) {
+                        hasReading = true;
+                        wordhtml += "<" + AnnotationTags.READING_BASETEXT.getId() + "><"
+                            + AnnotationTags.READING.getId() + "> </" + AnnotationTags.READING.getId()
+                            + "><" + AnnotationTags.BASETEXT.getId() + ">"
+                            + text.substring( baseStart, baseEnd) + "</" + AnnotationTags.BASETEXT.getId()
+                            + "></" + AnnotationTags.READING_BASETEXT.getId() + ">";
+                        inKanji = false;
+                        baseStart = baseEnd;
+                    }
+                }
+                else if (baseEnd == text.length() ||
+                         StringTools.isCJKUnifiedIdeographs( text.charAt( baseEnd))) {
+                    wordhtml += "<" + AnnotationTags.BASETEXT + ">" + text.substring( baseStart, baseEnd)
+                        + "</" + AnnotationTags.BASETEXT + ">";
+                    inKanji = true;
+                    baseStart = baseEnd;
+                }
+            }
+            if (!hasReading)
+                wordhtml = "<" + AnnotationTags.READING_BASETEXT.getId() + "><"
+                            + AnnotationTags.READING.getId() + "> </" + AnnotationTags.READING.getId()
+                            + ">" + wordhtml + "</" + AnnotationTags.READING_BASETEXT.getId() + ">";
+
+            html += wordhtml + "</" + AnnotationTags.WORD.getId() + "><" + AnnotationTags.TRANSLATION.getId()
                 + "> </" + AnnotationTags.TRANSLATION.getId() + "></" + AnnotationTags.ANNOTATION.getId()
                 + "></p></body></html>";
             // The insertion will create a new annotation element and trigger a document changed
@@ -352,7 +387,7 @@ public class AnnotationModel extends DefaultTreeModel {
             // annotation node.
             // Unfortunately the JGlossDocument has no method for inserting HTML text at an
             // arbitrary location. So we will have to use an editor kit.
-            kit.insertHTML( doc, startp.getOffset(), text, 0, 0, AnnotationTags.ANNOTATION);
+            kit.insertHTML( doc, startp.getOffset(), html, 0, 0, AnnotationTags.ANNOTATION);
 
             // remove the '\n\n' which the HTMLEditorKit insists on inserting
             doc.remove( endp.getOffset()-2, 2);
