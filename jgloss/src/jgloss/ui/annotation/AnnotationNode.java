@@ -51,10 +51,6 @@ public class AnnotationNode extends InnerNode {
      */
     private Element annotation;
     /**
-     * The kanji element, which is a child of the annotation element.
-     */
-    private Element kanji;
-    /**
      * The document text contained in the kanji element.
      */
     private String kanjiText;
@@ -82,8 +78,8 @@ public class AnnotationNode extends InnerNode {
     public AnnotationNode( InnerNode parent, Element annotation) {
         super( parent, new Vector( ((List) annotation.getAttributes().getAttribute
                                    ( JGlossDocument.TEXT_ANNOTATION)).size()+2));
-        // note that the child elements are guraranteed to exist by the way the element is constructed
-        // in JGlossDocument.JGlossReader
+        // Note that the child elements are guraranteed to exist by the way the element is constructed
+        // in JGlossDocument.JGlossReader.
         this.annotation = annotation;
         Element readingElement = annotation.getElement( 0);
         Element kanjiElement = annotation.getElement( 1);
