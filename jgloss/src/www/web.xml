@@ -49,6 +49,14 @@
       </init-param>
 
       <init-param>
+        <param-name>rewritten_types</param-name>
+        <param-value>text/html:text/xhtml</param-value>
+        <description>
+           List of MIME types which will be rewritten.
+        </description>
+      </init-param>
+
+      <init-param>
         <param-name>enable_cookie_forwarding</param-name>
         <param-value>true</param-value>
         <description>
@@ -100,7 +108,15 @@
             and POST method bodies.
         </description>
       </init-param>
-    
+
+      <init-param>
+        <param-name>response-buffer-size</param-name>
+        <param-value>1024</param-value>
+        <description>
+            Size in bytes of the response buffer. Set this to a low value if the servlet
+            accesses the remote servers through a slow connection to increase response time.
+        </description>
+      </init-param>
     </servlet>
 
     <servlet-mapping>
