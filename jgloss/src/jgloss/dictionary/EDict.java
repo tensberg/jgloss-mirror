@@ -23,10 +23,9 @@
 
 package jgloss.dictionary;
 
-import jgloss.JGloss;
-
 import java.io.*;
 import java.util.*;
+import java.text.MessageFormat;
 
 /**
  * Dictionary implementation for dictionaries in EDICT format with
@@ -51,6 +50,12 @@ public class EDict implements Dictionary {
      * Current version of the JJDX format.
      */
     public final static int JJDX_VERSION = 1001;
+
+    /**
+     * Localizable message resource.
+     */
+    protected final static ResourceBundle messages = 
+        ResourceBundle.getBundle( "resources/messages-dictionary");
 
     /**
      * Path to the dictionary file.
@@ -138,8 +143,8 @@ public class EDict implements Dictionary {
 
         File f = new File( dicfile);
         name = f.getName();
-        System.err.println( JGloss.messages.getString( "dictionary.load",
-                                                       new String[] { name }));
+        System.err.println( MessageFormat.format( messages.getString( "dictionary.load"),
+                                                  new String[] { name }));
         dictionary = new byte[(int) f.length()];
         InputStream is = new BufferedInputStream( new FileInputStream( f));
         int off = 0;
@@ -169,10 +174,9 @@ public class EDict implements Dictionary {
                 jindex.createNewFile();
                 saveJJDX( jindex);
             } catch (IOException ex) {
-                System.err.println( JGloss.messages.getString
-                                    ( "edict.error.writejjdx",
-                                      new String[] { ex.getClass().getName(),
-                                                     ex.getLocalizedMessage() }));
+                System.err.println( MessageFormat.format( messages.getString( "edict.error.writejjdx"),
+                                                          new String[] { ex.getClass().getName(),
+                                                                         ex.getLocalizedMessage() }));
             }
         }
     }
@@ -196,7 +200,6 @@ public class EDict implements Dictionary {
         // do a binary search through the index file
         try {
             byte[] expr_euc = expression.getBytes( "EUC-JP");
-            List translationlist = new ArrayList( 10);
 
             // do a binary search
             int from = 0;
@@ -225,19 +228,36 @@ public class EDict implements Dictionary {
             } while (from<=to && match==-1);
 
             if (match != -1) {
+                int firstmatch = match - 1;
+                int lastmatch = match + 1;
                 // search backwards for the first matching entry
-                curr = match - 1;
-                while (curr >= from) {
+                while (firstmatch >= from) {
                     // read entry
-                    int i = 0;
-                    while (i<expr_euc.length && index[curr]+i<dictionary.length)
-                        i++;
-                    int c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[curr], i, xjdxIndex);
-                    if (c != 0)
-                        curr = from - 1; // First non-matching entry. End search.
+                    int c = -1;
+                    if (expr_euc.length <= dictionary.length-index[firstmatch])
+                        c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[firstmatch],
+                                     expr_euc.length, xjdxIndex);
+                    if (c != 0) { // First non-matching entry. End search.
+                        firstmatch++;
+                        break;
+                    }
                     else {
-                        match = curr;
-                        curr--;
+                        firstmatch--;
+                    }
+                }
+                // search forward for the last matching entry
+                while (lastmatch <= to) {
+                    // read entry
+                    int c = -1;
+                    if (expr_euc.length <= dictionary.length-index[lastmatch])
+                        c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[lastmatch],
+                                     expr_euc.length, xjdxIndex);
+                    if (c != 0) { // First non-matching entry. End search.
+                        lastmatch--;
+                        break;
+                    }
+                    else {
+                        lastmatch++;
                     }
                 }
 
@@ -248,7 +268,7 @@ public class EDict implements Dictionary {
                 Set seenEntries = new HashSet( 50);
 
                 // read all matching entries
-                do {
+                for ( match=firstmatch; match<=lastmatch; match++) {
                     // find beginning of entry line
                     int start = index[match];
                     while (start>0 && dictionary[start-1]!=0x0a)
@@ -262,118 +282,118 @@ public class EDict implements Dictionary {
                     else
                         seenEntries.add( starti);
                     
-                    int end = start + 1;
-                    while (end<dictionary.length && dictionary[end]!=0x0a) {
+                    int end = index[match];
+                    while (end<dictionary.length && dictionary[end]!=0x0a)
                         end++;
+
+                    String entry = new String( dictionary, start, end-start, "EUC-JP");
+
+                    int j, k;
+                    // word:
+                    String word;
+                    int i = entry.indexOf( ' ');
+                    if (i == -1) {
+                        System.err.println( "WARNING: " + dicfile +
+                                            "\nMalformed dictionary entry: " + entry);
+                        continue;
                     }
-                    String entry = new String( dictionary, start, end-start, "EUC-JP").trim();
-                    if (entry.indexOf( expression) == -1)
-                        match = index.length; // first non-matching entry: end search
                     else {
-                        match++;
-                        int j, k;
-                        // word:
-                        String word;
-                        int i = entry.indexOf( ' ');
-                        if (i == -1) {
-                            System.err.println( "WARNING: " + dicfile +
-                                                "\nMalformed dictionary entry: " + entry);
-                            word = "";
-                        }
-                        else {
-                            word = entry.substring( 0, i);
-                        }
-                        // reading:
-                        String reading = null;
-                        i = entry.indexOf( '[');
-                        if (i != -1) {
-                            j = entry.indexOf( ']', i+1);
-                            if (j == -1) {
-                                System.err.println( "WARNING: " + dicfile +
-                                                   "\nMalformed dictionary entry: " + entry);
-                                reading = null;
-                            }
-                            else
-                                reading = entry.substring( i+1, j);
-                        } // else: no reading
-                        // translations
-                        translationlist.clear();
-                        i = entry.indexOf( '/', i);
-                        if (i == -1) {
-                            System.err.println( "WARNING: " + dicfile +
-                                                "\nMalformed dictionary entry: " + entry);
-                        }
-                        else {
-                            j = entry.lastIndexOf( '/');
-                            while (i < j) {
-                                k = entry.indexOf( '/', i+1);
-                                translationlist.add( entry.substring( i+1, k));
-                                i = k;
-                            }
-                        }
-                        String[] translation = new String[translationlist.size()];
-                        translation = (String[]) translationlist.toArray( translation);
-                        
-                        // test if this entry matches the search mode
-                        boolean addEntry = false;
-                        switch (mode) {
-                        case SEARCH_EXACT_MATCHES:
-                            if (expression.equalsIgnoreCase( word) ||
-                                expression.equalsIgnoreCase( reading)) {
-                                addEntry = true;
-                            }
-                            else {
-                                for ( i=0; i<translation.length; i++) {
-                                    if (expression.equalsIgnoreCase( translation[i])) {
-                                        addEntry = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-
-                        case SEARCH_STARTS_WITH:
-                            if (word.startsWith( expression) ||
-                                reading!=null && reading.startsWith( expression)) {
-                                addEntry = true;
-                            }
-                            else {
-                                for ( i=0; i<translation.length; i++) {
-                                    if (translation[i].startsWith( expression)) {
-                                        addEntry = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-
-                        case SEARCH_ENDS_WITH:
-                            if (word.endsWith( expression) ||
-                                reading!=null && reading.endsWith( expression)) {
-                                addEntry = true;
-                            }
-                            else {
-                                for ( i=0; i<translation.length; i++) {
-                                    if (translation[i].endsWith( expression)) {
-                                        addEntry = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-
-                        case SEARCH_ANY_MATCHES:
-                            addEntry = true;
-                            break;
-
-                        default:
-                            throw new IllegalArgumentException( "Invalid search mode");
-                        }
-                        
-                        if (addEntry)
-                            result.add( new DictionaryEntry( word, reading, translation, this));
+                        word = entry.substring( 0, i);
                     }
-                } while (match < index.length);
+                    // reading:
+                    String reading = null;
+                    i = entry.indexOf( '[');
+                    if (i != -1) {
+                        j = entry.indexOf( ']', i+1);
+                        if (j == -1) {
+                            System.err.println( "WARNING: " + dicfile +
+                                                "\nMalformed dictionary entry: " + entry);
+                            continue;
+                        }
+                        else
+                            reading = entry.substring( i+1, j);
+                    } // else: no reading
+
+                    // translations
+                    i = entry.indexOf( '/', i);
+                    if (i == -1) {
+                        System.err.println( "WARNING: " + dicfile +
+                                            "\nMalformed dictionary entry: " + entry);
+                        continue;
+                    }
+                    // count number of translations
+                    int slashes = 1;
+                    for ( int x=i+1; x<entry.length(); x++)
+                        if (entry.charAt( x)=='/')
+                            slashes++;
+                    String[] translation = new String[slashes-1];
+                    slashes = 0;
+                    j = entry.lastIndexOf( '/');
+                    while (i < j) {
+                        k = entry.indexOf( '/', i+1);
+                        translation[slashes++] = entry.substring( i+1, k);
+                        i = k;
+                    }
+                    
+                    // test if this entry matches the search mode
+                    boolean addEntry = false;
+                    switch (mode) {
+                    case SEARCH_EXACT_MATCHES:
+                        if (expression.equalsIgnoreCase( word) ||
+                            expression.equalsIgnoreCase( reading)) {
+                            addEntry = true;
+                        }
+                        else {
+                            for ( i=0; i<translation.length; i++) {
+                                if (expression.equalsIgnoreCase( translation[i])) {
+                                    addEntry = true;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                        
+                    case SEARCH_STARTS_WITH:
+                        if (word.startsWith( expression) ||
+                            reading!=null && reading.startsWith( expression)) {
+                            addEntry = true;
+                        }
+                        else {
+                            for ( i=0; i<translation.length; i++) {
+                                if (translation[i].startsWith( expression)) {
+                                    addEntry = true;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                        
+                    case SEARCH_ENDS_WITH:
+                        if (word.endsWith( expression) ||
+                            reading!=null && reading.endsWith( expression)) {
+                            addEntry = true;
+                        }
+                        else {
+                            for ( i=0; i<translation.length; i++) {
+                                if (translation[i].endsWith( expression)) {
+                                    addEntry = true;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                        
+                    case SEARCH_ANY_MATCHES:
+                        addEntry = true;
+                        break;
+                        
+                    default:
+                        throw new IllegalArgumentException( "Invalid search mode");
+                    }
+                    
+                    if (addEntry)
+                        result.add( new DictionaryEntry( word, reading, translation, this));
+                }
             }
         } catch (IOException ex) {
             throw new SearchException( "IOException: " + ex.getMessage());
@@ -441,8 +461,8 @@ public class EDict implements Dictionary {
         DataInputStream is = new DataInputStream( new BufferedInputStream( new FileInputStream( indexfile)));
         int version = is.readInt();
         if (version > JJDX_VERSION) {
-            System.err.println( JGloss.messages.getString( "edict.warning.jjdxversion",
-                                new String[] { getName() }));
+            System.err.println( MessageFormat.format( messages.getString( "edict.warning.jjdxversion"),
+                                                      new String[] { getName() }));
         }
         int offset = is.readInt();
         int size = is.readInt();
@@ -460,8 +480,8 @@ public class EDict implements Dictionary {
      * @exception IOException when the file cannot be written.
      */
     public void saveJJDX( File indexfile) throws IOException {
-        System.err.println( JGloss.messages.getString( "edict.writejjdx",
-                                                       new String[] { getName() }));
+        System.err.println( MessageFormat.format( messages.getString( "edict.writejjdx"),
+                                                  new String[] { getName() }));
 
         DataOutputStream os = new DataOutputStream( new BufferedOutputStream
             ( new FileOutputStream( indexfile)));
@@ -478,8 +498,8 @@ public class EDict implements Dictionary {
      * Creates an index for the EDICT dictionary. The dictionary file must have been already loaded.
      */
     public void buildIndex() {
-        System.err.println( JGloss.messages.getString( "edict.buildindex", 
-                                                       new String[] { getName() }));
+        System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
+                                                  new String[] { getName() }));
       
         index = null; // delete old index if any
         xjdxIndex = false;
