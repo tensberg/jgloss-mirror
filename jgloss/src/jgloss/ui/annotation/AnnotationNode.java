@@ -97,7 +97,7 @@ public class AnnotationNode extends InnerNode {
                 public void updateReadingText() {
                     super.updateReadingText();
                     if (AnnotationNode.this != null) // is null while still in constructor
-                        AnnotationNode.this.updateNodeText();
+                        AnnotationNode.this.updateNodeText( true);
                 }
             };
         if (word.getReadingCount() == 1)
@@ -110,7 +110,7 @@ public class AnnotationNode extends InnerNode {
         translation = new TranslationTextNode( this) {
                 public void setText( String text) {
                     super.setText( text);
-                    updateNodeText();
+                    updateNodeText( true);
                 }
             };
         children.add( translation);
@@ -163,7 +163,7 @@ public class AnnotationNode extends InnerNode {
             }
         }
 
-        updateNodeText();
+        updateNodeText( false);
     }
 
     /**
@@ -254,7 +254,7 @@ public class AnnotationNode extends InnerNode {
                 ((JGlossDocument) annotation.getDocument()).getStyleSheet()
                     .addRule( AnnotationTags.ANNOTATION.getId() + " { }");
             }
-            updateNodeText();
+            updateNodeText( true);
         }
     }
 
@@ -300,20 +300,22 @@ public class AnnotationNode extends InnerNode {
      * Sets the new node text. This should be called if the attributes of the annotation element
      * have changed (for example after being hidden).
      */
-    private void updateNodeText() {
-        String newNodeText = word.getWord() + ":";
-        if (isHidden()) {
+    private void updateNodeText( boolean fireNodeChanged) {
+        String newNodeText = word.getWord();
+        String reading = word.getReading();
+        if (reading.length() > 0)
+            newNodeText += " " + reading;
+        String translation = getTranslationNode().getText();
+        if (translation.length() > 0)
+            newNodeText += " " + translation;
+
+        if (isHidden())
             newNodeText += JGloss.messages.getString( "annotationeditor.entry.hidden");
-            String reading = word.getReading();
-            if (reading.length() > 0)
-                newNodeText += " " + reading;
-            String translation = getTranslationNode().getText();
-            if (translation.length() > 0)
-                newNodeText += " " + translation;
-        }
+
         if (!newNodeText.equals( nodeText)) {
             nodeText = newNodeText;
-            getRootNode().getModel().nodeChanged( this);
+            if (fireNodeChanged)
+                getRootNode().getModel().nodeChanged( this);
         }
     }
 } // class AnnotationNode

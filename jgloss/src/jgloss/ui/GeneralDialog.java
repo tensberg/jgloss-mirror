@@ -164,9 +164,12 @@ public class GeneralDialog extends Box {
         }
         importClipboardParserSelector.setFirstOccurrenceOnly
             ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE));
-        importClipboardParserSelector.setReadingBrackets
-            ( JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS).charAt( 0),
-              JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS).charAt( 1));
+        String brackets = JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS);
+        if (brackets.length() == 2)
+            importClipboardParserSelector.setReadingBrackets
+                ( brackets.charAt( 0), brackets.charAt( 1));
+        else
+            importClipboardParserSelector.setNoReadingBrackets();
     }
 
     /**
@@ -180,8 +183,9 @@ public class GeneralDialog extends Box {
                           importClipboardParserSelector.getSelectedParser().getName());
         JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE,
                           importClipboardParserSelector.isFirstOccurrenceOnly());
-        if (importClipboardParserSelector.getReadingStart() != '\0' &&
-            importClipboardParserSelector.getReadingEnd() != '\0')
+        if (importClipboardParserSelector.isNoReadingBrackets())
+            JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS, "");
+        else
             JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS,
                               new String( new char[] { importClipboardParserSelector.getReadingStart(),
                                                        importClipboardParserSelector.getReadingEnd() }));
@@ -198,8 +202,15 @@ public class GeneralDialog extends Box {
     public Parser createImportClipboardParser( jgloss.dictionary.Dictionary[] dictionaries,
                                                Set exclusions) {
         return ParserSelector.createParser( importClipboardParser, dictionaries, exclusions,
-                                            firstOccurrenceOnly,
-                                            readingStart, readingEnd);
+                                            firstOccurrenceOnly);
+    }
+
+    public ReadingAnnotationFilter createReadingAnnotationFilter() {
+        if (readingStart!='\0' && readingEnd!='\0')
+            // FIXME: kanji separator '\uff5c' should be user-configurable
+            return new ReadingAnnotationFilter( readingStart, readingEnd, '\uff5c');
+        else
+            return null;
     }
 
     private void chooseChasenLocation() {

@@ -217,6 +217,7 @@ import.clipboard=Zwischenablage
 load.progress=Öffne {0}
 
 parserselector.readingbrackets=Klammern für Lesungs-Anmerkungen:
+parserselector.noreadings=keine
 parserselector.firstoccurrence=Nur das erste Vorkommen eines Wortes annotieren
 
 print.title=Dokument drucken

@@ -301,13 +301,15 @@ public class JGlossEditor extends JTextPane {
             this.addMouseMotionListener( mouseFollower);
 
             mouseListener = new MouseListener() {
-                    private void checkPopupTrigger( MouseEvent e) {
+                    private boolean checkPopupTrigger( MouseEvent e) {
                         if (e.isPopupTrigger()) {
                             int pos = viewToModel( e.getPoint());
                             annotationEditor.makeVisible( pos);
                             annotationEditor.selectAnnotation( pos);
                             annotationEditor.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
+                            return true;
                         }
+                        return false;
                     }
 
                     public void mousePressed( MouseEvent e) {
@@ -319,15 +321,18 @@ public class JGlossEditor extends JTextPane {
                     }
                     
                     public void mouseClicked( MouseEvent e) {
-                        checkPopupTrigger( e);
-                        if (!autoscroll && (e.getModifiers() & (MouseEvent.BUTTON2_MASK|
-                                                                MouseEvent.BUTTON3_MASK))!=0) {
-                            annotationEditor.makeVisible( viewToModel( e.getPoint()));
-                        }
-                        if (!tooltips && (e.getModifiers() & MouseEvent.BUTTON1_MASK)!=0) {
-                            showToolTip( ((AnnotationModel) annotationEditor.getModel())
-                                         .getAnnotationText( viewToModel( e.getPoint())),
-                                         e.getPoint());
+                        if (!checkPopupTrigger( e)) {
+                            if (!autoscroll && (e.getModifiers() & (MouseEvent.BUTTON2_MASK|
+                                                                    MouseEvent.BUTTON3_MASK))!=0) {
+                                int pos = viewToModel( e.getPoint());
+                                annotationEditor.makeVisible( pos);
+                                annotationEditor.selectAnnotation( pos);
+                            }
+                            if (!tooltips && (e.getModifiers() & MouseEvent.BUTTON1_MASK)!=0) {
+                                showToolTip( ((AnnotationModel) annotationEditor.getModel())
+                                             .getAnnotationText( viewToModel( e.getPoint())),
+                                             e.getPoint());
+                            }
                         }
                     }
 

@@ -79,6 +79,10 @@ public class JGlossDocument extends HTMLDocument {
      */
     private Parser parser;
     /**
+     * Filter for fetching reading annotations from the document during import.
+     */
+    private ReadingAnnotationFilter readingFilter;
+    /**
      * The instance of the JGlossReader used by this document.
      */
     private JGlossReader reader;
@@ -226,16 +230,128 @@ public class JGlossDocument extends HTMLDocument {
             try {
                 int from = 0; // from offset of the data currently worked on
                 int to = 0; // to offset of the data currently worked on
+                
+                List readings = new ArrayList( 10);
+                int readingsindex = 0;
+                if (readingFilter != null)
+                    data = readingFilter.filter( data, readings);
+
+                List result = parser.parse( data);
                 int resultindex = 0; // index in the list of returned annotations
                 
-                List result = parser.parse( data);
-                
-                while (resultindex < result.size()) {
-                    // get start of next annotation
-                    Parser.TextAnnotation ta = (Parser.TextAnnotation) result.get( resultindex);
+                while (readingsindex<readings.size() || resultindex<result.size()) {
+                    // Get the next annotation. This can be either an annotation generated
+                    // by the parser or a Reading from the reading annotation filter, or both if
+                    // they overlap. If a reading
+                    // is overlapped by a parser annotation (lies between ta.start and 
+                    // ta.start + ta.lenght, a new reading is generated spanning the whole parser
+                    // annotation.
+                    Parser.TextAnnotation ta;
+                    List annotations = new ArrayList( 5);
+                    if (resultindex < result.size()) {
+                        ta = (Parser.TextAnnotation) result.get( resultindex);
+                        //System.out.println( "ta:" + ta.getStart() + " " + ta.getLength());
+                        resultindex++;
+                        if (readingsindex < readings.size()) {
+                            Reading r = (Reading) readings.get( readingsindex);
+                            //System.out.println( "r:" + r.getStart() + " " + r.getLength());
+                            readingsindex++;
+                            if (r.getStart() < ta.getStart()) { 
+                                // reading comes first, skip parser annotation for this iteration
+                                ta = r;
+                                resultindex--;
+                            }
+                            else if (r.getStart()==ta.getStart() && r.getLength()>=ta.getLength()) {
+                                // handle reading and text annotation at same time
+                                ta = r;
+                                resultindex--;
+                                // current parser annotation will be re-added to annotation list
+                                // when all annotations for this position in the text are added
+                            }
+                            else if (r.getStart() >= ta.getStart()+ta.getLength()) {
+                                // reading starts after current annotation, skip reading in this
+                                // iteration
+                                readingsindex--;
+                            }
+                            else if (r.getStart()+r.getLength() > ta.getStart()+ta.getLength()) {
+                                // Reading and parser annotation overlap. Give preference to reading
+                                // and skip annotation.
+                                ta = r;
+                                // skip all additional parser annotations which start before reading
+                                while (resultindex<result.size() && 
+                                       ((Parser.TextAnnotation) result.get( resultindex))
+                                       .getStart()<ta.getStart()) {
+                                    resultindex++;
+                                }
+                            }
+                            else {
+                                // reading lies in parser annotation, grow reading annoation to
+                                // area of parser annotation.
+                                StringBuffer readingbuf = new StringBuffer( ta.getLength() +
+                                                                            r.getReading().length());
+                                int beforeindex = ta.getStart();
+                                boolean moreReadings = false;
+                                do {
+                                    // add text before reading start
+                                    readingbuf.append( data, beforeindex, r.getStart()-beforeindex);
+                                    // add reading
+                                    readingbuf.append( r.getReading());
+                                    // Parser annotation may overlap several reading annotations
+                                    // (for example for compound words). Check if the next Reading
+                                    // is overlapped too.
+                                    moreReadings = false;
+                                    beforeindex = r.getStart() + r.getLength();
+                                    if (readingsindex < readings.size()) {
+                                        Reading r2 = (Reading) readings.get( readingsindex);
+                                        if (r2.getStart() < ta.getStart() + ta.getLength()) {
+                                            r = r2;
+                                            readingsindex++;
+                                            moreReadings = true;
+                                        }
+                                    }
+                                } while (moreReadings);
+                                // add text after reading end
+                                readingbuf.append( data, beforeindex, ta.getStart() +
+                                                   ta.getLength() - (r.getStart()+r.getLength()));
+
+                                // create new compound reading
+                                final String word = new String( data, ta.getStart(), ta.getLength());
+                                final String reading = readingbuf.toString();
+                                final jgloss.dictionary.Dictionary dictionary = r.getWordReadingPair()
+                                    .getDictionary();
+                                r = new Reading( ta.getStart(), ta.getLength(), new WordReadingPair() {
+                                        public String getWord() { return word; }
+                                        public String getReading() { return reading; }
+                                        public jgloss.dictionary.Dictionary getDictionary() { 
+                                            return dictionary;
+                                        }
+                                    });
+
+                                // now r.start==ta.start && r.length==ta.length
+                                // add new reading to annotation list
+                                annotations.add( r);
+                                // ta will be added further down
+                            }
+                        }
+                    }
+                    else {
+                        // no more parser annotations, just add readings
+                        ta = (Parser.TextAnnotation) readings.get( readingsindex);
+                        readingsindex++;
+                    }
+
+                    // ta now contains the next annotation
+                    annotations.add( ta);
                     to = ta.getStart() - 1;
-                    
                     int talen = ta.getLength();
+                    
+                    // get all annotations for this position in the text
+                    // the tests above guarantee that there can be no more readings at this position
+                    while (resultindex<result.size() && ((Parser.TextAnnotation) result.get( resultindex))
+                           .getStart()<ta.getStart()+talen) {
+                        annotations.add( result.get( resultindex));
+                        resultindex++;
+                    }
                     
                     // handle text between annotations
                     if (to >= from) {
@@ -245,17 +361,7 @@ public class JGlossDocument extends HTMLDocument {
                         pos += d.length;
                     }
                     
-                    // handle annotation
-                    // get all annotations for this position in the text
-                    List annotations = new ArrayList( 5);
-                    annotations.add( ta);
-                    resultindex++;
-                    while (resultindex<result.size() && ((Parser.TextAnnotation) result.get( resultindex))
-                           .getStart()<ta.getStart()+talen) {
-                        annotations.add( result.get( resultindex));
-                        resultindex++;
-                    }
-                    
+                    // handle annotations
                     String word = new String( data, ta.getStart(), talen);
                     String reading = null; // reading (in dictionary form)
                     String dictionaryWord = null; // null means same as word
@@ -392,12 +498,6 @@ public class JGlossDocument extends HTMLDocument {
                     handleEndTag( AnnotationTags.ANNOTATION, pos);
                     
                     from = ta.getStart() + talen;
-                    if (ta instanceof Reading && from<data.length &&
-                        parser instanceof ReadingAnnotationParser &&
-                        data[from]==((ReadingAnnotationParser) parser).getReadingStart()) {
-                        // skip reading annotation in original document
-                        from += ((Reading) ta).getReading().length() + 2;
-                    }
                 }
                 
                 // add remaining text
@@ -531,7 +631,7 @@ public class JGlossDocument extends HTMLDocument {
      * @param htmlparser The HTML parser to use.
      */
     public JGlossDocument( HTMLEditorKit.Parser htmlparser) {
-        this( htmlparser, null, false);
+        this( htmlparser, null, null, false);
     }
 
     /**
@@ -539,10 +639,11 @@ public class JGlossDocument extends HTMLDocument {
      * a loaded document.
      *
      * @param htmlparser The HTML parser to use.
+     * @param filter Filter for fetching the reading annotations from a parsed document.
      * @param parser The parser to use to find annotations for some text.
      */
-    public JGlossDocument( HTMLEditorKit.Parser htmlparser, Parser parser) {
-        this( htmlparser, parser, true);
+    public JGlossDocument( HTMLEditorKit.Parser htmlparser, Parser parser, ReadingAnnotationFilter filter) {
+        this( htmlparser, parser, filter, true);
     }
 
     /**
@@ -551,16 +652,19 @@ public class JGlossDocument extends HTMLDocument {
      *
      * @param htmlparser The HTML parser to use.
      * @param parser The parser to use to find annotations for some text.
+     * @param filter Filter for fetching the reading annotations from a parsed document.
      * @param addAnnotations <CODE>true</CODE> if annotations should be added when loading a
      *                       document.
      */
-    public JGlossDocument( HTMLEditorKit.Parser htmlparser, Parser parser, boolean addAnnotations) {
+    public JGlossDocument( HTMLEditorKit.Parser htmlparser, Parser parser, ReadingAnnotationFilter filter,
+                           boolean addAnnotations) {
         setParser( htmlparser);
         this.parser = parser;
+        this.readingFilter = filter;
         this.addAnnotations = addAnnotations;
 
         if (addAnnotations) {
-            // creates new JGloss file
+            // create new JGloss file
             jglossVersion = JGlossWriter.JGLOSS_VERSION;
             fileFormatMajorVersion = JGlossWriter.FILE_FORMAT_MAJOR_VERSION;
             fileFormatMinorVersion = JGlossWriter.FILE_FORMAT_MINOR_VERSION;

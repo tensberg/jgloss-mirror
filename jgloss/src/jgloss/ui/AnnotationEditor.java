@@ -235,6 +235,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * to set the document to edit. The constructor will create a new empty AnnotationModel.
      */
     public AnnotationEditor() {
+        setLargeModel( true);
         model = new AnnotationModel() {
                 public void valueForPathChanged( TreePath path, Object newValue) {
                     ((EditableTextNode) path.getLastPathComponent()).setText( newValue.toString());
@@ -286,7 +287,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         r.setLeafIcon( nullIcon);
         r.setOpenIcon( nullIcon);
         r.setClosedIcon( nullIcon);
-        this.setCellRenderer( r);
+        setCellRenderer( r);
+        setRowHeight( r.getPreferredSize().height);
         if (this.getUI() instanceof BasicTreeUI) {
             BasicTreeUI ui = (BasicTreeUI) this.getUI();
             ui.setCollapsedIcon( nullIcon);
@@ -297,7 +299,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
 
         this.setRootVisible( false);
         this.setShowsRootHandles( false);
-        this.setLargeModel( true);
 
         addTreeSelectionListener( this);
 
@@ -820,15 +821,17 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * @param path Contains the path from root to the node inclusive.
      */
     private void expandAll( TreePath path) {
-        this.expandPath( path);
-
         TreeNode child = null;
+        boolean hasExpandedChild = false;
         for ( Enumeration e=((TreeNode) path.getLastPathComponent()).children(); e.hasMoreElements(); ) {
             child = (TreeNode) e.nextElement();
             if (!(child.isLeaf() || child instanceof DictionaryFormNode)) {
                 expandAll( path.pathByAddingChild( child));
+                hasExpandedChild = true;
             }
         }
+        if (!hasExpandedChild)
+            this.expandPath( path);
     }
 
     /**
@@ -876,7 +879,17 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             }
 
             if (selection != annotationSelection) {
+                if (annotationSelection != null) {
+                    // collapse old selection
+                    collapsePath( new TreePath( new Object[] { model.getRoot(), annotationSelection }));
+                    // the whole tree is collapsed now, clear the cache of toggled paths to conserve memory
+                    clearToggledPaths();
+                }
+                // expand new selection
                 annotationSelection = (AnnotationNode) selection;
+                expandAll( annotationSelection);
+                makeVisible( annotationSelection);
+
                 int start = annotationSelection.getAnnotationElement().getStartOffset();
                 int end = annotationSelection.getAnnotationElement().getEndOffset();
                 docpane.makeVisible( start, end);
@@ -960,7 +973,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
 
     /**
      * Scrolls the display of the annotation editor so that the given annotation node is
-     * visible. This will uncollapse the split pane, if the annotation editor is contained in one.
+     * visible. This will uncollapse the split pane if the annotation editor is contained in one.
      *
      * @param node The annotation node which will be made visible.
      */
@@ -979,7 +992,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 port.setViewPosition( new Point
                     ( 0, Math.max( 0, Math.min( r.y, port.getViewSize().height -
                                                 port.getSize().height))));
-                }
+            }
 
             // uncollapse split pane if neccessary
             if (parent!=null && !(parent instanceof JSplitPane))

@@ -1,4 +1,10 @@
 0.9.4: (2001/11/01)
+	- Improved handling of reading annotations in imported text;
+	  ChaSen parser can now be used with texts with reading
+	  annotations.
+	- Changed annotation editor to only expand tree for selected
+	  annotation. This speeds up document display and decreases
+	  memory usage.
 	- Fixed escaping of special characters in LaTeX export.
 	- Fixes to JGloss-WWW.
 0.9.3: (2001/09/14)

@@ -114,13 +114,11 @@ public class ParserSelector extends JPanel {
 
         Box b = Box.createVerticalBox();
         parserButtons = new JRadioButton[parsers.size()/2];
-        boolean hasReadingAnnotationParser = false;
         ButtonGroup bg = new ButtonGroup();
         int i = 0;
         for ( Iterator j=parsers.iterator(); j.hasNext(); ) {
             Class parser = (Class) j.next();
             String name = (String) j.next();
-            hasReadingAnnotationParser |= ReadingAnnotationParser.class.isAssignableFrom( parser);
             parserButtons[i] = new JRadioButton( name);
             parserButtons[i].putClientProperty( PARSER_CLASS_PROPERTY, parser);
             bg.add( parserButtons[i]);
@@ -131,9 +129,11 @@ public class ParserSelector extends JPanel {
         firstOccurrenceOnly = new JCheckBox( JGloss.messages.getString( "parserselector.firstoccurrence"));
         b.add( firstOccurrenceOnly);
         this.add( b, c);
+        parserButtons[0].setSelected( true);
 
         if (showReadingAnnotationSelector) {
             Vector v = new Vector();
+            v.add( JGloss.messages.getString( "parserselector.noreadings"));
             String s = JGloss.prefs.getString( Preferences.READING_BRACKET_CHARS);
             for ( i=0; i<s.length()-1; i+=2)
                 v.add( s.substring( i, i+2));
@@ -149,22 +149,7 @@ public class ParserSelector extends JPanel {
             JPanel p = UIUtilities.createSpaceEater( b, true);
             p.setBorder( BorderFactory.createEmptyBorder( 5, 2, 0, 2));
             this.add( p, c);
-
-            ItemListener il = new ItemListener() {
-                    public void itemStateChanged( ItemEvent e) {
-                        if (e.getStateChange() == ItemEvent.SELECTED) {
-                            JRadioButton rb = (JRadioButton) e.getItem();
-                            readingBrackets.setEnabled( ReadingAnnotationParser.class.isAssignableFrom
-                                                        ( (Class) rb.getClientProperty
-                                                          ( PARSER_CLASS_PROPERTY)));
-                        }
-                    }
-                };
-            for ( i=0; i<parserButtons.length; i++)
-                parserButtons[i].addItemListener( il);
         }
-
-        parserButtons[0].setSelected( true); // must be done after registration of the ItemListener
 
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 2;
@@ -176,8 +161,7 @@ public class ParserSelector extends JPanel {
      * Creates a new instance of the parser class.
      */
     public static Parser createParser( Class parserClass, jgloss.dictionary.Dictionary[] dictionaries,
-                                       Set exclusions, boolean firstOccurrenceOnly, 
-                                       char readingStart, char readingEnd) {
+                                       Set exclusions, boolean firstOccurrenceOnly) {
         if (parserClass == null)
             return null;
 
@@ -186,11 +170,7 @@ public class ParserSelector extends JPanel {
                 .getConstructor( new Class[] { jgloss.dictionary.Dictionary[].class, Set.class });
             Parser p = (Parser) c.newInstance( new Object[] { dictionaries, exclusions });
             p.setAnnotateFirstOccurrenceOnly( firstOccurrenceOnly);
-            if (p instanceof ReadingAnnotationParser) {
-                ReadingAnnotationParser rp = (ReadingAnnotationParser) p;
-                rp.setReadingStart( readingStart);
-                rp.setReadingEnd( readingEnd);
-            }
+
             return p;
         }
         catch (Exception ex) {
@@ -198,6 +178,19 @@ public class ParserSelector extends JPanel {
         }
 
         return null;
+    }
+
+    /**
+     * Creates a reading annotation filter with the given reading brackets. If the reading
+     * brackets are not valid, <CODE>null</CODE> is returned.
+     */
+    public static ReadingAnnotationFilter createReadingAnnotationFilter( char readingStart, 
+                                                                         char readingEnd) {
+        if (readingStart!='\0' && readingEnd!='\0')
+            // FIXME: kanji separator '\uff5c' should be user-configurable
+            return new ReadingAnnotationFilter( readingStart, readingEnd, '\uff5c');
+        else
+            return null;
     }
 
     /**
@@ -211,14 +204,19 @@ public class ParserSelector extends JPanel {
     }
 
     /**
-     * Creates a new instance of the currently selected parser. If it is an instance of
-     * {@link ReadingAnnotaionParser ReadingAnnotationParser}, the currently selected reading
-     * brackets will be set.
+     * Creates a new instance of the currently selected parser.
      */
     public Parser createParser( jgloss.dictionary.Dictionary[] dictionaries, Set exclusions) {
         return createParser( getSelectedParser(), dictionaries, exclusions, 
-                             firstOccurrenceOnly.isSelected(),
-                             getReadingStart(), getReadingEnd());
+                             firstOccurrenceOnly.isSelected());
+    }
+
+    /**
+     * Creates a new reading annotation filter with the currently selected reading brackets.
+     * If no reading brackets are selected, <CODE>null</CODE> is returned.
+     */
+    public ReadingAnnotationFilter createReadingAnnotationFilter() {
+        return createReadingAnnotationFilter( getReadingStart(), getReadingEnd());
     }
 
     /**
@@ -299,20 +297,35 @@ public class ParserSelector extends JPanel {
 
     public char getReadingStart() {
         String s = (String) readingBrackets.getSelectedItem();
-        if (!readingBrackets.isEnabled() || s==null || s.length()<2)
+        if (s==null || s.equals( readingBrackets.getItemAt( 0)) || s.length()<2)
             return '\0';
         return s.charAt( 0);
     }
 
     public char getReadingEnd() {
         String s = (String) readingBrackets.getSelectedItem();
-        if (!readingBrackets.isEnabled() || s==null || s.length()<2)
+        if (s==null || s.equals( readingBrackets.getItemAt( 0)) || s.length()<2)
             return '\0';
         return s.charAt( 1);
     }
 
     public void setReadingBrackets( char readingStart, char readingEnd) {
         readingBrackets.setSelectedItem( new String( new char[] { readingStart, readingEnd }));
+    }
+
+    /**
+     * Disable the use of a reading bracket filter by setting the selected reading brackets to
+     * "none".
+     */
+    public void setNoReadingBrackets() {
+        readingBrackets.setSelectedIndex( 0);
+    }
+
+    /**
+     * Tests if no reading brackets are selected.
+     */
+    public boolean isNoReadingBrackets() {
+        return (getReadingStart()=='\0' || getReadingEnd()=='\0');
     }
 
     public void setFirstOccurrenceOnly( boolean firstOccurrenceOnly) {

@@ -65,6 +65,10 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * The parser used to annotate text.
      */
     private jgloss.dictionary.Parser parser;
+    /**
+     * Filter for fetching reading annotations from the document during import.
+     */
+    private jgloss.dictionary.ReadingAnnotationFilter readingFilter;    
 
     /**
      * Flag if the view should be in compact mode.
@@ -647,16 +651,20 @@ public class JGlossEditorKit extends HTMLEditorKit {
      *
      * @param parser Parser for finding annotations when a document is loaded. The parser will be used
      *               when creating the default document.
+     * @param filter Filter for fetching the reading annotations from a parsed document.
      * @param addAnnotations Flag if annotations should be added when a document is loaded. This will
      *                       be used when the default document is created.
      * @param compactView <CODE>true</CODE> if compact view mode should be used.
      * @param showReading <CODE>true</CODE> if reading annotations should be visible.
      * @param showTranslation <CODE>true</CODE> if translation annotations should be visible.
      */
-    public JGlossEditorKit( jgloss.dictionary.Parser parser, boolean addAnnotations, boolean compactView,
+    public JGlossEditorKit( jgloss.dictionary.Parser parser, 
+                            jgloss.dictionary.ReadingAnnotationFilter filter,
+                            boolean addAnnotations, boolean compactView,
                             boolean showReading, boolean showTranslation) {
         super();
         this.parser = parser;
+        this.readingFilter = filter;
         this.compactView = compactView;
         this.showReading = showReading;
         this.showTranslation = showTranslation;
@@ -733,7 +741,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * @return The new document.
      */
     public Document createDefaultDocument() {
-        return new JGlossDocument( getParser(), parser, addAnnotations);
+        return new JGlossDocument( getParser(), parser, readingFilter, addAnnotations);
     }
 
     /**

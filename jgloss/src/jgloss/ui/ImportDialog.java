@@ -80,8 +80,9 @@ public class ImportDialog extends JDialog {
                                           parserSelector.getSelectedParser().getName());
                         JGloss.prefs.set( Preferences.IMPORT_FIRSTOCCURRENCE,
                                           parserSelector.isFirstOccurrenceOnly());
-                        if (parserSelector.getReadingStart() != '\0' &&
-                            parserSelector.getReadingEnd() != '\0')
+                        if (parserSelector.isNoReadingBrackets())
+                            JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS, "");
+                        else
                             JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS,
                                               new String( new char[] { parserSelector.getReadingStart(),
                                                                        parserSelector.getReadingEnd() }));
@@ -165,9 +166,11 @@ public class ImportDialog extends JDialog {
         } catch (ClassNotFoundException ex) {}
         parserSelector.setFirstOccurrenceOnly( JGloss.prefs.getBoolean
                                                ( Preferences.IMPORT_FIRSTOCCURRENCE));
-        parserSelector.setReadingBrackets
-            ( JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS).charAt( 0),
-              JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS).charAt( 1));
+        String brackets = JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS);
+        if (brackets.length() == 2)
+            parserSelector.setReadingBrackets( brackets.charAt( 0), brackets.charAt( 1));
+        else
+            parserSelector.setNoReadingBrackets();
         parserSelector.setEnabled( ChasenParser.class, ChasenParser.isChasenExecutable
                                    ( ChasenParser.getDefaultExecutable()));
         JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {
@@ -226,5 +229,12 @@ public class ImportDialog extends JDialog {
      */
     public Parser createParser( Dictionary[] dictionaries, java.util.Set exclusions) {
         return parserSelector.createParser( dictionaries, exclusions);
+    }
+
+    /**
+     * Creates a new reading annotation filter using the user-selected reading brackets.
+     */
+    public ReadingAnnotationFilter createReadingAnnotationFilter() {
+        return parserSelector.createReadingAnnotationFilter();
     }
 } // class ImportDialog

@@ -94,6 +94,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                             ( d.getSelection(),
                                               d.createParser( Dictionaries.getDictionaries(),
                                                               ExclusionList.getExclusions()),
+                                              d.createReadingAnnotationFilter(),
                                               d.getEncoding());
                                         which.documentChanged = true;
                                     }
@@ -322,8 +323,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
         // set up the frame
         annotationEditor = new AnnotationEditor();
         annotationEditorScroller = new JScrollPane( annotationEditor,
-                                                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                                                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         docpane = new JGlossEditor( annotationEditor);
         docpane.setEditable( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
         docpaneScroller = new JScrollPane( docpane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -603,6 +604,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                           JGloss.messages.getString( "import.clipboard"),
                           GeneralDialog.getComponent().createImportClipboardParser
                           ( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                          GeneralDialog.getComponent().createReadingAnnotationFilter(),
                           true, len);
                     which.documentChanged = true;
                 }
@@ -628,11 +630,13 @@ public class JGlossFrame extends JFrame implements ActionListener {
      *
      * @param path URL or path of the file to import.
      * @param parser Parser used to annotate the text.
+     * @param filter Filter for fetching the reading annotations from a parsed document.
      * @param encoding Character encoding of the file. May be either <CODE>null</CODE> or the
      *                 value of the "encodings.default" resource to use autodetection.
      * @see #loadDocument(Reader,String,String,Parser,boolean,int)
      */
-    private void importDocument( String path, Parser parser, String encoding) {
+    private void importDocument( String path, Parser parser, ReadingAnnotationFilter filter, 
+                                 String encoding) {
         try {
             Reader in = null;
             int contentlength = 0;
@@ -677,7 +681,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
             if (!contenttype.equals( "text/html"))
                 in = new HTMLifyReader( in);
 
-            loadDocument( in, path, title, parser, true,
+            loadDocument( in, path, title, parser, filter, true,
                           CharacterEncodingDetector.guessLength( contentlength, encoding));
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -709,6 +713,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 ( new HTMLifyReader( new StringReader( text)), path, title,
                   GeneralDialog.getComponent().createImportClipboardParser
                   ( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                  GeneralDialog.getComponent().createReadingAnnotationFilter(),
                   true, text.length());
             documentChanged = true;
             if (setPath)
@@ -736,7 +741,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
             Reader in = new InputStreamReader( new FileInputStream( f), "UTF-8");
             documentPath = f.getAbsolutePath();
             loadDocument( in, documentPath, f.getName(), 
-                          null, false,
+                          null, null, false,
                           CharacterEncodingDetector.guessLength( (int) f.length(), "UTF-8"));
 
             // test the file version of the loaded document
@@ -793,17 +798,19 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * @param path The location of the document which was used to create the reader.
      * @param title Title of the file. This will normally be the filename component of the path.
      * @param parser The parser to use to annotate Japanese text.
+     * @param filter Filter for fetching the reading annotations from a parsed document.
      * @param addAnnotations <CODE>true</CODE> if annotations should be added while loading the
      *                       document.
      * @param length Approximate length in characters of the document to load. This will only be used
      *               for the progress bar.
      */
     private void loadDocument( Reader in, String path, String title, Parser parser, 
+                               ReadingAnnotationFilter filter,
                                boolean addAnnotations, int length) 
         throws IOException {
         documentLoaded = true;
 
-        kit = new JGlossEditorKit( parser, addAnnotations, compactViewItem.isSelected(),
+        kit = new JGlossEditorKit( parser, filter, addAnnotations, compactViewItem.isSelected(),
                                    showReadingItem.isSelected(),
                                    showTranslationItem.isSelected());
         doc = (JGlossDocument) kit.createDefaultDocument();
@@ -855,7 +862,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         docpane.setStyledDocument( doc);
 
         annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
-        annotationEditor.expandNonHidden();
+        //annotationEditor.expandNonHidden();
 
         getContentPane().removeAll();
         getContentPane().add( split);
