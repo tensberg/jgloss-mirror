@@ -430,9 +430,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Subclasses may override this method to create custom character handlers.
      */
     protected EncodedCharacterHandler createCharacterHandler(String encoding) {
-        if (encoding.equals("EUC-JP"))
+        if ("EUC-JP".equals(encoding))
             return new EUCJPCharacterHandler();
-        else if (encoding.equals("UTF-8"))
+        else if ("UTF-8".equals(encoding))
             return new UTF8CharacterHandler();
         else
             throw new IllegalArgumentException(encoding);

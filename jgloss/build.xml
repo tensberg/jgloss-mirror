@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ Copyright (C) 2004 Michael Koch (tensberg@gmx.net)
+
+ This file is part of JGloss.
+
+ JGloss is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ JGloss is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with JGloss; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ $Id$
+
+-->
+<project name="JGloss" default="compile-jgloss" basedir=".">
+	<description>
+	Build file for the JGloss project
+	</description>
+
+	<!-- JGloss uses javamake for compilation. Download javamake from http://www.experimentalstuff.com/Technologies/JavaMake/index.html -->
+	<taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
+
+	<!-- global properties -->
+	<property name="release" value="2.0a3" />
+	
+	<property name="jgloss-distname" value="jgloss-${release}" />
+	<property name="jdictionary-distname" value="jdictionary-${release}" />
+
+	<property name="source" value="src" />
+	<property name="build" value="build" />
+	
+	<property name="jgloss-sources"
+			  value="jgloss/JGlossApp.java
+                     jgloss/ui/export/XSLTExporter.java
+                     jgloss/ui/export/LaTeXExporter.java" />
+
+    <!-- targets -->
+	<target name="compile-jgloss">
+		<mkdir dir="${build}" />
+		<javac srcdir="${source}" destdir="${build}" includes="${jgloss-sources}"  />
+	</target>
+</project>

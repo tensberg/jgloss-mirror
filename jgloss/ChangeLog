@@ -17,6 +17,9 @@
 	- Redesign and rewrite of many internals.
 	- Java2 1.3 is no longer supported, minimum version is 1.4.
 	- Some features from JGloss 1.0.x are missing in this release.
+1.0.8: (2004/03/07)
+	- fixed bug in dictionary loading which made the preferences
+	  window unuseable
 1.0.7: (2004/02/23)
 	- changed dictionary format detection to work with more EDICT
 	  and WadokuJT versions.
