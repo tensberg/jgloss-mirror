@@ -1746,11 +1746,12 @@ public class JGlossFrame extends JPanel implements ActionListener {
         // The JRE1.3 AWT/Swing implementation keeps static references to created JFrames, thus
         // they are never garbage collected. Remove all references from the JFrame to the JGlossFrame
         // to ensure that the JGlossFrame can be garbage collected.
-        frame.getJMenuBar().removeAll();
+        UIUtilities.dismantleHierarchy( frame.getJMenuBar());
         frame.setJMenuBar( null);
         frame.removeComponentListener( componentListener);
         frame.removeWindowListener( windowListener);
         frame.setContentPane( new JPanel());
+        frame.getContentPane().requestFocus();
         frame.dispose();
 
         // Sometimes, due to the fact that swing keeps internal references, the JGlossFrame is

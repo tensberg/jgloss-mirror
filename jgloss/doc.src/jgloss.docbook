@@ -29,7 +29,7 @@
     <author>
       <firstname>Michael</firstname><surname>Koch</surname>
     </author>
-    <edition>1.0.4</edition>
+    <edition>1.0.5</edition>
     <copyright><year>2001,2002</year><holder>Michael Koch</holder></copyright>
     <pubdate>2002</pubdate>
   </bookinfo>
@@ -89,7 +89,7 @@
     </sect1>
   </chapter>
 
-  <chapter><title>Making it work</title>
+  <chapter><title>Setting up JGloss</title>
     <sect1 id="sect.whatyouneed"><title>What you need</title>
       <para>
         &JGloss; is a Java application. To run it, you will need a Java implementation that
@@ -128,7 +128,7 @@
             <term><ulink url="http://www.bibiko.com/dlde.htm">GDICT</ulink></term>
             <listitem>
               <para>
-                GDICT is an extensive Japanese-German dictionary. 
+                The WaDokuJiten/GDICT is an extensive Japanese-German dictionary. 
                 To use it, download the file <filename>gdictutf.zip</filename> from
                 <ulink url="http://www.bibiko.com/dlde.htm">this page</ulink>, unzip it
                 and add the resulting file <filename>gdictutf.txt</filename> to the list of
@@ -653,7 +653,7 @@
         <guilabel>Import</guilabel> dialog. In the text field you can enter
         an HTTP URL or the file name of a local document. The document should be plain text.
         There is some support for importing <acronym>HTML</acronym> documents, but it will only work
-        for simple layouts. If you click the <guibutton>Choose File</guibutton>
+        for documents with simple layout. If you click the <guibutton>Choose File</guibutton>
         button, a file chooser dialog will pop up and let you select a local file.
         The character encoding of the file can be selected in the 
         <guilabel>Character encoding ...</guilabel> popup menu. You can usually
@@ -857,7 +857,11 @@
       <para>
         If the <guilabel>annotate first occurrence</guilabel> option is selected, each word in a
         document is only annotated the first time it appears. This decreases the RAM usage and
-        the time it takes to display the document.
+        the time it takes to display the document. The <guilabel>Guess paragraph breaks</guilabel>
+        option controls how line breaks in the imported document are converted to paragraph breaks.
+        If the option is selected, JGloss tries to determine if a line break in the imported document
+        signifies the end of a paragraph or if it is used for formatting reasons only. In the second
+        case, it will be ignored.
       </para>
       <para>
         Some documents you can find on the internet
@@ -1489,7 +1493,7 @@
           <row>
             <entry>Name</entry>
             <entry>Function</entry>
-            <entry>Appears in</entry>
+            <entry>Defined in</entry>
             <entry>Default</entry>
           </row>
         </thead>

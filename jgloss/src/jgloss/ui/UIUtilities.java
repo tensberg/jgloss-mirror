@@ -135,4 +135,19 @@ public class UIUtilities {
 
         return se;
     }
+
+    /**
+     * Dismantles a hierarchy of nested components by removing all children from their parents.
+     * The method will recurse over all children of the passed-in container. It can be called
+     * to guarantee no reference to child objects is kept even if the parent for some reason
+     * does not get garbage collected.
+     */
+    public static void dismantleHierarchy( Container c) {
+        while (c.getComponentCount() > 0) {
+            Component child = c.getComponent( c.getComponentCount()-1);
+            if (child instanceof Container)
+                dismantleHierarchy( (Container) child);
+            c.remove( c.getComponentCount()-1);
+        }
+    }
 } // class UIUtilities

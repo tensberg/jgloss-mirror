@@ -60,6 +60,10 @@ public class StyleDialog extends Box {
     }
 
     /**
+     * CSS background-color property value for body color.
+     */
+    private final static String BACKGROUND_COLOR = "white";
+    /**
      * Four japanese characters used to test the fonts.
      */
     private final static String JAPANESE_CHARS_TEST = "A\u3042\u30a2\u660e\u3002";
@@ -636,7 +640,7 @@ public class StyleDialog extends Box {
         if (s == null)
             return;
 
-        String style = "body { ";
+        String style = "body { background-color: " + BACKGROUND_COLOR + "; ";
         if (JGloss.prefs.getString( Preferences.FONT_TEXT).length()!=0) {
             style += "font-family: " + JGloss.prefs.getString( Preferences.FONT_TEXT) + "; ";
         }
@@ -674,8 +678,7 @@ public class StyleDialog extends Box {
                 ( JGloss.prefs.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff)) + "; ";
         }
         else {
-            // this removes, among other settings, the current background color settings
-            s.removeStyle( AnnotationTags.READING.getId());
+            style += "background-color: " + BACKGROUND_COLOR + "; ";
         }
         if (additionalStyles.containsKey( AnnotationTags.READING.getId()))
             style += additionalStyles.get( AnnotationTags.READING.getId()).toString();
@@ -694,8 +697,7 @@ public class StyleDialog extends Box {
                 ( JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff)) + "; ";
         }
         else {
-            // this removes, among other settings, the current background color settings
-            s.removeStyle( AnnotationTags.TRANSLATION.getId());
+            style += "background-color: " + BACKGROUND_COLOR + "; ";
         }
 
         if (additionalStyles.containsKey( AnnotationTags.TRANSLATION.getId()))
@@ -707,8 +709,9 @@ public class StyleDialog extends Box {
             currentStyles.put( s, style);
         }
 
-        JGlossEditor.setHighlightColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
+        JGlossEditor.setHighlightColor
+            ( new Color( Math.max( 0, JGloss.prefs.getInt
+                                   ( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
     }
 
     /**

@@ -374,7 +374,8 @@ public class JGloss {
         while (Toolkit.getDefaultToolkit().getSystemEventQueue().peekEvent() != null) try {
             System.err.println( Toolkit.getDefaultToolkit().getSystemEventQueue().getNextEvent());
         } catch (InterruptedException ex) {}
-        System.gc();*/
+        System.gc();
+        */
 
         System.exit( 0);
 

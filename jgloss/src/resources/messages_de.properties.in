@@ -40,7 +40,7 @@ error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\n
 error.dictionary.jjdxnotavailable=\
 Die JJDX-Indexdatei für das Wörterbuch {0} konnte\n\
 nicht geöffnet oder erzeugt werden. Überprüfen sie, ob das Verzeichnis\n\
-{1} zum Schreiben freigegeben ist.\n\
+"{1}" zum Schreiben freigegeben ist.\n\
 Das Wörterbuch wird nicht verfügbar sein.
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.\nDas Wörterbuch wird nicht verfügbar sein.
 error.dictionary.format=Die Datei {0} ist keine\nWörterbuchdatei in einem unterstützten Format.

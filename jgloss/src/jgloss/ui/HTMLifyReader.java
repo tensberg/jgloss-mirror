@@ -98,6 +98,12 @@ public class HTMLifyReader extends FilterReader {
         Arrays.sort( NO_PARAGRAPH_END);        
     }
     
+    /**
+     * Constructs a new reader without inserting a HTML title for an underlying reader and which
+     * detects paragraph breaks.
+     *
+     * @exception IOException if an error occurrs when accessing the underlying reader.
+     */
     public HTMLifyReader( Reader in) throws IOException {
         this( in, null, true);
     }
@@ -117,7 +123,9 @@ public class HTMLifyReader extends FilterReader {
      *
      * @param in The reader from which to read the plain text file.
      * @param title The title to insert in the generated HTML document.
-     * @param detectParagraphs If <code>true</code>, 
+     * @param detectParagraphs If <code>false</code>, every line break in the underlying reader 
+     *        will be interpreted as a paragraph break. If <code>true</code>, a heuristic is used to
+     *        determine between line breaks and paragraph breaks in the document read from the reader.
      * @exception IOException if an error occurrs when accessing the underlying reader.
      */
     public HTMLifyReader( Reader in, String title, boolean detectParagraphs) throws IOException {
@@ -144,9 +152,15 @@ public class HTMLifyReader extends FilterReader {
     }
 
     public int read() throws IOException {
+        /* line buffers the data read from the underlying reader and additional HTML markup added
+         * by this class.
+         * line[position] contains the character which is returned from this call to read(). If
+         * line[position] does not exist, read the next char from the underlying reader and interpret it.
+         */
+
         if (position >= line.length) {
             if (eof == true) {
-                // eof at underlying stream and all additional HTML already returned
+                // eof at underlying reader and all additional HTML already returned
                 return -1;
             }
 
@@ -154,7 +168,7 @@ public class HTMLifyReader extends FilterReader {
 
             int next = super.read();
             if (next == -1) {
-                // eof at underlying stream. Write HTML document end tags.
+                // eof at underlying reader. Generate HTML document end tags.
                 eof = true;
                 line = END_HTML;
                 if (inParagraph) {
@@ -173,7 +187,7 @@ public class HTMLifyReader extends FilterReader {
                             // if the last line ended with a normal (not punctuation mark) char, and
                             // the new line starts with a normal char, no paragraph break will be generated
                             if (!endsParagraph( lastChar)) {
-                                next = in.read();
+                                next = in.read(); // first character in the following input line
                                 if (next != -1) {
                                     char c = (char) next;
                                     if (!startsParagraph( c)) {
@@ -193,7 +207,7 @@ public class HTMLifyReader extends FilterReader {
                         }
                     }
                     else {
-                        // empty line; generate empty paragraph
+                        // two adjacent line breaks: empty line; generate empty paragraph
                         line = EMPTY_PARAGRAPH;
                     }
                 }
@@ -210,7 +224,6 @@ public class HTMLifyReader extends FilterReader {
             }
         }
 
-        System.err.print( line[position]);
         lastChar = line[position++];
         return lastChar;
     }
@@ -276,6 +289,10 @@ public class HTMLifyReader extends FilterReader {
             return false;
     }
 
+    /**
+     * Test if a character signifies the beginning of a new paragraph if encountered at the
+     * beginning of a line.
+     */
     private boolean startsParagraph( char c) {
         if (contains( NO_PARAGRAPH_START, c))
             return false;
@@ -286,6 +303,10 @@ public class HTMLifyReader extends FilterReader {
         return true;
     }
 
+    /**
+     * Test if a character signifies the end of a paragraph if encountered at the
+     * beginning of a line.
+     */
     private boolean endsParagraph( char c) {
         if (contains( NO_PARAGRAPH_END, c))
             return false;
@@ -296,6 +317,10 @@ public class HTMLifyReader extends FilterReader {
         return true;
     }
 
+    /**
+     * Test if a character c is contained in a sorted character array a. The
+     * character array must be sorted lexicographically.
+     */
     private boolean contains( char[] a, char c) {
         int where = Arrays.binarySearch( a, c);
         return (where>=0 && where<a.length && a[where]==c);
