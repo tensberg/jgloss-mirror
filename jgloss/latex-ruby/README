@@ -6,7 +6,7 @@ taken from the CJK 4.2.0 macro package for LaTeX2e, written by Werner Lemberg
 <wl@gnu.org>. You can find a copy of the package at http://www.ctan.org/. It
 is distributed under the terms of the GNU General Public License Version 2.
 
-You can use the macro in conjunction with platex (japanese LaTeX) which
-is included with teTeX.
+You can use the macro in conjunction with platex (Japanese LaTeX) which
+is included with TeTeX.
 
  Michael Koch <tensberg@gmx.net>
