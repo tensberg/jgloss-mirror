@@ -44,9 +44,11 @@ public class PasteImportFrame extends JFrame implements TextListener {
      */
     public void textValueChanged( TextEvent e) {
         String text = pastearea.getText();
-        pastearea.setText( "");
-        if (text.length() < 2) // ignore single key inputs
+        if (text.length() < 3 || // ignore single key inputs
+            text.equals( JGloss.messages.getString( "pasteimport.standby"))) // avoid recursive calls
             return;
+        pastearea.setEditable( false);
+        pastearea.setText( JGloss.messages.getString( "pasteimport.standby"));
 
         // construct a new string the hacky way because AWT ignores the
         // charset when pasting japanese text from the X primary selection
@@ -71,7 +73,17 @@ public class PasteImportFrame extends JFrame implements TextListener {
             }
         }
 
-        new JGlossFrame().importString( text, JGloss.messages.getString( "import.clipboard"),
-                                        JGloss.messages.getString( "import.clipboard"), false);
+        // During the construction of the frame, the user has no visible feedback except for the
+        // message in the text area. So don't do it in an own thread.
+        final JGlossFrame f = new JGlossFrame();
+        final String ftext = text;
+        new Thread() {
+                public void run() {
+                    f.importString( ftext, JGloss.messages.getString( "import.clipboard"),
+                                    JGloss.messages.getString( "import.clipboard"), false);
+                }
+            }.start();
+        pastearea.setText( "");
+        pastearea.setEditable( true);
     }
 } // class PasteImportFrame
