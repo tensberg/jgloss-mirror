@@ -44,6 +44,7 @@ public class JGlossDocument {
         String TITLE = "title";
         String GENERATOR = "generator";
         String BODY = "body";
+        String DIV = "div";
         String P = "p";
         String ANNOTATION = "anno";
         String RBASE = "rbase";

@@ -139,6 +139,9 @@ my $footer = <<'END_FOOTER';
 END_FOOTER
 
 my %replacements = ();
+$replacements{'document-title'} = <<'END';
+</xsl:text><xsl:value-of select="/jgloss/head/title" /><xsl:text>
+END
 $replacements{'document-filename'} = <<'END';
 </xsl:text><xsl:value-of select="$document-filename" /><xsl:text>
 END
@@ -228,12 +231,12 @@ sub main {
 sub substituteVariables {
     my $line = shift(@_);
     
-    if ($line =~ m/\%(.+?)\%/) {
+    if ($line =~ m/\%(.+?)(?=\%)/) {
         if (exists($replacements{$1})) {
-            $line = $PREMATCH . $replacements{$1} . substituteVariables($POSTMATCH);
+            $line = $PREMATCH . $replacements{$1} . substituteVariables(substr($POSTMATCH, 1));
         }
         else {
-            $line = "$PREMATCH" . "\%$1\%" . substituteVariables($POSTMATCH);
+            $line = "$PREMATCH" . "\%$1" . substituteVariables($POSTMATCH);
         }
     }
     
@@ -349,9 +352,9 @@ sub handleTemplateLine {
 sub unescapePattern {
     my $pattern = shift(@_);
 
-    $pattern =~ s/([^\\](\\\\)*)\\n/$1\n/g;
-    $pattern =~ s/([^\\](\\\\)*)\\n\\t/$1\t/g;
-    $pattern =~ s/([^\\](\\\\)*)\\n\\r/$1\r/g;
+    $pattern =~ s/(\G|[^\\](\\\\)*)\\n/$1\n/g;
+    $pattern =~ s/(\G|[^\\](\\\\)*)\\t/$1\t/g;
+    $pattern =~ s/(\G|[^\\](\\\\)*)\\r/$1\r/g;
     $pattern =~ s/\\\\/\\/g;
 
     return $pattern;

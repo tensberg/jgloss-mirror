@@ -34,7 +34,7 @@
   </description>
 
   <parameters>
-    <docname name="docname" />
+    <docname name="document-filename" />
     <datetime name="generation-time" />
 
     <list name="fontsize"
