@@ -107,7 +107,6 @@ public class JGloss {
      * Starts JGloss.
      *
      * @param args Arguments to the application. Not used.
-     * @exception Exception if something goes wrong during the initialisation.
      */
     public static void main( String args[]) {
         try {
