@@ -500,6 +500,10 @@ public class StyleDialog extends Box {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff)) + "; ";
         }
+        else {
+            // this removes, among other settings, the current background color settings
+            s.removeStyle( AnnotationTags.KANJI.getId());
+        }
         if (additionalStyles.containsKey( AnnotationTags.KANJI.getId()))
             style += additionalStyles.get( AnnotationTags.KANJI.getId()).toString();
         style += "}\n";
@@ -515,6 +519,10 @@ public class StyleDialog extends Box {
         if (JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR)) {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff)) + "; ";
+        }
+        else {
+            // this removes, among other settings, the current background color settings
+            s.removeStyle( AnnotationTags.READING.getId());
         }
         if (additionalStyles.containsKey( AnnotationTags.READING.getId()))
             style += additionalStyles.get( AnnotationTags.READING.getId()).toString();
@@ -532,6 +540,11 @@ public class StyleDialog extends Box {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff)) + "; ";
         }
+        else {
+            // this removes, among other settings, the current background color settings
+            s.removeStyle( AnnotationTags.TRANSLATION.getId());
+        }
+
         if (additionalStyles.containsKey( AnnotationTags.TRANSLATION.getId()))
             style += additionalStyles.get( AnnotationTags.TRANSLATION.getId()).toString();
         style += "}\n";
