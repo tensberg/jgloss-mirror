@@ -58,6 +58,31 @@ public class Dictionaries extends Box {
     private DefaultListModel dictionariesOrig;
 
     /**
+     * Wrapper for a dictionary and its descriptor. Used as elements in the list model
+     */
+    private class DictionaryWrapper {
+        /**
+         * Descriptor used to create the dictionary. Usually the path to the dictionary file.
+         *
+         * @see jgloss.dictionary.DictionaryFactory
+         */
+        public String descriptor;
+        public Dictionary dictionary;
+
+        public DictionaryWrapper( String descriptor, Dictionary dictionary) {
+            this.descriptor = descriptor;
+            this.dictionary = dictionary;
+        }
+
+        /**
+         * Returns the name of the dictionary.
+         */
+        public String toString() {
+            return dictionary.toString();
+        }
+    }
+
+    /**
      * Returns the single application-wide instance.
      *
      * @return The Dictionaries component.
@@ -79,7 +104,7 @@ public class Dictionaries extends Box {
         ListModel m = getComponent().dictionariesOrig;
         Dictionary[] out = new Dictionary[m.getSize()];
         for ( int i=0; i<m.getSize(); i++) {
-            out[i] = (Dictionary) m.getElementAt( i);
+            out[i] = ((DictionaryWrapper) m.getElementAt( i)).dictionary;
         }
 
         return out;
@@ -127,7 +152,8 @@ public class Dictionaries extends Box {
                 public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
-                    m.remove( i);
+                    DictionaryWrapper d = (DictionaryWrapper) m.remove( i);
+                    d.dictionary.dispose();
                     if (i < m.getSize())
                         dictionaries.setSelectedIndex( i);
                     else if (m.getSize() > 0)
@@ -191,9 +217,11 @@ public class Dictionaries extends Box {
         if (result == JFileChooser.APPROVE_OPTION) {
             File[] fs = chooser.getSelectedFiles();
             for ( int i=0; i<fs.length; i++) {
-                Dictionary d = loadDictionary( fs[i].getAbsolutePath());
+                String descriptor = fs[i].getAbsolutePath();
+                Dictionary d = loadDictionary( descriptor);
                 if (d != null)
-                    ((DefaultListModel) dictionaries.getModel()).addElement( d);
+                    ((DefaultListModel) dictionaries.getModel())
+                        .addElement( new DictionaryWrapper( descriptor, d));
             }
             JGloss.prefs.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
                               .getAbsolutePath());
@@ -201,22 +229,30 @@ public class Dictionaries extends Box {
     }
 
     /**
-     * Creates a new dictionary by loading it from a file. Currently, only
-     * <CODE>EDict</CODE> dictionaries are supported. If loading the dictionary fails,
+     * Creates a new dictionary by invoking the <CODE>createDictionary</CODE> method
+     * of <CODE>DictionaryFactory</CODE>. If loading the dictionary fails,
      * an error dialog will be displayed.
      *
-     * @param file The path to the dictionary file. The path to the index will be
-     *             derived by adding the ending ".xjdx".
-     * @return The newly created dictionary.
-     * @see jgloss.dictionary.EDict
+     * @param file The path to the dictionary file.
+     * @return The newly created dictionary, or <CODE>null</CODE> if the dictionary could not
+     *         be created.
+     * @see jgloss.dictionary.DictionaryFactory
      */
     private Dictionary loadDictionary( String file) {
+        String msgid;
+        String [] objects;
+
         try {
-            return new EDict( file, true);
-        } catch (IOException ex) {
+            Dictionary d = DictionaryFactory.createDictionary( file);
+            if (d != null)
+                return d;
+
+            // dictionary format not supported
+            msgid = "error.dictionary.format";
+            objects = new String[] { new File( file).getAbsolutePath() };
+        } catch (Exception ex) {
+            ex.printStackTrace();
             File f = new File( file);
-            String msgid;
-            String [] objects;
             if (ex instanceof FileNotFoundException) {
                 msgid = "error.dictionary.filenotfound";
                 objects = new String[] { f.getName(), f.getAbsolutePath() };
@@ -225,14 +261,14 @@ public class Dictionaries extends Box {
                 msgid = "error.dictionary.ioerror";
                 objects = new String[] { f.getAbsolutePath() };
             }
-            
-            JOptionPane.showConfirmDialog
-                ( SwingUtilities.getRoot( box), JGloss.messages.getString
-                  ( msgid, objects),
-                  JGloss.messages.getString( "error.dictionary.title"),
-                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            return null;
         }
+            
+        JOptionPane.showConfirmDialog
+            ( SwingUtilities.getRoot( box), JGloss.messages.getString
+              ( msgid, objects),
+              JGloss.messages.getString( "error.dictionary.title"),
+              JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        return null;
     }
 
     /**
@@ -247,10 +283,10 @@ public class Dictionaries extends Box {
 
             // construct a string which consists of the paths to the dictionary files
             if (m.getSize() > 0) {
-                paths = ((EDict) m.getElementAt( 0)).getDictionaryFile();
+                paths = ((DictionaryWrapper) m.getElementAt( 0)).descriptor;
                 for ( int i=1; i<m.getSize(); i++) {
                     paths += File.pathSeparatorChar +
-                        ((EDict) m.getElementAt( i)).getDictionaryFile();
+                        ((DictionaryWrapper) m.getElementAt( i)).descriptor;
                 }
             }
             p.set( Preferences.DICTIONARIES, paths);
@@ -276,7 +312,7 @@ public class Dictionaries extends Box {
                 for ( int i=0; i<fs.length; i++) {
                     Dictionary d = loadDictionary( fs[i]);
                     if (d != null)
-                        dictionariesOrig.addElement( d);
+                        dictionariesOrig.addElement( new DictionaryWrapper( fs[i], d));
                 }
             }
             
