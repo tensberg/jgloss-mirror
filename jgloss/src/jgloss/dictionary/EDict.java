@@ -23,16 +23,33 @@
 
 package jgloss.dictionary;
 
+import jgloss.JGloss;
+
 import java.io.*;
 import java.util.*;
 
 /**
- * Dictionary implementation for dictionaries in Edict format with
+ * Dictionary implementation for dictionaries in EDICT format with
  * associated xjdx index.
  *
  * @author Michael Koch
  */
 public class EDict implements Dictionary {
+    /**
+     * Filename extension of an XJDX-format index. Will be added to the filename of the
+     * dictionary.
+     */
+    public final static String XJDX_EXTENSION = ".xjdx";
+    /**
+     * Filename extension of a JJDX-format index. Will be added to the filename of the
+     * dictionary.
+     */
+    public final static String JJDX_EXTENSION = ".jjdx";
+    /**
+     * Current version of the JJDX format.
+     */
+    public final static int JJDX_VERSION = 1001;
+
     /**
      * Path to the dictionary file.
      */
@@ -49,21 +66,32 @@ public class EDict implements Dictionary {
      * Array containing the content of the xjdx file associated with the dictionary file.
      */
     private int[] index;
+    /**
+     * Flag if index is in XJDX format;
+     */
+    private boolean xjdxIndex;
 
     /**
-     * Creates a new dictionary from a dictionary file in EDict format and the associated
+     * Creates a new dictionary from a dictionary file in EDICT format and the associated
      * xjdx index file.
      *
-     * @param dicfile Path to a file in EDict format.
-     * @param indexfile Path to the associated index file in XJDX format.
+     * @param dicfile Path to a file in EDICT format.
+     * @param createindex Flag if the index should be automatically created and written to disk
+     *                    if no index file exists. A write will not be attempted if the directory
+     *                    is not writable. If no index file exists and createindex is
+     *                    false, you have to call {@link #buildIndex() buildIndex} to create the
+     *                    index manually.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
-    public EDict( String dicfile, String indexfile) throws IOException {
+    public EDict( String dicfile, boolean createindex) throws IOException {
         this.dicfile = dicfile;
+
         File f = new File( dicfile);
         name = f.getName();
+        System.err.println( JGloss.messages.getString( "edict.load",
+                                                       new String[] { name }));
         dictionary = new byte[(int) f.length()];
-        InputStream is = new FileInputStream( f);
+        InputStream is = new BufferedInputStream( new FileInputStream( f));
         int off = 0;
         int len = dictionary.length;
         int read = 0;
@@ -73,41 +101,32 @@ public class EDict implements Dictionary {
             len -= read;
         }
         is.close();
-      
-        /* The xjdx files are created by a platform-dependent C program. They
-           consist of an array of unsigned longs with indexes into the EDict file.
-           On an ix86 box, the format of an array element is 4-byte
-           least significant byte first. The following code tries to detect
-           endianness by assuming that the MSB is always zero. This works as
-           long as the dictionary size does not exceed 2^24 bytes.
-           The first entry in the xjdx file contains the size of the dictionary
-           file plus the version number of the index format.
-        */
-        // Test the first 4 entries. On a LSB first architecture it is very impropable that all 4 entries
-        // are multiples of 256 and thus have a first byte of 0.
-        RandomAccessFile r = new RandomAccessFile( indexfile, "r");
-        byte b[] = new byte[16];
-        r.readFully( b);
-        boolean msbFirst = (b[0]==0) && (b[4]==0) && (b[8]==0) && (b[12]==0);
-        r.close();
 
-        // read the index
-        f = new File( indexfile);
-        index = new int[(int) f.length()/4-1];
-        is = new FileInputStream( indexfile);
-        byte[] ib = new byte[4];
-        int[] ii = new int[4];
-        for ( int i=0; i<index.length; i++) {
-            is.read( ib);
-            for ( int j=0; j<4; j++)
-                ii[j] = (ib[j]>=0) ? ib[j] : 256 + ib[j];
-            
-            if (msbFirst)
-                index[i] = ii[0]<<24 | ii[1]<<16 | ii[2]<<8 | ii[3];
-            else
-                index[i] = ii[3]<<24 | ii[2]<<16 | ii[1]<<8 | ii[0];
+        File jindex = new File( dicfile + JJDX_EXTENSION);
+        File xindex = new File( dicfile + XJDX_EXTENSION);
+        if (jindex.canRead()) {
+            loadJJDX( jindex);
+            xjdxIndex = false;
         }
-        is.close();
+        else if (xindex.canRead()) {
+            loadXJDX( xindex);
+            xjdxIndex = true;
+        }
+        else if (createindex) {
+            xjdxIndex = false;
+            buildIndex();
+            try {
+                jindex.createNewFile();
+                if (jindex.canWrite()) {
+                    saveJJDX( jindex);
+                }
+            } catch (IOException ex) {
+                System.err.println( JGloss.messages.getString
+                                    ( "edict.error.writejjdx",
+                                      new String[] { ex.getClass().getName(),
+                                                     ex.getLocalizedMessage() }));
+            }
+        }
     }
 
     /**
@@ -129,8 +148,6 @@ public class EDict implements Dictionary {
         // do a binary search through the index file
         try {
             byte[] expr_euc = expression.getBytes( "EUC-JP");
-            byte[] euc = expression.getBytes( "EUC-JP"); // EDict uses EUC. We only need the length
-                                                         // and not the data of the array.
 
             // do a binary search
             int from = 0;
@@ -142,15 +159,14 @@ public class EDict implements Dictionary {
                 curr = (to-from)/2 + from;
 
                 // read entry
-                for ( int i=0; i<euc.length; i++) try {
-                    euc[i] = dictionary[index[curr]-1+i];
-                } catch (ArrayIndexOutOfBoundsException ex) { // end of dictionary
-                    euc[i] = 0;
-                }
+                int i = 0;
+                while (i<expr_euc.length && index[curr]+i<dictionary.length)
+                  i++;
+
                 // A simple compareToIgnoreCase does not work, because Kstrcmp, which was used
                 // by the index creation program behaves somewhat differently.
                 // It also does not have the overhead of creating a new string for the search.
-                int c = Kstrcmp( expr_euc, euc);
+                int c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[curr], i, xjdxIndex);
                 if (c > 0)
                     from = curr+1;
                 else if (c < 0)
@@ -164,12 +180,10 @@ public class EDict implements Dictionary {
                 curr = match - 1;
                 while (curr >= from) {
                     // read entry
-                    for ( int i=0; i<euc.length; i++) try {
-                        euc[i] = dictionary[index[curr]-1+i];
-                    } catch (ArrayIndexOutOfBoundsException ex) { // end of dictionary
-                        euc[i] = 0;
-                    }
-                    int c = Kstrcmp( expr_euc, euc);
+                    int i = 0;
+                    while (i<expr_euc.length && index[curr]+i<dictionary.length)
+                        i++;
+                    int c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[curr], i, xjdxIndex);
                     if (c != 0)
                         curr = from - 1; // First non-matching entry. End search.
                     else {
@@ -181,16 +195,15 @@ public class EDict implements Dictionary {
                 // read all matching entries
                 do {
                     // find beginning of entry line
-                    int i = index[match]-1;
-                    while (i>0 && dictionary[i-1]!=0x0a)
-                        i--;
+                    int start = index[match];
+                    while (start>0 && dictionary[start-1]!=0x0a)
+                        start--;
                     
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    while (i<dictionary.length && dictionary[i]!=0x0a) {
-                        bos.write( dictionary[i]);
-                        i++;
+                    int end = start + 1;
+                    while (end<dictionary.length && dictionary[end]!=0x0a) {
+                        end++;
                     }
-                    String entry = bos.toString( "EUC-JP").trim();
+                    String entry = new String( dictionary, start, end-start, "EUC-JP").trim();
                     if (entry.indexOf( expression) == -1)
                         match = index.length; // first non-matching entry: end search
                     else {
@@ -198,7 +211,7 @@ public class EDict implements Dictionary {
                         int j, k;
                         // word:
                         String word;
-                        i = entry.indexOf( ' ');
+                        int i = entry.indexOf( ' ');
                         if (i == -1) {
                             System.err.println( "WARNING: " + dicfile +
                                                 "\nMalformed dictionary entry: " + entry);
@@ -306,37 +319,358 @@ public class EDict implements Dictionary {
     }
 
     /**
-     * Lexicographic comparison of two Strings encoded as EUC-JP byte-arrays. 
+     * Loads an XJDX-format index for the dictionary. 
+     */
+    private void loadXJDX( File indexfile) throws IOException {
+        /* The xjdx files are created by a platform-dependent C program. They
+           consist of an array of unsigned longs with indexes into the EDICT file.
+           On an ix86 box, the format of an array element is 4-byte
+           least significant byte first. The following code tries to detect
+           endianness by assuming that the MSB is always zero. This works as
+           long as the dictionary size does not exceed 2^24 bytes.
+           The first entry in the xjdx file contains the size of the dictionary
+           file plus the version number of the index format.
+        */
+        // Test the first 4 entries. On a LSB first architecture it is very impropable that all 4 entries
+        // are multiples of 256 and thus have a first byte of 0.
+        DataInputStream is = new DataInputStream( new BufferedInputStream( new FileInputStream( indexfile)));
+        byte b[] = new byte[16];
+        is.readFully( b);
+        boolean msbFirst = (b[0]==0) && (b[4]==0) && (b[8]==0) && (b[12]==0);
+        is.close();
+
+        // read the index
+        index = new int[(int) indexfile.length()/4-1];
+        InputStream fis = new BufferedInputStream( new FileInputStream( indexfile));
+        byte[] ib = new byte[4];
+        int[] ii = new int[4];
+        for ( int i=0; i<index.length; i++) {
+            fis.read( ib);
+            for ( int j=0; j<4; j++)
+                ii[j] = (ib[j]>=0) ? ib[j] : 256 + ib[j];
+            
+            if (msbFirst)
+                index[i] = ii[0]<<24 | ii[1]<<16 | ii[2]<<8 | ii[3];
+            else
+                index[i] = ii[3]<<24 | ii[2]<<16 | ii[1]<<8 | ii[0];
+            index[i]--; // XJDX uses 1-based offsets, whereas this class uses 0-based offsets
+        }
+        fis.close();
+    }
+
+    /**
+     * Loads a JJDX-format index for the dictionary. The JJDX format is similar to
+     * XJDX, but without the endianness-problems.
+     *
+     * @param indexfile The file which contains the index.
+     */
+    private void loadJJDX( File indexfile) throws IOException {
+        // JJDX consists of 4 byte long signed integers, with most significant byte first.
+        // The first integer is the version of the index format.
+        // The second integer is the offset in bytes from the start of the file
+        // to the first index entry (12 for version 1001).
+        // The third integer is the number of index entries.
+        // All other entries are byte offsets into the EUC-encoded EDICT dictionary,
+        // ordered alphabetically.
+
+        // read the index
+        DataInputStream is = new DataInputStream( new BufferedInputStream( new FileInputStream( indexfile)));
+        int version = is.readInt();
+        if (version > JJDX_VERSION) {
+            System.err.println( JGloss.messages.getString( "edict.warning.jjdxversion",
+                                new String[] { getName() }));
+        }
+        int offset = is.readInt();
+        int size = is.readInt();
+        is.skip( offset - 4*3); // should be 0 for version 1001 index
+        index = new int[size];
+        for ( int i=0; i<size; i++)
+            index[i] = is.readInt();
+        is.close();
+    }
+
+    /**
+     * Saves the index to a file in JJDX format.
+     *
+     * @param indexfile File to write to.
+     * @exception IOException when the file cannot be written.
+     */
+    public void saveJJDX( File indexfile) throws IOException {
+        System.err.println( JGloss.messages.getString( "edict.writejjdx",
+                                                       new String[] { getName() }));
+
+        DataOutputStream os = new DataOutputStream( new BufferedOutputStream
+            ( new FileOutputStream( indexfile)));
+        os.writeInt( JJDX_VERSION);
+        os.writeInt( 12);
+        os.writeInt( index.length);
+
+        for ( int i=0; i<index.length; i++)
+            os.writeInt( index[i]);
+        os.close();
+    }
+
+    /**
+     * Creates an index for the EDICT dictionary. The dictionary file must have been already loaded.
+     */
+    public void buildIndex() {
+        System.err.println( JGloss.messages.getString( "edict.buildindex", 
+                                                       new String[] { getName() }));
+      
+        index = null; // delete old index if any
+        xjdxIndex = false;
+
+        // Set containing offsets of words in the dictionary, ordered by lexicographic
+        // comparison of the words.
+        Set indexentries = new TreeSet( new Comparator() {
+                public int compare( Object o1, Object o2) {
+                    return Kstrcmp( ((Integer) o1).intValue(), ((Integer) o2).intValue(), false);
+                }
+                public boolean equals( Object o1) {
+                    return (o1 == this);
+                }
+            });
+        
+        // Search over the whole dictionary and add an index entry for every kanji/kana string and
+        // every alphabetic string with length >= 3.
+        // This creates an index similar to the ones created by xjdxgen.
+        boolean inword = false;
+        int entry = 0;
+        for ( int i=0; i<dictionary.length; i++) {
+            int c = byteToUnsignedByte( dictionary[i]);
+            if (inword) {
+                if (!(alphaoreuc( dictionary[i]) || c=='-' || c=='.' || (c>='0' && c<='9'))) {
+                    inword = false;
+                    int len = i - entry;
+                    // save all entries with length >= 3 or kanji/kana entries of length 2 (bytes).
+                    if (byteToUnsignedByte(dictionary[entry])>=127 || len>2) {
+                        indexentries.add( new Integer( entry));
+
+                        if (byteToUnsignedByte( dictionary[entry]) > 127) {
+                            // add index entry for every kanji in word.
+                            if (byteToUnsignedByte( dictionary[entry]) == 0x8f) // JIS X 0212 3-Byte Kanji
+                                entry++;
+                            for ( int j=entry+2; j<i; j+=2) {
+                                int cj = byteToUnsignedByte( dictionary[j]);
+                                if (cj >= 0xb0 || cj == 0x8f) {
+                                    indexentries.add( new Integer( j));
+                                    
+                                    if (cj == 0x8f) // JIS X 0212 3-Byte Kanji
+                                        j++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                if (alphaoreuc( dictionary[i])) {
+                    inword = true;
+                    entry = i;
+                }
+            }
+        }
+
+        index = new int[indexentries.size()];
+        int i = 0;
+        for ( Iterator j=indexentries.iterator(); j.hasNext(); )
+            index[i++] = ((Integer) j.next()).intValue();
+    }
+
+    /**
+     * Determines if b is an alphanumerical ASCII character or an EUC kana or kanji character.
+     * Adapted from Jim Breens xjdic.
+     *
+     * @param b The character to test.
+     * @param return <CODE>true</CODE>, if the character is alphanumeric or EUC.
+     */
+    private final static boolean alphaoreuc( byte b) {
+        int c = byteToUnsignedByte( b);
+
+        if (c>=65 && c<= 90 || c>=97 && c<=122)
+            return true;
+        if (c>='0' && c<='9')
+            return true;
+        if ((c & 0x80) > 0)
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Lexicographic comparison of two strings encoded as EUC-JP byte-arrays. 
      * Adapted from Jim Breen's xjdic.
      * Effectively does a equalsIgnoreCase on two "strings" within the dictionary,
      * except it will make katakana and hirgana match (EUC A4 & A5).
      *
      * @param str1 A string encoded as EUC-JP.
+     * @param off1 Offset to where to start the comparison in str1.
+     * @param len1 Length in bytes of the string.
      * @param str2 A string encoded as EUC-JP.
+     * @param off2 Offset to where to start the comparison in str2.
+     * @param len2 Length in bytes of the string.
+     * @param backwardsCompatible Flag if the comparison should be backwards compatible to
+     *        an index generated by xjdxgen from xjdic 2.3.
      */
-    private int Kstrcmp( byte[] str1, byte[] str2) {
+    private final int Kstrcmp( byte[] str1, int off1, int len1, 
+                         byte[] str2, int off2, int len2, boolean backwardsCompatible) {
         int c1 = 0, c2 = 0;
 
-        for ( int i = 0; i<Math.min( str1.length, str2.length); i++) {
-            c1 = (str1[i]>=0) ? str1[i] : 256 + str1[i];
-            c2 = (str2[i]>=0) ? str2[i] : 256 + str2[i];
-            if ((i % 2) == 0) {
-                if (c1 == 0xA5) {
-                    c1 = 0xA4;
-                }
-                if (c2 == 0xA5) {
-                    c2 = 0xA4;
+        int len = Math.min( len1, len2);
+
+        int b = 1; // byte in multibyte character
+        int ONE_BYTE = 1;
+        int TWO_BYTES = 2;
+        int THREE_BYTES = 3;
+        int type = ONE_BYTE;
+
+        for ( int i=0; i<len; i++) {
+            c1 = byteToUnsignedByte( str1[i+off1]);
+            c2 = byteToUnsignedByte( str2[i+off2]);
+
+            if (backwardsCompatible) {
+                if ((i % 2) == 0) {
+                    // Convert katakana to hiragana
+                    // The i%2 test for first byte in a two-byte character can fail because
+                    // a previous character may have been a 3-byte JIS X 0212 Kanji, but I keep
+                    // it for XJDX compatibility.
+                    if (c1 == 0xA5) {
+                        c1 = 0xA4;
+                    }
+                    if (c2 == 0xA5) {
+                        c2 = 0xA4;
+                    }
                 }
             }
+            else {
+                if (b == 1) {
+                    // convert katakana to hiragana
+                    if (c1 == 0xA5) {
+                        c1 = 0xA4;
+                    }
+                    if (c2 == 0xA5) {
+                        c2 = 0xA4;
+                    }
+                    // We only need to test the type of c1, because if c1 and c2 are different,
+                    // the equality test ends.
+                    if (c1 < 127)
+                        type = ONE_BYTE;
+                    else {
+                        if (c1 == 0x8f) // JIS X 0212 3-Byte Kanji
+                            type = THREE_BYTES;
+                        else
+                            type = TWO_BYTES;
+                    }
+                    b++;
+                }
+                else if (b == type) // last byte in char, reset counter
+                    b = 1;
+            }
+
             if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
             if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
-            if (c1 != c2 ) break;
+            if (c1 != c2) break;
         }
 
         if (c1 == c2)
-            return (str2.length - str1.length);
+            return (len2 - len1);
         
         return(c1-c2);
+    }
+
+    /**
+     * Lexicographic comparison of strings in the dictionary. 
+     *
+     * @param i1 Index in the dictionary to the first string.
+     * @param i2 Index in the dictionary to the second string.
+     * @param backwardsCompatible Flag if the comparison should be backwards compatible to
+     *        an index generated by xjdxgen from xjdic 2.3.
+     */
+    private final int Kstrcmp( int i1, int i2, boolean backwardsCompatible) {
+        int c1 = 0, c2 = 0;
+
+        boolean endc1 = false;
+        boolean endc2 = false;
+
+        int b = 1; // byte in multibyte character
+        int ONE_BYTE = 1;
+        int TWO_BYTES = 2;
+        int THREE_BYTES = 3;
+        int type = ONE_BYTE;
+
+        int i = 0;
+        while (i1<dictionary.length && i2<dictionary.length) {
+            c1 = byteToUnsignedByte( dictionary[i1]);
+            c2 = byteToUnsignedByte( dictionary[i2]);
+
+            endc1 = !(alphaoreuc( dictionary[i1]) || c1=='-' || c1=='.' || (c1>='0' && c1<='9'));
+            endc2 = !(alphaoreuc( dictionary[i2]) || c2=='-' || c2=='.' || (c2>='0' && c2<='9'));
+            if (endc1 || endc2)
+                break;
+
+            if (backwardsCompatible) {
+                if ((i++ % 2) == 0) {
+                    // Convert katakana to hiragana
+                    // The i%2 test for first byte in a two-byte character can fail because
+                    // a previous character may have been a 3-byte JIS X 0212 Kanji, but I keep
+                    // it for XJDX compatibility.
+                    if (c1 == 0xA5) {
+                        c1 = 0xA4;
+                    }
+                    if (c2 == 0xA5) {
+                        c2 = 0xA4;
+                    }
+                }
+            }
+            else {
+                if (b == 1) {
+                    // convert katakana to hiragana
+                    if (c1 == 0xA5) {
+                        c1 = 0xA4;
+                    }
+                    if (c2 == 0xA5) {
+                        c2 = 0xA4;
+                    }
+                    // We only need to test the type of c1, because if c1 and c2 are different,
+                    // the equality test ends.
+                    if (c1 < 127)
+                        type = ONE_BYTE;
+                    else {
+                        if (c1 == 0x8f) // JIS X 0212 3-Byte Kanji
+                            type = THREE_BYTES;
+                        else
+                            type = TWO_BYTES;
+                    }
+                    b++;
+                }
+                else if (b == type) // last byte in char, reset counter
+                    b = 1;
+            }
+
+            if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
+            if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
+            if (c1 != c2) break;
+
+            i1++;
+            i2++;
+            i++;
+        }
+
+        if (c1 == c2) { // end of dictionary for one of the strings
+            if (i1 < dictionary.length)
+                return 1; // string 1 > string 2
+            else
+                return -1;
+        }
+
+        if (endc1 && endc2)
+            return 0;
+        if (endc1)
+            return -1;
+        if (endc2)
+            return 1;
+        
+        return (c1-c2) > 0 ? 1 : -1;
     }
 
     /**
@@ -365,4 +699,15 @@ public class EDict implements Dictionary {
     public String toString() {
         return name;
     }
-} // class Edict
+
+    /**
+     * Converts the byte value to an int with the value of the 8 bits
+     * interpreted as an unsigned byte.
+     *
+     * @param b The byte value to convert.
+     * @return The unsigned byte value of b.
+     */
+    private final static int byteToUnsignedByte( byte b) {
+        return b & 0xff;
+    }
+} // class EDict
