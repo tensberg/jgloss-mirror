@@ -246,7 +246,8 @@
         On Windows and MacOS X systems no font configuration should be neccessary.
         The first time JGloss is run, it tries to determine which font to use for displaying Japanese
         characters. If the Java default fonts don't contain Japanese characters, it tests if one of
-        the fonts <emphasis>MS Gothic</emphasis>, <emphasis>MS Mincho</emphasis> or
+        the fonts <emphasis>Arial Unicode MS</emphasis>, <emphasis>MS UI Gothic</emphasis>, 
+        <emphasis>MS Mincho</emphasis>, <emphasis>MS Gothic</emphasis> or
         <emphasis>Osaka</emphasis> is available and configures itself to use it.
         If none of the fonts work, no configuration is done and the default settings are kept. In this
         case Japanese characters will not display correctly.

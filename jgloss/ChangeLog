@@ -1,18 +1,24 @@
-1.0.1: (2002/01/16)
+1.0.1: (2002/01/21)
 	- Added user interface font selection to style preference panel.
 	- Font autodetection on first startup. JGloss tries to set
 	  reasonable default fonts depending on the system.
 	- Added dialog to set the document title.
 	- LaTeX export uses document title for page header.
+	- Added a text field to the document window in which Japanese
+	  text can be pasted. This obsoletes the -p command line option,
+	  which is removed.
 	- Keyboard shortcut: typing delete while an annotation node
 	  is selected clears the translation.
 	- Katakana words are no longer annotated with hiragana readings
 	  when a word/reading is selected.
+	- Last selected annotation is remembered between saves.
+	- Import Clipboard now works under X11.
 	- Fixed display of dictionary entries without readings in long
 	  word lookup results.
-	- Fixed saving of preferences on MacOS X.
 	- Fixed button sizes in dictionary and exclusion list preferences.
 	- Fixed adding annotation with reading but no translation.
+	- Fixed saving of the preferences and user dictionary if the
+	  application is quit by other means than closing all windows.
 1.0: (2001/12/14)
 	- Improved handling of long result lists in word lookup dialog.
 	- Removed the dummy print menu item from the word lookup dialog.

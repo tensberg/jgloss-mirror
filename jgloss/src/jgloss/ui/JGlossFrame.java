@@ -96,12 +96,22 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                         else
                                             which = target;
                                         
-                                        which.importDocument
-                                            ( d.getSelection(),
-                                              d.createParser( Dictionaries.getDictionaries(),
-                                                              ExclusionList.getExclusions()),
-                                              d.createReadingAnnotationFilter(),
-                                              d.getEncoding());
+                                        if (d.getFilename().length() > 0)
+                                            which.importDocument
+                                                ( d.getFilename(),
+                                                  d.createParser( Dictionaries.getDictionaries(),
+                                                                  ExclusionList.getExclusions()),
+                                                  d.createReadingAnnotationFilter(),
+                                                  d.getEncoding());
+                                        else
+                                            which.importString
+                                                ( d.getPastedText(), 
+                                                  d.createParser( Dictionaries.getDictionaries(),
+                                                                  ExclusionList.getExclusions()),
+                                                  d.createReadingAnnotationFilter(),
+                                                  JGloss.messages.getString( "import.textarea"),
+                                                  JGloss.messages.getString( "import.textarea"),
+                                                  false);
                                         which.documentChanged = true;
                                     }
                                 }
@@ -182,15 +192,22 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
             importClipboardListener = new MenuListener() {
                     public void menuSelected( MenuEvent e) {
+                        // enable the import clipboard menu item if the clipboard contains some text
                         Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard()
-                            .getContents( null);
-                        if (t != null &&
-                            (t.isDataFlavorSupported( DataFlavor.getTextPlainUnicodeFlavor()) ||
-                             t.isDataFlavorSupported( DataFlavor.stringFlavor))) {
-                            importClipboard.setEnabled( true);
+                            .getContents( this);
+                        boolean enabled = false;
+                        if (t != null) {
+                            if (t.isDataFlavorSupported( DataFlavor.stringFlavor))
+                                enabled = true;
+                            else if (t.getClass().getName().equals( "sun.awt.motif.X11Selection")) try {
+                                // With the X11 implementation of Java, getting the transfer data
+                                // succeeds even if isDataFlavorSupported returns false.
+                                t.getTransferData( DataFlavor.stringFlavor);
+                                enabled = true;
+                            } catch (UnsupportedFlavorException ex) {
+                            } catch (IOException ex) {}
                         }
-                        else
-                            importClipboard.setEnabled( false);
+                        importClipboard.setEnabled( enabled);
                     }
                     public void menuDeselected( MenuEvent e) {}
                     public void menuCanceled( MenuEvent e) {}
@@ -633,21 +650,33 @@ public class JGlossFrame extends JFrame implements ActionListener {
      */
     private void doImportClipboard() {
         Transferable t = getToolkit().getSystemClipboard().getContents( this);
-        DataFlavor plain = DataFlavor.getTextPlainUnicodeFlavor();
 
         if (t != null) {
             try {
                 Reader in = null;
                 int len = 0;
-                if (t.isDataFlavorSupported( plain)) {
-                    in = plain.getReaderForText( t);
-                    // no length information available
+                String data = (String) t.getTransferData( DataFlavor.stringFlavor);
+                len = data.length();
+
+                // try to autodetect the character encoding if the transfer didn't honor the 
+                // charset correctly.
+                boolean autodetect = true;
+                for ( int i=0; i<data.length(); i++) {
+                    if (data.charAt( i) > 255) {
+                        // The string contains a character outside the ISO-8859-1 range,
+                        // so presumably the transfer went OK.
+                        autodetect = false;
+                        break;
+                    }
                 }
-                else if (t.isDataFlavorSupported( DataFlavor.stringFlavor)) {
-                    String data = (String) t.getTransferData( DataFlavor.stringFlavor);
-                    len = data.length();
-                    in = new StringReader( data);
+                if (autodetect) {
+                    byte[] bytes = data.getBytes( "ISO-8859-1");
+                    String enc = CharacterEncodingDetector.guessEncodingName( bytes);
+                    if (!enc.equals( CharacterEncodingDetector.ENC_UTF_8)) // don't trust UTF-8 detection
+                        data = new String( bytes, enc);
                 }
+
+                in = new StringReader( data);
 
                 if (in != null) {
                     JGlossFrame which = this;
@@ -762,14 +791,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
      *        which the newly created document should be written. If <CODE>false</CODE>,
      *        <CODE>path</CODE> will only be used in informational messages to the user during import.
      */
-    public void importString( String text, String title, String path, boolean setPath) {
+    public void importString( String text, Parser parser, ReadingAnnotationFilter filter, String title,
+                              String path, boolean setPath) {
         try {
             loadDocument
                 ( new HTMLifyReader( new StringReader( text)), path, title,
-                  GeneralDialog.getComponent().createImportClipboardParser
-                  ( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
-                  GeneralDialog.getComponent().createReadingAnnotationFilter(),
-                  true, text.length());
+                  parser, filter, true, text.length());
             documentChanged = true;
             if (setPath)
                 this.documentPath = path;

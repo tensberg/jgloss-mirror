@@ -161,29 +161,29 @@ public class PreferencesFrame {
      * Saves the current settings to the application <CODE>Preferences</CODE> instance.
      */
     public void savePreferences() {
-        Dictionaries.getComponent().savePreferences();
         GeneralDialog.getComponent().savePreferences();
         StyleDialog.getComponent().savePreferences();
         ExclusionList.getComponent().savePreferences();
+        Dictionaries.getComponent().savePreferences();
     }
 
     /**
      * Loads the settings to the application <CODE>Preferences</CODE> instance.
      */
     public void loadPreferences() {
-        Dictionaries.getComponent().loadPreferences();
         GeneralDialog.getComponent().loadPreferences();
         StyleDialog.getComponent().loadPreferences();
         ExclusionList.getComponent().loadPreferences();
+        Dictionaries.getComponent().loadPreferences();
     }
 
     /**
      * Applies the settings from the <CODE>Preferences</CODE> to the application.
      */
     public void applyPreferences() {
-        Dictionaries.getComponent().applyPreferences();
         GeneralDialog.getComponent().applyPreferences();
         StyleDialog.getComponent().applyPreferences();
         ExclusionList.getComponent().applyPreferences();
+        Dictionaries.getComponent().applyPreferences();
     }
 } // class PreferencesFrame

@@ -70,33 +70,9 @@ public class StyleDialog extends Box {
     private static String defaultJapaneseFont;
 
     /**
-     * Default L&F font.
+     * Map from Swing L&F property keys to the default L&F fonts.
      */
-    private static Font textFieldFont;
-    /**
-     * Default L&F font.
-     */
-    private static Font treeFont;
-    /**
-     * Default L&F font.
-     */
-    private static Font comboBoxFont;
-    /**
-     * Default L&F font.
-     */
-    private static Font textAreaFont;
-    /**
-     * Default L&F font.
-     */
-    private static Font textPaneFont;
-    /**
-     * Default L&F font.
-     */
-    private static Font toolTipFont;
-    /**
-     * Default L&F font.
-     */
-    private static Font listFont;
+    private static Map defaultLFFonts;
 
     /**
      * Adds a new style sheet which will then automatically track any changes made to the
@@ -257,12 +233,6 @@ public class StyleDialog extends Box {
      */
     public StyleDialog() {
         super( BoxLayout.Y_AXIS);
-
-        // automatically set the fonts the first time JGloss is run
-        if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED)) {
-            autodetectFonts();
-            JGloss.prefs.set( Preferences.FONT_AUTODETECTED, true);
-        }
 
         currentStyles = new HashMap( 10);
         styleSheets = new ArrayList( 10);
@@ -562,43 +532,45 @@ public class StyleDialog extends Box {
      */
     public void applyPreferences() {
         // apply custom font settings
-        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
-            // restore java default fonts
-            if (textFieldFont != null) {
-                UIManager.put( "TextField.font", textFieldFont);
-                UIManager.put( "Tree.font", treeFont);
-                UIManager.put( "ComboBox.font", comboBoxFont);
-                UIManager.put( "TextArea.font", textAreaFont);
-                UIManager.put( "TextPane.font", textPaneFont);
-                UIManager.put( "ToolTip.font", toolTipFont);
-                UIManager.put( "List.font", listFont);
-            }
-        }
-        else {
-            // save java default fonts
-            if (textFieldFont == null) {
-                textFieldFont = UIManager.getFont( "TextField.font");
-                treeFont = UIManager.getFont( "Tree.font");
-                comboBoxFont = UIManager.getFont( "ComboBox.font");
-                textAreaFont = UIManager.getFont( "TextArea.font");
-                textPaneFont = UIManager.getFont( "TextPane.font");
-                toolTipFont = UIManager.getFont( "ToolTip.font");
-                listFont = UIManager.getFont( "List.font");
-            }
-            // set custom font
-            UIManager.put( "TextField.font", deriveGeneralFont( textFieldFont));
-            UIManager.put( "Tree.font", deriveGeneralFont( treeFont));
-            UIManager.put( "ComboBox.font", deriveGeneralFont( comboBoxFont));
-            UIManager.put( "TextArea.font", deriveGeneralFont( textAreaFont));
-            UIManager.put( "TextPane.font", deriveGeneralFont( textPaneFont));
-            UIManager.put( "ToolTip.font", deriveGeneralFont( toolTipFont));
-            UIManager.put( "List.font", deriveGeneralFont( listFont));
-        }
+        applyUIFont();
 
         // apply document view styles
         synchronized (styleSheets) {
             for ( Iterator i=styleSheets.iterator(); i.hasNext(); )
                 applyPreferences( (StyleSheet) i.next(), (Map) i.next());
+        }
+    }
+
+    /**
+     * Applies the UI font setting.
+     */
+    public static void applyUIFont() {
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+            // restore java default fonts
+            if (defaultLFFonts != null) {
+                for ( Iterator i=defaultLFFonts.entrySet().iterator(); i.hasNext(); ) {
+                    Map.Entry entry = (Map.Entry) i.next();
+                    UIManager.put( entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        else {
+            // save java default fonts
+            if (defaultLFFonts == null) {
+                defaultLFFonts = new TreeMap();
+                for ( Enumeration e=UIManager.getDefaults().keys(); e.hasMoreElements(); ) {
+                    Object key = e.nextElement();
+                    Object value = UIManager.getDefaults().get( key);
+                    if (value instanceof Font) {
+                        defaultLFFonts.put( key, value);
+                    }
+                }
+            }
+            // set custom font
+            for ( Iterator i=defaultLFFonts.entrySet().iterator(); i.hasNext(); ) {
+                Map.Entry entry = (Map.Entry) i.next();
+                UIManager.put( entry.getKey(), deriveGeneralFont( (Font) entry.getValue()));
+            }
         }
     }
 

@@ -60,8 +60,8 @@ font.translation.size=9
 font.translation.bgcolor=13421823
 font.translation.usecolor=true
 # some fonts to try if the generic fonts like Serif, SansSerif etc. don't contain Japanese characters
-font.defaultfonts=MS Gothic,MS Mincho,Osaka,Gothic,Mincho
-# flag if the automatic font setting has already occurred
+font.defaultfonts=Arial Unicode MS,MS UI Gothic,MS Mincho,MS Gothic,Osaka,Mincho,Gothic
+# flag if the automatic font setting was already done
 font.autodetected=false
 
 view.compactview=false
@@ -113,6 +113,11 @@ wordlookup.deinflection=true
 wordlookup.alldictionaries=true
 # Limit for the number of results the word lookup panel will show.
 wordlookup.resultlimit=1000
+
+# remember selected annotation in document
+history.selection=
+# maximum number of documents in history
+history.size=20
 
 # location of the chasen executable
 chasen.location=

@@ -26,5 +26,9 @@ Known problems:
     the print dialog opens. This seems to be a problem in the interaction 
     between the interaction of Java and the KDE window manager which I don't 
     know how to fix.
+  - On Linux force-quitting JGloss by typing Control-C or using kill -HUP
+    sometimes doesn't work.
+  - The custom user interface font chosen in the style dialog is applied thorough
+    the whole application only after JGloss is restarted.
 
 (c) 2001/2002 Michael Koch <tensberg@gmx.net>

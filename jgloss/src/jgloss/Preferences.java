@@ -139,6 +139,9 @@ public class Preferences {
     public static final String CHASEN_LOCATION = "chasen.location";
 
     public static final String OPENRECENT_FILES = "openrecent.files";
+
+    public static final String HISTORY_SELECTION = "history.selection";
+    public static final String HISTORY_SIZE = "history.size";
     
     /**
      * Path to the user preferences file.
@@ -259,7 +262,8 @@ public class Preferences {
      *
      * @param key Key to the preference.
      * @param separator Character which separates the strings in the preference value.
-     * @return The corresponding preference value.
+     * @return The corresponding preference value as string array. If the preference is not
+     *         set, an empty array will be returned.
      */
     public synchronized String[] getList( String key, char separator) {
         List paths = new ArrayList( 10);

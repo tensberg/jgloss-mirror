@@ -81,7 +81,7 @@ public class DictionaryFormNode extends InnerNode {
                     Element ae = anno.getAnnotationElement();
                     ((JGlossDocument) ae.getDocument()).setAttribute
                         ( (MutableAttributeSet) ae.getAttributes(),
-                          JGlossDocument.DICTIONARY_WORD, text);
+                          JGlossDocument.DICTIONARY_WORD, text, true);
                 }
             };
         children.add( wordNode);
@@ -97,7 +97,7 @@ public class DictionaryFormNode extends InnerNode {
                     Element ae = anno.getAnnotationElement();
                     ((JGlossDocument) ae.getDocument()).setAttribute
                         ( (MutableAttributeSet) ae.getAttributes(),
-                          JGlossDocument.DICTIONARY_READING, text);
+                          JGlossDocument.DICTIONARY_READING, text, true);
                 }
             };
         children.add( readingNode);

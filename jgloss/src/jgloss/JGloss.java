@@ -53,11 +53,6 @@ public class JGloss {
     private static String currentDir;
 
     /**
-     * Flag if a paste frame is opened.
-     */
-    private static boolean pasteFrameActive;
-
-    /**
      * Ties together ResourceBundles and MessageFormat to access localizable,
      * customizable messages.
      */
@@ -166,9 +161,6 @@ public class JGloss {
                     }
                     System.exit( 0);
                 }
-                else if (args[0].equals( "-p") || args[0].equals( "--pastewindow")) {
-                    pasteFrameActive = true;
-                }
                 else if (args[0].equals( "-a") || args[0].equals( "--annotatehtml")) {
                     if (args.length > 3) { 
                         System.err.println( messages.getString( "main.usage"));
@@ -252,6 +244,16 @@ public class JGloss {
 
             splash.setInfo( messages.getString( "splashscreen.initPreferences"));
             ChasenParser.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+
+            // automatically set the fonts the first time JGloss is run
+            if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED)) {
+                StyleDialog.autodetectFonts();
+                JGloss.prefs.set( Preferences.FONT_AUTODETECTED, true);
+            }
+
+            // make sure the UI font is initialized before any UI elements are created
+            StyleDialog.applyUIFont();
+
             // Initialize the preferences at startup. This includes loading the dictionaries.
             // Do this in its own thread to decrease perceived initialization time.
             new Thread() {
@@ -266,17 +268,23 @@ public class JGloss {
                     }
                 }.start();
             splash.setInfo( messages.getString( "splashscreen.initMain"));
-            if (pasteFrameActive) {
-                PasteImportFrame frame = new PasteImportFrame();
-                frame.addWindowListener( new WindowAdapter() {
-                        public void windowClosed( WindowEvent e) {
-                            pasteFrameActive = false;
-                            exit();
+            
+            Runtime.getRuntime().addShutdownHook
+                ( new Thread() {
+                        public void run() {
+                            try {
+                                prefs.store();
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            
+                            Dictionary[] dicts = Dictionaries.getDictionaries();
+                            for ( int i=0; i<dicts.length; i++)
+                            dicts[i].dispose();
                         }
                     });
-            }
-            
-            if (args.length==0 || pasteFrameActive) {
+
+            if (args.length == 0) {
                 if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP))
                     WordLookup.getFrame().show();
                 else
@@ -314,36 +322,10 @@ public class JGloss {
      * @return <CODE>false</CODE>, if the application will not quit.
      */
     public static boolean exit() {
-        if (JGlossFrame.getFrameCount()>0 || WordLookup.getFrame().isVisible() ||
-            pasteFrameActive)
+        if (JGlossFrame.getFrameCount()>0 || WordLookup.getFrame().isVisible())
             return false;
 
-        // Instantiate a new Thread because the exit() method may have been called from
-        // an event dispatch thread (for example a window close event). The displayError method which might
-        // be called needs the event dispatch thread to work, so the exit() method has to return.
-        new Thread() {
-                public void run() {
-                    try {
-                        // seems like MacOS X has some tighter security and needs to do the save operation
-                        // privileged
-                        java.security.AccessController.doPrivileged
-                            ( new java.security.PrivilegedExceptionAction() {
-                                    public Object run() throws Exception {
-                                        prefs.store();
-                                        return null;
-                                    }
-                                });
-                    } catch (Exception ex) {
-                        displayError( messages.getString( "error.storePreferences"), ex, false);
-                    }
-
-                    Dictionary[] dicts = Dictionaries.getDictionaries();
-                    for ( int i=0; i<dicts.length; i++)
-                        dicts[i].dispose();
-
-                    System.exit( 0);
-                }
-            }.start();
+        System.exit( 0);
 
         return true;
     }

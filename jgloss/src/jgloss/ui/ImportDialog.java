@@ -41,11 +41,20 @@ import javax.swing.*;
  *
  * @author Michael Koch
  */
-public class ImportDialog extends JDialog {
+public class ImportDialog extends JDialog implements TextListener {
     /**
      * Path to the selected file.
      */
     private JTextField selection;
+    /**
+     * Area in which the user can enter some text, which should be imported if no filename is specified.
+     */
+    private TextArea pastearea;
+    /**
+     * Remember if the text area was empty prior to a text changed event.
+     */
+    private boolean pasteareaWasEmpty = true;
+
     /**
      * Widget to select the character encoding of the file.
      */
@@ -73,7 +82,7 @@ public class ImportDialog extends JDialog {
         b.add( Box.createHorizontalGlue());
         final Action ok = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    if (getSelection().length() > 0) {
+                    if (getFilename().length()>0 || getPastedText().length()>0) {
                         result = true;
                         ImportDialog.this.hide();
                         JGloss.prefs.set( Preferences.IMPORT_PARSER, 
@@ -157,6 +166,22 @@ public class ImportDialog extends JDialog {
         b2.add( encodings);
         b2.add( Box.createHorizontalGlue());
         b.add( b2);
+        b.add( Box.createVerticalStrut( 20));
+
+        b2 = Box.createHorizontalBox();
+        l = new JLabel( JGloss.messages.getString( "import.pastetext"));
+        b2.add( l);
+        b2.add( Box.createHorizontalGlue());
+        b.add( b2);
+        pastearea = new TextArea( 5, 50);
+        pastearea.setEditable( true);
+        pastearea.setFont( selection.getFont());
+        // use SWING colors
+        pastearea.setBackground( selection.getBackground());
+        pastearea.setForeground( selection.getForeground());
+        pastearea.addTextListener( this);
+
+        b.add( pastearea);
         b.add( Box.createVerticalStrut( 5));
 
         parserSelector = new ParserSelector( true);
@@ -212,8 +237,15 @@ public class ImportDialog extends JDialog {
      *
      * @return The filename or url.
      */
-    public String getSelection() {
+    public String getFilename() {
         return selection.getText();
+    }
+
+    /**
+     * Returns the text from the area where the user can paste the text to import.
+     */
+    public String getPastedText() {
+        return pastearea.getText();
     }
 
     /**
@@ -238,4 +270,50 @@ public class ImportDialog extends JDialog {
     public ReadingAnnotationFilter createReadingAnnotationFilter() {
         return parserSelector.createReadingAnnotationFilter();
     }
+
+    /**
+     * Convert the encoding of text pasted in the paste text area on the fly if it wasn't converted
+     * correctly by the Java environment. This is only done if the text area was empty prior to the
+     * change which triggered the event.
+     */
+    public void textValueChanged( TextEvent e) {
+        String text = pastearea.getText();
+        if (!pasteareaWasEmpty) {
+            pasteareaWasEmpty = text.length() == 0;
+            return;
+        }
+        if (text.length() == 0)
+            return;
+
+        pasteareaWasEmpty = false;
+        pastearea.setEditable( false);
+
+        // construct a new string the hacky way because sometimes the charset is ignored
+        // when pasting japanese text from the X primary selection
+        byte[] tb = new byte[text.length()];
+        boolean convert = true;
+        for ( int i=0; i<text.length(); i++) {
+            char c = text.charAt( i);
+            if (c > 255) { 
+                // non-ISO-8859-1, seems that the paste operation did not ignore the charset
+                convert = false;
+                break;
+            }
+            tb[i] = (byte) c;
+        }
+
+        if (convert) {
+            String enc = CharacterEncodingDetector.guessEncodingName( tb);
+            if (!enc.equals( CharacterEncodingDetector.ENC_UTF_8)) { // don't trust UTF-8 detection
+                try {
+                    pastearea.setText( new String( tb, enc));
+                    // the text changed event triggered by this setText is ignored because
+                    // pasteareaWasEmpty is already set to false
+                } catch (java.io.UnsupportedEncodingException ex) {}
+            }
+        }
+
+        pastearea.setEditable( true);
+    }
+
 } // class ImportDialog

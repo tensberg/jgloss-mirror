@@ -911,6 +911,11 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * The currently selected annotation node.
      */
     private AnnotationNode annotationSelection = null;
+    /**
+     * The last selected annotation. This is equal to <CODE>annotationSelection</CODE>, unless no
+     * annotation is selected.
+     */
+    private AnnotationNode lastSelectedAnnotation;
 
     /**
      * Adapt the display to a new selection. In response to a node selected in the annotation
@@ -944,6 +949,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     }
                     // expand new selection
                     annotationSelection = (AnnotationNode) selection;
+                    lastSelectedAnnotation = annotationSelection;
                     expandAll( annotationSelection);
                     makeVisible( annotationSelection);
                     
@@ -1243,5 +1249,20 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             y = screen.y + screen.height - size.height;
 
         pmenu.show( invoker, x - sc.x, y - sc.y);
+    }
+    
+    /**
+     * Returns the currently selected annotation, or <CODE>null</CODE> if no annotation is
+     * selected.
+     */
+    public AnnotationNode getSelectedAnnotation() {
+        return annotationSelection;
+    }
+
+    /**
+     * Returns the annotation which was most recently selected.
+     */
+    public AnnotationNode getLastSelectedAnnotation() {
+        return lastSelectedAnnotation;
     }
 } // class AnnotationEditor

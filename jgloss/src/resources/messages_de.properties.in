@@ -104,9 +104,7 @@ Optionen:\n\
 \                     Parameterformat: -a [in [out]]\n\
 \                     Falls in und out ausgelassen werden oder zu '-'\n\
 \                     gesetzt werden wird die Standard-Ein/Ausgabe\n\
-\                     benutzt.\n\
-\  -p, --pastewindow  Öffnet anstatt einem JGloss-Dokument ein Fenster in\n\
-\                     das Text kopiert werden kann, der dann importiert wird.
+\                     benutzt.
 main.unknownoption=Unbekannte Option {0}
 main.format=Das Format von {0} scheint {1} zu sein.
 main.format.unrecognized=Das Format von {0} wurde nicht erkannt.
@@ -223,12 +221,14 @@ exclusions.export.title=Ausschluss-Liste exportieren
 exclusions.import.title=Ausschluss-Liste importieren
 
 import.title=Datei importieren
-import.urlorfile=Geben sie eine URL ein, oder wählen sie die Datei, die sie importieren möchten.
+import.urlorfile=Geben sie eine URL ein, oder wählen sie die Datei, die sie importieren möchten:
+import.pastetext=Oder kopieren sie den japanischen Text hierhin:
 import.button.choosefile=Datei auswählen...
 import.encodings=Zeichensatz der Datei:
 import.parserselector=Text-Parser
 
 import.clipboard=Zwischenablage
+import.textarea=Importierter Text
 load.progress=Öffne {0}
 
 parserselector.readingbrackets=Klammern für Lesungs-Anmerkungen:
@@ -304,10 +304,6 @@ filechooser.overwrite.title=Datei überschreiben?
 filechooser.overwrite=Die ausgewählte Datei {0} existiert\nbereits. Überschreiben?
 
 encodings.default=<auto>
-
-pasteimport.title=JGloss Import
-pasteimport.description=Text, der in dieses Fenster kopiert wird, wird in \nein neues JGloss-Dokument importiert.
-pasteimport.standby=Bitte warten sie während das Dokument geöffnet wird.
 
 userdictionary.name=Benutzerwörterbuch
 userdictionary.instance.name=Benutzerwörterbuch (editierbares EDICT)

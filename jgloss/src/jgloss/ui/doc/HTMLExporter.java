@@ -230,10 +230,10 @@ public class HTMLExporter extends JGlossWriter {
             // add the document setup handler
             doc.setAttribute
                 ( (MutableAttributeSet) elem.getAttributes(),
-                  "onLoad", "setupDoc()");
+                  "onLoad", "setupDoc()", false);
             super.startTag( elem);
             doc.setAttribute
-                ( (MutableAttributeSet) elem.getAttributes(), "onLoad", null);
+                ( (MutableAttributeSet) elem.getAttributes(), "onLoad", null, false);
         }
         else
             super.startTag( elem);

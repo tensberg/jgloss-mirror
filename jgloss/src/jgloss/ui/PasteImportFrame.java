@@ -105,7 +105,10 @@ public class PasteImportFrame extends JFrame implements TextListener {
         final String ftext = text;
         new Thread() {
                 public void run() {
-                    f.importString( ftext, JGloss.messages.getString( "import.clipboard"),
+                    f.importString( ftext, GeneralDialog.getComponent().createImportClipboardParser
+                                    ( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                                    GeneralDialog.getComponent().createReadingAnnotationFilter(),
+                                    JGloss.messages.getString( "import.clipboard"),
                                     JGloss.messages.getString( "import.clipboard"), false);
                 }
             }.start();

@@ -123,11 +123,11 @@ public class JGlossWriter extends HTMLWriter {
                 AttributeSet attr = ec.getAttributes();
                 if (attr.containsAttribute( HTML.Attribute.NAME, "generator")) {
                     doc.setAttribute( (MutableAttributeSet) attr, HTML.Attribute.CONTENT,
-                                      getFileVersionString());
+                                      getFileVersionString(), false);
                     generatorTagExists = true;
                 } else if (attr.containsAttribute( HTML.Attribute.HTTPEQUIV, "content-type")) {
                     doc.setAttribute( (MutableAttributeSet) attr, HTML.Attribute.CONTENT,
-                                      "text/html; charset=" + getCharacterEncoding());
+                                      "text/html; charset=" + getCharacterEncoding(), false);
                     contentTypeTagExists = true;
                 }
             }
@@ -227,7 +227,7 @@ public class JGlossWriter extends HTMLWriter {
                                                    wordElement.getStartOffset());
                     if (wordText.equals( dictWord))
                         doc.setAttribute( (MutableAttributeSet) attr, 
-                                          JGlossDocument.DICTIONARY_WORD, null);
+                                          JGlossDocument.DICTIONARY_WORD, null, false);
                 } catch (BadLocationException ex) {}
             }
             // If the dict_reading attribute equals the reading of the word, remove it
@@ -240,7 +240,7 @@ public class JGlossWriter extends HTMLWriter {
                                                       readingElement.getStartOffset());
                     if (readingText.equals( dictReading))
                         doc.setAttribute( (MutableAttributeSet) attr, 
-                                          JGlossDocument.DICTIONARY_READING, null);
+                                          JGlossDocument.DICTIONARY_READING, null, false);
                 } catch (BadLocationException ex) {}
             }
         }

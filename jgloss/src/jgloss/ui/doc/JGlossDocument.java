@@ -843,8 +843,9 @@ public class JGlossDocument extends HTMLDocument {
      * @param attr The attribute set to change.
      * @param key Key of the attribute.
      * @param value New value of the attribute; or <CODE>null</CODE> to remove the attribute.
+     * @param fireChanged <CODE>true</CODE> if a document changed event should be triggered.
      */
-    public void setAttribute( MutableAttributeSet attr, Object key, Object value) {
+    public void setAttribute( MutableAttributeSet attr, Object key, Object value, boolean fireChanged) {
         writeLock();
         if (value != null)
             attr.addAttribute( key, value);
@@ -852,8 +853,9 @@ public class JGlossDocument extends HTMLDocument {
             attr.removeAttribute( key);
         writeUnlock();
 
-        fireChangedUpdate( new DefaultDocumentEvent
-            ( 0, 0, javax.swing.event.DocumentEvent.EventType.CHANGE));
+        if (fireChanged)
+            fireChangedUpdate( new DefaultDocumentEvent
+                ( 0, 0, javax.swing.event.DocumentEvent.EventType.CHANGE));
     }
 
     /**
