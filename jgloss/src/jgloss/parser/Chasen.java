@@ -20,7 +20,9 @@
  * $Id$
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
+
+import jgloss.util.CharacterEncodingDetector;
 
 import java.util.*;
 import java.io.*;
@@ -35,7 +37,7 @@ import java.io.*;
  */
 public class Chasen {
     public static void main( String args[]) throws Exception {
-        System.err.println( StringTools.unicodeEscape( args[0].charAt( 0)));
+        System.err.println( jgloss.util.StringTools.unicodeEscape( args[0].charAt( 0)));
         System.err.println( Character.UnicodeBlock.of( args[0].charAt( 0)));
         System.exit( 0);
 

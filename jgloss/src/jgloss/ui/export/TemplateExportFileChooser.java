@@ -27,6 +27,7 @@ import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.ui.ExtensionFileFilter;
 import jgloss.ui.CustomFileView;
+import jgloss.util.StringTools;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -188,7 +189,7 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
         String[] templates;
         if (resourceMessagePrefsKey != null) {
             // add default templates stored in jgloss.jar
-            templates = jgloss.dictionary.StringTools.split
+            templates = StringTools.split
                 ( JGloss.messages.getString( resourceMessagePrefsKey), ':');
             for( int i=0; i<templates.length; i++)
                 comboBoxItems.add( new ResourceTemplate( templates[i]));

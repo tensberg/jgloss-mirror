@@ -25,6 +25,7 @@ package jgloss.ui.doc;
 
 import jgloss.*;
 import jgloss.dictionary.*;
+import jgloss.parser.*;
 
 import java.util.*;
 

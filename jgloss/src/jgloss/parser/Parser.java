@@ -21,7 +21,9 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
+
+import jgloss.dictionary.SearchException;
 
 import java.util.*;
 

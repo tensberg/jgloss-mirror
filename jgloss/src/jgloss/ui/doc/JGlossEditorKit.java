@@ -64,11 +64,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
     /**
      * The parser used to annotate text.
      */
-    private jgloss.dictionary.Parser parser;
+    private jgloss.parser.Parser parser;
     /**
      * Filter for fetching reading annotations from the document during import.
      */
-    private jgloss.dictionary.ReadingAnnotationFilter readingFilter;    
+    private jgloss.parser.ReadingAnnotationFilter readingFilter;    
 
     /**
      * Flag if the view should be in compact mode.
@@ -796,8 +796,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * @param showReading <CODE>true</CODE> if reading annotations should be visible.
      * @param showTranslation <CODE>true</CODE> if translation annotations should be visible.
      */
-    public JGlossEditorKit( jgloss.dictionary.Parser parser, 
-                            jgloss.dictionary.ReadingAnnotationFilter filter,
+    public JGlossEditorKit( jgloss.parser.Parser parser, 
+                            jgloss.parser.ReadingAnnotationFilter filter,
                             boolean addAnnotations, boolean compactView,
                             boolean showReading, boolean showTranslation) {
         super();

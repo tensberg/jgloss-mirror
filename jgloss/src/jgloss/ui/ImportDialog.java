@@ -25,6 +25,11 @@ package jgloss.ui;
 
 import jgloss.*;
 import jgloss.dictionary.*;
+import jgloss.parser.Parser;
+import jgloss.parser.ChasenParser;
+import jgloss.parser.Chasen;
+import jgloss.parser.ReadingAnnotationFilter;
+import jgloss.util.CharacterEncodingDetector;
 
 import java.awt.*;
 import java.awt.event.*;

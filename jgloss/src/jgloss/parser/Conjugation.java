@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
 
 import java.io.*;
 import java.util.*;
@@ -119,7 +119,7 @@ public class Conjugation {
     /**
      * Map of all created conjugations.
      */
-    private static Map conjugations = new HashMap( 500);
+    private static Map conjugations = new HashMap( 501);
 
     /**
      * The root inflection node. Does not describe a conjugation by itself.

@@ -26,6 +26,8 @@ package jgloss.ui.doc;
 import jgloss.*;
 import jgloss.ui.ShortenedTranslation;
 import jgloss.dictionary.*;
+import jgloss.parser.*;
+import jgloss.util.StringTools;
 
 import java.beans.*;
 import java.util.*;

@@ -28,6 +28,8 @@ import jgloss.ui.doc.*;
 import jgloss.ui.annotation.*;
 import jgloss.ui.export.*;
 import jgloss.dictionary.*;
+import jgloss.parser.*;
+import jgloss.util.CharacterEncodingDetector;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -26,6 +26,7 @@ package jgloss.ui;
 import jgloss.*;
 import jgloss.ui.export.ExportFileChooser;
 import jgloss.dictionary.*;
+import jgloss.util.CharacterEncodingDetector;
 
 import java.io.*;
 import java.util.*;

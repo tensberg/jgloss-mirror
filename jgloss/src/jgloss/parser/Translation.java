@@ -21,7 +21,9 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
+
+import jgloss.dictionary.DictionaryEntry;
 
 import java.util.List;
 

@@ -25,6 +25,7 @@ package jgloss.ui;
 
 import jgloss.*;
 import jgloss.dictionary.*;
+import jgloss.parser.Conjugation;
 
 import java.awt.*;
 import java.awt.event.*;

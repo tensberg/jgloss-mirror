@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -21,9 +21,14 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
 
-import java.util.*;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.NullDictionary;
+
+import java.util.Set;
+import java.util.ResourceBundle;
 
 /**
  * Implementation of common methods of the ReadingAnnotationParser interface.

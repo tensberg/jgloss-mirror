@@ -21,9 +21,24 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
 
-import java.util.*;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.WordReadingPair;
+import jgloss.dictionary.DictionaryEntry;
+
+import jgloss.util.StringTools;
+
+import java.util.Set;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import java.io.*;
 
 /**
@@ -517,7 +532,7 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
             if (result.size() > 0)
                 lookupCache.put( key, result);
             else
-                lookupCache.put( key, Collections.EMPTY_LIST);
+                lookupCache.put( key, java.util.Collections.EMPTY_LIST);
         }
 
         return result;

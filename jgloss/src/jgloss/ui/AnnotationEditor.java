@@ -27,6 +27,8 @@ import jgloss.*;
 import jgloss.ui.doc.*;
 import jgloss.ui.annotation.*;
 import jgloss.dictionary.*;
+import jgloss.parser.*;
+import jgloss.util.StringTools;
 
 import java.awt.*;
 import java.awt.event.*;

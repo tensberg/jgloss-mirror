@@ -20,9 +20,25 @@
  * $Id$
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
 
-import java.util.*;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.WordReadingPair;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.NullDictionary;
+import jgloss.dictionary.DictionaryEntry;
+
+import jgloss.util.*;
+
+import java.util.Set;
+import java.util.Locale;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import java.io.*;
 
 /**
@@ -325,7 +341,7 @@ public class ChasenParser extends AbstractParser {
                 if (result.size() > 0)
                     lookupCache.put( word, result);
                 else {
-                    lookupCache.put( word, Collections.EMPTY_LIST);
+                    lookupCache.put( word, java.util.Collections.EMPTY_LIST);
                 }
             }
         }

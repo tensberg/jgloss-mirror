@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -21,7 +21,9 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
+
+import jgloss.dictionary.WordReadingPair;
 
 /**
  * Representation of a reading annotation in a parsed text.

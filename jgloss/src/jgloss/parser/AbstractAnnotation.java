@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
 
 /**
  * Representation of a reading annotation in a parsed text.

@@ -25,6 +25,7 @@ package jgloss.ui.annotation;
 
 import jgloss.*;
 import jgloss.dictionary.*;
+import jgloss.parser.*;
 
 import javax.swing.tree.TreeNode;
 

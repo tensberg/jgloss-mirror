@@ -43,7 +43,9 @@ endif
 RELEASE := 1.0.6
 DISTNAME := jgloss-$(RELEASE)
 
-PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www
+PACKAGES := jgloss jgloss.dictionary jgloss.parser jgloss.util \
+            jgloss.ui jgloss.ui.doc jgloss.ui.annotation \
+            jgloss.www
 
 DATA_WWW := HTMLAnnotator vconj
 

@@ -24,7 +24,7 @@
 package jgloss.ui.export;
 
 import jgloss.*;
-import jgloss.dictionary.CharacterEncodingDetector;
+import jgloss.util.CharacterEncodingDetector;
 import jgloss.ui.doc.*;
 import jgloss.ui.annotation.*;
 

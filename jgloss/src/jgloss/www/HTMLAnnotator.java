@@ -24,6 +24,7 @@
 package jgloss.www;
 
 import jgloss.dictionary.*;
+import jgloss.parser.*;
 
 import java.io.*;
 import java.net.*;

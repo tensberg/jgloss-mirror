@@ -24,7 +24,8 @@
 package jgloss.ui;
 
 import jgloss.*;
-import jgloss.dictionary.*;
+import jgloss.parser.Parser;
+import jgloss.parser.ReadingAnnotationFilter;
 
 import java.lang.reflect.Constructor;
 import java.util.*;

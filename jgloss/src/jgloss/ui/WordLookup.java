@@ -25,6 +25,7 @@ package jgloss.ui;
 
 import jgloss.*;
 import jgloss.dictionary.*;
+import jgloss.util.StringTools;
 
 import java.awt.*;
 import java.awt.event.*;

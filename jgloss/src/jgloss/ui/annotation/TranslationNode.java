@@ -24,6 +24,7 @@
 package jgloss.ui.annotation;
 
 import jgloss.dictionary.*;
+import jgloss.parser.*;
 
 import java.util.*;
 

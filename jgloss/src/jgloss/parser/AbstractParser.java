@@ -21,9 +21,12 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
 
-import java.util.*;
+import jgloss.dictionary.Dictionary;
+
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Implementation of common methods of the Parser interface.

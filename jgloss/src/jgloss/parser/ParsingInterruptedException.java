@@ -21,32 +21,31 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
 
-import java.util.*;
+import jgloss.dictionary.SearchException;
 
 /**
- * Parser which handles reading annotations contained in the
- * parsed text.
+ * Thrown if the parsing thread is interrupted by calling its <CODE>interrupt</CODE>
+ * method.
  *
  * @author Michael Koch
+ * @see java.lang.Thread#interrupt()
  */
-public interface ReadingAnnotationParser extends Parser {
+public class ParsingInterruptedException extends SearchException {
     /**
-     * Sets the character which signals the beginning of a reading annotation for a kanji word.
+     * Creates a new exception without a description.
      */
-    void setReadingStart( char readingStart);
+    public ParsingInterruptedException() {
+        super();
+    }
+    
     /**
-     * Sets the character which signals the end of a reading annotation for a kanji word.
+     * Creates a new exception with the given message.
+     *
+     * @param message A description of this exception.
      */
-    void setReadingEnd( char readingEnd);
-
-    /**
-     * Returns the character which signals the beginning of a reading annotation for a kanji word.
-     */
-    char getReadingStart();
-    /**
-     * Returns the character which signals the end of a reading annotation for a kanji word.
-     */
-    char getReadingEnd();
-} // interfacte ReadingAnnotationParser
+    public ParsingInterruptedException( String message) {
+        super( message);
+    }
+} // class ParsingInterruptedException

@@ -20,7 +20,13 @@
  * $Id$
  */
 
-package jgloss.dictionary;
+package jgloss.parser;
+
+import jgloss.dictionary.WordReadingPair;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.NullDictionary;
+
+import jgloss.util.StringTools;
 
 import java.util.*;
 

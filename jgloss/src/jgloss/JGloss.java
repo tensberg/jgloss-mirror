@@ -24,6 +24,8 @@
 package jgloss;
 
 import jgloss.dictionary.*;
+import jgloss.parser.*;
+import jgloss.util.CharacterEncodingDetector;
 import jgloss.ui.*;
 import jgloss.www.*;
 

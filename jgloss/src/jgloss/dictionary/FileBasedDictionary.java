@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.util.*;
+
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;

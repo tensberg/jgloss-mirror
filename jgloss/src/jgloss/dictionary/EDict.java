@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.util.StringTools;
+
 import java.io.*;
 import java.util.*;
 import java.text.MessageFormat;
@@ -119,7 +121,7 @@ public class EDict implements Dictionary {
                         do {
                             l = r.readLine();
                             lines++;
-                            // skip empty lines and comments
+                            // skip empty lines and comments; test a maximum of 100 lines
                         } while (l!=null && (l.length()==0 || l.charAt( 0)<128) && lines<100);
                         r.close();
                         if (l!=null && lines<100) {
