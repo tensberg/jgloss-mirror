@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -28,16 +28,25 @@ import java.util.*;
 import java.beans.*;
 
 /**
- * Management of the application-wide preferences. The preferences are a mapping from string
- * keys to string values. The class provides convenience methods for the storage and
- * retrieval of additional data types. If a user preference for a specific key is not set, the value
- * from the default preferences in resources/preferences.properties (or a localized variant)
- * will be used. The preferences of the user will be stored in the file ".jgloss" in the users
- * home directory.
+ * Management of the application-wide preferences. The preference storage mechanism varies
+ * with the Version of the running VM. Under Java 1.3, {@link PropertiesPreferences PropertiesPreferences}
+ * is used, which stores the preferences in a properties file. Under Java 1.4,
+ * {@link JavaPreferences JavaPreferences} is used, which uses the <CODE>java.util.prefs</CODE> preferences.
+ * <p>
+ * A set of default preferences is stored with the application jar file and accessed using the
+ * <CODE>ResourceBundle</CODE> mechanism from the file "resources/preferences". 
+ * If a user preference is not yet set, the value from the default preferences is used.
+ * The default value passed in to the methods <CODE>getInt</CODE>,... is only used if the default
+ * preference setting (a string) cannot be converted to the requested data type.
+ * </p><p>
+ * Property change listeners are used to inform interested objects of preference value changes.
+ * The field <CODE>oldValue</CODE> of any property change event may not be initialized depending
+ * on the implementation.
+ * </p>
  *
  * @author Michael Koch
  */
-public class Preferences {
+public abstract class Preferences {
     public static final String DICTIONARIES = "dictionaries";
     public static final String DICTIONARIES_DIR = "dictionaries.dir";
 
@@ -144,31 +153,32 @@ public class Preferences {
 
     public static final String HISTORY_SELECTION = "history.selection";
     public static final String HISTORY_SIZE = "history.size";
+
+    public static final String PREFERENCES_MIGRATED = "preferences.migrated";
     
     /**
-     * Path to the user preferences file.
+     * Default application preferences. The default preferences are loaded from the 
+     * resource "resources/preferences" and stored in a property file and initialized in the
+     * <CODE>Preferences</CODE> constructor.
      */
-    private final String PREFS_FILE = 
-        System.getProperty( "user.home") + File.separator + ".jgloss";
-
-    private Properties prefs;
-    private boolean changed = false;
-    private List propertyChangeListeners;
+    protected Properties defaults;
+    /**
+     * List of objects being notified of preference changes.
+     */
+    protected List propertyChangeListeners;
 
     /**
      * Initializes the preferences with the user's settings.
      */
     public Preferences() {
         // load default settings from properties file
-        Properties defaults = new Properties();
+        defaults = new Properties();
         ResourceBundle defrb = ResourceBundle.getBundle( "resources/preferences");
         for ( Enumeration e=defrb.getKeys(); e.hasMoreElements(); ) {
             String key = (String) e.nextElement();
             defaults.setProperty( key, (String) defrb.getString( key));
         }
-
-        prefs = new Properties( defaults);
-        propertyChangeListeners = new LinkedList();
+        propertyChangeListeners = new ArrayList( 5);
     }
 
     /**
@@ -177,9 +187,7 @@ public class Preferences {
      * @param key Key to a preference.
      * @return The corresponding preference string.
      */
-    public synchronized String getString( String key) {
-        return prefs.getProperty( key);
-    }
+    public abstract String getString( String key);
 
     /**
      * Sets a new preference value.
@@ -187,15 +195,7 @@ public class Preferences {
      * @param key Key to the preference.
      * @param value The new value. May be <CODE>null</CODE> to reset to the default preference.
      */
-    public synchronized void set( String key, String value) {
-        // see if the value really changed
-        String orig = getString( key);
-        if (value!=null && !value.equals( orig) || orig==null) {
-            changed = true;
-            prefs.setProperty( key, value);
-            firePropertyChanged( key, orig, value);
-        }
-    }
+    public abstract void set( String key, String value);
 
     /**
      * Returns the preference for the given key as an int. If the preference is not a
@@ -205,16 +205,7 @@ public class Preferences {
      * @param d Default value, if the preference is not parseable as int.
      * @return The corresponding preference value.
      */
-    public synchronized int getInt( String key, int d) {
-        int out = d;
-        try {
-            out = Integer.parseInt( getString( key));
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
-
-        return out;
-    }
+    public abstract int getInt( String key, int d);
 
     /**
      * Sets the new preference value to an int.
@@ -222,9 +213,7 @@ public class Preferences {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public synchronized void set( String key, int value) {
-        set( key, Integer.toString( value));
-    }
+    public abstract void set( String key, int value);
 
     /**
      * Returns the preference for the given key as a double. If the preference is not a
@@ -234,16 +223,7 @@ public class Preferences {
      * @param d Default value, if the preference is not parseable as double.
      * @return The corresponding preference value.
      */
-    public synchronized double getDouble( String key, double d) {
-        double out = d;
-        try {
-            out = Double.parseDouble( getString( key));
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
-
-        return out;
-    }
+    public abstract double getDouble( String key, double d);
 
     /**
      * Sets the new preference value to a double.
@@ -251,20 +231,17 @@ public class Preferences {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public synchronized void set( String key, double value) {
-        set( key, Double.toString( value));
-    }
+    public abstract void set( String key, double value);
 
     /**
      * Returns the preference for the given key as a boolean. If the preference is not a
      * valid boolean, false will be returned.
      *
      * @param key Key to the preference.
+     * @param d Default value, if the preference is not parseable as boolean.
      * @return The corresponding preference value.
      */
-    public synchronized boolean getBoolean( String key) {
-        return Boolean.valueOf( getString( key)).booleanValue();
-    }
+    public abstract boolean getBoolean( String key, boolean d);
 
     /**
      * Sets the new preference value to a boolean.
@@ -272,9 +249,7 @@ public class Preferences {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public synchronized void set( String key, boolean value) {
-        set( key, value ? "true" : "false");
-    }
+    public abstract void set( String key, boolean value);
 
     /**
      * Returns the preference for the given key as an array of strings with pathnames.
@@ -318,37 +293,6 @@ public class Preferences {
     }
 
     /**
-     * Loads the user preferences.
-     *
-     * @exception java.io.IOException if the preferences file cannot be loaded. If the preferences
-     *            file does not exist, no error will be signalled.
-     */
-    public synchronized void load() throws IOException {
-        File f = new File( PREFS_FILE);
-        if (!f.exists()) // no preferences
-            return;
-
-        FileInputStream in = new FileInputStream( PREFS_FILE);
-        prefs.load( in);
-        in.close();
-        changed = false;
-    }
-
-    /**
-     * Saves the current preferences settings.
-     *
-     * @exception java.io.IOException if the user preference file cannot be written.
-     */
-    public synchronized void store() throws IOException {
-        if (changed) {
-            FileOutputStream out = new FileOutputStream( PREFS_FILE);
-            prefs.store( out, JGloss.messages.getString( "preferences.header"));
-            out.close();
-            changed = false;
-        }
-    }
-
-    /**
      * Adds a listener which will be notified of changes to the preferences.
      *
      * @param cl The listener.
@@ -378,7 +322,7 @@ public class Preferences {
      * @param oldValue The previous setting of the preference.
      * @param newValue The new setting of the preference.
      */
-    private void firePropertyChanged( String name, Object oldValue, Object newValue) {
+    protected void firePropertyChanged( String name, Object oldValue, Object newValue) {
         PropertyChangeEvent e = new PropertyChangeEvent( this, name, oldValue, newValue);
 
         synchronized (propertyChangeListeners) {

@@ -135,7 +135,7 @@ public class WordLookupPanel extends JPanel {
 
         verbDeinflection = new JCheckBox( JGloss.messages.getString
                                           ( "wordlookup.choice.verbdeinflection"));
-        verbDeinflection.setSelected( JGloss.prefs.getBoolean( Preferences.WORDLOOKUP_DEINFLECTION));
+        verbDeinflection.setSelected( JGloss.prefs.getBoolean( Preferences.WORDLOOKUP_DEINFLECTION, false));
 
         JPanel p = new JPanel( new GridLayout( 0, 1));
         p.setBorder( BorderFactory.createCompoundBorder 
@@ -171,7 +171,7 @@ public class WordLookupPanel extends JPanel {
         allDictionaries = new JRadioButton
             ( JGloss.messages.getString( "wordlookup.choice.alldictionaries"));
         dictionaries.add( allDictionaries);
-        if (JGloss.prefs.getBoolean( Preferences.WORDLOOKUP_ALLDICTIONARIES))
+        if (JGloss.prefs.getBoolean( Preferences.WORDLOOKUP_ALLDICTIONARIES, true))
             allDictionaries.setSelected( true);
         else
             dictionary.setSelected( true);
@@ -247,7 +247,7 @@ public class WordLookupPanel extends JPanel {
         resultFancy = new JTextPane();
         resultFancy.setContentType( "text/html");
         resultFancy.setEditable( false);
-        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true)) {
             ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()
                 .addRule( STYLE);
         }
@@ -319,7 +319,7 @@ public class WordLookupPanel extends JPanel {
                     }
                     else if (e.getPropertyName().equals( "TextPane.font")) {
                         resultFancy.setFont( (Font) e.getNewValue());
-                        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+                        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true)) {
                             ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()
                                 .removeStyle( "body");
                             ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()

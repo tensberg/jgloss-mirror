@@ -211,7 +211,7 @@ public class ImportDialog extends JDialog implements TextListener {
             parserSelector.setSelected( Class.forName( JGloss.prefs.getString( Preferences.IMPORT_PARSER)));
         } catch (ClassNotFoundException ex) {}
         parserSelector.setFirstOccurrenceOnly( JGloss.prefs.getBoolean
-                                               ( Preferences.IMPORT_FIRSTOCCURRENCE));
+                                               ( Preferences.IMPORT_FIRSTOCCURRENCE, true));
         String brackets = JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS);
         if (brackets.length() == 2)
             parserSelector.setReadingBrackets( brackets.charAt( 0), brackets.charAt( 1));

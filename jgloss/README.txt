@@ -1,4 +1,4 @@
-JGloss 1.0.2
+JGloss 1.0.3
 ------------
 
 JGloss homepage: http://jgloss.sourceforge.net/

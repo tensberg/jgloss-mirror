@@ -144,7 +144,7 @@ public class GeneralDialog extends Box {
         all.add( Box.createVerticalStrut( 2));
 
         // enable editing
-        if ( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITINGCHECKBOX)) {
+        if ( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITINGCHECKBOX, false)) {
             // this is a "hidden" control because the direct editing feature is buggy and can
             // break the current document if not used with care.
             b = Box.createHorizontalBox();
@@ -165,17 +165,17 @@ public class GeneralDialog extends Box {
      * Loads the preferences and initializes the dialog accordingly.
      */
     public void loadPreferences() {
-        if (JGloss.prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP))
+        if (JGloss.prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
             startWordLookup.setSelected( true);
         else
             startFrame.setSelected( true);
-        if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP))
+        if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false))
             clickTooltip.setSelected( true);
         else
             clickSelect.setSelected( true);
 
         if (enableEditing != null)
-            enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
+            enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
         chasenLocation.setText( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
         importClipboardParserSelector.setEnabled( ChasenParser.class,
                                                   ChasenParser.isChasenExecutable
@@ -188,7 +188,7 @@ public class GeneralDialog extends Box {
             ex.printStackTrace();
         }
         importClipboardParserSelector.setFirstOccurrenceOnly
-            ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE));
+            ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE, true));
         String brackets = JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS);
         if (brackets.length() == 2)
             importClipboardParserSelector.setReadingBrackets

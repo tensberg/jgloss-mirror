@@ -1,3 +1,6 @@
+1.0.3: (2002/02/20)
+	- Use of Java 1.4 prefs API if available. Old .jgloss preference
+	  settings will be migrated automatically.
 1.0.2: (2002/02/17)
 	- Annotation editor now remembers it's width.
 	- Fixes for JDK 1.4 incompatibilities.

@@ -40,7 +40,7 @@ ifndef NATIVE2ASCII
   NATIVE2ASCII := native2ascii
 endif
 
-RELEASE := 1.0.2
+RELEASE := 1.0.3
 DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www
@@ -62,8 +62,11 @@ RESOURCES_WWW := messages-www.properties messages-dictionary.properties \
 HTML_WWW := index.html converturl.js
 
 CLASSPATH := $(CLASSPATH):./src
-ROOT_SOURCE := src/jgloss/JGloss.java
-WWW_SOURCE := src/jgloss/www/JGlossServlet.java
+
+# List main class source file and all other class source files not referenced from main class
+# for compilation
+ROOT_SOURCES := src/jgloss/JGloss.java src/jgloss/JavaPreferences.java
+WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
 SOURCE_DIST := README.txt COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex-ruby
@@ -141,10 +144,10 @@ setup_www:
 	cp $(addprefix src/data/, $(DATA_WWW)) data
 
 compile:
-	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(ROOT_SOURCE)
+	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(ROOT_SOURCES)
 
 compile-www:
-	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(WWW_SOURCE)
+	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(WWW_SOURCES)
 
 # Convert properties files in native charset to ascii.
 # The charset is given in the input file by a line of the form "# Encoding: SOME-ENCODING"

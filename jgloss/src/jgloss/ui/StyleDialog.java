@@ -441,11 +441,11 @@ public class StyleDialog extends Box {
      * Loads the preferences and initializes the dialog accordingly.
      */
     public void loadPreferences() {
-        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT))
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true))
             generalFontDefault.setSelected( true);
         else
             generalFontCustom.setSelected( true);
-        generalFont.setEnabled( !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT));
+        generalFont.setEnabled( !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true));
 
         generalFont.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_GENERAL));
         textFont.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TEXT));
@@ -456,9 +456,10 @@ public class StyleDialog extends Box {
         readingFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
         translationFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
 
-        textUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR));
-        readingUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR));
-        translationUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR));
+        textUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR, true));
+        readingUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR, true));
+        translationUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, 
+                                                                  true));
 
         ((ColorIcon) textColor.getIcon()).setColor( new Color
             ( Math.max( 0, JGloss.prefs.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff))));
@@ -545,7 +546,7 @@ public class StyleDialog extends Box {
      * Applies the UI font setting.
      */
     public static void applyUIFont() {
-        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true)) {
             // restore java default fonts
             if (defaultLFFonts != null) {
                 for ( Iterator i=defaultLFFonts.entrySet().iterator(); i.hasNext(); ) {
@@ -597,7 +598,7 @@ public class StyleDialog extends Box {
         style += "}\n";
         
         style += AnnotationTags.BASETEXT.getId() + " { ";
-        if (JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR)) {
+        if (JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR, true)) {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff)) + "; ";
         }
@@ -617,7 +618,7 @@ public class StyleDialog extends Box {
             int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
             style += "font-size: " + size + "pt; ";
         } catch (NumberFormatException ex) { ex.printStackTrace(); }
-        if (JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR)) {
+        if (JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR, true)) {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff)) + "; ";
         }
@@ -637,7 +638,7 @@ public class StyleDialog extends Box {
             int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
             style += "font-size: " + size + "pt; ";
         } catch (NumberFormatException ex) { ex.printStackTrace(); }
-        if (JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR)) {
+        if (JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, true)) {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff)) + "; ";
         }

@@ -356,7 +356,7 @@ public class JGlossEditor extends JTextPane {
                         if (!(checkPopupTrigger( e) || annotationEditor.getContextMenu().isVisible())) {
                             int tooltipButtonMask;
                             int selectButtonMask;
-                            if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP)) {
+                            if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) {
                                 // left mouse button shows annotation tooltip, 
                                 // all other select the annotation
                                 tooltipButtonMask = MouseEvent.BUTTON1_MASK;

@@ -383,7 +383,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                                     JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         docpane = new JGlossEditor( annotationEditor);
-        docpane.setEditable( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
+        docpane.setEditable( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
         docpaneScroller = new JScrollPane( docpane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         docpane.setNextFocusableComponent( annotationEditor);
@@ -554,23 +554,23 @@ public class JGlossFrame extends JFrame implements ActionListener {
         bar.add( menu);
 
         compactViewItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.compactview"));
-        compactViewItem.setSelected( JGloss.prefs.getBoolean( Preferences.VIEW_COMPACTVIEW));
+        compactViewItem.setSelected( JGloss.prefs.getBoolean( Preferences.VIEW_COMPACTVIEW, false));
         compactViewItem.setToolTipText( JGloss.messages.getString( "main.menu.compactview.tt"));
         compactViewItem.addActionListener( this);
         showReadingItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.showreading"));
-        showReadingItem.setSelected( JGloss.prefs.getBoolean( Preferences.VIEW_SHOWREADING));
+        showReadingItem.setSelected( JGloss.prefs.getBoolean( Preferences.VIEW_SHOWREADING, true));
         showReadingItem.setToolTipText( JGloss.messages.getString( "main.menu.showreading.tt"));
         showReadingItem.addActionListener( this);
         showTranslationItem = new JCheckBoxMenuItem( JGloss.messages.getString
                                                      ( "main.menu.showtranslation"));
         showTranslationItem.setSelected( JGloss.prefs.getBoolean
-                                         ( Preferences.VIEW_SHOWTRANSLATION));
+                                         ( Preferences.VIEW_SHOWTRANSLATION, true));
         showTranslationItem.setToolTipText( JGloss.messages.getString( "main.menu.showtranslation.tt"));
         showTranslationItem.addActionListener( this);
         showAnnotationItem = new JCheckBoxMenuItem( JGloss.messages.getString
                                                     ( "main.menu.showannotation"));
         showAnnotationItem.setSelected( JGloss.prefs.getBoolean
-                                        ( Preferences.VIEW_SHOWANNOTATION));
+                                        ( Preferences.VIEW_SHOWANNOTATION, false));
         showAnnotationItem.setToolTipText( JGloss.messages.getString( "main.menu.showannotation.tt"));
         showAnnotationItem.addActionListener( this);
 
@@ -1040,7 +1040,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     getContentPane().removeAll();
                     getContentPane().add( split);
                     validate();
-                    if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN))
+                    if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN, false))
                         split.setDividerLocation( 1.0f);
                     else {
                         double position = JGloss.prefs.getDouble
@@ -1375,7 +1375,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
         b = Box.createHorizontalBox();
         JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
-        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_PLAINTEXT_WRITEREADING));
+        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_PLAINTEXT_WRITEREADING, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeReading, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1385,7 +1385,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox writeTranslations = 
             new JCheckBox( JGloss.messages.getString( "export.writetranslations"));        
         writeTranslations.setSelected( JGloss.prefs.getBoolean
-                                       ( Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS));
+                                       ( Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeTranslations, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1395,7 +1395,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox writeHidden = 
             new JCheckBox( JGloss.messages.getString( "export.writehidden"));        
         writeHidden.setSelected( JGloss.prefs.getBoolean
-                                 ( Preferences.EXPORT_PLAINTEXT_WRITEHIDDEN));
+                                 ( Preferences.EXPORT_PLAINTEXT_WRITEHIDDEN, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeHidden, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1459,7 +1459,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         Box b2 = Box.createVerticalBox();
         Box b = Box.createHorizontalBox();
         JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
-        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_LATEX_WRITEREADING));
+        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_LATEX_WRITEREADING, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeReading, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1469,7 +1469,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         final JCheckBox writeTranslations = 
             new JCheckBox( JGloss.messages.getString( "export.writetranslations"));        
         writeTranslations.setSelected( JGloss.prefs.getBoolean
-                                       ( Preferences.EXPORT_LATEX_WRITETRANSLATIONS));
+                                       ( Preferences.EXPORT_LATEX_WRITETRANSLATIONS, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeTranslations, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1479,7 +1479,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         final JCheckBox translationsOnPage = 
             new JCheckBox( JGloss.messages.getString( "export.latex.translationsonpage"));        
         translationsOnPage.setSelected( JGloss.prefs.getBoolean
-                                        ( Preferences.EXPORT_LATEX_TRANSLATIONSONPAGE));
+                                        ( Preferences.EXPORT_LATEX_TRANSLATIONSONPAGE, true));
         translationsOnPage.setEnabled( writeTranslations.isSelected());
         b.add( Box.createHorizontalStrut( 24));
         b.add( UIUtilities.createSpaceEater( translationsOnPage, true));
@@ -1496,7 +1496,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox writeHidden = 
             new JCheckBox( JGloss.messages.getString( "export.writehidden"));        
         writeHidden.setSelected( JGloss.prefs.getBoolean
-                                 ( Preferences.EXPORT_LATEX_WRITEHIDDEN));
+                                 ( Preferences.EXPORT_LATEX_WRITEHIDDEN, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeHidden, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1574,7 +1574,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox backwardsCompatible = 
             new JCheckBox( JGloss.messages.getString( "export.html.backwardscompatible"));        
         backwardsCompatible.setSelected( JGloss.prefs.getBoolean
-                                         ( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE));
+                                         ( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( backwardsCompatible, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1582,7 +1582,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
         b = Box.createHorizontalBox();
         JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
-        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_HTML_WRITEREADING));
+        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_HTML_WRITEREADING, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeReading, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1593,7 +1593,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox writeTranslations = 
             new JCheckBox( JGloss.messages.getString( "export.writetranslations"));        
         writeTranslations.setSelected( JGloss.prefs.getBoolean
-                                       ( Preferences.EXPORT_HTML_WRITETRANSLATIONS));
+                                       ( Preferences.EXPORT_HTML_WRITETRANSLATIONS, true));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeTranslations, true));
         b.add( Box.createHorizontalStrut( 3));
@@ -1603,7 +1603,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox writeHidden = 
             new JCheckBox( JGloss.messages.getString( "export.writehidden"));        
         writeHidden.setSelected( JGloss.prefs.getBoolean
-                                 ( Preferences.EXPORT_HTML_WRITEHIDDEN));
+                                 ( Preferences.EXPORT_HTML_WRITEHIDDEN, false));
         b.add( Box.createHorizontalStrut( 3));
         b.add( UIUtilities.createSpaceEater( writeHidden, true));
         b.add( Box.createHorizontalStrut( 3));

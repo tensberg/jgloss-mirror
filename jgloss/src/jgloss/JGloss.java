@@ -98,7 +98,8 @@ public class JGloss {
     /**
      * The application-wide preferences. Use this to store and retrieve preferences.
      */
-    public static final Preferences prefs = new Preferences();
+    public static final Preferences prefs = initPreferences();
+
     /**
      * The application-wide messages. Use this to retrieve localizable string messages.
      */
@@ -166,12 +167,7 @@ public class JGloss {
                         System.err.println( messages.getString( "main.usage"));
                         System.exit( 1);
                     }
-                    try {
-                        prefs.load();
-                    } catch (IOException ex) {
-                        System.err.println( messages.getString( "error.loadPreferences"));
-                        System.exit( 1);
-                    }
+
                     String[] fs = prefs.getPaths( Preferences.DICTIONARIES);
                     Dictionary[] d = new Dictionary[fs.length];
                     try {
@@ -227,12 +223,6 @@ public class JGloss {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
             
             SplashScreen splash = new SplashScreen();
-            splash.setInfo( messages.getString( "splashscreen.loadingPreferences"));
-            try {
-                prefs.load();
-            } catch (IOException ex) {
-                displayError( messages.getString( "error.loadPreferences"), ex, false);
-            }
             
             // set default location of the chasen executable if this is the first start of JGloss
             String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
@@ -246,7 +236,7 @@ public class JGloss {
             ChasenParser.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
 
             // automatically set the fonts the first time JGloss is run
-            if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED)) {
+            if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED, false)) {
                 StyleDialog.autodetectFonts();
                 JGloss.prefs.set( Preferences.FONT_AUTODETECTED, true);
             }
@@ -263,7 +253,7 @@ public class JGloss {
                         } catch (IllegalArgumentException ex) {}
 
                         PreferencesFrame.getFrame();
-                        if (!prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP))
+                        if (!prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
                             WordLookup.getFrame();
                     }
                 }.start();
@@ -272,12 +262,6 @@ public class JGloss {
             Runtime.getRuntime().addShutdownHook
                 ( new Thread() {
                         public void run() {
-                            try {
-                                prefs.store();
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                            
                             Dictionary[] dicts = Dictionaries.getDictionaries();
                             for ( int i=0; i<dicts.length; i++)
                             dicts[i].dispose();
@@ -285,7 +269,7 @@ public class JGloss {
                     });
 
             if (args.length == 0) {
-                if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP))
+                if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
                     WordLookup.getFrame().show();
                 else
                     new JGlossFrame();
@@ -418,5 +402,36 @@ public class JGloss {
      */
     public static void setCurrentDir( String dir) {
         currentDir = dir;
+    }
+
+    /**
+     * Return a Preference implementation appropriate for the current Java VM.
+     *
+     * @see PropertiesPreferences
+     * @see JavaPreferences
+     */
+    private static Preferences initPreferences() {
+        try {
+            // Test for availability of JDK1.4 prefs API
+            // We have to use instantiation via Class.forName, because otherwise the Java VM
+            // dies while JGloss is initialized on Java 1.3 because the java.util.prefs classes
+            // can't be found
+            Preferences prefs = (Preferences) Class.forName( "jgloss.JavaPreferences").newInstance();
+            // copy old settings if needed
+            if (!prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, true)) {
+                new PropertiesPreferences().copyPreferences( prefs);
+                prefs.set( Preferences.PREFERENCES_MIGRATED, true);
+            }
+            return prefs;
+        } catch (NoClassDefFoundError ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex1) {
+            ex1.printStackTrace();
+        } catch (IllegalAccessException ex2) {
+            ex2.printStackTrace();
+        } catch (InstantiationException ex3) {
+            ex3.printStackTrace();
+        }
+        return new PropertiesPreferences(); // use properties-based prefs
     }
 } // class JGloss

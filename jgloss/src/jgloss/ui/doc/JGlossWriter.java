@@ -44,7 +44,7 @@ public class JGlossWriter extends HTMLWriter {
      * Current version of JGloss. Will be written to the generator meta-tag
      * of the generated file.
      */
-    public static int JGLOSS_VERSION = 102;
+    public static int JGLOSS_VERSION = 103;
     
     /**
      * Major version of the JGloss file format. The major version is changed if a

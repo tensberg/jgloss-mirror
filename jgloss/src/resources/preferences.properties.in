@@ -24,6 +24,9 @@
 # $Id$
 #
 
+# flag if the preferences have been copied from the old, file based prefs to the new format
+preferences.migrated=false
+
 # Position and size of the main application frame
 frame.x=0
 frame.y=0
