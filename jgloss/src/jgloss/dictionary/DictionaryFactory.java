@@ -213,5 +213,10 @@ public abstract class DictionaryFactory {
          * @exception DictionaryFactory.InstantiationException if the instantiation of the dictionary failed.
          */
         Dictionary createInstance( String descriptor) throws DictionaryFactory.InstantiationException;
+        /**
+         * Returns the class of the dictionary which would be created for this descriptor by
+         * {@link #createInstance(String) createInstance}.
+         */
+        Class getDictionaryClass( String descriptor);
     } // interface Implementation
 } // class DictionaryFactory

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -72,6 +72,8 @@ public class UserDictionary extends EditableEDict {
         public String getDescriptor() {
             return dicfile;
         }
+
+        public Class getDictionaryClass( String descriptor) { return UserDictionary.class; }
 
         public Dictionary createInstance( String descriptor) 
             throws DictionaryFactory.InstantiationException {

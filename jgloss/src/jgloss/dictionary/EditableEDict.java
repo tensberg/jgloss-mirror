@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -66,6 +66,8 @@ public class EditableEDict extends EDict {
                 }
 
                 public String getName() { return EDict.messages.getString( "edict.editable.name"); }
+
+                public Class getDictionaryClass( String descriptor) { return EditableEDict.class; }
             };
 
     /**
@@ -386,10 +388,10 @@ public class EditableEDict extends EDict {
     protected void saveIndex() {
         try {
             if (indexLength == 0) {
-                new File( dicfile + JJDX_EXTENSION).delete();
+                new File( dicfile + INDEX_EXTENSION).delete();
             }
             else
-                saveJJDX( new File( dicfile + JJDX_EXTENSION));
+                saveJJDX( new File( dicfile + INDEX_EXTENSION));
         } catch (Exception ex) {
             System.err.println( MessageFormat.format( messages.getString( "edict.error.writejjdx"),
                                                       new String[] { ex.getClass().getName(),

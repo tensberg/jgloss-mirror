@@ -71,12 +71,14 @@ public class EDictNIO extends FileBasedDictionary {
 
         //EDict eo = new EDict( "/home/michael/testdic", true);
         //EDictNIO en = new EDictNIO( new File( "/home/michael/testdic"), true);
-        EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
+        EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict.b"), true);
+        //GDict en = new GDict( new File( "/home/michael/japan/dictionaries/edict.gdt"), true);
+        GDict eo = new GDict( new File( "/home/michael/japan/dictionaries/edict.gdt"), true);
         //EDictNIO eo = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
-        EDict eo = new EDict( "/home/michael/japan/dictionaries/edict2", true);
+        //EDict eo = new EDict( "/home/michael/japan/dictionaries/edict2", true);
         //EDictNIO en = new EDictNIO( new File( "/usr/share/edict/edict"), true);
         //EDict eo = new EDict( "/usr/share/edict/edict", true);
-        //test( "regular (stops at every station) Jouetsu-line shinkansen", en, eo, SEARCH_ANY_MATCHES);
+        //test( "boy", en, eo, SEARCH_ANY_MATCHES);
         
         Matcher word = Pattern.compile( "^(\\S+)").matcher( "");
         Matcher reading = Pattern.compile( "\\[(.*?)\\]").matcher( "");
@@ -116,13 +118,16 @@ public class EDictNIO extends FileBasedDictionary {
     private final static void test( String word, Dictionary d1, Dictionary d2, short mode) 
         throws SearchException {
         long t = System.currentTimeMillis();
+        //System.out.println( "searching " + word + " in " + d1 + ", mode " + mode);
         List r1 = d1.search( word, mode, RESULT_DICTIONARY_ENTRIES);
         t1 += System.currentTimeMillis() - t;
         t = System.currentTimeMillis();
+        //System.out.println( "searching " + word + " in " + d2 + ", mode " + mode);
         List r2 = d2.search( word, mode, RESULT_DICTIONARY_ENTRIES);
+        //System.out.println( "end search");
         t2 += System.currentTimeMillis() - t;
         //System.err.println( "Results: " + r1.size() + "/" + r2.size());
-        java.util.Set s1 = new java.util.HashSet( r1.size()*2+1);
+        /*java.util.Set s1 = new java.util.HashSet( r1.size()*2+1);
         for ( java.util.Iterator i=r1.iterator(); i.hasNext(); ) {
             s1.add( i.next().toString());
         }
@@ -169,7 +174,7 @@ public class EDictNIO extends FileBasedDictionary {
                 System.out.println( i.next());
             }
             System.exit( 1);
-        }
+            }*/
     }
 
     /**
@@ -199,9 +204,9 @@ public class EDictNIO extends FileBasedDictionary {
             // it is tested that the first char in the translation is not a Kanji
             // (InCJKUnifiedIdeographs)
             return new FileBasedDictionary.Implementation
-                ( "EDICT", "EUC-JP", Pattern.compile
+                ( "EDICT", "EUC-JP", true, Pattern.compile
                   ( "\\A\\S+?(\\s\\[.+?\\])?\\s/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
-                  1.0f, 1024, EDictNIO.class.getConstructor( new Class[] { File.class }));
+                  1.0f, 4096, EDictNIO.class.getConstructor( new Class[] { File.class }));
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -219,20 +224,28 @@ public class EDictNIO extends FileBasedDictionary {
     public String getEncoding() { return "EUC_JP"; }
 
     protected boolean isEntryStart( int offset) {
-        byte b = dictionary.get( offset-1);
-        return (b=='[' || b=='/' || b==10 || b==13);
+        try {
+            byte b = dictionary.get( offset-1);
+            return (b=='[' || b=='/' || b==10 || b==13);
+        } catch (IndexOutOfBoundsException ex) {
+            return true;
+        }
     }
     
     protected boolean isEntryEnd( int offset) {
-        byte b = dictionary.get( offset);
-        if (b==']' || b=='/' || b==10 || b==13)
+        try {
+            byte b = dictionary.get( offset);
+            if (b==']' || b=='/' || b==10 || b==13)
+                return true;
+            else if (b == ' ') { // end of word if followed by [ or /
+                b = dictionary.get( offset+1);
+                return (b=='[' || b=='/');
+            }
+            else
+                return false;
+        } catch (IndexOutOfBoundsException ex) {
             return true;
-        else if (b == ' ') { // end of word if followed by [ or /
-            b = dictionary.get( offset+1);
-            return (b=='[' || b=='/');
         }
-        else
-            return false;
     }
 
     /**
@@ -315,7 +328,7 @@ public class EDictNIO extends FileBasedDictionary {
             if (c>='a' && c<='z' ||
                 c>='A' && c<='Z' ||
                 c>='0' && c<='9' ||
-                (inWord && (c=='-' || c=='.')))
+                (inWord && c=='-'))
                 return 3; // word character
             else
                 return -1; // not in index word

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -81,7 +81,9 @@ public class GDictEntry extends DefaultDictionaryEntry {
     /**
      * Creates a new dictionary entry.
      *
-     * @param wordlist List of lists which each hold a word with alternative spellings.
+     * @param wordlist List of words with alternative spellings. An item in the list is either a
+     *          a string object which is a word, or a list, which contains a word with alternative 
+     *          spellings as string objects.
      * @param reading The reading of the words. May be <code>null</code>.
      * @param translations List of translations.
      * @param rangesOfMeaning Indexes in the translation list for the start of new ranges of meaning
@@ -100,8 +102,16 @@ public class GDictEntry extends DefaultDictionaryEntry {
         words = new String[wordlist.size()][];
         int c = 0;
         for ( Iterator i=wordlist.iterator(); i.hasNext(); ) {
-            List alternatives = (List) i.next();
-            words[c++] = (String[]) alternatives.toArray( new String[alternatives.size()]);
+            Object o = i.next();
+            if (o instanceof String) {
+                // entry is a single word
+                words[c++] = new String[] { (String) o };
+            } 
+            else {
+                // not a single word, must be list of words
+                List alternatives = (List) o;
+                words[c++] = (String[]) alternatives.toArray( new String[alternatives.size()]);
+            }
         }
         if (rangesOfMeaning == null)
             this.rangesOfMeaning = new int[0];
@@ -178,10 +188,7 @@ public class GDictEntry extends DefaultDictionaryEntry {
      * <code>alternative==0</code>, the <code>GDictEntry</code> itself is returned.
      */
     public DictionaryEntry getDictionaryEntry( int word, int alternative) {
-        if (word==0 && alternative==0)
-            return this;
-        else
-            return new DictionaryEntryWrapper( word, alternative);
+        return new DictionaryEntryWrapper( word, alternative);
     }
 
     public String toString() {

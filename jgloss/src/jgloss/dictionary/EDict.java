@@ -45,7 +45,7 @@ public class EDict implements Dictionary {
      * Filename extension of a JJDX-format index. Will be added to the filename of the
      * dictionary.
      */
-    public final static String JJDX_EXTENSION = ".jjdx";
+    public final static String INDEX_EXTENSION = ".jjdx";
     /**
      * Version of the JJDX format supported by this implementation.
      */
@@ -152,6 +152,10 @@ public class EDict implements Dictionary {
                 }
 
                 public String getName() { return "EDICT"; }
+
+                public Class getDictionaryClass( String descriptor) {
+                    return EDict.class;
+                }
             };
 
     /**
@@ -162,14 +166,29 @@ public class EDict implements Dictionary {
      * @param createindex Flag if the index should be automatically created and written to disk
      *                    if no index file exists. A write will not be attempted if the directory
      *                    is not writable. If no index file exists and createindex is
-     *                    false, you have to call {@link #buildIndex(boolean) buildIndex} to create the
+     *                    false, you have to call {@link #buildIndex(File) buildIndex} to create the
      *                    index manually.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
     public EDict( String dicfile, boolean createindex) throws IOException {
-        this.dicfile = dicfile;
+        this( new File( dicfile), createindex);
+    }
 
-        File df = new File( dicfile);
+    /**
+     * Creates a new dictionary from a dictionary file in EDICT format and the associated
+     * xjdx or jjdx index file.
+     *
+     * @param df File in EDICT format.
+     * @param createindex Flag if the index should be automatically created and written to disk
+     *                    if no index file exists. A write will not be attempted if the directory
+     *                    is not writable. If no index file exists and createindex is
+     *                    false, you have to call {@link #buildIndex(File) buildIndex} to create the
+     *                    index manually.
+     * @exception IOException if the dictionary or the index file cannot be read.
+     */
+    public EDict( File df, boolean createindex) throws IOException {
+        this.dicfile = df.getAbsolutePath();
+
         name = df.getName();
         System.err.println( MessageFormat.format( messages.getString( "dictionary.load"),
                                                   new String[] { name }));
@@ -186,7 +205,7 @@ public class EDict implements Dictionary {
         is.close();
         dictionaryLength = dictionary.length - len; // == dictionary.length if the file was read fully
 
-        File jindex = new File( dicfile + JJDX_EXTENSION);
+        File jindex = new File( dicfile + INDEX_EXTENSION);
         File xindex = new File( dicfile + XJDX_EXTENSION);
         if (jindex.canRead() && jindex.lastModified()>=df.lastModified()) {
             loadJJDX( jindex);
@@ -199,9 +218,8 @@ public class EDict implements Dictionary {
             xjdxIndex = true;
         }
         else if (createindex) {
-            buildIndex( true);
             try {
-                saveJJDX( jindex);
+                buildIndex( jindex);
             } catch (IOException ex) {
                 System.err.println( MessageFormat.format( messages.getString( "edict.error.writejjdx"),
                                                           new String[] { ex.getClass().getName(),
@@ -548,18 +566,26 @@ public class EDict implements Dictionary {
     }
 
     /**
-     * Creates a JJD index for the EDICT dictionary. The dictionary file must have been already loaded.
+     * Creates a JJD index for the EDICT dictionary and writes it to the specified file. 
+     * The dictionary file must have been already loaded.
+     * For a specification of the JJDX index format see {@link FileBasedDictionary FileBasedDictionary}.
+     *
+     * @param indexfile File to which the index will be saved.
+     */
+    public void buildIndex( File indexfile) throws IOException {
+        buildIndex( true);
+        saveJJDX( indexfile);
+    }
+
+    /**
+     * Creates the JJDX index for the EDICT dictionary. The dictionary file must have been already loaded.
      * The method will call {@link #preBuildIndex() preBuildIndex}, 
      * {@link #addIndexRange(int,int) addIndexRange( 0, dictionaryLength)} and
      * {@link #postBuildIndex() postBuildIndex()}.
-     * For a specification of the JJDX index format see {@link FileBasedDictionary FileBasedDictionary}.
-     *
-     * @param printMessage Flag if an informational message should be printed to <CODE>System.err</CODE>.
      */
-    public void buildIndex( boolean printMessage) {
-        if (printMessage)
-            System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
-                                                      new String[] { getName() }));
+    protected void buildIndex( boolean printMessage) {
+        System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
+                                                  new String[] { getName() }));
       
         xjdxIndex = false;
 
@@ -594,7 +620,7 @@ public class EDict implements Dictionary {
         for ( int i=start; i<end; i++) {
             int c = byteToUnsignedByte( dictionary[i]);
             if (inword) {
-                if (!(alphaoreuc( dictionary[i]) || c=='-' || c=='.')) {
+                if (!(alphaoreuc( dictionary[i]) || c=='-')) {
                     inword = false;
                     int len = i - entry;
                     // save all entries with length >= 3 or kanji/kana entries of length >= 2 (bytes).

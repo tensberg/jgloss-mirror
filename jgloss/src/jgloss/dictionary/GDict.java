@@ -39,8 +39,9 @@ import java.util.regex.*;
 public class GDict extends FileBasedDictionary {
     public static void main( String[] args) throws Exception {
         GDict g = new GDict( new File( "/home/michael/japan/dictionaries/gdict/gdictutf.txt"), true);
-        //g.search( "\u6f22\u5b57", SEARCH_ANY_MATCHES);
-        g.search( args[0], SEARCH_ANY_MATCHES, RESULT_DICTIONARY_ENTRIES);
+        //GDict g = new GDict( new File( "/home/michael/testdic"), true);
+        //GDict g = new GDict( new File( "/home/michael/japan/dictionaries/edict.gdt"), true);
+        //System.out.println( g.search( "so", SEARCH_EXACT_MATCHES, RESULT_DICTIONARY_ENTRIES));
     }
 
     /**
@@ -77,9 +78,9 @@ public class GDict extends FileBasedDictionary {
             // At least four of the fields must be present in the first line of the file for
             // the match to be successful.
             return new FileBasedDictionary.Implementation
-                ( FORMAT_NAME, ENCODING, Pattern.compile
+                ( FORMAT_NAME, ENCODING, true, Pattern.compile
                   ( "\\A([^\\|]*\\|){3,}[^\\|]*$", Pattern.MULTILINE),
-                  1.0f, 1024, GDict.class.getConstructor( new Class[] { File.class }));
+                  1.0f, 4096, GDict.class.getConstructor( new Class[] { File.class }));
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -90,22 +91,36 @@ public class GDict extends FileBasedDictionary {
      * Matches each word entry with alternatives. The word match is stored in group 1, the
      * alternatives are stores as single string in group 2.
      */
-    protected static Pattern WORD_PATTERN = Pattern.compile
+    protected static final Pattern WORD_PATTERN = Pattern.compile
         ( "(\\S+)(?:\\s\\[\\d+\\])?(?:\\s\\((.+?)\\))?(?:;\\s|$)");
+    protected static Matcher WORD_MATCHER = WORD_PATTERN.matcher( "");
     /**
      * Matches semicolon-separated alternatives. The separator is a semicolon followed by a single
      * whitespace. The matched alternative is stored in group 1. Semicolons in brackets are ignored.
-     * 
+     * If an opening bracket is not matched by a closing bracket, everything to the end of the
+     * pattern is matched.
      */
-    protected static Pattern ALTERNATIVES_PATTERN = Pattern.compile
-        ( "((?:[^(]+?(?:\\(.*?\\))?)+?)(?:;\\s|$)");
+    protected static final Pattern ALTERNATIVES_PATTERN = Pattern.compile
+        ( "((?:[^(]+?|(?:\\(.*?(?:\\)|(?:\\||$))))+?)(?:;\\s|$)");
+    protected static Matcher ALTERNATIVES_MATCHER = ALTERNATIVES_PATTERN.matcher( "");
     /**
      * Matches translation ranges of meaning. Group 1 contains the number of the range written in 
      * brackets at the beginning of the entry (or <code>null</code> if there is no such number), 
      * group 2 contains a string of all the meanings in the range.
      */
-    protected static Pattern TRANSLATIONS_PATTERN = Pattern.compile
+    protected static final Pattern TRANSLATIONS_PATTERN = Pattern.compile
         ( "(?:\\[(\\d+)\\]\\s)?(.+?)\\.?\\s?(?=\\[\\d+\\]|$)");
+    protected static Matcher TRANSLATIONS_MATCHER = TRANSLATIONS_PATTERN.matcher( "");
+
+    /**
+     * Used for {@link GDictEntry GDictEntry} creation if there are no groups of meanings.
+     */
+    protected static final int[] NO_GROUPS = new int[0];
+    /**
+     * List of words used in find. Since the list is copied in the {@link GDictEntry GDictEntry}
+     * constructor, it is safe (and faster) to recycle the same list.
+     */
+    protected final List wordlist = new ArrayList( 10);
 
     public GDict( File dicfile) throws IOException {
         this( dicfile, true);
@@ -118,14 +133,39 @@ public class GDict extends FileBasedDictionary {
     public String getEncoding() { return "UTF-8"; }
 
     protected boolean isEntryStart( int offset) {
-        byte b = dictionary.get( offset-1);
-        return (b==';' || b==' ' || b=='|' || b==10 || b==13);
+        try {
+            byte b = dictionary.get( offset-1);
+            if (b==';' || b=='|' || b==10 || b==13)
+                return true;
+            if (b == ' ') {
+                byte b2 = dictionary.get( offset-2);
+                return (b2 == ';' || b2 == ']');
+            }
+            return false;
+        } catch (IndexOutOfBoundsException ex) {
+            return true;
+        }
     }
-    
+
     protected boolean isEntryEnd( int offset) {
-        byte b = dictionary.get( offset);
-        return (b==';' || b=='|' || b==10 || b==13 || b==')' ||
-                (b==' ' && dictionary.get( offset+1)=='('));
+        try {
+            byte b = dictionary.get( offset);
+            if (b==';' || b=='|' || b==10 || b==13)
+                return true;
+            if (b == '.') {
+                // end of translation if followed by field end marker '|' or new range of meaning " [..."
+                byte b2 = dictionary.get( offset+1);
+                if (b2 == '|')
+                    return true;
+                else if (b2 == ' ') 
+                    return (dictionary.get( offset+2) == '[');
+            }
+            else if (b==' ' || b==')') // only end marker if not in translation
+                return dictionary.get( offset-1) > 127; // test for non-ASCII character
+            return false;
+        } catch (IndexOutOfBoundsException ex) {
+            return true;
+        }
     }
 
     protected void parseEntry( List result, String entry, int entrystart, int where, 
@@ -140,11 +180,13 @@ public class GDict extends FileBasedDictionary {
             start = end+1;
             end = entry.indexOf( '|', start);
             String reading = entry.substring( start, end);
-            // cut of [n] marker
+            // cut off [n] marker
             int bracket = reading.indexOf( '[');
             if (bracket != -1)
                 // the [ must always be preceeded by a single space, therefore bracket-1
                 reading = reading.substring( 0, bracket-1);
+            if (reading.length() == 0)
+                reading = null;
 
             // skip part of speech
             start = end+1;
@@ -155,41 +197,60 @@ public class GDict extends FileBasedDictionary {
             end = entry.indexOf( '|', start);
             String translations = entry.substring( start, end);
 
+            GDictEntry out; 
             // split words
-            Matcher wordmatch = WORD_PATTERN.matcher( words);
-            List wordlist = new ArrayList( 2); // list of lists of word with alternatives
-            while (wordmatch.find()) {
-                List alternatives = new ArrayList( 3);
-                alternatives.add( wordmatch.group( 1));
-                if (wordmatch.group( 2) != null) {
-                    Matcher altmatch = ALTERNATIVES_PATTERN.matcher( wordmatch.group( 2));
-                    while (altmatch.find())
-                        alternatives.add( altmatch.group( 1));
+            synchronized (WORD_MATCHER) {
+                WORD_MATCHER.reset( words);
+                wordlist.clear(); // list of lists of word with alternatives
+                while (WORD_MATCHER.find()) {
+                    if (WORD_MATCHER.group( 2) == null) {
+                        // word without alternative spellings
+                        wordlist.add( WORD_MATCHER.group( 1));
+                    }
+                    else {
+                        // word with alternatives
+                        List alternatives = new ArrayList( 3);
+                        alternatives.add( WORD_MATCHER.group( 1));
+                        ALTERNATIVES_MATCHER.reset( WORD_MATCHER.group( 2));
+                        while (ALTERNATIVES_MATCHER.find())
+                            alternatives.add( ALTERNATIVES_MATCHER.group( 1));
+                        wordlist.add( alternatives);
+                    }
                 }
-                wordlist.add( alternatives);
-            }
-
-            // split translations
-            Matcher translationmatch = TRANSLATIONS_PATTERN.matcher( translations);
-            List translationlist = new ArrayList( 5);
-            List grouplist = new ArrayList( 2);
-            while (translationmatch.find()) {
-                // put group start marker in grouplist, if a group indicator was found by the matcher
-                // in group 1 and this is not the first group.
-                if (translationmatch.group( 1) != null &&
-                    translationlist.size() > 0)
-                    grouplist.add( new Integer( translationlist.size()));
+                
+                // split translations
+                TRANSLATIONS_MATCHER.reset( translations);
+                ArrayList translationlist = new ArrayList( 10);
+                List grouplist = null;
+                while (TRANSLATIONS_MATCHER.find()) {
+                    // put group start marker in grouplist, if a group indicator was found by the matcher
+                    // in group 1 and this is not the first group.
+                    if (TRANSLATIONS_MATCHER.group( 1) != null &&
+                        translationlist.size() > 0) {
+                        if (grouplist == null)
+                            grouplist = new ArrayList( 2);
+                        grouplist.add( new Integer( translationlist.size()));
+                    }
                     
-                Matcher altmatch = ALTERNATIVES_PATTERN.matcher( translationmatch.group( 2));
-                while (altmatch.find())
-                    translationlist.add( altmatch.group( 1));
+                    ALTERNATIVES_MATCHER.reset( TRANSLATIONS_MATCHER.group( 2));
+                    while (ALTERNATIVES_MATCHER.find()) {
+                        translationlist.add( ALTERNATIVES_MATCHER.group( 1));
+                    }
+                }
+                translationlist.trimToSize();
+
+                int[] groups;
+                if (grouplist == null)
+                    groups = NO_GROUPS;
+                else {
+                    groups = new int[grouplist.size()];
+                    for ( int i=0; i<grouplist.size(); i++)
+                        groups[i] = ((Integer) grouplist.get( i)).intValue();
+                }
+                out = new GDictEntry( wordlist, reading, translationlist, groups, null,
+                                      null, null, this);
             }
 
-            int[] groups = new int[grouplist.size()];
-            for ( int i=0; i<grouplist.size(); i++)
-                groups[i] = ((Integer) grouplist.get( i)).intValue();
-            GDictEntry out = new GDictEntry( wordlist, reading, translationlist, groups, null,
-                                             null, null, this);
             if (resultmode == RESULT_NATIVE)
                 result.add( out);
             else { // create dictionary entries
@@ -343,8 +404,10 @@ public class GDict extends FileBasedDictionary {
         // convert katakana->hiragana
         if (StringTools.isKatakana( (char) c))
             c -= 96; // katakana-hiragana difference is 96 code points
-        else
-            c = Character.toLowerCase( (char) c);
+        else if ((c >= 'A') && (c <= 'Z')) // lowercase for ASCII letters
+            c |= 0x20;
+        else if (c>127 && c<256) // lowercase for latin umlauts
+            c = Character.toLowerCase( (char) c); // this method is slow, so only use it for the special case
 
         return c;
     }
@@ -352,8 +415,10 @@ public class GDict extends FileBasedDictionary {
     protected int isWordCharacter( int c, boolean inWord) {
         if (c>=0x4e00 && c<0xa000)
             return 0; // kanji
-        else if (c>=3000 && c<3100)
+        else if (c>=0x3000 && c<0x3100)
             return 1; // katakana, hiragana
+        else if (c == '-')
+            return (inWord ? 3 : -1);
         else if (Character.isLetterOrDigit( (char) c)) // any other characters
             return 3;
         else

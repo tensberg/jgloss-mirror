@@ -45,6 +45,7 @@ public abstract class FileBasedDictionary implements Dictionary {
     public static class Implementation implements DictionaryFactory.Implementation {
         private String name;
         private String encoding;
+        private boolean doEncodingTest;
         private java.util.regex.Pattern pattern;
         private float maxConfidence;
         private int lookAtLength;
@@ -55,6 +56,10 @@ public abstract class FileBasedDictionary implements Dictionary {
          *
          * @param name Name of the dictionary format.
          * @param encoding Character encoding used by dictionary files.
+         * @param doEncodingTest If <code>true</code>, Use the 
+         *        {@link CharacterEncodingDetector CharacterEncodingDetector} to guess the encoding
+         *        of the tested file and return <code>ZERO_CONFIDENCE</code> if it does not match
+         *        the encoding.
          * @param pattern Regular expression to match against the start of a tested file.
          * @param maxConfidence The confidence which is returned when the <code>linePattern</code>
          *                      matches.
@@ -63,11 +68,13 @@ public abstract class FileBasedDictionary implements Dictionary {
          * @param dictionaryConstructor Constructor used to create a new dictionary instance for 
          *        a matching file. The constructor must take a single <code>File</code> as parameter.
          */
-        public Implementation( String name, String encoding, java.util.regex.Pattern pattern,
+        public Implementation( String name, String encoding, boolean doEncodingTest,
+                               java.util.regex.Pattern pattern,
                                float maxConfidence, int lookAtLength, 
                                java.lang.reflect.Constructor dictionaryConstructor) {
             this.name = name;
             this.encoding = encoding;
+            this.doEncodingTest = doEncodingTest;
             this.pattern = pattern;
             this.maxConfidence = maxConfidence;
             this.lookAtLength = lookAtLength;
@@ -96,6 +103,9 @@ public abstract class FileBasedDictionary implements Dictionary {
                     in.close();
                 }
 
+                if (doEncodingTest && 
+                    !encoding.equals( CharacterEncodingDetector.guessEncodingName( buffer)))
+                    return ZERO_CONFIDENCE;
                 if (pattern.matcher( new String( buffer, encoding)).find())
                     return maxConfidence;
             } catch (IOException ex) {}
@@ -126,13 +136,17 @@ public abstract class FileBasedDictionary implements Dictionary {
                 throw new DictionaryFactory.InstantiationException( ex);
             }
         }
+
+        public Class getDictionaryClass( String descriptor) {
+            return dictionaryConstructor.getDeclaringClass();
+        }
     } // class Implementation
 
     /**
      * Filename extension of a JJDX-format index. Will be added to the filename of the
      * dictionary.
      */
-    public final static String JJDX_EXTENSION = ".jjdx";
+    public final static String INDEX_EXTENSION = ".jjdx";
     /**
      * Current version of the JJDX format.
      */
@@ -229,13 +243,13 @@ public abstract class FileBasedDictionary implements Dictionary {
         dictionary = dicchannel.map( FileChannel.MapMode.READ_ONLY, 0, dictionarySize);
 
         // prepare the index
-        indexfile = new File( dicfile.getAbsolutePath() + JJDX_EXTENSION);
+        indexfile = new File( dicfile.getAbsolutePath() + INDEX_EXTENSION);
         try {
             // rebuild the index file if it does not exist or the dictionary file was modified
             // after the index was created
             if (!indexfile.exists() || dicfile.lastModified()>indexfile.lastModified()) {
                 if (createindex) {
-                    buildIndex( true); // this also initializes the index member variable
+                    buildIndex( indexfile); // this also initializes the index member variable
                 }
             }
             else {
@@ -258,7 +272,7 @@ public abstract class FileBasedDictionary implements Dictionary {
                                                               ( "edict.warning.jjdxsize"),
                                                               new String[] { getName() }));
                     if (createindex) {
-                        buildIndex( true);
+                        buildIndex( indexfile);
                         return;
                     }
                 }
@@ -471,7 +485,7 @@ public abstract class FileBasedDictionary implements Dictionary {
         // search matching entry
         do {
             curr = (to-from)/2 + from;
-            
+
             int c = compare( expression, 0, expression.capacity(), dictionary, index.get( curr));
             if (c > 0)
                 from = curr+1;
@@ -522,14 +536,14 @@ public abstract class FileBasedDictionary implements Dictionary {
     /**
      * Create the index file for the dictionary.
      *
-     * @param printMessage <CODE>true</CODE>, if an informational message should be printed on stderr.
+     * @param indexfile File to which the index should be saved.
      */
-    public void buildIndex( boolean printMessage) throws IOException {
+    public void buildIndex( File indexfile) throws IOException {
         synchronized (dictionary) {
-            if (printMessage)
-                System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
-                                                          new String[] { getName() }));
-            
+            System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
+                                                      new String[] { getName() }));
+
+            this.indexfile = indexfile;
             indexchannel = new RandomAccessFile( indexfile, "rw").getChannel();
             MappedByteBuffer indexbuf = indexchannel.map( FileChannel.MapMode.READ_WRITE,
                                                           0, INDEX_OFFSET + 50000*4);
@@ -546,11 +560,14 @@ public abstract class FileBasedDictionary implements Dictionary {
             // add index entries
             index = indexbuf.asIntBuffer();
             System.err.println( "adding entries");
+            long t = System.currentTimeMillis();
             int entries = addIndexRange( 0, (int) dictionarySize);
             System.err.println( entries + " entries");
+            System.err.println( (System.currentTimeMillis()-t)/1000.0);
             System.err.println( "quicksort");
-            quicksortIndex( 0, entries-1);
+            quicksortIndex( 0, entries-1, dictionary, dictionary.duplicate());
             System.err.println( "end quicksort");
+            System.err.println( (System.currentTimeMillis()-t)/1000.0);
             
             // write number of entries
             indexbuf.order( ByteOrder.BIG_ENDIAN);
@@ -661,10 +678,7 @@ public abstract class FileBasedDictionary implements Dictionary {
     protected abstract int readCharacter( ByteBuffer buf) throws BufferUnderflowException;
 
     /**
-     * Decide how a character should be treated
-     * for index creation. The character must be read from the current position of
-     * {@link #dictionary dictionary}. An arbitrary number of bytes may be skipped by the method
-     * after the character is read in order to skip over non-indexable dictionary fields.
+     * Decide how a character should be treated for index creation.
      *
      * @param character The character to decide. This is a character returned by 
      *                  {@link #readCharacter( ByteBuffer) readCharacter}, so it is not neccessary in
@@ -714,7 +728,8 @@ public abstract class FileBasedDictionary implements Dictionary {
      * Sorts a part of the index array using randomized quicksort. Call this with
      * (0, index lenght-1) to sort the whole index.
      */
-    protected void quicksortIndex( int left, int right) throws IOException {
+    protected void quicksortIndex( int left, int right, ByteBuffer buf1, ByteBuffer buf2) 
+        throws IOException {
         if (left >= right)
             return;
 
@@ -722,10 +737,9 @@ public abstract class FileBasedDictionary implements Dictionary {
         int mv = index.get( middle);
         index.put( middle, index.get( left));
 
-        ByteBuffer dic2 = dictionary.duplicate();
         int l = left + 1; // l is the first index which compares greater mv
         for ( int i=l; i<=right; i++) {
-            if (compare( dictionary, mv, Integer.MAX_VALUE, dic2, index.get( i)) > 0) {
+            if (compare( buf1, mv, Integer.MAX_VALUE, buf2, index.get( i)) > 0) {
                 if (i > l) {
                     int t = index.get( i);
                     index.put( i, index.get( l));
@@ -740,12 +754,12 @@ public abstract class FileBasedDictionary implements Dictionary {
         
         // sorting the smaller subset first will keep the stack depth small
         if (l < (left+right)/2) {
-            quicksortIndex( left, l-1);
-            quicksortIndex( l+1, right);
+            quicksortIndex( left, l-1, buf1, buf2);
+            quicksortIndex( l+1, right, buf1, buf2);
         }
         else {
-            quicksortIndex( l+1, right);
-            quicksortIndex( left, l-1);
+            quicksortIndex( l+1, right, buf1, buf2);
+            quicksortIndex( left, l-1, buf1, buf2);
         }
     }
 
@@ -765,8 +779,9 @@ public abstract class FileBasedDictionary implements Dictionary {
     protected int compare( ByteBuffer buf1, int i1, int length, ByteBuffer buf2, int i2) {
         buf1.position( i1);
         buf2.position( i2);
+        int end = (int) Math.min( Integer.MAX_VALUE, (long) i1 + (long) length);
         try {
-            while (buf1.position()-i1 < length) {
+            while (buf1.position() < end) {
                 int b1 = readCharacter( buf1);
                 int b2 = readCharacter( buf2);
                 if (b1 < b2)

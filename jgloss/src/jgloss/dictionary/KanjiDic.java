@@ -98,6 +98,8 @@ public class KanjiDic implements Dictionary {
                 }
 
                 public String getName() { return "KANJIDIC"; }
+
+                public Class getDictionaryClass( String descriptor) { return KanjiDic.class; }
             };
 
     /**

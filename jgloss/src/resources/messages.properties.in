@@ -2,7 +2,7 @@
 #
 # Default localization for messages in JGloss.
 #
-# Copyright (C) 2001/2002 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
 #
 # This file is part of JGloss.
 #
@@ -116,6 +116,8 @@ Options:\n\
 main.unknownoption=Unknown option {0}
 main.format=The format of {0} seems to be {1}.
 main.format.unrecognized=The file {0} is not a dictionary file in a supported format.
+main.createindex.noindex=No index needs to be created for dictionary {0}.
+main.createindex.exception=Failed to create index file for {0}:\n{1} {2}
 main.annotatehtml.files=The input and output file must be different.
 main.title=JGloss
 main.renderingdocument=Creating Document View...
@@ -228,6 +230,8 @@ prefs.title=Preferences
 dictionaries.title=Dictionaries
 dictionaries.chooser.title=Add dictionary files
 dictionaries.chooser.button.add=Add
+dictionaries.loading.title=Loading dictionaries...
+dictionaries.loading=Loading dictionary {0}.
 dictionaries.button.up=Move entry up
 dictionaries.button.down=Move entry down
 dictionaries.button.add=Add dictionary file...

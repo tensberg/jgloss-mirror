@@ -106,6 +106,8 @@ public class SKKDictionary implements Dictionary {
                 }
 
                 public String getName() { return "SKK"; }
+
+                public Class getDictionaryClass( String descriptor) { return SKKDictionary.class; }
             };
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)
  * Copyright (c) 1994 Yasuhiro Tonooka (tonooka@msi.co.jp)
  *
  * This file is part of JGloss.
@@ -33,9 +33,10 @@ import java.io.*;
 
 /**
  * Try to detect the character encoding of an input stream reading Japanese
- * text. Detected encodings are ISO-2022-JP, EUC-JP and Shift-JIS. If none of
- * these encodings match and the analyzed byte array contains 8 bit characters,
- * UTF-8 is assumed. (TODO: replace this with real UTF-8 detection).<BR>
+ * text. Detected encodings are ISO-2022-JP, EUC-JP, Shift-JIS and UTF-8.
+ * The test works by checking the validity of each byte from the input array
+ * in each character encoding and eliminating the encodings where the byte combinations
+ * are illegal.<br>
  * The encoding detection routine is taken from Yasuhiro Tonooka's
  * "Kanji Code Converter" (kcc) unix program.
  * 
@@ -51,6 +52,7 @@ public class CharacterEncodingDetector {
     public final static String ENC_EUC_JP = "EUC-JP";
     public final static String ENC_SHIFT_JIS = "Shift_JIS";
     public final static String ENC_UTF_8 = "UTF-8";
+    public final static String ENC_ISO_8859_1 = "ISO-8859-1";
     public final static String ENC_ASCII = "ASCII";
 
     private final static int ESC = 0x1b;
@@ -74,12 +76,16 @@ public class CharacterEncodingDetector {
     /**
      * Flag set if the byte array contains Shift-JIS values.
      */
-    public final static int SJIS = 0x40;
+    public final static int SJIS = 0x20;
     /**
      * Flag set if the byte array contains 8-bit JIS values.
      */
-    public final static int JIS8 = 0x80; /* 8-bit JIS */
-    
+    public final static int JIS8 = 0x40; /* 8-bit JIS */
+    /**
+     * Flag set if the byte array contains UTF-8 characters.
+     */
+    public final static int UTF8 = 0x80;
+
     private final static byte M_ASCII = 0;
     private final static byte M_KANJI = 1;
     private final static byte M_GAIJI = 2;
@@ -208,8 +214,10 @@ public class CharacterEncodingDetector {
             enc = ENC_EUC_JP;
         else if ((code&SJIS) > 0)
             enc = ENC_SHIFT_JIS;
-        else if ((code&NONASCII) > 0) // always assume UTF-8 until real UTF-8 detection is implemented
+        else if ((code&UTF8) > 0)
             enc = ENC_UTF_8;
+        else if ((code&NONASCII) > 0) // assume ISO-8859-1
+            enc = ENC_ISO_8859_1;
         else
             enc = ENC_ASCII;
 
@@ -224,14 +232,15 @@ public class CharacterEncodingDetector {
      * @return Result of the detection as a number of flags.
      */
     public static int guessEncoding( byte[] data) {
-        int euc, sjis;
+        int euc, sjis, utf8;
+        int utf8charlen = 1; // length of utf8-encoded char in bytes
         boolean jis8;
         int code;
         int i = 1;
         int gsmode = M_ASCII;
         int oldmode;
       
-        euc = sjis = 1;
+        euc = sjis = utf8 = 1;
         jis8 = true;
         code = 0;
         for ( int s=0; s<data.length; s+=i) {
@@ -357,11 +366,40 @@ public class CharacterEncodingDetector {
                 }
                 break;
             }
+
+            if (utf8 > 0) {
+                if (utf8==1 && (c&0x80) > 0) {
+                    // First byte of utf8 char. Figure out length.
+                    if ((c&0xe0) == 0xc0)
+                        utf8charlen = 2; // 2-byte char
+                    else if ((c&0xf0) == 0xe0)
+                        utf8charlen = 3;
+                    else if ((c&0xf8) == 0xf0)
+                        utf8charlen = 4;
+                    else if ((c&0xfc) == 0xf8)
+                        utf8charlen = 5;
+                    else if ((c&0xfe) == 0xfc)
+                        utf8charlen = 6;
+                    else
+                        utf8 = 0; // not UTF-8
+                    utf8++;
+                }
+                else if (utf8 > 1) {
+                    if ((c&0xc0) != 0x80) // invalid utf8 n-th byte
+                        utf8 = 0; // not UTF-8
+                    if (utf8 == utf8charlen)
+                        utf8 = 1;
+                    else
+                        utf8++;
+                }
+            }
         }
         if (euc != 0)
             code |= EUC;
         if (sjis != 0)
             code |= !jis8 ? SJIS : SJIS | JIS8;
+        if (utf8 != 0)
+            code |= UTF8;
 
         return code;
     }

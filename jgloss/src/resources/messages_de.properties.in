@@ -2,7 +2,7 @@
 #
 # German localization of the JGloss messages.
 #
-# Copyright (C) 2001/2002 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
 #
 # This file is part of JGloss.
 #
@@ -115,6 +115,8 @@ Optionen:\n\
 main.unknownoption=Unbekannte Option {0}
 main.format=Das Format von {0} scheint {1} zu sein.
 main.format.unrecognized=Das Format von {0} wurde nicht erkannt.
+main.createindex.noindex=Für das Wörterbuch {0} muß kein Index erstellt werden.
+main.createindex.exception=Die Indexdatei für {0} konnte nicht erstellt werden:\n{1} {2}
 main.annotatehtml.files=Die Ein- und Ausgabedatei müssen verschieden sein.
 main.title=JGloss
 main.renderingdocument=Erstelle Dokumentansicht...

@@ -321,7 +321,7 @@ public class Dictionaries extends JComponent {
             dir = System.getProperty( "user.home");
         }
 
-        JFileChooser chooser = new JFileChooser( dir);
+        final JFileChooser chooser = new JFileChooser( dir);
         chooser.setFileHidingEnabled( true);
         chooser.setMultiSelectionEnabled( true);
         chooser.setDialogTitle( JGloss.messages.getString( "dictionaries.chooser.title"));
@@ -329,26 +329,71 @@ public class Dictionaries extends JComponent {
         int result = chooser.showDialog( SwingUtilities.getRoot( box), JGloss.messages.getString
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
-            File[] fs = chooser.getSelectedFiles();
-            DefaultListModel model = (DefaultListModel) dictionaries.getModel();
-            for ( int i=0; i<fs.length; i++) {
-                String descriptor = fs[i].getAbsolutePath();
-                // check if the dictionary is already added
-                boolean alreadyAdded = false;
-                for ( Enumeration e=model.elements(); e.hasMoreElements(); ) {
-                    if (((DictionaryWrapper) e.nextElement()).descriptor.equals( descriptor)) {
-                        alreadyAdded = true;
-                        break;
+            final File[] fs = chooser.getSelectedFiles();
+            // Dictionary loading might take some time if an index file has to be created first.
+            // Pop up an informational message if it takes longer than one second.
+            Frame parent = (Frame) SwingUtilities.getRoot( this);
+            final JDialog messageDialog = new JDialog( parent, true);
+            messageDialog.setTitle( JGloss.messages.getString( "dictionaries.loading.title"));
+            final JLabel message = new JLabel( "");
+            messageDialog.getContentPane().add( message);
+            messageDialog.setSize( 500, 50);
+            messageDialog.setLocation( (int) (parent.getLocation().getX() + 
+                                       parent.getSize().getWidth()/2 - 250),
+                                       (int) (parent.getLocation().getY() + 
+                                       parent.getSize().getHeight()/2 - 25));
+            messageDialog.setDefaultCloseOperation( JDialog.DO_NOTHING_ON_CLOSE);
+            final Cursor currentCursor = getCursor();
+            Thread worker = new Thread() {
+                    public void run() {
+                        final DefaultListModel model = (DefaultListModel) dictionaries.getModel();
+                        for ( int i=0; i<fs.length; i++) {
+                            final String descriptor = fs[i].getAbsolutePath();
+                            // check if the dictionary is already added
+                            boolean alreadyAdded = false;
+                            for ( Enumeration e=model.elements(); e.hasMoreElements(); ) {
+                                if (((DictionaryWrapper) e.nextElement()).descriptor.equals( descriptor)) {
+                                    alreadyAdded = true;
+                                    break;
+                                }
+                            }
+                            if (!alreadyAdded) {
+                                EventQueue.invokeLater( new Runnable() {
+                                        public void run() {
+                                            message.setText( JGloss.messages.getString
+                                                             ( "dictionaries.loading",
+                                                               new String[] { new File( descriptor)
+                                                                   .getName() }));
+                                        }
+                                    });
+                                final Dictionary d = loadDictionary( descriptor);
+                                if (d != null) {
+                                    EventQueue.invokeLater( new Runnable() {
+                                            public void run() {
+                                                model.addElement( new DictionaryWrapper( descriptor, d));
+                                            }
+                                        });
+                                }                 
+                            }
+                        }
+                        JGloss.prefs.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
+                                          .getAbsolutePath());
+
+                        setCursor( currentCursor);
+                        messageDialog.hide();
+                        messageDialog.dispose();
                     }
-                }
-                if (!alreadyAdded) {
-                    Dictionary d = loadDictionary( descriptor);
-                    if (d != null)
-                        model.addElement( new DictionaryWrapper( descriptor, d));
-                }
+                };
+            worker.start();
+            try {
+                worker.join( 1000);
+            } catch (InterruptedException ex) {}
+
+            if (worker.isAlive()) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+                messageDialog.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+                messageDialog.show();
             }
-            JGloss.prefs.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
-                              .getAbsolutePath());
         }
     }
 

@@ -127,7 +127,7 @@ public class JGloss {
                     ( edictnio, (DictionaryFactory.Implementation)
                       edictnio.getField( "implementation").get( null));
             } catch (NoClassDefFoundError ex) {
-                // this is normal on J2SE 1.3. In this case, GDict is not available.
+                // this is normal on J2SE 1.3. In this case, GDict is not available and old EDict is used.
                 DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
             }
 
@@ -145,17 +145,46 @@ public class JGloss {
                 }
                 else if (args[0].equals( "-i") || args[0].equals( "--createindex")) {
                     for ( int i=1; i<args.length; i++) {
-                        EDict e = new EDict( args[i], false);
-                        e.buildIndex( true);
+                        // build an index for the given file if it is in a known dictionary format,
+                        // the dictionary class has a constructor which will not create the index
+                        // automatically and has a method buildIndex
                         try {
-                            // write index to local directory
-                            e.saveJJDX( new File( e.getName() + EDict.JJDX_EXTENSION));
-                        } catch (IOException ex) {
+                            Class dicclass = DictionaryFactory.getImplementation( args[i])
+                                .getDictionaryClass( args[i]);
+                            // dicclass must have a constructor which takes a File argument with
+                            // the dictionary location and the boolean "false" meaning that
+                            // no index file should be created.
+                            Dictionary dic = (Dictionary) dicclass.getConstructor
+                                ( new Class[] { File.class, Boolean.TYPE}).newInstance
+                                ( new Object[] { new File( args[i]), Boolean.FALSE });
+                            // build index and write it to local directory
+                            String extension = dicclass.getField( "INDEX_EXTENSION")
+                                .get( dic).toString();
+                            File index = new File( new File( args[i]).getName() + extension);
+                            // dicclass must have a method buildIndex, which takes the location of
+                            // the index as parameter
+                            dicclass.getMethod( "buildIndex", new Class[] { File.class })
+                                .invoke( dic, new Object[] { index });
+                            dic.dispose();
+                        } catch (NoSuchFieldError ex1) {
                             System.err.println( messages.getString
-                                                ( "edict.error.writejjdx",
-                                                  new String[] { ex.getClass().getName(),
-                                                                 ex.getLocalizedMessage() }));
-                            System.exit( 1);
+                                                ( "main.createindex.noindex",
+                                                new String[] { args[i] }));
+                        } catch (NoSuchMethodException ex2) {
+                            System.err.println( messages.getString
+                                                ( "main.createindex.noindex",
+                                                new String[] { args[i] }));
+                        } catch (java.lang.reflect.InvocationTargetException ex3) {
+                            Throwable cause = ex3.getTargetException();
+                            System.err.println( messages.getString
+                                                ( "main.createindex.exception",
+                                                  new String[] { args[i],
+                                                                 cause.getClass().getName(),
+                                                                 cause.getLocalizedMessage() }));
+                        } catch (DictionaryFactory.NotSupportedException ex) {
+                            System.err.println( messages.getString
+                                                ( "main.format.unrecognized",
+                                                  new String[] { args[i] }));
                         }
                     }
                     System.exit( 0);
