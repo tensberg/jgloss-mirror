@@ -107,6 +107,26 @@ public class AnnotationNode extends InnerNode {
                         add( dn);
                         dictionaryNodes.put( d, dn);
                     }
+                    else {
+                        // Test if the translations of the new node are equal to the translations
+                        // of the previous node and if so, remove the translations from the previous
+                        // node. This is not the most elegant solution to do this, but the
+                        // cost should be negligible.
+                        TranslationNode tnp = (TranslationNode) dn.getChildAt( dn.getChildCount()-1);
+                        String[] t1 = t.getDictionaryEntry().getTranslations();
+                        String[] t2 = tnp.getTranslation().getDictionaryEntry().getTranslations();
+                        if (t1.length == t2.length) {
+                            boolean equal = true;
+                            for ( int j=0; j<t1.length; j++) {
+                                if (!t1[j].equals( t2[j])) {
+                                    equal = false;
+                                    break;
+                                }
+                            }
+                            if (equal)
+                                tnp.removeAll();
+                        }
+                    }
                     dn.add( new TranslationNode( dn, t));
                 }
                 else if (o instanceof Reading) {
