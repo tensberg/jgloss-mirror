@@ -259,7 +259,7 @@ public class JGlossDocument extends HTMLDocument {
                     String dictionaryReading = null; // null means same as reading
                     String reading = null;
                     String translation = null;
-                    if (ta instanceof Reading) {
+                    if (ta instanceof Reading && !(ta instanceof Translation)) {
                         // get reading from annotations
                         Reading r = (Reading) ta;
                         reading = r.getReading();

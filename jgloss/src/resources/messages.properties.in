@@ -84,6 +84,7 @@ button.close=Close
 button.overwrite=Overwrite
 button.choose=Choose...
 button.select=Select
+button.annotate=Annotate
 
 jgloss.title=JGloss
 jgloss.version=Version 0.9.3

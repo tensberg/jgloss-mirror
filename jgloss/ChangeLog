@@ -1,4 +1,9 @@
-0.9.3: (2001/08/19)
+0.9.3: (2001/08/31)
+	- Added new text parser infrastructure. There are now two parsers,
+	  the previous "Kanji" parser and a parser which uses the ChaSen
+	  morphological analysis tool.
+	- Manual annotation addition now displays a dialog which lets you
+	  look up the annotation in the dictionaries before you add it.
 	- Fixed document name setting in save as.
 	- Fixed JJDX creation for dictionaries with more than 500.000
 	  index entries.

@@ -789,7 +789,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
      *                       document.
      * @param length Approximate length in characters of the document to load. This will only be used
      *               for the progress bar.
-     * @exception Exception if something goes wrong while loading the document.
      */
     private void loadDocument( Reader in, String path, String title, Parser parser, 
                                boolean addAnnotations, int length) 

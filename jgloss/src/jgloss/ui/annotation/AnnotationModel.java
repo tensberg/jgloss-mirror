@@ -46,7 +46,7 @@ import javax.swing.tree.*;
  */
 public class AnnotationModel extends DefaultTreeModel {
     /**
-     * Translate some text to something that will be looked up in the dictionaries. This is
+     * Take some text and return annotations for this text. This is
      * used by 
      * {@link AnnotationModel#addAnnotation(int,int,AnnotationModel.LookupTranslator,HTMLEditorKit)
      * addAnnotation}
@@ -54,14 +54,15 @@ public class AnnotationModel extends DefaultTreeModel {
      */
     public static interface LookupTranslator {
         /**
-         * Takes the input string and transforms it to a new string which will be used
-         * for the dictionary lookup.
+         * Takes the string and returns a list of annotations.
          *
          * @param text The original string.
-         * @return The string which will be looked up. Returns <CODE>null</CODE> if the
-         *         lookup was cancelled.
+         * @return A list of {@link jgloss.dictionary.Parser.TextAnnotation TextAnnotations},
+         *         {@link jgloss.dictionary.WordReadingPair WordReadingPairs} and
+         *         {@link jgloss.dictionary.DictionaryEntry DictionaryEntries}, or <CODE>null</CODE>
+         *         to cancel the operation.
          */
-        String translate( String text);
+        List translate( String text);
     } // interface LookupTranslator
 
     /**
@@ -261,8 +262,7 @@ public class AnnotationModel extends DefaultTreeModel {
      *
      * @param start Start offset of the interval to annotate.
      * @param end End offset of the interval to annotate.
-     * @param trans A lookup translator which allows a modification to the string which is
-     *              looked up in the dictionaries.
+     * @param annotations List of .
      * @param kit An editor kit, which is needed to insert the new annotation.
      * @return The newly created annotation node.
      */
@@ -293,22 +293,18 @@ public class AnnotationModel extends DefaultTreeModel {
             start = startp.getOffset();
             end = endp.getOffset();
             String text = doc.getText( start, end-start);
-
-            // look up the new annotation in the dictionaries.
-            String transText = trans.translate( text);
-            if (transText == null)
+            List annotations = trans.translate( text);
+            if (annotations == null) // cancelled
                 return null;
 
-            List l;
-            if (transText.length() > 0) {
-                l = new ArrayList( 20);
-                jgloss.dictionary.Dictionary[] dictionaries = Dictionaries.getDictionaries();
-                for ( int i=0; i<dictionaries.length; i++)
-                    l.addAll( dictionaries[i].search( transText, 
-                                                      jgloss.dictionary.Dictionary.SEARCH_EXACT_MATCHES));
+            // create Reading/Translation wrappers for WordReadingPair/DictionaryEntry objects
+            for ( ListIterator i=annotations.listIterator(); i.hasNext(); ) {
+                Object o = i.next();
+                if (o instanceof DictionaryEntry)
+                    i.set( new Translation( (DictionaryEntry) o));
+                else if (o instanceof WordReadingPair)
+                    i.set( new Reading( (WordReadingPair) o));
             }
-            else
-                l = Collections.EMPTY_LIST;
 
             boolean paragraphSpaceInserted = false;
             if (start == paragraph.getStartOffset()) {
@@ -341,11 +337,11 @@ public class AnnotationModel extends DefaultTreeModel {
                 end = endp.getOffset()-1;
                 endp = doc.createPosition( end);
             }
-            
+
             // construct the new annotation and insert it
             text = "<html><body><p>"
                 + "<" + AnnotationTags.ANNOTATION.getId() + " " + JGlossDocument.TEXT_ANNOTATION
-                + "=\"" + TextAnnotationCodec.encode( l) + "\"><"
+                + "=\"" + TextAnnotationCodec.encode( annotations) + "\"><"
                 + AnnotationTags.READING.getId() + "> </"
                 + AnnotationTags.READING.getId() + "><" + AnnotationTags.KANJI.getId() + ">"  
                 + text + "</" + AnnotationTags.KANJI.getId() + "><" + AnnotationTags.TRANSLATION.getId()

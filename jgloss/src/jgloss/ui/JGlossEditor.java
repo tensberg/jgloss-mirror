@@ -29,6 +29,7 @@ import jgloss.ui.annotation.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -117,8 +118,72 @@ public class JGlossEditor extends JTextPane {
     }
 
     /**
+     * Modal dialog which lets the user look up words in the dictionary. The dialog is used
+     * when the user wants to add an annotation to a word in the document.
+     */
+    private class WordLookupDialog extends JDialog {
+        private WordLookupPanel wordlookup;
+        private JButton annotateButton;
+        private boolean accepted;
+
+        public WordLookupDialog() {
+            super( (Frame) SwingUtilities.getWindowAncestor( JGlossEditor.this),
+                   JGloss.messages.getString( "editor.addannotation.title"), true);
+            Action annotateAction = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        accepted = true;
+                        WordLookupDialog.this.hide();
+                    }
+                };
+            UIUtilities.initAction( annotateAction, "button.annotate");
+            Action cancelAction = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        accepted = false;
+                        WordLookupDialog.this.hide();
+                    }
+                };
+            UIUtilities.initAction( cancelAction, "button.cancel");
+            wordlookup = new WordLookupPanel();
+
+            getContentPane().setLayout( new BorderLayout());
+            getContentPane().add( wordlookup, BorderLayout.CENTER);
+            Box buttons = Box.createHorizontalBox();
+            annotateButton = new JButton( annotateAction);
+            buttons.add( annotateButton);
+            buttons.add( Box.createHorizontalStrut( 5));
+            buttons.add( new JButton( cancelAction));
+
+            JPanel p = new JPanel( new BorderLayout());
+            JPanel p2 = new JPanel( new GridLayout( 1, 1));
+            p2.setBorder( BorderFactory.createEmptyBorder( 4, 4, 4, 4));
+            p2.add( buttons);
+            p.add( p2, BorderLayout.EAST);
+            getContentPane().add( p, BorderLayout.SOUTH);
+            pack();
+            this.setSize( this.getPreferredSize().width, this.getPreferredSize().height + 100);
+        }
+
+        /**
+         * Displays the dialog and returns the lookup result when the dialog is closed.
+         *
+         * @param text Initial word to look up.
+         * @return List of dictionary entries, or <CODE>null</CODE> if the dialog was cancelled.
+         */
+        public java.util.List runDialog( String text) {
+            accepted = false;
+            wordlookup.search( text);
+            annotateButton.requestFocus();
+            WordLookupDialog.this.show();
+            dispose(); // works around a bug in the Java/KDE window manager interaction
+            if (accepted)
+                return wordlookup.getLastResult();
+            else
+                return null;
+        }
+    }
+
+    /**
      * Object identifying the currently highlighted annotation in the <CODE>HighlightPainter</CODE>.
-     *
      */
     private Object highlightTag = null;
     /**
@@ -168,18 +233,19 @@ public class JGlossEditor extends JTextPane {
      * Manager for the cut/copy/past actions;
      */
     private XCVManager xcvManager;
-
+    /**
+     * Dialog used when adding annotations to a word in the document.
+     */
+    private WordLookupDialog wordLookupDialog;
     /**
      * Displays a dialog which allows the user to enter the word to look up.
      */
     private AnnotationModel.LookupTranslator lookupTranslator = 
         new AnnotationModel.LookupTranslator() {
-                public String translate( String text) {
-                    String newText = (String) JOptionPane.showInputDialog
-                        ( JGlossEditor.this, JGloss.messages.getString( "editor.addannotation.text"),
-                          JGloss.messages.getString( "editor.addannotation.title"),
-                          JOptionPane.QUESTION_MESSAGE, null, null, text);
-                    return newText;
+                public java.util.List translate( String text) {
+                    if (wordLookupDialog == null)
+                        wordLookupDialog = new WordLookupDialog();
+                    return wordLookupDialog.runDialog( text);
                 }
             };
 
@@ -448,6 +514,6 @@ public class JGlossEditor extends JTextPane {
      */
     public void setEditorKit( JGlossEditorKit kit) {
         super.setEditorKit( kit);
-        xcvManager.updateActions();
+        xcvManager.updateActions( this);
     }
 } // class JEditorPane

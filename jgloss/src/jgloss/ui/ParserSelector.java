@@ -34,6 +34,14 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+/**
+ * Panel which provides an interface to select a specific parser. Available parsers are registered
+ * globally via {@link #registerParser(Class,String) registerParser}. The user can select one
+ * of the registered parsers, and a new instance of the selected parser can be created with
+ * {@link #createParser(jgloss.dictionary.Dictionary[],Set) createParser}.
+ *
+ * @author Michael Koch
+ */
 public class ParserSelector extends JPanel {
     /**
      * List of registered parsers and their display names.
@@ -70,10 +78,28 @@ public class ParserSelector extends JPanel {
      */
     private JComboBox readingBrackets;
 
+    /**
+     * Creates a new parser selector which shows the currently registered parsers.
+     *
+     * @param showReadingAnnotationSelector If this is <CODE>true</CODE>, a widget will be shown
+     *        which lets the user choose the brackets which delimit reading annotations. The widget
+     *        is only active if the currently selected parser is a 
+     *        {@link jgloss.Dictionary.ReadingAnnotationParser ReadingAnnotationParser}.
+     */
     public ParserSelector( boolean showReadingAnnotationSelector) {
         this( showReadingAnnotationSelector, '\0', '\0');
     }
 
+    /**
+     * Creates a new parser selector which shows the currently registered parsers.
+     *
+     * @param showReadingAnnotationSelector If this is <CODE>true</CODE>, a widget will be shown
+     *        which lets the user choose the brackets which delimit reading annotations. The widget
+     *        is only active if the currently selected parser is a 
+     *        {@link jgloss.Dictionary.ReadingAnnotationParser ReadingAnnotationParser}.
+     * @param readingStart Start character of a reading annotation.
+     * @param readingEnd End character of a reading annotation.
+     */
     public ParserSelector( boolean showReadingAnnotationSelector, char readingStart, char readingEnd) {
         setLayout( new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -142,6 +168,9 @@ public class ParserSelector extends JPanel {
         this.add( new JPanel(), c);
     }
 
+    /**
+     * Creates a new instance of the parser class.
+     */
     public static Parser createParser( Class parserClass, jgloss.dictionary.Dictionary[] dictionaries,
                                        Set exclusions, char readingStart, char readingEnd) {
         if (parserClass == null)
@@ -165,6 +194,9 @@ public class ParserSelector extends JPanel {
         return null;
     }
 
+    /**
+     * Returns the class of the currently selected parser.
+     */
     public Class getSelectedParser() {
         for ( int i=0; i<parserButtons.length; i++)
             if (parserButtons[i].isSelected())
@@ -172,11 +204,21 @@ public class ParserSelector extends JPanel {
         return null;
     }
 
+    /**
+     * Creates a new instance of the currently selected parser. If it is an instance of
+     * {@link ReadingAnnotaionParser ReadingAnnotationParser}, the currently selected reading
+     * brackets will be set.
+     */
     public Parser createParser( jgloss.dictionary.Dictionary[] dictionaries, Set exclusions) {
         return createParser( getSelectedParser(), dictionaries, exclusions, getReadingStart(),
                              getReadingEnd());
     }
 
+    /**
+     * Enables/disables a registered parser in this selector. At least one parser class 
+     * must always be enabled. If the currently selected parser is disabled, the first enabled
+     * parser in the list is selected.
+     */
     public void setEnabled( Class parserClass, boolean enabled) {
         for ( int i=0; i<parserButtons.length; i++) {
             if (parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY).equals( parserClass)) {
@@ -186,6 +228,11 @@ public class ParserSelector extends JPanel {
         }
     }
 
+    /**
+     * Enables/disables a registered parser in this selector. At least one parser class 
+     * must always be enabled. If the currently selected parser is disabled, the first enabled
+     * parser in the list is selected.
+     */
     public void setEnabled( String displayName, boolean enabled) {
         for ( int i=0; i<parserButtons.length; i++) {
             if (parserButtons[i].getText().equals( displayName)) {
@@ -195,6 +242,13 @@ public class ParserSelector extends JPanel {
         }
     }
 
+    /**
+     * Enables/disables a registered parser in this selector. At least one parser class 
+     * must always be enabled. If the currently selected parser is disabled, the first enabled
+     * parser in the list is selected.
+     *
+     * @param i Offset of the parser button in the <CODE>parserButtons</CODE> array.
+     */
     private void setEnabled( int i, boolean enabled) {
         parserButtons[i].setEnabled( enabled);
         if (!enabled && parserButtons[i].isSelected()) {
@@ -208,6 +262,10 @@ public class ParserSelector extends JPanel {
         }
     }
 
+    /**
+     * Makes the parser the currently selected parser. If the parser is disabled, the selection
+     * will not be changed.
+     */
     public void setSelected( Class parserClass) {
         for ( int i=0; i<parserButtons.length; i++) {
             if (parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY).equals( parserClass)) {
@@ -218,6 +276,10 @@ public class ParserSelector extends JPanel {
         }
     }
 
+    /**
+     * Makes the parser the currently selected parser. If the parser is disabled, the selection
+     * will not be changed.
+     */
     public void setSelected( String displayName) {
         for ( int i=0; i<parserButtons.length; i++) {
             if (parserButtons[i].getText().equals( displayName)) {

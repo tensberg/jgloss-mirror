@@ -153,7 +153,7 @@ public class EDict implements Dictionary {
      * @param createindex Flag if the index should be automatically created and written to disk
      *                    if no index file exists. A write will not be attempted if the directory
      *                    is not writable. If no index file exists and createindex is
-     *                    false, you have to call {@link #buildIndex() buildIndex} to create the
+     *                    false, you have to call {@link #buildIndex(boolean) buildIndex} to create the
      *                    index manually.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
@@ -604,7 +604,7 @@ public class EDict implements Dictionary {
 
     /**
      * Add a word entry to the index. This method will be called by 
-     * {@link addIndexRange(int,int) addIndexRange} during index creation.
+     * {@link #addIndexRange(int,int) addIndexRange} during index creation.
      *
      * @param offset Offset in the dictionary file where the word starts.
      */

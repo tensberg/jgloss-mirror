@@ -33,7 +33,21 @@ public class Reading extends AbstractAnnotation {
     /**
      * Word/Reading pair for the text.
      */
-    private WordReadingPair wordReadingPair;
+    protected WordReadingPair entry;
+
+    /**
+     * Create a reading without location information and conjugation.
+     */
+    public Reading( WordReadingPair wrp) {
+        this( 0, 0, wrp, null);
+    }
+
+    /**
+     * Create a reading without location information, but with conjugation.
+     */
+    public Reading( WordReadingPair wrp, Conjugation conjugation) {
+        this( 0, 0, wrp, conjugation);
+    }
 
     /**
      * Creates a new reading annotation.
@@ -57,14 +71,14 @@ public class Reading extends AbstractAnnotation {
      */
     public Reading( int start, int length, WordReadingPair wrp, Conjugation conjugation) {
         super( start, length, conjugation);
-        this.wordReadingPair = wrp;
+        this.entry = wrp;
     }
 
-    public String getWord() { return wordReadingPair.getWord(); }
-    public String getReading() { return wordReadingPair.getReading(); }
+    public String getWord() { return entry.getWord(); }
+    public String getReading() { return entry.getReading(); }
 
     /**
      * Returns the Word/Reading pair of this entry.
      */
-    public WordReadingPair getWordReadingPair() { return wordReadingPair; }
+    public WordReadingPair getWordReadingPair() { return entry; }
 } // class Reading

@@ -233,7 +233,6 @@ public class ChasenParser implements Parser {
                     String readingBase = line.substring( s);
                     
                     if (partOfSpeech.equals( "\u540d\u8a5e") || // meishi (noun)
-                        partOfSpeech.equals( "\u5f62\u5bb9\u8a5e") || // keiyoushi ("true" adjective)
                         partOfSpeech.equals( "\u5f62\u5bb9\u52d5\u8a5e") || // keiyoudoushi (adjectival noun)
                         partOfSpeech.equals( "\u9023\u4f53\u8a5e") || // rentaishi (pre-noun adjectival)
                         partOfSpeech.equals( "\u526f\u8a5e") || // fukushi (adverb)
@@ -313,7 +312,9 @@ public class ChasenParser implements Parser {
                             }
                         } while (from<to && from<surfaceInflected.length());
                     }
-                    else if (partOfSpeech.equals( "\u52d5\u8a5e")) { // douji (verb)
+                    else if (partOfSpeech.equals( "\u52d5\u8a5e") ||  // douji (verb)
+                             partOfSpeech.equals( "\u5f62\u5bb9\u8a5e") // keiyoushi ("true" adjective)
+                             ) {
                         if (exclusions!=null && exclusions.contains( surfaceBase)) {
                             parsePosition += surfaceInflected.length();
                             continue;
@@ -322,7 +323,7 @@ public class ChasenParser implements Parser {
                         List translations = search( surfaceBase, readingBase);
                         if (translations.size() > 0) {
                             Conjugation c = getConjugation( surfaceInflected, surfaceBase,
-                                                            inflectedForm);
+                                                            partOfSpeech + "\u3001" + inflectedForm);
                             for ( Iterator i=translations.iterator(); i.hasNext(); ) {
                                 WordReadingPair wrp = (WordReadingPair) i.next();
                                 if (wrp instanceof DictionaryEntry) {

@@ -32,11 +32,20 @@ import java.util.List;
  * @author Michael Koch
  * @see Parser
  */
-public class Translation extends AbstractAnnotation {
+public class Translation extends Reading {
     /**
-     * Dictionary entry for the annotated text.
+     * Create a translation without location information and conjugation.
      */
-    private DictionaryEntry dictionaryEntry;
+    public Translation( DictionaryEntry entry) {
+        this( 0, 0, entry, null);
+    }
+
+    /**
+     * Create a translation without location information, but with conjugation.
+     */
+    public Translation( DictionaryEntry entry, Conjugation conjugation) {
+        this( 0, 0, entry, conjugation);
+    }
 
     /**
      * Constructs a new Translation object for a word in the parsed text which has no
@@ -62,17 +71,13 @@ public class Translation extends AbstractAnnotation {
      *                    lookup. May be <CODE>null</CODE>
      */
     public Translation( int start, int length, DictionaryEntry dictionaryEntry, Conjugation conjugation) {
-        super( start, length, conjugation);
-        this.dictionaryEntry = dictionaryEntry;
+        super( start, length, dictionaryEntry, conjugation);
     }
-
-    public String getWord() { return dictionaryEntry.getWord(); }
-    public String getReading() { return dictionaryEntry.getReading(); }
 
     /**
      * Returns the dictionary entry describing the annotated text.
      *
      * @return The dictionary entry describing the annotated text.
      */
-    public DictionaryEntry getDictionaryEntry() { return dictionaryEntry; }
+    public DictionaryEntry getDictionaryEntry() { return (DictionaryEntry) entry; }
 } // class Translation

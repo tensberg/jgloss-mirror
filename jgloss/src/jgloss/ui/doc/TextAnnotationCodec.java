@@ -174,25 +174,21 @@ public abstract class TextAnnotationCodec {
     public static String encode( Parser.TextAnnotation ta) {
         String classname = ta.getClass().getName();
         // change classname for backwards compatibility with V0.9
-        if (ta instanceof Reading)
+        if (classname.equals( Reading.class.getName()))
             classname += "_" + JGlossWriter.FORMAT_MAJOR_VERSION + "." + 
                 JGlossWriter.FORMAT_MINOR_VERSION;
         String code = classname + FIELD_SEPARATOR 
             + ta.getStart() + FIELD_SEPARATOR + ta.getLength() + FIELD_SEPARATOR;
 
-        if (ta instanceof Reading || ta instanceof Translation) {
-            AbstractAnnotation aa = (AbstractAnnotation) ta;
-            String word = aa.getWord();
-            String reading = aa.getReading();
-            Conjugation c = aa.getConjugation();
-            jgloss.dictionary.Dictionary d;
+        if (ta instanceof Reading) {
+            Reading annotation = (Reading) ta;
+            String word = annotation.getWord();
+            String reading = annotation.getReading();
+            Conjugation c = annotation.getConjugation();
+            jgloss.dictionary.Dictionary d = annotation.getWordReadingPair().getDictionary();
             String[] translations = null;
-            if (ta instanceof Translation) {
+            if (ta instanceof Translation)
                 translations = ((Translation) ta).getDictionaryEntry().getTranslations();
-                d = ((Translation) ta).getDictionaryEntry().getDictionary();
-            }
-            else
-                d = ((Reading) ta).getWordReadingPair().getDictionary();
 
             code += word + FIELD_SEPARATOR;
             if (reading == null)
@@ -201,7 +197,7 @@ public abstract class TextAnnotationCodec {
                 code += reading;
             code += FIELD_SEPARATOR;
 
-            if (translations!=null) {
+            if (translations != null) {
                 if (translations.length>0) {
                     code += translations[0];
                     for ( int i=1; i<translations.length; i++)

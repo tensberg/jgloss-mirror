@@ -33,19 +33,6 @@ import java.util.*;
  */
 public interface ReadingAnnotationParser extends Parser {
     /**
-     * Dummy dictionary which is used for Readings constructed from reading anntoations found in
-     * the document. This is used to return a descriptive name for the dictionary.
-     */
-    Dictionary DOCUMENT_DICTIONARY = new Dictionary() {
-            private final static String name = 
-                ResourceBundle.getBundle( "resources/messages-dictionary")
-                .getString( "parser.dictionary.document");
-            public String getName() { return name; }
-            public List search( String expression, short mode) { return null; }
-            public void dispose() {}
-        };
-
-    /**
      * Sets the character which signals the beginning of a reading annotation for a kanji word.
      */
     void setReadingStart( char readingStart);

@@ -75,6 +75,19 @@ public class KanjiParser implements ReadingAnnotationParser {
     }
 
     /**
+     * Dummy dictionary which is used for Readings constructed from reading anntoations found in
+     * the document. This is used to return a descriptive name for the dictionary.
+     */
+    public static Dictionary DOCUMENT_DICTIONARY = new Dictionary() {
+            public final String DOCUMENT_DICTIONARY_NAME = 
+                ResourceBundle.getBundle( "resources/messages-dictionary")
+                .getString( "parser.dictionary.document");
+            public String getName() { return DOCUMENT_DICTIONARY_NAME; }
+            public List search( String expression, short mode) { return null; }
+            public void dispose() {}
+        };
+
+    /**
      * Set of words which should not be annotated.
      */
     private Set exclusions;
@@ -151,10 +164,6 @@ public class KanjiParser implements ReadingAnnotationParser {
      * reading annotations for kanji words. That is, if after a kanji word <CODE>readingStart</CODE>
      * is encountered, the text to <CODE>readingEnd</CODE> will be used to create a
      * <CODE>Reading</CODE> annotation for the kanji word.<BR>
-     * If a cache is to be used, all dictionary lookup results will be stored in a <CODE>TreeMap</CODE>,
-     * with the entries stored in a <CODE>SoftReference</CODE>. This means that the cache entries
-     * can be garbage collected at any time, so the memory overhead of the cache should not be
-     * problematic.
      * 
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
@@ -165,7 +174,6 @@ public class KanjiParser implements ReadingAnnotationParser {
      *                       will be ignored and the character immediately before and after the newline
      *                       will be treated as if forming a single word.
      * @see Reading
-     * @see SoftReference
      */
     public KanjiParser( Dictionary[] dictionaries, Set exclusions, char readingStart, char readingEnd,
                    boolean cacheLookups, boolean ignoreNewlines) {
