@@ -110,6 +110,12 @@ public class JGloss {
      */
     public static void main( String args[]) {
         try {
+            // register dictionaries
+            DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
+            DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
+            DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
+
+            // parse command line options
             if (args.length > 0) {
                 if (args[0].equals( "-h") || args[0].equals( "--help") ||
                     args[0].equals( "/?")) {
@@ -129,6 +135,23 @@ public class JGloss {
                                                   new String[] { ex.getClass().getName(),
                                                                  ex.getLocalizedMessage() }));
                             System.exit( 1);
+                        }
+                    }
+                    System.exit( 0);
+                }
+                else if (args[0].equals( "-f") || args[0].equals( "--format")) {
+                    for ( int i=1; i<args.length; i++) {
+                        DictionaryFactory.Implementation imp =
+                            DictionaryFactory.getImplementation( args[i]);
+                        if (imp != null) {
+                            System.out.println( messages.getString
+                                                ( "main.format",
+                                                  new String[] { args[i], imp.getName() }));
+                        }
+                        else {
+                            System.out.println( messages.getString
+                                                ( "main.format.unrecognized",
+                                                  new String[] { args[i] }));
                         }
                     }
                     System.exit( 0);
@@ -195,6 +218,11 @@ public class JGloss {
                     } catch (IOException ex) {
                         displayError( messages.getString( "error.storePreferences"), ex, false);
                     }
+
+                    Dictionary[] dicts = Dictionaries.getDictionaries();
+                    for ( int i=0; i<dicts.length; i++)
+                        dicts[i].dispose();
+
                     System.exit( 0);
                 }
             }.start();
