@@ -47,7 +47,7 @@ public class HTMLExporter extends JGlossWriter {
     private final static String SCRIPT_RESOURCE = "/data/HTMLExporter";
 
     /**
-     * The writer will skip all output when this is <CODE>. It is used to skip everything
+     * The writer will skip all output when this is <CODE>true</CODE>. It is used to skip everything
      * inside an annotation element.
      */
     private boolean skipAll;
