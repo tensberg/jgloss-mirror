@@ -43,13 +43,21 @@ endif
 RELEASE := 0.9.1
 DISTNAME := jgloss-$(RELEASE)
 
-PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation
+PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www
 
-RESOURCES := messages.properties messages_de.properties messages_fr.properties \
+RESOURCES := messages.properties messages-dictionary.properties \
+             messages_de.properties messages-dictionary_de.properties \
+             messages_fr.properties messages-dictionary_fr.properties \
              preferences.properties
+
+RESOURCES_WWW := messages-www.properties messages-dictionary.properties \
+                 messages-dictionary_de.properties \
+                 messages-dictionary_fr.properties
 
 CLASSPATH := $(CLASSPATH):./src
 ROOT_SOURCE := src/jgloss/JGloss.java
+WWW_SOURCE := src/jgloss/www/JGlossServlet.java
+
 # files and directories that go into the source distribution
 SOURCE_DIST := README COPYING ChangeLog Makefile MANIFEST.MF src doc.src javadoc latex-ruby
 # files and directories that go into the binary distribution, either in the JGloss jar file
@@ -59,7 +67,6 @@ BINARY_DIST := README COPYING ChangeLog jgloss data resources doc latex-ruby
 BINARY_JAR := jgloss data resources
 # files that go into the binary distribution zip file
 BINARY_ZIP := jgloss.jar README COPYING ChangeLog doc latex-ruby
-
 
 #
 # end configuration
@@ -71,10 +78,16 @@ vpath %.pdf doc
 vpath %.docbook doc.src
 vpath %.html doc/html
 
-.phony: dist dist-binary dist-source setup clean compile doc gen-javadoc jar
+.phony: dist dist-binary dist-source setup clean compile doc gen-javadoc jar jgloss-www
 
 jar: compile $(RESOURCES) setup
 	$(JAR) cfm jgloss.jar MANIFEST.MF $(BINARY_JAR)
+
+jgloss-www: compile-www $(RESOURCES_WWW)
+	mkdir -p jgloss-www/WEB-INF/classes
+	cp src/www/index.html jgloss-www
+	cp src/www/web.xml jgloss-www/WEB-INF
+	cp -r jgloss resources jgloss-www/WEB-INF/classes
 
 dist: dist-source dist-binary
 
@@ -116,6 +129,9 @@ setup:
 compile:
 	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(ROOT_SOURCE)
 
+compile-www:
+	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(WWW_SOURCE)
+
 # Convert properties files in native charset to ascii.
 # The charset is given in the input file by a line of the form "# Encoding: SOME-ENCODING"
 %.properties: %.properties.in
@@ -136,4 +152,4 @@ index.html: jgloss.docbook doc.src/stylesheet.dsl
 	docbook2html -o doc/html -d $(shell pwd)/doc.src/stylesheet.dsl $<
 
 clean:
-	-rm -r jgloss resources data dist doc javadoc jgloss.jar
+	-rm -r jgloss resources data dist doc javadoc jgloss.jar jgloss-www
