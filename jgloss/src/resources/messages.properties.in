@@ -1,0 +1,235 @@
+# Encoding: ISO-8859-1
+#
+# Default localization for messages in JGloss.
+#
+# Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+#
+# This file is part of JGloss.
+#
+# JGloss is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# JGloss is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with JGloss; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id$
+#
+jgloss.mimetype=application/x-jgloss
+
+error.no_message=(no message)
+error.loadPreferences=An error occured while loading the preferences:
+error.storePreferences=An error occured while saving the preferences:
+error.dictionary.title=Error opening dictionary
+error.dictionary.filenotfound=The dictionary {0} could not be opened.\nCheck if the dictionary and the index file (".xjdx")\n are readable.
+error.dictionary.ioerror=An error occured while loading\the dictionary {0}.
+error.import.title=Error while importing file
+error.import.exception=An error occured while importing {0}:\n{1}.
+error.export.title=Error while exporting file
+error.export.exception=An error occured while exporting:\n{0}.
+error.load.title=Error while loading file
+error.load.exception=An error occured while loadin {0}:\n{1}.
+error.save.title=Error while saving file
+error.save.exception=An error occured while saving {0}:\n{1}.
+error.save.unknownannotation=Skipping unknown annotation type {0}
+
+button.ok=OK
+button.cancel=Cancel
+button.apply=Apply
+button.import=Import
+button.save=Save
+button.discard=Discard
+button.close=Close
+
+jgloss.title=JGloss
+jgloss.version=Version 0.9
+
+# reserve space in info label with dummy entry:
+splashscreen.dummyinfo=<creating application window>
+splashscreen.loadingPreferences=loading preferences
+splashscreen.initPreferences=loading dictionaries
+splashscreen.initMain=creating application window
+
+main.title=JGloss
+
+main.menu.file=File
+main.menu.import=Import...
+main.menu.import.ak=control I
+main.menu.import.mk=I
+main.menu.import.tt=Create a new document by importing a file
+main.menu.importclipboard=Import Clipboard
+main.menu.open=Open...
+main.menu.open.ak=control O
+main.menu.open.mk=O
+main.menu.open.tt=Open a JGloss document
+main.menu.save=Save
+main.menu.save.ak=control S
+main.menu.save.mk=S
+main.menu.save.tt=Save the document
+main.menu.saveAs=Save As...
+main.menu.saveAs.mk=A
+main.menu.saveAs.tt=Save the document under a new name
+main.menu.export=Export
+main.menu.export.mk=E
+main.menu.export.plaintext=Plain Text...
+main.menu.export.plaintext.mk=P
+main.menu.export.latex=LaTeX...
+main.menu.export.plaintext.mk=L
+main.menu.export.html=HTML...
+main.menu.export.html.mk=H
+main.menu.export.annotationlist=Annotation List...
+main.menu.export.annotationlist.mk=A
+main.menu.print=Print...
+main.menu.print.ak=control P
+main.menu.print.mk=P
+main.menu.close=Close
+main.menu.close.ak=control W
+main.menu.close.mk=C
+main.menu.close.tt=Close the document
+main.menu.preferences=Preferences
+main.menu.preferences.mk=P
+main.menu.view=View
+main.menu.compactview=Compact View
+main.menu.showreading=Show Readings
+main.menu.showtranslation=Show Translations
+main.menu.showannotation=Show Annotation Tooltips
+main.menu.editorfollowsmouse=Annotations Follow Mouse
+main.menu.help=Help
+main.menu.about=About JGloss
+main.menu.about.mk=A
+
+main.dialog.close.title=Save changes
+main.dialog.close.message=Save changes to {0}?
+
+editor.menu.edit=Edit
+editor.menu.cut=Cut
+editor.menu.cut.ak=control X
+editor.menu.cut.mk=C
+editor.menu.copy=Copy
+editor.menu.copy.ak=control C
+editor.menu.copy.mk=O
+editor.menu.paste=Paste
+editor.menu.paste.ak=control V
+editor.menu.paste.mk=P
+editor.menu.addannotation=Annotate Selection...
+editor.menu.addannotation.ak=control D
+editor.menu.addannotation.mk=A
+editor.menu.addannotation.tt=Adds an annotation to the current selection
+editor.addannotation.text=Please enter the word to look up in\nthe dictionaries for the new annotation:
+editor.addannotation.title=Annotate selection
+
+prefs.title=Preferences
+prefs.button.up=Move entry up
+prefs.button.down=Move entry down
+prefs.button.add=Add dictionary file...
+prefs.button.remove=Remove entry
+prefs.editor.enableediting=Enable direct editing (for adventurous users)
+
+dictionaries.title=Dictionaries
+dictionaries.chooser.title=Add dictionary files
+dictionaries.chooser.button.add=Add
+
+import.title=Import file
+import.urlorfile=Enter the URL, or specify the file you want to import.
+import.button.choosefile=Choose file...
+import.encodings=Character encoding of file:
+import.readingbrackets=Brackets delimiting reading annotations:
+
+import.clipboard=clipboard
+load.progress=Loading {0}
+
+style.title=General
+style.text=Text
+style.reading=Reading
+style.translation=Translation
+style.text.font=Font:
+style.text.size=Size:
+style.text.usecolor=set background color:
+style.text.colorchooser.title=Choose background color
+style.highlight.color=Highlight color for annotations:
+style.highlight.colorchooser.title=Annotation highlight
+
+print.title=Print document
+
+annotationeditor.reading=Reading:\ 
+annotationeditor.translation=Translation:\ 
+annotationeditor.readingannotation=Reading from document: {0}
+annotationeditor.menu.title=Annotation
+annotationeditor.menu.usereading=Use this Reading
+annotationeditor.menu.usetranslation=Use this Translation
+annotationeditor.menu.hide=Hide Annotation
+annotationeditor.menu.show=Show Annotation
+annotationeditor.menu.remove=Remove Annotation
+annotationeditor.menu.add=Add Annotation
+annotationeditor.menu.hideduplicates=Hide Duplicates
+annotationeditor.menu.unhide=Show all Annotations
+annotationeditor.entry.hidden=\ (hidden)
+
+annotationeditor.action.next=Next Annotation
+annotationeditor.action.next.ak=N
+annotationeditor.action.previous=Previous Annotation
+annotationeditor.action.previous.ak=P
+annotationeditor.action.meta=Do something useful
+annotationeditor.action.meta.ak=SPACE
+annotationeditor.action.remove.ak=R
+annotationeditor.action.hide.ak=H
+
+export.encodings=Encoding:
+export.annotationlist.title=Export annotation list
+export.annotationlist.header=\# annotation list for {0}\n\# Encoding: {1}\n
+export.writereading=Write readings
+export.writetranslations=Write translations
+export.writehidden=write "hidden" annotations
+export.plaintext.title=Export plain text
+export.html.title=Export HTML
+export.html.interactive=Interactive HTML
+export.html.backwardscompatible=Backwards Compatible
+export.latex.title=Export LaTeX
+
+about.frame.title=About JGloss
+about.title=JGloss
+about.text=A tool for making reading and understanding japanese texts easier.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+about.showlicense=Show License
+about.license.title=GNU General Public License
+
+preferences.header=This file contains the preferences for the application JGloss.
+
+filefilter.jgloss.description=JGloss documents (*.jgloss)
+filefilter.html.description=HTML documents (*.html)
+filefilter.latex.description=LaTeX documents (*.tex)
+
+encodings.default=<auto>
+
+# conjugation descriptions for the file data/vconj
+vconj.0=plain, negative, nonpast
+vconj.1=polite, non-past
+vconj.2=conditional
+vconj.3=volitional
+vconj.4=te-form
+vconj.5=plain, past
+vconj.6=plain, negative, past
+vconj.7=passive
+vconj.8=causative
+vconj.9=potential or imperative
+vconj.10=imperative
+vconj.11=polite, past
+vconj.12=polite, negative, non-past
+vconj.13=polite, negative, past
+vconj.14=polite, volitional
+vconj.15=adj. -> adverb
+vconj.16=adj., past
+vconj.17=polite
+vconj.18=polite, volitional
+vconj.19=passive or potential
+vconj.20=passive (or potential if Grp 2)
+vconj.21=adj., negative
+vconj.22=adj., negative, past
+vconj.23=adj., past
+vconj.24=plain verb or adjective

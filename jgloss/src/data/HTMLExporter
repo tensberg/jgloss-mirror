@@ -1,0 +1,202 @@
+<!-- start of JGloss embedded file -->
+<!--
+Written by Michael Koch (tensberg@gmx.net)
+
+Original character encoding: UTF-8
+
+The content of this file (everything between
+- start of JGloss embedded file - and - end of JGloss embedded file -) are embedded
+in the HTML document when a JGloss document is exported via the HTMLExporter.
+
+The content of this data file is public domain and comes with no warranties. Do with it
+whatever you want.
+
+$Id$
+-->
+
+
+<STYLE type="text/css">
+<!--
+span.an { cursor: pointer; }
+ruby, rbc, rtc, rb, rt { display: inline; }
+rt.re { ruby-position: before; }
+rt.tr { ruby-position: after; }
+//-->
+</STYLE>
+
+<SCRIPT language="javascript">
+<!--
+// The scripts have to handle three cases: browsers which understand the <ruby> element, browsers
+// which don't understand <ruby> but don't throw away unknown tags (in both cases the "display"
+// style attribute will be used to show/hide annotations) and browsers which will throw
+// away all unkown tags (in this case annotations will be stored as an element attribute and nodes will
+// will be added/removed as to show/hide the annotations).
+
+// If the browser knows how to display the <ruby> element, we will always display reading
+// annotations.
+var rubySupported = false;
+
+function setupDoc( backwardsCompatible, interactive) {
+    if (document.getElementsByTagName) {
+        // all hope is lost for browsers which don't support DOM Level 1
+
+        // hide all annotations (if needed with this browser)
+        var rts = document.getElementsByTagName( "rt");
+        if (rts.length != 0) {
+            // This browser supports <rt> tags (Internet Explorer 5)
+            // or does not throw away unrecognized tags (Mozilla).
+            // In the former case, we remove the annotation parentheses,
+            // in the latter we hide the tags and add parentheses if not backwardsCompatible.
+            if (navigator.userAgent.search(/MSIE/)!=-1) {
+                rubySupported = true;
+                if (backwardsCompatible || interactive) {
+                    for ( i=0; i<rts.length; i++) {
+                        var rt = rts[i];
+                        if (interactive && rt.className == "tr")
+                            rt.style.display = "none";
+                        if (backwardsCompatible) {
+                            // find the text node
+                            for ( j=0; j<rt.childNodes.length; j++) {
+                                if (rt.childNodes[j].nodeType == 3) {
+                                    var text = rt.childNodes[j].nodeValue;
+                                    text = text.substring( 1, text.length-1);
+                                    rt.childNodes[j].nodeValue = text;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (navigator.appCodeName.search(/Mozilla/)!=-1 &&
+                navigator.appVersion.search(/5.0/)!=-1) {
+                if (interactive) {
+                    for ( i=0; i<rts.length; i++)
+                        rts[i].style.display = "none";
+                }
+                if (!backwardsCompatible) {
+                    for ( i=0; i<rts.length; i++) {
+                        var rt = rts[i];
+                        // find the text node
+                        for ( j=0; j<rt.childNodes.length; j++) {
+                            if (rt.childNodes[j].nodeType == 3) {
+                                var text = rt.childNodes[j].nodeValue;
+                                if (rt.className == "re") {
+                                    text = "《" + text + "》";
+                                }
+                                else {
+                                    text = "{" + text + "}";
+                                }
+                                rt.childNodes[j].nodeValue = text;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if (interactive || !backwardsCompatible) {
+            // The text in the annotation <span> elements will be flattened, hopefully to one
+            // text element for each text/ruby/translation.
+            // If backwardsCompatible is not set, add parentheses to ruby and annotation.
+            // If interactive, extract ruby and translation and store them as attribute.
+            var an = document.getElementsByTagName( "span");
+            for ( i=0; i<an.length; i++) {
+                if (an[i].className == "an") {
+                    var ruby = "";
+                    var first = true;
+                    var j=0;
+                    while (j<an[i].childNodes.length) {
+                        var child = an[i].childNodes[j];
+                        if (child.nodeType == 3) { // text node
+                            if (first) { // skip the ruby base text
+                                first = false;
+                            }
+                            else {
+                                var text = child.nodeValue;
+                                if (!backwardsCompatible) {
+                                    if (ruby.length == 0) {
+                                        text = "《" + text + "》";
+                                    }
+                                    else {
+                                        text = "{" + text + "}";
+                                    }
+                                    if (!interactive) // otherwise node will be removed anyway
+                                        an[i].replaceChild( document.createTextNode( text),
+                                                            child);
+                                }
+                                ruby += text;
+                                if (interactive) {
+                                    an[i].removeChild( child);
+                                    continue;
+                                }
+                            }
+                        }
+                        j++;
+                    }
+                    if (ruby.length > 0)
+                        an[i].setAttribute( "ruby", ruby);
+                }
+            }
+        }
+    }
+}
+
+function sp( el) {
+    if (el.getElementsByTagName)
+        el.style.color = "blue";
+}
+
+function hp( el) {
+    if (el.getElementsByTagName)
+        el.style.color = el.parentNode.style.color;
+}
+
+// toggle annotation shown/hidden in interactive mode
+function tp( el) {
+    if (el.getElementsByTagName) {
+        var rts = el.getElementsByTagName( "rt");
+        if (rts.length > 0) {
+            for ( i=0; i<rts.length; i++) {
+                var rt = rts[i];
+		// if the browser supports ruby display, only translations are toggled
+                if (!rubySupported || rt.className=="tr") {
+                    if (rt.style.display != "inline") {
+                        rt.style.display = "inline";
+                    }
+                    else {
+                        rt.style.display = "none";
+                        hp( el);
+                    }
+                }
+            }
+        }
+        else if (el.getAttribute( "ruby") != "") {
+            // el has only textNode children. The second stores the annotation
+            var first = true;
+            var hadAnnotation = false;
+            var i = 0;
+            while (i < el.childNodes.length) {
+                if (el.childNodes[i].nodeType == 3) {
+                    if (first) {
+                        first = false;
+                    }
+                    else {
+                        hadAnnotation = true;
+                        el.removeChild( el.childNodes[i]);
+                        break;
+                    }
+                }
+                i++;
+            }
+            // We want to toggle the display of the annotation, so add the annotation if it
+            // was not removed.
+            if (!hadAnnotation) {
+                el.appendChild( document.createTextNode( el.getAttribute( "ruby")));
+            }
+        }
+    }
+}
+
+//-->
+</SCRIPT>
+
+<!-- end of JGloss embedded file -->

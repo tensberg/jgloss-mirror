@@ -1,0 +1,176 @@
+/*
+ * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ *
+ * This file is part of JGloss.
+ *
+ * JGloss is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * JGloss is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with JGloss; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id$
+ *
+ */
+
+package jgloss;
+
+import jgloss.dictionary.*;
+import jgloss.ui.*;
+
+import java.io.*;
+import java.util.ResourceBundle;
+import java.text.MessageFormat;
+
+import javax.swing.UIManager;
+
+/**
+ * Entry point for the JGloss application. Does the initialisation and manages access to
+ * localisation resources and preferences.
+ *
+ * @author Michael Koch
+ */
+public class JGloss {
+    /**
+     * Path to the file with message strings.
+     */
+    private static final String MESSAGES = "resources/messages";
+
+    /**
+     * Path to the directory last used.
+     */
+    private static String currentDir;
+
+    /**
+     * Ties together ResourceBundles and MessageFormat to access localizable,
+     * customizable messages.
+     */
+    public static class Messages {
+        private ResourceBundle messages;
+
+        /**
+         * Creates a new Messages object which accesses the given resource bundle.
+         * The system default locale will be used.
+         *
+         * @param bundle Base name of the bundle.
+         */
+        public Messages( String bundle) {
+            messages = ResourceBundle.getBundle( MESSAGES);
+        }
+
+        /**
+         * Returns the string for the given key.
+         *
+         * @param key Key for a string in the resource bundle.
+         * @return Message for this key.
+         */
+        public String getString( String key) {
+            return messages.getString( key);
+        }
+
+        /**
+         * Returns the string for the given key, filled in with the given values.
+         * MessageFormat is used to parse the string stored in the resource bundle
+         * and fill in the Objects. See the documentation for MessageFormat for the
+         * used format.
+         *
+         * @param key Key for a string in the resource bundle.
+         * @param data Data to insert in the message.
+         * @return Message for this key and data.
+         * @see java.text.MessageFormat
+         */
+        public String getString( String key, Object[] data) {
+            return MessageFormat.format( messages.getString( key), data);
+        }
+    } // class messages
+
+    /**
+     * The application-wide preferences. Use this to store and retrieve preferences.
+     */
+    public static final Preferences prefs = new Preferences();
+    /**
+     * The application-wide messages. Use this to retrieve localizable string messages.
+     */
+    public static final Messages messages = new Messages( MESSAGES);
+
+    /**
+     * Starts JGloss.
+     *
+     * @param args Arguments to the application. Not used.
+     * @exception Exception if something goes wrong during the initialisation.
+     */
+    public static void main( String args[]) throws Exception {
+        UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
+
+        SplashScreen splash = new SplashScreen();
+        splash.setInfo( messages.getString( "splashscreen.loadingPreferences"));
+        try {
+            prefs.load();
+        } catch (IOException ex) {
+            displayError( messages.getString( "error.loadPreferences"), ex);
+        }
+
+        splash.setInfo( messages.getString( "splashscreen.initPreferences"));
+        // Initialize the preferences at startup. This includes loading the dictionaries.
+        PreferencesFrame.getFrame();
+        splash.setInfo( messages.getString( "splashscreen.initMain"));
+        new JGlossFrame();
+        splash.close();
+    }
+
+    /**
+     * Exits JGloss. Before the application quits, the preferences will be saved.
+     * This method will be called when the last JGloss frame is closed.
+     */
+    public static void exit() {
+        try {
+            prefs.store();
+        } catch (IOException ex) {
+            displayError( messages.getString( "error.storePreferences"), ex);
+        }
+        System.exit( 0);
+    }
+
+    /**
+     * Shows an error message. Currenty it is written to System.err.
+     *
+     * @param message A user-understandable error message.
+     * @param t The exception which signalled the error.
+     */
+    public static void displayError( String message, Throwable t) {
+        System.err.println( message);
+        System.err.println( t.getLocalizedMessage());
+    }
+
+    /**
+     * Returns the current directory. This usually is the directory which was last
+     * used in a file chooser. When called for the first time, the user's home directory
+     * is used.
+     *
+     * @return Path to the current directory.
+     */
+    public static String getCurrentDir() {
+        if (currentDir == null)
+            currentDir = System.getProperty( "user.home");
+
+        return currentDir;
+    }
+
+    /**
+     * Sets the current directory. This method should be called after the user has
+     * selected a file in a file chooser.
+     *
+     * @param dir The new current directory.
+     */
+    public static void setCurrentDir( String dir) {
+        currentDir = dir;
+    }
+} // class JGloss

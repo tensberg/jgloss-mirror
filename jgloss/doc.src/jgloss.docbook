@@ -1,0 +1,886 @@
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY JGloss "<application>JGloss</application>">
+]>
+
+<!-- JGloss User's Guide 0.9 (c) 2001 Michael Koch
+
+ This file is part of JGloss.
+
+ JGloss is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ JGloss is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with JGloss; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ $Id$ 
+-->
+
+<book lang="en">
+  <bookinfo>
+    <title>JGloss User's Guide</title>
+    <author>
+      <firstname>Michael</firstname><surname>Koch</surname>
+    </author>
+    <edition>0.9</edition>
+    <copyright><year>2001</year><holder>Michael Koch</holder></copyright>
+    <pubdate>2001</pubdate>
+    <publisher>
+      <publishername>Professor Daravon Publications</publishername>
+    </publisher>
+  </bookinfo>
+
+  <chapter><title>Introduction</title>
+    <sect1><title>What it is</title>
+      <para>
+        &JGloss; is an application for adding reading and translation annotations
+        to words in a japanese text document. This can be done automatically and
+        manually. When a text document is first opened, kanji words will be looked
+        up in a dictionary and the first reading and translation (if any) used to
+        annotate the word. The user can then edit the annotations: choose among the
+        readings and translations found in the dictionaries, enter own readings and
+        translations, remove annotations and add new annotations. The document
+        can be exported as plain text with annotations, HTML (with support for
+        the <ulink url="http://www.w3.org/TR/ruby/">
+          <citetitle>Ruby Annotation</citetitle></ulink> XHTML specification) or LaTeX.
+      </para>
+      <para>
+        I intend it mainly as a translation aid for students of japanese (like me).
+        With some new document, you can first skim the text and change the annotations
+        to match the likeliest meaning of the word. Then you can print/export the text
+        with annotations and start working on the details of understanding the text.
+      </para>
+      <para>
+        &JGloss; is written in Java. It should work on any computer with support
+        for the Java 2 Version 1.3 platform.
+      </para>
+    </sect1>
+    <sect1><title>Credits</title>
+      <para>
+        &JGloss; is written by Michael Koch <email>tensberg@gmx.net</email>. 
+        It was inspired by Jim Breen's work, particularly the 
+        <ulink url="http://www.dgs.monash.edu.au/~jwb/wwwjdic.html">
+          <application>WWWJDIC</application></ulink> and
+        <ulink url="http://www.csse.monash.edu.au/~jwb/xjdic/"><application>XJDIC</application></ulink>.
+        The text parsing backend of &JGloss; is based on 
+        <ulink url="ftp://ftp.cc.monash.edu.au/pub/nihongo/www-jdict.ps.gz">ideas from the WWWJDIC</ulink>.
+        The character encoding detection uses code from Yasuhiro Tonooka's 
+        <application>kcc</application> (Kanji Code Converter) program.
+      </para>
+    </sect1>
+    <sect1><title>License</title>
+      <para>
+        &JGloss; is licensed under the terms of the GNU General Public License.
+        It comes with ABSOLUTELY NO WARRANTY. This is free software, and you are
+        welcome to redistribute it under certain conditions. Read the 
+        license for details.
+      </para>
+    </sect1>
+  </chapter>
+
+  <chapter><title>Making it work</title>
+    <sect1 id="sect.whatyouneed"><title>What you need</title>
+      <para>
+        &JGloss; is a Java application. To run it, you will need a Java implementation that
+        conforms to the Java 2 Version 1.3 specifications, <abbrev>e. g.</abbrev> Sun's
+        <ulink url="http://java.sun.com/">
+          <application>Java Runtime Environment 1.3</application></ulink>(<acronym>JRE</acronym>).
+        Make sure that you have the international version.
+      </para>
+      <para>
+        Your computer system should already be configured to work with japanese text. You must
+        have a japanese font installed. Having a japanese input method working is not absolutely
+        necessary, but very useful. As a test, if your web browser can display japanese, it should
+        be possible to set up Java do do the same. See also <xref linkend="sect.japanesejava">.
+      </para>
+      <para>
+        If you want to use the automatic annotation function, you will need some dictionaries.
+        &JGloss; currently supports dictionaries in the 
+        <ulink url="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDict format</ulink>.
+        You will also have to create the <filename>xjdx</filename> index files for the dictionaries.
+        A tool for this does not come with &JGloss;, you can use the tool coming with 
+        <application>XJDIC</application>, <application>GJiten</application> or some other package
+        supporting EDict.
+      </para>
+    </sect1>
+
+    <sect1><title>Running &JGloss;</title>
+      <para>
+        &JGloss; requires no installation. On a <application>Windows</application> box,
+        double-clicking the <filename>jgloss.jar</filename> file should start the application.
+        To start &JGloss; from a shell, change to the directory which contains the 
+        <acronym>JAR</acronym> file and enter <userinput>java -jar jgloss.jar</userinput>.
+      </para>
+    </sect1>
+
+    <sect1 id="sect.japanesejava"><title>Making Java work with japanese text</title>
+      <para>
+        If japanese is set as your computer system's default language, &JGloss; should work without
+        any further setup. If not, you should at least have a japanese font installed.
+        A japanese input method, while not required, should also be installed.
+        If you are using Sun's <application>Java Runtime Environment</application>, make sure
+        that you have the international version installed (the smaller version comes only with
+        English locale settings).
+      </para>
+      <para>
+        The easiest way to get Java to use japanese fonts is to set the 
+        <envar>user.language</envar> parameter to <literal>ja</literal>: start &JGloss; as
+        <userinput>java -Duser.language=ja -jar jgloss.jar</userinput>. Unfortunately, at
+        least on my Linux box, this will not make Java use the
+        japanese input method. On <application>Unix</application> systems, a second way is to
+        set the <envar>LANG</envar> environment variable to <literal>ja_JP</literal>
+        in a shell and then run &JGloss; from that shell. This will also make Java recognize
+        an installed japanese input method.
+      </para>
+      <para>
+        An alternative method, and one that allows more customization of what fonts to use,
+        is to edit the <filename>font.properties</filename> files. The 
+        <filename>font.properties</filename> files are stored in the <filename>lib</filename>
+        folder in the install directory of the <application>Java Runtime Environment</application>.
+        They contain the settings for the fonts to used default fonts, for dialogs and the like.
+        Which file is used depends on the locale setting of the operating system, <abbrev>e. g.</abbrev>
+        if you are running in a japanese environment, the <filename>font.properties.ja</filename>
+        will be used. If there is no matching file for the current locale, the
+        <filename>font.properties</filename> file will be used. This file contains no definition
+        for japanese fonts, but you can edit it and add these fonts. The easiest way to do this
+        is to simply rename the file <filename>font.properties.ja</filename> to 
+        <filename>font.properties</filename> (but make a backup of the original file first). You
+        can also edit the file to make it use different fonts. The file 
+        <filename>psfonts.properties.ja</filename> controls what fonts are used when printing
+        a document which contains japanese characters.
+      </para>
+      <para>
+        On <application>Windows 2000</application>, the <application>JRE</application> supports
+        the japanese input method regardless of the system language settings, but you will have
+        to use one of the methods mentioned above to get Java to use japanese fonts. I had no luck
+        so far in getting the JRE to use the input method under <application>Windows 98</application>.
+      </para>
+    </sect1>
+
+    <sect1><title>Do It Yourself</title>
+      <para>
+        This section describes how to build &JGloss; from the sources. You do not need to read
+        it if you just want to use &JGloss;.
+      </para>
+      <para>
+        To build the &JGloss; JAR file, you have to have the 
+        <application>Java Development Kit 1.3</application> from SUN (or something compatible) 
+        installed. To create the different documentation files from <filename>jgloss.docbook</filename>
+        you need the DocBook 3.1 DTD and various DocBook tools. Look for them at
+        the <ulink url="http://www.oasis-open.org/docbook/">OASIS site</ulink>, 
+        <ulink url="http://nwalsh.com/docbook/">Norman Walsh</ulink>'s site
+        or on your favorite Linux distribution's CD-ROM.
+      </para>
+      <para>
+        The sources come with a <filename>Makefile</filename> which automates the build process.
+        The Makefile is written for a GNU/Linux system, but might work on other systems with
+        the GNU tools or equivalent commands installed. The default <command>make</command> target 
+        will create the <filename>jgloss.jar</filename> application archive. Some of the other 
+        <command>make</command> targets are:
+        <variablelist>
+          <varlistentry><term><command>compile</command></term>
+            <listitem><para>Compiles all Java class files.</para></listitem>
+          </varlistentry>
+          <varlistentry><term><command>doc</command></term>
+            <listitem><para>Generates the documentation files from 
+                <filename>doc/jgloss.docbook</filename></para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><command>gen-javadoc</command></term>
+            <listitem><para>Generates the javadoc documentation for the JGloss source files.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><command>dist</command></term>
+            <listitem><para>Creates the source and binary distribution zip and tgz files.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+      <para>
+        If you can't use the Makefile, you can build the JGloss JAR archive by hand. Use
+        <command>javac</command> to compile the <filename>*.java</filename> files in the 
+        <filename>src</filename> directory. Use <command>native2ascii</command> to convert
+        every <filename>.properties.in</filename> file in the <filename>src/resources</filename>
+        directory to a <filename>.properties</filename> file using the <acronym>ASCII</acronym>
+        charset. The native charset of the file is specified in the first line of the
+        input file. Then use <command>jar</command> to build a JAR archive, using the
+        <filename>MANIFEST.MF</filename> file as manifest (see <command>jar</command> options).
+        Make sure that the <filename>resources</filename> and <filename>data</filename>
+        directories are included in the archive.
+      </para>
+    </sect1>
+  </chapter>
+
+  <chapter><title>Using JGloss</title>
+    <sect1><title>Quickstart</title>
+      <para>
+        When you start &JGloss; for the first time, you should first set the dictionary files
+        which you want to use. Choose the <guimenuitem>Preferences</guimenuitem> item from
+        the <guimenu>Edit</guimenu> menu, and select the <guimenuitem>Dictionaries</guimenuitem>
+        tab in the newly opened window. Add the dictionaries you want to use and hit
+        <guibutton>OK</guibutton>. Note that dictionary entries will be chosen in the order
+        of the dictionaries, so put your preferred dictionaries higher in the list.
+      </para>
+      <para>
+        Use the <guimenuitem>Import</guimenuitem> item from the <guimenu>File</guimenu> menu
+        to open the import dialog. Enter the URL of the file you want to import, or select 
+        a local file by hitting the <guibutton>Choose file</guibutton> button. Once you push
+        <guibutton>Import</guibutton>, the text will be parsed and annotations will be added
+        by looking up words in the text in the dictionaries. After some time 
+        (this can take rather long for larger texts) the annotated document will be 
+        displayed in the window.
+      </para>
+      <figure id="figure.main" float="1"><title>JGloss Main Window</title>
+        <screenshot><mediaobject><imageobject>
+              <imagedata align="center" fileref="img/main.png" scale="50">
+            </imageobject>
+            <textobject><phrase>&JGloss; main window</phrase></textobject>
+          </mediaobject></screenshot>
+        <blockquote>
+          <para>
+            The left part of the &JGloss; window shows the annotated document
+            (see <xref linkend="sect.docview">). The right part is the 
+            annotation editor (see <xref linkend="sect.annotationeditor">), which is used
+            to manipulate the annotations in the document.
+          </para>
+        </blockquote>
+      </figure>
+      <para>
+        <xref linkend="figure.main"> shows the &JGloss; window after some text is imported.
+        The left part of the window shows the annotated document. An annotated word is shown
+        in light red, with the reading annotation above and the translation annotation below the
+        word. The right part of the window contains the annotation editor. For every annotated word,
+        it will display the word and below it the current reading and translation annotation, and
+        all readings and translations found in the dictionary. You can use the annotation editor
+        to change the reading and translation of a word, either by selecting one of the listed
+        entries, or by selecting the current reading/translation item and entering the new text.
+      </para>
+      <para>
+        As you can see, the heuristics used for generating the annotations are not perfect.
+        For example, in the imported text, 
+        <inlinemediaobject><imageobject><imagedata fileref="img/kuru_kanji.png" scale="50">
+          </imageobject><textobject><phrase>kuru (written with kanji)</phrase>
+          </textobject>
+        </inlinemediaobject>
+        is assigned the reading
+        <inlinemediaobject><imageobject><imagedata fileref="img/kitaru.png" scale="50">
+          </imageobject><textobject><phrase>kitaru</phrase>
+          </textobject>
+        </inlinemediaobject>
+        instead of 
+        <inlinemediaobject><imageobject><imagedata fileref="img/kuru.png" scale="50">
+          </imageobject><textobject><phrase>kuru</phrase>
+          </textobject>
+        </inlinemediaobject>
+        and 
+        <inlinemediaobject><imageobject><imagedata fileref="img/hitori_kanji.png" scale="50">
+          </imageobject><textobject><phrase>hitori (written with kanji)</phrase>
+          </textobject>
+        </inlinemediaobject>
+        is assigned the reading
+        <inlinemediaobject><imageobject><imagedata fileref="img/ichinin.png" scale="50">
+          </imageobject><textobject><phrase>ichinin</phrase>
+          </textobject>
+        </inlinemediaobject>
+        instead of the more common 
+        <inlinemediaobject><imageobject><imagedata fileref="img/hitori.png" scale="50">
+          </imageobject><textobject><phrase>hitori</phrase>
+          </textobject>
+        </inlinemediaobject>
+        . This happens because the application picks the the first reading and translation 
+        found in a dictionary. Also, the algorithm used for verb/adjective deinflection can produce
+        false results. What follows is you should not trust the automatic annotations too much
+        and that the document will require some editing. 
+      </para>
+      <para>
+        To edit an annotation, select it in the annotation editor. The selected entry will be
+        highlighted red in the document view. Use the down key to select an entry with the appropriate
+        reading or translation and hit the space bar. This will make the selected
+        entry the reading/translation of the annotation. To manually edit the text of an annotation,
+        select the <guimenuitem>Reading</guimenuitem> or <guimenuitem>Translation</guimenuitem>
+        item and hit space to start editing.
+      </para>
+      <para>
+        When you are finished with editing your document, you can export it to different formats.
+        Select <guimenuitem>HTML</guimenuitem> from the <guisubmenu>Export</guisubmenu>
+        entry in the <guimenu>File</guimenu> menu. In the file chooser you can select which type of
+        annotations will be written. Select a file name and save the HTML file. If you are using
+        the <application>Internet Explorer 5.5</application>, which already more or less supports the
+        <citetitle>Ruby Annotation</citetitle> XHTML specification, the ruby in the document will be
+        rendered above the annotated word. Otherwise, it will be inserted after the annotated word.
+      </para>
+    </sect1>
+
+    <sect1 id="sect.docview"><title>The Document View</title>
+      <para>
+        The left part of the window shows the annotated document. Annotated words will have a colored
+        background. You can change the colors or switch them off in the 
+        <link linkend="sect.prefs.general">Preferences dialog</link> and toggle the display
+        of reading and translation annotations in the <link linkend="sect.menu.view">View menu</link>.
+        If you left-click on an annotated word, a popup window will show all dictionary entries
+        for this word. A right-click will select this word in the annotation editor and pop up
+        a context menu with options for this annotation (see 
+        <xref linkend="sect.menu.annotation">). To add an annotation, select some text
+        and use <guimenuitem>Annotate Selection</guimenuitem> in the <guimenu>Edit</guimenu> menu
+        (see <xref linkend="sect.menu.edit">).
+      </para>
+    </sect1>
+
+    <sect1 id="sect.annotationeditor"><title>The Annotation Editor</title>
+      <para>
+        The annotation editor is used to edit the reading and translation annotations of annotated
+        words in the document. It is displayed in the right half of the &JGloss; window
+        (see <xref linkend="figure.main">). Each annotated word has an entry in the editor, ordered
+        by its appearance in the document. The entries are displayed in a hierarchical style.
+        If an entry is selected, the annotation will be highlighted in the document view.
+      </para>
+      <para>
+        You can use the keyboard to navigate in the editor. The <keycap>cursor up/down</keycap>
+        keys will move the selection by one item. To move to the next annotation press
+        <keycap>N</keycap>, to move to the previous annotation press <keycap>P</keycap>.
+        Pressing <keycap>space</keycap> will do something useful, depending on what kind of item is
+        currently selected (see below). Right-clicking an entry with the mouse will show a context menu for
+        the chosen item, see <xref linkend="sect.menu.annotation">.
+      </para>
+      <para>
+        The first item under the annotated word is the current reading. To edit the reading,
+        select the item and hit <keycap>space</keycap>, or click it twice and wait a moment.
+        When you are done with editing, press <keycap>return</keycap>, and the document view
+        will be updated with the new reading.
+        The second item shows the current translation. It is edited in the same way as the
+        reading.
+      </para>
+      <para>
+        Some text documents you can find on the net are already annotated with readings 
+        by placing the reading in brackets after a word. These readings will be recognized 
+        during importing and used used as reading
+        annotation. They are shown in the <guimenuitem>Reading from document</guimenuitem> items.
+        Selecting one and hitting <keycap>space</keycap> will make it the reading of the
+        annotation.
+      </para>
+      <para>
+        For every dictionary in which an entry for the annotated word is found, an item
+        will be generated showing the dictionary name. Under the name, for each entry the
+        dictionary word and reading will be shown, and under that one item for every translation.
+        If you select a reading and hit <keycap>space</keycap>, the reading will be made the new
+        reading of the annotation, and likewise for a translation. If a dictionary entry was found
+        using the verb/adjective de-inflection algorithm, the item will show the dictionary form
+        of the word and in brackets the grammatical form in which the word appears in the document.
+        Note that this algorithm may show wrong grammatical forms and therefore this feature
+        should not always be trusted.
+      </para>
+    </sect1>
+
+    <sect1 id="sect.import"><title>Importing text documents</title>
+      <para>
+        To create a new annotated document, select <guimenuitem>Import</guimenuitem> or
+        <guimenuitem>Import Clipboard</guimenuitem> from the <guimenu>File</guimenu> menu.
+        <guimenuitem>Import Clipboard</guimenuitem> will create a new document from the
+        content of the system clipboard and needs no further setup.
+      </para>
+      <para>
+        Selecting <guimenuitem>Import</guimenuitem> will show the 
+        <guilabel>Import File</guilabel> dialog. In the text field you can enter
+        an HTTP URL or the file name of a local document. The document should be plain text.
+        There is some support for importing <acronym>HTML</acronym> documents, but
+        the layout usually does not work very well. If you hit the <guibutton>Choose File</guibutton>
+        button, a file chooser dialog will pop up and let you select a local file.
+        The character encoding of the file can be selected in the 
+        <guilabel>Character encoding ...</guilabel> popup menu. You can usually
+        leave it on the <guilabel>&lt;auto&gt;</guilabel> setting, which will make &JGloss;
+        auto-detect the encoding of the file. If the auto-detection fails for a file, you can
+        select the encoding manually. If a text document already contains annotations with the
+        reading of kanji words, the import parser will use these readings for the automatically
+        generated annotations. The readings must appear after a kanji word, enclosed in brackets
+        which you can select in the <guilabel>Brackets ...</guilabel> popup menu. If the document
+        does not contain annotations, you can ignore the settings. Hitting the 
+        <guibutton>Import</guibutton> button will import the selected file.
+      </para>
+      <para>
+        The import process will automatically generate annotations for the file by looking up
+        words in the user-selected dictionaries. A simple heuristic decides what is looked up:
+        for a sequence of katakana characters, the whole sequence is treated as one word and
+        looked up. For a sequence of kanji characters followed by hiragana characters, the
+        algorithm first looks for possible inflected forms in the hiragana string and will
+        try to find words that consist of the kanji word and the dictionary form of the inflected
+        forms that appear in the hiragana string. If no match is found, only the kanji part
+        is looked up. If still no match is found in any of the dictionaries, prefixes of the
+        kanji word will be tried and if this leads to a match the process will be repeated with
+        the remainder. A consequence of this is that hiragana words will never be annotated
+        automatically even if they are in the dictionaries. You can add annotations to them
+        manually later.
+      </para>
+      <para>
+        If there was a reading annotation in the document for the annotated word, this reading
+        will be used for the reading annotation, and the first translation found with this reading
+        will be used for the translation annotation. Otherwise, the first reading and translation
+        found in a dictionary will be used for the annotation. You can change this later.
+      </para>
+      <note>
+        <para>
+          The &JGloss; application is quite resource intensive. It can take a rather long time
+          for the newly imported document to be displayed. You should consider breaking a long text
+          in several shorter files.
+        </para>
+      </note>
+    </sect1>
+
+    <sect1 id="sect.export"><title>Exporting annotated documents</title>
+      <para>
+        &JGloss; supports the exporting of annotated documents in several formats, described below.
+        You can select one of the formats from the <guisubmenu>Export</guisubmenu> submenu in 
+        the <guimenu>File</guimenu> menu.
+      </para>
+      <para>
+        A common option for all formats is the character encoding of the generated file.
+        What format you use depends mainly on what application you want to use the exported
+        file with. Modern web browsers should support all of the encodings. For other applications,
+        if you are working on Windows, you should try Shift-JIS and on Unix EUC-JP. If the document
+        or your annotations contain characters not in ASCII or the japanese character set
+        (<abbrev>e. g.</abbrev> umlauts), you should use UTF-8, which takes more disk space
+        but can represent all characters.
+      </para>
+      <sect2><title><acronym>HTML</acronym></title>
+        <para>
+          If you export the document in HTML format, the document can viewed in any web browser
+          that supports display of japanese characters. The markup defined in the
+          <citetitle>Ruby Annotation</citetitle> specification is used to embed the annotations,
+          so browsers which support it can place the annotations above/below the annotated words.
+          On browsers which don't support it, the annotations will be rendered after the annotated
+          word.
+        </para>
+        <para>
+          If you select the <guilabel>Interactive HTML</guilabel> option, Javascript
+          will be used in the generated document to interactively show and hide the annotations
+          on browsers which support it. Annotations will initially be hidden. When the user
+          clicks on an annotated word, the annotation is shown. On browsers which don't support
+          the necessary Javascript functions, the annotations will always be shown.
+        </para>
+        <para>
+          With the <guilabel>Backwards compatible</guilabel> option, you can control the form
+          of generated HTML. Usually, the annotations are put in brackets to distinguish
+          them from the normal flow of text. On browsers which support 
+          ruby annotations, this is not only unnecessary but would
+          look wrong. If <guilabel>Backwards compatible</guilabel> is selected, the generated
+          HTML will use brackets, and a Javascript will remove the brackets from the
+          annotations if they are not needed when the document is loaded in the browser.
+          The documents will be usable in all browsers, even if they don't support
+          ruby annotations and Javascript. If it is unchecked, the generated document will not
+          have brackets around annotations. The brackets will be added by Javascript when the
+          document is loaded on browsers not supporting ruby annotations. This means less
+          work for modern browsers but will generate documents that don't work as well with
+          older browsers or browsers with Javascript disabled. As an added bonus, try importing
+          the HTML document in <application>Word 2000</application>. <application>Word 2000</application>
+          understands ruby annotations and will use them in the imported document.
+        </para>
+        <para>
+          With the <guilabel>write "hidden" annotations</guilabel> you can control how to
+          treat annotations which are marked as <link linkend="sect.menu.annotation">
+            <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
+          the annotations for the word will not be written to the generated document.
+        </para>
+      </sect2>
+
+      <sect2><title>Plain Text</title>
+        <para>
+          The plain text export function will generate a text document similar to the
+          originally imported document. Annotations will be written after the annotated word,
+          enclosed in brackets.
+        </para>
+        <para>
+          With the <guilabel>write "hidden" annotations</guilabel> you can control how to
+          treat annotations which are marked as <link linkend="sect.menu.annotation">
+            <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
+          the annotations for the word will not be written to the generated document.
+        </para>
+      </sect2>
+
+      <sect2><title>LaTeX</title>
+        <para>
+          The LaTeX export function will generate a text document in LaTeX format. It
+          can be processed with <application>platex</application>. <application>platex</application>
+          is an extension to TeX for typesetting japanese documents. It is bundled with
+          TeTex.
+        </para>
+        <para>
+          The generated document uses the ruby macro for reading annotations. You can find it
+          in the <filename>latex-ruby</filename> folder of &JGloss;
+        </para>
+        <para>
+          With the <guilabel>write "hidden" annotations</guilabel> you can control how to
+          treat annotations which are marked as <link linkend="sect.menu.annotation">
+            <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
+          the annotations for the word will not be written to the generated document.
+        </para>
+      </sect2>
+
+      <sect2><title>Annotation List</title>
+        <para>
+          The annotation list export function will write a text file listing all annotations
+          in the document. Annotations will only be written once, duplicate entries will be
+          skipped. You can use the generated text as a basis for a vocabulary list, but
+          the file will need some editing.
+        </para>
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <chapter><title>Reference</title>
+    <sect1><title>JGloss menus</title>
+
+      <sect2><title>File</title>
+        <variablelist>
+          <varlistentry><term>Import</term>
+            <listitem>
+              <para>
+                Creates a new document by importing a text file, annotating it on
+                the fly. See <xref linkend="sect.import"> for details.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Import Clipboard</term>
+            <listitem>
+              <para>
+                Creates a new document by importing the content of the clipboard.
+                See <xref linkend="sect.import"> for details.
+                This item will only be available if the clipboard currently contains some
+                text.
+              </para>
+              <note>
+                <para>
+                  On <application>Linux</application> I have so far been unable to get Java
+                  to properly interact with the X clipboard and let me import the text copied
+                  in another application.
+                </para>
+              </note>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Open</term>
+            <listitem>
+              <para>
+                Open a &JGloss; annotated document.
+              </para>
+              <note>
+                <para>
+                  The application can take rather long to display a document for the first time
+                  after it is loaded, especially for larger documents.
+                </para>
+              </note>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Save</term>
+            <listitem>
+              <para>
+                Saves the current annotated document in the &JGloss; file format. If the file name
+                has not yet been determined, a file chooser dialog will be shown.
+              </para>
+              <note>
+                <para>
+                  The &JGloss; file format is basically HTML with a few custom tags. You can open
+                  the file in a HTML editor to edit the text of the document, but be careful not
+                  to change any of the special tags and attributes.
+                </para>
+              </note>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Save As</term>
+            <listitem>
+              <para>
+                Saves the current document in the &JGloss; file format under a new name.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Export</term>
+            <listitem>
+              <para>
+                The entries in this submenu let you export the current annotated document in several
+                formats. See <xref linkend="sect.export"> for details.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Print</term>
+            <listitem>
+              <para>
+                Print the annotated document. The current settings for font sizes and colors
+                will be used in the printed document. You can also use this option to generate 
+                a Postscript version of the document by selecting the print to file option in
+                the print dialog.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Close</term>
+            <listitem>
+              <para>
+                Closes the document window. If the document has unsaved changes, a warning dialog
+                will be shown. If all document windows are closed, the &JGloss; application will
+                quit.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </sect2>
+
+      <sect2 id="sect.menu.edit"><title>Edit</title>
+        <variablelist>
+          <varlistentry><term>Cut/Copy/Paste</term>
+            <listitem>
+              <para>
+                These have the standard functionality. Note that because the document view
+                is not editable, the <guimenuitem>Cut</guimenuitem> and <guimenuitem>Paste</guimenuitem>
+                items are always disabled.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Annotate Selection</term>
+            <listitem>
+              <para>
+                This will let you add an annotation to the currently selected text. A
+                dialog will pop up where you can edit the word for the dictionary lookup,
+                <abbrev>e. g.</abbrev> change a verb to the dictionary form. This word
+                will then be looked up in the dictionaries and an annotation will be added
+                with the result of the lookup.
+              </para>
+              <note>
+                <para>
+                  Annotations cannot overlap. If the selected text already contains annotations,
+                  these annotations will be deleted. Also, an annotation cannot span paragraphs.
+                  If text from more than one paragraph is selected, the annotation will end at
+                  the end of the first paragraph.
+                </para>
+              </note>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Preferences</term>
+            <listitem>
+              <para>
+                Selecting this item will show the preferences dialog (see 
+                <xref linkend="sect.preferences">).
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </sect2>
+
+      <sect2 id="sect.menu.view"><title>View</title>
+        <variablelist>
+          <varlistentry><term>Compact View</term>
+            <listitem>
+              <para>
+                Enabling compact view will make each annotation only take as much
+                space in the display as the annotated word needs, with the annotation text overlapping
+                the surrounding text. This may look nicer, but will cause long 
+                annotations to overlap each other. You should try this with the display of
+                translation annotations switched off.
+              </para>
+            </listitem>
+          </varlistentry>
+          
+          <varlistentry><term>Show Readings</term>
+            <listitem>
+              <para>
+                This item toggles the display of reading annotations in the document view.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Show Translations</term>
+            <listitem>
+              <para>
+                This item toggles the display of translation annotations in the document view.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Show Annotation Tooltips</term>
+            <listitem>
+              <para>
+                If this item is selected, a window will pop up if you move the mouse over an
+                annotation in the document view, showing all dictionary entries of this annotation.
+                If the item is not selected you can left-click on an annotation to make the
+                window pop up.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Annotations Follow Mouse</term>
+            <listitem>
+              <para>
+                If this item is selected and you move the mouse over an annotated word in the
+                document view, the annotation editor will scroll to make the annotation item
+                visible. If the item is not selected you can click the middle or right mouse button
+                to make the annotation editor scroll to the current annotated word.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </sect2>
+
+      <sect2 id="sect.menu.annotation"><title>Annotation</title>
+        <para>
+          The items in this entry manipulate the annotations of the entry currently
+          selected in the annotation editor. The items also appear in the context
+          menu for annotation editor items and annotated words in the document view.
+        </para>
+        <variablelist>
+          <varlistentry><term>Use this Reading</term>
+            <listitem>
+              <para>
+                Makes the currently selected item the reading of the annotation. The menu entry
+                is only selectable if the item is a <guimenuitem>Reading from document</guimenuitem>
+                item or a dictionary entry word/reading item.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Use this Translation</term>
+            <listitem>
+              <para>
+                Makes the currently selected item the translation of the annotation. The menu
+                entry is only selectable if the item is a dictionary entry translation item.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Hide Annotation</term>
+            <listitem>
+              <para>
+                Toggles the visibility of the reading and translation of this annotation.
+                If an annotation is hidden, the document view will only display the word,
+                but not the reading and annotation. This also influences how this annotation
+                is treated when the document is exported (see <xref linkend="sect.export">).
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Remove Annotation</term>
+            <listitem>
+              <para>
+                Removes the annotation from the currently selected word. It will
+                be removed from the annotation editor, and the word will be made
+                normal text in the document view.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Hide Duplicates</term>
+            <listitem>
+              <para>
+                This will make all annotations hidden which are duplicates of a previous
+                annotation. An annotation is a duplicate if it has the same word, reading
+                and translation as a previous entry. Note that if an annotation is edited,
+                duplicate annotations will not be changed. This command will work on
+                all annotations, not just the currently selected item.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Show all Annotations</term>
+            <listitem>
+              <para>
+                This item will remove the hidden status from all annotations.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </sect2>
+    </sect1>
+
+    <sect1 id="sect.preferences"><title>The Preferences Dialog</title>
+      <para>
+        The preferences dialog contains two tabs, one for setting the visual appearance
+        of the application and one for selecting the dictionaries used when importing
+        a document. You can access the dialog by selecting <guimenuitem>Preferences</guimenuitem>
+        from the <guimenu>Edit</guimenu> menu.
+      </para>
+      <sect2 id="sect.prefs.general"><title>General</title>
+        <para>
+          Here you can set the appearance for annotated words in the document view.
+          Select the font by using the popup menu. Note that not all fonts in the list
+          can display japanese characters. The font size can be selected from the
+          popup menu to the right, or you can enter the font size manually if it is not in
+          the list. You can select a different background color by clicking on the button
+          with the color label, or disable the use of a background color by unchecking the
+          <guilabel>set background color</guilabel> checkbox. The 
+          <guilabel>Highlight color ...</guilabel> button lets you select the color
+          which is used for highlighting the currently selected annotation in the document view.
+        </para>
+        <para>
+          If you select the <guilabel>Enable direct editing</guilabel> checkbox, you can
+          edit the text in the document view like you would in a text editor. Unfortunately
+          this function does not work very well and you should save the document before enabling
+          it. Problems include positioning the cursor, no actualization of the annotation
+          editor for changed annotations and problems if you delete an annotation by removing
+          all characters from it. An alternative to this is to edit the saved &JGloss;
+          document, either as source in a normal text editor or by loading it into an HTML
+          editor.
+        </para>
+      </sect2>
+      <sect2><title>Dictionaries</title>
+        <para>
+          In this dialog you can set the dictionaries which are used when importing a text
+          or adding annotations to a document manually. Click the 
+          <guibutton>Add dictionary file</guibutton> to add one or more new dictionaries to
+          the list. &JGloss; currently supports dictionaries in the EDict format. The directory
+          must also contain the <filename>xjdx</filename> index file associated with the
+          dictionary file (see <xref linkend="sect.whatyouneed">). Select a dictionary from
+          the list and push <guibutton>Remove entry</guibutton> to remove it.
+        </para>
+        <para>
+          Since the automatic annotation process will search the dictionaries in the sequence
+          in which they are displayed in the list and use the first entry as default annotation, 
+          you should put your favorite dictionary first in the list. Select one of the dictionaries
+          and push <guibutton>Move entry up</guibutton> and <guibutton>Move entry down</guibutton>
+          do move it to the desired position.
+        </para>
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <chapter><title>Links</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <ulink url="http://www.dgs.monash.edu.au/~jwb/japanese.html">Jim Breen's Japanese Page
+          </ulink>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The <ulink url="http://www.dgs.monash.edu.au/~jwb/wwwjdic.html">WWWJDIC</ulink>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="http://www.csse.monash.edu.au/~jwb/xjdic/"><application>XJDIC</application></ulink>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="http://gjiten.sourceforge.net/"><application>GJiten</application></ulink>, a dictionary
+          program for Linux which uses EDict.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The <ulink url="http://www.aozora.gr.jp/">Aozora Internet Library</ulink>.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </chapter>
+</book>

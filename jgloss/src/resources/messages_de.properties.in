@@ -1,0 +1,149 @@
+# Encoding: ISO-8859-1
+#
+# Default localization for messages in JGloss.
+#
+# Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+#
+# This file is part of JGloss.
+#
+# JGloss is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# JGloss is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with JGloss; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id$
+#
+error.no_message=(keine Information)
+error.loadPreferences=Beim Laden der Voreinstellungen ist ein Fehler aufgetreten:
+error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufgetreten:
+error.dictionary.title=Fehler beim Öffnen des Wörterbuchs
+error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei und die Indexdatei (".xjdx")\nlesbar sind.
+error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.
+error.import.title=Fehler beim Importieren
+error.import.exception=Beim Import von {0} ist ein Fehler aufgetreten:\n{1}.
+error.load.title=Fehler beim Öffnen
+error.load.exception=Beim Öffnen von {0} ist ein Fehler aufgetreten:\n{1}.
+error.save.title=Fehler beim Speichern
+error.save.exception=Beim Speichern von {0] ist ein Fehler aufgetreten:\n{1}.
+error.save.unknownannotation=Überspringe unbekannten Annotationstyp {0}
+
+button.ok=OK
+button.cancel=Abbrechen
+button.apply=Anwenden
+button.import=Import
+button.save=Speichern
+button.discard=Verwerfen
+
+jgloss.title=JGloss
+jgloss.version=Version 0.1
+
+# reserve space in info label with dummy entry:
+splashscreen.dummyinfo=<Erstelle Anwendungsfenster>
+splashscreen.loadingPreferences=Lade Voreinstellungen
+splashscreen.initPreferences=Lade Wörterbücher
+splashscreen.initMain=Erstelle Anwendungsfenster
+
+main.title=JGloss
+
+main.menu.file=Datei
+main.menu.import=Importieren...
+main.menu.import.ak=control I
+main.menu.import.mk=I
+main.menu.importclipboard=Importiere Zwischenablage
+main.menu.open=Öffnen...
+main.menu.open.ak=control O
+main.menu.open.mk=Ö
+main.menu.save=Speichern
+main.menu.save.ak=control S
+main.menu.save.mk=S
+main.menu.saveAs=Speichern unter...
+main.menu.print=Drucken...
+main.menu.print.ak=control P
+main.menu.print.mk=D
+main.menu.close=Schließen
+main.menu.close.ak=control W
+main.menu.close.mk=S
+main.menu.preferences=Voreinstellungen
+main.menu.preferences.mk=V
+main.menu.view=Ansicht
+main.menu.compactview=Kompakte Anzeige
+main.menu.showruby=Ruby anzeigen
+main.menu.showtranslation=Übersetzungen anzeigen
+main.menu.showannotation=Zeige Annotations-Tooltips
+main.menu.editorfollowsmouse=Annotationen folgen Maus
+main.menu.help=Hilfe
+main.menu.about=Über JGloss
+main.menu.about.mk=Ü
+
+main.dialog.close.title=Änderungen speichern
+main.dialog.close.message=Änderungen an {0} speichern?
+
+editor.menu.edit=Bearbeiten
+editor.menu.cut=Ausschneiden
+editor.menu.copy=Kopieren
+editor.menu.paste=Einfügen
+editor.menu.addannotation=Auswahl annotieren
+
+prefs.title=Voreinstellungen
+prefs.button.up=Eintrag nach oben
+prefs.button.down=Eintrag nach unten
+prefs.button.add=Wörterbuch hinzufügen...
+prefs.button.remove=Eintrag entfernen
+prefs.editor.enableediting=Direktes Editieren ermöglichen (fehlerhaft)
+
+dictionaries.title=Wörterbücher
+dictionaries.chooser.title=Wörterbücher hinzufügen
+dictionaries.chooser.button.add=Hinzufügen
+
+import.title=Datei importieren
+import.urlorfile=Geben sie eine URL ein, oder wählen sie die Datei, die sie importieren möchten.
+import.button.choosefile=Datei auswählen...
+import.encodings=Zeichensatz der Datei:
+import.rubybrackets=Klammern für Ruby-Anmerkungen:
+
+import.clipboard=Zwischenablage
+load.progress=Öffne {0}
+
+style.title=Allgemein
+style.text=Text
+style.ruby=Ruby
+style.translation=Übersetzung
+style.text.font=Font:
+style.text.size=Größe:
+style.text.usecolor=Hintergrundfarbe:
+style.text.colorchooser.title=Hintergrundfarbe auswählen
+style.highlight.color=Auswahlfarbe für Annotationen:
+style.highlight.colorchooser.title=Auswahlfarbe für Annotationen
+
+print.title=Dokument drucken
+
+annotationeditor.ruby=Ruby:\ 
+annotationeditor.translation=Übersetzung:\ 
+annotationeditor.rubyannotation=Ruby im Dokument: {0}
+annotationeditor.menu.title=Annotation
+annotationeditor.menu.useruby=Dieses Ruby benutzen
+annotationeditor.menu.usetranslation=Diese Übersetzung benutzen
+annotationeditor.menu.hide=Annotation ausblenden
+annotationeditor.menu.show=Annotation einblenden
+annotationeditor.menu.remove=Annotation entfernen
+annotationeditor.menu.add=Annotation hinzufügen
+annotationeditor.menu.hideduplicates=Duplikate ausblenden
+annotationeditor.entry.hidden=\ (ausgeblendet)
+
+annotationeditor.action.next=Nächste Annotation
+annotationeditor.action.previous=Vorherige Annotation
+
+preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
+
+filefilter.description=JGloss-Dokumente (*.jgloss)
+
+encodings.default=<auto>

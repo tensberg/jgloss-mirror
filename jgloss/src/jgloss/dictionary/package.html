@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<!--
+ Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ 
+ This file is part of JGloss.
+ 
+ JGloss is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ JGloss is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with JGloss; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+ $Id$
+-->
+<TITLE>jgloss.dictionary package description</TITLE>
+</HEAD>
+<BODY>
+Backend for parsing japanese text, looking for readings and translations of words.
+<P>
+Use instances of {@link jgloss.dictionary.Dictionary Dictionary} to look up individual words
+in a single dictionary,
+or instances of {@link jgloss.dictionary.Parser Parser} to look up words in a japanese text
+in a set of dictionaries.
+</P><P>
+Note that {@link jgloss.dictionary.Dictionary Dictionary} instances use 
+{@link jgloss.dictionary.WordReadingPair WordReadingPair} and
+{@link jgloss.dictionary.DictionaryEntry DictionaryEntry} objects as lookup results,
+while {@link jgloss.dictionary.Parser Parser} uses {@link jgloss.dictionary.Reading Reading}
+and {@link jgloss.dictionary.Translation} objects as results.
+</BODY>
+</HTML>

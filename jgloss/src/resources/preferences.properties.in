@@ -1,0 +1,84 @@
+# Encoding: EUC_JP
+#
+# Default preferences.
+#
+# Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+#
+# This file is part of JGloss.
+#
+# JGloss is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# JGloss is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with JGloss; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id$
+#
+
+# Position and size of the main application frame
+frame.x=0
+frame.y=0
+frame.width=640
+frame.height=400
+
+# List of dictionaries
+dictionaries=
+
+# Delimiters for reading annotations
+reading.bracket.chars=�ԡաΡϡڡ�
+
+encodings=ISO-2022-JP,EUC-JP,SHIFT_JIS,UTF-8
+export.encoding=ISO-2022-JP
+fontsizes.kanji=9,11,12,13,14,15,16,18,20,24
+fontsizes.reading=6,7,8,9,10,11,12,13,14,15,16,18
+fontsizes.translation=4,5,6,7,8,9,10,11,12,13,14,15,16
+
+font.text=Serif
+font.text.size=18
+font.text.bgcolor=16764108
+font.text.usecolor=true
+font.reading=SansSerif
+font.reading.size=12
+font.reading.bgcolor=10092492
+font.reading.usecolor=true
+font.translation=SansSerif
+font.translation.size=9
+font.translation.bgcolor=13421823
+font.translation.usecolor=true
+
+view.compactview=false
+view.showreading=true
+view.showtranslation=true
+view.showannotation=false
+view.editorfollowsmouse=false
+view.annotationeditorhidden=false
+
+editor.enableediting=false
+
+annotation.highlight.color=16743034
+
+export.plaintext.writereading=true
+export.plaintext.writetranslations=false
+export.plaintext.writehidden=false
+export.html.writereading=true
+export.html.writetranslations=true
+export.html.backwardscompatible=true
+export.html.interactive=true
+export.html.writehidden=false
+export.latex.writereading=true
+export.latex.writetranslations=false
+export.latex.writehidden=false
+export.latex.preamble=\\usepackage{pslatex}\n\\renewcommand{\\thefootnote}{}\n
+export.latex.documentclass=jarticle
+
+# Name of the DTD the javax.swing.text.html.parser.ParserDelegator uses. Found in the
+# Swing source code. There is no way to inquire this programatically. 
+dtd.default=html32
