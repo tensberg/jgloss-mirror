@@ -92,7 +92,7 @@ public class GDict extends FileBasedDictionary {
      * alternatives are stores as single string in group 2.
      */
     protected static final Pattern WORD_PATTERN = Pattern.compile
-        ( "(\\S+)(?:\\s\\[\\d+\\])?(?:\\s\\((.+?)\\))?(?:;\\s|$)");
+        ( "(\\S+)(?:\\s\\{.+?\\})?(?:\\s\\[\\w+\\])?(?:\\s\\((.+?)\\))?(?:\\s\\[\\w+\\])?(?:;\\s|$)");
     protected static Matcher WORD_MATCHER = WORD_PATTERN.matcher( "");
     /**
      * Matches semicolon-separated alternatives. The separator is a semicolon followed by a single
@@ -101,7 +101,7 @@ public class GDict extends FileBasedDictionary {
      * pattern is matched.
      */
     protected static final Pattern ALTERNATIVES_PATTERN = Pattern.compile
-        ( "((?:[^(]+?|(?:\\(.*?(?:\\)|(?:\\||$))))+?)(\\s\\[\\d+\\])?(?:;\\s|$)");
+        ( "((?:[^(]+?|(?:\\(.*?(?:\\)|(?:\\||$))))+?)(\\s\\[\\w+\\])?(?:\\s\\{.+?\\})?(?:;\\s|$)");
     protected static Matcher ALTERNATIVES_MATCHER = ALTERNATIVES_PATTERN.matcher( "");
     /**
      * Matches translation ranges of meaning. Group 1 contains the number of the range written in 
@@ -109,7 +109,7 @@ public class GDict extends FileBasedDictionary {
      * group 2 contains a string of all the meanings in the range.
      */
     protected static final Pattern TRANSLATIONS_PATTERN = Pattern.compile
-        ( "(?:\\[(\\d+)\\]\\s)?(.+?)\\.?\\s?(?=\\[\\d+\\]|$)");
+        ( "(?:\\[(\\d+)\\]\\s|//\\s)?(.+?)\\.?\\s?(?=\\[\\d+\\]|//|$)");
     protected static Matcher TRANSLATIONS_MATCHER = TRANSLATIONS_PATTERN.matcher( "");
 
     /**
@@ -122,11 +122,11 @@ public class GDict extends FileBasedDictionary {
      */
     protected final List wordlist = new ArrayList( 10);
 
-    public GDict( File dicfile) throws IOException {
+    public GDict( File dicfile) throws IOException, IndexCreationException {
         this( dicfile, true);
     }
 
-    public GDict( File dicfile, boolean createindex) throws IOException {
+    public GDict( File dicfile, boolean createindex) throws IOException, IndexCreationException {
         super( dicfile, createindex);
     }
 
@@ -176,7 +176,6 @@ public class GDict extends FileBasedDictionary {
     protected void parseEntry( List result, String entry, int entrystart, int where, 
                                String expression, ByteBuffer exprbuf,
                                short searchmode, short resultmode) {
-        //System.err.println( entry);
         try {
             int start = 0;
             int end = entry.indexOf( '|');
@@ -296,7 +295,6 @@ public class GDict extends FileBasedDictionary {
                     }
                 } while (off < where);
                 
-                //System.err.println( out);
                 if (wordMatches) {
                     // Create dictionary entry only for the matching word
                     // If there would be more than one matching word, the others are ignored.

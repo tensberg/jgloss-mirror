@@ -1082,7 +1082,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                 final JViewport port = new JViewport();
                                 if (dp != null) {
                                     synchronized (dp) {
-                                        long time = System.currentTimeMillis();
                                         // the docpane is not visible, and we are synched on it,
                                         // so it is safe to set the size even though this is not 
                                         // the event dispatch thread
@@ -1093,15 +1092,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                         dp.setSize( docpaneScroller.getViewport().getExtentSize().width,
                                                     docpane.getPreferredSize().height);
                                         port.setView( dp);
-                                        System.err.println( "time for setSize(): " + 
-                                                            (System.currentTimeMillis()-time));
                                     }
                                 }
                                 // installing the docpane in the scroller, which is already visible,
                                 // has to be done in the event dispatch thread
                                 Runnable installer = new Runnable() {
                                         public void run() {
-                                            long time = System.currentTimeMillis();
                                             JScrollPane ds = docpaneScroller;
                                             JGlossEditor dp2 = docpane;
                                             AnnotationEditor ae = annotationEditor;
@@ -1118,8 +1114,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                                                      getEndOffset());
                                                 }
                                                 setCursor( currentCursor);
-                                                System.err.println( "time for install(): " + 
-                                                                    (System.currentTimeMillis()-time));
                                             }
                                         }
                                     };

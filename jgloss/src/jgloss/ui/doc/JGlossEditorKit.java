@@ -557,6 +557,25 @@ public class JGlossEditorKit extends HTMLEditorKit {
         }
     } // class WordView
 
+
+    /**
+     * Maximum number of characters displayed by a <code>ReadingTranslationView</code>.
+     * If the content of the reading/translation is longer than <code>MAX_TRANSLATION_LENGTH-3</code>,
+     * only <code>MAX_TRANSLATION_LENGTH</code> chars, followed by "..." will be rendered.
+     */
+    private final static int MAX_TRANSLATION_LENGTH = 47;
+
+    /**
+     * Shared segment used by instances of <code>ReadingTranslationView</code> used to retrieve
+     * text from the document.
+     */
+    private Segment segment = new Segment();
+
+    /**
+     * Segment character buffer used by instances of <code>ReadingTranslationView</code>.
+     */
+    private char[] segmentBuffer = new char[MAX_TRANSLATION_LENGTH+3];
+
     /**
      * A view which renders a reading or a translation element. These views are placed
      * above or below the normal flow of text and centered vertically on the annotated text
@@ -654,6 +673,28 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 return ((ReadingBaseView) parent).isAnnotationHidden();
             else
                 return false;
+        }
+
+        /**
+         * Return the text in the given span, possibly shortened to {@link #MAX_TRANSLATION_LENGTH}.
+         */
+        public Segment getText( int p0, int p1) {
+            if (p1-p0 <= MAX_TRANSLATION_LENGTH+3)
+                return super.getText( p0, p1);
+            else try {
+                getDocument().getText( p0, MAX_TRANSLATION_LENGTH, segment);
+                // segment.count should not be larger than MAX_TRANSLATION_LENGTH
+                System.arraycopy( segment.array, segment.offset, segmentBuffer, 0, segment.count);
+                segmentBuffer[segment.count] = '.';
+                segmentBuffer[segment.count+1] = '.';
+                segmentBuffer[segment.count+2] = '.';
+                segment.array = segmentBuffer;
+                segment.offset = 0;
+                segment.count += 3;
+                return segment;
+            } catch (BadLocationException ex) {
+                return super.getText( p0, p1);
+            }
         }
     } // class ReadingTranslationView
 

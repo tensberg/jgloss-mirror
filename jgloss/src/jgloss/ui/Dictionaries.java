@@ -221,19 +221,8 @@ public class Dictionaries extends JComponent {
         public void loadDictionaries( File[] dictionaries) {
             this.dictionaries = dictionaries;
             dictionariesLoaded = false;
-            if (messageDialog == null) {
-                Frame parent = (Frame) SwingUtilities.getRoot( Dictionaries.this);
-                messageDialog = new JDialog( parent, true);
-                messageDialog.setTitle( JGloss.messages.getString( "dictionaries.loading.title"));
+            if (message == null)
                 message = new JLabel( "", JLabel.CENTER);
-                messageDialog.getContentPane().add( message);
-                messageDialog.setSize( 450, 50);
-                messageDialog.setLocation( Math.max( (int) (parent.getLocation().getX() + 
-                                                            parent.getSize().getWidth()/2 - 225), 0),
-                                           (int) (parent.getLocation().getY() + 
-                                                  parent.getSize().getHeight()/2 - 25));
-                messageDialog.setDefaultCloseOperation( JDialog.DO_NOTHING_ON_CLOSE);
-            }
             currentCursor = getCursor();
 
             Thread worker = new Thread( this);
@@ -245,6 +234,18 @@ public class Dictionaries extends JComponent {
 
             if (!dictionariesLoaded) {
                 setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+                if (messageDialog == null) {
+                    Frame parent = (Frame) SwingUtilities.getRoot( Dictionaries.this);
+                    messageDialog = new JDialog( parent, true);
+                    messageDialog.setTitle( JGloss.messages.getString( "dictionaries.loading.title"));
+                    messageDialog.getContentPane().add( message);
+                    messageDialog.setSize( 450, 50);
+                    messageDialog.setLocation( Math.max( (int) (parent.getLocation().getX() + 
+                                                                parent.getSize().getWidth()/2 - 225), 0),
+                                               (int) (parent.getLocation().getY() + 
+                                                      parent.getSize().getHeight()/2 - 25));
+                    messageDialog.setDefaultCloseOperation( JDialog.DO_NOTHING_ON_CLOSE);
+                }
                 messageDialog.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
                 messageDialog.show();
             }
@@ -293,8 +294,10 @@ public class Dictionaries extends JComponent {
 
             dictionariesLoaded = true;
             setCursor( currentCursor);
-            messageDialog.hide();
-            messageDialog.dispose();                
+            if (messageDialog != null) {
+                messageDialog.hide();
+                messageDialog.dispose(); 
+            }               
 
             // show error messages for dictionary load failures
             for ( Iterator i=errors.iterator(); i.hasNext(); )
@@ -443,25 +446,6 @@ public class Dictionaries extends JComponent {
     }
 
     /**
-     * Creates a new dictionary by invoking the <CODE>createDictionary</CODE> method
-     * of <CODE>DictionaryFactory</CODE>. If loading the dictionary fails,
-     * an error dialog will be displayed.
-     *
-     * @param file The path to the dictionary file.
-     * @return The newly created dictionary, or <CODE>null</CODE> if the dictionary could not
-     *         be created.
-     * @see jgloss.dictionary.DictionaryFactory
-     */
-    private Dictionary loadDictionary( String file) {
-        try {
-            return DictionaryFactory.createDictionary( file);
-        } catch (DictionaryFactory.Exception ex) {
-            showDictionaryError( ex, file);
-            return null;
-        }
-    }
-
-    /**
      * Show an error dialog for the dictionary exception.
      */
     private void showDictionaryError( DictionaryFactory.Exception ex, String file) {
@@ -469,12 +453,15 @@ public class Dictionaries extends JComponent {
         String [] objects;
 
         if (ex instanceof DictionaryFactory.InstantiationException) {
-            ex.printStackTrace();
             Exception root = ((DictionaryFactory.InstantiationException) ex).getRootCause();
             File f = new File( file);
             if (root instanceof FileNotFoundException) {
                 msgid = "error.dictionary.filenotfound";
                 objects = new String[] { f.getName(), f.getAbsolutePath() };
+            }
+            else if (root instanceof IndexCreationException) {
+                msgid = "error.dictionary.jjdxnotavailable";
+                objects = new String[] { f.getAbsolutePath(), f.getParent() };
             }
             else {
                 msgid = "error.dictionary.ioerror";
@@ -533,27 +520,44 @@ public class Dictionaries extends JComponent {
      */
     private synchronized void loadDictionariesFromPreferences() {
         String[] fs = JGloss.prefs.getPaths( Preferences.DICTIONARIES);
+        // exceptions occurring during dictionary loading
+        final List exceptions = new ArrayList( 5);
+
         for ( int i=0; i<fs.length; i++) {
-            Dictionary d = loadDictionary( fs[i]);
-            if (d != null) {
+            try {
+                Dictionary d = DictionaryFactory.createDictionary( fs[i]);
                 synchronized (activeDictionaries) {
                     activeDictionaries.add( new DictionaryWrapper( fs[i], d));
                 }
                 fireDictionaryListChanged(); // fire for every loaded dictionary
                 if (d instanceof UserDictionary)
                     userDictionary = (UserDictionary) d;
+            } catch (DictionaryFactory.Exception ex) {
+                exceptions.add( ex);
+                exceptions.add( fs[i]);
             }
         }
         // insert the user dictionary if not already in the dictionary list
-        if (userDictionary == null) {
+        if (userDictionary == null) try {
             userDictionary = (UserDictionary)
-                loadDictionary( userDictImplementation.getDescriptor());
-            if (userDictionary != null)
-                synchronized (activeDictionaries) {
-                    activeDictionaries.add( 0, new DictionaryWrapper
-                        ( userDictImplementation.getDescriptor(), userDictionary));
-                }
+                DictionaryFactory.createDictionary( userDictImplementation.getDescriptor());
+            synchronized (activeDictionaries) {
+                activeDictionaries.add( 0, new DictionaryWrapper
+                    ( userDictImplementation.getDescriptor(), userDictionary));
+            }
+        } catch (DictionaryFactory.Exception ex) {
+            exceptions.add( ex);
+            exceptions.add( userDictImplementation.getDescriptor());
         }
+        
+        EventQueue.invokeLater( new Runnable() {
+                public void run() {
+                    // show dialogs for all errors which occurred while the dictionaries were opened
+                    for ( Iterator i=exceptions.iterator(); i.hasNext(); ) {
+                        showDictionaryError( (DictionaryFactory.Exception) i.next(), (String) i.next());
+                    }
+                }
+            });
     }
 
     /**

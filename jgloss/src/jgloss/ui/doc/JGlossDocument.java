@@ -467,7 +467,14 @@ public class JGlossDocument extends HTMLDocument {
                         String base = dictionaryWord;
                         if (base == null)
                             base = word;
-                        String[][] wr = StringTools.splitWordReading( word, base, reading);
+                        String[][] wr;
+                        try {
+                            wr = StringTools.splitWordReading( word, base, reading);
+                        } catch (StringIndexOutOfBoundsException ex) {
+                            System.err.println( "WARNING: unparseable word/base/reading " +
+                                                word + "/" + base + "/" + reading);
+                            wr = new String[][] { { word } };
+                        }
                         if (wr.length==1 && wr[0].length==1) {
                             // Single word without reading. Since there has to be at least one
                             // reading, use an empty string as reading.

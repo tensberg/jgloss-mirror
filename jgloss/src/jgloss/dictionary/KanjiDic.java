@@ -171,120 +171,125 @@ public class KanjiDic implements Dictionary {
         }
 
         /**
+         * Used during entry parsing in constructor.
+         */
+        private final static List readingsl = new ArrayList( 10);
+        /**
+         * Used during entry parsing in constructor.
+         */
+        private final static List nanoril = new ArrayList( 10);
+        /**
+         * Used during entry parsing in constructor.
+         */
+        private final static List translationsl = new ArrayList( 10);
+
+        /**
          * Creates a new entry for a line in the dictionary file. Only a subset of the fields
          * are used.
          *
          * @param dicline A line from the dictionary file in the format as specified in the
          *        KANJIDIC documentation.
+         * @param extendedInformation <code>true</code>, if bushu number, classical radical number,
+         *        frequency of use and stroke count should be parsed.
          */
-        protected Entry( String dicline) {
-            List readingsl = new LinkedList();
-            List nanoril = new LinkedList();
-            List currentl = readingsl;
-            List translationsl = new LinkedList();
+        protected Entry( String dicline, boolean extendedInformation) {
+            synchronized (readingsl) {
+                readingsl.clear();
+                nanoril.clear();
+                translationsl.clear();
+                List currentl = readingsl;
 
-            kanji = dicline.charAt( 0);
-
-            strokecount = NOT_AVAILABLE;
-            bnum = NOT_AVAILABLE;
-            cnum = NOT_AVAILABLE;
-            frequency = NOT_AVAILABLE;
-
-            // iterate over all fields (delimited by a ' ')
-            int from = 7; // skip kanji and ASCII kanji code
-            int to = dicline.indexOf( ' ', from + 1);
-            if (to == -1) // last field
-                to = dicline.length();
-            while (to > from) {
-                char c = dicline.charAt( from); // first char in field determines type
-                if (c < 128) { // ASCII character: reading only if c=='-'
-                    switch (c) {
-                    case '-': // reading (for kanji used as suffix)
-                        // radicalname never starts with -
-                        currentl.add( dicline.substring( from, to));
-                        break;
-
-                    case '{': // translation, enclosed in {}
-                        // translations can contain spaces
-                        to = dicline.indexOf( '}', from+1) + 1;
-                        translationsl.add( dicline.substring( from+1, to-1));
-                        break;
-
-                    case 'T': // type change for following readings
-                        if (dicline.charAt( from+1) == '1') // nanori readings
-                            currentl = nanoril;
-                        else if (dicline.charAt( from+1) == '2') // radical name
-                            currentl = null;
-                        break;
-
-                    case 'B': // bushu number
-                        try {
-                            bnum = Short.parseShort( dicline.substring( from+1, to));
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                            System.err.println( "WARNING: malformed dictionary entry " + dicline);
-                        }
-                        break;
-
-                    case 'C': // classical radical number
-                        try {
-                            cnum = Short.parseShort( dicline.substring( from+1, to));
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                            System.err.println( "WARNING: malformed dictionary entry " + dicline);
-                        }
-                        break;
-
-                    case 'F': // frequency of use
-                        try {
-                            frequency = Short.parseShort( dicline.substring( from+1, to));
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                            System.err.println( "WARNING: malformed dictionary entry " + dicline);
-                        }
-                        break;
-
-                    case 'S': // stroke count
-                        // If there is more than one stroke count, all but the first
-                        // are common miscounts. These entries are currently not used.
-                        if (strokecount == NOT_AVAILABLE) {
-                            try {
-                                strokecount = Byte.parseByte( dicline.substring( from+1, to));
-                            } catch (NumberFormatException ex) {
-                                ex.printStackTrace();
-                                System.err.println( "WARNING: malformed dictionary entry " + dicline);
-                            }
-                        }
-                        break;
-
-                    // all other entry types are currently not used
-                    }
-                }
-                else {
-                    if (currentl != null)
-                        currentl.add( dicline.substring( from, to));
-                    else
-                        radicalname = dicline.substring( from, to);
-                }
-
-                // move to the next entry
-                from = to + 1;
-                to = dicline.indexOf( ' ', from + 1);
+                kanji = dicline.charAt( 0);
+                
+                strokecount = NOT_AVAILABLE;
+                bnum = NOT_AVAILABLE;
+                cnum = NOT_AVAILABLE;
+                frequency = NOT_AVAILABLE;
+                
+                // iterate over all fields (delimited by a ' ')
+                int from = 7; // skip kanji and ASCII kanji code
+                int to = dicline.indexOf( ' ', from + 1);
                 if (to == -1) // last field
                     to = dicline.length();
-            }
+                while (to > from) {
+                    char c = dicline.charAt( from); // first char in field determines type
+                    if (c < 128) { // ASCII character: reading only if c=='-'
+                        switch (c) {
+                        case '-': // reading (for kanji used as suffix)
+                                // radicalname never starts with -
+                            currentl.add( dicline.substring( from, to));
+                            break;
+                            
+                        case '{': // translation, enclosed in {}
+                                // translations can contain spaces
+                            to = dicline.indexOf( '}', from+1) + 1;
+                            translationsl.add( dicline.substring( from+1, to-1));
+                            break;
+                            
+                        case 'T': // type change for following readings
+                            if (dicline.charAt( from+1) == '1') // nanori readings
+                                currentl = nanoril;
+                            else if (dicline.charAt( from+1) == '2') // radical name
+                                currentl = null;
+                            break;
+                        }
 
-            if (readingsl.size() > 0) {
-                readings = new String[readingsl.size()];
-                readingsl.toArray( readings);
-            }
-            if (nanoril.size() > 0) {
-                nanoriReadings = new String[nanoril.size()];
-                nanoril.toArray( nanoriReadings);
-            }
-            if (translationsl.size() > 0) {
-                translations = new String[translationsl.size()];
-                translationsl.toArray( translations);
+                        // only parse other fields if extended information is wanted by caller
+                        if (extendedInformation) try {
+                            switch (c) {
+                            case 'B': // bushu number
+                                bnum = Short.parseShort( dicline.substring( from+1, to));
+                                break;
+                                
+                            case 'C': // classical radical number
+                                cnum = Short.parseShort( dicline.substring( from+1, to));
+                                break;
+                                
+                            case 'F': // frequency of use
+                                frequency = Short.parseShort( dicline.substring( from+1, to));
+                                break;
+                                
+                            case 'S': // stroke count
+                                // If there is more than one stroke count, all but the first
+                                // are common miscounts. These entries are currently not used.
+                                if (strokecount == NOT_AVAILABLE) {
+                                    strokecount = Byte.parseByte( dicline.substring( from+1, to));
+                                }
+                                break;
+                                
+                                // all other entry types are currently not used
+                            }
+                        } catch (NumberFormatException ex) {
+                            ex.printStackTrace();
+                            System.err.println( "WARNING: malformed dictionary entry " + dicline);
+                        }
+                    }
+                    else {
+                        if (currentl != null)
+                            currentl.add( dicline.substring( from, to));
+                        else
+                            radicalname = dicline.substring( from, to);
+                    }
+                    
+                    // move to the next entry
+                    from = to + 1;
+                    to = dicline.indexOf( ' ', from + 1);
+                    if (to == -1) // last field
+                        to = dicline.length();
+                }
+                
+                if (readingsl.size() > 0) {
+                    readings = new String[readingsl.size()];
+                    readingsl.toArray( readings);
+                }
+                if (nanoril.size() > 0) {
+                    nanoriReadings = new String[nanoril.size()];
+                    nanoril.toArray( nanoriReadings);
+                }
+                if (translationsl.size() > 0) {
+                    translations = new String[translationsl.size()];
+                    translationsl.toArray( translations);
+                }
             }
         }
 
@@ -336,7 +341,7 @@ public class KanjiDic implements Dictionary {
      * @exception IOException when the dictionary file cannot be read.
      */
     public KanjiDic( String dicfile) throws IOException {
-        entries = new HashMap( 25000);
+        entries = new HashMap( 25001);
         this.dicfile = dicfile;
         File dic = new File( dicfile);
         name = dic.getName();
@@ -344,14 +349,14 @@ public class KanjiDic implements Dictionary {
                                                   new String[] { name }));
 
         BufferedReader in = new BufferedReader( new InputStreamReader
-            ( new FileInputStream( dic), "EUC-JP"));
+            ( new BufferedInputStream( new FileInputStream( dic)), "EUC-JP"));
         String line;
         while ((line = in.readLine()) != null) {
             // an ASCII character at the beginning of the line is treated as start of a comment
             if (line.length()>0 && line.charAt( 0)>127) {
-                Entry e = new Entry( line);
+                Entry e = new Entry( line, false);
                 // storing strings in the hashmap instead of entries decreases ram usage
-                entries.put( new String( new char[] { e.getKanji() }), line);
+                addEntry( new String( new char[] { e.getKanji() }), line);
                 
                 addReadings( line, e, e.getReadings());
                 addReadings( line, e, e.getNanoriReadings());
@@ -365,18 +370,24 @@ public class KanjiDic implements Dictionary {
                 }
             }
         }
+
+        // compact all stored array lists to minimize memory usage
+        for ( Iterator i=entries.entrySet().iterator(); i.hasNext(); ) {
+            Object value = ((Map.Entry) i.next()).getValue();
+            if (value instanceof ArrayList)
+                ((ArrayList) value).trimToSize();
+        }
     }
 
     /**
      * Adds an entry to the map of entries. If the map does not contain the key,
      * the entry will be put directly, otherwise all entries for this key are stored in
-     * a list. If the entry has already been placed in the map for this key, it will be
-     * ignored (no duplicates in the list).
+     * a list.
      *
      * @param key The key under which to store the entry.
      * @param entry The entry which will be stored.
      */
-    protected void addEntry( String key, Object entry) {
+    protected void addEntry( Object key, String entry) {
         Object o = entries.get( key);
         if (o == entry)
             return;
@@ -385,11 +396,14 @@ public class KanjiDic implements Dictionary {
         }
         else if (o instanceof List) {
             List l = (List) o;
-            if (!l.contains( entry))
-                l.add( entry);
+            // Entries are stored one after the other, so in the case of duplicate keys
+            // only the last item of the entry list has to be tested for equality to prevent
+            // duplicate insertions
+            if (l.get( l.size()-1) != entry)
+                ((List) o).add( entry);
         }
         else {
-            List l = new ArrayList( 2);
+            List l = new ArrayList( 5);
             l.add( o);
             l.add( entry);
             entries.put( key, l);
@@ -404,18 +418,16 @@ public class KanjiDic implements Dictionary {
      * @param e The entry to add.
      * @param readings List of readings. This can be normal or nanori readings.
      */
-    protected void addReadings( Object line, Entry e, String[] readings) {
+    protected void addReadings( String line, Entry e, String[] readings) {
         if (readings != null) {
             for ( int i=0; i<readings.length; i++) {
                 int dot = readings[i].indexOf( '.');
                 if (dot == -1)
                     addEntry( readings[i], line);
                 else {
-                    String k = readings[i].substring( 0, dot) +
-                        readings[i].substring( dot+1);
-                    addEntry( k, line);
-                    k = e.getKanji() + readings[i].substring( dot+1);
-                    addEntry( k, line);
+                    String end = readings[i].substring( dot+1);
+                    addEntry( readings[i].substring( 0, dot) + end, line);
+                    addEntry( e.getKanji() + end, line);
                 }
             }
         }
@@ -443,11 +455,11 @@ public class KanjiDic implements Dictionary {
             List original = (List) o;
             r = new ArrayList( original.size());
             for ( Iterator i=original.iterator(); i.hasNext(); )
-                r.add( new Entry( (String) i.next()));
+                r.add( new Entry( (String) i.next(), true));
         }
         else {
             r = new ArrayList( 1);
-            r.add( new Entry( (String) o));
+            r.add( new Entry( (String) o, true));
         }
         return r;
     }
@@ -485,7 +497,7 @@ public class KanjiDic implements Dictionary {
      */
     protected void constructResult( String expression, List r, String entry, short searchmode,
                                     short resultmode) {
-        Entry e = new Entry( entry);
+        Entry e = new Entry( entry, true);
         final String kanji = new String( new char[] { e.getKanji() });
         boolean kanjiMatches = kanji.equals( expression);
         

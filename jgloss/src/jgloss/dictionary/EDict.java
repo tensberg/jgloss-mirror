@@ -593,7 +593,6 @@ public class EDict implements Dictionary {
         preBuildIndex();
         addIndexRange( 0, dictionaryLength);
         postBuildIndex();
-        System.out.println( indexLength + " entries");
     }
 
     /**

@@ -11,6 +11,9 @@ JGloss is written in Java. It should work on any computer with support for
 the Java 2 Version 1.3/1.4 platform. It is distributed under the terms of the
 GNU General Public License.
 
+To start JGloss, double-click the file "jgloss.jar", or type
+"java -jar jgloss.jar" in a shell.
+
 If this is the binary release, you can find the documentation in the folder
 "doc". If is is the source release, you can create the jgloss.jar
 executable JAR file by typing "make jgloss", create the documentation by
@@ -18,11 +21,11 @@ executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
 Known problems:
-  - When the ChaSen parser with JRE 1.3 on Windows 98/ME/XP, a window pops
-    up while ChaSen runs. This does not happen with JRE 1.4.
+  - When the ChaSen parser is used with JRE 1.3 on Windows 98/ME/XP, a window
+    pops up while ChaSen runs. This does not happen with JRE 1.4.
   - On Windows 98/ME when using JRE 1.3 the ChaSen window does not close 
-    automatically after a document is imported. You will have to close it by hand.
-    Use JRE 1.4 instead.
+    automatically after a document is imported. You will have to close it by
+    hand. Use JRE 1.4 instead.
   - When using JGloss with JRE 1.3 and KDE, the word annotation dialog will
     sometimes be resized to a minimum when it is opened. Also, Java locks up if
     the preference window is opened after a document is loaded and when
@@ -35,7 +38,7 @@ Known problems:
     thorough the application only after JGloss is restarted.
   - Pasting text in the text field of the input dialog does not work with non-
     Japanese Windows. Use Import Clipboard instead.
-  - Import Clipboard does not work in MacOSX, unless the system language is
+  - Import Clipboard does not work in MacOS X, unless the system language is
     set to Japanese. Paste the text in the text field of the import dialog
     instead.
 

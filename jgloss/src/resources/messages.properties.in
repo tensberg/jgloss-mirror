@@ -38,6 +38,7 @@ error.loadPreferences=An error occurred while loading the preferences.
 error.storePreferences=An error occurred while saving the preferences.
 error.dictionary.title=Error opening dictionary
 error.dictionary.filenotfound=The dictionary {0} could not be opened.\nCheck if the dictionary file {1}\nexists and is readable.
+error.dictionary.jjdxnotavailable=The JJDX index file for the dictionary {0} could not be opened or created.\nPlease make sure that the directory "{1}" is writable by JGloss.\nThe dictionary will not be available.
 error.dictionary.ioerror=An error occurred while opening dictionary {0}.\nThe dictionary will not be available.
 error.dictionary.format=The file {0} is not\na dictionary file in a supported format.
 error.exclusions.save.title=Error writing exclusion list

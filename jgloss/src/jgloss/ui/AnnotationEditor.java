@@ -591,7 +591,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     String reading = selection.getDictionaryFormNode().getReading();
                     if (reading.length() == 0 || reading.equals( word))
                         reading = null;
-                    Dictionaries.getUserDictionary().addEntry( word, reading, translation);
+                    try {
+                        Dictionaries.getUserDictionary().addEntry( word, reading, translation);
+                    } catch (NullPointerException ex) {}
                 }
             };
         UIUtilities.initAction( addToDictionaryAction, "annotationeditor.menu.addtodictionary");

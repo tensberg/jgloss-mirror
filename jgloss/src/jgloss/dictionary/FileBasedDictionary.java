@@ -29,6 +29,8 @@ import java.nio.channels.*;
 import java.nio.charset.*;
 import java.util.*;
 import java.text.MessageFormat;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Base class for dictionaries stored in a local file with separate index file.
@@ -67,11 +69,6 @@ import java.text.MessageFormat;
  *   Byte order used to store the index entries. 1 for big-endian, 2 for
  *   little-endian. (The header always uses big-endian.)
  * </td><td>2001</td></tr>
- * <tr><td>Creator</td>
- * <td>
- *   ID of the dictionary implementation creating this index file. This
- *   can be used to adapt the sorting order to be compatible with the creator.
- * </td><td>2001</td></tr>
  * </table>
  * <p>
  *   Currently existing index file versions are 1001, used by JGloss 1.0.2 and earlier, and
@@ -108,7 +105,7 @@ public abstract class FileBasedDictionary implements Dictionary {
         private java.util.regex.Pattern pattern;
         private float maxConfidence;
         private int lookAtLength;
-        private java.lang.reflect.Constructor dictionaryConstructor;
+        private Constructor dictionaryConstructor;
 
         /**
          * Creates a new implementation instance for some file based dictionary format.
@@ -130,7 +127,7 @@ public abstract class FileBasedDictionary implements Dictionary {
         public Implementation( String name, String encoding, boolean doEncodingTest,
                                java.util.regex.Pattern pattern,
                                float maxConfidence, int lookAtLength, 
-                               java.lang.reflect.Constructor dictionaryConstructor) {
+                               Constructor dictionaryConstructor) {
             this.name = name;
             this.encoding = encoding;
             this.doEncodingTest = doEncodingTest;
@@ -191,7 +188,11 @@ public abstract class FileBasedDictionary implements Dictionary {
             try {
                 return (Dictionary) dictionaryConstructor.newInstance
                     ( new Object[] { new File( descriptor) });
+            } catch (InvocationTargetException ex) {
+                throw new DictionaryFactory.InstantiationException
+                    ( (Exception) ((InvocationTargetException) ex).getTargetException());
             } catch (Exception ex) {
+                // highly unlikely
                 throw new DictionaryFactory.InstantiationException( ex);
             }
         }
@@ -262,6 +263,10 @@ public abstract class FileBasedDictionary implements Dictionary {
     /**
      * Index file mapped into a byte buffer.
      */
+    protected MappedByteBuffer indexbuf;
+    /**
+     * View of the index file as int buffer.
+     */
     protected IntBuffer index;
     /**
      * Name of the dictionary. This will be the filename of the dictionary file.
@@ -271,7 +276,11 @@ public abstract class FileBasedDictionary implements Dictionary {
      * Random number generator. Used for randomized quicksort in index creation.
      */
     protected static Random random = new Random();
-
+    /**
+     * Flag if a call to {@link #search(String,short,short) search} is the first since object creation.
+     */
+    private boolean firstSearch = true;
+    
     /**
      * Initializes the dictionary by mapping the dictionary and file into memory and
      * possibly creatig the indexfile if neccessary.
@@ -280,11 +289,12 @@ public abstract class FileBasedDictionary implements Dictionary {
      * @param createindex Flag if the index should be automatically created and written to disk
      *                    if no index file exists. A write will not be attempted if the directory
      *                    is not writable. If no index file exists and createindex is
-     *                    false, you have to call {@link #buildIndex(boolean) buildIndex} to create the
+     *                    false, you have to call {@link #buildIndex(File) buildIndex} to create the
      *                    index manually.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
-    protected FileBasedDictionary( File dicfile, boolean createindex) throws IOException {
+    protected FileBasedDictionary( File dicfile, boolean createindex) 
+        throws IOException, IndexCreationException {
         this.dicfile = dicfile;
         name = dicfile.getName();
         System.err.println( MessageFormat.format( messages.getString( "dictionary.load"),
@@ -304,55 +314,59 @@ public abstract class FileBasedDictionary implements Dictionary {
 
         // prepare the index
         indexfile = new File( dicfile.getAbsolutePath() + INDEX_EXTENSION);
-        try {
-            // rebuild the index file if it does not exist or the dictionary file was modified
-            // after the index was created
-            if (!indexfile.exists() || dicfile.lastModified()>indexfile.lastModified()) {
-                if (createindex) {
-                    buildIndex( indexfile); // this also initializes the index member variable
-                }
+        // rebuild the index file if it does not exist or the dictionary file was modified
+        // after the index was created
+        if (!indexfile.exists() || dicfile.lastModified()>indexfile.lastModified()) {
+            if (createindex) try {
+                buildIndex( indexfile); // this also initializes the index member variable
+            } catch (IOException ex) {
+                throw new IndexCreationException();
             }
-            else {
-                indexchannel = new FileInputStream( indexfile).getChannel();
-                MappedByteBuffer indexbuf = indexchannel.map
-                    ( FileChannel.MapMode.READ_ONLY, 0, indexchannel.size());
-                // read index header
-                int version = indexbuf.getInt();
-                if (version > JJDX_VERSION) {
-                    System.err.println( MessageFormat.format( messages.getString
-                                                              ( "edict.warning.jjdxversion"),
-                                                              new String[] { getName() }));
-                }
-                int offset = indexbuf.getInt();
-                int size = indexbuf.getInt();
-
-                // sanity check the index file size
-                if (offset + size*4 != indexfile.length()) {
-                    System.err.println( MessageFormat.format( messages.getString
-                                                              ( "edict.warning.jjdxsize"),
-                                                              new String[] { getName() }));
-                    if (createindex) {
-                        buildIndex( indexfile);
-                        return;
-                    }
-                }
-
-                ByteOrder order = ByteOrder.BIG_ENDIAN;
-                if (version >= JJDX_VERSION) { // byte order is introduced in JJDX 2001
-                    if (indexbuf.getInt() == JJDX_LITTLE_ENDIAN)
-                        order = ByteOrder.LITTLE_ENDIAN;
-                }
-
-                // move to index start
-                indexbuf.position( offset);
-                indexbuf.order( order);
-                index = indexbuf.asIntBuffer();
+        }
+        else try {
+            indexchannel = new FileInputStream( indexfile).getChannel();
+            indexbuf = indexchannel.map
+                ( FileChannel.MapMode.READ_ONLY, 0, indexchannel.size());
+            // read index header
+            int version = indexbuf.getInt();
+            if (version > JJDX_VERSION) {
+                System.err.println( MessageFormat.format( messages.getString
+                                                          ( "edict.warning.jjdxversion"),
+                                                          new String[] { getName() }));
             }
+            int offset = indexbuf.getInt();
+            int size = indexbuf.getInt();
+            
+            // sanity check the index file size
+            if (offset + size*4 != indexfile.length()) {
+                System.err.println( MessageFormat.format( messages.getString
+                                                          ( "edict.warning.jjdxsize"),
+                                                          new String[] { getName() }));
+                // throw an exception which will be caught by the enclosing block and
+                // trigger a rebuild of the index file
+                throw new Exception();
+            }
+            
+            ByteOrder order = ByteOrder.BIG_ENDIAN;
+            if (version >= JJDX_VERSION) { // byte order is introduced in JJDX 2001
+                if (indexbuf.getInt() == JJDX_LITTLE_ENDIAN)
+                    order = ByteOrder.LITTLE_ENDIAN;
+            }
+            
+            // move to index start
+            indexbuf.position( offset);
+            indexbuf.order( order);
+            index = indexbuf.asIntBuffer();
         } catch (Exception ex) {
-            dicchannel.close();
-            IOException ex2 = new IOException();
-            ex2.initCause( ex);
-            throw ex2;
+            // the index file is broken, try to rebuild it
+            if (createindex) try {
+                buildIndex( indexfile);
+                return;
+            } catch (IOException ex2) {
+                dicchannel.close();
+                ex.printStackTrace();
+            }
+            throw new IndexCreationException();
         }
     }
 
@@ -362,6 +376,15 @@ public abstract class FileBasedDictionary implements Dictionary {
     public abstract String getEncoding();
 
     public List search( String expression, short searchmode, short resultmode) throws SearchException {
+        if (firstSearch) {
+            // Load the dictionary and index file into RAM. This is deferred to the first search
+            // to decrease the time spent in the constructor, and is only done once because different
+            // dictionaries could swap each other out between searches in low memory conditions.
+            dictionary.load();
+            indexbuf.load();
+            firstSearch = false;
+        }
+
         List result = new ArrayList( 10);
         expression = escape( expression);
 
@@ -377,8 +400,6 @@ public abstract class FileBasedDictionary implements Dictionary {
                 int lastmatch;
                 firstmatch = findMatch( exprbuf, match, true);
                 lastmatch = findMatch( exprbuf, match, false);
-                //System.err.println( "all matches in EDictNIO: " + (lastmatch-firstmatch+1));
-                //System.err.println( "EdictNIO: " + firstmatch + "/" + lastmatch);
                 
                 // Several index entries can point to the same entry line. For example
                 // if a word contains the same kanji twice, and words with this kanji are looked up,
@@ -654,8 +675,8 @@ public abstract class FileBasedDictionary implements Dictionary {
 
             this.indexfile = indexfile;
             indexchannel = new RandomAccessFile( indexfile, "rw").getChannel();
-            MappedByteBuffer indexbuf = indexchannel.map( FileChannel.MapMode.READ_WRITE,
-                                                          0, INDEX_OFFSET + 50000*4);
+            indexbuf = indexchannel.map( FileChannel.MapMode.READ_WRITE,
+                                         0, INDEX_OFFSET + 50000*4);
             
             // write index header (big endian format)
             indexbuf.putInt( JJDX_VERSION);
@@ -668,15 +689,8 @@ public abstract class FileBasedDictionary implements Dictionary {
             
             // add index entries
             index = indexbuf.asIntBuffer();
-            System.err.println( "adding entries");
-            long t = System.currentTimeMillis();
             int entries = addIndexRange( 0, (int) dictionarySize);
-            System.err.println( entries + " entries");
-            System.err.println( (System.currentTimeMillis()-t)/1000.0);
-            System.err.println( "quicksort");
             quicksortIndex( 0, entries-1, dictionary, dictionary.duplicate());
-            System.err.println( "end quicksort");
-            System.err.println( (System.currentTimeMillis()-t)/1000.0);
             
             // write number of entries
             indexbuf.order( ByteOrder.BIG_ENDIAN);

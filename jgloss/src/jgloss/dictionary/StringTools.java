@@ -136,6 +136,7 @@ public class StringTools {
      * @return Array with the word split in kanji/kana substrings. For every kanji substring, a
      *         kanji/reading string pair is contained in the array. For every kana substring,
      *         a single string is contained.
+     * @exception StringIndexOutOfBoundsException if the word/base/reading tuple is not parseable.
      */
     public static String[][] splitWordReading( String inflectedWord, String baseWord, String baseReading) {
         //System.err.println( "splitting " + inflectedWord + "/" + baseWord + "/" + baseReading);

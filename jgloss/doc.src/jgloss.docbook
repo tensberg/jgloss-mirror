@@ -112,18 +112,42 @@
                 EDICT dictionaries are Japanese to English word dictionaries. You can download them
                 from the 
                 <ulink url="http://ftp.cc.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil">
-                  Monash Nihongo FTP Archive</ulink>. Each dictionary also needs an index file.
-                &JGloss; can use the <acronym>XJDX</acronym> index files used by
-                <ulink url="http://www.csse.monash.edu.au/~jwb/xjdic/"><application>XJDIC</application>
-                 </ulink> or <ulink url="http://gjiten.sourceforge.net/">
-                  <application>GJiten</application></ulink>, or
-                index files in its own format <acronym>JJDX</acronym>. 
-                If no index file is found, it will be created automatically.
+                  Monash Nihongo FTP Archive</ulink>. Each dictionary also needs a JJDX index file.
+                If no index file is found, it will be created automatically by &JGloss; and saved in the
+                dictionary directory. Should the index file creation fail, for example because the
+                directory is write-protected, the dictionary can't be used and an error message is
+                displayed.
               </para>
             </listitem>
           </varlistentry>
-        </variablelist>
-        <variablelist>
+
+          <varlistentry>
+            <term><ulink url="http://www.bibiko.com/dlde.htm">GDICT</ulink></term>
+            <listitem>
+              <para>
+                GDICT is an extensive Japanese-German dictionary. 
+                To use it, download the file <filename>gdictutf.zip</filename> from
+                <ulink url="http://www.bibiko.com/dlde.htm">this page</ulink>, unzip it
+                and add the resulting file <filename>gdictutf.txt</filename> to the list of
+                dictionaries used by &JGloss; in the dictionary dialog.
+              </para>
+              <para>
+                The GDICT dictionary format is only supported if you have Java Version 1.4
+                installed, otherwise &JGloss; will display a "not a dictionary file" error
+                dialog. The GDICT dictionary is also available converted to EDICT format from the same
+                location. EDICT however does not support umlauts and the
+                more complex entry format of GDICT.
+              </para>
+              <para>
+                GDICT also needs a JJDX index file.
+                If no index file is found, it will be created automatically by &JGloss; and saved in the
+                dictionary directory. Should the index file creation fail, for example because the
+                directory is write-protected, the dictionary can't be used and an error message is
+                displayed.
+              </para>
+            </listitem>
+          </varlistentry>
+
           <varlistentry>
             <term><ulink url="http://ftp.cc.monash.edu.au/pub/nihongo/kanjidic_doc.html">KANJIDIC
               </ulink></term>
@@ -135,8 +159,7 @@
               </para>
             </listitem>
           </varlistentry>
-        </variablelist>
-        <variablelist>
+
           <varlistentry>
             <term><ulink url="http://openlab.ring.gr.jp/skk/">SKK</ulink></term>
             <listitem>

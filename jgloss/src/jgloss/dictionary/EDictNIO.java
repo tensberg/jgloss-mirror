@@ -188,12 +188,6 @@ public class EDictNIO extends FileBasedDictionary {
         initImplementation();
 
     /**
-     * Dictionary ID written to the JJDX header. The ASCII-value of the ID is JGEN,
-     * which is short for JGloss EDictNIO.
-     */
-    public final static int DICTIONARY_ID = 0x4a47454e;
-
-    /**
      * Returns a {@link FileBasedDictionary.Implementation FileBasedDictionary.Implementation}
      * which recognizes EUC-JP encoded EDICT dictionaries. Used to initialize the
      * {@link #implementation implementation} final member because the constructor has to
@@ -219,11 +213,11 @@ public class EDictNIO extends FileBasedDictionary {
         }
     }
 
-    public EDictNIO( File dicfile) throws IOException {
+    public EDictNIO( File dicfile) throws IOException, IndexCreationException {
         this( dicfile, true);
     }
 
-    public EDictNIO( File dicfile, boolean createindex) throws IOException {
+    public EDictNIO( File dicfile, boolean createindex) throws IOException, IndexCreationException {
         super( dicfile, createindex);
     }
 
@@ -289,7 +283,6 @@ public class EDictNIO extends FileBasedDictionary {
             System.err.println( "EDICT warning: " + dicfile +
                                 "\nMalformed dictionary entry: " + entry);
         }
-
     }
     
     /**
