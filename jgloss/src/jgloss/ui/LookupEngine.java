@@ -76,19 +76,19 @@ public class LookupEngine {
                 handler.dictionary( d);
                 try {
                     ResultIterator results = d.search( mode, parameters);
-                    results: 
+                    results:
                     while (dictionaryEntries<dictionaryEntryLimit &&
                            results.hasNext()) try {
                                if (Thread.interrupted())
                                    throw new InterruptedException();
                                
                                DictionaryEntry de = results.next();
-                               dictionaryEntries++;
                                for ( int f=0; f<filters.length; f++) {
                                    if (!filters[f].accept( de)) {
                                        continue results;
                                    }
                                }
+                               dictionaryEntries++;
                                handler.dictionaryEntry( de);
                            } catch (SearchException ex) {
                                handler.exception( ex);

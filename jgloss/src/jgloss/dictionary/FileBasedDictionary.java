@@ -923,25 +923,23 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         public DictionaryEntry next() throws SearchException, NoSuchElementException {
             if (!hasNext())
                 throw new NoSuchElementException();
-            if (deferredException != null) {
-                SearchException out = deferredException;
-                deferredException = null;
 
-                if (out instanceof MalformedEntryException) // perhaps the next entry will work
+            if (deferredException == null) {
+                DictionaryEntry current = nextEntry;
+                generateNextEntry(); // changes nextEntry
+                return current;
+            }
+            else {
+                SearchException out = new SearchException( deferredException);
+                deferredException = null;
+                
+                if (out instanceof MalformedEntryException) {
+                    // perhaps the next entry will work
                     generateNextEntry();
+                }
 
                 throw out;
             }
-
-            DictionaryEntry current = nextEntry;
-            try {
-                generateNextEntry(); // changes nextEntry
-            } catch (SearchException ex) {
-                // the current entry is valid, so defer throwing this exception to the next
-                // call to next
-                deferredException = ex;
-            }
-            return current;
         }
         public void remove() throws UnsupportedOperationException {
             throw new UnsupportedOperationException();
@@ -951,52 +949,57 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * Set the {@link #nextEntry nextEntry} variable to the next dictionary entry matching
          * the search. If there are no more entries, it will be set to <code>null</code>.
          */
-        protected void generateNextEntry() throws SearchException {
+        protected void generateNextEntry() {
             nextEntry = null;
-            while (nextEntry==null && matchingIndexEntries.hasNext()) {
-                int match = matchingIndexEntries.next();
-
-                ByteBuffer entry = copyEntry( match, entrybuf, seenEntries, entryOffsets);
-                if (entry == null) // this entry has already been found
-                    continue;
-
-                match = entry.position(); // location of match in entry buffer
-                DictionaryEntryField field = getFieldType( entry, 0, entry.limit(), match);
-                try {
-                    if (!fields.isSelected( field))
-                        continue; // field is not selected by the user
-                } catch (IllegalArgumentException ex) {
-                    // field not WORD, READING or TRANSLATION
-                    continue;
-                }
-
-                /*System.err.println( isFieldStart( entry, match, field));
-                System.err.println( isFieldEnd( entry, match+expressionLength, field));
-                System.err.println( isWordStart( entry, match, field));
-                System.err.println( isWordEnd( entry, match+expressionLength, field));*/
-                // test if entry matches search mode
-                if (searchmode == ExpressionSearchModes.EXACT ||
-                    searchmode == ExpressionSearchModes.PREFIX) {
-                    // test if the index entry location is at the beginning of a word or field
-                    // depending on search parameter.
-                    if (match>0 &&
-                        !(fields.isSelected( MatchMode.WORD) ? 
-                          isWordStart( entry, match, field) :
-                          isFieldStart( entry, match, field)))
-                        continue;
-                }
-                if (searchmode == ExpressionSearchModes.EXACT ||
-                    searchmode == ExpressionSearchModes.SUFFIX) {
-                    int matchend = match+expressionLength;
-                    if (matchend<entry.limit() &&
-                        !(fields.isSelected( MatchMode.WORD) ? 
-                          isWordEnd( entry, matchend, field) :
-                          isFieldEnd( entry, matchend, field)))
-                        continue;
-                }
+            try {
+                while (nextEntry==null && matchingIndexEntries.hasNext()) {
+                    int match = matchingIndexEntries.next();
                     
-                nextEntry = createEntryFrom( entry, entryOffsets[0]);
-                seenEntries.add( entryOffsets[0]); // start offset of entry
+                    ByteBuffer entry = copyEntry( match, entrybuf, seenEntries, entryOffsets);
+                    if (entry == null) // this entry has already been found
+                        continue;
+                    
+                    match = entry.position(); // location of match in entry buffer
+                    DictionaryEntryField field = getFieldType( entry, 0, entry.limit(), match);
+                    try {
+                        if (!fields.isSelected( field))
+                            continue; // field is not selected by the user
+                    } catch (IllegalArgumentException ex) {
+                        // field not WORD, READING or TRANSLATION
+                        continue;
+                    }
+                    
+                    /*System.err.println( isFieldStart( entry, match, field));
+                      System.err.println( isFieldEnd( entry, match+expressionLength, field));
+                      System.err.println( isWordStart( entry, match, field));
+                      System.err.println( isWordEnd( entry, match+expressionLength, field));*/
+                    // test if entry matches search mode
+                    if (searchmode == ExpressionSearchModes.EXACT ||
+                        searchmode == ExpressionSearchModes.PREFIX) {
+                        // test if the index entry location is at the beginning of a word or field
+                        // depending on search parameter.
+                        if (match>0 &&
+                            !(fields.isSelected( MatchMode.WORD) ? 
+                              isWordStart( entry, match, field) :
+                              isFieldStart( entry, match, field)))
+                            continue;
+                    }
+                    if (searchmode == ExpressionSearchModes.EXACT ||
+                        searchmode == ExpressionSearchModes.SUFFIX) {
+                        int matchend = match+expressionLength;
+                        if (matchend<entry.limit() &&
+                            !(fields.isSelected( MatchMode.WORD) ? 
+                              isWordEnd( entry, matchend, field) :
+                              isFieldEnd( entry, matchend, field)))
+                            continue;
+                    }
+                    
+                    nextEntry = createEntryFrom( entry, entryOffsets[0]);
+                    seenEntries.add( entryOffsets[0]); // start offset of entry
+                }
+            } catch (SearchException ex) {
+                // the exception will be thrown at the next call to next()
+                deferredException = ex;
             }
         }
     }

@@ -42,11 +42,11 @@ endif
 
 RELEASE := 1.1
 JGLOSS_DISTNAME := jgloss-$(RELEASE)
-JDICTIONARY_DISTNAME := jgloss-$(RELEASE)
+JDICTIONARY_DISTNAME := jdictionary-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.dictionary.attribute\
             jgloss.parser jgloss.util \
-            jgloss.ui jgloss.ui.doc jgloss.ui.annotation \
+            jgloss.ui jgloss.ui.xml jgloss.ui.html jgloss.ui.export jgloss.ui.annotation \
             jgloss.www
 
 DATA_WWW := HTMLAnnotator vconj
@@ -57,13 +57,16 @@ RESOURCES := $(basename $(notdir $(wildcard src/resources/*.in)))
 
 DICTIONARY_MAPS := edict.map wadokujt.map wadokujt-gairaigo.map
 
-RESOURCES_WWW := messages-www.properties messages-dictionary.properties \
+RESOURCES_WWW := messages-www.properties \
+		 messages-dictionary.properties \
                  messages-dictionary_de.properties \
-                 messages-dictionary_fr.properties
+                 messages-dictionary_fr.properties \
+                 messages-parser.properties \
+                 messages-parser_de.properties
 
 HTML_WWW := index.html converturl.js
 
-CLASSPATH := $(CLASSPATH):./src
+CLASSPATH := ./src:$(CLASSPATH)
 
 # List main class source file and all other class source files not referenced from main class
 # for compilation
@@ -74,20 +77,16 @@ WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
 SOURCE_DIST := README.txt COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex
-# files and directories that go into the binary distribution, either in the JGloss jar file
-# or in the zip file.
-JGLOSS_BINARY_DIST := README.txt COPYING ChangeLog jgloss data resources doc latex
+
 # files that go into the binary distribution jar file
 JGLOSS_BINARY_JAR := jgloss data resources
 # files that go into the binary distribution zip file
 JGLOSS_BINARY_ZIP := jgloss.jar README.txt COPYING ChangeLog doc latex
-# files and directories that go into the binary distribution, either in the JGloss jar file
-# or in the zip file.
-JDICTIONARY_BINARY_DIST := README.txt COPYING ChangeLog jgloss data resources doc
+
 # files that go into the binary distribution jar file
 JDICTIONARY_BINARY_JAR := jgloss data resources
 # files that go into the binary distribution zip file
-JDICTIONARY_BINARY_ZIP := jgloss.jar README.txt COPYING ChangeLog doc
+JDICTIONARY_BINARY_ZIP := jdictionary.jar README.txt COPYING ChangeLog doc
 
 #
 # end configuration
@@ -120,25 +119,20 @@ jgloss-www: compile-www $(RESOURCES_WWW) setup_www
 	cp src/www/web.xml jgloss-www/WEB-INF
 	cp -r jgloss resources data jgloss-www/WEB-INF/classes
 
-dist: dist-source dist-binary-jdictionary dist-binary
+dist: dist-source dist-binary-jdictionary dist-binary-jgloss
 
 dist-binary-jgloss: jgloss doc
 	mkdir -p dist/$(JGLOSS_DISTNAME)
-	cp -r $(JGLOSS_BINARY_DIST) dist/$(JGLOSS_DISTNAME)
-	cp -r data/templates dist/$(JGLOSS_DISTNAME)/latex/
+	cp -r $(JGLOSS_BINARY_ZIP) dist/$(JGLOSS_DISTNAME)
 	-cd dist/$(JGLOSS_DISTNAME) && find -depth -name "CVS" -exec rm -r \{\} \;
-	cd dist/$(JGLOSS_DISTNAME) && $(JAR) cfm jgloss.jar ../../MANIFEST.MF $(JGLOSS_BINARY_JAR)
-	cd dist/$(JGLOSS_DISTNAME) && rm -r $(filter-out $(JGLOSS_BINARY_ZIP), $(JGLOSS_BINARY_DIST))
 	cd dist && zip -q -r $(JGLOSS_DISTNAME).zip $(JGLOSS_DISTNAME)
 	cd dist && tar -czf $(JGLOSS_DISTNAME).tgz $(JGLOSS_DISTNAME)
 	rm -r dist/$(JGLOSS_DISTNAME)
 
 dist-binary-jdictionary: jdictionary doc
 	mkdir -p dist/$(JDICTIONARY_DISTNAME)
-	cp -r $(JDICTIONARY_BINARY_DIST) dist/$(JDICTIONARY_DISTNAME)
-	cp -r data/templates dist/$(JDICTIONARY_DISTNAME)/latex/
+	cp -r $(JDICTIONARY_BINARY_ZIP) dist/$(JDICTIONARY_DISTNAME)
 	-cd dist/$(JDICTIONARY_DISTNAME) && find -depth -name "CVS" -exec rm -r \{\} \;
-	cd dist/$(JDICTIONARY_DISTNAME) && $(JAR) cfm jgloss.jar ../../MANIFEST.MF $(JDICTIONARY_BINARY_JAR)
 	cd dist/$(JDICTIONARY_DISTNAME) && rm -r $(filter-out $(JDICTIONARY_BINARY_ZIP), $(JDICTIONARY_BINARY_DIST))
 	cd dist && zip -q -r $(JDICTIONARY_DISTNAME).zip $(JDICTIONARY_DISTNAME)
 	cd dist && tar -czf $(JDICTIONARY_DISTNAME).tgz $(JDICTIONARY_DISTNAME)

@@ -243,28 +243,10 @@ public class DocumentStyleDialog extends StyleDialog {
      * @param s The style sheet to add.
      * @param additionalStyles Additional CSS styles.
      */
-    public void addStyleSheet( StyleSheet s, Map additionalStyles) {
+    public void addStyleSheet( StyleSheet s) {
         synchronized (styleSheets) {
             styleSheets.add( s);
-            styleSheets.add( additionalStyles);
-            applyPreferences( s, additionalStyles);
-        }
-    }
-
-    /**
-     * Updates the additional styles of a style sheet.
-     *
-     * @param s The style sheet to update.
-     * @param additionalStyles Additional CSS styles.
-     */
-    public void updateAdditionalStyles( StyleSheet s, Map additionalStyles) {
-        synchronized (styleSheets) {
-            int i = styleSheets.indexOf( s);
-            if (i != -1) {
-                styleSheets.remove( i+1);
-                styleSheets.add( i+1, additionalStyles);
-                applyPreferences( s, additionalStyles);
-            }
+            applyPreferences( s);
         }
     }
 
@@ -278,7 +260,6 @@ public class DocumentStyleDialog extends StyleDialog {
             int i = styleSheets.indexOf( s);
             if (i != -1) {
                 styleSheets.remove( i); // Style Sheet
-                styleSheets.remove( i); // additionalStyles
                 currentStyles.remove( s);
             }
         }
@@ -370,7 +351,7 @@ public class DocumentStyleDialog extends StyleDialog {
         // apply document view styles
         synchronized (styleSheets) {
             for ( Iterator i=styleSheets.iterator(); i.hasNext(); )
-                applyPreferences( (StyleSheet) i.next(), (Map) i.next());
+                applyPreferences( (StyleSheet) i.next());
         }
     }
 
@@ -400,9 +381,8 @@ public class DocumentStyleDialog extends StyleDialog {
      * Applies the settings from the application preferences to a single style sheet.
      *
      * @param s The style sheet.
-     * @param additionalStyles Style sheet-specific additional CSS styles.
      */
-    protected void applyPreferences( StyleSheet s, Map additionalStyles) {
+    protected void applyPreferences( StyleSheet s) {
         if (s == null)
             return;
 
@@ -414,8 +394,6 @@ public class DocumentStyleDialog extends StyleDialog {
             int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
             style += "font-size: " + size + "pt; ";
         } catch (NumberFormatException ex) { ex.printStackTrace(); }
-        if (additionalStyles.containsKey( "body"))
-            style += additionalStyles.get( "body").toString();
         style += "}\n";
         
         style += AnnotationTags.BASETEXT.getId() + " { ";
@@ -427,8 +405,6 @@ public class DocumentStyleDialog extends StyleDialog {
             // this removes, among other settings, the current background color settings
             s.removeStyle( AnnotationTags.BASETEXT.getId());
         }
-        if (additionalStyles.containsKey( AnnotationTags.BASETEXT.getId()))
-            style += additionalStyles.get( AnnotationTags.BASETEXT.getId()).toString();
         style += "}\n";
 
         style += AnnotationTags.READING.getId() + " { ";
@@ -446,8 +422,6 @@ public class DocumentStyleDialog extends StyleDialog {
         else {
             style += "background-color: " + BACKGROUND_COLOR + "; ";
         }
-        if (additionalStyles.containsKey( AnnotationTags.READING.getId()))
-            style += additionalStyles.get( AnnotationTags.READING.getId()).toString();
         style += "}\n";
 
         style += AnnotationTags.TRANSLATION.getId() + " { ";
@@ -466,8 +440,6 @@ public class DocumentStyleDialog extends StyleDialog {
             style += "background-color: " + BACKGROUND_COLOR + "; ";
         }
 
-        if (additionalStyles.containsKey( AnnotationTags.TRANSLATION.getId()))
-            style += additionalStyles.get( AnnotationTags.TRANSLATION.getId()).toString();
         style += "}\n";
 
         if (!style.equals( currentStyles.get( s))) { // only apply style if something changed

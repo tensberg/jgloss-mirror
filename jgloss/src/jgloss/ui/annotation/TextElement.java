@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -43,7 +43,8 @@ class TextElement {
     /**
      * Sets the text for this node. This will change the document to
      * show the new text. If the text is <CODE>null</CODE> or the empty string it will be
-     * replaced by " " to prevent this element from being removed from the document.
+     * replaced by {@link JGlossHTMLDoc#EMPTY_ELEMENT_PLACEHOLDER EMPTY_ELEMENT_PLACEHOLDER}
+     * to prevent this element from being removed from the document.
      *
      * @param text The new text for the element.
      */
@@ -65,7 +66,8 @@ class TextElement {
     }
 
     /**
-     * Returns the text of this node. If the text equals " ", the empty string
+     * Returns the text of this node. If the text equals 
+     * {@link JGlossHTMLDoc#EMPTY_ELEMENT_PLACEHOLDER EMPTY_ELEMENT_PLACEHOLDER}, the empty string
      * will be returned.
      *
      * @see #setText(String)
@@ -84,4 +86,4 @@ class TextElement {
     }
 
     public Element getElement() { return element; }
-} // class ReadingTranslationNode
+} // class TextElement

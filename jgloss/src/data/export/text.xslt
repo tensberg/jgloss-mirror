@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+
+  Written by Michael Koch <tensberg@gmx.net>
+
+  This file is in the public domain and may be distributed freely unmodified or modified.
+
+  $Id$
+
+-->
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   
   <xsl:output method="text" encoding="UTF-8" />

@@ -23,6 +23,8 @@
 
 package jgloss.util;
 
+import java.util.regex.Pattern;
+
 /**
  * Configurable formatting of a list of strings as one string.
  * Start, end and in-between markers can be arbitrarily defined. The formatter allows
@@ -131,5 +133,34 @@ public class ListFormatter {
     }
 
     public StringBuffer getBuffer() { return buffer; }
-} // class ListFormatter
 
+    public Pattern getPattern() {
+        StringBuffer pattern = new StringBuffer();
+
+        pattern.append( "(?:(?:");
+        addToRegex( multiListBefore, pattern);
+        pattern.append( '|');
+        addToRegex( multiListBetween, pattern);
+        pattern.append( ")(.+?)(?=");
+        addToRegex( multiListBetween, pattern);
+        pattern.append( '|');
+        addToRegex( multiListAfter, pattern);
+
+        pattern.append( ")|(?:");
+        addToRegex( singleListBefore, pattern);
+        pattern.append( "(.+?)");
+        addToRegex( singleListAfter, pattern);
+        pattern.append( ")");
+
+        return Pattern.compile( pattern.toString());
+    }
+
+    private void addToRegex( String[] format, StringBuffer regex) {
+        StringTools.addToRegex( format[0], regex);
+        if (format.length == 2) {
+            // match itemno marker
+            regex.append( "\\d+");
+            StringTools.addToRegex( format[1], regex);
+        }
+    }
+} // class ListFormatter

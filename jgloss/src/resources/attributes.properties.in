@@ -2,10 +2,10 @@
 #
 # Attribute id to short (.s) and long (.l) name mapping used by
 # jgloss.dictionary.attribute.DefaultCategoryAttributeValue 
-# Author: Michael Koch <tensberg@gmx.net>; definitions and descriptions
-# taken from the EDICT dictionary file format definition (Copyright
-# 2001 The Electronic Dictionary Research and Development Group, Monash
-# University)
+# Author: Michael Koch <tensberg@gmx.net>; 
+# pos and usage definitions and descriptions taken from the EDICT
+# dictionary file format definition (Copyright 2001 The Electronic
+# Dictionary Research and Development Group, Monash University)
 
 # parts of speech
 

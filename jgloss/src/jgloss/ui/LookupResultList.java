@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
@@ -42,7 +43,7 @@ import javax.swing.text.*;
 import javax.swing.text.html.*;
 
 public class LookupResultList extends JPanel implements LookupResultHandler {
-    protected final static String STYLE = "body { color: black; background-color: white; }\n";
+    protected final static String DEFAULT_STYLE_SHEET = "/data/lookup.css";
 
     /**
      * Text field used to display the result as HTML text.
@@ -52,6 +53,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected JScrollPane resultScroller;
 
     protected int fancyLimit;
+    protected boolean showAllDictionaries;
 
     protected DictionaryEntryFormatter htmlFormatter;
     protected MarkerListFormatter.Group markerGroup;
@@ -62,6 +64,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected StringBuffer resultTextBuffer = new StringBuffer( 8192);
     protected int entriesInTextBuffer;
     protected int dictionaryEntries;
+    protected String previousDictionaryName;
     protected boolean previousDictionaryHasMatch;
     protected JLabel status;
     protected String searchExpression;
@@ -75,19 +78,27 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }
 
     public LookupResultList( int _fancyLimit) {
+        this( _fancyLimit, null, true);
+    }
+
+    public LookupResultList( int _fancyLimit, URL _styleSheet, boolean _showAllDictionaries) {
         setLayout( new BorderLayout());
 
         fancyLimit = _fancyLimit;
+        showAllDictionaries = _showAllDictionaries;
+        if (_styleSheet == null)
+            _styleSheet = LookupResultList.class.getResource( DEFAULT_STYLE_SHEET);
+
         resultFancy = new JEditorPane();
         resultFancy.setContentType( "text/html");
         resultFancy.setEditable( false);
-        HTMLEditorKit kit = new HTMLEditorKit();
-        kit.getStyleSheet().addRule( STYLE);
-        kit.getStyleSheet().addRule
+        
+        StyleSheet styleSheet = ((HTMLDocument) resultFancy.getDocument()).getStyleSheet();
+        styleSheet.importStyleSheet( _styleSheet);
+        styleSheet.addRule
             ( "body { font-family: '" + JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP) +
               "'; font-size: " + JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12) + 
               "pt; }\n");
-        resultFancy.setEditorKit( kit);
 
         resultPlain = new JTextArea();
         resultPlain.setFont( new Font( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP),
@@ -115,7 +126,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                         String fontname = JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP);
                         int size = JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12);
                         Font font = new Font( fontname, Font.PLAIN, size);
-                        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
+                        ((HTMLDocument) resultFancy.getDocument()).getStyleSheet().addRule
                             ( "body { font-family: '" + fontname +
                               "'; font-size: " + size +
                               "pt; }\n");
@@ -220,7 +231,11 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }   
 
     protected void format( Dictionary d, boolean fancy) {
-        if (!previousDictionaryHasMatch) {
+        if (showAllDictionaries && !previousDictionaryHasMatch) {
+            // No match in the previous dictionary. Print the dictionary name
+            // and a comment.
+
+            formatDictionaryName( previousDictionaryName, fancy);
             if (fancy)
                 resultTextBuffer.append( "<p>");
             resultTextBuffer.append( JGloss.messages.getString( "wordlookup.nomatches_dictionary"));
@@ -229,26 +244,35 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             resultTextBuffer.append( "\n\n");
         }
 
-        if (multipleDictionaries) {
-            if (fancy) {
-                resultTextBuffer.append( "<h4>");
-                resultTextBuffer.append
-                    ( JGloss.messages.getString( "wordlookup.matches",
-                                                 new String[] { "<font color=\"green\">" +
-                                                                d.getName() + "</font>" }));
-                resultTextBuffer.append( "</h4>");
-            }
-            else {
-                resultTextBuffer.append( JGloss.messages.getString( "wordlookup.matches",
-                                                                    new String[] { d.getName() }));
-            }
-            resultTextBuffer.append( "\n\n");
-        }
-        
+        previousDictionaryName = d.getName();
         previousDictionaryHasMatch = false;
     }
 
+    protected void formatDictionaryName( String name, boolean fancy) {
+        if (fancy) {
+            resultTextBuffer.append( "<h4>");
+            resultTextBuffer.append
+                ( JGloss.messages.getString( "wordlookup.matches",
+                                             new String[] { "<font color=\"green\">" +
+                                                            name + "</font>" }));
+            resultTextBuffer.append( "</h4>");
+        }
+        else {
+            resultTextBuffer.append( JGloss.messages.getString( "wordlookup.matches",
+                                                                new String[] { name }));
+        }
+        resultTextBuffer.append( "\n\n");
+    }
+
     protected void format( DictionaryEntry de, boolean fancy) {
+        if (previousDictionaryName != null) {
+            // First entry for this dictionary. Print the dictionary name
+            // if multi-dictionary mode is active.
+            if (multipleDictionaries)
+                formatDictionaryName( previousDictionaryName, fancy);
+            previousDictionaryName = null;
+        }
+
         previousDictionaryHasMatch = true;
         if (fancy) {
             resultTextBuffer.append( "<p>");

@@ -311,7 +311,8 @@ public class StringTools {
 
     /**
      * Return the unicode escape string for a character. The unicode escape string is
-     * Backslash-u, followed by a 4-digit hexadecimal string representing the unicode value of the character.
+     * Backslash-u, followed by a 4-digit hexadecimal string representing the unicode value 
+     * of the character.
      *
      * @see #unicodeUnescape(String)
      */
@@ -372,6 +373,30 @@ public class StringTools {
             return str;
         else
             return buf.toString();
+    }
+
+    /**
+     * Appends a character to a regular expression pattern, escaping any special characters.
+     */
+    public static StringBuffer addToRegex( char c, StringBuffer regex) {
+        // A \ escape char may be prepended to every non-aphabetical character,
+        // even if it does not need escaping.
+        // Do this to err on the safe side.
+        if (!(c>='a' && c<='z' || c>='A' && c<='Z'))
+            regex.append( '\\');
+
+        regex.append( c);
+        return regex;
+    }
+
+    /**
+     * Appends a character sequence to a regular expression pattern, escaping any
+     * special characters.
+     */
+    public static StringBuffer addToRegex( CharSequence text, StringBuffer regex) {
+        for ( int i=0; i<text.length(); i++)
+            addToRegex( text.charAt( i), regex);
+        return regex;
     }
 
     /**

@@ -157,6 +157,9 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     public AutoSearchComboBox( LookupModel _model, int _limit) {
         model = _model;
         limit = _limit;
+
+        setPrototypeDisplayValue( "aaa");
+
         engine = new AsynchronousLookupEngine( this, limit);
         setModel( new ReplaceableItemsComboBoxModel());
         ((JTextComponent) getEditor().getEditorComponent()).getDocument().addDocumentListener( this);

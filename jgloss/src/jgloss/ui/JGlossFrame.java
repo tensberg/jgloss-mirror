@@ -1051,7 +1051,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                    showTranslationItem.isSelected());
         htmlDoc = (JGlossHTMLDoc) kit.createDefaultDocument();
         DocumentStyleDialog.getDocumentStyleDialog()
-            .addStyleSheet( htmlDoc.getStyleSheet(), Collections.EMPTY_MAP);
+            .addStyleSheet( htmlDoc.getStyleSheet());
         htmlDoc.setJGlossDocument( doc);
 
         documentName = title;

@@ -1,0 +1,14 @@
+body {
+  color: black;
+  background-color: white;
+}
+
+p {
+  margin: 0px;
+}
+
+h4 {
+  font-weight: bold;
+  margin-top: 2px;
+  margin-bottom: 3px;
+}

@@ -296,6 +296,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         c.gridy = 2;
         c.gridx = 0;
         c.gridwidth = 3;
+        c.fill = GridBagConstraints.HORIZONTAL;
         this.add( inputPanel, c);
 
         // update font if prefs change
@@ -447,8 +448,11 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
             updateDictionaryAvailability();
         if (event.hasChanged( LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY))
             updateSearchFieldAvailability();
-        if (event.hasChanged( LookupChangeEvent.FILTER_AVAILABILITY))
+        if (event.hasChanged( LookupChangeEvent.FILTER_AVAILABILITY)) {
             updateFilterAvailability();
+            // the selection state of the JCheckBoxes also depends on the availability
+            updateFilterSelection();
+        }
         if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY))
             updateInputAvailability();
         if (event.hasChanged( LookupChangeEvent.DICTIONARY_LIST_CHANGED)) {

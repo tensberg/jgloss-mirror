@@ -203,7 +203,6 @@ public abstract class JGloss {
         DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
         DictionaryFactory.registerImplementation( WadokuJT.class, WadokuJT.implementation);
         DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
-        //DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
     }
 
     protected void initUI() throws Exception {
@@ -231,8 +230,7 @@ public abstract class JGloss {
             else if (args[0].equals( "-i") || args[0].equals( "--createindex")) {
                 for ( int i=1; i<args.length; i++) {
                     // build an index for the given file if it is in a known dictionary format,
-                    // the dictionary class has a constructor which will not create the index
-                    // automatically and has a method buildIndex
+                    // which is of class IndexedDictionary
                     try {
                         Dictionary d = DictionaryFactory.createDictionary( args[i]);
                         if (d instanceof IndexedDictionary &&
