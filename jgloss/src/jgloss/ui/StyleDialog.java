@@ -126,6 +126,12 @@ public class StyleDialog extends Box {
     private JButton highlightColor;
 
     /**
+     * The styles currently applied to the documents. Map from managed style sheet to style string.
+     * Will be updated when {@link #applyPreferences() applyPreferences} is called.
+     */
+    private Map currentStyles;
+
+    /**
      * The list of managed style sheets.
      */
     private java.util.List styleSheets;
@@ -209,6 +215,7 @@ public class StyleDialog extends Box {
     public StyleDialog() {
         super( BoxLayout.Y_AXIS);
 
+        currentStyles = new HashMap( 10);
         styleSheets = new ArrayList( 10);
 
         String [] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -534,7 +541,10 @@ public class StyleDialog extends Box {
             style += additionalStyles.get( AnnotationTags.TRANSLATION.getId()).toString();
         style += "}\n";
 
-        s.addRule( style);
+        if (!style.equals( currentStyles.get( s))) { // only apply style if something changed
+            s.addRule( style);
+            currentStyles.put( s, style);
+        }
 
         JGlossEditor.setHighlightColor( new Color
             ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));

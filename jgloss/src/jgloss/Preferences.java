@@ -121,6 +121,7 @@ public class Preferences {
     public static final String USERDICTIONARY_FILE = "userdictionary.file";
 
     public static final String STARTUP_WORDLOOKUP = "startup.wordlookup";
+    public static final String LEFTCLICK_TOOLTIP = "leftclick.tooltip";
 
     public static final String WORDLOOKUP_WIDTH = "wordlookup.width";
     public static final String WORDLOOKUP_HEIGHT = "wordlookup.height";

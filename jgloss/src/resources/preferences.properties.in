@@ -96,6 +96,7 @@ exclusions.file=.jgloss-exclusions
 userdictionary.file=.jgloss-userdictionary
 
 startup.wordlookup=false
+leftclick.tooltip=false
 
 # actual minimum size of the word lookup frame will be determined at runtime
 wordlookup.width=0

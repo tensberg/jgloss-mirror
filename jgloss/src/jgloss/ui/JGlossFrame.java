@@ -1327,19 +1327,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
         p.setLayout( new GridLayout( 1, 1));
         Box b2 = Box.createVerticalBox();
         Box b = Box.createHorizontalBox();
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( new JLabel( JGloss.messages.getString( "export.encodings")));
-        b.add( Box.createHorizontalStrut( 3));
-        Vector v = new Vector( 5);
-        JComboBox encodings = new JComboBox( JGloss.prefs.getList( Preferences.ENCODINGS, ','));
-        encodings.setSelectedItem( JGloss.prefs.getString( Preferences.EXPORT_ENCODING));
-        encodings.setEditable( true);
-        b.add( encodings);
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-        b2.add( Box.createVerticalStrut( 3));
-
-        b = Box.createHorizontalBox();
         JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
         writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_LATEX_WRITEREADING));
         b.add( Box.createHorizontalStrut( 3));
@@ -1393,13 +1380,13 @@ public class JGlossFrame extends JFrame implements ActionListener {
             Writer out = null;
             try {
                 out = new BufferedWriter( new OutputStreamWriter
-                    ( new FileOutputStream( f.getSelectedFile()),
-                      (String) encodings.getSelectedItem()));
-                JGloss.prefs.set( Preferences.EXPORT_ENCODING, (String) encodings.getSelectedItem());
+                    ( new FileOutputStream( f.getSelectedFile()), "EUC_JP"));
                 JGloss.prefs.set( Preferences.EXPORT_LATEX_WRITEREADING,
                                   writeReading.isSelected());
                 JGloss.prefs.set( Preferences.EXPORT_LATEX_WRITETRANSLATIONS,
                                   writeTranslations.isSelected());
+                JGloss.prefs.set( Preferences.EXPORT_LATEX_TRANSLATIONSONPAGE,
+                                  translationsOnPage.isSelected());
                 JGloss.prefs.set( Preferences.EXPORT_LATEX_WRITEHIDDEN,
                                   writeHidden.isSelected());
                 LaTeXExporter.export( doc, (AnnotationModel) annotationEditor.getModel(),

@@ -188,6 +188,9 @@ general.title=Allgemein
 general.startup=Beim Start
 general.startup.jglossframe=Öffne leeres JGloss-Dokument
 general.startup.wordlookup=Öffne Wörterbuch-Dialog
+general.leftclick=Links-Klick auf ein annotiertes Wort
+general.leftclick.select=Annotation auswählen
+general.leftclick.tooltip=Annotations-Tooltip zeigen
 general.editor.enableediting=Direktes Editieren ermöglichen (fehlerhaft)
 general.chasen.label=ChaSen-Programm:
 general.chasen.chooser.title=ChaSen-Programm auswählen
@@ -267,6 +270,7 @@ export.html.title=HTML exportieren
 export.html.interactive=Interaktives HTML
 export.html.backwardscompatible=Abwärtskompatibel
 export.latex.title=LaTeX exportieren
+export.latex.translationsonpage=Übersetzungen auf selber Seite
 
 about.frame.title=Über JGloss
 about.title=JGloss
@@ -276,9 +280,14 @@ about.license.title=GNU General Public License
 
 preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
 
-filefilter.jgloss.description=JGloss Dokumente (*.jgloss)
+filefilter.description.jgloss=JGloss Dokumente (*.jgloss)
 filefilter.html.description=HTML Dokumente (*.html)
 filefilter.latex.description=LaTeX Dokumente (*.tex)
+
+fileview.description.jgloss=JGloss-Dokument
+fileview.description.html=HTML-Dokument
+fileview.description.tex=LaTeX-Dokument
+fileview.description.text=Textdokument
 
 filechooser.overwrite.title=Datei überschreiben?
 filechooser.overwrite=Die ausgewählte Datei {0} existiert\nbereits. Überschreiben?
@@ -308,6 +317,6 @@ wordlookup.clear=Löschen
 wordlookup.result=Suchergebnis:
 wordlookup.nodictionary=<keine verfügbar>
 wordlookup.matches=Treffer in\ 
-wordlookup.matchesfor={0} Einträge für {1} gefunden:
+wordlookup.matchesfor={0,choice,1#1 Eintrag|1<{0} Einträge} für {1} gefunden:
 wordlookup.nomatches=Keine Einträge für {0} gefunden
 wordlookup.inflection=Mögliche Inflektion: {0}, {1}->{2}

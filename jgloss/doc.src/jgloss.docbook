@@ -477,8 +477,8 @@
         background. You can change the colors or switch them off in the 
         <link linkend="sect.prefs.general">preferences dialog</link> and toggle the display
         of reading and translation annotations in the <link linkend="sect.menu.view">View menu</link>.
-        If you left-click on an annotated word, a popup window will show all dictionary entries
-        for this word. A right-click will select this word in the annotation editor and pop up
+        If you left-click on an annotated word, the annotation will be selected in the annotation
+        editor. A right-click will select the word and pop up
         a context menu with options for this annotation (see 
         <xref linkend="sect.menu.annotation">). To look up the selection in the dictionaries,
         select <guimenuitem>Word Lookup</guimenuitem>. To add an annotation, select some text
@@ -864,7 +864,12 @@
         <para>
           You can select the window opened on startup with the 
           <guilabel>Open empty JGloss document</guilabel> and 
-          <guilabel>Open Word Lookup dialog</guilabel> radio buttons. The text parser used when
+          <guilabel>Open Word Lookup dialog</guilabel> radio buttons.
+          The function of the left mouse button is changed in the <guilabel>Left-clicking an
+            annotated word</guilabel> section of the dialog. If you select <guilabel>Show annotation
+            tooltip</guilabel>, a popup window with the annotation text will be shown if you
+          click on a word. Otherwise, the annotation will be selected in the annotation editor.
+          The text parser used when
           importing the clipboard content can be selected in the 
           <guilabel>Import Clipboard Parser</guilabel> section of the dialog. See 
           <xref linkend="sect.parser"> for details. You can set the location of the

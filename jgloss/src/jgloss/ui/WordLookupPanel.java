@@ -488,7 +488,7 @@ public class WordLookupPanel extends JPanel {
                 resultText.insert( 0, "<br>");
             resultText.insert( 0, JGloss.messages.getString( "wordlookup.matchesfor",
                                                              new Object[] 
-                { Integer.toString( results), expression.getSelectedItem() }));
+                { new Integer( results), expression.getSelectedItem() }));
         }
 
         // create new result display pane

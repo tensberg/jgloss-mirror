@@ -253,7 +253,8 @@ public class JGloss {
                         } catch (IllegalArgumentException ex) {}
 
                         PreferencesFrame.getFrame();
-                        WordLookup.getFrame();
+                        if (!prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP))
+                            WordLookup.getFrame();
                     }
                 }.start();
             splash.setInfo( messages.getString( "splashscreen.initMain"));

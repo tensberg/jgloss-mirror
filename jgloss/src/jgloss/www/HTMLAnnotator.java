@@ -269,13 +269,17 @@ public class HTMLAnnotator {
         String lastword = prevannotation[1];
         String lasttranslation = prevannotation[2];
 
+        // Some browsers don't interpret a \n in a JavaScript parameter string as a return escape,
+        // probably because the \ is replaced by the Yen symbol in some Japanese character encodings.
+        // I use the custom escape _R instead of \n and replace it at display time using JavaScript
+
         String dictionary = null;
         if (a instanceof Reading)
             dictionary = ((Reading) a).getWordReadingPair().getDictionary().getName();
         else if (a instanceof Translation)
             dictionary = ((Translation) a).getDictionaryEntry().getDictionary().getName();
         if (!dictionary.equals( lastdictionary)) {
-            text.append( dictionary + ":\\n");
+            text.append( dictionary + ":_R");
             lastdictionary = dictionary;
             lastword = "";
             lasttranslation = "";
@@ -288,7 +292,7 @@ public class HTMLAnnotator {
             for ( int j=0; j<translations.length; j++) {
                 t.append( "    ");
                 t.append( translations[j]);
-                t.append( "\\n");
+                t.append( "_R");
             }
             translation = t.toString();
         }
@@ -318,7 +322,7 @@ public class HTMLAnnotator {
                 text.append( "  " + word);
                 if (reading != null)
                     text.append( " [" + reading + "]");
-                text.append( "\\n" + translation);
+                text.append( "_R" + translation);
                 lastword = word;
                 lasttranslation = translation;
             }

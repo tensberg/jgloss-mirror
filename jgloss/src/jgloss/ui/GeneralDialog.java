@@ -65,6 +65,9 @@ public class GeneralDialog extends Box {
     private JRadioButton startFrame;
     private JRadioButton startWordLookup;
 
+    private JRadioButton clickTooltip;
+    private JRadioButton clickSelect;
+
     private JTextField chasenLocation;
 
     private ParserSelector importClipboardParserSelector;
@@ -91,6 +94,19 @@ public class GeneralDialog extends Box {
         startWordLookup = new JRadioButton( JGloss.messages.getString( "general.startup.wordlookup"));
         bg.add( startWordLookup);
         p.add( startWordLookup);
+        all.add( p);
+        all.add( Box.createVerticalStrut( 2));
+
+        p = new JPanel( new GridLayout( 2, 1));
+        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
+                                                       ( "general.leftclick")));
+        bg = new ButtonGroup();
+        clickSelect = new JRadioButton( JGloss.messages.getString( "general.leftclick.select"));
+        bg.add( clickSelect);
+        p.add( clickSelect);
+        clickTooltip = new JRadioButton( JGloss.messages.getString( "general.leftclick.tooltip"));
+        bg.add( clickTooltip);
+        p.add( clickTooltip);
         all.add( p);
         all.add( Box.createVerticalStrut( 2));
 
@@ -153,6 +169,10 @@ public class GeneralDialog extends Box {
             startWordLookup.setSelected( true);
         else
             startFrame.setSelected( true);
+        if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP))
+            clickTooltip.setSelected( true);
+        else
+            clickSelect.setSelected( true);
 
         if (enableEditing != null)
             enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
@@ -182,6 +202,7 @@ public class GeneralDialog extends Box {
      */
     public void savePreferences() {
         JGloss.prefs.set( Preferences.STARTUP_WORDLOOKUP, startWordLookup.isSelected());
+        JGloss.prefs.set( Preferences.LEFTCLICK_TOOLTIP, clickTooltip.isSelected());
         if (enableEditing != null)
             JGloss.prefs.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
         JGloss.prefs.set( Preferences.CHASEN_LOCATION, chasenLocation.getText());

@@ -63,8 +63,8 @@ public class LaTeXExporter {
         } catch (BadLocationException ex) {}
         StringBuffer outtext = new StringBuffer( text.length());
         StringBuffer translations = new StringBuffer();
-        String longestword = "";
-        String longestreading = "";
+        String longestword = ""; // longest annotated word in the document
+        String longestreading = ""; // longest reading of any annotated word
         
         int prevend = 0; // end offset of the previous annotation
         for ( int i=0; i<model.getAnnotationCount(); i++) {
@@ -109,12 +109,14 @@ public class LaTeXExporter {
 
                 if (translationsOnPage) {
                     // place translation as footnote on the current page
-                    String footnote;
-                    footnote = "\\footnotetext{" + nb;
-                    if (nr!=null && !nr.equals( " "))
-                        footnote += " " + nr;
-                    footnote += " " + translation + "}";
-                    outtext.append( footnote);
+                    outtext.append( "\\fn{");
+                    outtext.append( nb);
+                    outtext.append( "}{");
+                    if (nr != null)
+                        outtext.append( nr);
+                    outtext.append( "}{");
+                    outtext.append( translation);
+                    outtext.append( "}");
                 }
                 else {
                     // place translation in separate list
@@ -124,11 +126,13 @@ public class LaTeXExporter {
                     if (nr!=null && !nr.equals( " "))
                         translations.append( nr);
                     translations.append( " \\> " + translation);
-                    if (longestword.length() < nb.length())
-                        longestword = nb;
-                    if (longestreading.length() < nr.length())
-                        longestreading = nr;
                 }
+
+                // The longest word and reading are used for proper alignment
+                if (longestword.length() < nb.length())
+                    longestword = nb;
+                if (longestreading.length() < nr.length())
+                    longestreading = nr;
             }
         }
         // add the remaining text
@@ -172,10 +176,25 @@ public class LaTeXExporter {
         out.write( preamble);
         out.write( "\\begin{document}\n\n");
 
+        if (translationsOnPage) {
+            // generate length calculation for size of the longest word and reading
+            out.write( "\\newlength{\\ww}\n\\settowidth{\\ww}{");
+            out.write( longestword);
+            out.write( "---}\n");
+
+            out.write( "\\newlength{\\rw}\n\\settowidth{\\rw}{");
+            out.write( longestreading);
+            out.write( "---}\n\n");
+
+            // define footnote command for annotations
+            out.write( "\\newcommand{\\fn}[3]{\\footnotetext{\\noindent \\makebox[\\ww][l]{#1}" + 
+                       " \\makebox[\\rw][l]{#2} #3}}\n\n");
+        }
+
         out.write( outtext.toString());
 
-        // append translation list
         if (!translationsOnPage && translations.length() > 0) {
+            // append translation list to the end of the document
             out.write( "\n\n\\newpage\n\\small\\begin{tabbing}\n");
             // place tab stops by using the longest word and reading as measure
             out.write( longestword + "---\\=" + longestreading + "---\\=\\kill\n");

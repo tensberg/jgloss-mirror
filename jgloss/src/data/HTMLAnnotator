@@ -32,6 +32,12 @@ var annotation_text = null;
 var annotations = new Array();
 
 function ra( id, text) {
+        var lastIndex = -1;
+        while ((lastIndex=text.indexOf( "_R",lastIndex)) != -1) { // Konqueror is too stupid to replace more 
+                                                                  // than one occurrence at once
+                text = text.replace( /_R/g, String.fromCharCode( 10));
+                lastIndex++;
+        }
         annotations[id] = text;
 }
 

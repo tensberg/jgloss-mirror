@@ -348,13 +348,29 @@ public class JGlossEditor extends JTextPane {
                     
                     public void mouseClicked( MouseEvent e) {
                         if (!checkPopupTrigger( e)) {
-                            if (!autoscroll && (e.getModifiers() & (MouseEvent.BUTTON2_MASK|
-                                                                    MouseEvent.BUTTON3_MASK))!=0) {
+                            int tooltipButtonMask;
+                            int selectButtonMask;
+                            if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP)) {
+                                // left mouse button shows annotation tooltip, 
+                                // all other select the annotation
+                                tooltipButtonMask = MouseEvent.BUTTON1_MASK;
+                                selectButtonMask = MouseEvent.BUTTON2_MASK|
+                                    MouseEvent.BUTTON3_MASK;
+                            }
+                            else {
+                                // left mouse button selects annotation, 
+                                // all other show annotation tooltip
+                                tooltipButtonMask = MouseEvent.BUTTON2_MASK|
+                                    MouseEvent.BUTTON3_MASK;
+                                selectButtonMask = MouseEvent.BUTTON1_MASK;
+                            }
+
+                            if (!autoscroll && (e.getModifiers() & selectButtonMask)!=0) {
                                 int pos = viewToModel( e.getPoint());
                                 annotationEditor.makeVisible( pos);
                                 annotationEditor.selectAnnotation( pos);
                             }
-                            if (!tooltips && (e.getModifiers() & MouseEvent.BUTTON1_MASK)!=0) {
+                            else if (!tooltips && (e.getModifiers() & tooltipButtonMask)!=0) {
                                 showToolTip( ((AnnotationModel) annotationEditor.getModel())
                                              .getAnnotationText( viewToModel( e.getPoint())),
                                              e.getPoint());
