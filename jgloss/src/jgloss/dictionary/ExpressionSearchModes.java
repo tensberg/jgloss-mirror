@@ -46,8 +46,8 @@ public class ExpressionSearchModes extends AbstractSearchMode {
     }
 
     /**
-     * Parameters are {@link StandardSearchParameter.EXPRESSION EXPRESSION} and
-     * {@link StandardSearchParameter.SEARCH_FIELDS SEARCH_FIELDS}.
+     * Parameters are {@link StandardSearchParameter#EXPRESSION EXPRESSION} and
+     * {@link StandardSearchParameter#SEARCH_FIELDS SEARCH_FIELDS}.
      */
     public SearchParameters getParameters() { return PARAMETERS; }
 } // class ExpressionSearchModes

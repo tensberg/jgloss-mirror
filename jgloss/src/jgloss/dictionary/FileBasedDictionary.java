@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -101,9 +101,6 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * by the descriptor. The byte array is converted to a string using {@link #encoding encoding}
          * and the {@link #pattern pattern} is tested against it. If the pattern matches, the file
          * is accepted and {@link #maxConfidence maxConfidence} is returned.
-         *
-         * @see #Implementation(String,String,java.util.regex.Pattern,float,int,
-         *                      java.lang.reflect.Constructor)
          */
         public float isInstance( String descriptor) {
             try {
@@ -138,7 +135,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         /**
          * Creates a new dictionary instance using 
-         * {@link dictionaryConstructor dictionaryConstructor}.
+         * {@link #dictionaryConstructor dictionaryConstructor}.
          * The constructor is passed a <code>File</code> wrapping the <code>descriptor</code> as only
          * argument.
          */
@@ -221,7 +218,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * The index file is not loaded from the constructor. Before the dictionary can be used,
      * {@link #loadIndex() loadIndex} must be successfully called.
      *
-     * @dicfile File which holds the dictionary.
+     * @param dicfile File which holds the dictionary.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
     protected FileBasedDictionary( File _dicfile) throws IOException {
@@ -506,7 +503,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
     /**
      * Create a dictionary entry from a marker, which is the start offset of the entry.
-     * Used from {@link BaseEntry#BaseEntryRef BaseEntryRef} to recreate a dictionary entry.
+     * Used from {@link BaseEntry.BaseEntryRef BaseEntryRef} to recreate a dictionary entry.
      */
     public DictionaryEntry createEntryFromMarker( int marker) throws SearchException {
         dictionary.position( marker);
@@ -520,7 +517,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Create a {@link DictionaryEntry DictionaryEntry} object from the data stored in the byte
      * buffer. The method converts the byte buffer data to a string and invokes
-     * {@link #parseEntry(String) parseEntry}.
+     * {@link #parseEntry(String,int) parseEntry}.
      */
     protected DictionaryEntry createEntryFrom( ByteBuffer entry, int startOffset) 
         throws SearchException {
@@ -575,8 +572,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Test if the character at the given location is the first in a word. The method first tests
      * if the location is at the start of a field by calling 
-     * {@link #isFieldStart(entry,location,field) isFieldStart}. If it is not at the start of a field,
-     * it calls {@link #isWordBoundary(entry,location,field isWordBoundary}.
+     * {@link #isFieldStart(ByteBuffer,int,DictionaryEntryField) isFieldStart}. 
+     * If it is not at the start of a field,
+     * it calls {@link #isWordBoundary(ByteBuffer,int,DictionaryEntryField) isWordBoundary}.
      * 
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
@@ -592,8 +590,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Test if the character at the given location is the last in a word. The method first tests
      * if the location is at the start of a field by calling 
-     * {@link #isFieldStart(entry,location,field) isFieldEnd}. If it is not at the start of a field,
-     * it calls {@link #isWordBoundary(entry,location,field isWordBoundary}.
+     * {@link #isFieldEnd(ByteBuffer,int,DictionaryEntryField) isFieldEnd}. 
+     * If it is not at the start of a field,
+     * it calls {@link #isWordBoundary(ByteBuffer,int,DictionaryEntryField) isWordBoundary}.
      * 
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
@@ -647,7 +646,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * fields of a dictionary entry is not covered by this escaping scheme.
      * </p><p>
      * This implementation calls {@link #escapeChar(char) escapeChar} for every character
-     * in the string and uses a {@link StringTools.unicodeEscape(char) unicode escape sequence}
+     * in the string and uses a {@link StringTools#unicodeEscape(char) unicode escape sequence}
      * if the method returns <code>true</code>.
      * </p>
      */
@@ -678,7 +677,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Replace any escape sequences in the string by the character represented.
      * This is the inverse method to {@link #escape(String) escape}. This implementation
-     * calls {@link StringTools.unicodeUnescape(String) StringTools.unicodeUnescape}.
+     * calls {@link StringTools#unicodeUnescape(String) StringTools.unicodeUnescape}.
      */
     protected String unescape( String str) {
         return StringTools.unicodeUnescape( str);

@@ -50,6 +50,8 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.JPopupMenu;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.ComponentInputMap;
 import javax.swing.ActionMap;
 import javax.swing.KeyStroke;
 import javax.swing.text.Element;
@@ -147,12 +149,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         // remove the currently selected annotation
         removeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    int selection = getSelectedIndex();
-                    if (selection != -1) {
-                        Element annotation = annotationList.getAnnotation(selection)
-                            .getAnnotationElement();
-                        ((JGlossHTMLDoc) annotation.getDocument()).removeAnnotationElement(annotation);
-                    }
+                    removeSelectedAnnotation();
                 }
             };
         UIUtilities.initAction( removeAction, "annotationeditor.menu.remove");
@@ -161,39 +158,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         // The word is added as it appears in the text and in its dictionary form
         addToExclusionsAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    Annotation selection = (Annotation) getSelectedValue();
-                    if (selection == null)
-                        return;
-
-                    String word = selection.getAnnotatedText();
-                    String dictionaryWord = selection.getDictionaryForm();
-
-                    // Some words are written as hiragana in the text and appear as katakana
-                    // in the dictionary or vice versa. In this case add the word as it appears
-                    // in the text as well as the dictionary form.
-                    if (dictionaryWord.length() > 0) {
-                        if (StringTools.isHiragana( word.charAt( 0)) &&
-                            StringTools.isKatakana( dictionaryWord.charAt( 0)) ||
-                            StringTools.isKatakana( word.charAt( 0)) &&
-                            StringTools.isHiragana( dictionaryWord.charAt( 0)))
-                            ExclusionList.addWord( word);
-                    }
-
-                    // if the annotated word is all kana, add the dictionary reading,
-                    // else add the dictionary word.
-                    boolean isKana = true;
-                    for ( int i=0; i<word.length(); i++) {
-                        if (!(StringTools.isHiragana( word.charAt( i)) ||
-                              StringTools.isKatakana( word.charAt( i)))) {
-                            isKana = false;
-                            break;
-                        }
-                    }
-
-                    if (!isKana || selection.getDictionaryFormReading().length()==0)
-                        ExclusionList.addWord( dictionaryWord);
-                    else
-                        ExclusionList.addWord( selection.getDictionaryFormReading());
+                    addSelectionToExclusions();
                 }
             };
         UIUtilities.initAction( addToExclusionsAction, "annotationeditor.menu.addtoexclusions");
@@ -201,21 +166,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         // add the selected annotation to the user dictionary
         addToDictionaryAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    Annotation selection = (Annotation) getSelectedValue();
-                    if (selection == null)
-                        return;
-                    String translation = selection.getTranslation();
-                    if (translation==null || translation.length()==0)
-                        return;
-                    String word = selection.getDictionaryForm();
-                    if (word==null || word.length()==0)
-                        return;
-                    String reading = selection.getDictionaryFormReading();
-                    if (reading!=null && (reading.length()==0 || reading.equals( word)))
-                        reading = null;
-                    /*try {
-                        Dictionaries.getUserDictionary().addEntry( word, reading, translation);
-                        } catch (NullPointerException ex) {}*/
+                    addSelectionToDictionary();
                 }
             };
         UIUtilities.initAction( addToDictionaryAction, "annotationeditor.menu.addtodictionary");
@@ -263,9 +214,12 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         UIUtilities.initAction( previousAnnotationAction, "annotationeditor.action.previous");
 
         // Add the key bindings for the actions to the annotation editor.
-        InputMap im = getInputMap();
-        KeyStroke[] strokes = im.allKeys();
-        ActionMap am = getActionMap();
+        InputMap im = new InputMap();
+        im.setParent(getInputMap());
+        setInputMap(WHEN_FOCUSED, im);
+        ActionMap am = new ActionMap();
+        am.setParent(getActionMap());
+        setActionMap(am);
 
         im.put( (KeyStroke) nextAnnotationAction.getValue( Action.ACCELERATOR_KEY),
                 nextAnnotationAction.getValue( Action.NAME));
@@ -380,29 +334,12 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         y += sc.y;
         Dimension size = pmenu.getSize();
         Rectangle screen = invoker.getGraphicsConfiguration().getBounds();
-        // If the menu has not been shown yet, the size will be 0, even if validate()
-        // and pack() were called.
-        /*if (size.width == 0 && size.height == 0) {
-            // move the menu off-screen
-            pmenu.setLocation( screen.x + screen.width + 1, 0);
-            pmenu.setVisible( true);
-            size = pmenu.getSize();
-            pmenu.setVisible( false);
-        }
-
-        // fit menu on the screen
-        if (x + size.width > screen.x + screen.width)
-            x = screen.x + screen.width - size.width;
-        if (y + size.height > screen.y + screen.height)
-        y = screen.y + screen.height - size.height;*/
 
         pmenu.show( invoker, x - sc.x, y - sc.y);
     }
 
     /**
-     * Wraps the handler in a <CODE>KeyEventDelegator</CODE>.
-     *
-     * @see AnnotationEditor.KeyEventDelegator
+     * Wraps the handler in a {@link AnnotationList.KeyEventDelegator KeyEventDelegator}.
      */
     public void addKeyListener( KeyListener handler) {
         if (handler.getClass().getName().equals( "javax.swing.plaf.basic.BasicListUI$KeyHandler")) {
@@ -413,9 +350,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
     }
 
     /**
-     * Removes the <CODE>KeyEventDelegator</CODE> which wraps the handler.
-     *
-     * @see AnnotationEditor.KeyEventDelegator
+     * Removes the {@link AnnotationList.KeyEventDelegator KeyEventDelegator} which wraps the handler.
      */
     public void removeKeyListener( KeyListener handler) {
         if (handler.getClass().getName().equals( "javax.swing.plaf.basic.BasicListUI$KeyHandler")) {
@@ -436,5 +371,82 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         addToExclusionsAction.setEnabled(annoSelected);
         addToDictionaryAction.setEnabled(annoSelected);
         clearTranslationAction.setEnabled(annoSelected);
+    }
+
+    /**
+     * Removes the currently selected annotation.
+     */
+    private void removeSelectedAnnotation() {
+        int selection = getSelectedIndex();
+        if (selection != -1) {
+            Element annotation = annotationList.getAnnotation(selection)
+                .getAnnotationElement();
+            ((JGlossHTMLDoc) annotation.getDocument()).removeAnnotationElement(annotation);
+        }
+
+        // select the next annotation (or previous, if this was the last annotation)
+        selection = Math.min(selection, getModel().getSize()-1);
+        if (selection > 0)
+            setSelectedIndex(selection);
+    }
+
+    /**
+     * Adds the word of the currently selected annotation to the list of exclusions.
+     */
+    private void addSelectionToExclusions() {
+        Annotation selection = (Annotation) getSelectedValue();
+        if (selection == null)
+            return;
+
+        String word = selection.getAnnotatedText();
+        String dictionaryWord = selection.getDictionaryForm();
+
+        // Some words are written as hiragana in the text and appear as katakana
+        // in the dictionary or vice versa. In this case add the word as it appears
+        // in the text as well as the dictionary form.
+        if (dictionaryWord.length() > 0) {
+            if (StringTools.isHiragana( word.charAt( 0)) &&
+                StringTools.isKatakana( dictionaryWord.charAt( 0)) ||
+                StringTools.isKatakana( word.charAt( 0)) &&
+                StringTools.isHiragana( dictionaryWord.charAt( 0)))
+                ExclusionList.addWord( word);
+        }
+
+        // if the annotated word is all kana, add the dictionary reading,
+        // else add the dictionary word.
+        boolean isKana = true;
+        for ( int i=0; i<word.length(); i++) {
+            if (!(StringTools.isHiragana( word.charAt( i)) ||
+                  StringTools.isKatakana( word.charAt( i)))) {
+                isKana = false;
+                break;
+            }
+        }
+
+        if (!isKana || selection.getDictionaryFormReading().length()==0)
+            ExclusionList.addWord( dictionaryWord);
+        else
+            ExclusionList.addWord( selection.getDictionaryFormReading());
+    }
+
+    /**
+     * Adds the currently selected annotation to the user dictionary.
+     */
+    private void addSelectionToDictionary() {
+        Annotation selection = (Annotation) getSelectedValue();
+        if (selection == null)
+            return;
+        String translation = selection.getTranslation();
+        if (translation==null || translation.length()==0)
+            return;
+        String word = selection.getDictionaryForm();
+        if (word==null || word.length()==0)
+            return;
+        String reading = selection.getDictionaryFormReading();
+        if (reading!=null && (reading.length()==0 || reading.equals( word)))
+            reading = null;
+        /*try {
+          Dictionaries.getUserDictionary().addEntry( word, reading, translation);
+          } catch (NullPointerException ex) {}*/
     }
 } // class AnnotationList

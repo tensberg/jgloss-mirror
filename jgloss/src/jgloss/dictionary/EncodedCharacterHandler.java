@@ -81,7 +81,7 @@ public interface EncodedCharacterHandler {
                                                          CharacterCodingException;
 
     /**
-     * Modify a character returned by {@link readCharacter(ByteBuffer) readCharacter} to make
+     * Modify a character returned by {@link #readCharacter(ByteBuffer) readCharacter} to make
      * different character classes compare equal. This is used for searching and indexing to
      * treat certain character classes as identical with respect to comparison. Examples are
      * uppercase and lowercase western characters, or katakana and hiragana. What characters
@@ -89,14 +89,14 @@ public interface EncodedCharacterHandler {
      * configured by modifying the object's state.
      *
      * @param character The character to convert, as returned by 
-     *                  {@link readCharacter(ByteBuffer) readCharacter}.
+     *                  {@link #readCharacter(ByteBuffer) readCharacter}.
      * @return The converted character.
      */
     int convertCharacter( int character);
 
     /**
      * Test the character class of a character returned by 
-     * {@link readCharacter(ByteBuffer) readCharacter}. These are specialized character classes
+     * {@link #readCharacter(ByteBuffer) readCharacter}. These are specialized character classes
      * which do not directly map to any unicode character classes. They are used during index
      * creation to decide if the current character is part of an indexable word.
      *

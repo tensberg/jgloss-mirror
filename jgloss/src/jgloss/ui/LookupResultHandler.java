@@ -27,6 +27,12 @@ import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.SearchException;
 
+/**
+ * Process dictionary lookup results. Instances of this interface handle the result of a
+ * dictionary search, typically performed by a {@link LookupEngine LookupEngine}.
+ *
+ * @author Michael Koch
+ */
 public interface LookupResultHandler {
     void startLookup( String description);
 

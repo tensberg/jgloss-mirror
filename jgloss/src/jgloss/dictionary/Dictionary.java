@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -62,7 +62,7 @@ public interface Dictionary {
      * an "any match" search could be approximated by a "starts with" or an "exact match" search,
      * which will give some results but not find all theroretically possible matches. If a search
      * mode is not supported, calling
-     * {@link #search(SearchMode,Object[]) search) with this search mode will throw an exception.
+     * {@link #search(SearchMode,Object[]) search} with this search mode will throw an exception.
      *
      * @param searchmode The search mode to test.
      * @param fully If <code>true</code>, test if the search mode is fully supported, if 
@@ -80,10 +80,12 @@ public interface Dictionary {
      * Return the set of known attribute values for an attribute. If the set of possible
      * values of an attribute are constant and not dependent on a particular dictionary
      * entry, they will be returned. An example for a constant set of attribute values
-     * are {@link PartOfSpeech PartOfSpeech} attributes. An example for non-constant values,
+     * are {@link jgloss.dictionary.attribute.PartOfSpeech PartOfSpeech} attributes. 
+     * An example for non-constant values,
      * which will not be returned by this method, are 
-     * {@link InformationAttributeValue InformationAttributeValues}. In this case, an empty
-     * set is returned. For unsupported attributes, <code>null</code> will be returned.
+     * {@link jgloss.dictionary.attribute.InformationAttributeValue InformationAttributeValues}. 
+     * In this case, an empty set is returned. For unsupported attributes, 
+     * <code>null</code> will be returned.
      */
     Set getAttributeValues( Attribute att);
 

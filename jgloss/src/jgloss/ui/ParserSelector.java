@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -53,10 +53,10 @@ public class ParserSelector extends JPanel {
      * Registers a parser class with the parser selector. Instances of
      * <CODE>ParserSelector</CODE> created before a new parser is registered will not be updated.
      *
-     * @param parserClass Class implementing the {@link jgloss.dictionary.Parser Parser} interface.
+     * @param parserClass Class implementing the {@link jgloss.parser.Parser Parser} interface.
      * @param displayName Name of the parser shown to the user.
      * @exception ClassCastException if the parser class does not implement the 
-     *            {@link jgloss.dictionary.Parser Parser} interface.
+     *            {@link jgloss.parser.Parser Parser} interface.
      * @exception NoSuchMethodException if the parser class has no constructor of the form 
      *            <CODE>(Dictionary[] dictionaries,Set exclusions)</CODE>.
      */
@@ -82,9 +82,7 @@ public class ParserSelector extends JPanel {
      * Creates a new parser selector which shows the currently registered parsers.
      *
      * @param showReadingAnnotationSelector If this is <CODE>true</CODE>, a widget will be shown
-     *        which lets the user choose the brackets which delimit reading annotations. The widget
-     *        is only active if the currently selected parser is a 
-     *        {@link jgloss.dictionary.ReadingAnnotationParser ReadingAnnotationParser}.
+     *        which lets the user choose the brackets which delimit reading annotations.
      */
     public ParserSelector( boolean showReadingAnnotationSelector) {
         this( showReadingAnnotationSelector, '\0', '\0');
@@ -94,9 +92,7 @@ public class ParserSelector extends JPanel {
      * Creates a new parser selector which shows the currently registered parsers.
      *
      * @param showReadingAnnotationSelector If this is <CODE>true</CODE>, a widget will be shown
-     *        which lets the user choose the brackets which delimit reading annotations. The widget
-     *        is only active if the currently selected parser is a 
-     *        {@link jgloss.dictionary.ReadingAnnotationParser ReadingAnnotationParser}.
+     *        which lets the user choose the brackets which delimit reading annotations.
      * @param readingStart Start character of a reading annotation.
      * @param readingEnd End character of a reading annotation.
      */
@@ -359,7 +355,8 @@ public class ParserSelector extends JPanel {
 
     /**
      * Determines if the user selected the detect paragraphs checkbox. If <code>true</code>, the
-     * detect paragraphs option of the {@link HTMLifyReader} should be used when importing a text
+     * detect paragraphs option of the {@link jgloss.ui.xml.JGlossifyReader JGlossifyReader}
+     * should be used when importing a text
      * document. While this option has no relation to the text parser backend, from a UI perspective
      * it makes sense to place the control here because the user does not make a difference between
      * text import and parsing.

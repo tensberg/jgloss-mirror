@@ -33,8 +33,8 @@ public interface ValueListFormatter {
      * Format an attribute and its list of values as a string.
      *
      * @param valueFormatter The formatter must call 
-     *        {@link #format(Attribute,AttributeValue,StringBuffer) format} on this object to
-     *        format values from the value list.
+     *        {@link AttributeValueFormatter#format(Attribute,AttributeValue,StringBuffer) format} 
+     *        on this object to format values from the value list.
      * @param val Value of the attribute. May be <code>null</code> if the attribute is set but
      *            has no value.
      * @param buf String buffer to which the formatted attribute is appended.

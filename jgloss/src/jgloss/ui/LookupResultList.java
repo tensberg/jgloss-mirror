@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002,2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -166,6 +166,10 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
      * Text field used to display the result as HTML text.
      */
     protected JEditorPane resultFancy;
+    /**
+     * Text field used to display the result as plain text, if the result list becomes too
+     * long for fast HTML rendering.
+     */
     protected JTextArea resultPlain;
     protected JScrollPane resultScroller;
 
@@ -528,5 +532,19 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
     public void restoreViewState( ViewState state) {
         resultScroller.getViewport().setViewPosition( state.resultScrollerPosition);
+    }
+
+    /**
+     * Return the editor pane which is used to display the result list marked up as HTML.
+     */
+    public JEditorPane getFancyResultPane() {
+        return resultFancy;
+    }
+
+    /**
+     * Return the editor pane which is used to display the result list marked up as plain text.
+     */
+    public JTextArea getPlainResultPane() {
+        return resultPlain;
     }
 } // class LookupResultList

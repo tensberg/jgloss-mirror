@@ -29,6 +29,7 @@ import java.util.Iterator;
 
 /**
  * Perform a dictionary lookup. The lookup configuration is taken from a {@link LookupModel LookupModel}.
+ * The lookup results are forwarded to a {@link LookupResultHandler LookupResultHandler}.
  *
  * @author Michael Koch
  */

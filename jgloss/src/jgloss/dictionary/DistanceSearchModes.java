@@ -45,9 +45,9 @@ public class DistanceSearchModes extends AbstractSearchMode {
     }
 
     /**
-     * Parameters are {@link StandardSearchParameter.EXPRESSION EXPRESSION}, 
-     * {@link StandardSearchParameter.SEARCH_FIELDS SEARCH_FIELDS} and
-     * {@link StandardSearchParameter.DISTANCE DISTANCE}
+     * Parameters are {@link StandardSearchParameter#EXPRESSION EXPRESSION}, 
+     * {@link StandardSearchParameter#SEARCH_FIELDS SEARCH_FIELDS} and
+     * {@link StandardSearchParameter#DISTANCE DISTANCE}
      */
     public SearchParameters getParameters() { return PARAMETERS; }
 } // class DistanceSearchModes

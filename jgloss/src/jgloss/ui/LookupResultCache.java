@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002,2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -35,9 +35,8 @@ import java.util.Iterator;
  *
  * @author Michael Koch
  */
-public class LookupResultCache implements LookupResultHandler, Cloneable {
+public class LookupResultCache extends LookupResultProxy implements Cloneable {
     protected Collection cache;
-    private LookupResultHandler forwardTo;
     
     public LookupResultCache() {
         cache = new ArrayList( 100);
@@ -45,17 +44,13 @@ public class LookupResultCache implements LookupResultHandler, Cloneable {
 
     public LookupResultCache( LookupResultHandler _forwardTo) {
         this();
-        forwardTo = _forwardTo;
+        addHandler(_forwardTo);
     }
 
     public LookupResultCache( String description, ResultIterator dictionaryEntries) 
         throws SearchException {
         this();
         setData( description, dictionaryEntries);
-    }
-
-    public void setForwardTo( LookupResultHandler _forwardTo) {
-        forwardTo = _forwardTo;
     }
 
     public void setData( String description, ResultIterator dictionaryEntries)
@@ -75,83 +70,88 @@ public class LookupResultCache implements LookupResultHandler, Cloneable {
 
     public int size() { return cache.size(); }
 
+    /**
+     * Replays the recorded search result events on all registered handlers.
+     */
     public void replay() {
-        replay( forwardTo);
-    }
-
-    public void replay( LookupResultHandler handler) {
         if (cache.size() == 0)
             throw new IllegalStateException( "cache is empty");
 
+        // to prevent the events from being re-recorded, all events are forwarded directly
+        // to the proxy superclass
         Iterator i = cache.iterator();
         Object o = i.next();
         if (o instanceof String)
-            handler.startLookup( (String) o);
+            super.startLookup( (String) o);
         else
-            handler.startLookup( (LookupModel) o);
+            super.startLookup( (LookupModel) o);
 
         while (i.hasNext()) {
             o = i.next();
 
             if (o instanceof Dictionary)
-                handler.dictionary( (Dictionary) o);
+                super.dictionary( (Dictionary) o);
             else if (o instanceof DictionaryEntry)
-                handler.dictionaryEntry( (DictionaryEntry) o);
+                super.dictionaryEntry( (DictionaryEntry) o);
             else if (o instanceof DictionaryEntryReference) try {
-                handler.dictionaryEntry( ((DictionaryEntryReference) o).getEntry());
+                super.dictionaryEntry( ((DictionaryEntryReference) o).getEntry());
             } catch (SearchException ex) {
-                handler.exception( ex);
+                super.exception( ex);
             }
             else if (o instanceof SearchException)
-                handler.exception( (SearchException) o);
+                super.exception( (SearchException) o);
             else
-                handler.note( o.toString());
+                super.note( o.toString());
         }
 
-        handler.endLookup();
+        super.endLookup();
+    }
+
+    /**
+     * Temporarily adds <code>handler</code> to the list of registered handlers and playbacks
+     * the stored lookup events. <code>handler</code> will be removed from the list of handlers
+     * at the end of the method.
+     */
+    public void replay(LookupResultHandler handler) {
+        addHandler(handler);
+        replay();
+        removeHandler(handler);
     }
 
     public void startLookup( String description) {
         cache.clear();
         cache.add( description);
-        if (forwardTo != null)
-            forwardTo.startLookup( description);
+        super.startLookup( description);
     }
 
     public void startLookup( LookupModel model) {
         cache.clear();
         cache.add( model);
-        if (forwardTo != null)
-            forwardTo.startLookup( model);
+        super.startLookup(model);
     }
 
     public void dictionary( Dictionary dictionary) {
         cache.add( dictionary);
-        if (forwardTo != null)
-            forwardTo.dictionary( dictionary);
+        super.dictionary(dictionary);
     }
 
     public void dictionaryEntry( DictionaryEntry entry) {
         cache.add( entry.getReference());
-        if (forwardTo != null)
-            forwardTo.dictionaryEntry( entry);
+        super.dictionaryEntry(entry);
     }
 
     public void exception( SearchException ex) {
         cache.add( ex);
-        if (forwardTo != null)
-            forwardTo.exception( ex);
+        super.exception(ex);
     }
 
     public void note( String note) {
         cache.add( note);
-        if (forwardTo != null)
-            forwardTo.note( note);
+        super.note(note);
     }
 
     public void endLookup() {
-        if (forwardTo != null)
-            forwardTo.endLookup();
+        super.endLookup();
     }
 
     public Object clone() {

@@ -24,7 +24,7 @@
 package jgloss.dictionary;
 
 /**
- * Thrown if {@link Dictionary#search(SearchMode,Object[]) Dictionary.search is called with a
+ * Thrown if {@link Dictionary#search(SearchMode,Object[]) Dictionary.search} is called with a
  * search mode not supported by that dictionary.
  *
  * @author Michael Koch

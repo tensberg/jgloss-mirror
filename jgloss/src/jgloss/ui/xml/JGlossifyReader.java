@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002,2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -335,7 +335,8 @@ class JGlossifyReader extends FilterReader {
     /**
      * Returns a character array containing the character in a form suitable for inclusion
      * in a HTML document. If the character is a HTML special character, the array will contain
-     * the escaped form of the char, otherwise the {@link singleChar} array containing the character
+     * the escaped form of the char, otherwise the {@link #singleChar singleChar} array 
+     * containing the character
      * is returned. The returned array may not be modified.
      */
     private char[] escape( char c) {

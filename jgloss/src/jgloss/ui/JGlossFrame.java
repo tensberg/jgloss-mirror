@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -28,6 +28,7 @@ import jgloss.JGlossApp;
 import jgloss.Preferences;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
+import jgloss.dictionary.DictionaryEntry;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.export.ExportMenu;
@@ -113,6 +114,7 @@ import javax.swing.event.MenuListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.View;
+import javax.swing.text.Position;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -350,6 +352,15 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     private SimpleLookup lookupPanel;
     private JSplitPane[] splitPanes;
     private LookupResultList.Hyperlinker hyperlinker;
+    /**
+     * Remembers the first dictionary entry shown in the result list of the lookup panel.
+     * This is used when a new annotation is created to automatically set the reading and
+     * translation.
+     */
+    private FirstEntryCache firstEntryCache;
+
+    private Position lastSelectionStart;
+    private Position lastSelectionEnd;
     
     /**
      * Defer a window closing event until the frame object is in a safe state. This is used while
@@ -528,6 +539,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         lookupPanel = new SimpleLookup( new Component[] { new JButton( addAnnotationAction) },
                                         hyperlinker);
         lookupPanel.addHyperlinkListener( this);
+        firstEntryCache = new FirstEntryCache();
+        lookupPanel.addLookupResultHandler(firstEntryCache);
 
         JScrollPane annotationEditorScroller = 
             new JScrollPane( annotationEditor,
@@ -546,6 +559,23 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         docpaneScroller = new JScrollPane( rendering,
                                            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        KeystrokeForwarder forwarder = new KeystrokeForwarder();
+        docpane.addKeyListener(forwarder);
+        forwarder.addTarget(annotationList);
+        forwarder.addTarget(lookupPanel.getLookupResultList().getFancyResultPane());
+        // Disable focusability (and thereby tab traversal) for annotation list and
+        // result list. They receive their keyboard events via forwarding.
+        annotationList.setFocusable(false);
+        lookupPanel.getLookupResultList().getFancyResultPane().setFocusable(false);
+        lookupPanel.getLookupResultList().getPlainResultPane().setFocusable(false);
+        // Disable focusability of some more components
+        annotationEditorScroller.getHorizontalScrollBar().setFocusable(false);
+        annotationListScroller.getHorizontalScrollBar().setFocusable(false);
+        docpaneScroller.getHorizontalScrollBar().setFocusable(false);
+        annotationEditorScroller.getVerticalScrollBar().setFocusable(false);
+        annotationListScroller.getVerticalScrollBar().setFocusable(false);
+        docpaneScroller.getVerticalScrollBar().setFocusable(false);
 
         JSplitPane split1 = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT,
                                             docpaneScroller,
@@ -634,7 +664,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         wordLookupAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    JGlossApp.getLookupFrame().setVisible( true);
+                    JGlossApp.getLookupFrame().show();
                     String selection = docpane.getSelectedText();
                     if (selection == null || selection.length() == 0) {
                         Annotation anno = (Annotation) annotationList.getSelectedValue();
@@ -881,7 +911,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * created reader.
      *
      * @param path URL or path of the file to import.
-     * @param detectParagraphs Flag if the {@link HTMLifyReader HTMLifyReader} should detect paragraphs.
+     * @param detectParagraphs Flag if paragraph detection should be done.
      * @param parser Parser used to annotate the text.
      * @param filter Filter for fetching the reading annotations from a parsed document.
      * @param encoding Character encoding of the file. May be either <CODE>null</CODE> or the
@@ -955,7 +985,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * @param detectParagraphs Flag if paragraph detection should be done.
      * @param title Title of the newly created document.
      * @param path Path to the document.
-     * @param setPath If <CODE>true</CODE>, the {@link #documentPath documentPath} variable will
+     * @param setPath If <CODE>true</CODE>, the document path will
      *        be set to the <CODE>path</CODE> parameter. Use this if path denotes a the file to
      *        which the newly created document should be written. If <CODE>false</CODE>,
      *        <CODE>path</CODE> will only be used in informational messages to the user during import.
@@ -1147,8 +1177,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                     // Layout document view in the background while still allowing user interaction
                     // in other windows. Since Swing is single-threaded, this is somewhat complicated:
                     // 1. A renderer thread is created, which prepares the docpane asynchronously to
-                    //    the event dispatch thread.
-                    // 2. After the preparation is done (this is the part that uses the most time), the
+                    //    the event dispatch thread. This is the part that uses the most time.
+                    // 2. After the preparation is done, the
                     //    docpane is installed in the docpaneScroller. This is done in the event dispatch
                     //    thread
                     // 3. The renderer thread is only started after the document window is drawn with
@@ -1201,6 +1231,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                                                              current.getEndOffset());
                                                     }
                                                     setCursor( currentCursor);
+                                                    docpane.requestFocusInWindow();
                                                 }
                                             }
                                         }
@@ -1336,12 +1367,20 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             anno.setTranslation( text);
     }
 
+    /**
+     * React to changes to the selection of the annotation list by selecting the annotation
+     * in the docpane and annotation editor.
+     */
     public void valueChanged( ListSelectionEvent e) {
         if (e.getFirstIndex() >= 0) {
             Annotation anno = (Annotation) annotationList.getSelectedValue();
             if (anno != null) {
                 docpane.highlightText( anno.getStartOffset(),
                                        anno.getEndOffset());
+                // Move the caret to the beginning of the annotation. While the caret
+                // is not visible, this has the side effect of clearing a text selection
+                // the user has made, which is what is wanted.
+                docpane.setCaretPosition(anno.getStartOffset());
                 annotationEditor.setAnnotation( anno);
                 lookupPanel.search( anno.getDictionaryForm());
             }
@@ -1375,11 +1414,20 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 from = e.getMark();
                 to = e.getDot();
             }
-            
+
+            // don't search again if the selection hasn't changed.
+            if (lastSelectionStart!=null && lastSelectionStart.getOffset()==from &&
+                lastSelectionEnd!=null && lastSelectionEnd.getOffset()==to)
+                return;
+
             String selection = model.getHTMLDocument()
                 .getUnannotatedText(from,to);
             if (selection.length() > 0)
                 lookupPanel.search( selection);
+            try {
+                lastSelectionStart = model.getHTMLDocument().createPosition(from);
+                lastSelectionEnd = model.getHTMLDocument().createPosition(to);
+            } catch (BadLocationException ex) {}
         }
     }        
 
@@ -1596,6 +1644,14 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         annotationList.setSelectedIndex
             (model.getAnnotationListModel().findAnnotationIndex
              (selectionStart, AnnotationListModel.BIAS_NONE));
+        // Set the new annotation reading and translation to the reading and translation
+        // of the first dictionary item displayed in the lookup result list.
+        DictionaryEntry entry = firstEntryCache.getEntry();
+        if (entry != null) {
+            Annotation anno = (Annotation) annotationList.getSelectedValue();
+            anno.setReading(entry.getReading(0));
+            anno.setTranslation(entry.getTranslation(0, 0, 0));
+        }
     }
 
     /**
@@ -1623,7 +1679,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         frame.removeComponentListener( componentListener);
         frame.removeWindowListener( windowListener);
         frame.setContentPane( new JPanel());
-        frame.getContentPane().requestFocus();
+        frame.getContentPane().requestFocusInWindow();
         frame.dispose();
 
         // Sometimes, due to the fact that swing keeps internal references, the JGlossFrame is
@@ -1642,5 +1698,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         annotationEditor = null;
         lookupPanel.removeHyperlinkListener( this);
         lookupPanel = null;
+        lastSelectionStart = null;
+        lastSelectionEnd = null;
     }
 } // class JGlossFrame

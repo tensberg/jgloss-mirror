@@ -2,7 +2,7 @@
 #
 # Default localization for messages in JGloss.
 #
-# Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
 #
 # This file is part of JGloss.
 #
@@ -102,10 +102,10 @@ button.add=Add...
 button.add.mk=A
 
 jgloss.title=JGloss
-jgloss.version=Version 1.1
+jgloss.version=Version 2
 
 jdictionary.title=JDictionary
-jdictionary.version=Version 1.1
+jdictionary.version=Version 2
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -359,9 +359,9 @@ annotationeditor.entry.hidden=\ (hidden)
 annotationeditor.action.cleartranslation=Clear Translation
 annotationeditor.action.cleartranslation.ak=DELETE
 annotationeditor.action.next=Next Annotation
-annotationeditor.action.next.ak=N
+annotationeditor.action.next.ak=DOWN
 annotationeditor.action.previous=Previous Annotation
-annotationeditor.action.previous.ak=P
+annotationeditor.action.previous.ak=UP
 annotationeditor.action.meta=Do something useful
 annotationeditor.action.meta.ak=released SPACE
 annotationeditor.action.remove.ak=R
@@ -409,15 +409,15 @@ export.latex.template.latexcjk-top=LaTeX-CJK - translations on page
 export.latex.template.latexcjk-list=LaTeX-CJK - transl. at end - hyperlinks
 export.latex.template.latexcjk-ruby=LaTeX-CJK - no translations
 
-jgloss.generator=JGloss 1.1
+jgloss.generator=JGloss 2 alpha 0
 jgloss.about.frame.title=About JGloss
-jgloss.about.title=JGloss 1.1 alpha
-jgloss.about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+jgloss.about.title=JGloss 2 alpha 0
+jgloss.about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001-2003 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
 jdictionary.about.frame.title=About JDictionary
-jdictionary.about.title=JDictionary 1.1 alpha
-jdictionary.about.text=A front-end for Japanese dictionaries.\n\nCopyright (c) 2002 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+jdictionary.about.title=JDictionary 2 alpha 0
+jdictionary.about.text=A front-end for Japanese dictionaries.\n\nCopyright (c) 2002,2003 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 
 preferences.header=This file contains the preferences for the application JGloss.
 preferences.header.obsolete=\

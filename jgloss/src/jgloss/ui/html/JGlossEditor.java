@@ -261,6 +261,9 @@ public class JGlossEditor extends JTextPane {
                                 ( pos, AnnotationListModel.BIAS_NONE);
                             if (annoIndex >= 0) {
                                 annotationList.setSelectedIndex( annoIndex);
+                                // transfer input focus to annotation list to enable keyboard
+                                // navigation
+                                annotationList.requestFocus();
                             }
                         }
                         else if (!tooltips && (e.getModifiers() & tooltipButtonMask)!=0) {
@@ -349,21 +352,7 @@ public class JGlossEditor extends JTextPane {
      * @param end End offset in the document.
      */
     public void makeVisible( int start, int end) {
-        try {
-            Rectangle r1 = modelToView( start);
-            // end-1 selects the last character of the annotation element
-            Rectangle r2 = modelToView( end-1);
-            if (r1 != null) {
-                if (r2 != null)
-                    r1 = r1.createUnion( r2).getBounds();
-
-                if (!getVisibleRect().contains( r1)) {
-                    scrollRectToVisible( r1);
-                }
-            }
-        } catch (javax.swing.text.BadLocationException ex) {
-            ex.printStackTrace();
-        }
+        UIUtilities.makeVisible(this, start, end);
     }
 
     /**

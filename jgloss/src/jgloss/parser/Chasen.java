@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002,2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -60,7 +60,7 @@ public class Chasen {
 
     /**
      * Result of the parsing of some text using the Chasen instance of the class.
-     * Instances of this class are returned by {@link Chasen#parse(char[]) Chasen.parse}.
+     * Instances of this class are returned by {@link Chasen#parse(char[],int,int) Chasen.parse}.
      */
     public class Result {
         /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002,2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -42,6 +42,8 @@ import javax.swing.event.DocumentListener;
  * Combo box which automatically performs searches on the entered text using the
  * parameters from a {@link LookupModel LookupModel}. The results of the search are
  * displayed in the popup menu of the combo box.
+ *
+ * @author Michael Koch
  */
 public class AutoSearchComboBox extends JComboBox implements LookupResultHandler,
                                                              DocumentListener {

@@ -44,7 +44,7 @@ import javax.swing.text.html.parser.TagElement;
 
 /**
  * The <CODE>JGlossEditorKit</CODE> is an extension of the <CODE>HTMLEditorKit</CODE> 
- * with several additions to manage the generation and display of JGloss documents.
+ * with several additions to manage the generation, display and manipulation of JGloss documents.
  * It also has to work around the shortcomings in the HTML document API.
  * It contains the views for the annotation
  * elements and its subelements as subclasses, since they share some view attribute state with the
@@ -281,7 +281,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      */
     public class AnnotationView extends BlockView {
         /**
-         * Last parent view which was a LogicalView. See {@link #setParent() setParent}.
+         * Last parent view which was a LogicalView. See {@link #setParent(View) setParent}.
          */
         private View logicalViewParent = null;
 

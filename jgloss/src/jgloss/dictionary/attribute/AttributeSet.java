@@ -26,7 +26,7 @@ package jgloss.dictionary.attribute;
 import java.util.Iterator;
 
 /**
- * Set of attribute key/object mappings used by {@link DictionaryEntry DictionaryEntry}.
+ * Set of attribute key/object mappings used by {@link jgloss.dictionary.DictionaryEntry DictionaryEntry}.
  * Each attribute set may have parent sets from which key/value pairs are inherited.
  *
  * @author Michael Koch

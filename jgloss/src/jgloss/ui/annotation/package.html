@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 <!--
- Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
  
  This file is part of JGloss.
  
@@ -25,17 +25,5 @@
 </HEAD>
 <BODY>
 Classes specific to the annotation editor tree.
-<P>
-The {@link jgloss.ui.annotation.AnnotationModel AnnotationModel} is a tree view of all
-annotations in the document. 
-Children of the root node are {@link jgloss.ui.annotation.AnnotationNode AnnotationNodes}, which each
-wrap one annotation element. The <CODE>AnnotationNodes</CODE> are ordered by their position in
-the document.
-</P><P>
-Each <CODE>AnnotationNode</CODE> has two {@link jgloss.ui.annotation.ReadingTranslationNode
-ReadingTranslationNodes} as children. One allows the edit of the current ruby, the other the edit of the
-current translation of this element. Additional children are created for the
-dictionary entries which were found for this annotation.
-</P>
 </BODY>
 </HTML>

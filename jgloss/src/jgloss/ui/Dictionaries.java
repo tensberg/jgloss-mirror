@@ -58,7 +58,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * List of {@link Dictionaries.DictionaryWrapper DictionaryWrapper } instances with
      * dictionaries currently used in the application. This is the list of dictionaries
-     * returned by {@link #getDictionaries() getDictionaries()}.
+     * returned by {@link #getDictionaries(boolean) getDictionaries}.
      * If the user has edited
      * the dictionary list in the preference dialog, but not yet applied the changes,
      * this list is different from the dictionary list displayed.

@@ -1,5 +1,5 @@
-JGloss 1.0.6
-------------
+JGloss 2 Alpha 0
+----------------
 
 JGloss homepage: http://jgloss.sourceforge.net/
 
@@ -8,7 +8,7 @@ words in a Japanese text document. This can be done automatically and manually.
 The document can be exported as plain text with annotations, HTML or LaTeX.
 
 JGloss is written in Java. It should work on any computer with support for
-the Java 2 Version 1.3/1.4 platform. It is distributed under the terms of the
+the Java 2 Version 1.4 platform. It is distributed under the terms of the
 GNU General Public License.
 
 To start JGloss, double-click the file "jgloss.jar", or type
@@ -24,18 +24,38 @@ JGloss 1.0.3 fixed some bugs in the EDICT implementation. To improve dictionary
 lookup accuracy, you should delete any old .jjdx index files created by
 versions of JGloss before 1.0.3.
 
-Known problems:
+About Alpha 0
+-------------
+This is a preview of the new JGloss version, mainly to show that I am still
+working on the program. It should give you an opportunity to try out the
+new user interface and expanded dictionary functions. You are welcome to
+send comments about the features and write your ideas, but it is
+unneccessary to send bug reports, since the program is still being heavily
+worked on. There are many features which where in the previous JGloss
+versions but are not in this Alpha version. They will eventually make their
+reappearance.
+
+Some of the greater issues of JGloss 2 Alpha 0:
+- The file format of the .jgloss files has incompatibly changed, opening
+  older files is not (yet) possible
+- The handbook is out of date
+- The German localization is incomplete
+- The user dictionary is not implemented yet
+- LaTeX export is not implemented yet
+- The dictionary implementations do not yet support all planned features
+- Documentation of the source code is incomplete.
+
+Tip for keyboard navigation:
+use cursor up/down to switch between annotations; cursor left/right to
+switch between readings/translations, space to select a
+reading/translation; and Alt-A to annotate the currently selected text.
+
+Known problems (JGloss 1.0.6):
   - When the ChaSen parser is used with JRE 1.3 on Windows 98/ME/XP, a window
     pops up while ChaSen runs. This does not happen with JRE 1.4.
   - On Windows 98/ME when using JRE 1.3 the ChaSen window does not close 
     automatically after a document is imported. You will have to close it by
     hand. Use JRE 1.4 instead.
-  - When using JGloss with JRE 1.3 and KDE, the word annotation dialog will
-    sometimes be resized to a minimum when it is opened. Also, Java locks up if
-    the preference window is opened after a document is loaded and when
-    the print dialog opens. This seems to be a problem in the interaction 
-    between Java and the KDE window manager which I don't know how to fix. Use 
-    JRE 1.4 instead.
   - On Linux force-quitting JGloss by typing Control-C or using kill -HUP
     sometimes doesn't work.
   - The custom user interface font chosen in the style dialog is applied
@@ -46,4 +66,6 @@ Known problems:
     set to Japanese. Paste the text in the text field of the import dialog
     instead.
 
-(c) 2001,2002 Michael Koch <tensberg@gmx.net>
+(c) 2001-2003 Michael Koch <tensberg@gmx.net>
+
+Parts of JGloss code (C) 2002 Eric Crahen

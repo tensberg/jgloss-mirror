@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -37,13 +37,14 @@ import java.util.*;
 public class DictionaryEntryFormatter {
     /**
      * Position of an attribute in the formatted string. The positions are used with 
-     * {@link DictionaryEntryFormatter#addAttributeFormat(Attribute,Position,AttributeFormatter)
-     *        addAttributeFormat} to select where a particular attribute is inserted.
+     * {@link DictionaryEntryFormatter#addAttributeFormat(Attribute,AttributeFormatter,
+     *        DictionaryEntryFormatter.Position) addAttributeFormat}
+     * to select where a particular attribute is inserted.
      * For most of the positions, the
      * position corresponds to the attribute set which is used to find an attribute. For
      * example, {@link #BEFORE_ROM BEFORE_ROM} is always used with attributes from a
-     * {@link DictionaryEntry#getTranslationRomAttributes(int) getTranslationRomAttributes}
-     * attribute set. The exceptions are {@link #BEFORE_FIELD2 BEFORE_FIELD2} and
+     * {@link DictionaryEntry#getTranslationAttributes(int,int,int) getTranslationAttributes}
+     * ROM attribute set. The exceptions are {@link #BEFORE_FIELD2 BEFORE_FIELD2} and
      * {@link #BEFORE_FIELD2 BEFORE_FIELD2}, which are used with the general attribute set.
      */
     public static class Position {

@@ -58,7 +58,7 @@ abstract class BaseEntry implements DictionaryEntry {
      * Dictionaries using <code>BaseEntry</code> objects for their entries should implement
      * this interface.
      *
-     * @see BaseEntryRef
+     * @see BaseEntry.BaseEntryRef
      * @see BaseEntry#getReference()
      */
     public interface MarkerDictionary {
@@ -69,7 +69,7 @@ abstract class BaseEntry implements DictionaryEntry {
      * Reference to a base dictionary entry. The dictionary entry object which is referenced
      * is stored using a <code>WeakReference</code>. If the object is garbage collected when
      * {@link #getEntry() getEntry} is called, it will be recreated by calling 
-     * {@link MarkerDictionary#createEntryFromMarker(int) createEntryFromMarker} on the entry's
+     * {@link BaseEntry.MarkerDictionary#createEntryFromMarker(int) createEntryFromMarker} on the entry's
      * dictionary.
      */
     protected static class BaseEntryRef implements DictionaryEntryReference {

@@ -32,6 +32,7 @@ import java.awt.datatransfer.*;
 import java.io.IOException;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 
 /**
  * Collection of static utility methods for user interface creation.
@@ -222,5 +223,31 @@ public class UIUtilities {
         }
 
         return containsString;
+    }
+
+    /**
+     * Scroll a text component inside a viewport such that the text at the specified position
+     * becomes visible. If the text is already fully visible, no scrolling is done.
+     *
+     * @param textPane The text pane which is scrolled.
+     * @param start Start offset in the document.
+     * @param end End offset in the document.
+     */
+    public static void makeVisible(JTextComponent textPane, int start, int end) {
+        try {
+            Rectangle r1 = textPane.modelToView( start);
+            // end-1 selects the last character of the annotation element
+            Rectangle r2 = textPane.modelToView( end-1);
+            if (r1 != null) {
+                if (r2 != null)
+                    r1 = r1.createUnion( r2).getBounds();
+
+                if (!textPane.getVisibleRect().contains( r1)) {
+                    textPane.scrollRectToVisible( r1);
+                }
+            }
+        } catch (javax.swing.text.BadLocationException ex) {
+            // can happen if layout of text component is not done yet
+        }
     }
 } // class UIUtilities

@@ -53,7 +53,7 @@ public interface IndexContainer {
      * Return the byte order used by this index container for <code>ByteBuffers</code>.
      * {@link Index Indexes} and {@link IndexBuilder IndexBuilders} should use this byte order
      * to guarantee that the index file is portable. <code>ByteBuffers</code> returned by
-     * {@link getIndexData(int) getIndexData} are set to the byte order returned by this method.
+     * {@link #getIndexData(int) getIndexData} are set to the byte order returned by this method.
      */
     ByteOrder getIndexByteOrder();
 
@@ -61,7 +61,7 @@ public interface IndexContainer {
      * Fetch the index data for a particular index type for read access. {@link Index Index}
      * instances will call this method to get at their data.
      *
-     * @return Byte buffer with the index data. The buffer is valid until {@link close() close} 
+     * @return Byte buffer with the index data. The buffer is valid until {@link #close() close} 
      *         is called.
      * @exception IllegalStateException if the index container is not in <code>access</code> mode.
      */

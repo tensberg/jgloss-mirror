@@ -56,6 +56,7 @@ class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
     private LookupModel model;
 
     private AsynchronousLookupEngine engine;
+    private LookupResultProxy lookupResultProxy;
     private LookupResultList list;
 
     /**
@@ -141,9 +142,16 @@ class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
         list = new LookupResultList( 100, SimpleLookup.class.getResource( STYLE_SHEET), false,
                                      hyperlinker);
         list.addHyperlinkListener( this);
+        new HyperlinkKeyNavigator(list.getFancyResultPane().getSelectionColor())
+            .setTargetEditor(list.getFancyResultPane());
 
         this.add( list, BorderLayout.CENTER);
-        engine = new AsynchronousLookupEngine( list);
+        lookupResultProxy = new LookupResultProxy(list);
+        engine = new AsynchronousLookupEngine( lookupResultProxy);
+    }
+
+    public void addLookupResultHandler(LookupResultHandler handler) {
+        lookupResultProxy.addHandler(handler);
     }
 
     public void search( String text) {
@@ -198,6 +206,13 @@ class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
         }
     }
 
+    /**
+     * Return the component used to display the lookup result.
+     */
+    public LookupResultList getLookupResultList() { 
+        return list;
+    }
+
     protected void followReference( String type, String refKey) {
         if (LookupResultList.Hyperlinker.REFERENCE_PROTOCOL.equals( type)) {
             ReferenceAttributeValue ref = (ReferenceAttributeValue) 
@@ -206,7 +221,7 @@ class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
                 new LookupResultCache
                     ( JGloss.messages.getString( "wordlookup.reference", 
                                                  new Object[] { ref.getReferenceTitle() }),
-                      ref.getReferencedEntries()).replay( list);
+                      ref.getReferencedEntries()).replay( lookupResultProxy);
             } catch (SearchException ex) {
                 ex.printStackTrace();
             }

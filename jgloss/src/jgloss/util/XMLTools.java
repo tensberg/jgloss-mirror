@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002,2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -38,7 +38,7 @@ public class XMLTools {
     /**
      * Returns the text under the node.
      *
-     * @see {@link #getText(Node,StringBuffer) getText(Node,StringBuffer)}
+     * @see #getText(Node,StringBuffer)
      */
     public static String getText( Node node) {
         return getText( node, new StringBuffer()).toString();

@@ -355,7 +355,7 @@ public class ImportDialog extends JDialog implements TextListener {
 
     /**
      * Returns the state of the paragraph detection checkbox. If the box is selected, the corresponding
-     * option of the {@link HTMLifyReader HTMLifyReader} should be set.
+     * option of the {@link jgloss.ui.xml.JGlossifyReader JGlossifyReader} should be set.
      */
     public boolean isDetectParagraphs() {
         return parserSelector.isDetectParagraphs();

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
 #
 # This file is part of JGloss.
 #
@@ -40,14 +40,9 @@ ifndef NATIVE2ASCII
   NATIVE2ASCII := native2ascii
 endif
 
-RELEASE := 1.1
+RELEASE := 2.0a0
 JGLOSS_DISTNAME := jgloss-$(RELEASE)
 JDICTIONARY_DISTNAME := jdictionary-$(RELEASE)
-
-PACKAGES := jgloss jgloss.dictionary jgloss.dictionary.attribute\
-            jgloss.parser jgloss.util \
-            jgloss.ui jgloss.ui.xml jgloss.ui.html jgloss.ui.export jgloss.ui.annotation# \
-            #jgloss.www
 
 DATA_WWW := HTMLAnnotator vconj
 
@@ -102,11 +97,11 @@ vpath %.html doc/html
         compile-jgloss compile-jdictionary doc gen-javadoc\
         jgloss jdictionary jgloss-www resources
 
-jdictionary: compile-jdictionary $(RESOURCES) setup
-	$(JAR) cfm jdictionary.jar MANIFEST.MF.jdictionary $(JDICTIONARY_BINARY_JAR)
-
 jgloss: compile-jgloss $(RESOURCES) setup
 	$(JAR) cfm jgloss.jar MANIFEST.MF $(JGLOSS_BINARY_JAR)
+
+jdictionary: compile-jdictionary $(RESOURCES) setup
+	$(JAR) cfm jdictionary.jar MANIFEST.MF.jdictionary $(JDICTIONARY_BINARY_JAR)
 
 im: compile-im
 	mkdir -p META-INF/services
@@ -153,12 +148,14 @@ doc: jgloss.pdf index.html
 
 gen-javadoc:
 	mkdir -p javadoc
-	javadoc -d javadoc -package \
+	javadoc -quiet -d javadoc -private \
                 -classpath "src:$(CLASSPATH)" \
                 -sourcepath src \
                 -windowtitle "JGloss documentation" -doctitle "JGloss documentation" \
                 -use -author -version \
-                $(PACKAGES)
+		-breakiterator \
+                -subpackages jgloss -exclude jgloss.www
+# generate for all packages, except jgloss.www because it is currently broken
 
 setup:
 	cp $(addprefix src/resources/, $(DICTIONARY_MAPS)) resources
@@ -205,4 +202,4 @@ index.html: jgloss.docbook doc.src/stylesheet.dsl
 resources: $(RESOURCES)
 
 clean:
-	-rm -r jgloss resources data dist doc javadoc jgloss.jar jgloss-www META-INF
+	-rm -r jgloss resources data dist doc jgloss.jar jgloss-www META-INF

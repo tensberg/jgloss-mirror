@@ -201,11 +201,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         }
 
         /**
-         * Handles the addition of text to the document. If either {@link #addAnnotations addAnnotations}
-         * is <CODE>false</CODE>, the <CODE>JGlossDocument</CODE> has no {@link #parser parser} or the
-         * loading was aborted, this will forward the call to the superclass. Otherwise the text will
-         * be put through the parser and for the annotations which the parser returns the appropriate
-         * annotation element will be inserted in the text.
+         * Updates the <code>pos</code> member variable and forwards the call to the superclass.
          *
          * @param data Text data to insert in the document.
          * @param pos Position in the document.
@@ -286,7 +282,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
 
     /**
      * Returns a reader for a document at the given position. This will return a new instance
-     * of {@link JGlossReader JGlossReader}.
+     * of {@link JGlossHTMLDoc.JGlossReader JGlossReader}.
      *
      * @param pos Position in the document.
      * @return A reader for a document.
@@ -298,7 +294,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
 
     /**
      * Returns a reader for a document at the given position. This will return a new instance
-     * of {@link JGlossDocument.JGlossReader JGlossReader}.
+     * of {@link JGlossHTMLDoc.JGlossReader JGlossReader}.
      *
      * @param pos Position in the document.
      * @param popDepth The number of ElementSpec.EndTagTypes to generate before inserting

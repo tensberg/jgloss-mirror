@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -40,8 +40,10 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * Entry point for the JGloss application. Does the initialization and manages access to
- * localisation resources and preferences.
+ * Framework for the initialization of the two applications {@link JGlossApp JGlossApp} and
+ * {@link JDictionaryApp JDictionaryApp}. Provides the basic functionality for initialization
+ * and destruction of the application instance and hooks for extending the process. Also provides
+ * static access to resources used by the application UI classes.
  *
  * @author Michael Koch
  */
@@ -117,6 +119,9 @@ public abstract class JGloss {
         return application.doExit();
     }
 
+    /**
+     * Empty constructor.
+     */
     JGloss() {}
 
     protected void init( String[] args) {

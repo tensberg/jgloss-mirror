@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -155,7 +155,7 @@ public abstract class DictionaryFactory {
     /**
      * Interface which is used to match descriptors to <CODE>Dictionary</CODE> implementations.
      *
-     * @autor Michael Koch
+     * @author Michael Koch
      * @see Dictionary
      */
     public interface Implementation {

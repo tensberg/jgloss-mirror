@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -95,7 +95,6 @@ public class KanjiParser extends AbstractParser {
      * @param ignoreNewlines If this is <CODE>true</CODE>, 0x0a and 0x0d characters in the parsed text
      *                       will be ignored and the character immediately before and after the newline
      *                       will be treated as if forming a single word.
-     * @see Reading
      */
     public KanjiParser( Dictionary[] dictionaries, Set exclusions,
                         boolean cacheLookups, boolean ignoreNewlines, boolean firstOccurrenceOnly) {
@@ -288,9 +287,6 @@ public class KanjiParser extends AbstractParser {
      * @return <code>true</code> if at least one annotation was generated or part of the word
      *         matched the exclusion list.
      * @exception SearchException If a dictionary lookup failed.
-     * @see Reading
-     * @see Translation
-     * @see Conjugation
      */
     private boolean createAnnotations( int wordStart, String word,
                                        String inflection, boolean tryPrefixes,

@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @class RomajiTranslator
- *
  * Simple utlitly class to aid in the translation romanji text to
  * a unicode representation. This can translate into both kana and
  * hiragana.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
 
 /**
  * Attribute values for usage attribute. The values cannot be instantiated directly.
- * Instead, they are fetched by calling the static {@link get(String) get} method.
+ * Instead, they are fetched by calling the static {@link #get(String) get} method.
  *
  * @author Michael Koch
  */
