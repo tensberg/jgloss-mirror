@@ -368,6 +368,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
         docpane.setEditable( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
         docpaneScroller = new JScrollPane( docpane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        docpane.setNextFocusableComponent( annotationEditor);
+        annotationEditor.setNextFocusableComponent( docpane);
         split = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT,
                                 docpaneScroller,
                                 annotationEditorScroller);
@@ -1551,6 +1553,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
         }        
     }
 
+    /**
+     * Dispose resources associated with the JGloss document.
+     */
     public void dispose() {
         // try to dump as many references as possible to ensure that the objects are garbage collected
         jglossFrames.remove( this);   

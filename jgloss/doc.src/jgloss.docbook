@@ -406,9 +406,10 @@
         The left part of the window shows the annotated document. An annotated word is shown
         in light red, with the reading annotation above and the translation annotation below the
         word. The right part of the window contains the annotation editor. For every annotated word,
-        it will display the word and below it the current reading and translation annotation, 
+        the word and its current reading and translation is shown. For the selected annotation
+        at the top of the list, the annotation editor shows the current reading and translation, 
         the dictionary form of the entry, and
-        all readings and translations found in the dictionary. You can use the annotation editor
+        all readings and translations found in the dictionaries. You can use the annotation editor
         to change the reading and translation of a word, either by selecting one of the listed
         entries, or by selecting the current reading/translation item and entering the new text.
       </para>
@@ -450,7 +451,8 @@
         and that the document will require some editing. 
       </para>
       <para>
-        To edit an annotation, select it in the annotation editor. The selected entry will be
+        To edit an annotation, select it in the annotation editor. The annotation editor will expand
+        the annotation to show the dictionary lookup result and the annotation will be
         highlighted red in the document view. Use the down key to select an entry with the appropriate
         reading or translation and hit the space bar. This will make the selected
         entry the reading/translation of the annotation. To manually edit the text of an annotation,
@@ -489,7 +491,8 @@
         The annotation editor is used to edit the reading and translation annotations of annotated
         words in the document. It is displayed in the right half of the &JGloss; window
         (see <xref linkend="figure.main">). Each annotated word has an entry in the editor, ordered
-        by its appearance in the document. The entries are displayed in a hierarchical style.
+        by its appearance in the document. The entries are displayed list, with the currently
+        selected annotation expanded to show the dictionary search results.
         If an entry is selected, the annotation will be highlighted in the document view.
       </para>
       <para>
@@ -685,11 +688,19 @@
 
       <sect2><title>LaTeX</title>
         <para>
-          The LaTeX export function will generate a text document in LaTeX format. It
-          can be processed with <application>platex</application>. <application>platex</application>
-          is an extension to TeX for typesetting Japanese documents. It is bundled with
-          TeTex. The generated document uses the ruby macro for reading annotations. You can find it
-          in the <filename>latex-ruby</filename> folder of &JGloss;
+          The LaTeX export function will generate a text document in LaTeX format. 
+          Since normal LaTeX can't handle Japanese text, you will have to use 
+          <application>platex</application> to process the file. <application>platex</application>
+          is an extension to TeX for typesetting Japanese documents, it comes as part of the
+          standard TeTeX installation and may be available with other TeX implementations.
+          You will also need some Japanese fonts for displaying the generated file.
+          Ghostscript can supply fonts to TeX, Japanese fonts for Ghostscript are available
+          at <ulink url="http://www.enel.ucalgary.ca/People/far/howto/gs-ttf.html">
+            http://www.enel.ucalgary.ca/People/far/howto/gs-ttf.html</ulink>. 
+          <application>dvips</application> will also have to be configured to know about the Japanese
+          fonts if you want to convert the generated dvi file to Postscript.
+          The generated document uses the ruby macro for reading annotations. You can find it
+          in the <filename>latex-ruby</filename> folder of &JGloss;.
         </para>
         <para>
           The generated document contains footnotes for every annotated word. The footnote
@@ -784,11 +795,11 @@
         document is only annotated the first time it appears. This decreases the RAM usage and
         the time it takes to display the document. Some documents you can find on the internet
         already have reading annotations added to kanji words in the form of some hiragana
-        enclosed in brackets after the kanji word. The kanji parser will generate
+        enclosed in brackets after the kanji word. The parsers can generate
         reading annotation entries for these words. You can select the brackets used in the document
         for reading annotations with the <guilabel>Brackets used...</guilabel> box. If the document
-        contains no reading annotations, you can ignore this setting. The ChaSen parser does
-        not support reading annotations in the document.
+        contains no reading annotations, you can select <guilabel>none</guilabel> or ignore this 
+        setting.
       </para>
       <sect2><title>The Kanji parser</title>
         <para>
@@ -951,6 +962,15 @@
                   after it is loaded, especially for larger documents.
                 </para>
               </note>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Open Recent</term>
+            <listitem>
+              <para>
+                Open a &JGloss; annotated document by selecting it from the list of recently
+                opened files.
+              </para>
             </listitem>
           </varlistentry>
 

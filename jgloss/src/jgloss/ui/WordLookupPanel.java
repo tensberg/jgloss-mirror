@@ -350,13 +350,13 @@ public class WordLookupPanel extends JPanel {
 
         result.insert( 0, "<html><head></head><body>");
         result.append( "</body></html>");
-        
+
         // setting up the new doc this way is more complicated than simply using setText
         // on the JTextPane, but avoids the scroll pane moving to the end of the generated document
         Document doc = this.result.getEditorKit().createDefaultDocument();
         try {
             this.result.getEditorKit().read( new java.io.StringReader( result.toString()),
-                                        doc, 0);
+                                             doc, 0);
         } catch (Exception exc) {}
         this.result.setDocument( doc);
         resultScroller.getViewport().setViewPosition( new Point( 0, 0));
@@ -395,8 +395,8 @@ public class WordLookupPanel extends JPanel {
                                short mode, StringBuffer result) {
         try {
             java.util.List entries = dic.search( expression, mode);
-            lastResult.addAll( entries);
             if (entries.size() > 0) {
+                lastResult.addAll( entries);
                 if (conjugation != null) {
                     result.append( "<i>" + JGloss.messages.getString
                                    ( "wordlookup.inflection", new String[] {

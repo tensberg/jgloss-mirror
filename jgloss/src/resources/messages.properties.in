@@ -180,12 +180,23 @@ editor.menu.copy.mk=O
 editor.menu.paste=Paste
 editor.menu.paste.ak=control V
 editor.menu.paste.mk=P
+editor.menu.find=Find...
+editor.menu.find.mk=F
+editor.menu.find.ak=control F
+editor.menu.findagain=Find Again
+editor.menu.findagain.mk=g
+editor.menu.findagain.ak=control G
 editor.menu.addannotation=Annotate Selection...
 editor.menu.addannotation.ak=control D
 editor.menu.addannotation.mk=A
 editor.menu.addannotation.tt=Adds an annotation to the current selection
 editor.addannotation.text=Please enter the word to look up in\nthe dictionaries for the new annotation:
 editor.addannotation.title=Annotate selection
+
+editor.dialog.find=Search for:
+editor.dialog.find.title=Find
+editor.dialog.find.notfound=The text "{0}" was not found in the document.
+editor.dialog.findagain.notfound=No further occurrences of "{0}" were found.
 
 prefs.title=Preferences
 

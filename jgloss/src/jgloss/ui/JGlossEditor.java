@@ -234,6 +234,23 @@ public class JGlossEditor extends JTextPane {
      */
     private Action addAnnotationAction;
     /**
+     * Searches a string in the document.
+     */
+    private Action findAction;
+    /**
+     * Repeats the last search.
+     */
+    private Action findAgainAction;
+    /**
+     * Last search string. Used with find again action.
+     */
+    private String lastFindText;
+    /**
+     * Last find position. Used with find again action.
+     */
+    private int lastFindPosition;
+
+    /**
      * The menu which contains actions specific to document editing.
      */
     private JMenu editMenu;
@@ -286,6 +303,16 @@ public class JGlossEditor extends JTextPane {
     public JGlossEditor( AnnotationEditor source) {
         super();
         setAutoscrolls( true);
+
+        // A JTextComponent normally does not do TAB focus traversal since TAB is a valid input
+        // character. Because the JGlossEditor is not used for normal text input, I override
+        // this behavior for convenience.
+        getKeymap().addActionForKeyStroke( KeyStroke.getKeyStroke( "pressed TAB"),
+                                           new AbstractAction() {
+                                                   public void actionPerformed( ActionEvent e) {
+                                                       transferFocus();
+                                                   }
+                                               });
 
         xcvManager = new XCVManager( this);
         editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
@@ -369,6 +396,43 @@ public class JGlossEditor extends JTextPane {
                 };
             addAnnotationAction.setEnabled( false);
             UIUtilities.initAction( addAnnotationAction, "editor.menu.addannotation");
+            findAction = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        String text = JOptionPane.showInputDialog
+                            ( JGlossEditor.this, 
+                              JGloss.messages.getString( "editor.dialog.find"),
+                              JGloss.messages.getString( "editor.dialog.find.title"),
+                              JOptionPane.PLAIN_MESSAGE);
+                        if (text!=null && text.length()>0) {
+                            try {
+                                lastFindText = text;
+                                int where = find( text, 0);
+                                if (where != -1) {
+                                    lastFindPosition = where;
+                                    findAgainAction.setEnabled( true);
+                                }
+                            } catch (BadLocationException ex) {}
+                        }
+                    }
+                };
+            UIUtilities.initAction( findAction, "editor.menu.find");
+            findAgainAction = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        try {
+                            int where = find( lastFindText, lastFindPosition + 1);
+                            if (where != -1)
+                                lastFindPosition = where;
+                            else
+                                lastFindPosition = 0;
+                        } catch (BadLocationException ex) {}
+                    }
+                };
+            UIUtilities.initAction( findAgainAction, "editor.menu.findagain");
+            findAgainAction.setEnabled( false); // will be enabled after first find
+
+            editMenu.addSeparator();
+            editMenu.add( UIUtilities.createMenuItem( findAction));
+            editMenu.add( UIUtilities.createMenuItem( findAgainAction));
             editMenu.add( UIUtilities.createMenuItem( addAnnotationAction));
 
             addCaretListener( new CaretListener() {
@@ -529,6 +593,48 @@ public class JGlossEditor extends JTextPane {
         xcvManager.updateActions( this);
     }
 
+    /**
+     * Search for some text in the document. If the text is found as part of an annotation, the
+     * annotation will be selected.
+     *
+     * @param text Text to find.
+     * @param from Index in the document from where search should start.
+     * @return Index in the document where the text was found, or <CODE>-1</CODE> if the text was
+     *         not found.
+     * @exception BadLocationException if the from search index is not valid.
+     */
+    private int find( String text, int from) throws BadLocationException {
+        int where = getText( from, getDocument().getLength()-from).indexOf( text);
+        if (where == -1) { 
+            // text not found
+            if (from == 0) { 
+                // search in whole document
+                JOptionPane.showMessageDialog
+                    ( this, JGloss.messages.getString( "editor.dialog.find.notfound",
+                                                       new Object[] { text }));
+            }
+            else {
+                // search in part of the document
+                JOptionPane.showMessageDialog
+                    ( this, JGloss.messages.getString( "editor.dialog.findagain.notfound",
+                                                       new Object[] { text }));
+            }
+            return -1;
+        }
+        where += from; // start offset must be taken into account
+
+        annotationEditor.selectAnnotation( where); // does nothing if where is not in annotation
+        requestFocus(); // selection will only be visible if editor has the focus
+        // select found text
+        setCaretPosition( where);
+        moveCaretPosition( where + text.length());
+
+        return where;
+    }
+
+    /**
+     * Dispose resources associated with the editor.
+     */
     public void dispose() {
         editMenu.removeAll();
         editMenu.removeMenuListener( xcvManager.getEditMenuListener());
