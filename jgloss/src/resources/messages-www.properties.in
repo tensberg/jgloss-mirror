@@ -29,6 +29,8 @@ error.noprotocols=No allowed protocols were defined in parameter {0}.
 error.nourl=No URL was specified in the request.
 error.malformedurl=The specified URL {0} is not a valid URL.
 error.protocolnotallowed=URLs with protocol {0} are not allowed.
+error.forwardprotocolnotallowed=A forwarding directive to {0} was received from the remote server. \
+The address could not be opened because protocol {1} is not allowed.
 error.addressnotallowed=Access to {0} is not allowed.
 error.malformedrequest=The request URL {0} is invalid.
 error.unknownhost=Could not connect to {0}. The host {1} is not known.
