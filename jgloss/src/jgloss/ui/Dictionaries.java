@@ -77,7 +77,7 @@ public class Dictionaries extends JComponent {
      * Interface implemented by objects interested in notifications of changes in the
      * active dictionary list.
      */
-    public static interface DictionaryListChangeListener {
+    public interface DictionaryListChangeListener {
         void dictionaryListChanged();
     } // interface DictionaryListChangeListener
 

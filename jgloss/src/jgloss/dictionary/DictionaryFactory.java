@@ -161,12 +161,12 @@ public abstract class DictionaryFactory {
      * @autor Michael Koch
      * @see Dictionary
      */
-    public static interface Implementation {
+    public interface Implementation {
         /**
          * Confidence value meaning that the descriptor does not descripe a dictionary in the
          * format described by this implementation.
          */
-        final float ZERO_CONFIDENCE = 0.0f;
+        float ZERO_CONFIDENCE = 0.0f;
 
         /**
          * Test if the descriptor points to a dictionary in a format supported by the

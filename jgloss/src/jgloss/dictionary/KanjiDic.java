@@ -615,8 +615,8 @@ public class KanjiDic implements Dictionary {
         }
         return new WordReadingPair() {
                 public String getWord() { return k; }
-                public String getReading() { return r; };
-                public Dictionary getDictionary() { return KanjiDic.this; };
+                public String getReading() { return r; }
+                public Dictionary getDictionary() { return KanjiDic.this; }
                 public String toString() { return DefaultDictionaryEntry.toString( this); }
             };
     }
@@ -652,7 +652,7 @@ public class KanjiDic implements Dictionary {
 
     public boolean equals( Object o) {
         try {
-            return new File(((EDict) o).dicfile).equals( new File( dicfile));
+            return new File(((KanjiDic) o).dicfile).equals( new File( dicfile));
         } catch (ClassCastException ex) {
             return false;
         }

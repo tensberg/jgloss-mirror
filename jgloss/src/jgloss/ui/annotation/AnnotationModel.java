@@ -53,7 +53,7 @@ public class AnnotationModel extends DefaultTreeModel {
      * addAnnotation}
      * to allow the user to modify what will be looked up when adding a new annotation.
      */
-    public static interface LookupTranslator {
+    public interface LookupTranslator {
         /**
          * Takes the string and returns a list of annotations.
          *

@@ -165,7 +165,7 @@ public class StyleDialog extends Box {
      *
      * @author Michael Koch
      */
-    private class ColorIcon implements Icon {
+    private static class ColorIcon implements Icon {
         /**
          * Width of the icon.
          */

@@ -38,7 +38,7 @@ public interface Parser {
      *
      * @author Michael Koch
      */
-    public interface TextAnnotation {
+    interface TextAnnotation {
         /**
          * Returns the start offset of this annotation in the parsed text. 
          *

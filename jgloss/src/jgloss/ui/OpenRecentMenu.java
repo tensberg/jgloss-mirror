@@ -36,7 +36,7 @@ import javax.swing.*;
  * @author Michael Koch
  */
 public class OpenRecentMenu {
-    public static interface FileSelectedListener {
+    public interface FileSelectedListener {
         /**
          * Invoked when the user selects a file from the open recent menu
          */

@@ -1,0 +1,32 @@
+# Encoding: EUC-JP
+#
+# Customization strings for the jgloss.ui.HTMLifyReader class.
+#
+# Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+#
+# This file is part of JGloss.
+#
+# JGloss is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# JGloss is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with JGloss; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id$
+#
+
+# Characters which, if they appear last on a line, do not mark the end of a paragraph.
+no_paragraph_end=,，、…
+
+# Characters which, if they appear first on a line, do not mark the beginning of a paragraph.
+# This is only tested if the last line ended with a letter, digit or one of the no_paragraph_end
+# chars.
+no_paragraph_start=,.．，、。！？…

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
 #
 # This file is part of JGloss.
 #
@@ -40,7 +40,7 @@ ifndef NATIVE2ASCII
   NATIVE2ASCII := native2ascii
 endif
 
-RELEASE := 1.0.4
+RELEASE := 1.0.5
 DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www
@@ -52,6 +52,7 @@ ICONS := jgloss.png html.png tex.png txt.png chasen.png template.png
 RESOURCES := messages.properties messages-dictionary.properties \
              messages_de.properties messages-dictionary_de.properties \
              messages_fr.properties messages-dictionary_fr.properties \
+             jgloss-ui-HTMLifyReader.properties \
              preferences.properties
 
 RESOURCES_WWW := messages-www.properties messages-dictionary.properties \

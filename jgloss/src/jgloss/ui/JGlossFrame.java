@@ -89,7 +89,9 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss import") {
                                 public void run() {
-                                    ImportDialog d = new ImportDialog( target.frame);
+                                    ImportDialog d = new ImportDialog( target != null ? 
+                                                                       target.frame :
+                                                                       null);
                                     if (d.doDialog()) {
                                         JGlossFrame which;
                                         if (target==null || target.documentLoaded)
@@ -470,7 +472,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
                 public void propertyChange( PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( Preferences.EDITOR_ENABLEEDITING))
                         docpane.setEditable( "true".equals( e.getNewValue()));
-                };
+                }
             };
         JGloss.prefs.addPropertyChangeListener( prefsListener);
         
@@ -749,21 +751,19 @@ public class JGlossFrame extends JPanel implements ActionListener {
 
                 in = new StringReader( data);
 
-                if (in != null) {
-                    JGlossFrame which = this;
-                    if (documentLoaded)
-                        which = new JGlossFrame();
-                    
-                    which.loadDocument
-                        ( new HTMLifyReader( in),
-                          JGloss.messages.getString( "import.clipboard"),
-                          JGloss.messages.getString( "import.clipboard"),
-                          GeneralDialog.getComponent().createImportClipboardParser
-                          ( Dictionaries.getDictionaries( true), ExclusionList.getExclusions()),
-                          GeneralDialog.getComponent().createReadingAnnotationFilter(),
-                          true, len);
-                    which.documentChanged = true;
-                }
+                JGlossFrame which = this;
+                if (documentLoaded)
+                    which = new JGlossFrame();
+                
+                which.loadDocument
+                    ( new HTMLifyReader( in),
+                      JGloss.messages.getString( "import.clipboard"),
+                      JGloss.messages.getString( "import.clipboard"),
+                      GeneralDialog.getComponent().createImportClipboardParser
+                      ( Dictionaries.getDictionaries( true), ExclusionList.getExclusions()),
+                      GeneralDialog.getComponent().createReadingAnnotationFilter(),
+                      true, len);
+                which.documentChanged = true;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
@@ -806,12 +806,12 @@ public class JGlossFrame extends JPanel implements ActionListener {
                 contentlength = c.getContentLength();
                 contenttype = c.getContentType();
                 String enc = c.getContentEncoding();
-                InputStream is = c.getInputStream();
+                InputStream is = new BufferedInputStream( c.getInputStream());
                 // a user-selected value for encoding overrides enc
                 if (encoding != null) // use user-selected encoding
-                    in = new InputStreamReader( c.getInputStream(), encoding);
+                    in = new InputStreamReader( is, encoding);
                 else { // auto-detect, works even if enc==null
-                    in = CharacterEncodingDetector.getReader( c.getInputStream(), enc);
+                    in = CharacterEncodingDetector.getReader( is, enc);
                     encoding = ((InputStreamReader) in).getEncoding();
                 }
                 title = url.getFile();
@@ -824,7 +824,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
                 title = f.getName();
                 if (title.toLowerCase().endsWith( "htm") || title.toLowerCase().endsWith( "html"))
                     contenttype = "text/html";
-                InputStream is = new FileInputStream( path);
+                InputStream is = new BufferedInputStream( new FileInputStream( path));
                 if (encoding != null) // use user-selected encoding
                     in = new InputStreamReader( is, encoding);
                 else { // auto-detect
@@ -1750,7 +1750,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
         frame.dispose();
 
         // Sometimes, due to the fact that swing keeps internal references, the JGlossFrame is
-        // not garbage collected until a new frame is created. To ensure that the Objects referenced
+        // not garbage collected until a new frame is created. To ensure that the objects referenced
         // from the JGlossFrame are freed, set references to null
         docpane = null;
         doc = null;

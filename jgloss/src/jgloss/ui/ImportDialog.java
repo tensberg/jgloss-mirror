@@ -224,7 +224,7 @@ public class ImportDialog extends JDialog implements TextListener {
                     if (e.getPropertyName().equals( Preferences.CHASEN_LOCATION))
                         parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
                                                    ( (String) e.getNewValue()));
-                };
+                }
             });
 
         b.add( parserSelector);
