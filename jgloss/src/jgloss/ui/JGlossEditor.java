@@ -427,12 +427,15 @@ public class JGlossEditor extends JTextPane {
             UIUtilities.initAction( addAnnotationAction, "editor.menu.addannotation");
             documentTitleAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
+                        String title = ((JGlossDocument) getDocument()).getTitle();
+                        if (title == null)
+                            title = "";
                         Object result = JOptionPane.showInputDialog
                             ( SwingUtilities.getRoot( JGlossEditor.this), 
                               JGloss.messages.getString( "editor.dialog.doctitle"),
                               JGloss.messages.getString( "editor.dialog.doctitle.title"),
                               JOptionPane.PLAIN_MESSAGE, null, null, 
-                              ((JGlossDocument) getDocument()).getTitle());
+                              title);
                         if (result != null) {
                             ((JGlossDocument) getDocument()).setTitle( result.toString());
                         }
@@ -704,7 +707,7 @@ public class JGlossEditor extends JTextPane {
     }
 
     /**
-     * Dispose resources associated with the editor.
+     * Dispose of resources associated with the editor.
      */
     public void dispose() {
         editMenu.removeAll();

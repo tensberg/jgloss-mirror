@@ -461,8 +461,9 @@ public class WordLookupPanel extends JPanel {
                 }
                 else {
                     // add entry as plain text
-                    resultText.append( wrp.getWord() + " \uff08" + wrp.getReading());
-                    resultText.append( '\uff09');
+                    resultText.append( wrp.getWord());
+                    if (wrp.getReading() != null)
+                        resultText.append( " \uff08" + wrp.getReading() + "\uff09");
                     if (wrp instanceof DictionaryEntry) {
                         resultText.append( ' ');
                         String[] t = ((DictionaryEntry) wrp).getTranslations();

@@ -53,7 +53,7 @@ public class ExclusionList extends Box {
      * displayed in the <CODE>exclusionList</CODE> if the user has not yet applied
      * the changes.
      */
-    private SortedSet exclusions;
+    private Set exclusions;
     /**
      * The widget which displays the excluded words.
      */
@@ -98,7 +98,7 @@ public class ExclusionList extends Box {
     private ExclusionList() {
         super( BoxLayout.X_AXIS);
 
-        exclusions = new TreeSet();
+        exclusions = new HashSet( 20);
         // construct the dictionaries list editor
         exclusionList = new JList();
         exclusionList.setModel( new DefaultListModel());
@@ -193,7 +193,8 @@ public class ExclusionList extends Box {
     public void loadPreferences() {
         DefaultListModel m = (DefaultListModel) exclusionList.getModel();
         m.removeAllElements();
-        for ( Iterator i=exclusions.iterator(); i.hasNext(); ) {
+        // Sort the exclusions by putting them in a tree set.
+        for ( Iterator i=new TreeSet( exclusions).iterator(); i.hasNext(); ) {
             m.addElement( i.next());
         }
     }
@@ -239,7 +240,7 @@ public class ExclusionList extends Box {
         try {
             BufferedReader r = new BufferedReader( CharacterEncodingDetector.getReader
                 ( new FileInputStream( filename)));
-            SortedSet newExclusions = new TreeSet();
+            Set newExclusions = new HashSet( 1000);
             String line;
             while ((line=r.readLine()) != null) {
                 if (line.length() > 0)

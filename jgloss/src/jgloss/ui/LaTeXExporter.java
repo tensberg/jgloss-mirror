@@ -78,27 +78,6 @@ public class LaTeXExporter {
                 outtext.append( escape( text.substring( prevend, ae.getStartOffset())));
             prevend = ae.getEndOffset();
 
-            // handle reading and word text
-            boolean discardReadings = !writeReading || (!writeHidden && annotation.isHidden());
-            Element wordelement = ae.getElement( 0);
-            for ( int j=0; j<wordelement.getElementCount(); j++) {
-                Element child = wordelement.getElement( j);
-                if (child.getElementCount() == 2) { // READING_BASETEXT element
-                    String word = text.substring( child.getElement( 1).getStartOffset(),
-                                                  child.getElement( 1).getEndOffset());
-                    String reading = text.substring( child.getElement( 0).getStartOffset(),
-                                                     child.getElement( 0).getEndOffset());
-                    if (discardReadings || " ".equals( reading))
-                        outtext.append( escape( word));
-                    else
-                        outtext.append( "\\ruby{" + escape( word) + "}{" + escape( reading) + "}");
-                }
-                else { // BASETEXT element
-                    outtext.append( escape( text.substring( child.getStartOffset(),
-                                                            child.getEndOffset())));
-                }
-            }
-
             // handle translation text
             String translation = escape( text.substring( ae.getElement( 1).getStartOffset(), 
                                                          ae.getElement( 1).getEndOffset()));
@@ -134,19 +113,36 @@ public class LaTeXExporter {
                 if (longestreading.length() < nr.length())
                     longestreading = nr;
             }
+
+            // handle reading and word text
+            boolean discardReadings = !writeReading || (!writeHidden && annotation.isHidden());
+            Element wordelement = ae.getElement( 0);
+            for ( int j=0; j<wordelement.getElementCount(); j++) {
+                Element child = wordelement.getElement( j);
+                if (child.getElementCount() == 2) { // READING_BASETEXT element
+                    String word = text.substring( child.getElement( 1).getStartOffset(),
+                                                  child.getElement( 1).getEndOffset());
+                    String reading = text.substring( child.getElement( 0).getStartOffset(),
+                                                     child.getElement( 0).getEndOffset());
+                    if (discardReadings || " ".equals( reading))
+                        outtext.append( escape( word));
+                    else
+                        outtext.append( "\\ruby{" + escape( word) + "}{" + escape( reading) + "}");
+                }
+                else { // BASETEXT element
+                    outtext.append( escape( text.substring( child.getStartOffset(),
+                                                            child.getEndOffset())));
+                }
+            }
         }
         // add the remaining text
         if (prevend < text.length())
             outtext.append( escape( text.substring( prevend, text.length())));
 
-        // Remove the &nbsp;'s (non-breakable spaces) and let LaTeX determine the insets.
-        // Also insert an additional line for every \n, which is LaTeX's mark for a
+        // Insert an additional line for every \n, which is LaTeX's mark for a
         // paragraph break.
         for ( int i=outtext.length()-1; i>=0; i-=1) {
-            if (outtext.charAt( i)=='\u00a0') {
-                outtext.deleteCharAt( i);
-            }
-            else if (outtext.charAt( i)=='\n') {
+            if (outtext.charAt( i)=='\n') {
                 if (i>0 && outtext.charAt( i-1)=='\n') {
                     // an empty paragraph in the original document,
                     // probably used as a separator. Insert some blank
@@ -256,6 +252,9 @@ public class LaTeXExporter {
                 break;
             case '^':
                 buf.replace( i, i+1, "\\^{}");
+                break;
+            case 0xa0: // non-breakable space
+                buf.setCharAt( i, ' ');
                 break;
             }
         }

@@ -315,7 +315,7 @@ export.latex.header=\
 % Use platex to process this file.\n\
 % Note that the file ruby-annotation.sty which comes with JGloss\n\
 % must be installed.\n\n
-export.latex.vocabulary=\ -- Vocabulary List
+export.latex.vocabulary=\ --- Vocabulary List
 
 about.frame.title=About JGloss
 about.title=JGloss 1.0.1
