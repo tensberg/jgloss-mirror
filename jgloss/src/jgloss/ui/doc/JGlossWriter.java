@@ -51,6 +51,25 @@ public class JGlossWriter extends HTMLWriter {
     protected String encoding;
 
     /**
+     * Element used as the annotation wrapper. The annotation wrapper element is inserted
+     * around an annotation element and the HTML DTD is modified so that it allows an
+     * annotation element as child. The purpose of this is to allow an annotation element
+     * anywhere in the HTML document where the wrapper element is allowed. The wrapper element
+     * will be removed from the document when it is loaded.
+     */
+    public static final HTML.Tag ANNOTATION_WRAPPER = HTML.Tag.P;
+    
+    /**
+     * Value of the class attribute of the wrapper element.
+     */
+    public static final String ANNOTATION_WRAPPER_CLASS = "_aw_";
+
+    private final static char[] annotationWrapperStart = ("<" + ANNOTATION_WRAPPER.toString() +
+        " class=\"" + ANNOTATION_WRAPPER_CLASS + "\">").toCharArray();
+    private final static char[] annotationWrapperEnd = ("</" + ANNOTATION_WRAPPER.toString() +
+        ">").toCharArray();
+
+    /**
      * Creates a new writer for a JGloss document which outputs to the given writer.
      * The writer must support the full charset of the characters used in the document.
      *
@@ -87,7 +106,7 @@ public class JGlossWriter extends HTMLWriter {
                 if (ascii)
                     super.output( chars, from, to-from);
                 else
-                    nonAsciiOutput( chars, from, to-from);
+                    nonEscapedOutput( chars, from, to-from);
                 from = to;
                 ascii = !ascii;
             }
@@ -98,7 +117,7 @@ public class JGlossWriter extends HTMLWriter {
         if (ascii)
             super.output( chars, from, to-from);
         else
-            nonAsciiOutput( chars, from, to-from);
+            nonEscapedOutput( chars, from, to-from);
     }
 
     /**
@@ -129,17 +148,40 @@ public class JGlossWriter extends HTMLWriter {
     }
 
     /**
-     * Writes an array of non-ASCII characters directly to the writer.
+     * Writes an array of non-ASCII characters directly to the writer, without using
+     * escape sequences.
      *
      * @param chars The characters to write.
      * @param start Start offset in the character array.
      * @param length Number of characters to write.
      * @exception java.io.IOException if an error occurs during writing.
      */
-    protected void nonAsciiOutput( char[] chars, int start, int length) throws IOException {
+    protected void nonEscapedOutput( char[] chars, int start, int length) throws IOException {
         getWriter().write( chars, start, length);
         setCurrentLineLength( getCurrentLineLength() + length);
     }
+
+    /**
+     * Write a start tag. Overridden to insert an annotation wrapper tag.
+     */
+    protected void startTag( Element elem) throws IOException, BadLocationException {
+        if (matchNameAttribute( elem.getAttributes(), AnnotationTags.ANNOTATION)) {
+            nonEscapedOutput( annotationWrapperStart, 0, annotationWrapperStart.length);
+        }
+        
+        super.startTag( elem);
+    }
+
+    /**
+     * Write an end tag. Overridden to insert an annotation wrapper tag.
+     */
+    protected void endTag( Element elem) throws IOException {
+        super.endTag( elem);
+
+        if (matchNameAttribute( elem.getAttributes(), AnnotationTags.ANNOTATION)) {
+            nonEscapedOutput( annotationWrapperEnd, 0, annotationWrapperEnd.length);
+        }
+    }    
 
     /**
      * Prevent linebreaks. This method always returns false to prevent line breaks, which would
@@ -169,4 +211,5 @@ public class JGlossWriter extends HTMLWriter {
     protected String getCharacterEncoding() {
         return encoding;
     }
+
 } // class JGlossWriter
