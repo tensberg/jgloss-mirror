@@ -45,7 +45,8 @@ DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation
 
-RESOURCES := messages.properties messages_de.properties preferences.properties
+RESOURCES := messages.properties messages_de.properties messages_fr.properties \
+             preferences.properties
 
 CLASSPATH := $(CLASSPATH):./src
 ROOT_SOURCE := src/jgloss/JGloss.java
