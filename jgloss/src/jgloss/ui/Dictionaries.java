@@ -212,17 +212,23 @@ public class Dictionaries extends Box {
      */
     private Dictionary loadDictionary( String file) {
         try {
-            return new EDict( file, file + ".xjdx");
+            return new EDict( file, true);
         } catch (IOException ex) {
+            File f = new File( file);
             String msgid;
-            if (ex instanceof FileNotFoundException)
+            String [] objects;
+            if (ex instanceof FileNotFoundException) {
                 msgid = "error.dictionary.filenotfound";
-            else
+                objects = new String[] { f.getName(), f.getAbsolutePath() };
+            }
+            else {
                 msgid = "error.dictionary.ioerror";
+                objects = new String[] { f.getAbsolutePath() };
+            }
             
             JOptionPane.showConfirmDialog
                 ( SwingUtilities.getRoot( box), JGloss.messages.getString
-                  ( msgid, new Object[] { new File( file).getName() }),
+                  ( msgid, objects),
                   JGloss.messages.getString( "error.dictionary.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             return null;
