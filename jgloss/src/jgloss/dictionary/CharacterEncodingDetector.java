@@ -154,12 +154,18 @@ public class CharacterEncodingDetector {
         PushbackInputStream pbin = new PushbackInputStream( new BufferedInputStream( in), buf.length);
         String enc = null;
         byte[] data;
-        int len = in.read( buf);
-        if (len == -1) // empty file
+        int size = 0;
+        int len = -1;
+        do {
+            len = in.read( buf, size, buf.length-size);
+            if (len > 0)
+                size += len;
+        } while (size<buf.length && len!=-1);
+        if (size == 0) // empty file
             return new InputStreamReader( pbin);
-        if (len < buf.length) {
-            data = new byte[len];
-            System.arraycopy( buf, 0, data, 0, len);
+        if (size < buf.length) {
+            data = new byte[size];
+            System.arraycopy( buf, 0, data, 0, size);
         }
         else
             data = buf;
