@@ -463,7 +463,7 @@ public class JGloss {
             // can't be found
             Preferences prefs = (Preferences) Class.forName( "jgloss.JavaPreferences").newInstance();
             // copy old settings if needed
-            if (prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, true) &&
+            if (!prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, true) &&
                 new File( PropertiesPreferences.PREFS_FILE).exists()) {
                 PropertiesPreferences prop = new PropertiesPreferences();
                 prop.copyPreferences( prefs);

@@ -29,7 +29,7 @@ ifndef JAVAC
 endif
 
 ifndef JAVAC_FLAGS
-  JAVAC_FLAGS := -deprecation -g
+  JAVAC_FLAGS := -deprecation
 endif
 
 ifndef JAR

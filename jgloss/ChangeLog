@@ -1,9 +1,9 @@
-1.0.3: (2002/03/08)
+1.0.3: (2002/03/17)
 	- Added support for GDICT dictionaries (J2SE 1.4 required).
 	- Reimplementation of EDICT using the NIO API (J2SE 1.4 required).
 	  Improved load time and decreased RAM usage.
-	- Added escaping of characters not directly supported to user
-	  dictionary. Umlauts can be used now.
+	- Added escaping of characters not supported by EUC-JP to the
+	  user dictionary.
 	- The document view will truncate long translations to improve the
 	  layout. This does not affect the length of translations in
 	  export formats.
@@ -15,6 +15,8 @@
 	  loading until after the main window is created.
 	- Better error handling when opening dictionaries.
 	- Improved KanjiDic load time.
+	- The annotation list dialog now defaults to the last used
+	  directory.
 	- Use of J2SE 1.4 prefs API if available. Old .jgloss preference
 	  settings will be migrated automatically.
 1.0.2: (2002/02/17)

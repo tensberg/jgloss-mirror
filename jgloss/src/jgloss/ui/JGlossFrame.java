@@ -1744,12 +1744,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Exports the annotation list to a user-specified file.
      */
     private void doExportAnnotationList() {
-        String path;
-        if (documentPath == null)
-            path = JGloss.getCurrentDir();
-        else
-            path = new File( documentPath).getPath();
-        JFileChooser f = new SaveFileChooser( path);
+        JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
         f.setDialogTitle( JGloss.messages.getString( "export.annotationlist.title"));
         f.setFileHidingEnabled( true);
         f.setFileView( CustomFileView.getFileView());
