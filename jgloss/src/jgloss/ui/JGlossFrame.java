@@ -643,7 +643,8 @@ public class JGlossFrame implements ActionListener {
                         ( new HTMLifyReader( in),
                           JGloss.messages.getString( "import.clipboard"),
                           JGloss.messages.getString( "import.clipboard"),
-                          new Parser( Dictionaries.getDictionaries()), true, len);
+                          new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                          true, len);
                     which.documentChanged = true;
                 }
             } catch (Exception ex) {
@@ -748,7 +749,7 @@ public class JGlossFrame implements ActionListener {
             File f = new File( path);
             Reader in = new InputStreamReader( new FileInputStream( f), "UTF-8");
             loadDocument( in, path, f.getName(), 
-                          new Parser( Dictionaries.getDictionaries()), false,
+                          new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()), false,
                           CharacterEncodingDetector.guessLength( (int) f.length(), "UTF-8"));
         } catch (Exception ex) {
             ex.printStackTrace();
