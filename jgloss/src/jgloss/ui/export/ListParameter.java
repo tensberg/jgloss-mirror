@@ -39,6 +39,10 @@ import javax.swing.JComboBox;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+/**
+ * A list parameter gives the user several choices to pick from. The UI component used is a combo
+ * box.
+ */
 class ListParameter extends UIParameter {
     protected static class Value {
         private String label;

@@ -25,6 +25,11 @@ package jgloss.ui.export;
 
 import org.w3c.dom.Element;
 
+/**
+ * UI element for choosing the XSLT export template. While the element names are different,
+ * the tree structure of the XML element is identical to the list parameter. The list parameter
+ * can thus be used as superclass.
+ */
 class TemplateChooser extends ListParameter {
     TemplateChooser( Element elem) {
         super( elem);

@@ -27,7 +27,21 @@ import jgloss.ui.JGlossFrameModel;
 
 import java.net.URL;
 
+/**
+ * Export parameter passed to the export XSLT style sheet.
+ * The parameter can be accessed in the XSLT style sheet by defining a global
+ * &lt;xsl:param&gt; section with the parameter name as name attribute.
+ */
 interface Parameter {
+    /**
+     * Name of the parameter. Set this in the name attribute of the xsl:param element
+     * of the style sheet.
+     */
     String getName();
+    /**
+     * Value of the parameter. The <code>Object</code> value is converted internally
+     * to the expected type by the style sheet engine. To pass primitive types like
+     * <code>boolean</code>, wrap them in their object counterparts.
+     */
     Object getValue( JGlossFrameModel source, URL systemId);
 } // class Parameter

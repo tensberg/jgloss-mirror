@@ -114,8 +114,9 @@
 <!ELEMENT template ((label|label-key)?,source)>
 <!ELEMENT source (#PCDATA)> <!-- path to the XSLT file, relative to the export descriptor -->
 
-<!-- Collection of two or more different templates -->
-<!ELEMENT templates (template,template+)>
+<!-- Collection of templates. If the editable attribute is set to true, the user can choose
+     his own template files in addition to the supplied ones. -->
+<!ELEMENT templates (template*)>
 <!ATTLIST templates name CDATA "template-name"
                     label-key CDATA #REQUIRED
                     prefs-key CDATA #REQUIRED

@@ -27,6 +27,12 @@ import jgloss.util.XMLTools;
 
 import org.w3c.dom.Element;
 
+/**
+ * Abstract implementation of a export parameter. The name and default value is initialized
+ * through an XML element.
+ *
+ * @author Michael Koch
+ */
 abstract class AbstractParameter implements Parameter {
     protected String name;
     protected String defaultValue;
@@ -37,6 +43,9 @@ abstract class AbstractParameter implements Parameter {
 
     public String getName() { return name; }
 
+    /**
+     * Initializes the name and default value from an XML element.
+     */
     protected void initFromElement( Element elem) {
         name = elem.getAttribute( Exporter.Attributes.NAME);
         defaultValue = XMLTools.getText( elem);

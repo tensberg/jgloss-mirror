@@ -25,5 +25,28 @@
 </HEAD>
 <BODY>
 Classes for exporting JGloss documents to other formats.
+<p>
+JGloss documents are stored as XML documents which conform to the JGloss
+DTD. Exporting JGloss documents to other formats is done by applying XSLT
+templates to the XML document to generate HTML, plain text, LaTeX or
+other formats.
+</p><p>
+Export descriptor documents in XML format are used to specify the export
+options of an export format. The descriptor defines the name of the export
+menu item, parameters which may be configured by the user and are passed to
+the XSLT export template and the links to the XSLT export templates
+themselves. The export descriptor files are stored in
+<code>src/data/export</code>.
+</p><p>
+The XSLT export templates are normal XSLT documents, which are applied
+to a JGloss XML document. The export mechanism additionally supplies them
+with parameters which are defined by the export descriptor and can be
+accessed in the XSLT document by defining a global xsl:param element.
+</p><p>
+Instances of class {@link jgloss.ui.export.Exporter Exporter} run the
+export process. Each instance is configured from a single export descriptor
+XML file. The exporter runs the export file chooser and starts the XML
+transformation from the XSLT file.
+</p>
 </BODY>
 </HTML>

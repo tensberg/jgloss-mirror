@@ -42,16 +42,31 @@ import javax.swing.JMenuItem;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * Menu with export items.
+ *
+ * @author Michael Koch
+ */
 public class ExportMenu extends JMenu implements ActionListener {
     private static List exporters = new ArrayList();
 
     private static final String EXPORTER_CLIENT_PROPERTY = "exporter client property";
     
+    /**
+     * Register an exporter. The supplied input source must be initialized to an
+     * export descriptor XML document. For each registered exporter a menu item will be
+     * created.
+     */
     public static synchronized void registerExporter( InputSource in) throws IOException,
                                                                              SAXException {
         exporters.add( new Exporter( in));
     }
 
+    /**
+     * Register the standard export menu items. The list of standard exporters are stored in
+     * the resources, the corresponding files are stored in the JGloss jar file under
+     * <code>data/exporters</code>.
+     */
     public static synchronized void registerStandardExporters() {
         String[] resources = StringTools.split( JGloss.messages.getString( "exporters"), ':');
         for ( int i=0; i<resources.length; i++) try {
@@ -64,6 +79,9 @@ public class ExportMenu extends JMenu implements ActionListener {
 
     private JGlossFrameModel context;
 
+    /**
+     * Creates a new export menu. For each registered exporter a menu item is created.
+     */
     public ExportMenu() {
         super( JGloss.messages.getString( "main.menu.export"));
 
@@ -80,6 +98,10 @@ public class ExportMenu extends JMenu implements ActionListener {
         setEnabled( false);
     }
 
+    /**
+     * Set the export context. The context supplies the document which is exported as well
+     * as meta-information about the document such as the file name.
+     */
     public void setContext( JGlossFrameModel _context) {
         context = _context;
         boolean enabled = (context != null && !context.isEmpty());
@@ -88,6 +110,9 @@ public class ExportMenu extends JMenu implements ActionListener {
             getItem( i).setEnabled( enabled);
     }
 
+    /**
+     * Starts the export process when an export menu item is selected.
+     */
     public void actionPerformed( ActionEvent a) {
         JMenuItem source = (JMenuItem) a.getSource();
         Exporter exporter = (Exporter) source.getClientProperty( EXPORTER_CLIENT_PROPERTY);

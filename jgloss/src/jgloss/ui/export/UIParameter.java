@@ -30,21 +30,50 @@ import java.awt.Component;
 
 import org.w3c.dom.Element;
 
+/**
+ * Export parameter which is configured by the user through a UI component.
+ *
+ * @author Michael Koch
+ */
 abstract class UIParameter extends AbstractParameter {
+    /**
+     * Label of the UI component.
+     */
     protected String label;
+    /**
+     * Key under which the parameter value is stored in the user preferences.
+     */
     protected String prefsKey;
 
+    /**
+     * Creates a new UI parameter initialized from a XML element.
+     */
     protected UIParameter( Element elem) {
         super( elem);
     }
 
+    /**
+     * Returns the UI component through which the user can configure the value of the
+     * export parameter.
+     */
     public abstract Component getComponent();
+
+    /**
+     * Loads the value of the parameter from the user preferences.
+     */
     public abstract void loadFromPrefs();
 
+    /**
+     * Saves the value of the parameter to the user preferences.
+     */
     public void saveToPrefs() {
         JGloss.prefs.set( prefsKey, String.valueOf(getValue( null, null)));
     }
 
+    /**
+     * Configure the UI parameter from a XML element. Initializes the name, default value,
+     * preferences key and label.
+     */
     protected void initFromElement( Element elem) {
         super.initFromElement( elem);
         label = JGloss.messages.getString( elem.getAttribute( Exporter.Attributes.LABEL_KEY));

@@ -62,7 +62,17 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.EntityResolver;
 
+/**
+ * An <code>Exporter</code> runs the export process when the user selects an export menu item.
+ * The exporter configuration is read from an export descriptor XML file. The export is done
+ * by applying a XSLT template to the JGloss XML document.
+ *
+ * @author Michael Koch
+ */
 class Exporter {
+    /**
+     * Element names of an export descriptor XML file.
+     */
     interface Elements {
         String PARAMETERS = "parameters";
         String LOCALIZED_STRINGS = "localized-strings";
@@ -73,6 +83,9 @@ class Exporter {
         String TEMPLATES = "templates";
     } // interface Elements
 
+    /**
+     * Attribute names of an export descriptor XML file.
+     */
     interface Attributes {
         String KEY = "key";
         String DESCRIPTION_KEY = "description-key";
@@ -87,6 +100,9 @@ class Exporter {
     public static final String DTD_SYSTEM = "http://jgloss.sourceforge.net/export-descriptor.dtd";
     public static final String DTD_RESOURCE = "/data/export/export-descriptor.dtd";
 
+    /**
+     * Uses the locally stored export descriptor dtd instead of the system id link.
+     */
     private static final EntityResolver EXPORT_ENTITY_MAPPER =
         new EntityResolver() {
             public InputSource resolveEntity( String publicId, String systemId)
@@ -127,6 +143,9 @@ class Exporter {
     private String template;
     private URL systemId;
 
+    /**
+     * Creates a new exporter from an export descriptor XML file.
+     */
     Exporter( InputSource _config) throws SAXException, IOException {
         try {
             DocumentBuilder builder = docFactory.newDocumentBuilder();
@@ -155,6 +174,9 @@ class Exporter {
         return UIUtilities.initButton( b, menuKey);
     }
 
+    /**
+     * Shows the export file chooser and runs the export.
+     */
     public synchronized void export( JGlossFrameModel source, Document doc, Component parent) {
         if (filechooser == null) {
             initFileChooser();
