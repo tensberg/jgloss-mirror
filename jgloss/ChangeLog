@@ -3,7 +3,7 @@
 	- Reimplementation of EDICT using the NIO API (J2SE 1.4 required).
 	  Improved load time and decreased RAM usage.
 	- Added escaping of characters not directly supported to user
-	  dictionary. Umlauts now can be used.
+	  dictionary. Umlauts can be used now.
 	- The document view will truncate long translations to improve the
 	  layout. This does not affect the length of translations in
 	  export formats.

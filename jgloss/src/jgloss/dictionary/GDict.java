@@ -37,13 +37,6 @@ import java.util.regex.*;
  * @author Michael Koch
  */
 public class GDict extends FileBasedDictionary {
-    public static void main( String[] args) throws Exception {
-        GDict g = new GDict( new File( "/home/michael/japan/dictionaries/gdict/gdictutf.txt"), true);
-        //GDict g = new GDict( new File( "/home/michael/testdic"), true);
-        //GDict g = new GDict( new File( "/home/michael/japan/dictionaries/edict.gdt"), true);
-        //System.out.println( g.search( "so", SEARCH_EXACT_MATCHES, RESULT_DICTIONARY_ENTRIES));
-    }
-
     /**
      * Name of the dictionary format.
      */
@@ -379,6 +372,9 @@ public class GDict extends FileBasedDictionary {
         }
     }
 
+    /**
+     * Reads the next UTF-8 encoded character.
+     */
     protected int readCharacter( ByteBuffer buf) throws BufferUnderflowException {
         byte b = buf.get();
         int c;
@@ -419,7 +415,7 @@ public class GDict extends FileBasedDictionary {
         else if ((c >= 'A') && (c <= 'Z')) // lowercase for ASCII letters
             c |= 0x20;
         else if (c>127 && c<256) // lowercase for latin umlauts
-            c = Character.toLowerCase( (char) c); // this method is slow, so only use it for the special case
+            c = Character.toLowerCase( (char) c); // this method is slow, only use it for the special case
 
         return c;
     }

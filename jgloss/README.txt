@@ -20,6 +20,10 @@ executable JAR file by typing "make jgloss", create the documentation by
 executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
+JGloss 1.0.3 fixes some bugs in the EDICT implementation. To improve dictionary
+lookup accuracy, you should delete any old .jjdx index files created by
+previous versions of JGloss.
+
 Known problems:
   - When the ChaSen parser is used with JRE 1.3 on Windows 98/ME/XP, a window
     pops up while ChaSen runs. This does not happen with JRE 1.4.
