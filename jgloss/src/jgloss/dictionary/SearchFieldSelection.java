@@ -33,8 +33,8 @@ public class SearchFieldSelection {
     private boolean readingSelected = false;
     private boolean translationSelected = false;
 
-    private boolean matchField;
-    private boolean matchWord;
+    private boolean matchField = false;
+    private boolean matchWord = false;
 
     /**
      * Creates a new instance in which none of the fields is selected.

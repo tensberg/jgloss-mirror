@@ -34,6 +34,12 @@ import java.util.*;
  * @author Michael Koch
  */
 public class FileIndexContainer implements IndexContainer {
+    public static void main( String[] args) throws Exception {
+        FileIndexContainer f = new FileIndexContainer( new File( args[0]), false);
+        System.err.println( f.indexes);
+        f.close();
+    }
+
     /**
      * Meta data for indexes stored in the container.
      */
@@ -82,6 +88,10 @@ public class FileIndexContainer implements IndexContainer {
             }
             else
                 return data.duplicate();
+        }
+
+        public String toString() {
+            return "Index data: " + Integer.toHexString( type) + "/" + start + "/" + length;
         }
     } // class IndexMetaData
     
@@ -268,6 +278,7 @@ public class FileIndexContainer implements IndexContainer {
             
             // the last indexOffset points after the end of the index container file
             while (indexOffset < length) {
+                indexFile.seek( indexOffset);
                 IndexMetaData index = new IndexMetaData( indexFile);
                 indexes.add( index);
                 indexOffset = index.nextIndexMetaDataOffset();

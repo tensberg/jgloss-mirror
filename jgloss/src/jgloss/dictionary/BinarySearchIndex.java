@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 public class BinarySearchIndex implements Index {
-    private static class BinarySearchIterator implements Index.Iterator {
+    private class BinarySearchIterator implements Index.Iterator {
         private int firstEntry;
         private int lastEntry;
         private int currentEntry;
@@ -42,11 +42,11 @@ public class BinarySearchIndex implements Index {
         public int next() {
             if (!hasNext())
                 throw new java.util.NoSuchElementException();
-            return currentEntry++;
+            return index.get( currentEntry++);
         }
     } // class BinarySearchIterator
 
-    protected static final BinarySearchIterator EMPTY_MATCH = new BinarySearchIterator( 0, -1);
+    protected final BinarySearchIterator EMPTY_MATCH = new BinarySearchIterator( 0, -1);
 
     /**
      * Return type for {@link #getType() getType}.

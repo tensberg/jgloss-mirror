@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.util.StringTools;
+
 import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
 import java.nio.charset.CharacterCodingException;
@@ -33,41 +35,100 @@ import java.nio.charset.CharacterCodingException;
  * @author Michael Koch
  */
 public class UTF8CharacterHandler implements EncodedCharacterHandler {
+    private int[] charData = new int[6];
+
     public UTF8CharacterHandler() {}
 
     public int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,
-                                                 CharacterCodingException {
-        byte b = buf.get();
-        int c;
-        // the dictionary is UTF-8 encoded; if the highest bit is set, more than one byte must be read
+                                                        IndexOutOfBoundsException,
+                                                        CharacterCodingException {
+        byte b = buffer.get();
+        int length = 1;
         if ((b&0x80) == 0) {
-            // ASCII character
-            c = b;
+            return b; // single byte character
         }
-        else if ((b&0xe0) == 0xc0) { // 2-byte encoded char
-            byte b2 = buf.get();
-            if ((b2&0xc0) == 0x80) // valid second byte
-                c = ((b&0x1f) << 6) | (b&0x3f);
-            else {
-                throw new CharacterCodingException( "invalid 2-byte character");
-            }
+        else if ((b&0xe0) == 0xc0) { // %110xxxxx
+            length = 2;
+            charData[0] = b & 0x1f;
         }
-        else if ((b&0xf0) == 0xe0) { // 3-byte encoded char
-            byte b2 = buf.get();
-            byte b3 = buf.get();
-            if (((b2&0xc0) == 0x80) &&
-                ((b3&0xc0) == 0x80)) { // valid second and third byte
-                c = ((b&0x0f) << 12) | ((b2&0x3f) << 6) | (b3&0x3f);
-            }
-            else {
-                c = '?';
-                throw new CharacterCodingException( "invalid 3-byte character");
-            }
+        else if ((b&0xf0) == 0xe0) { // %1110xxxx
+            length = 3;
+            charData[0] = b & 0x0f;
         }
-        else { // 4-6 byte encoded char or invalid char
-            // FIXME: support 4-6 byte characters
-            throw new CharacterCodingException( "4-6 byte chars not supported by this implementation");
+        else if ((b&0xf8) == 0xf0) { // %11110xxx
+            length = 4;
+            charData[0] = b & 0x07;
         }
+        else if ((b&0xfc) == 0xf8) { // % 111110xx
+            length = 5;
+            charData[0] = b & 0x03;
+        }
+        else if ((b&0xfe) == 0xfc) { // % 1111110x
+            length = 6;
+            charData[0] = b & 0x01;
+        }
+        for ( int i=1; i<length; i++) {
+            b = buffer.get();
+            if ((b&0xc0) != 0x80)
+                throw new CharacterCodingException();
+            charData[i] = b & 0x3f;
+        }
+
+        return decode( charData, 0, length);
+    }
+
+    public int readPreviousCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+                                                                CharacterCodingException {
+        int position = buffer.position();
+        byte b = buffer.get( --position);
+        if ((b&0x80) == 0) {
+            buffer.position( position);
+            return b; // single byte character
+        }
+        if ((b&0xc0) != 0x80)
+            throw new CharacterCodingException();
+        
+        charData[5] = b & 0x3f;
+        int length = 2;
+        
+        do {
+            b = buffer.get( --position);
+            if ((b&0xc0) != 0x80)
+                break;
+            charData[6-length] = b & 0x3f;
+            length++;
+        } while (length <= 6);
+        
+        if (length==2 && (b&0xe0)==0xc0)
+            charData[4] = b&0x1f;
+        else if (length==3 && (b&0xf0)==0xe0)
+            charData[3] = b&0x0f;
+        else if (length==4 && (b&0xf8)==0xf0)
+            charData[2] = b&0x07;
+        else if (length==5 && (b&0xfc)==0xf8)
+            charData[1] = b&0x03;
+        else if (length==6 && (b&0xfe)==0xfc)
+            charData[0] = b&0x01;
+        else // invalid length or wrong length marker in byte b
+            throw new CharacterCodingException();
+        
+        buffer.position( position);
+        return decode( charData, 6-length, length);
+    }
+
+    protected int decode( int[] charData, int offset, int length) throws CharacterCodingException {
+        // catch overlong UTF-8 sequences 
+        // (sequences that are longer than necessary to encode a character)
+        if (length==2 && charData[offset]==0 ||
+            length==3 && (charData[offset+1]&0x20)==0 ||
+            length==4 && (charData[offset+1]&0x30)==0 ||
+            length==5 && (charData[offset+1]&0x38)==0 ||
+            length==6 && (charData[offset+1]&0x3c)==0)
+            throw new CharacterCodingException();
+
+        int c = charData[offset];
+        for ( int i=1; i<length; i++)
+            c = c<<6 | charData[offset+i];
 
         return c;
     }

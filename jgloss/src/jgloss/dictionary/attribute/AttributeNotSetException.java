@@ -24,9 +24,17 @@
 package jgloss.dictionary.attribute;
 
 public class AttributeNotSetException extends Exception {
+    protected Attribute attribute;
+
     public AttributeNotSetException() {}
 
     public AttributeNotSetException( String message) {
         super( message);
     }
+
+    public AttributeNotSetException( Attribute _attribute) {
+        this.attribute = _attribute;
+    }
+
+    public Attribute getAttribute() { return attribute; }
 } // class AttributeNotDefinedException

@@ -57,7 +57,28 @@ public interface EncodedCharacterHandler {
      *            a legal encoded character.
      */
     int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+                                                 IndexOutOfBoundsException,
                                                  CharacterCodingException;
+
+    /**
+     * Decode the character before the character at the current buffer position. 
+     * Returns the character value;
+     * which does not have to be a unicode code point. Comparison of two integer values returned
+     * by this method is equivalent to the alphabetical comparison of the represented characters.
+     * When the method returns, the buffer's <code>position()</code> will be at the start of the
+     * character returned. Calling this method multiple times will effectively read the encoded
+     * string backwards.
+     *
+     * @param buffer The buffer which contains the encoded character.
+     * @return The decoded character.
+     * @exception BufferUnderflowException if the end of the buffer is reached before a character
+     *            is completely decoded.
+     * @exception CharacterCodingException if the bytes at the current buffer position are not
+     *            a legal encoded character.
+     */
+    int readPreviousCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+                                                         IndexOutOfBoundsException,
+                                                         CharacterCodingException;
 
     /**
      * Modify a character returned by {@link readCharacter(ByteBuffer) readCharacter} to make
@@ -88,7 +109,8 @@ public interface EncodedCharacterHandler {
     CharacterClass getCharacterClass( int character, boolean inWord);
 
     /**
-     * Return the name of the encoding supported by this handler.
+     * Return the name of the encoding supported by this handler. The name must be compatible
+     * with class <code>java.nio.charset.Charset</code>.
      */
     String getEncodingName();
 } // interface EncodedCharacterHandler

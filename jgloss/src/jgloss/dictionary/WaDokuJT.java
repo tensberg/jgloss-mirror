@@ -40,7 +40,7 @@ import java.util.regex.*;
  *
  * @author Michael Koch
  */
-public class GDict extends FileBasedDictionary {
+public class WaDokuJT extends FileBasedDictionary {
     public static void main( String[] args) {
         ALTERNATIVES_MATCHER.reset( "foo (baz$vad); bar");
         System.err.println( "running alternative matcher");
@@ -138,12 +138,8 @@ public class GDict extends FileBasedDictionary {
      */
     protected final List wordlist = new ArrayList( 10);
 
-    public GDict( File dicfile) throws IOException, IndexCreationException {
-        this( dicfile, true);
-    }
-
-    public GDict( File dicfile, boolean createindex) throws IOException, IndexCreationException {
-        super( dicfile, createindex);
+    public WaDokuJT( File dicfile) throws IOException {
+        super( dicfile);
     }
 
     public String getEncoding() { return "UTF-8"; }
@@ -189,9 +185,7 @@ public class GDict extends FileBasedDictionary {
         }
     }
 
-    protected void parseEntry( List result, String entry, int entrystart, int where, 
-                               String expression, ByteBuffer exprbuf,
-                               short searchmode, short resultmode) {
+    protected DictionaryEntry parseEntry( String entry) {
         try {
             int start = 0;
             int end = entry.indexOf( '|');
@@ -388,67 +382,6 @@ public class GDict extends FileBasedDictionary {
                 // in previous switch block
                 indexPosition = INDEX_IN_WORD;
         }
-    }
-
-    /**
-     * Reads the next UTF-8 encoded character.
-     */
-    protected int readCharacter( ByteBuffer buf) throws BufferUnderflowException {
-        byte b = buf.get();
-        int c;
-        // the dictionary is UTF-8 encoded; if the highest bit is set, more than one byte must be read
-        if ((b&0x80) == 0) {
-            // ASCII character
-            c = b;
-        }
-        else if ((b&0xe0) == 0xc0) { // 2-byte encoded char
-            byte b2 = buf.get();
-            if ((b2&0xc0) == 0x80) // valid second byte
-                c = ((b&0x1f) << 6) | (b&0x3f);
-            else {
-                System.err.println( "GDICT warning: invalid 2-byte character");
-                c = '?';
-            }
-        }
-        else if ((b&0xf0) == 0xe0) { // 3-byte encoded char
-            byte b2 = buf.get();
-            byte b3 = buf.get();
-            if (((b2&0xc0) == 0x80) &&
-                ((b3&0xc0) == 0x80)) { // valid second and third byte
-                c = ((b&0x0f) << 12) | ((b2&0x3f) << 6) | (b3&0x3f);
-            }
-            else {
-                c = '?';
-                System.err.println( "GDICT warning: invalid 3-byte character");
-            }
-        }
-        else { // 4-6 byte encoded char or invalid char
-            System.err.println( "GDICT warning: invalid character");
-            c = '?';
-        }
-
-        // convert katakana->hiragana
-        if (StringTools.isKatakana( (char) c))
-            c -= 96; // katakana-hiragana difference is 96 code points
-        else if ((c >= 'A') && (c <= 'Z')) // lowercase for ASCII letters
-            c |= 0x20;
-        else if (c>127 && c<256) // lowercase for latin umlauts
-            c = Character.toLowerCase( (char) c); // this method is slow, only use it for the special case
-
-        return c;
-    }
-
-    protected int isWordCharacter( int c, boolean inWord) {
-        if (c>=0x4e00 && c<0xa000)
-            return 0; // kanji
-        else if (c>=0x3000 && c<0x3100)
-            return 1; // katakana, hiragana
-        else if (c == '-')
-            return (inWord ? 3 : -1);
-        else if (Character.isLetterOrDigit( (char) c)) // any other characters
-            return 3;
-        else
-            return -1; // not in word
     }
 
     public String toString() {

@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.util.NumberTools;
+
 import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
 import java.nio.charset.CharacterCodingException;
@@ -36,6 +38,7 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
     public EUCJPCharacterHandler() {}
 
     public int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+                                                        IndexOutOfBoundsException,
                                                         CharacterCodingException {
         int c = NumberTools.byteToUnsignedByte( buffer.get());
         if (c > 127) { // 2/3-Byte Japanese
@@ -51,21 +54,46 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
         return c;
     }
 
+    public int readPreviousCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+                                                         IndexOutOfBoundsException,
+                                                         CharacterCodingException {
+        // NOTE: currently no support for 3-byte Kanji. Needs to be added as soon as I know
+        //       how to recognize them when reading backwards.
+
+        int position = buffer.position();
+        int character;
+        byte b = buffer.get( --position);
+        if ((b&0x80) == 0) { // single byte character
+            character = b;
+        }
+        else {
+            byte b2 = buffer.get( --position);
+            if ((b2&0x80) == 0)
+                throw new CharacterCodingException();
+
+            character = NumberTools.byteToUnsignedByte( b2)<<8 | b;
+        }
+
+        buffer.position( position);
+        return character;
+    }
+
     public int convertCharacter( int c) {
         if ((c >= 'A') && (c <= 'Z')) // uppercase -> lowercase conversion
             c |= 0x20;
-        if (c&0xff00 == 0xa500) // convert katakana to hiragana
+        if ((c&0xff00) == 0xa500) // convert katakana to hiragana
             c &= 0xfeff; // converts 0xa5 to 0xa4
+        return c;
     }
 
     public CharacterClass getCharacterClass( int c, boolean inWord) {
         if (c > 127) { // multibyte character in EUC-JP encoding
             if (c >= 0xb000) // 2- or 3-byte kanji
                 return CharacterClass.KANJI;
-            if (c&0xff00 == 0xa500)
+            if ((c&0xff00) == 0xa500)
                 return CharacterClass.HIRAGANA;
             else
-                return CharacterClass.KANA;
+                return CharacterClass.KATAKANA;
         }
         else { // ASCII character
             if (c>='a' && c<='z' ||

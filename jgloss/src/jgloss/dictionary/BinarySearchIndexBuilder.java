@@ -34,10 +34,12 @@ import java.util.Random;
  * @author Michael Koch
  */
 public class BinarySearchIndexBuilder implements IndexBuilder {
+    private static final int INITIAL_INDEX_SIZE = 500000;
+
     protected IndexContainer indexContainer;
     protected Indexable dictionary;
-    protected File tempIndexFile;
-    protected RandomAccessFile tempIndex;
+    protected ByteBuffer tempIndex;
+    protected IntBuffer tempIndexInt;
 
     /**
      * Random number generator. Used for randomized quicksort in index creation.
@@ -52,11 +54,12 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
         this.dictionary = _dictionary;
 
         try {
-            tempIndexFile = File.createTempFile( "jgloss", null);
-            tempIndex = new RandomAccessFile( tempIndexFile, "rw");
-        } catch (IOException ex) {
-            throw new IndexException( ex);
+            tempIndex = ByteBuffer.allocate( INITIAL_INDEX_SIZE*4);
+        } catch (OutOfMemoryError er) {
+            throw new IndexException( er);
         }
+        tempIndex.order( indexContainer.getIndexByteOrder());
+        tempIndexInt = tempIndex.asIntBuffer();
     }
                                                                                   
     public boolean addEntry( int location, int length, DictionaryEntryField field) throws IndexException {
@@ -64,22 +67,26 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
             field == DictionaryEntryField.READING ||
             field == DictionaryEntryField.TRANSLATION) {
             try {
-                if (indexContainer.getIndexByteOrder() == ByteOrder.BIG_ENDIAN)
-                    tempIndex.writeInt( location);
-                else { // shuffle bytes
-                    tempIndex.write( location); // writes the low eight bits of location
-                    location >>>= 8;
-                    tempIndex.write( location);
-                    location >>>= 8;
-                    tempIndex.write( location);
-                    location >>>= 8;
-                    tempIndex.write( location);
+                tempIndexInt.put( location);
+            } catch (BufferOverflowException ex) {
+                // index buffer is not large enough, increase the size
+                ByteBuffer newIndex;
+                try {
+                    newIndex = ByteBuffer.allocate( (int) (tempIndex.capacity()*1.5));
+                } catch (OutOfMemoryError er) {
+                    tempIndex = null;
+                    throw new IndexException( er);
                 }
-
-                return true;
-            } catch (IOException ex) {
-                throw new IndexException( ex);
+                newIndex.order( tempIndex.order());
+                newIndex.put( tempIndex);
+                tempIndex = newIndex;
+                tempIndex.rewind();
+                int intpos = tempIndexInt.position();
+                tempIndexInt = tempIndex.asIntBuffer();
+                tempIndexInt.position( intpos);
+                tempIndexInt.put( location);
             }
+            return true;
         }
         else
             return false;
@@ -88,23 +95,25 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
     public void endBuildIndex( boolean commit) throws IndexException {
         try {
             if (commit) {
-                FileChannel indexChannel = tempIndex.getChannel();
-                ByteBuffer buffer = indexChannel.map( FileChannel.MapMode.READ_WRITE, 0,
-                                                      tempIndex.length());
-                buffer.order( indexContainer.getIndexByteOrder());
-                IntBuffer index = buffer.asIntBuffer();
-                
-                quicksortIndex( 0, index.capacity()-1, index);
-                
+                // position of tempIndexInt is now one after the last int written
+                tempIndex.limit( tempIndexInt.position()*4);
+                tempIndex.rewind();
+
+                System.err.println( tempIndexInt.position());
+                System.err.println( "Committing index");
+                System.err.println( "sorting index");
+                quicksortIndex( 0, tempIndexInt.position()-1, tempIndexInt);
+                System.err.println( "sorted index");
+
                 // copy index data from temp file to index container
-                buffer.position( 0);
-                indexContainer.createIndex( BinarySearchIndex.TYPE, buffer);
+                try {
+                    indexContainer.createIndex( BinarySearchIndex.TYPE, tempIndex);
+                } catch (IndexOutOfBoundsException ex) {
+                    throw new IndexException( ex);
+                }
             }
 
-            tempIndex.close();
-            tempIndexFile.delete();
             tempIndex = null;
-            tempIndexFile = null;
         } catch (IOException ex) {
             throw new IndexException( ex);
         }
@@ -146,17 +155,6 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
         else {
             quicksortIndex( l+1, right, index);
             quicksortIndex( left, l-1, index);
-        }
-    }
-
-    protected void finalize() {
-        if (tempIndex != null) {
-            try {
-                tempIndex.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            tempIndexFile.delete();
         }
     }
 } // class BinarySearchIndexBuilder

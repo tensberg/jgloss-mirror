@@ -177,6 +177,11 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      */
     protected MappedByteBuffer dictionary;
     /**
+     * Duplicate of the  {@link #dictionary dictionary} byte buffer. Created using
+     * <code>dictionary.duplicate()</code> and needed for comparison.
+     */
+    protected ByteBuffer dictionaryDuplicate;
+    /**
      * Decoder initialized to convert a byte array to a char array using the charset of the
      * dictionary.
      */
@@ -190,6 +195,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Name of the dictionary. This will be the filename of the dictionary file.
      */
     protected String name;
+    protected File indexFile;
     /**
      * Container which stores the index data for this dictionary.
      */
@@ -212,12 +218,12 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * @dicfile File which holds the dictionary.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
-    protected FileBasedDictionary( File _dicfile) 
-        throws IOException {
+    protected FileBasedDictionary( File _dicfile) throws IOException {
         this.dicfile = _dicfile;
         name = dicfile.getName();
+        indexFile = new File( dicfile.getCanonicalPath() + FileIndexContainer.EXTENSION);
 
-        characterHandler = getEncodedCharacterHandler();
+        characterHandler = createCharacterHandler();
         try {
             decoder = Charset.forName( characterHandler.getEncodingName()).newDecoder();
         } catch (UnsupportedCharsetException ex) {
@@ -229,6 +235,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         dicchannel = new FileInputStream( dicfile).getChannel();
         dictionarySize = (int) dicchannel.size();
         dictionary = dicchannel.map( FileChannel.MapMode.READ_ONLY, 0, dictionarySize);
+        dictionaryDuplicate = dictionary.duplicate();
 
         binarySearchIndex = new BinarySearchIndex();
 
@@ -272,17 +279,21 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     }
 
     public boolean loadIndex() throws IndexException {
-        File indexFile = new File( name + FileIndexContainer.EXTENSION);
-
         // rebuild the index if the dictionary was changed after the index was created
-        if (indexFile.lastModified() < dicfile.lastModified())
+        if (indexFile.lastModified() < dicfile.lastModified()) {
+            indexFile.delete();
             return false;
+        }
 
         try {
             indexContainer = new FileIndexContainer( indexFile, false);
             // insert tests for existence of additional index types here
-            if (indexContainer.hasIndex( binarySearchIndex.getType()))
-                return true;
+            if (!indexContainer.hasIndex( binarySearchIndex.getType()))
+                return false;
+
+            initIndexes();
+
+            return true;
         } catch (FileNotFoundException ex) {
             // no index file, create it
         } catch (IndexException ex) {
@@ -297,7 +308,6 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     }
 
     public void buildIndex() throws IndexException {
-        File indexFile = new File( name + FileIndexContainer.EXTENSION);
         try {
             indexContainer = new FileIndexContainer( indexFile, true);
             if (!indexContainer.hasIndex( binarySearchIndex.getType())) {
@@ -317,6 +327,12 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         } finally {
             indexContainer.endEditing();
         }
+
+        initIndexes();
+    }
+
+    protected void initIndexes() throws IndexException {
+        binarySearchIndex.setContainer( indexContainer);
     }
 
     /**
@@ -329,7 +345,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Return a character handler which understands the character encoding format used by this
      * dictionary.
      */
-    public EncodedCharacterHandler getCharacterHandler() {
+    public EncodedCharacterHandler getEncodedCharacterHandler() {
         return characterHandler;
     }
 
@@ -450,6 +466,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             // end of dictionary->end of entry
         }
 
+        /*try {
+            System.err.println( new String( entrybuf, 0, entrylength, "EUC-JP"));
+            } catch (UnsupportedEncodingException ex) {}*/
         ByteBuffer out = ByteBuffer.wrap( entrybuf, 0, entrylength);
         out.position( matchstart-start);
 
@@ -473,7 +492,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         // NIO decoder is faster than new String(), but NIO character encoding support is limited
         if (decoder != null) {
             try {
-                entrystring = decoder.decode( entry).toString();
+                entrystring = unescape( decoder.decode( entry).toString());
             } catch (CharacterCodingException ex) {
                 throw new SearchException( ex);
             }
@@ -491,7 +510,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     }
     
     /**
-     * Test if the character at the given location is the first in an entry field.
+     * Test if the character at the given location is the first in an entry field. If the dictionary
+     * supports several words, readings or translations in one entry, each counts as its own field.
      * 
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
@@ -499,7 +519,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      */
     protected abstract boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field);
     /**
-     * Test if the character at the given location is the last in an entry field.
+     * Test if the character at the given location is the last in an entry field. If the dictionary
+     * supports several words, readings or translations in one entry, each counts as its own field.
      * 
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
@@ -584,8 +605,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Create a {@link DictionaryEntry DictionaryEntry} object from the entry string from the dictionary.
      *
      * @param entry Entry string as found in the dictionary.
+     * @exception SearchException if the dictionary entry is malformed.
      */
-    protected abstract DictionaryEntry parseEntry( String entry);
+    protected abstract DictionaryEntry parseEntry( String entry) throws SearchException;
     
     public void dispose() {
         try {
@@ -607,59 +629,89 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     }
     
     /**
-     * Parses a subset of the dictionary file for index creation.
+     * Adds all indexable terms in the dictionary to the index builder.
      *
      * @return The number of index entries created.
      */
     protected int addIndexTerms( IndexBuilder builder) throws IOException, IndexException {
+        // Indexes all terms in word, reading and translation fields.
+        // Index term boundaries are determined using characterHandler.getCharacterClass():
+        // if the character classes of two adjacent characters differ they are assumed to 
+        // belong to two different terms.
+        // For kanji characters, each kanji in a term is indexed.
+        // For kana characters, whole terms are indexed.
+        // For romaji, terms of length >= 3 are indexed.
+
         int indexsize = 0;
         dictionary.position( 0);
-        ArrayList entryStarts = new ArrayList( 25);
+        ArrayList termStarts = new ArrayList( 25);
+
+        int previousTerm = -1;
         
-        DictionaryEntryField field = moveToNextField( dictionary, 0);
-        while (dictionary.position() < dictionarySize) {
+        DictionaryEntryField field = moveToNextField( dictionary, 0, null);
+        while (dictionary.position() < dictionarySize) try {
             boolean inWord = false;
             int c;
             CharacterClass clazz;
-            int entryStart;
-            DictionaryEntryField currentField = field;
+            int termStart;
+            DictionaryEntryField termField;
+            // find first character of indexable term
             do {
-                entryStart = dictionary.position();
-                c = characterHandler.convertCharacter( characterHandler.readCharacter( dictionary));
+                termStart = dictionary.position();
+                c = characterHandler.readCharacter( dictionary);
                 clazz = characterHandler.getCharacterClass( c, inWord);
-                field = moveToNextField( dictionary, c);
+                field = moveToNextField( dictionary, c, field);
             } while (clazz == CharacterClass.OTHER);
-            entryStarts.clear();
-            entryStarts.add( new Integer( entryStart));
+            termStarts.clear();
+            termStarts.add( new Integer( termStart));
+            termField = field;
             if (clazz == CharacterClass.ROMAN_WORD)
                 inWord = true;
 
-            int entryLength = 1; // entry length in number of characters
-            int entryEnd;
+            int termLength = 1; // term length in number of characters
+            // find end of term
+            int termEnd;
             CharacterClass clazz2;
             do {
-                entryLength++;
-                entryEnd = dictionary.position();
-                c = characterHandler.convertCharacter( characterHandler.readCharacter( dictionary));
+                termLength++;
+                termEnd = dictionary.position(); // first position not part of term
+                c = characterHandler.readCharacter( dictionary);
                 clazz2 = characterHandler.getCharacterClass( c, inWord);
 
+                // for kanji terms, each kanji in the term is indexed
                 if (clazz == CharacterClass.KANJI && clazz2==clazz)
-                    entryStarts.add( new Integer( dictionary.position()));
+                    termStarts.add( new Integer( termEnd));
             } while (clazz2 == clazz);
-            
+
+            // add the term to the index
             if (clazz==CharacterClass.KANJI || 
                 clazz==CharacterClass.HIRAGANA ||
                 clazz==CharacterClass.KATAKANA ||
-                clazz==CharacterClass.ROMAN_WORD && entryLength >= 3) {
-                for ( int i=0; i<entryStarts.size(); i++) {
-                    entryStart = ((Integer) entryStarts.get( i)).intValue();
-                    if (builder.addEntry( entryStart, entryEnd-entryStart, currentField))
+                clazz==CharacterClass.ROMAN_WORD && termLength >= 3) {
+                for ( int i=0; i<termStarts.size(); i++) {
+                    termStart = ((Integer) termStarts.get( i)).intValue();
+
+                    // debug index creation
+                    if (termStart <= previousTerm)
+                        System.err.println( "Warning: possible duplicate index entry");
+                    previousTerm = termStart;
+                    // debug index creation
+
+                    if (builder.addEntry( termStart, termEnd-termStart, termField))
                         indexsize++;
                 }
             }
             
-            field = moveToNextField( dictionary, c);
-        }
+            if (clazz2 != CharacterClass.OTHER) {
+                // unread the last character, because it may be the start of the
+                // next indexable term
+                dictionary.position( termEnd);
+            }
+            else { // char may be a field seperator
+                field = moveToNextField( dictionary, c, field);
+            }
+        } catch (BufferUnderflowException ex) {
+        } catch (IndexOutOfBoundsException ex) {} // end of dictionary file
         
         return indexsize;
     }
@@ -674,9 +726,11 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      *                  character format is dependent on 
      *                  {@link EncodedCharacterHandler#readCharacter(ByteBuffer) readCharacter}
      *                  and not neccessary unicode.
+     * @param field The current field.
      * @return The type of the field the method moved to.
      */
-    protected abstract DictionaryEntryField moveToNextField( ByteBuffer buf, int character);
+    protected abstract DictionaryEntryField moveToNextField( ByteBuffer buf, int character,
+                                                             DictionaryEntryField field);
 
     /**
      * Return the type of the entry field at the given location.
@@ -685,7 +739,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
     public int compare( int pos1, int pos2) throws IndexException {
         try {
-            return compare( dictionary, pos1, Integer.MAX_VALUE, dictionary.duplicate(), pos2);
+            return compare( dictionary, pos1, Integer.MAX_VALUE, dictionaryDuplicate, pos2);
         } catch (java.nio.charset.CharacterCodingException ex) {
             throw new IndexException( ex);
         }
@@ -713,25 +767,35 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      */
     protected int compare( ByteBuffer buf1, int i1, int length, ByteBuffer buf2, int i2) 
         throws CharacterCodingException {
+        if (i1 == i2) {
+            return 0;
+        }
+
         buf1.position( i1);
         buf2.position( i2);
         int end = (int) Math.min( Integer.MAX_VALUE, (long) i1 + (long) length);
+        int l = 0;
         try {
             while (buf1.position() < end) {
-                int b1 = characterHandler.readCharacter( buf1);
-                int b2 = characterHandler.readCharacter( buf2);
+                l++;
+                int b1 = characterHandler.convertCharacter
+                    ( characterHandler.readCharacter( buf1));
+                int b2 = characterHandler.convertCharacter
+                    ( characterHandler.readCharacter( buf2));
                 if (b1 < b2)
                     return -1;
                 else if (b1 > b2)
                     return 1;
             }
         } catch (BufferUnderflowException ex) {
+            System.err.println( "underflow " + l);
             if (buf1.hasRemaining()) // buf2 is prefix of buf1
                 return 1;
             else if (buf2.hasRemaining()) // buf1 is prefix of buf2
                 return -1;
             // else equality
         }
+
         return 0; // equality
     }
 
@@ -811,8 +875,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                 if (searchmode == ExpressionSearchModes.EXACT ||
                     searchmode == ExpressionSearchModes.PREFIX) {
                     // test if preceeding character marks beginning of word entry
-                    if (match>0 && 
-                        !(fields.isSelected( DictionaryEntryField.WORD) ? 
+                    if (match>0 &&
+                        !(fields.isSelected( MatchMode.WORD) ? 
                           isWordStart( entry, match, field) :
                           isFieldStart( entry, match, field)))
                         continue;
@@ -821,7 +885,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                     searchmode == ExpressionSearchModes.SUFFIX) {
                     // test if following character marks end of word entry
                     if (match+expressionLength+1<entry.limit() &&
-                        !(fields.isSelected( DictionaryEntryField.WORD) ? 
+                        !(fields.isSelected( MatchMode.WORD) ? 
                           isWordEnd( entry, match, field) :
                           isFieldEnd( entry, match, field)))
                         continue;

@@ -56,7 +56,7 @@ public class CharacterClass {
     private String name;
 
     private CharacterClass( String _name) {
-        this.name = name;
+        this.name = _name;
     }
 
     public String toString() {

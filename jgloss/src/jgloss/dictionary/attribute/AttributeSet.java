@@ -27,7 +27,7 @@ import java.util.Iterator;
 
 /**
  * Set of attribute key/object mappings used by {@link DictionaryEntry DictionaryEntry}.
- * Each attribute set may have parent sets from which key/value pairs may be inherited.
+ * Each attribute set may have parent sets from which key/value pairs are inherited.
  *
  * @author Michael Koch
  */
@@ -48,7 +48,7 @@ public interface AttributeSet {
      *                  <code>false</code> if inherited attributes should be ignored.
      * @exception AttributeNotSetException if the attribute is not defined.
      */
-    Object getAttribute( Attribute key, boolean resolveInherited) throws AttributeNotSetException;
+    AttributeValue getAttribute( Attribute key, boolean resolveInherited) throws AttributeNotSetException;
     /**
      * Test if a given attribute is inherited from a parent attribute set.
      *
@@ -65,4 +65,8 @@ public interface AttributeSet {
      * @return Iteration of {@link Attribute Attributes}.
      */
     Iterator getAttributeKeys( boolean resolveInherited);
+    /**
+     * Get the parent attribute set of this set. Returns <code>null</code> if this is a root set.
+     */
+    AttributeSet getParent();
 } // interface AttributeSet
