@@ -305,7 +305,6 @@ public class CharacterEncodingDetector {
                         jis8 = false;
                         break;
                     }
-                    System.out.println( "sjis failed 1: " + c + " " + i);
                     sjis = 0;	/* not SJIS */
                 }
                 break;
@@ -317,7 +316,6 @@ public class CharacterEncodingDetector {
 		    c <= 0xfc)
                     sjis = 1;
                 else {
-                    System.out.println( "sjis failed 2: " + c + " " + i);
                     sjis = 0;	/* not SJIS */
                 }
                 break;
