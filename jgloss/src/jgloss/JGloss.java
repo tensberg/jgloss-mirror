@@ -449,7 +449,8 @@ public class JGloss {
     }
 
     /**
-     * Return a Preference implementation appropriate for the current Java VM.
+     * Return a Preference implementation appropriate for the current Java VM. If this is the first
+     * time that the 
      *
      * @see PropertiesPreferences
      * @see JavaPreferences
@@ -462,8 +463,15 @@ public class JGloss {
             // can't be found
             Preferences prefs = (Preferences) Class.forName( "jgloss.JavaPreferences").newInstance();
             // copy old settings if needed
-            if (!prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, true)) {
-                new PropertiesPreferences().copyPreferences( prefs);
+            if (prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, true) &&
+                new File( PropertiesPreferences.PREFS_FILE).exists()) {
+                PropertiesPreferences prop = new PropertiesPreferences();
+                prop.copyPreferences( prefs);
+                // write note about migration in old prefs file
+                try {
+                    prop.store( ResourceBundle.getBundle( MESSAGES)
+                                .getString( "preferences.header.obsolete"));
+                } catch (IOException ex) {}
                 prefs.set( Preferences.PREFERENCES_MIGRATED, true);
             }
             return prefs;

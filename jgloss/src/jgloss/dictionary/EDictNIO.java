@@ -71,12 +71,12 @@ public class EDictNIO extends FileBasedDictionary {
 
         //EDict eo = new EDict( "/home/michael/testdic", true);
         //EDictNIO en = new EDictNIO( new File( "/home/michael/testdic"), true);
-        EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict.b"), true);
+        //EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict.b"), true);
         //GDict en = new GDict( new File( "/home/michael/japan/dictionaries/edict.gdt"), true);
-        GDict eo = new GDict( new File( "/home/michael/japan/dictionaries/edict.gdt"), true);
+        //GDict eo = new GDict( new File( "/home/michael/japan/dictionaries/edict.gdt"), true);
         //EDictNIO eo = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
-        //EDict eo = new EDict( "/home/michael/japan/dictionaries/edict2", true);
-        //EDictNIO en = new EDictNIO( new File( "/usr/share/edict/edict"), true);
+        EDictNIO eo = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict2"), true);
+        EDictNIO en = new EDictNIO( new File( "/usr/share/edict/edict"), true);
         //EDict eo = new EDict( "/usr/share/edict/edict", true);
         //test( "boy", en, eo, SEARCH_ANY_MATCHES);
         

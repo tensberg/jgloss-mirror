@@ -232,7 +232,7 @@ dictionaries.title=Dictionaries
 dictionaries.chooser.title=Add dictionary files
 dictionaries.chooser.button.add=Add
 dictionaries.loading.title=Loading dictionaries...
-dictionaries.loading=Loading dictionary {0}...
+dictionaries.loading=Loading dictionary {0}/Creating index...
 dictionaries.button.up=Move entry up
 dictionaries.button.down=Move entry down
 dictionaries.button.add=Add dictionary file...
@@ -363,12 +363,17 @@ export.latex.header=\
 export.latex.vocabulary=\ --- Vocabulary List
 
 about.frame.title=About JGloss
-about.title=JGloss 1.0.2
+about.title=JGloss 1.0.3
 about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
 
 preferences.header=This file contains the preferences for the application JGloss.
+preferences.header.obsolete=\
+ This file used to contain the JGloss preferences settings.\n\
+# Since JGloss 1.0.3, the settings are stored in a different\n\
+# location (registry on Windows, .java/.userPrefs/jgloss on Unix).\n\
+# This file can be safely deleted.
 
 filefilter.description.jgloss=JGloss documents (*.jgloss)
 filefilter.description.html=HTML documents (*.html)

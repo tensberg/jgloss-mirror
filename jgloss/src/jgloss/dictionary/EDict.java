@@ -931,7 +931,8 @@ public class EDict implements Dictionary {
     public boolean equals( Object o) {
         try {
             return new File(((EDict) o).dicfile).equals( new File( dicfile));
-        } catch (ClassCastException ex) {
+        } catch (Exception ex) {
+            // ClassCastException or NullPointerException
             return false;
         }
     }

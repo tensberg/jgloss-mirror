@@ -252,7 +252,6 @@ public class EditableEDict extends EDict {
                     postBuildIndex();
                 }
             }
-            System.out.println( "added entry");
         } catch (UnsupportedEncodingException ex) {}
     }
 

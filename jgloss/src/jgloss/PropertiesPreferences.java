@@ -36,7 +36,7 @@ class PropertiesPreferences extends Preferences {
     /**
      * Path to the user preferences file.
      */
-    private final String PREFS_FILE = 
+    public final static String PREFS_FILE = 
         System.getProperty( "user.home") + File.separator + ".jgloss";
 
     private Properties prefs;
@@ -195,14 +195,25 @@ class PropertiesPreferences extends Preferences {
     /**
      * Saves the current preferences settings.
      *
+     * @param header Message put in the file header.
+     * @exception java.io.IOException if the user preference file cannot be written.
+     */
+    public synchronized void store( String header) throws IOException {
+        FileOutputStream out = new FileOutputStream( PREFS_FILE);
+        prefs.store( out, header);
+        out.close();
+        changed = false;
+    }
+
+    /**
+     * Saves the current preferences settings. The preferences setting are only written if they
+     * have been changed. The standard preferences file header is used.
+     *
      * @exception java.io.IOException if the user preference file cannot be written.
      */
     private synchronized void store() throws IOException {
         if (changed) {
-            FileOutputStream out = new FileOutputStream( PREFS_FILE);
-            prefs.store( out, JGloss.messages.getString( "preferences.header"));
-            out.close();
-            changed = false;
+            store( JGloss.messages.getString( "preferences.header"));
         }
     }
 

@@ -34,9 +34,9 @@ import java.beans.*;
  * {@link JavaPreferences JavaPreferences} is used, which uses the <CODE>java.util.prefs</CODE> preferences.
  * <p>
  * A set of default preferences is stored with the application jar file and accessed using the
- * <CODE>ResourceBundle</CODE> mechanism from the file "resources/preferences". 
+ * <CODE>ResourceBundle</CODE> mechanism from the resource "resources/preferences". 
  * If a user preference is not yet set, the value from the default preferences is used.
- * The default value passed in to the methods <CODE>getInt</CODE>,... is only used if the default
+ * The default value passed to the methods <CODE>getInt</CODE>,... is only used if the default
  * preference setting (a string) cannot be converted to the requested data type.
  * </p><p>
  * Property change listeners are used to inform interested objects of preference value changes.

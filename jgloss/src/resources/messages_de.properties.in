@@ -37,6 +37,11 @@ error.loadPreferences=Beim Laden der Voreinstellungen ist ein Fehler aufgetreten
 error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufgetreten.
 error.dictionary.title=Fehler beim Öffnen des Wörterbuchs
 error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei {1}\n existiert und lesbar ist.
+error.dictionary.jjdxnotavailable=\
+Die JJDX-Indexdatei für das Wörterbuch {0} konnte\n\
+nicht geöffnet oder erzeugt werden. Überprüfen sie, ob das Verzeichnis\n\
+{1} zum Schreiben freigegeben ist.\n\
+Das Wörterbuch wird nicht verfügbar sein.
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.\nDas Wörterbuch wird nicht verfügbar sein.
 error.dictionary.format=Die Datei {0} ist keine\nWörterbuchdatei in einem unterstützten Format.
 error.exclusions.save.title=Fehler beim Schreiben der Ausschluss-Liste
@@ -215,7 +220,7 @@ dictionaries.title=Wörterbücher
 dictionaries.chooser.title=Wörterbücher hinzufügen
 dictionaries.chooser.button.add=Hinzufügen
 dictionaries.loading.title=Lade Wörterbücher...
-dictionaries.loading=Lade Wörterbuch {0}...
+dictionaries.loading=Lade Wörterbuch {0}/Erzeuge Index...
 dictionaries.button.up=Eintrag nach oben
 dictionaries.button.down=Eintrag nach unten
 dictionaries.button.add=Wörterbuch hinzufügen...
@@ -335,11 +340,22 @@ export.latex.header=\
 export.latex.vocabulary=\ --- Vokabelliste
 
 about.frame.title=Über JGloss
-about.text=Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\nCopyright (c) 2001/2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+about.text=\
+Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\
+\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\
+\n\
+JGloss comes with ABSOLUTELY NO WARRANTY.\n\
+This is free software, and you are welcome to redistribute it\n\
+under certain conditions; select "Show License" for details.
 about.showlicense=Lizenz anzeigen
 about.license.title=GNU General Public License
 
 preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
+preferences.header.obsolete=\
+ Diese Datei enthielt die Voreinstellungen für die Anwendung JGloss.\n\
+# Seit JGloss 1.0.3 werden die Voreinstellungen an einem anderen Ort\n\
+# gespeichert (Registry unter Windows, .java/.userPrefs/jgloss unter\n\
+# Unix). Diese Datei kann problemlos gelöscht werden.
 
 filefilter.description.jgloss=JGloss Dokumente (*.jgloss)
 filefilter.description.html=HTML Dokumente (*.html)

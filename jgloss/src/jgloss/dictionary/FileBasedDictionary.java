@@ -192,7 +192,7 @@ public abstract class FileBasedDictionary implements Dictionary {
                 throw new DictionaryFactory.InstantiationException
                     ( (Exception) ((InvocationTargetException) ex).getTargetException());
             } catch (Exception ex) {
-                // highly unlikely
+                // should never happen
                 throw new DictionaryFactory.InstantiationException( ex);
             }
         }
@@ -261,10 +261,6 @@ public abstract class FileBasedDictionary implements Dictionary {
      */
     protected FileChannel indexchannel;
     /**
-     * Index file mapped into a byte buffer.
-     */
-    protected MappedByteBuffer indexbuf;
-    /**
      * View of the index file as int buffer.
      */
     protected IntBuffer index;
@@ -276,10 +272,6 @@ public abstract class FileBasedDictionary implements Dictionary {
      * Random number generator. Used for randomized quicksort in index creation.
      */
     protected static Random random = new Random();
-    /**
-     * Flag if a call to {@link #search(String,short,short) search} is the first since object creation.
-     */
-    private boolean firstSearch = true;
     
     /**
      * Initializes the dictionary by mapping the dictionary and file into memory and
@@ -318,14 +310,14 @@ public abstract class FileBasedDictionary implements Dictionary {
         // after the index was created
         if (!indexfile.exists() || dicfile.lastModified()>indexfile.lastModified()) {
             if (createindex) try {
-                buildIndex( indexfile); // this also initializes the index member variable
+                buildIndex( indexfile); // this also initializes the index member variables
             } catch (IOException ex) {
                 throw new IndexCreationException();
             }
         }
         else try {
-            indexchannel = new FileInputStream( indexfile).getChannel();
-            indexbuf = indexchannel.map
+            indexchannel = new RandomAccessFile( indexfile, "r").getChannel();
+            MappedByteBuffer indexbuf = indexchannel.map
                 ( FileChannel.MapMode.READ_ONLY, 0, indexchannel.size());
             // read index header
             int version = indexbuf.getInt();
@@ -359,12 +351,14 @@ public abstract class FileBasedDictionary implements Dictionary {
             index = indexbuf.asIntBuffer();
         } catch (Exception ex) {
             // the index file is broken, try to rebuild it
+            if (indexchannel != null)
+                indexchannel.close();
             if (createindex) try {
                 buildIndex( indexfile);
                 return;
             } catch (IOException ex2) {
                 dicchannel.close();
-                ex.printStackTrace();
+                ex2.printStackTrace();
             }
             throw new IndexCreationException();
         }
@@ -376,15 +370,6 @@ public abstract class FileBasedDictionary implements Dictionary {
     public abstract String getEncoding();
 
     public List search( String expression, short searchmode, short resultmode) throws SearchException {
-        if (firstSearch) {
-            // Load the dictionary and index file into RAM. This is deferred to the first search
-            // to decrease the time spent in the constructor, and is only done once because different
-            // dictionaries could swap each other out between searches in low memory conditions.
-            dictionary.load();
-            indexbuf.load();
-            firstSearch = false;
-        }
-
         List result = new ArrayList( 10);
         expression = escape( expression);
 
@@ -674,33 +659,36 @@ public abstract class FileBasedDictionary implements Dictionary {
                                                       new String[] { getName() }));
 
             this.indexfile = indexfile;
-            indexchannel = new RandomAccessFile( indexfile, "rw").getChannel();
-            indexbuf = indexchannel.map( FileChannel.MapMode.READ_WRITE,
-                                         0, INDEX_OFFSET + 50000*4);
+            // delete old (invalid) index file if any
+            indexfile.delete();
+
+            DataOutputStream indexstream
+                = new DataOutputStream( new BufferedOutputStream( new FileOutputStream( indexfile)));
             
             // write index header (big endian format)
-            indexbuf.putInt( JJDX_VERSION);
-            indexbuf.putInt( INDEX_OFFSET); // offset to first index entry
-            indexbuf.putInt( 0); // number of index entries (currently unknown)
+            indexstream.writeInt( JJDX_VERSION);
+            indexstream.writeInt( INDEX_OFFSET); // offset to first index entry
+            indexstream.writeInt( 0); // number of index entries (currently unknown)
             // use platform's native byte order
-            indexbuf.putInt( (ByteOrder.nativeOrder()==ByteOrder.BIG_ENDIAN) ? 
-                             JJDX_BIG_ENDIAN : JJDX_LITTLE_ENDIAN);
-            indexbuf.order( ByteOrder.nativeOrder());
+            indexstream.writeInt( (ByteOrder.nativeOrder()==ByteOrder.BIG_ENDIAN) ? 
+                                  JJDX_BIG_ENDIAN : JJDX_LITTLE_ENDIAN);
             
             // add index entries
-            index = indexbuf.asIntBuffer();
-            int entries = addIndexRange( 0, (int) dictionarySize);
-            quicksortIndex( 0, entries-1, dictionary, dictionary.duplicate());
-            
+            int entries = addIndexRange( indexstream, 0, (int) dictionarySize);
+
+            // reopen the index file for random access and map it into memory
+            indexstream.close();
+            RandomAccessFile indexra = new RandomAccessFile( indexfile, "rw");
             // write number of entries
-            indexbuf.order( ByteOrder.BIG_ENDIAN);
-            indexbuf.putInt( 4*2, entries);
-            indexchannel.truncate( INDEX_OFFSET + entries*4);
-            indexchannel.force( true);
-            // map index to new size
+            indexra.seek( 4*2);
+            indexra.writeInt( entries);
+            indexchannel = indexra.getChannel();
             index = indexchannel.map( FileChannel.MapMode.READ_WRITE, INDEX_OFFSET,
                                       indexchannel.size()-INDEX_OFFSET).order( ByteOrder.nativeOrder())
                 .asIntBuffer();
+
+            // sort index
+            quicksortIndex( 0, entries-1, dictionary, dictionary.duplicate());
         }
     }
 
@@ -726,11 +714,12 @@ public abstract class FileBasedDictionary implements Dictionary {
      * {@link #addIndexEntry(int) addIndexEntry}.
      * </p>
      *
+     * @param out Output stream to which index entries will be appended.
      * @param start Byte offset in the dictionary where the parsing should start (inclusive).
      * @param end Byte offset in the dictionary where the parsing should end (exclusive).
      * @return The number of index entries created.
      */
-    protected int addIndexRange( int start, int end) throws IOException {
+    protected int addIndexRange( DataOutputStream out, int start, int end) throws IOException {
         int indexsize = 0;
         dictionary.position( start);
         boolean inWord = false;
@@ -749,7 +738,7 @@ public abstract class FileBasedDictionary implements Dictionary {
                     if (type < 0) {
                         // end of word; add index entry the current word is long enough
                         if (wordlength >= wantedlength) {
-                            addIndexEntry( wordstart);
+                            addIndexEntry( out, wordstart);
                             indexsize++;
                         }
                         inWord = false;
@@ -758,7 +747,7 @@ public abstract class FileBasedDictionary implements Dictionary {
                         // since we are inWord, this is guaranteed not to be the first character
                         // of an index word, the index entry won't be added once for type==0 and once
                         // for type==-1 at the end of the word
-                        addIndexEntry( position);
+                        addIndexEntry( out, position);
                         indexsize++;
                         wordlength++;
                     }
@@ -831,19 +820,21 @@ public abstract class FileBasedDictionary implements Dictionary {
      * Add a word entry to the index. This method will be called by 
      * {@link #addIndexRange(int,int) addIndexRange} during index creation.
      *
+     * @param out Output stream to which the index entry will be written. The integer values will 
+     *            be written in the operating system's byte order.
      * @param offset Offset in the dictionary file where the word starts.
      */
-    protected void addIndexEntry( int offset) throws IOException {
-        try {
-            index.put( offset);
-        } catch (BufferOverflowException ex) {
-            // increase file size
-            int position = index.position();
-            index = indexchannel.map( FileChannel.MapMode.READ_WRITE, INDEX_OFFSET,
-                                      indexchannel.size()*2).order( ByteOrder.nativeOrder())
-                .asIntBuffer();
-            index.position( position);
-            index.put( offset);
+    protected void addIndexEntry( DataOutputStream out, int offset) throws IOException {
+        if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN)
+            out.writeInt( offset);
+        else { // shuffle bytes
+            out.write( offset); // writes the low eight bits of offset
+            offset >>>= 8;
+            out.write( offset);
+            offset >>>= 8;
+            out.write( offset);
+            offset >>>= 8;
+            out.write( offset);
         }
     }
 

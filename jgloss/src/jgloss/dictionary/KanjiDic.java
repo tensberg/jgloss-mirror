@@ -103,6 +103,19 @@ public class KanjiDic implements Dictionary {
             };
 
     /**
+     * Used during entry parsing in constructor.
+     */
+    private final static List readingsl = new ArrayList( 10);
+    /**
+     * Used during entry parsing in constructor.
+     */
+    private final static List nanoril = new ArrayList( 10);
+    /**
+     * Used during entry parsing in constructor.
+     */
+    private final static List translationsl = new ArrayList( 10);
+
+    /**
      * Represents a single entry in the kanji dictionary file. Only a subset of the fields
      * defined in the KANJIDIC specification is supported.
      */
@@ -169,19 +182,6 @@ public class KanjiDic implements Dictionary {
             this.cnum = cnum;
             this.frequency = frequency;
         }
-
-        /**
-         * Used during entry parsing in constructor.
-         */
-        private final static List readingsl = new ArrayList( 10);
-        /**
-         * Used during entry parsing in constructor.
-         */
-        private final static List nanoril = new ArrayList( 10);
-        /**
-         * Used during entry parsing in constructor.
-         */
-        private final static List translationsl = new ArrayList( 10);
 
         /**
          * Creates a new entry for a line in the dictionary file. Only a subset of the fields
@@ -617,6 +617,7 @@ public class KanjiDic implements Dictionary {
                 public String getWord() { return k; }
                 public String getReading() { return r; };
                 public Dictionary getDictionary() { return KanjiDic.this; };
+                public String toString() { return DefaultDictionaryEntry.toString( this); }
             };
     }
 

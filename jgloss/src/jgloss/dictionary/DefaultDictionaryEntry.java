@@ -114,9 +114,9 @@ public class DefaultDictionaryEntry implements DictionaryEntry {
     public Dictionary getDictionary() { return dictionary; }
 
     /**
-     * Returns a string representation of a dictionary entry.
+     * Returns a string representation of a word/reading pair or dictionary entry.
      */
-    public static String toString( DictionaryEntry entry) {
+    public static String toString( WordReadingPair entry) {
         StringBuffer out = new StringBuffer( 128);
         out.append( entry.getWord());
         if (entry.getReading() != null) {
@@ -124,13 +124,15 @@ public class DefaultDictionaryEntry implements DictionaryEntry {
             out.append( entry.getReading());
             out.append( '\uff09');
         }
-        out.append( ' ');
-        for ( Iterator i=entry.getTranslations().iterator(); i.hasNext(); ) {
-            out.append( i.next().toString());
-            if (i.hasNext())
-                out.append( "; ");
+        if (entry instanceof DictionaryEntry) {
+            out.append( ' ');
+            for ( Iterator i=((DictionaryEntry) entry).getTranslations().iterator(); i.hasNext(); ) {
+                out.append( i.next().toString());
+                if (i.hasNext())
+                    out.append( "; ");
+            }
         }
-
+            
         return out.toString();
     }
 
