@@ -87,7 +87,7 @@ public class Dictionaries extends Box {
      *
      * @return The Dictionaries component.
      */
-    public static Dictionaries getComponent() {
+    public static synchronized Dictionaries getComponent() {
         if (box == null)
             box = new Dictionaries();
         return box;
@@ -243,17 +243,16 @@ public class Dictionaries extends Box {
         String [] objects;
 
         try {
-            Dictionary d = DictionaryFactory.createDictionary( file);
-            if (d != null)
-                return d;
-
+            return DictionaryFactory.createDictionary( file);
+        } catch (DictionaryFactory.NotSupportedException ex) {
             // dictionary format not supported
             msgid = "error.dictionary.format";
             objects = new String[] { new File( file).getAbsolutePath() };
-        } catch (Exception ex) {
+        } catch (DictionaryFactory.InstantiationException ex) {
             ex.printStackTrace();
+            Exception root = ex.getRootCause();
             File f = new File( file);
-            if (ex instanceof FileNotFoundException) {
+            if (root instanceof FileNotFoundException) {
                 msgid = "error.dictionary.filenotfound";
                 objects = new String[] { f.getName(), f.getAbsolutePath() };
             }
