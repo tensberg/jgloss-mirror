@@ -1,0 +1,56 @@
+<!DOCTYPE web-app 
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" 
+    "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<web-app>
+<!-- (c) 2001 Michael Koch (tensberg@gmx.net)
+ Example deployment descriptor for use with the jgloss.www.JGlossServlet.
+
+ $Id$ 
+-->
+
+    <display-name>JGloss-WWW</display-name>
+    <description>
+      Rewriting proxy which annotates Japanese web pages with readings
+      and translations.
+    </description>
+
+    <servlet>
+      <servlet-name>jgloss-www</servlet-name>
+      <servlet-class>jgloss.www.JGlossServlet</servlet-class>
+
+      <init-param>
+        <param-name>dictionaries</param-name>
+        <param-value>
+        /usr/share/edict/edict:
+        /usr/share/edict/compverb:
+        /usr/share/edict/4jwords:
+        /usr/share/edict/enamdict:
+        /usr/share/edict/j_places:
+        /usr/share/edict/kanjidic
+        </param-value>
+        <description>
+            List of dictionaries used by the servlets. The initialization of the
+            servlet will fail if one of the dictionaries can't be opened. The separator
+            character is the platform-dependent path separator (':' for Unix, ';' for Windows).
+        </description>
+      </init-param>
+
+      <init-param>
+        <param-name>allowed_protocols</param-name>
+        <param-value>http:ftp</param-value>
+        <description>
+            List of protocols which are allowed in the URLs which the user specifies. Be careful
+            with what you allow. If you allow "file", the user can access all files on the webserver
+            to which the servlet has read access. If the user
+            specifies a protocol which is not allowed by this configuration parameter, the
+            servlet will send an error page. The separator character is a ':'.
+        </description>
+      </init-param>
+    </servlet>
+
+    <servlet-mapping>
+       <servlet-name>jgloss-www</servlet-name>
+       <url-pattern>/jgloss-www</url-pattern>
+    </servlet-mapping>      
+</web-app>
