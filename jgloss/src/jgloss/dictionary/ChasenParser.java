@@ -233,8 +233,11 @@ public class ChasenParser implements Parser {
                     String readingBase = line.substring( s);
                     
                     if (partOfSpeech.equals( "\u540d\u8a5e") || // meishi (noun)
+                        partOfSpeech.equals( "\u5f62\u5bb9\u8a5e") || // keiyoushi ("true" adjective)
+                        partOfSpeech.equals( "\u5f62\u5bb9\u52d5\u8a5e") || // keiyoudoushi (adjectival noun)
+                        partOfSpeech.equals( "\u9023\u4f53\u8a5e") || // rentaishi (pre-noun adjectival)
                         partOfSpeech.equals( "\u526f\u8a5e") || // fukushi (adverb)
-                        partOfSpeech.equals( "\u9023\u4f53\u8a5e") // rentaishi (pre-noun adjectival)
+                        partOfSpeech.equals( "\u63a5\u7d9a\u8a5e") // sezzokushi (conjunction)
                         ) {
                         // Search the surface form in all dictionaries. surfaceInflected and
                         // surfaceBase are identical. If no match is found,
@@ -243,7 +246,7 @@ public class ChasenParser implements Parser {
                         int to = surfaceInflected.length();
                         do {
                             String word = surfaceInflected.substring( from, to);
-                            /*if (exclusions!=null && exclusions.contains( word)) {
+                            if (exclusions!=null && exclusions.contains( word)) {
                                 // continue search with remaining suffix
                                 // (loop will terminate if this was remainder of word)
                                 from = to;
@@ -254,7 +257,7 @@ public class ChasenParser implements Parser {
                                     from++;
                                 to = surfaceInflected.length();
                                 continue;
-                                }*/
+                            }
 
                             List translations = search( word, readingBase);
                             if (translations.size() != 0) {
@@ -280,6 +283,14 @@ public class ChasenParser implements Parser {
                                        ( surfaceInflected.charAt( from)))
                                     from++;
                                 to = surfaceInflected.length();
+                                // Shorten readingBase if matching entry found.
+                                // If matching entry exists, search() has moved it to position 0.
+                                WordReadingPair wrp = (WordReadingPair) translations.get( 0);
+                                String reading = wrp.getReading();
+                                if (reading == null)
+                                    reading = wrp.getWord();
+                                if (readingBase.startsWith( StringTools.toKatakana( reading)))
+                                    readingBase = readingBase.substring( reading.length());
                             }
                             else {
                                 // no match found, try shorter prefix
@@ -303,6 +314,11 @@ public class ChasenParser implements Parser {
                         } while (from<to && from<surfaceInflected.length());
                     }
                     else if (partOfSpeech.equals( "\u52d5\u8a5e")) { // douji (verb)
+                        if (exclusions!=null && exclusions.contains( surfaceBase)) {
+                            parsePosition += surfaceInflected.length();
+                            continue;
+                        }
+
                         List translations = search( surfaceBase, readingBase);
                         if (translations.size() > 0) {
                             Conjugation c = getConjugation( surfaceInflected, surfaceBase,
@@ -421,8 +437,11 @@ public class ChasenParser implements Parser {
      */
     private List search( String word, String preferredReading) throws SearchException {
         List result = null;
+        String cacheKey = word + "_" + preferredReading;
 
         System.out.println( "looking up " + word);
+        if (lookupCache != null)
+            result = (List) lookupCache.get( cacheKey);
         if (lookupCache != null)
             result = (List) lookupCache.get( word);
 
@@ -431,7 +450,7 @@ public class ChasenParser implements Parser {
             result = new ArrayList( dictionaries.length*2);
             for ( int i=0; i<dictionaries.length; i++) {
                 List r = dictionaries[i].search( word, Dictionary.SEARCH_EXACT_MATCHES);
-                // reorder entries according to preferred reading
+                // Reorder entries according to preferred reading.
                 int matches = 0;
                 for ( Iterator j=r.iterator(); j.hasNext(); ) {
                     WordReadingPair wrp = (WordReadingPair) j.next();
@@ -446,19 +465,21 @@ public class ChasenParser implements Parser {
                         matches++;
                         j.remove();
                     }
-                    if (matches>0 && !readingFound) {
-                        readingFound = true;
-                        result.addAll( matches, r);
-                    }
-                    else
-                        result.addAll( r); // append
                 }
+                if (matches>0 && !readingFound) {
+                    readingFound = true;
+                    result.addAll( matches, r);
+                }
+                else
+                    result.addAll( r); // append
             }
             if (lookupCache != null) {
                 if (result.size() > 0)
-                    lookupCache.put( word, result);
-                else
+                    lookupCache.put( cacheKey, result);
+                else {
+                    lookupCache.put( cacheKey, Collections.EMPTY_LIST);
                     lookupCache.put( word, Collections.EMPTY_LIST);
+                }
             }
         }
 
@@ -466,19 +487,17 @@ public class ChasenParser implements Parser {
     }
 
     private Conjugation getConjugation( String inflected, String base, String type) {
-        int i = 0;
-        // search common prefix
-        while (i<inflected.length() && i<base.length() &&
-               inflected.charAt( i)==base.charAt( i)) {
-            i++;
+        // search last kanji in inflected form, everything after it is inflection
+        int i = inflected.length();
+        while (i>0 && !StringTools.isCJKUnifiedIdeographs( inflected.charAt( i-1))) {
+            i--;
         }
-        if (i==inflected.length() && i==base.length()) {
-            // Both strings are identical. Can happen for dictionary form. Hiragana
-            // suffix is both base and inflected form.
-            while (i>0 && StringTools.isHiragana( inflected.charAt( i-1)))
-                i--;
+        if (i == 0) {
+            // Annotated hiragana word. Use point of divergence as inflection start.
+            while (i<inflected.length() && i<base.length() &&
+                   inflected.charAt( i)==base.charAt( i))
+                i++;
         }
-        // inflected form can have length 0 if i==inflected.length
         inflected = inflected.substring( i);
         base = base.substring( i);
         
