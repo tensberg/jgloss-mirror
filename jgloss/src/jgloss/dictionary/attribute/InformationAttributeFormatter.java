@@ -43,7 +43,8 @@ public class InformationAttributeFormatter extends DefaultAttributeFormatter {
                _valueFormat);
     }
 
-    protected String formatValue( AttributeValue val) {
-        return ((InformationAttributeValue) val).getInformation();
+    public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+        buf.append( ((InformationAttributeValue) val).getInformation());
+        return buf;
     }
 } // class InformationAttributeFormatter

@@ -155,4 +155,4 @@ public class JGlossApp extends JGloss {
 
         return true;
     }
-} // class JGloss
+} // class JGlossApp

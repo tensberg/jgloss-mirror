@@ -27,10 +27,11 @@ import jgloss.JGloss;
 import jgloss.dictionary.*;
 import jgloss.dictionary.attribute.*;
 import jgloss.util.ListFormatter;
+import jgloss.util.DefaultListFormatter;
 
 import java.util.Map;
 
-// TODO: make formats configurable
+// TODO: make formats configurable by the user
 
 /**
  * Format definition for rendering of dictionary entries.
@@ -38,166 +39,204 @@ import java.util.Map;
  * @author Michael Koch
  */
 class DictionaryEntryFormat {
+    interface Decorator {
+        int WORD = 0;
+        int READING = 1;
+        int TRANSLATION_ROM = 2;
+        int TRANSLATION_CRM = 3;
+        int TRANSLATION_SYN = 4;
+
+        int POSITION_BEFORE = 0;
+        int POSITION_AFTER = 1;
+
+        ListFormatter decorateList( ListFormatter formatter, int type);
+
+        AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
+                                              int position);
+        ListFormatter decorateList( ListFormatter formatter, Attribute type, int position);
+    } // interface Decorator
+
+    static class IdentityDecorator implements Decorator {
+        IdentityDecorator() {}
+
+        public ListFormatter decorateList( ListFormatter formatter, int type) {
+            return formatter;
+        }
+
+        public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
+                                                     int position) {
+            return formatter;
+        }
+
+        public ListFormatter decorateList( ListFormatter formatter, Attribute type, int position) {
+            return formatter;
+        }
+    } // class IdentityDecorator
+
     public static final String PROTOCOL_REF = "ref";
     public static final String PROTOCOL_SYN = "syn";
     public static final String PROTOCOL_ANT = "ant";
     public static final String PROTOCOL_ALT_READING = "ar";
 
-    private static final ListFormatter word = new ListFormatter( " ", "; ", "");
-    private static final ListFormatter reading = new ListFormatter( " [", "; ", "]");
-    private static final ListFormatter rom = new ListFormatter( "", "", ".", " [n]", ". [n]", ".");
-    private static final ListFormatter crm = new ListFormatter( " ", "; ", "");
-    private static final ListFormatter syn = new ListFormatter( "", "/", "");
+    private static final DefaultListFormatter word = 
+        new DefaultListFormatter( " ", "; ", "");
+    private static final DefaultListFormatter reading = 
+        new DefaultListFormatter( " [", "; ", "]");
+    private static final DefaultListFormatter rom = 
+        new DefaultListFormatter( "", "", ".", " [n]", ". [n]", ".");
+    private static final DefaultListFormatter crm = 
+        new DefaultListFormatter( " ", "; ", "");
+    private static final DefaultListFormatter syn = 
+        new DefaultListFormatter( "", "/", "");
 
-    public static ListFormatter getWordFormatter() { return new ListFormatter( word); }
-    public static ListFormatter getReadingFormatter() { return new ListFormatter( reading); }
-    public static ListFormatter getTranslationRomFormatter() { return new ListFormatter( rom); }
-    public static ListFormatter getTranslationCrmFormatter() { return new ListFormatter( crm); }
-    public static ListFormatter getTranslationSynonymFormatter() { return new ListFormatter( syn); }
+    public static ListFormatter getWordFormatter() { return new DefaultListFormatter( word); }
+    public static ListFormatter getReadingFormatter() { return new DefaultListFormatter( reading); }
+    public static ListFormatter getTranslationRomFormatter() { return new DefaultListFormatter( rom); }
+    public static ListFormatter getTranslationCrmFormatter() { return new DefaultListFormatter( crm); }
+    public static ListFormatter getTranslationSynonymFormatter() { return new DefaultListFormatter( syn); }
 
     public static AttributeFormatter getAttributeFormatter( Attribute att) {
-        return getAttributeFormatter( att, false);
+        return getAttributeFormatter( att, false, new IdentityDecorator(), Decorator.POSITION_BEFORE);
     }
 
     public static AttributeFormatter getAttributeFormatter( Attribute att, boolean nameOnly) {
+        return getAttributeFormatter( att, nameOnly, new IdentityDecorator(), Decorator.POSITION_BEFORE);
+    }
+
+    public static AttributeFormatter getAttributeFormatter( Attribute att,
+                                                            Decorator decorator, int position) {
+        return getAttributeFormatter( att, false, decorator, position);
+    }
+
+    public static AttributeFormatter getAttributeFormatter( Attribute att, boolean nameOnly,
+                                                            Decorator decorator, int position) {
+        ListFormatter commaList = decorator.decorateList
+            ( new DefaultListFormatter( ","), att, position);
+
+        AttributeFormatter format = null;
+
         if (nameOnly || att==Attributes.EXAMPLE)
-            return new AttributeNameFormatter( " {", "}");
+            format = new AttributeNameFormatter( " {", "}");
 
-        if (att == Attributes.PART_OF_SPEECH ||
-            att == Attributes.USAGE ||
-            att == Attributes.CATEGORY)
-            return new DefaultAttributeFormatter
-                ( " (", ")", "", false, new ListFormatter( ","));
+        else if (att == Attributes.PART_OF_SPEECH ||
+                 att == Attributes.USAGE ||
+                 att == Attributes.CATEGORY)
+            format = new DefaultAttributeFormatter
+                ( " (", ")", "", false, commaList);
 
-        if (att == Attributes.ABBREVIATION)
-            return new WordFormatter( JGloss.messages.getString( "abbr.word"),
-                                      "", JGloss.messages.getString( "abbr.lang_and_word"),
-                                      new ListFormatter( " (", ",", ")"));
+        else if (att == Attributes.ABBREVIATION)
+            format = new WordFormatter( JGloss.messages.getString( "abbr.word"),
+                                        "", JGloss.messages.getString( "abbr.lang_and_word"),
+                                        decorator.decorateList( new DefaultListFormatter( " (", ",", ")"),
+                                                                att, position));
 
-        if (att == Attributes.GAIRAIGO)
-            return new WordFormatter( "", JGloss.messages.getString( "gairaigo.lang"),
-                                      JGloss.messages.getString( "gairaigo.lang_and_word"),
-                                      new ListFormatter( " (", ",", ")"));
+        else if (att == Attributes.GAIRAIGO)
+            format = new WordFormatter( "", JGloss.messages.getString( "gairaigo.lang"),
+                                        JGloss.messages.getString( "gairaigo.lang_and_word"),
+                                        decorator.decorateList( new DefaultListFormatter( " (", ",", ")"),
+                                                                att, position));
 
-        if (att == Attributes.REFERENCE)
-            return new ReferenceAttributeFormatter
-                ( " \u21d2", "", new ListFormatter( ","));
+        else if (att == Attributes.REFERENCE)
+            format = new ReferenceAttributeFormatter
+                ( " \u21d2", "", commaList);
 
-        if (att == Attributes.SYNONYM)
-            return new ReferenceAttributeFormatter
-                ( " \u21d2", "", new ListFormatter( ","));
+        else if (att == Attributes.SYNONYM)
+            format = new ReferenceAttributeFormatter
+                ( " \u21d2", "", commaList);
 
-        if (att == Attributes.ANTONYM)
-            return new ReferenceAttributeFormatter
-                ( " \u21d4", "", new ListFormatter( ","));
+        else if (att == Attributes.ANTONYM)
+            format = new ReferenceAttributeFormatter
+                ( " \u21d4", "", commaList);
 
-        if (att == WadokuJT.ALT_READING)
-            return new ReferenceAttributeFormatter
-                ( " \u2192", "", new ListFormatter( ","));
+        else if (att == WadokuJT.ALT_READING)
+            format = new ReferenceAttributeFormatter
+                ( " \u2192", "", commaList);
 
-        if (att == Attributes.EXPLANATION)
-            return new InformationAttributeFormatter
-                ( " (", ")", "", false, new ListFormatter( ","));
+        else if (att == Attributes.EXPLANATION)
+            format = new InformationAttributeFormatter
+                ( " (", ")", "", false, commaList);
 
-        return null; // attribute not supported
+        // else: attribute not supported
+
+        if (format != null)
+            format = decorator.decorateAttribute( format, att, position);
+
+        return format;
     }
 
     public static DictionaryEntryFormatter createFormatter() {
+        return createFormatter( null);
+    }
+
+    public static DictionaryEntryFormatter createFormatter( Decorator decorator) {
         DictionaryEntryFormatter out = new DictionaryEntryFormatter();
 
-        out.addWordFormat( new ListFormatter( word));
-        out.addReadingFormat( new ListFormatter( reading));
-        out.addTranslationFormat( new ListFormatter( rom), new ListFormatter( crm),
-                                  new ListFormatter( syn));
+        if (decorator == null)
+            decorator = new IdentityDecorator();
 
-        addBeforeAttributeFormats( out);
+        out.addWordFormat( decorator.decorateList( new DefaultListFormatter( word),
+                                                   Decorator.WORD));
+        out.addReadingFormat( decorator.decorateList( new DefaultListFormatter( reading),
+                                                      Decorator.READING));
+        out.addTranslationFormat( decorator.decorateList( new DefaultListFormatter( rom),
+                                                          Decorator.TRANSLATION_ROM), 
+                                  decorator.decorateList( new DefaultListFormatter( crm),
+                                                          Decorator.TRANSLATION_CRM),
+                                  decorator.decorateList( new DefaultListFormatter( syn),
+                                                          Decorator.TRANSLATION_SYN));
 
-        out.addAttributeFormat( Attributes.EXPLANATION, 
-                                getAttributeFormatter( Attributes.EXPLANATION), false);
-        out.addAttributeFormat( Attributes.REFERENCE,
-                                getAttributeFormatter( Attributes.REFERENCE), false);
-        out.addAttributeFormat( Attributes.SYNONYM,
-                                getAttributeFormatter( Attributes.SYNONYM), false);
-        out.addAttributeFormat( Attributes.ANTONYM,
-                                getAttributeFormatter( Attributes.ANTONYM), false);
-        out.addAttributeFormat( WadokuJT.ALT_READING,
-                                getAttributeFormatter( WadokuJT.ALT_READING), false);
-
-        addAfterAttributeFormats( out);
+        addAttributeFormats( out, decorator);
         
         return out;
     }
 
-    public static DictionaryEntryFormatter createHTMLFormatter( MarkerListFormatter.Group group,
-                                                                Map references) {
-        DictionaryEntryFormatter out = new DictionaryEntryFormatter();
-
-        out.addWordFormat( new MarkerListFormatter( group, word));
-        out.addReadingFormat( new MarkerListFormatter( group, reading));
-        out.addTranslationFormat( new ListFormatter( rom), 
-                                  new ListFormatter( crm),
-                                  new MarkerListFormatter( group, syn));
-
-        addBeforeAttributeFormats( out);
-
-        ListFormatter commaList = new ListFormatter( ",");
-
-        AttributeFormatter informationFormat = new InformationAttributeFormatter
-            ( " (", ")", "", false, new MarkerListFormatter( group, commaList));
-        out.addAttributeFormat( Attributes.EXPLANATION, informationFormat, false);
-
-        out.addAttributeFormat( Attributes.REFERENCE,
-                                new HTMLReferenceAttributeFormatter
-                                ( PROTOCOL_REF, " \u21d2", "", commaList,
-                                  references), false);
-        out.addAttributeFormat( Attributes.SYNONYM,
-                                new HTMLReferenceAttributeFormatter
-                                ( PROTOCOL_SYN, " \u21d2", "", commaList,
-                                  references), false);
-        out.addAttributeFormat( Attributes.ANTONYM,
-                                new HTMLReferenceAttributeFormatter
-                                ( PROTOCOL_ANT, " \u21d4", "", commaList,
-                                  references), false);
-        out.addAttributeFormat( WadokuJT.ALT_READING,
-                                new HTMLReferenceAttributeFormatter
-                                ( PROTOCOL_ALT_READING, " \u2192", "", commaList,
-                                references), false);
-
-        addAfterAttributeFormats( out);
-
-        return out;
-    }
-
-    private static void addBeforeAttributeFormats( DictionaryEntryFormatter out) {
+    private static void addAttributeFormats( DictionaryEntryFormatter out,
+                                             Decorator decorator) {
         out.addAttributeFormat( Attributes.PART_OF_SPEECH, 
-                                getAttributeFormatter( Attributes.PART_OF_SPEECH),
+                                getAttributeFormatter( Attributes.PART_OF_SPEECH, decorator,
+                                                       Decorator.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         out.addAttributeFormat( Attributes.ABBREVIATION,
-                                getAttributeFormatter( Attributes.ABBREVIATION, true),
-                                DictionaryEntryFormatter.Position.BEFORE_FIELD3);
-        out.addAttributeFormat( Attributes.ABBREVIATION,
-                                getAttributeFormatter( Attributes.ABBREVIATION, true),
-                                true);
+                                getAttributeFormatter( Attributes.ABBREVIATION, true, decorator,
+                                                       Decorator.POSITION_BEFORE),
+                                DictionaryEntryFormatter.Position.BEFORE_FIELD3, true);
         out.addAttributeFormat( Attributes.EXAMPLE,
-                                getAttributeFormatter( Attributes.EXAMPLE),
+                                getAttributeFormatter( Attributes.EXAMPLE, decorator,
+                                                       Decorator.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         out.addAttributeFormat( Attributes.USAGE,
-                                getAttributeFormatter( Attributes.USAGE),
+                                getAttributeFormatter( Attributes.USAGE, decorator,
+                                                       Decorator.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3, true);
         out.addAttributeFormat( Attributes.CATEGORY,
-                                getAttributeFormatter( Attributes.CATEGORY),
+                                getAttributeFormatter( Attributes.CATEGORY, decorator,
+                                                       Decorator.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3, true);
-        out.addAttributeFormat( Attributes.GAIRAIGO, 
-                                getAttributeFormatter( Attributes.GAIRAIGO),
-                                false);
-    }
 
-    private static void addAfterAttributeFormats( DictionaryEntryFormatter out) {
-        out.addAttributeFormat( Attributes.ABBREVIATION,
-                                getAttributeFormatter( Attributes.ABBREVIATION, false),
+
+        out.addAttributeFormat( Attributes.GAIRAIGO, 
+                                getAttributeFormatter( Attributes.GAIRAIGO, decorator,
+                                                       Decorator.POSITION_AFTER),
                                 false);
+        out.addAttributeFormat( Attributes.EXPLANATION, 
+                                getAttributeFormatter( Attributes.EXPLANATION, decorator,
+                                                       Decorator.POSITION_AFTER), false);
+        out.addAttributeFormat( Attributes.REFERENCE,
+                                getAttributeFormatter( Attributes.REFERENCE, decorator,
+                                                       Decorator.POSITION_AFTER), false);
+        out.addAttributeFormat( Attributes.SYNONYM,
+                                getAttributeFormatter( Attributes.SYNONYM, decorator,
+                                                       Decorator.POSITION_AFTER), false);
+        out.addAttributeFormat( Attributes.ANTONYM,
+                                getAttributeFormatter( Attributes.ANTONYM, decorator,
+                                                       Decorator.POSITION_AFTER), false);
+        out.addAttributeFormat( WadokuJT.ALT_READING,
+                                getAttributeFormatter( WadokuJT.ALT_READING, decorator,
+                                                       Decorator.POSITION_AFTER), false);
+
         out.addAttributeFormat( Attributes.ABBREVIATION,
-                                getAttributeFormatter( Attributes.ABBREVIATION, false),
-                                DictionaryEntryFormatter.Position.AFTER_ENTRY);
+                                getAttributeFormatter( Attributes.ABBREVIATION, decorator,
+                                                       Decorator.POSITION_AFTER),
+                                DictionaryEntryFormatter.Position.AFTER_ENTRY, false);
     }
 } // class DictionaryEntryFormat

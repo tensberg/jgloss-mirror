@@ -28,17 +28,18 @@ package jgloss.dictionary.attribute;
  *
  * @author Michael Koch
  */
-public abstract class AttributeFormatter implements ValueListFormatter, AttributeValueFormatter {
+public interface ValueListFormatter {
     /**
-     * Format an attribute and its list of values as a string. The attribute formatter will
-     * use itself to format attribute values.
+     * Format an attribute and its list of values as a string.
      *
+     * @param valueFormatter The formatter must call 
+     *        {@link #format(Attribute,AttributeValue,StringBuffer) format} on this object to
+     *        format values from the value list.
      * @param val Value of the attribute. May be <code>null</code> if the attribute is set but
      *            has no value.
      * @param buf String buffer to which the formatted attribute is appended.
      * @return The string buffer passed in.
      */
-    public StringBuffer format( Attribute att, ValueList val, StringBuffer buf) {
-        return format( this, att, val, buf);
-    }
-} // class AttributeFormatter
+    StringBuffer format( AttributeValueFormatter valueFormatter, Attribute att, ValueList val,
+                         StringBuffer buf);
+} // interface ValueListFormatter

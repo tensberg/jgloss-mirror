@@ -239,16 +239,19 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
     }
 
     protected void followReference( String type, String refKey) {
-        ReferenceAttributeValue ref = list.getReference( refKey);
-        if (ref != null) try {
-            addToHistory( createHistoryItem());
-            currentResults.setData
-                ( JGloss.messages.getString( "wordlookup.reference." + type, 
+        if (LookupResultList.Hyperlinker.REFERENCE_PROTOCOL.equals( type)) {
+            ReferenceAttributeValue ref = (ReferenceAttributeValue) 
+                ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
+            if (ref != null) try {
+                addToHistory( createHistoryItem());
+                currentResults.setData
+                ( JGloss.messages.getString( "wordlookup.reference", 
                                              new Object[] { ref.getReferenceTitle() }),
                   ref.getReferencedEntries());
-            currentResults.replay();
-        } catch (SearchException ex) {
-            ex.printStackTrace();
+                currentResults.replay();
+            } catch (SearchException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

@@ -26,7 +26,7 @@ package jgloss.ui.export;
 import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.util.XMLTools;
-import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossFrameModel;
 
 import java.util.Vector;
 import java.awt.Component;
@@ -70,7 +70,7 @@ class ComboBoxParameter extends UIParameter {
 
     public Component getComponent() { return box; }
 
-    public String getValue( JGlossFrame source, URL systemId) { 
+    public String getValue( JGlossFrameModel source, URL systemId) { 
         return getValue();
     }
     

@@ -46,8 +46,8 @@ JDICTIONARY_DISTNAME := jdictionary-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.dictionary.attribute\
             jgloss.parser jgloss.util \
-            jgloss.ui jgloss.ui.xml jgloss.ui.html jgloss.ui.export jgloss.ui.annotation \
-            jgloss.www
+            jgloss.ui jgloss.ui.xml jgloss.ui.html jgloss.ui.export jgloss.ui.annotation# \
+            #jgloss.www
 
 DATA_WWW := HTMLAnnotator vconj
 

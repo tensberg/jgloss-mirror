@@ -34,7 +34,7 @@ import java.text.MessageFormat;
  *
  * @author Michael Koch
  */
-public class WordFormatter implements AttributeFormatter {
+public class WordFormatter extends DefaultAttributeFormatter {
     protected static final ResourceBundle languages =
         ResourceBundle.getBundle( "resources/languages");
 
@@ -42,56 +42,44 @@ public class WordFormatter implements AttributeFormatter {
     protected MessageFormat langFormat;
     protected MessageFormat langAndWordFormat;
     protected Object[] langAndWord = new Object[2];
-    protected StringBuffer tempFormat = new StringBuffer( 128);
-
-    private ListFormatter formatter;
 
     public WordFormatter( String _wordFormat, String _langFormat, 
                           String _langAndWordFormat,
                           ListFormatter _formatter) {
+        super( _formatter);
         wordFormat = new MessageFormat( _wordFormat);
         langFormat = new MessageFormat( _langFormat);
         langAndWordFormat = new MessageFormat( _langAndWordFormat);
-        formatter = _formatter;
     }
 
-    public StringBuffer format( Attribute att, ValueList val, StringBuffer buf) {
-        if (val==null || val.size()==0) {
-            return buf;
-        }
-
-        formatter.newList( buf, val.size());
-        for ( int i=0; i<val.size(); i++) {
-            Word w = (Word) val.get( i);
-            tempFormat.setLength( 0);
+    public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+        Word w = (Word) val;
             
-            String lang = null;
-            if (w.getLanguageCode() != null) {
-                try {
-                    lang = languages.getString( w.getLanguageCode());
-                } catch (MissingResourceException ex) {
-                    System.err.println( "Warning: WordFormatter, missing language string for code " +
-                                        w.getLanguageCode());
-                    lang = w.getLanguageCode();
-                }
+        String lang = null;
+        if (w.getLanguageCode() != null) {
+            try {
+                lang = languages.getString( w.getLanguageCode());
+            } catch (MissingResourceException ex) {
+                System.err.println( "Debug: WordFormatter, missing language string for code " +
+                                    w.getLanguageCode());
+                lang = w.getLanguageCode();
             }
+        }
             
-            if (lang == null) {
-                langAndWord[0] = w.getWord();
-                formatter.addItem( wordFormat.format( langAndWord, tempFormat, null)); 
+        if (lang == null) {
+            langAndWord[0] = w.getWord();
+            wordFormat.format( langAndWord, buf, null); 
+        }
+        else {
+            langAndWord[0] = lang;
+            if (w.getWord() == null) {
+                langFormat.format( langAndWord, buf, null);
             }
             else {
-                langAndWord[0] = lang;
-                if (w.getWord() == null) {
-                    formatter.addItem( langFormat.format( langAndWord, tempFormat, null));
-                }
-                else {
-                    langAndWord[1] = w.getWord();
-                    formatter.addItem( langAndWordFormat.format( langAndWord, tempFormat, null));
-                }
+                langAndWord[1] = w.getWord();
+                langAndWordFormat.format( langAndWord, buf, null);
             }
         }
-        formatter.endList();
 
         return buf;
     }

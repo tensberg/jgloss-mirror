@@ -23,7 +23,7 @@
 
 package jgloss.ui.export;
 
-import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossFrameModel;
 
 import java.net.URL;
 import java.util.Date;
@@ -39,7 +39,7 @@ class DateTimeParameter extends AbstractParameter {
         super( elem);
     }
 
-    public String getValue( JGlossFrame source, URL systemId) {
+    public String getValue( JGlossFrameModel source, URL systemId) {
         return DATETIME_FORMAT.format( new Date( System.currentTimeMillis()));
     }
 } // class DateTimeParameter

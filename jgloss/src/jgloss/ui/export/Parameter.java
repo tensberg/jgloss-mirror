@@ -23,11 +23,11 @@
 
 package jgloss.ui.export;
 
-import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossFrameModel;
 
 import java.net.URL;
 
 interface Parameter {
     String getName();
-    String getValue( JGlossFrame source, URL systemId);
+    String getValue( JGlossFrameModel source, URL systemId);
 } // class Parameter

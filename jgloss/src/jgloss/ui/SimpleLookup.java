@@ -24,9 +24,11 @@
 package jgloss.ui;
 
 import jgloss.JGloss;
+import jgloss.dictionary.SearchException;
 import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.DictionaryEntryField;
 import jgloss.dictionary.MatchMode;
+import jgloss.dictionary.attribute.ReferenceAttributeValue;
 
 import java.lang.ref.WeakReference;
 
@@ -44,8 +46,10 @@ import java.util.Collections;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.event.HyperlinkEvent;
 
-class SimpleLookup extends JPanel implements ActionListener {
+class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
     private static final String STYLE_SHEET = "/data/lookup-minimal.css";
 
     private AutoSearchComboBox expression;
@@ -84,7 +88,7 @@ class SimpleLookup extends JPanel implements ActionListener {
         }
     } // class WeakDictionaryChangeListener
 
-    SimpleLookup( Component[] additionalControls) {
+    SimpleLookup( Component[] additionalControls, LookupResultList.Hyperlinker hyperlinker) {
         model = new LookupModel
             ( Arrays.asList( new Object[] { ExpressionSearchModes.EXACT,
                                             ExpressionSearchModes.PREFIX,
@@ -134,7 +138,10 @@ class SimpleLookup extends JPanel implements ActionListener {
 
         this.add( controls, BorderLayout.NORTH);
 
-        list = new LookupResultList( 100, SimpleLookup.class.getResource( STYLE_SHEET), false);
+        list = new LookupResultList( 100, SimpleLookup.class.getResource( STYLE_SHEET), false,
+                                     hyperlinker);
+        list.addHyperlinkListener( this);
+
         this.add( list, BorderLayout.CENTER);
         engine = new AsynchronousLookupEngine( list);
     }
@@ -165,7 +172,44 @@ class SimpleLookup extends JPanel implements ActionListener {
             });
     }
 
+    public void addHyperlinkListener( HyperlinkListener listener) {
+        list.addHyperlinkListener( listener);
+    }
+
+    public void removeHyperlinkListener( HyperlinkListener listener) {
+        list.removeHyperlinkListener( listener);
+    }
+
+    public void addToXCVManager( XCVManager manager) {
+        manager.addManagedComponent( expression);
+        list.addToXCVManager( manager);
+    }
+
     public void actionPerformed( ActionEvent e) {
         search( expression.getSelectedItem().toString());
+    }
+
+    public void hyperlinkUpdate( HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            int colon = e.getDescription().indexOf( ':');
+            String protocol = e.getDescription().substring( 0, colon);
+            String refKey = e.getDescription().substring( colon+1);
+            followReference( protocol, refKey);
+        }
+    }
+
+    protected void followReference( String type, String refKey) {
+        if (LookupResultList.Hyperlinker.REFERENCE_PROTOCOL.equals( type)) {
+            ReferenceAttributeValue ref = (ReferenceAttributeValue) 
+                ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
+            if (ref != null) try {
+                new LookupResultCache
+                    ( JGloss.messages.getString( "wordlookup.reference", 
+                                                 new Object[] { ref.getReferenceTitle() }),
+                      ref.getReferencedEntries()).replay( list);
+            } catch (SearchException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 } // class SimpleLookup

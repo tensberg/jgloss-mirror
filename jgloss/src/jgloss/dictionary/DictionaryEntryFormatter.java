@@ -128,7 +128,9 @@ public class DictionaryEntryFormatter {
 
     public void addAttributeFormat( Attribute att, AttributeFormatter format,
                                     Position generalAttributePosition, boolean before) {
-        if (generalAttributePosition!=null && att.appliesTo( DictionaryEntry.AttributeGroup.GENERAL)) {
+        if (att.appliesTo( DictionaryEntry.AttributeGroup.GENERAL)) {
+            if (generalAttributePosition == null)
+                generalAttributePosition = before ? Position.BEFORE_ENTRY : Position.AFTER_ENTRY;
             addAttributeFormat( att, format, generalAttributePosition);
         }
 

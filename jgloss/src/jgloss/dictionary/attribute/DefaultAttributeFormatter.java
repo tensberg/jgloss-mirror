@@ -24,21 +24,27 @@
 package jgloss.dictionary.attribute;
 
 import jgloss.util.ListFormatter;
+import jgloss.util.DefaultListFormatter;
 
 /**
  * Default formatter for attributes and their values.
  *
  * @author Michael Koch
  */
-public class DefaultAttributeFormatter implements AttributeFormatter {
+public class DefaultAttributeFormatter extends AttributeFormatter {
     protected String printBefore;
     protected String printAfter;
     protected String printBeforeValue;
     protected boolean printAttributeName;
     protected ListFormatter valueFormat;
+    protected StringBuffer tempBuffer;
 
     public DefaultAttributeFormatter() {
-        this( "(", ")", ":", true, new ListFormatter( "", "", "", "[", ",", "]"));
+        this( "(", ")", ":", true, new DefaultListFormatter( "", "", "", "[", ",", "]"));
+    }
+
+    public DefaultAttributeFormatter( ListFormatter _valueFormat) {
+        this( "", "", null, false, _valueFormat);
     }
 
     public DefaultAttributeFormatter( String _printBefore, String _printAfter,
@@ -50,9 +56,12 @@ public class DefaultAttributeFormatter implements AttributeFormatter {
         printBeforeValue = _printBeforeValue;
         printAttributeName = _printAttributeName;
         valueFormat = _valueFormat;
+
+        tempBuffer = new StringBuffer();
     }
 
-    public StringBuffer format( Attribute att, ValueList val, StringBuffer out) {
+    public StringBuffer format( AttributeValueFormatter valueFormatter, Attribute att, 
+                                ValueList val, StringBuffer out) {
         out.append( printBefore);
 
         if (printAttributeName)
@@ -64,7 +73,8 @@ public class DefaultAttributeFormatter implements AttributeFormatter {
 
             valueFormat.newList( out, val.size());
             for ( int i=0; i<val.size(); i++) {
-                valueFormat.addItem( formatValue( val.get( i)));
+                tempBuffer.setLength( 0);
+                valueFormat.addItem( valueFormatter.format( att, val.get( i), tempBuffer));
             }
             valueFormat.endList();
         }
@@ -73,7 +83,8 @@ public class DefaultAttributeFormatter implements AttributeFormatter {
         return out;
     }
 
-    protected String formatValue( AttributeValue val) {
-        return String.valueOf( val);
+    public StringBuffer format( Attribute att, AttributeValue val, StringBuffer out) {
+        out.append( String.valueOf( val));
+        return out;
     }
 } // class DefaultAttributeFormatter

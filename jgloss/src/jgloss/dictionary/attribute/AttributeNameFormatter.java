@@ -28,7 +28,7 @@ package jgloss.dictionary.attribute;
  *
  * @author Michael Koch
  */
-public class AttributeNameFormatter implements AttributeFormatter {
+public class AttributeNameFormatter extends AttributeFormatter {
     private String before;
     private String after;
 
@@ -41,12 +41,21 @@ public class AttributeNameFormatter implements AttributeFormatter {
         after = _after;
     }
 
-    public StringBuffer format( Attribute att, ValueList val, StringBuffer buf) {
+    protected StringBuffer format( Attribute att, StringBuffer buf) {
         if (before != null)
             buf.append( before);
         buf.append( att.getName());
         if (after != null)
             buf.append( after);
         return buf;
+    }
+
+    public StringBuffer format( AttributeValueFormatter formatter, Attribute att, 
+                                ValueList val, StringBuffer buf) {
+        return format( att, buf);
+    }
+
+    public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+        return format( att, buf);
     }
 } // class AttributeNameFormatter

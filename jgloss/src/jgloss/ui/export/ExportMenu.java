@@ -25,7 +25,7 @@ package jgloss.ui.export;
 
 import jgloss.JGloss;
 import jgloss.util.StringTools;
-import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossFrameModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -62,7 +62,7 @@ public class ExportMenu extends JMenu implements ActionListener {
         }
     }
 
-    private JGlossFrame context;
+    private JGlossFrameModel context;
 
     public ExportMenu() {
         super( JGloss.messages.getString( "main.menu.export"));
@@ -80,9 +80,9 @@ public class ExportMenu extends JMenu implements ActionListener {
         setEnabled( false);
     }
 
-    public void setContext( JGlossFrame _context) {
+    public void setContext( JGlossFrameModel _context) {
         context = _context;
-        boolean enabled = (context != null && context.isDocumentLoaded());
+        boolean enabled = (context != null && !context.isEmpty());
         setEnabled( enabled);
         for ( int i=0; i<getItemCount(); i++)
             getItem( i).setEnabled( enabled);
@@ -91,7 +91,7 @@ public class ExportMenu extends JMenu implements ActionListener {
     public void actionPerformed( ActionEvent a) {
         JMenuItem source = (JMenuItem) a.getSource();
         Exporter exporter = (Exporter) source.getClientProperty( EXPORTER_CLIENT_PROPERTY);
-        exporter.export( context, context.getJGlossDocument().getDOMDocument(), 
+        exporter.export( context, context.getDocument().getDOMDocument(), 
                          SwingUtilities.getRoot( this));
     }
 } // class ExportMenu

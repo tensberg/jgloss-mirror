@@ -387,7 +387,9 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     }
 
     protected void updateSearchModeSelection() {
-        searchModes[model.getSelectedSearchModeIndex()].setSelected( true);
+        int selectedIndex = model.getSelectedSearchModeIndex();
+        if (selectedIndex != -1)
+            searchModes[selectedIndex].setSelected( true);
     }
 
     protected void updateSearchModeAvailability() {

@@ -125,7 +125,7 @@ public class Annotation {
         owner.fireAnnotationChanged( this);
     }
 
-    public void setReading( String _reading, int index) {
+    public void setReading( int index, String _reading) {
         readings[index].setText( _reading);
         updateAnnotatedTextReading();
         owner.fireReadingChanged( this, index);
@@ -168,7 +168,12 @@ public class Annotation {
         StringBuffer reading = new StringBuffer();
         Element word = anno.getElement( 0);
         for ( int i=0; i<word.getElementCount(); i++) {
-            reading.append( getText( word.getElement( i).getElement( 0)));
+            Element child = word.getElement( i);
+            if (child.getElementCount() > 0)
+                // rb element, get bt child
+                child = child.getElement( 0);
+            // else: child is bt
+            reading.append( getText( child));
         }
         annotatedTextReading = reading.toString();
     }

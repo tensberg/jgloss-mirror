@@ -25,31 +25,23 @@ package jgloss.dictionary.attribute;
 
 import jgloss.util.ListFormatter;
 
-public class ReferenceAttributeFormatter implements AttributeFormatter {
+public class ReferenceAttributeFormatter extends DefaultAttributeFormatter {
     protected String beforeValue;
     protected String afterValue;
-    protected ListFormatter formatter;
     protected StringBuffer itemBuffer = new StringBuffer( 128);
 
     public ReferenceAttributeFormatter( String _beforeValue, String _afterValue,
                                         ListFormatter _formatter) {
+        super( _formatter);
         beforeValue = _beforeValue;
         afterValue = _afterValue;
-        formatter = _formatter;
     }
 
-    public StringBuffer format( Attribute att, ValueList val, StringBuffer buf) {
-        formatter.newList( buf, val.size());
-        for ( int i=0; i<val.size(); i++) {
-            itemBuffer.setLength( 0);
-            ReferenceAttributeValue ref = (ReferenceAttributeValue) val.get( i);
-            itemBuffer.append( beforeValue);
-            itemBuffer.append( ref.getReferenceTitle());
-            itemBuffer.append( afterValue);
-            
-            formatter.addItem( itemBuffer);
-        }
+    public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+        buf.append( beforeValue);
+        buf.append( ((ReferenceAttributeValue) val).getReferenceTitle());
+        buf.append( afterValue);
 
         return buf;
     }
-} // class HTMLReferenceAttributeFormatter
+} // class ReferenceAttributeFormatter

@@ -91,9 +91,6 @@ public class LookupModel implements Cloneable {
                 updateFilterAvailability();
             }
         }
-        else {
-            ((StateWrapper) searchModes.get( 0)).setSelected( true);
-        }
     }
 
     public SearchMode getSearchMode( int index) {
@@ -110,16 +107,38 @@ public class LookupModel implements Cloneable {
     }
 
     public SearchMode getSelectedSearchMode() {
-        return getSearchMode( getSelectedSearchModeIndex());
+        int selectedIndex = getSelectedSearchModeIndex();
+        if (selectedIndex != -1)
+            return getSearchMode( selectedIndex);
+        else
+            return null;
     }
 
     public int getSelectedSearchModeIndex() {
+        boolean selectedIsEnabled = true;
+
         for ( ListIterator i=searchModes.listIterator(); i.hasNext(); ) {
             StateWrapper wrapper = (StateWrapper) i.next();
-            if (wrapper.isSelected())
-                return i.previousIndex();
+            if (wrapper.isSelected()) {
+                if (wrapper.isEnabled()) {
+                    return i.previousIndex();
+                }
+                else {
+                    selectedIsEnabled = false;
+                    break;
+                }
+            }
         }
 
+        if (!selectedIsEnabled) {
+            for ( ListIterator i=searchModes.listIterator(); i.hasNext(); ) {
+                StateWrapper wrapper = (StateWrapper) i.next();
+                if (wrapper.isEnabled()) {
+                    return i.previousIndex();
+                }
+            }
+        }
+        
         return -1;
     }
 
@@ -144,14 +163,22 @@ public class LookupModel implements Cloneable {
 
     public void selectSearchMode( int index) {
         StateWrapper newModeWrapper = (StateWrapper) searchModes.get( index);
-        if (newModeWrapper.isSelected())
+        if (newModeWrapper.isSelected()) {
             return; // nothing to do
-        if (!newModeWrapper.isEnabled())
-            throw new IllegalArgumentException( "selected search mode not enabled");
+        }
 
-        ((StateWrapper) searchModes.get( getSelectedSearchModeIndex())).setSelected( false);
+        // unselect the old selected search mode
+        for ( Iterator i=searchModes.iterator(); i.hasNext(); ) {
+            StateWrapper wrapper = (StateWrapper) i.next();
+            if (wrapper.isSelected()) {
+                wrapper.setSelected( false);
+                break;
+            }
+        }
+
         newModeWrapper.setSelected( true);
-        SearchMode newMode = (SearchMode) newModeWrapper.getObject();
+
+        SearchMode newMode = getSelectedSearchMode();
 
         boolean dictionaryChanged = updateDictionaryAvailability( newMode);
         boolean parameterFieldsChanged = updateSearchParametersAvailability( newMode);
@@ -204,7 +231,8 @@ public class LookupModel implements Cloneable {
 
         fireLookupChange( new LookupChangeEvent
                           ( this, LookupChangeEvent.MULTI_DICTIONARY_MODE |
-                            (searchModeChanged ? LookupChangeEvent.SEARCH_MODE_AVAILABILITY : 0) | 
+                            (searchModeChanged ? LookupChangeEvent.SEARCH_MODE_AVAILABILITY|
+                             LookupChangeEvent.SEARCH_MODE_SELECTION : 0) | 
                             (filterChanged ? LookupChangeEvent.FILTER_AVAILABILITY : 0) |
                             (parameterFieldsChanged ? 
                             LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY : 0) |
@@ -225,7 +253,8 @@ public class LookupModel implements Cloneable {
         boolean filterChanged = updateFilterAvailability();
         fireLookupChange( new LookupChangeEvent
                           ( this, LookupChangeEvent.DICTIONARY_SELECTION |
-                            (searchModeChanged ? LookupChangeEvent.SEARCH_MODE_AVAILABILITY : 0) | 
+                            (searchModeChanged ? LookupChangeEvent.SEARCH_MODE_AVAILABILITY|
+                             LookupChangeEvent.SEARCH_MODE_SELECTION : 0) | 
                             (filterChanged ? LookupChangeEvent.FILTER_AVAILABILITY : 0) |
                             (parameterFieldsChanged ? 
                             LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY : 0) |
@@ -268,26 +297,12 @@ public class LookupModel implements Cloneable {
             !multiDictionarySelection;
         dictionaries = newDictionaries;
 
-        boolean searchModeChanged = false;
         if (selectNewDictionary) {
             ((StateWrapper) newDictionaries.get( 0)).setEnabled( true);
             ((StateWrapper) newDictionaries.get( 0)).setSelected( true);
-            searchModeChanged = updateSearchModeAvailability();
-            SearchMode selectedMode = null;
-            for ( Iterator i=searchModes.iterator(); i.hasNext(); ) {
-                StateWrapper wrapper = (StateWrapper) i.next();
-                if (wrapper.isEnabled()) {
-                    wrapper.setSelected( true);
-                    selectedMode = (SearchMode) wrapper.getObject();
-                    break;
-                }
-            }
-        }
-        else {
-            ((StateWrapper) searchModes.get( 0)).setSelected( true);
         }
 
-        searchModeChanged |= updateSearchModeAvailability();
+        boolean searchModeChanged = updateSearchModeAvailability();
         SearchMode searchmode = getSelectedSearchMode();
         boolean dictionaryChanged = updateDictionaryAvailability( searchmode);
         boolean parameterFieldsChanged = updateSearchParametersAvailability( searchmode);
@@ -295,7 +310,8 @@ public class LookupModel implements Cloneable {
         boolean filterChanged = updateFilterAvailability();
         fireLookupChange( new LookupChangeEvent
                           ( this, LookupChangeEvent.DICTIONARY_LIST_CHANGED |
-                            (searchModeChanged ? LookupChangeEvent.SEARCH_MODE_AVAILABILITY : 0) | 
+                            (searchModeChanged ? LookupChangeEvent.SEARCH_MODE_AVAILABILITY|
+                             LookupChangeEvent.SEARCH_MODE_SELECTION : 0) | 
                             (dictionaryChanged ? LookupChangeEvent.DICTIONARY_AVAILABILITY : 0) | 
                             (filterChanged ? LookupChangeEvent.FILTER_AVAILABILITY : 0) |
                             (parameterFieldsChanged ? 
@@ -346,7 +362,8 @@ public class LookupModel implements Cloneable {
         boolean filterChanged = updateFilterAvailability();
         fireLookupChange( new LookupChangeEvent
                           ( this, LookupChangeEvent.DICTIONARY_SELECTION |
-                            (searchModeChanged ? LookupChangeEvent.SEARCH_MODE_AVAILABILITY : 0) | 
+                            (searchModeChanged ? LookupChangeEvent.SEARCH_MODE_AVAILABILITY|
+                             LookupChangeEvent.SEARCH_MODE_SELECTION : 0) | 
                             (filterChanged ? LookupChangeEvent.FILTER_AVAILABILITY : 0) |
                             (parameterFieldsChanged ? 
                             LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY : 0) |
@@ -504,8 +521,8 @@ public class LookupModel implements Cloneable {
         for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
             StateWrapper wrapper = (StateWrapper) i.next();
             Dictionary dic = (Dictionary) wrapper.getObject();
-            boolean newState = dic.supports( searchmode, 
-                                             !(allDictionariesSelected || multiDictionarySelection));
+            boolean newState = searchmode==null ||
+                dic.supports( searchmode, !(allDictionariesSelected || multiDictionarySelection));
             if (newState != wrapper.isEnabled()) {
                 changed = true;
                 wrapper.setEnabled( newState);
@@ -546,26 +563,35 @@ public class LookupModel implements Cloneable {
     protected boolean updateSearchParametersAvailability( SearchMode searchmode) {
         boolean changed = false;
 
-        SearchParameters params = searchmode.getParameters();
-        boolean hasExpression = params.contains( StandardSearchParameter.EXPRESSION);
-        if (hasExpression != searchExpressionEnabled) {
-            searchExpressionEnabled = hasExpression;
-            changed = true;
+        if (searchmode != null) {
+            SearchParameters params = searchmode.getParameters();
+            boolean hasExpression = params.contains( StandardSearchParameter.EXPRESSION);
+            if (hasExpression != searchExpressionEnabled) {
+                searchExpressionEnabled = hasExpression;
+                changed = true;
+            }
+            
+            boolean hasDistance = params.contains( StandardSearchParameter.DISTANCE);
+            if (hasDistance != distanceEnabled) {
+                distanceEnabled = hasDistance;
+                changed = true;
+            }
         }
-
-        boolean hasDistance = params.contains( StandardSearchParameter.DISTANCE);
-        if (hasDistance != distanceEnabled) {
-            distanceEnabled = hasDistance;
-            changed = true;
+        else {
+            changed = searchExpressionEnabled | distanceEnabled;
+            searchExpressionEnabled = false;
+            distanceEnabled = false;
         }
 
         return changed;
     }
 
     protected boolean updateSearchFieldsAvailability( SearchMode searchmode) {
-        SearchFieldSelection newEnabled = new SearchFieldSelection();
+        SearchFieldSelection newEnabled = new SearchFieldSelection( false, false, false,
+                                                                    false, false);
 
-        if (searchmode.getParameters().contains( StandardSearchParameter.SEARCH_FIELDS)) {
+        if (searchmode != null &&
+            searchmode.getParameters().contains( StandardSearchParameter.SEARCH_FIELDS)) {
             for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
                 StateWrapper wrapper = (StateWrapper) i.next();
                 Dictionary dic = (Dictionary) wrapper.getObject();

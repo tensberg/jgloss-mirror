@@ -574,6 +574,8 @@ public class JGlossEditor extends JTextPane {
         documentTitleAction.setEnabled( true);
     }
 
+    public XCVManager getXCVManager() { return xcvManager; }
+
     /**
      * Search for some text in the document. If the text is found as part of an annotation, the
      * annotation will be selected.

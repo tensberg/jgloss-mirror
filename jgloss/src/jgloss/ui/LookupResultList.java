@@ -25,7 +25,11 @@ package jgloss.ui;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
+import jgloss.util.ListFormatter;
 import jgloss.dictionary.*;
+import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.Attributes;
+import jgloss.dictionary.attribute.AttributeFormatter;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
 
 import java.util.List;
@@ -43,6 +47,119 @@ import javax.swing.text.*;
 import javax.swing.text.html.*;
 
 public class LookupResultList extends JPanel implements LookupResultHandler {
+    private static class Marker implements DictionaryEntryFormat.Decorator {
+        private MarkerListFormatter.Group markerGroup = 
+            new MarkerListFormatter.Group( "<font color=\"blue\">", "</font>");
+        private DictionaryEntryFormat.Decorator child;
+
+        private Marker( DictionaryEntryFormat.Decorator _child) {
+            child = _child;
+        }
+
+        public ListFormatter decorateList( ListFormatter formatter, int type) {
+            if (type==WORD || type==READING || type==TRANSLATION_SYN) {
+                formatter = new MarkerListFormatter( markerGroup, formatter);
+            }
+
+            if (child != null)
+                formatter = child.decorateList( formatter, type);
+
+            return formatter;
+        }
+
+        public ListFormatter decorateList( ListFormatter formatter, Attribute type,
+                                           int position) {
+            if (type == Attributes.EXPLANATION)
+                formatter = new MarkerListFormatter( markerGroup, formatter);
+
+            if (child != null)
+                formatter = child.decorateList( formatter, type, position);
+            
+            return formatter;
+        }
+
+        public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
+                                                     int position) {
+            if (child != null)
+                formatter = child.decorateAttribute( formatter, type, position);
+
+            return formatter;
+        }
+
+        public void setMarkedText( String text) {
+            markerGroup.setMarkedText( text);
+        }
+    } // class Marker
+
+    public static class Hyperlinker extends DictionaryEntryFormat.IdentityDecorator {
+        public static final String WORD_PROTOCOL = "wo";
+        public static final String READING_PROTOCOL = "re";
+        public static final String TRANSLATION_PROTOCOL = "tr";
+        public static final String REFERENCE_PROTOCOL = "ref";
+        public static final String ATTRIBUTE_BEFORE_PROTOCOL = "atb";
+        public static final String ATTRIBUTE_AFTER_PROTOCOL = "ata";
+
+        private boolean words;
+        private boolean readings;
+        private boolean translations;
+        private boolean references;
+        private boolean allAttributes;
+
+        private Map hyperrefs;
+
+        public Hyperlinker() {
+            this( false, false, false, true, false);
+        }
+
+        public Hyperlinker( boolean _words, boolean _readings, boolean _translations,
+                            boolean _references, boolean _allAttributes) {
+            words = _words;
+            readings = _readings;
+            translations = _translations;
+            references = _references | _allAttributes;
+            allAttributes = _allAttributes;
+
+            hyperrefs = new HashMap();
+        }
+
+        public ListFormatter decorateList( ListFormatter formatter, int type) {
+            if (words && type==WORD)
+                formatter = new HyperlinkListFormatter( WORD_PROTOCOL, hyperrefs, formatter);
+            else if (readings && type==READING)
+                formatter = new HyperlinkListFormatter( READING_PROTOCOL, hyperrefs, formatter);
+            else if (translations && type==TRANSLATION_SYN)
+                formatter = new HyperlinkListFormatter( TRANSLATION_PROTOCOL, hyperrefs, formatter);
+
+            return formatter;
+        }
+
+        public AttributeFormatter decorateAttribute( AttributeFormatter formatter,
+                                                     Attribute type, int position) {
+            if (references && type.canHaveValue() && 
+                ReferenceAttributeValue.class.isAssignableFrom
+                ( type.getAttributeValueClass())) {
+                formatter = new HyperlinkAttributeFormatter( REFERENCE_PROTOCOL,
+                                                             true, hyperrefs, formatter);
+            }
+            else if (allAttributes) {
+                formatter = new HyperlinkAttributeFormatter( (position==POSITION_BEFORE) ? 
+                                                             ATTRIBUTE_BEFORE_PROTOCOL :
+                                                             ATTRIBUTE_AFTER_PROTOCOL,
+                                                             true, hyperrefs, formatter);
+            }
+            
+            return formatter;
+        }
+
+        public Object getReference( String key) {
+            return hyperrefs.get( key);
+        }
+
+        public void clearReferences() {
+            hyperrefs.clear();
+        }
+    } // class Hyperlinker
+
     protected final static String DEFAULT_STYLE_SHEET = "/data/lookup.css";
 
     /**
@@ -55,9 +172,10 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected int fancyLimit;
     protected boolean showAllDictionaries;
 
-    protected DictionaryEntryFormatter htmlFormatter;
-    protected MarkerListFormatter.Group markerGroup;
     protected DictionaryEntryFormatter plainFormatter;
+    protected DictionaryEntryFormatter htmlFormatter;
+    protected Marker marker;
+    protected Hyperlinker hyperlinker;
     
     protected boolean multipleDictionaries;
     protected List resultBuffer;
@@ -68,7 +186,6 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected boolean previousDictionaryHasMatch;
     protected JLabel status;
     protected String searchExpression;
-    protected Map references;
     protected int entryCount;
 
     protected final static int BUFFER_LIMIT = 500;
@@ -78,16 +195,18 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }
 
     public LookupResultList( int _fancyLimit) {
-        this( _fancyLimit, null, true);
+        this( _fancyLimit, null, true, new Hyperlinker());
     }
 
-    public LookupResultList( int _fancyLimit, URL _styleSheet, boolean _showAllDictionaries) {
+    public LookupResultList( int _fancyLimit, URL _styleSheet, boolean _showAllDictionaries,
+                             Hyperlinker _hyperlinker) {
         setLayout( new BorderLayout());
 
         fancyLimit = _fancyLimit;
         showAllDictionaries = _showAllDictionaries;
         if (_styleSheet == null)
             _styleSheet = LookupResultList.class.getResource( DEFAULT_STYLE_SHEET);
+        hyperlinker = _hyperlinker;
 
         resultFancy = new JEditorPane();
         resultFancy.setContentType( "text/html");
@@ -139,22 +258,20 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         resultScroller = new JScrollPane( resultFancy, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add( resultScroller, BorderLayout.CENTER);
-        status = new JLabel();
+        status = new JLabel( " ");
         this.add( status, BorderLayout.SOUTH);
 
-        references = new HashMap( fancyLimit*4+1);
-
-        markerGroup = new MarkerListFormatter.Group( "<font color=\"blue\">", "</font>");
-        htmlFormatter = DictionaryEntryFormat.createHTMLFormatter( markerGroup, references);
+        marker = new Marker( hyperlinker);
+        htmlFormatter = DictionaryEntryFormat.createFormatter( marker);
         plainFormatter = DictionaryEntryFormat.createFormatter();
-    }
-
-    public ReferenceAttributeValue getReference( String key) {
-        return (ReferenceAttributeValue) references.get( key);
     }
 
     public void addHyperlinkListener( HyperlinkListener listener) {
         resultFancy.addHyperlinkListener( listener);
+    }
+
+    public void removeHyperlinkListener( HyperlinkListener listener) {
+        resultFancy.removeHyperlinkListener( listener);
     }
 
     public void addToXCVManager( XCVManager manager) {
@@ -163,6 +280,10 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }
 
     public int getEntryCount() { return entryCount; }
+
+    public Object getReference( String key) {
+        return hyperlinker.getReference( key);
+    }
 
     public void startLookup( String description) {
         searchExpression = null;
@@ -177,7 +298,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }
 
     private void startLookup() {
-        markerGroup.setMarkedText( searchExpression);
+        marker.setMarkedText( searchExpression);
+        hyperlinker.clearReferences();
         previousDictionaryHasMatch = true;
         dictionaryEntries = 0;
         entriesInTextBuffer = 0;

@@ -93,12 +93,12 @@ class JGlossifyReader extends FilterReader {
         funnyChars.put( new Character( '"'), "&quot;".toCharArray());
         
         // The following character is a Japanese space. When it apears in a document
-        // it is probably used to format the indention at the beginning of a paragraph.
+        // it is probably used to format the indentation at the beginning of a paragraph.
         // Unfortunately, the layout algorithm uses the space as a opportunity for breaking
         // an overlong line. To prevent this I approximate it with two non-breakable spaces.
         funnyChars.put( new Character( '\u3000'), "&#160;&#160;".toCharArray());
 
-        ResourceBundle strings = ResourceBundle.getBundle( "resources/jgloss-ui-HTMLifyReader");
+        ResourceBundle strings = ResourceBundle.getBundle( "resources/jgloss-ui-JGlossifyReader");
         NO_PARAGRAPH_START = strings.getString( "no_paragraph_start").toCharArray();
         Arrays.sort( NO_PARAGRAPH_START);
         NO_PARAGRAPH_END = strings.getString( "no_paragraph_end").toCharArray();

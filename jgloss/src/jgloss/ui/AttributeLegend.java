@@ -143,14 +143,14 @@ public class AttributeLegend extends JPanel {
             if (att.canHaveValue()) {
                 if (!att.alwaysHasValue()) {
                     DictionaryEntryFormat.getAttributeFormatter( att, true).format
-                        ( att, null, buf);
+                        ( att, (ValueList) null, buf);
                     buf.append( " / ");
                 }
                 formatter.format( att, new SingletonValueList( att.getExampleValue()), buf);
                 createLegendForValue( dic, att, buf);
             }
             else
-                formatter.format( att, null, buf);
+                formatter.format( att, (ValueList) null, buf);
             buf.append( "</p>\n");
         }
 

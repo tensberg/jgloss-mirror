@@ -25,7 +25,7 @@ package jgloss.ui.export;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
-import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossFrameModel;
 
 import java.awt.Component;
 import java.net.URL;
@@ -52,7 +52,7 @@ class StringParameter extends UIParameter {
 
     public Component getComponent() { return box; }
 
-    public String getValue( JGlossFrame source, URL systemId) { return text.getText(); }
+    public String getValue( JGlossFrameModel source, URL systemId) { return text.getText(); }
 
     public void loadFromPrefs() {
         text.setText( JGloss.prefs.getString( prefsKey, defaultValue));

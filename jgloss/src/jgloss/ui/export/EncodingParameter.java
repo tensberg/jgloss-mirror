@@ -25,7 +25,7 @@ package jgloss.ui.export;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
-import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossFrameModel;
 
 import java.awt.Component;
 import java.net.URL;
@@ -53,7 +53,7 @@ class EncodingParameter extends UIParameter {
 
     public Component getComponent() { return box; }
 
-    public String getValue( JGlossFrame source, URL systemId) {
+    public String getValue( JGlossFrameModel source, URL systemId) {
         return getValue();
     }
 

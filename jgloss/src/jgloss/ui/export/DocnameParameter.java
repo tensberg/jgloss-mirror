@@ -23,7 +23,7 @@
 
 package jgloss.ui.export;
 
-import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossFrameModel;
 
 import java.net.URL;
 
@@ -34,7 +34,7 @@ class DocnameParameter extends AbstractParameter {
         super( elem);
     }
 
-    public String getValue( JGlossFrame source, URL systemId) {
+    public String getValue( JGlossFrameModel source, URL systemId) {
         return source.getDocumentName();
     }
 } // class DocnameParameter

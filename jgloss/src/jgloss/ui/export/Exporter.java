@@ -27,7 +27,7 @@ import jgloss.JGloss;
 import jgloss.util.XMLTools;
 import jgloss.ui.ExtensionFileFilter;
 import jgloss.ui.UIUtilities;
-import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossFrameModel;
 
 import java.awt.Component;
 import java.io.File;
@@ -155,7 +155,7 @@ class Exporter {
         return UIUtilities.initButton( b, menuKey);
     }
 
-    public synchronized void export( JGlossFrame source, Document doc, Component parent) {
+    public synchronized void export( JGlossFrameModel source, Document doc, Component parent) {
         if (filechooser == null) {
             initFileChooser();
         }
@@ -267,7 +267,7 @@ class Exporter {
         return new InputSource( source);
     }
 
-    private Element createParametersElement( JGlossFrame source, Document doc) {
+    private Element createParametersElement( JGlossFrameModel source, Document doc) {
         Element param = doc.createElement( Elements.PARAMETERS);
         for ( Iterator i=parameters.iterator(); i.hasNext(); ) {
             Parameter p = (Parameter) i.next();

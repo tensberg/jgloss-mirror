@@ -21,11 +21,21 @@
  *
  */
 
-package jgloss.ui.doc;
+package jgloss.dictionary.attribute;
 
-public interface AnnotationList {
-    int size();
-    Annotation getAnnotation( int index);
-    void addAnnotationListener( AnnotationListener l);
-    void removeAnnotationListener( AnnotationListener l);
-} // interface AnnotationList
+/**
+ * Format an attribute and its value as a string.
+ *
+ * @author Michael Koch
+ */
+public interface AttributeValueFormatter {
+    /**
+     * Format an attribute and its value as a string.
+     *
+     * @param val Value of the attribute. May be <code>null</code> if the attribute is set but
+     *            has no value.
+     * @param buf String buffer to which the formatted attribute is appended.
+     * @return The string buffer passed in.
+     */
+    StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf);
+} // interface AttributeValueFormatter

@@ -30,13 +30,15 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import java.util.regex.Pattern;
+
 /**
  * List formatter which will add some additional text to the list items, if they
  * contain a certain chooseable string.
  *
  * @author Michael Koch
  */
-public class MarkerListFormatter extends ListFormatter {
+public class MarkerListFormatter implements ListFormatter {
     /**
      * Group of marker list formatters which share a common configuration.
      */
@@ -95,33 +97,22 @@ public class MarkerListFormatter extends ListFormatter {
         public String getTextAfter() { return textAfter; }
     } // class Group
 
+    protected ListFormatter parent;
+
     protected String markedText;
     protected String textBefore;
     protected String textAfter;
 
-    public MarkerListFormatter( Group _group, ListFormatter _formatter) {
-        super( _formatter);
-        _group.add( this);
+    public MarkerListFormatter( ListFormatter _parent, String _markedText,
+                                String _textBefore, String _textAfter) {
+        parent = _parent;
+        markedText = _markedText;
+        textBefore = _textBefore;
+        textAfter = _textAfter;
     }
 
-    public MarkerListFormatter( Group _group, String _listBetween) {
-        this( _group, "", _listBetween, "");
-    }
-
-    public MarkerListFormatter( Group _group, String _listBefore, String _listAfter) {
-        this( _group, "", _listBefore, _listAfter, _listBefore, _listBefore + _listAfter, 
-              _listAfter);
-    }
-
-    public MarkerListFormatter( Group _group, String _listBefore, String _listBetween, String _listAfter) {
-        this( _group, "", _listBefore, _listAfter, _listBefore, _listBetween, _listAfter);
-    }
-
-    public MarkerListFormatter( Group _group, String _emptyList, String _singleListBefore,
-                                String _singleListAfter, String _multiListBefore,
-                                String _multiListBetween, String _multiListAfter) {
-        super( _emptyList, _singleListBefore, _singleListAfter,
-               _multiListBefore, _multiListBetween, _multiListAfter);
+    public MarkerListFormatter( Group _group, ListFormatter _parent) {
+        parent = _parent;
         _group.add( this);
     }
 
@@ -141,10 +132,15 @@ public class MarkerListFormatter extends ListFormatter {
     public String getTextBefore() { return textBefore; }
     public String getTextAfter() { return textAfter; }
 
-    protected void doAppendItem( Object item) {
+    public ListFormatter newList( StringBuffer _buffer, int _length) {
+        parent.newList( _buffer, _length);
+        return this;
+    }
+
+    public ListFormatter addItem( Object item) {
         if (markedText == null) {
-            super.doAppendItem( item);
-            return;
+            parent.addItem( item);
+            return this;
         }
 
         String s = String.valueOf( item);
@@ -158,8 +154,13 @@ public class MarkerListFormatter extends ListFormatter {
             from--;
         }
 
-        buffer.append( tempBuffer);
+        parent.addItem( tempBuffer);
+        return this;
     }
+
+    public StringBuffer endList() { return parent.endList(); }
+    public StringBuffer getBuffer() { return parent.getBuffer(); }
+    public Pattern getPattern() { return parent.getPattern(); }
 
     protected static final String normalize( String in) {
         return in != null ? StringTools.toHiragana( in.toLowerCase()) : null;

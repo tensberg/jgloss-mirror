@@ -25,6 +25,7 @@ package jgloss.dictionary;
 
 import jgloss.util.StringTools;
 import jgloss.util.ListFormatter;
+import jgloss.util.DefaultListFormatter;
 import jgloss.dictionary.attribute.*;
 
 import java.io.*;
@@ -65,20 +66,20 @@ public class WadokuJT extends FileBasedDictionary {
         f.select( MatchMode.WORD, true);
 
         DictionaryEntryFormatter formatter = new DictionaryEntryFormatter
-            ( new ListFormatter( "", "; ", ""),
-              new ListFormatter( " [", ": ", "]"),
-              new ListFormatter( "", " ", ".", " (n) ", ". (n) ", "."),
-              new ListFormatter( "", "; ", ""),
-              new ListFormatter( "", "/", ""));
+            ( new DefaultListFormatter( "", "; ", ""),
+              new DefaultListFormatter( " [", ": ", "]"),
+              new DefaultListFormatter( "", " ", ".", " (n) ", ". (n) ", "."),
+              new DefaultListFormatter( "", "; ", ""),
+              new DefaultListFormatter( "", "/", ""));
         formatter.addAttributeFormat( Attributes.PART_OF_SPEECH,
                                       new DefaultAttributeFormatter
-                                      ( " (", ")", "", false, new ListFormatter( ",")),
+                                      ( " (", ")", "", false, new DefaultListFormatter( ",")),
                                       DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         formatter.addAttributeFormat( Attributes.EXAMPLE,
                                       new DefaultAttributeFormatter( " {", "}", "", true, null),
                                       DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         formatter.addAttributeFormat( Attributes.EXPLANATION, new DefaultAttributeFormatter
-                                      ( " (", ")", "", false, new ListFormatter( ",")), false);
+                                      ( " (", ")", "", false, new DefaultListFormatter( ",")), false);
 
         ResultIterator r = d.search( ExpressionSearchModes.ANY,
                                      new Object[] { args[1], f });

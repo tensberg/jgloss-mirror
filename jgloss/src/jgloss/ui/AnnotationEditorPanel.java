@@ -25,12 +25,16 @@ package jgloss.ui;
 
 import jgloss.JGloss;
 import jgloss.ui.annotation.Annotation;
+import jgloss.ui.annotation.AnnotationEvent;
+import jgloss.ui.annotation.AnnotationListener;
 
 import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -39,7 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-public class AnnotationEditorPanel extends JPanel {
+public class AnnotationEditorPanel extends JPanel implements ActionListener, AnnotationListener {
     private Annotation annotation;
 
     private JLabel title;
@@ -63,7 +67,7 @@ public class AnnotationEditorPanel extends JPanel {
         dictionaryForm = new JTextField();
         dictionaryFormReading = new JTextField();
         grammaticalType = new JLabel();
-        readingEditor = new ReadingEditor();
+        readingEditor = new ReadingEditor( title);
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -110,6 +114,10 @@ public class AnnotationEditorPanel extends JPanel {
         JPanel p = new JPanel();
         p.setOpaque( false);
         add( p, c5);
+
+        translation.addActionListener( this);
+        dictionaryForm.addActionListener( this);
+        dictionaryFormReading.addActionListener( this);
     }
 
     public void setAnnotation( Annotation _annotation) {
@@ -119,6 +127,27 @@ public class AnnotationEditorPanel extends JPanel {
         annotation = _annotation;
         updateDisplay();
         readingEditor.setAnnotation( _annotation);
+    }
+
+    public void actionPerformed( ActionEvent e) {
+        if (annotation == null)
+            return;
+
+        JTextField source = (JTextField) e.getSource();
+        String text = source.getText();
+        if (source == translation) {
+            if (!text.equals( annotation.getTranslation()))
+                annotation.setTranslation( text);
+        }
+        else if (source == dictionaryForm) {
+            if (!text.equals( annotation.getDictionaryForm()))
+                annotation.setDictionaryForm( text);
+        }
+        else if (source == dictionaryFormReading) {
+            if (!text.equals( annotation.getDictionaryFormReading()))
+                annotation.setDictionaryFormReading( text);
+        }
+        title.setText( annotation.toString());
     }
 
     private void updateDisplay() {
@@ -155,7 +184,21 @@ public class AnnotationEditorPanel extends JPanel {
 
     public boolean isEnabled() { return enabled; }
 
-    private static class ReadingEditor extends JPanel {
+    public void annotationInserted( AnnotationEvent ae) {}
+    public void annotationRemoved( AnnotationEvent ae) {}
+    public void annotationChanged( AnnotationEvent ae) {
+        if (ae.getAnnotation() == annotation) {
+            updateDisplay();
+        }
+    }
+
+    public void readingChanged( AnnotationEvent ae) {
+       if (ae.getAnnotation() == annotation) {
+            readingEditor.updateDisplay();
+       } 
+    }
+
+    private static class ReadingEditor extends JPanel implements ActionListener {
         private Annotation annotation;
         private JLabel multiReadingLabel = new JLabel
             ( JGloss.messages.getString( "annotationeditor.readings"));
@@ -164,8 +207,11 @@ public class AnnotationEditorPanel extends JPanel {
         private GridBagConstraints multiReadingLabelC;
         private GridBagConstraints multiReadingBaseC;
         private GridBagConstraints multiReadingTextC;
+        private JLabel title;
 
-        ReadingEditor() {
+        ReadingEditor( JLabel _title) {
+            title = _title;
+
             setLayout( new GridBagLayout());
             setOpaque( false);
 
@@ -200,6 +246,7 @@ public class AnnotationEditorPanel extends JPanel {
                         readingLabels.add( new JLabel());
                     while (readings.size() < _annotation.getReadingCount()) {
                         JTextField reading = new JTextField( "");
+                        reading.addActionListener( this);
                         readings.add( reading);
                     }
 
@@ -214,10 +261,10 @@ public class AnnotationEditorPanel extends JPanel {
             }
 
             annotation = _annotation;
-            updateText();
+            updateDisplay();
         }
 
-        private void updateText() {
+        private void updateDisplay() {
             if (annotation == null)
                 return;
 
@@ -229,6 +276,18 @@ public class AnnotationEditorPanel extends JPanel {
                 ((JTextField) readings.get( i)).setText
                     ( annotation.getReading( i));
             }
+        }
+
+        public void actionPerformed( ActionEvent e) {
+            if (annotation == null)
+                return;
+
+            JTextField source = (JTextField) e.getSource();
+            String reading = source.getText();
+            int index = readings.indexOf( source);
+            if (!reading.equals( annotation.getReading( index)))
+                annotation.setReading( index, reading);
+            title.setText( annotation.toString());
         }
     } // class ReadingEditor
 } // class AnnotationEditorPanel
