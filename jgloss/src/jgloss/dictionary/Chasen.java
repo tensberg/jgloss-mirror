@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -44,11 +44,11 @@ public class Chasen {
     }
 
     /**
-     * End of input line marker.
+     * End of input line marker. This is used by Chasen if a 0x0a is encountered in the input.
      */
     public static final String EOS = "EOS";
     /**
-     * End of path marker.
+     * End of path marker. This is used by Chasen if the "-p" (show all paths) option is selected.
      */
     public static final String EOP = "EOP";
 
@@ -67,10 +67,6 @@ public class Chasen {
          * {@link next() next}.
          */
         private List nextBuffer = new ArrayList( 10);
-        /**
-         * Buffer used when reading from chasen output when discarding.
-         */
-        private char[] discardBuf = new char[4096];
         /**
          * EOS lines expected from Chasen process for this iteration. The last EOS signals the end
          * of the Chasen result for the current parse.
@@ -166,6 +162,7 @@ public class Chasen {
          * Discard all remaining result lines.
          */
         public void discard() {
+            char[] discardBuf = new char[4096];
             try {
                 // read all available output from chasen process and discard it
                 while (chasenOut.read( discardBuf) > 0)

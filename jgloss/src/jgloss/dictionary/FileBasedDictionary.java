@@ -54,7 +54,7 @@ import java.lang.reflect.InvocationTargetException;
  * <td>1001</td></tr>
  * <tr><td>Offset</td>
  * <td>
- *   Offset in bytes from the start of the dictionary file to the first index entry.
+ *   Offset in bytes from the start of the index file to the first index entry.
  *   This is effectively the length of the header.
  *   The information can be used to find the first index entry even if the index
  *   format version differs from the one supported by this index.

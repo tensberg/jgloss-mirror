@@ -127,7 +127,7 @@ doc: jgloss.pdf index.html
 
 gen-javadoc:
 	mkdir -p javadoc
-	javadoc -d javadoc -private \
+	javadoc -d javadoc -package \
                 -classpath "src:$(CLASSPATH)" \
                 -sourcepath src \
                 -windowtitle "JGloss documentation" -doctitle "JGloss documentation" \
