@@ -66,7 +66,7 @@ public class TranslationNode extends InnerNode {
         DictionaryEntry d = translation.getDictionaryEntry();
         word = d.getWord();
         if (d.getReading() != null) 
-            word += "\uff08" + d.getReading() + "\uff09"; // japanese brackets
+            word += "\uff08" + d.getReading() + "\uff09"; // Japanese brackets
         String[] translations = d.getTranslations();
         children = new Vector( translations.length);
         for ( int i=0; i<translations.length; i++)

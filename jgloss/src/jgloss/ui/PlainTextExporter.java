@@ -91,7 +91,7 @@ public class PlainTextExporter {
         }
 
         // Replace the two &nbsp;'s (non-breakable spaces) which were inserted 
-        // by the HTMLifyReader for every japanese space.
+        // by the HTMLifyReader for every Japanese space.
         for ( int i=text.length()-1; i>=1; i-=1) {
             if (text.charAt( i)=='\u00a0' &&
                 text.charAt( i-1)=='\u00a0' ) {

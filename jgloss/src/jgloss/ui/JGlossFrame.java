@@ -762,13 +762,13 @@ public class JGlossFrame implements ActionListener {
 
     /**
      * Loads a document into this JGlossFrame. This will completely set up the frame for editing.
-     * This can be used to either open a JGloss document or to import some japanese text, depending
+     * This can be used to either open a JGloss document or to import some Japanese text, depending
      * of the setting of <CODE>addAnnotations</CODE>.
      *
      * @param in The reader from which to load the document.
      * @param path The location of the document which was used to create the reader.
      * @param title Title of the file. This will normally be the filename component of the path.
-     * @param parser The parser to use to annotate japanese text.
+     * @param parser The parser to use to annotate Japanese text.
      * @param addAnnotations <CODE>true</CODE> if annotations should be added while loading the
      *                       document.
      * @param length Approximate length in characters of the document to load. This will only be used

@@ -89,7 +89,7 @@ public class HTMLifyReader extends BufferedReader {
         funnyChars.put( new Character( '>'), "&gt;");
         funnyChars.put( new Character( '"'), "&quot;");
 
-        // The following character is a japanese space. When it apears in a document
+        // The following character is a Japanese space. When it apears in a document
         // it is probably used to format the indention at the beginning of a paragraph.
         // Unfortunately, the layout algorithm uses the space as a opportunity for breaking
         // an overlong line. To prevent this I approximate it with two non-breakable spaces.
