@@ -160,12 +160,12 @@ public class EDict implements Dictionary {
     public EDict( String dicfile, boolean createindex) throws IOException {
         this.dicfile = dicfile;
 
-        File f = new File( dicfile);
-        name = f.getName();
+        File df = new File( dicfile);
+        name = df.getName();
         System.err.println( MessageFormat.format( messages.getString( "dictionary.load"),
                                                   new String[] { name }));
-        dictionary = new byte[(int) f.length()];
-        InputStream is = new BufferedInputStream( new FileInputStream( f));
+        dictionary = new byte[(int) df.length()];
+        InputStream is = new BufferedInputStream( new FileInputStream( df));
         int off = 0;
         int len = dictionary.length;
         int read = 0;
@@ -179,17 +179,16 @@ public class EDict implements Dictionary {
 
         File jindex = new File( dicfile + JJDX_EXTENSION);
         File xindex = new File( dicfile + XJDX_EXTENSION);
-        if (jindex.canRead()) {
+        if (jindex.canRead() && jindex.lastModified()>=df.lastModified()) {
             loadJJDX( jindex);
             xjdxIndex = false;
         }
-        else if (xindex.canRead()) {
+        else if (xindex.canRead() && xindex.lastModified()>=df.lastModified()) {
             loadXJDX( xindex);
             xjdxIndex = true;
         }
         else if (createindex) {
-            xjdxIndex = false;
-            buildIndex();
+            buildIndex( true);
             try {
                 jindex.createNewFile();
                 saveJJDX( jindex);
@@ -512,6 +511,9 @@ public class EDict implements Dictionary {
         System.err.println( MessageFormat.format( messages.getString( "edict.writejjdx"),
                                                   new String[] { getName() }));
 
+        if (indexLength == 0)
+            return;
+
         DataOutputStream os = new DataOutputStream( new BufferedOutputStream
             ( new FileOutputStream( indexfile)));
         os.writeInt( JJDX_VERSION);
@@ -528,12 +530,15 @@ public class EDict implements Dictionary {
      * The method will call {@link #preBuildIndex() preBuildIndex}, 
      * {@link #addIndexRange(int,int) addIndexRange( 0, dictionaryLength)} and
      * {@link #postBuildIndex() postBuildIndex()}.
+     *
+     * @param printMessage Flag if an informational message should be printed to <CODE>System.err</CODE>.
      */
-    public void buildIndex() {
-        System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
-                                                  new String[] { getName() }));
+    public void buildIndex( boolean printMessage) {
+        if (printMessage)
+            System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
+                                                      new String[] { getName() }));
       
-        index = null; // delete old index if any
+        index = null; // delete old index if existant
         xjdxIndex = false;
 
         preBuildIndex();
@@ -780,6 +785,8 @@ public class EDict implements Dictionary {
             i2++;
             i++;
         }
+        if (i == 20)
+            return 0;
 
         if (c1 == c2) { // end of dictionary for one of the strings
             if (i1 < dictionaryLength)
