@@ -23,6 +23,8 @@
 
 package jgloss.ui.annotation;
 
+import jgloss.ui.html.JGlossHTMLDoc;
+
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.BadLocationException;
@@ -30,8 +32,6 @@ import javax.swing.text.BadLocationException;
 class TextElement {
     private Element element;
     private String text = null;
-
-    private final static String PLACEHOLDER = " ";
 
     TextElement( Element _element) {
         element = _element;
@@ -51,7 +51,7 @@ class TextElement {
         text = _text;
         if (text==null || text.length()==0)
             // a minimal text must always be set so that the element will not be deleted
-            text = PLACEHOLDER;
+            text = JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER;
 
         try {
             int start = element.getStartOffset();
@@ -74,7 +74,7 @@ class TextElement {
         if (text == null) try {
             text = element.getDocument().getText( element.getStartOffset(),
                                                   element.getEndOffset()-element.getStartOffset());
-            if (text.equals( PLACEHOLDER))
+            if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER))
                 text = "";
         } catch (BadLocationException ex) {
             ex.printStackTrace();

@@ -24,7 +24,7 @@
 package jgloss.ui;
 
 import jgloss.*;
-import jgloss.ui.export.ExportFileChooser;
+//import jgloss.ui.export.ExportFileChooser;
 import jgloss.dictionary.*;
 import jgloss.util.CharacterEncodingDetector;
 
@@ -319,7 +319,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      * Displays a file chooser and writes the contents of the JList to the selected file.
      */
     private void exportList() {
-        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(), "exclusions.export.title");
+        /*ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(), "exclusions.export.title");
         f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_EXCLUSIONS_ENCODING);
 
         int r = f.showSaveDialog( SwingUtilities.getRoot( box));
@@ -351,7 +351,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                     ex.printStackTrace();
                 }
             }
-        }
+            }*/
     }
 
     /**

@@ -11,6 +11,19 @@
 
   <xsl:template match="anno">
     <anno>
+
+      <xsl:if test="string-length(@base)>0">
+        <xsl:attribute name="base"><xsl:value-of select="@base" /></xsl:attribute>
+      </xsl:if>
+
+      <xsl:if test="string-length(@basere)>0">
+        <xsl:attribute name="basere"><xsl:value-of select="@basere" /></xsl:attribute>
+      </xsl:if>
+
+      <xsl:if test="string-length(@type)>0">
+        <xsl:attribute name="type"><xsl:value-of select="@type" /></xsl:attribute>
+      </xsl:if>
+
       <word>
         <xsl:choose>
           <xsl:when test="count(rbase)=0">
@@ -52,6 +65,11 @@
 
   <xsl:template match="rbase">
     <rb>
+
+      <xsl:if test="string-length(@docre)>0">
+        <xsl:attribute name="docre"><xsl:value-of select="@docre" /></xsl:attribute>
+      </xsl:if>
+
       <reading>
         <xsl:choose>
           <xsl:when test="string-length(@re)>0">

@@ -52,8 +52,11 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param key Key to a preference.
      * @return The corresponding preference string.
      */
-    public String getString( String key) {
-        return prefs.get( key, defaults.getProperty( key));
+    public String getString( String key, String d) {
+        String defaultPref = defaults.getProperty( key);
+        if (defaultPref == null)
+            defaultPref = d;
+        return prefs.get( key, defaultPref);
     }
     
     /**
@@ -82,8 +85,7 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
         try {
             def = Integer.parseInt( defaults.getProperty( key));
         } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
+        } catch (NullPointerException ex) {}
         
         return prefs.getInt( key, def);
     }
@@ -111,8 +113,7 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
         try {
             def = Double.parseDouble( defaults.getProperty( key));
         } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
+        } catch (NullPointerException ex) {}
         
         return prefs.getDouble( key, def);
     }

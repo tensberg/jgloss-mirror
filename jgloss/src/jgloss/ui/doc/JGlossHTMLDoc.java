@@ -53,18 +53,31 @@ import javax.xml.transform.dom.DOMSource;
  * @author Michael Koch
  */
 public class JGlossHTMLDoc extends HTMLDocument {
-    /**
-     * Name of the attribute of an annotation element which contains the dictionary form
-     * of the annotated word. If the attribute is not set, the dictionary form is per
-     * definition equal to the annotated word.
-     */
-    public static final String DICTIONARY_WORD = "base";
-    /**
-     * Name of the attribute of an annotation element which contains the dictionary form
-     * of the reading of the annotated word. If the attribute is not set, the dictionary form is per
-     * definition equal to the reading of annotated word.
-     */
-    public static final String DICTIONARY_READING = "baseReading";
+    public interface Attributes {
+        /**
+         * Name of the attribute of an annotation element which contains the dictionary form
+         * of the annotated word. If the attribute is not set, the dictionary form is per
+         * definition equal to the annotated word.
+         */
+        String BASE = "base";
+        /**
+         * Name of the attribute of an annotation element which contains the dictionary form
+         * of the reading of the annotated word. If the attribute is not set, the dictionary form is per
+         * definition equal to the reading of annotated word.
+         */
+        String BASE_READING = "basere";
+        /**
+         * Name of the attribute of an annotation element which contains the grammatical type.
+         */
+        String TYPE = "type";
+        /**
+         * Name of the attribute of an rb element which contains the reading found in a
+         * document during import.
+         */
+        String DOCREADING = "docre";
+    }
+
+    public static final String EMPTY_ELEMENT_PLACEHOLDER = " ";
 
     private JGlossDocument baseDoc;
 

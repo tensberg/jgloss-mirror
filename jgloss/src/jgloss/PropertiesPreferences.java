@@ -64,14 +64,12 @@ class PropertiesPreferences extends Preferences {
             });
     }
 
-    /**
-     * Return the preference for the given key.
-     *
-     * @param key Key to a preference.
-     * @return The corresponding preference string.
-     */
-    public synchronized String getString( String key) {
-        return prefs.getProperty( key);
+    public synchronized String getString( String key, String d) {
+        String out = prefs.getProperty( key);
+        if (out == null)
+            out = d;
+
+        return out;
     }
 
     /**

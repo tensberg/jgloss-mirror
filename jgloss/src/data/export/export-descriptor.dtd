@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT export (description,parameters?,localized-strings?,(template|templates))>
+
+<!ELEMENT description (menuitem,title,file-extension?)>
+<!ELEMENT menuitem EMPTY>
+<!ATTLIST menuitem key CDATA #REQUIRED>
+<!ELEMENT title EMPTY>
+<!ATTLIST title key CDATA #REQUIRED>
+<!ELEMENT file-extension (#PCDATA)>
+<!ATTLIST file-extension description-key CDATA #REQUIRED>
+
+<!ELEMENT parameters (encoding|boolean|string|combobox|docname|datetime)+>
+<!ELEMENT docname (#PCDATA)>
+<!ATTLIST docname name CDATA #REQUIRED>
+<!ELEMENT datetime (#PCDATA)>
+<!ATTLIST datetime name CDATA #REQUIRED>
+
+<!ELEMENT encoding (#PCDATA)>
+<!ATTLIST encoding label-key CDATA #REQUIRED
+                   prefs-key CDATA #REQUIRED
+                   name CDATA #REQUIRED>
+<!ELEMENT boolean (#PCDATA)>
+<!ATTLIST boolean label-key CDATA #REQUIRED
+                  prefs-key CDATA #REQUIRED
+                  name CDATA #REQUIRED>
+<!ELEMENT string (#PCDATA)>
+<!ATTLIST string label-key CDATA #REQUIRED
+                 prefs-key CDATA #REQUIRED
+                 name CDATA #REQUIRED>
+<!ELEMENT combobox (comboitem)+>
+<!ATTLIST combobox label-key CDATA #REQUIRED
+                   prefs-key CDATA #REQUIRED
+                   name CDATA #REQUIRED
+                   editable (true|false) "false">
+<!ELEMENT comboitem ((label|label-key)?,value)>
+<!ELEMENT label (#PCDATA)>
+<!ELEMENT label-key (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+
+<!ELEMENT localized-strings (localized-string)+>
+<!ELEMENT localized-string EMPTY>
+<!ATTLIST localized-string key CDATA #REQUIRED
+                           name CDATA #REQUIRED>
+
+<!ELEMENT templates (template,template+)>
+<!ATTLIST templates name CDATA "template-name"
+                    label-key CDATA #REQUIRED
+                    prefs-key CDATA #REQUIRED
+                    editable (true|false) "false">
+
+<!ELEMENT template ((label|label-key)?,source)>
+<!ELEMENT source (#PCDATA)>

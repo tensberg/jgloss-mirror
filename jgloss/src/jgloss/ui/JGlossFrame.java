@@ -28,6 +28,7 @@ import jgloss.JGlossApp;
 import jgloss.Preferences;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
+import jgloss.ui.export.ExportMenu;
 import jgloss.ui.xml.JGlossDocument;
 import jgloss.ui.xml.JGlossDocumentBuilder;
 import jgloss.ui.html.JGlossEditor;
@@ -344,7 +345,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     private AnnotationListModel annotationListModel;
     private AnnotationEditorPanel annotationEditor;
     private SimpleLookup lookupPanel;
-
+    private JSplitPane[] splitPanes;
+    
     /**
      * The name of the document. For files this is the file name.
      */
@@ -394,23 +396,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * Submenu containing the export actions.
      */
-    private JMenu exportMenu;
-    /**
-     * Exports the document as plain text.
-     */
-    private Action exportPlainTextAction;
-    /**
-     * Export the document in LaTeX format.
-     */
-    private Action exportLaTeXAction;
-    /**
-     * Exports the document as HTML.
-     */
-    private Action exportHTMLAction;
-    /**
-     * Exports the annotations to a file.
-     */
-    private Action exportAnnotationListAction;
+    private ExportMenu exportMenu;
     /**
      * Menu item which holds the show preferences action.
      */
@@ -514,8 +500,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         JSplitPane split3 = new JSplitPane( JSplitPane.VERTICAL_SPLIT,
                                             split1, split2);
         split3.setOneTouchExpandable( true);
-
         this.add( split3);
+
+        splitPanes = new JSplitPane[] { split1, split2, split3 };
 
         setBackground( Color.white);
         frame.getContentPane().setBackground( Color.white);
@@ -573,34 +560,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             };
         saveAsAction.setEnabled( false);
         UIUtilities.initAction( saveAsAction, "main.menu.saveAs");
-        exportPlainTextAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    doExportPlainText();
-                }
-            };
-        exportPlainTextAction.setEnabled( false);
-        UIUtilities.initAction( exportPlainTextAction, "main.menu.export.plaintext"); 
-        exportLaTeXAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    doExportLaTeX();
-                } 
-            };
-        exportLaTeXAction.setEnabled( false);
-        UIUtilities.initAction( exportLaTeXAction, "main.menu.export.latex"); 
-        exportHTMLAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    doExportHTML();
-                }
-            };
-        exportHTMLAction.setEnabled( false);
-        UIUtilities.initAction( exportHTMLAction, "main.menu.export.html"); 
-        exportAnnotationListAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    doExportAnnotationList();
-                }
-            };
-        exportAnnotationListAction.setEnabled( false);
-        UIUtilities.initAction( exportAnnotationListAction, "main.menu.export.annotationlist"); 
         printAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doPrint();
@@ -631,13 +590,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( saveAction));
         menu.add( UIUtilities.createMenuItem( saveAsAction));
-        exportMenu = new JMenu( JGloss.messages.getString( "main.menu.export"));
+        exportMenu = new ExportMenu();
         exportMenu.setMnemonic( JGloss.messages.getString( "main.menu.export.mk").charAt( 0));
-        exportMenu.setEnabled( false);
-        exportMenu.add( UIUtilities.createMenuItem( exportHTMLAction));
-        exportMenu.add( UIUtilities.createMenuItem( exportPlainTextAction));
-        exportMenu.add( UIUtilities.createMenuItem( exportLaTeXAction));
-        exportMenu.add( UIUtilities.createMenuItem( exportAnnotationListAction));
         menu.add( exportMenu);
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( printAction));
@@ -709,6 +663,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         frame.show();
     }
+
+    public JGlossDocument getJGlossDocument() { return doc; }
+    public String getDocumentName() { return documentName; }
+    public String getDocumentPath() { return documentPath; }
+    public boolean isDocumentLoaded() { return documentLoaded; }
+    public boolean isDocumentChanged() { return documentChanged; }
+    public AnnotationListModel getAnnotationListModel() { return annotationListModel; }
 
     /**
      * Checks if it is OK to close the document. If the user has changed the document,
@@ -1094,17 +1055,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         htmlDoc.setJGlossDocument( doc);
 
         documentName = title;
-        updateTitle();
-        // get notified of title changes
-        htmlDoc.addPropertyChangeListener( new PropertyChangeListener() {
-                public void propertyChange( PropertyChangeEvent e) {
-                    markChanged();
-                }
-            });
 
         Runnable worker = new Runnable() {
                 public void run() {
                     final Cursor currentCursor = getCursor();
+                    updateTitle();
                     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
                     docpane.setEditorKit( kit);
@@ -1115,7 +1070,14 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                     frame.getContentPane().removeAll();
                     frame.getContentPane().add( JGlossFrame.this);
                     frame.validate();
-                    
+                
+                    // must wait after frame validation for split pane setup,
+                    // because otherwise the split pane divider location gets screwed up
+                    SplitPaneManager splitManager = new SplitPaneManager( "view.");
+                    splitManager.add( splitPanes[0], 1.0);
+                    splitManager.add( splitPanes[1], 0.3);
+                    splitManager.add( splitPanes[2], 0.65);
+    
                     // Layout document view in the background while still allowing user interaction
                     // in other windows. Since Swing is single-threaded, this is somewhat complicated:
                     // 1. A renderer thread is created, which prepares the docpane asynchronously to
@@ -1165,14 +1127,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                                     frame.validate();
                                                     docpane.followMouse( showAnnotationItem.isSelected());
                                                     // scroll to selected annotation
-                                                    /*AnnotationNode current = annotationEditor
-                                                        .getSelectedAnnotation();
+                                                    Annotation current = 
+                                                        (Annotation) annotationList
+                                                        .getSelectedValue();
                                                     if (current != null) {
-                                                        docpane.makeVisible( current.getAnnotationElement().
-                                                                             getStartOffset(),
-                                                                             current.getAnnotationElement().
-                                                                             getEndOffset());
-                                                                             }*/
+                                                        docpane.makeVisible( current.getStartOffset(),
+                                                                             current.getEndOffset());
+                                                    }
                                                     setCursor( currentCursor);
                                                 }
                                             }
@@ -1192,19 +1153,21 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                     // Parser must be set to non-strict mode for editing to work.
                     htmlDoc.setStrictParsing( false);
 
-                    exportMenu.setEnabled( true);
-                    exportPlainTextAction.setEnabled( true);
-                    exportLaTeXAction.setEnabled( true);
-                    exportHTMLAction.setEnabled( true);
-                    exportAnnotationListAction.setEnabled( true);
+                    exportMenu.setContext( JGlossFrame.this);
                     printAction.setEnabled( true);
                     if (documentPath == null) 
                         // this means that the document is imported, save will behave like save as
                         saveAction.setEnabled( true);
                     saveAsAction.setEnabled( true);
 
+                    // get notified of title changes
+                    htmlDoc.addPropertyChangeListener( new PropertyChangeListener() {
+                            public void propertyChange( PropertyChangeEvent e) {
+                                markChanged();
+                            }
+                        });
                     // mark document as changed if some editing occurs
-                    /*doc.addDocumentListener( new DocumentListener() {
+                    htmlDoc.addDocumentListener( new DocumentListener() {
                             public void insertUpdate(DocumentEvent e) {
                                 markChanged();
                             }
@@ -1214,26 +1177,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                             public void changedUpdate(DocumentEvent e) {
                                 // triggered by style changes, don't react to this
                             }
-                            });*/
-
-                    // save splitpane location settings in the preferences
-                    /*split.addPropertyChangeListener( new PropertyChangeListener() {
-                            public void propertyChange( PropertyChangeEvent e) {
-                                if (split.DIVIDER_LOCATION_PROPERTY.equals( e.getPropertyName())) {
-                                    int newPosition = ((Integer) e.getNewValue()).intValue();
-                                    if (newPosition >= split.getMaximumDividerLocation())
-                                        JGloss.prefs.set( Preferences.VIEW_ANNOTATIONEDITORHIDDEN,
-                                                          true);
-                                    else {
-                                        JGloss.prefs.set( Preferences.VIEW_ANNOTATIONEDITORHIDDEN,
-                                                          false);
-                                        JGloss.prefs.set( Preferences.VIEW_DIVIDERLOCATION,
-                                                          ((double) newPosition)/
-                                                          split.getWidth());
-                                    }
-                                }
-                            }
-                            });*/
+                        });
                 }
             };
         if (EventQueue.isDispatchThread()) {
@@ -1425,8 +1369,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     }
 
     /**
-     * Saves the document in JGloss format. This is basically HTML using a UTF-8 character
-     * encoding.
+     * Saves the document in JGloss XML format.
      *
      * @return <CODE>true</CODE> if the document was successfully saved.
      */
@@ -1473,8 +1416,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             documentPath =  f.getSelectedFile().getAbsolutePath();
             documentName = f.getSelectedFile().getName();
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-            frame.setTitle( documentName + 
-                            ":" + JGloss.messages.getString( "main.title"));
+            updateTitle();
             if (saveDocument())
                 OPEN_RECENT.addDocument( f.getSelectedFile());
         }
@@ -1489,219 +1431,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             if (documentPath != null)
                 saveAction.setEnabled( true);
         }
-    }
-
-    /**
-     * Exports the document as plain text to a user-specified file.
-     */
-    private void doExportPlainText() {
-        /*ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
-                                                     JGloss.messages.getString( "export.plaintext.title"));
-
-        f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_PLAINTEXT_ENCODING);
-        f.addElement( ExportFileChooser.WRITE_READING, Preferences.EXPORT_PLAINTEXT_WRITEREADING);
-        f.addElement( ExportFileChooser.WRITE_TRANSLATIONS, 
-                      Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS);
-        f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_PLAINTEXT_WRITEHIDDEN);
-
-        int r = f.showSaveDialog( this);
-        if (r == JFileChooser.APPROVE_OPTION) {
-            Writer out = null;
-            try {
-                out = new BufferedWriter( new OutputStreamWriter
-                    ( new FileOutputStream( f.getSelectedFile()),
-                      f.getEncoding()));
-                PlainTextExporter.export( doc, (AnnotationModel) annotationEditor.getModel(),
-                                          out, f.getWriteReading(), f.getWriteTranslations(),
-                                          f.getWriteHidden());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showConfirmDialog
-                    ( this, JGloss.messages.getString
-                      ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getClass().getName(),
-                            ex.getLocalizedMessage() }),
-                      JGloss.messages.getString( "error.export.title"),
-                      JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            } finally {
-                if (out != null) try {
-                    out.close();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            }  */      
-    }
-
-    /**
-     * Exports the document as plain text to a user-specified file.
-     */
-    private void doExportLaTeX() {
-        /*LaTeXExportFileChooser f = new LaTeXExportFileChooser( JGloss.getCurrentDir());
-
-        f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_LATEX_WRITEHIDDEN);
-
-        int r = f.showSaveDialog( this);
-        if (r == JFileChooser.APPROVE_OPTION) {
-            InputStreamReader template = null;
-            Writer out = null;
-            try {
-                template = f.getTemplate();
-                out = new BufferedWriter( new OutputStreamWriter
-                    ( new FileOutputStream( f.getSelectedFile()), template.getEncoding()));
-                new LaTeXExporter().export
-                    ( f.getTemplate(), doc, documentName, f.getFontSize(), 
-                      (AnnotationModel) annotationEditor.getModel(),
-                      out, template.getEncoding(), f.getWriteHidden());
-            } catch (Exception ex) {
-                if (ex instanceof TemplateException) {
-                    JOptionPane.showConfirmDialog
-                        ( this, ex.getMessage(),
-                          JGloss.messages.getString( "error.export.title"),
-                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-                }
-                else {
-                    ex.printStackTrace();
-                    JOptionPane.showConfirmDialog
-                        ( this, JGloss.messages.getString
-                          ( "error.export.exception", new Object[] 
-                              { documentPath, ex.getClass().getName(),
-                                ex.getLocalizedMessage() }),
-                          JGloss.messages.getString( "error.export.title"),
-                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-                }
-            } finally {
-                if (template != null) try {
-                    template.close();
-                } catch (IOException ex) { ex.printStackTrace(); }
-                if (out != null) try {
-                    out.close();
-                } catch (IOException ex) { ex.printStackTrace(); }
-            }
-            }   */     
-    }
-
-    /**
-     * Exports the document as HTML to a user-specified file.
-     */
-    private void doExportHTML() {
-        /*ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
-                                                     JGloss.messages.getString( "export.html.title"));
-
-        f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_HTML_ENCODING);
-        f.addElement( ExportFileChooser.WRITE_READING, Preferences.EXPORT_HTML_WRITEREADING);
-        f.addElement( ExportFileChooser.WRITE_TRANSLATIONS, 
-                      Preferences.EXPORT_HTML_WRITETRANSLATIONS);
-        JCheckBox backwardsCompatible = 
-            new JCheckBox( JGloss.messages.getString( "export.html.backwardscompatible"));        
-        backwardsCompatible.setSelected( JGloss.prefs.getBoolean
-                                         ( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE, true));
-        f.addCustomElement( backwardsCompatible);
-        f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_HTML_WRITEHIDDEN);
-
-        f.setFileFilter( new ExtensionFileFilter
-            ( "html", JGloss.messages.getString( "filefilter.description.html")));
-
-        int r = f.showSaveDialog( this);
-        if (r == JFileChooser.APPROVE_OPTION) {
-            Writer out = null;
-
-            // The document is modified during export. Save the original changed state.
-            boolean originalDocumentChanged = documentChanged;
-            try {
-                out = new BufferedWriter( new OutputStreamWriter
-                    ( new FileOutputStream( f.getSelectedFile()),
-                      (String) f.getEncoding()));
-                JGloss.prefs.set( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE,
-                                  backwardsCompatible.isSelected());
-                new HTMLExporter( out, f.getEncoding(), doc,
-                                  f.getWriteReading(), f.getWriteTranslations(),
-                                  backwardsCompatible.isSelected(),
-                                  f.getWriteHidden()).write();
-                // restore document changed state
-                if (originalDocumentChanged == false) {
-                    documentChanged = false;
-                    saveAction.setEnabled( false);
-                }   
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showConfirmDialog
-                    ( this, JGloss.messages.getString
-                      ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getClass().getName(),
-                            ex.getLocalizedMessage() }),
-                      JGloss.messages.getString( "error.export.title"),
-                      JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            } finally {
-                if (out != null) try {
-                    out.close();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            } */       
-    }
-
-    /**
-     * Exports the annotation list to a user-specified file.
-     */
-    private void doExportAnnotationList() {
-        /*ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
-                                                     JGloss.messages.getString
-                                                     ( "export.annotationlist.title"));
-
-        f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_ANNOTATIONLIST_ENCODING);
-
-        int r = f.showSaveDialog( this);
-        if (r == JFileChooser.APPROVE_OPTION) {
-            Writer out = null;
-            try {
-                out = new BufferedWriter( new OutputStreamWriter
-                    ( new FileOutputStream( f.getSelectedFile()),
-                      f.getEncoding()));
-                out.write( JGloss.messages.getString( "export.annotationlist.header",
-                                                      new Object[] 
-                    { documentName, f.getEncoding() }));
-                // do not output duplicate annotations:
-                Set seenAnnotations = new TreeSet();
-                for ( Iterator i=((AnnotationModel) annotationEditor.getModel()).getAnnotationNodes();
-                      i.hasNext(); ) {
-                    AnnotationNode an = (AnnotationNode) i.next();
-                    if (!an.isHidden()) {
-                        String word = an.getDictionaryFormNode().getWord();
-                        String reading = an.getDictionaryFormNode().getReading();
-                        String translation = an.getTranslationNode().getText();
-
-                        String line = word;
-                        if (reading!=null && reading.length()>0)
-                            line += " [" + reading + "]";
-                        if (translation!=null && translation.length()>0)
-                            line += " /" + translation + "/";
-                        
-                        if (!seenAnnotations.contains( line)) {
-                            out.write( line);
-                            out.write( '\n');
-                            seenAnnotations.add( line);
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showConfirmDialog
-                    ( this, JGloss.messages.getString
-                      ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getClass().getName(),
-                            ex.getLocalizedMessage() }),
-                      JGloss.messages.getString( "error.export.title"),
-                      JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            } finally {
-                if (out != null) try {
-                    out.close();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            } */       
     }
 
     /**
@@ -1755,6 +1484,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         // Sometimes, due to the fact that swing keeps internal references, the JGlossFrame is
         // not garbage collected until a new frame is created. To ensure that the objects referenced
         // from the JGlossFrame are freed, set references to null
+        splitPanes = null;
+        exportMenu.setContext( null);
+        exportMenu = null;
         docpane = null;
         docpaneScroller = null;
         doc = null;

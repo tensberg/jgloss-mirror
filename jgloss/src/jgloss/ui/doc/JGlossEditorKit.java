@@ -841,8 +841,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
                                    DTD.MODEL, false, false, pcdata, null, null, null);
             
-            al = new AttributeList( JGlossHTMLDoc.DICTIONARY_WORD, DTD.CDATA, 0, null, null, al);
-            al = new AttributeList( JGlossHTMLDoc.DICTIONARY_READING, DTD.CDATA, 0, null, null, al);
+            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE, DTD.CDATA, 0, null, null, al);
+            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE_READING, DTD.CDATA, 0, null, null, al);
 
             // The content model of <anno> should really be (word & translation)*,
             // but character level attributes created by a <font> or <a href> tag can be embedded

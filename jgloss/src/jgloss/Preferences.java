@@ -195,7 +195,19 @@ public abstract class Preferences {
      * @param key Key to a preference.
      * @return The corresponding preference string.
      */
-    public abstract String getString( String key);
+    public String getString( String key) {
+        return getString( key, "");
+    }
+
+    /**
+     * Return the preference for the given key.
+     *
+     * @param key Key to a preference.
+     * @param d Default value. Used if neither the preference value nor the default preference
+     *          value is set.
+     * @return The corresponding preference string.
+     */
+    public abstract String getString( String key, String d);
 
     /**
      * Sets a new preference value.

@@ -35,6 +35,7 @@ import jgloss.ui.Dictionaries;
 import jgloss.ui.ExclusionList;
 import jgloss.ui.JGlossFrame;
 import jgloss.ui.JGlossLookupFrame;
+import jgloss.ui.export.ExportMenu;
 
 import java.io.File;
 
@@ -93,6 +94,8 @@ public class JGlossApp extends JGloss {
     }
 
     protected void showMainWindow( String[] args) throws Exception {
+        ExportMenu.registerStandardExporters();
+
         if (args.length == 0) {
             if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
                 getLookupFrame().show();

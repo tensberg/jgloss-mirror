@@ -92,10 +92,10 @@ importclipboard.firstoccurrence=true
 importclipboard.detectparagraphs=true
 importclipboard.readingbrackets=
 
-export.plaintext.writereading=true
+export.plaintext.writereadings=true
 export.plaintext.writetranslations=false
 export.plaintext.writehidden=false
-export.html.writereading=true
+export.html.writereadings=true
 export.html.writetranslations=true
 export.html.backwardscompatible=true
 export.html.writehidden=false

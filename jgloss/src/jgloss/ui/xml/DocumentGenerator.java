@@ -63,10 +63,9 @@ class DocumentGenerator extends DefaultHandler {
 
     public InputSource resolveEntity( String publicId, String systemId) throws SAXException {
         if (JGlossDocument.DTD_PUBLIC.equals( publicId)) {
-            InputSource dtd = new InputSource( JGlossDocument.class.getResourceAsStream
-                                               ( JGlossDocument.DTD_RESOURCE));
+            InputSource dtd = new InputSource( JGlossDocument.class.getResource
+                                               ( JGlossDocument.DTD_RESOURCE).toExternalForm());
             dtd.setPublicId( publicId);
-            dtd.setSystemId( "res:" + JGlossDocument.DTD_RESOURCE);
             return dtd;
         }
         else

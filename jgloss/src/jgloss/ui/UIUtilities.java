@@ -92,7 +92,7 @@ public class UIUtilities {
      * @param key The base key in the messages resource bundle.
      * @see javax.swing.Action
      */
-    public static void initButton( AbstractButton b, String key) {
+    public static AbstractButton initButton( AbstractButton b, String key) {
         b.setText( JGloss.messages.getString( key));
 
         String s = null;
@@ -114,6 +114,8 @@ public class UIUtilities {
         } catch (MissingResourceException ex) {}
         if (s!=null && s.length()>0)
             b.setToolTipText( s);
+
+        return b;
     }
 
     /**

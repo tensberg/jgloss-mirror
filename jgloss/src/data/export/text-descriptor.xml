@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE export PUBLIC "JGloss export/1.0/JGloss export template description/EN"
+                        "http://jgloss.sourceforge.net/export-descriptor.dtd">
+
+<export>
+  <description>
+    <menuitem key="export.text.menu" />
+    <title key="export.text.title" />
+  </description>
+
+  <parameters>
+
+    <encoding name="encoding"
+      label-key="export.encodings" 
+      prefs-key="export.text.encoding" 
+      >UTF-8</encoding>
+
+    <boolean name="writereadings"
+      label-key="export.writereadings"
+      prefs-key="export.text.writereadings"
+      >true</boolean>
+
+    <boolean name="writetranslations"
+      label-key="export.writetranslations"
+      prefs-key="export.text.writetranslations" 
+      >false</boolean>
+
+    <boolean name="voclist"
+      label-key="export.text.voclist"
+      prefs-key="export.text.voclist" 
+      >true</boolean>
+
+  </parameters>
+  
+  <template>
+    <source>text.xslt</source>
+  </template>
+</export>

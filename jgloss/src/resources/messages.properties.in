@@ -151,15 +151,6 @@ main.menu.saveAs.mk=A
 main.menu.saveAs.tt=Save the document under a new name
 main.menu.export=Export
 main.menu.export.mk=E
-main.menu.export.plaintext=Plain Text...
-main.menu.export.plaintext.mk=P
-main.menu.export.plaintext.tt=Export the document as unformatted text
-main.menu.export.latex=LaTeX...
-main.menu.export.latex.mk=L
-main.menu.export.latex.tt=Export the document as LaTeX source file
-main.menu.export.html=HTML...
-main.menu.export.html.mk=H
-main.menu.export.html.tt=Export the document as HTML-formatted file
 main.menu.export.xml=XML...
 main.menu.export.xml.mk=X
 main.menu.export.xml.tt=Export the document as XML-formatted file
@@ -379,6 +370,7 @@ annotationeditor.action.addtoexclusions.ak=E
 annotationeditor.action.addtodictionary.ak=U
 annotationeditor.action.hide.ak=H
 
+exporters=/data/export/html-descriptor.xml:/data/export/text-descriptor.xml:/data/export/latex-descriptor.xml
 export.encodings=Encoding:
 export.templates=Template:
 export.template.unmatchedbegin=No matching end marker for {0} in export template, line {1,number}.
@@ -388,27 +380,35 @@ export.template.nodescription=No template description available.
 export.choosetemplate=Choose a template
 export.annotationlist.title=Export annotation list
 export.annotationlist.header=\# annotation list for {0}\n\# Encoding: {1}\n
-export.writereading=Write readings
+export.writereadings=Write readings
 export.writetranslations=Write translations
 export.writehidden=write hidden annotations
-export.plaintext.title=Export plain text
+
+export.text.title=Export plain text
+export.text.menu=Plain Text...
+export.text.menu.mk=P
+export.text.menu.tt=Export the document as unformatted text
+export.text.voclist=Vocabulary List
+
+export.html.menu=HTML...
+export.html.menu.mk=H
+export.html.menu.tt=Export the document as HTML-formatted file
 export.html.title=Export HTML
-export.html.interactive=Interactive HTML
-export.html.backwardscompatible=Backwards Compatible
-export.xml.title=Export XML
+
+export.latex.menu=LaTeX...
+export.latex.menu.mk=L
+export.latex.menu.tt=Export the document as LaTeX source file
 export.latex.title=Export LaTeX
 export.latex.fontsize=Font Size:
 export.latex.fontsize_pt=pt
+export.latex.template.platex-top=pLaTeX - translations on page
+export.latex.template.platex-list=pLaTeX - translations at end
+export.latex.template.platex-ruby=pLaTeX - no translations
+export.latex.template.latexcjk-top=LaTeX-CJK - translations on page
+export.latex.template.latexcjk-list=LaTeX-CJK - transl. at end - hyperlinks
+export.latex.template.latexcjk-ruby=LaTeX-CJK - no translations
 
-# List of templates stored in jgloss.jar and accessible as resource
-export.latex.templates=\
-/data/templates/platex-top.tex.tmpl:\
-/data/templates/platex-list.tex.tmpl:\
-/data/templates/platex-ruby.tex.tmpl:\
-/data/templates/latexcjk-top.tex.tmpl:\
-/data/templates/latexcjk-list.tex.tmpl:\
-/data/templates/latexcjk-ruby.tex.tmpl
-
+jgloss.generator=JGloss 1.1
 jgloss.about.frame.title=About JGloss
 jgloss.about.title=JGloss 1.1 alpha
 jgloss.about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.

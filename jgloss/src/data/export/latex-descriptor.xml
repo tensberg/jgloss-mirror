@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE export PUBLIC "JGloss export/1.0/JGloss export template description/EN"
+                        "http://jgloss.sourceforge.net/export-descriptor.dtd">
+
+<export>
+  <description>
+    <menuitem key="export.latex.menu" />
+    <title key="export.latex.title" />
+    <file-extension description-key="filefilter.description.latex">tex</file-extension>
+  </description>
+
+  <parameters>
+    <docname name="docname" />
+    <datetime name="creation-date" />
+
+    <combobox name="fontsize"
+      label-key="export.latex.fontsize"
+      prefs-key="export.latex.fontsize">
+      <comboitem><value>10</value></comboitem>
+      <comboitem><value>11</value></comboitem>
+      <comboitem><value>12</value></comboitem>
+    </combobox>
+
+  </parameters>
+  
+  <templates label-key="export.templates" prefs-key="export.latex.templates">
+    <template>
+      <label-key>export.latex.template.platex-top</label-key>
+      <source>platex-top.tex.xslt</source>
+    </template>
+    <template>
+      <label-key>export.latex.template.platex-list</label-key>
+      <source>platex-list.tex.xslt</source>
+    </template>
+    <template>
+      <label-key>export.latex.template.platex-ruby</label-key>
+      <source>platex-ruby.tex.xslt</source>
+    </template>
+    <template>
+      <label-key>export.latex.template.latexcjk-top</label-key>
+      <source>latexcjk-top.tex.xslt</source>
+    </template>
+    <template>
+      <label-key>export.latex.template.latexcjk-list</label-key>
+      <source>latexcjk-list.tex.xslt</source>
+    </template>
+    <template>
+      <label-key>export.latex.template.latexcjk-ruby</label-key>
+      <source>latexcjk-ruby.tex.xslt</source>
+    </template>
+  </templates>
+</export>
