@@ -46,17 +46,17 @@ public interface AttributeSet {
      * @param key Attribute key for which the attribute is requested.
      * @param resolveInherited <code>true</code> if the attribute is searched in the parent sets too, 
      *                  <code>false</code> if inherited attributes should be ignored.
-     * @exception AttributeNotDefinedException if the attribute is not defined.
+     * @exception AttributeNotSetException if the attribute is not defined.
      */
-    Object getAttribute( Attribute key, boolean resolveInherited) throws AttributeNotDefinedException;
+    Object getAttribute( Attribute key, boolean resolveInherited) throws AttributeNotSetException;
     /**
      * Test if a given attribute is inherited from a parent attribute set.
      *
      * @return <code>true</code> if the attribute is inherited, <code>false</code> if the attribute
      *         is contained in this set.
-     * @exception AttributeNotDefinedException if the attribute is not defined in this set or a parent set.
+     * @exception AttributeNotSetException if the attribute is not defined in this set or a parent set.
      */
-    boolean isInherited( Attribute key) throws AttributeNotDefinedException;
+    boolean isInherited( Attribute key) throws AttributeNotSetException;
     /**
      * Returns an iteration of attribute keys defined in the attribute set.
      * 

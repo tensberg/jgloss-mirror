@@ -244,7 +244,7 @@ public class CharacterEncodingDetector {
         jis8 = true;
         code = 0;
         for ( int s=0; s<data.length; s+=i) {
-            int c = byteToUnsignedByte( data[s]);
+            int c = NumberTools.byteToUnsignedByte( data[s]);
             i = 1;
             switch (c) {
             case ESC:
@@ -321,14 +321,14 @@ public class CharacterEncodingDetector {
                 /*
                  * EUC second byte or third byte of CS3.
                  */
-                if (byteToUnsignedByte( data[s-1]) == SS2) {
+                if (NumberTools.byteToUnsignedByte( data[s-1]) == SS2) {
                     if (0xa0 < c && c < 0xff) {
                         euc = 1;	/* hankaku kana */
                         break;
                     }
                 } else
                     if (0xa0 < c && c < 0xff) {
-                        if (byteToUnsignedByte( data[s-1]) != SS3)
+                        if (NumberTools.byteToUnsignedByte( data[s-1]) != SS3)
                             euc = 1;/* zenkaku */
                         break;
                     }
@@ -402,17 +402,6 @@ public class CharacterEncodingDetector {
             code |= UTF8;
 
         return code;
-    }
-
-    /**
-     * Converts the byte value to an int with the value of the 8 bits
-     * interpreted as an unsigned byte.
-     *
-     * @param b The byte value to convert.
-     * @return The unsigned byte value of b.
-     */
-    private final static int byteToUnsignedByte( byte b) {
-        return b & 0xff;
     }
 
     /**

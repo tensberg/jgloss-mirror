@@ -51,9 +51,9 @@ DATA_WWW := HTMLAnnotator vconj
 
 ICONS := jgloss.png html.png tex.png txt.png chasen.png template.png
 
-RESOURCES := messages.properties messages-dictionary.properties \
-             messages_de.properties messages-dictionary_de.properties \
-             messages_fr.properties messages-dictionary_fr.properties \
+RESOURCES := messages.properties messages-dictionary.properties messages-parser.properties \
+             messages_de.properties messages-dictionary_de.properties messages-parser_de.properties \
+             messages_fr.properties messages-dictionary_fr.properties messages-parser_fr.properties \
              jgloss-ui-HTMLifyReader.properties \
              preferences.properties
 
@@ -67,7 +67,9 @@ CLASSPATH := $(CLASSPATH):./src
 
 # List main class source file and all other class source files not referenced from main class
 # for compilation
-ROOT_SOURCES := src/jgloss/JGloss.java src/jgloss/JavaPreferences.java src/jgloss/dictionary/GDict.java \
+ROOT_SOURCES := src/jgloss/JGloss.java \
+                src/jgloss/JavaPreferences.java \
+                src/jgloss/dictionary/GDict.java \
                 src/jgloss/dictionary/EDictNIO.java
 WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 

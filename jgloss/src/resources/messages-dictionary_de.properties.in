@@ -35,5 +35,3 @@ edict.editable.name=EDICT (editierbar)
 
 kanjidic.nanori=(nanori, Namenslesung)
 kanjidic.radicalname=(Name des Radikals)
-
-parser.dictionary.document=Dokument

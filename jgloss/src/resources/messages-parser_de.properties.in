@@ -1,9 +1,8 @@
 # Encoding: ISO-8859-1
 #
-# French localization of the messages from jgloss.dictionary
+# German localization of the messages from jgloss.parser
 #
 # Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
-# French localization by A. Beraud (al_beraud@yahoo.fr)
 #
 # This file is part of JGloss.
 #
@@ -24,12 +23,4 @@
 # $Id$
 #
 
-dictionary.load=Chargement du dictionnaire {0}.
-
-edict.buildindex=Construction de l''index du dictionnaire {0}.\nCela peut prendre un certain temps.
-edict.writejjdx=Écriture de l''index JJDX pour le dictionnaire {0}.
-edict.warning.jjdxversion=WARNING: le numéro de version de l''index JJDX pour {0} est suppérieur à la version supportée par cette version de JGloss.
-edict.error.writejjdx=Erreur lors de l''écriture du fichier JJDX: {0}, {1}
-
-kanjidic.nanori=(nanori, lecture du nom)
-kanjidic.radicalname=(nom du radical)
+parser.dictionary.document=Dokument
