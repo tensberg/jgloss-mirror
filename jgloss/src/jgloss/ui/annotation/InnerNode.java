@@ -153,6 +153,14 @@ abstract class InnerNode implements TreeNode {
     }
 
     /**
+     * Remove all children of the node. The <CODE>nodesWereRemoved</CODE> method of
+     * the annotation model will not be called.
+     */
+    public void removeAll() {
+        children.clear();
+    }
+
+    /**
      * Returns a list with all nodes from this node to the last descendant.
      *
      * @return A list with all nodes from this node to the last descendant.
