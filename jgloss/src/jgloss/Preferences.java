@@ -105,6 +105,8 @@ public class Preferences {
     public static final String EXPORT_LATEX_WRITEHIDDEN = 
         "export.latex.writehidden";    
 
+    public static final String EXCLUSIONS_FILE = "exclusions.file";
+
     /**
      * Path to the user preferences file.
      */

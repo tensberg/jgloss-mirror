@@ -79,6 +79,8 @@ export.latex.writehidden=false
 export.latex.preamble=\\usepackage{pslatex}\n\\renewcommand{\\thefootnote}{}\n
 export.latex.documentclass=jarticle
 
+exclusions.file=.jgloss-exclusions
+
 # Name of the DTD the javax.swing.text.html.parser.ParserDelegator uses. Found in the
 # Swing source code. There is no way to inquire this programatically. 
 dtd.default=html32
