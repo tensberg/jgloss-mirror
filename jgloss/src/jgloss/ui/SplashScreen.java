@@ -60,7 +60,7 @@ public class SplashScreen {
      * will be made visible after creation. The texts will be taken from the application
      * resource.
      */
-    public SplashScreen() {
+    public SplashScreen( String applicationKey) {
         splash = new JWindow();
         splash.getContentPane().setLayout( new GridLayout( 1, 1));
 
@@ -70,17 +70,17 @@ public class SplashScreen {
 
         Box b2 = Box.createHorizontalBox();
         b2.add( Box.createHorizontalGlue());
-        title = new JLabel( JGloss.messages.getString( "jgloss.title"), SwingConstants.CENTER);
+        title = new JLabel( JGloss.messages.getString( applicationKey + ".title"), SwingConstants.CENTER);
         title.setFont( new Font( "SansSerif", Font.PLAIN, 18));
         title.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10));
         b2.add( title);
         b2.add( Box.createHorizontalGlue());
         b.add( b2);
-        version = new JLabel( JGloss.messages.getString( "jgloss.version"));
-        b.add( UIUtilities.createSpaceEater( version, true));
+        version = new JLabel( JGloss.messages.getString( applicationKey + ".version"));
+        b.add( UIUtilities.createFlexiblePanel( version, true));
         b2 = Box.createHorizontalBox();
         info = new JLabel( JGloss.messages.getString( "splashscreen.dummyinfo"));
-        b2.add( UIUtilities.createSpaceEater( info, true));
+        b2.add( UIUtilities.createFlexiblePanel( info, true));
         b.add( b2);
         c.add( b);
         splash.getContentPane().add( c);

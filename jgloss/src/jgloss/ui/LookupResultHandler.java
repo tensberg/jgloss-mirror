@@ -36,5 +36,7 @@ public interface LookupResultHandler {
 
     void exception( SearchException ex);
 
+    void note( String note);
+
     void endLookup();
 } // interface LookupResultHandler

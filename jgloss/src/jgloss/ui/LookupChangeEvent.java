@@ -37,6 +37,9 @@ class LookupChangeEvent extends EventObject {
     public static final int SEARCH_FIELDS_AVAILABILITY = 0x100;
     public static final int SEARCH_PARAMETERS = 0x200;
     public static final int SEARCH_PARAMETERS_AVAILABILITY = 0x400;
+    public static final int DICTIONARY_ADDED = 0x800;
+    public static final int DICTIONARY_REMOVED = 0x1000;
+    public static final int DICTIONARY_LIST_CHANGED = 0x2000;
 
     private int changes;
 

@@ -319,7 +319,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         } catch (IOException ex) {
             throw new IndexException( ex);
         } finally {
-            indexContainer.endEditing();
+            if (indexContainer != null)
+                indexContainer.endEditing();
         }
 
         initIndexes();
@@ -808,10 +809,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         buf1.position( i1);
         buf2.position( i2);
         int end = (int) Math.min( Integer.MAX_VALUE, (long) i1 + (long) length);
-        int l = 0;
         try {
             while (buf1.position() < end) {
-                l++;
                 int b1 = characterHandler.convertCharacter
                     ( characterHandler.readCharacter( buf1));
                 int b2 = characterHandler.convertCharacter
@@ -822,7 +821,6 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                     return 1;
             }
         } catch (BufferUnderflowException ex) {
-            System.err.println( "underflow " + l);
             if (buf1.hasRemaining()) // buf2 is prefix of buf1
                 return 1;
             else if (buf2.hasRemaining()) // buf1 is prefix of buf2

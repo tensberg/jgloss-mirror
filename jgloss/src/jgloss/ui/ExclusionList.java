@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -40,11 +40,11 @@ import javax.swing.event.*;
  * Panel which allows the user to manage the list of excluded words used for document parsing.
  * There exists
  * a single application-wide instance which can be accessed through the
- * {@link #getComponent() getComponent()} method.
+ * {@link #getInstance() getInstance()} method.
  *
  * @author Michael Koch
  */
-public class ExclusionList extends JPanel {
+public class ExclusionList extends JPanel implements PreferencesPanel {
     /**
      * The single application-wide instance.
      */
@@ -70,7 +70,7 @@ public class ExclusionList extends JPanel {
      *
      * @return The Dictionaries component.
      */
-    public static ExclusionList getComponent() {
+    public static ExclusionList getInstance() {
         if (box == null)
             box = new ExclusionList();
         return box;
@@ -84,7 +84,7 @@ public class ExclusionList extends JPanel {
      * @return Array of currently active dictionaries.
      */
     public static Set getExclusions() {
-        return getComponent().exclusions;
+        return getInstance().exclusions;
     }
 
     /**
@@ -196,6 +196,9 @@ public class ExclusionList extends JPanel {
             loadExclusionList( filename);
         changed = false;
     }
+
+    public String getTitle() { JGloss.messages.getString( "exclusions.title"); }
+    public Component getComponent() { return this; }
 
     /**
      * Copies the content of the JList into the exclusion set.

@@ -24,6 +24,7 @@
 package jgloss.ui;
 
 import jgloss.JGloss;
+import jgloss.Preferences;
 
 import jgloss.dictionary.*;
 
@@ -33,45 +34,13 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class LookupFrame extends JFrame implements ActionListener {
-    public static void main( String args[]) throws Exception {
-        EDict d1 = new EDict( new java.io.File( "/home/michael/japan/dictionaries/edict"));
-        System.err.println( "loading EDICT index");
-        if (!d1.loadIndex()) {
-            System.err.println( "building EDICT index");
-            d1.buildIndex();
-        }
-        System.err.println( "loading WadokuJT index");
-        WadokuJT d2 = new WadokuJT
-            ( new java.io.File
-              ( "/home/michael/japan/dictionaries/wadoku/WadokuJT.txt"));
-        if (!d2.loadIndex()) {
-            System.err.println( "building WadokuJT index");
-            d2.buildIndex();
-        }
-
-        LookupModel model = new LookupModel
-            ( java.util.Arrays.asList
-              ( new Object[] { ExpressionSearchModes.EXACT,
-                               ExpressionSearchModes.PREFIX,
-                               ExpressionSearchModes.SUFFIX,
-                               ExpressionSearchModes.ANY,
-                               DistanceSearchModes.NEAR,
-                               DistanceSearchModes.RADIUS }),
-              java.util.Arrays.asList
-              ( new Object[] { d1, d2 }),
-              java.util.Arrays.asList
-              ( new Object[] { new AttributeResultFilter() }));
-
-        LookupFrame frame = new LookupFrame( model);
-        frame.setSize( 800, 600);
-        frame.setVisible( true);
-    }
-
     protected LookupConfigPanel config;
     protected LookupModel model;
     protected LookupEngine engine;
     protected LookupResultList list;
     
+    protected Dimension preferredSize;
+
     private class SearchThread extends Thread {
         private Object THREAD_LOCK = new Object();
         private boolean terminateThread = false;
@@ -150,7 +119,8 @@ public class LookupFrame extends JFrame implements ActionListener {
         Action closeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     hide();
-                    JGloss.exit();
+                    if (JGloss.exit())
+                        dispose();
                 }
             };
         UIUtilities.initAction( closeAction, "main.menu.close");
@@ -159,7 +129,8 @@ public class LookupFrame extends JFrame implements ActionListener {
         addWindowListener( new WindowAdapter() {
                 public void windowClosing( WindowEvent e) {
                     hide();
-                    JGloss.exit();
+                    if (JGloss.exit())
+                        dispose();
                 }
             });
 
@@ -181,17 +152,17 @@ public class LookupFrame extends JFrame implements ActionListener {
         bar.add( menu);
 
         final JMenu editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
-        XCVManager xcv = new XCVManager( list.getResultPane());
-        xcv.addManagedComponent( config.getSearchExpressionField());
+        XCVManager xcv = new XCVManager( config.getSearchExpressionField());
         xcv.addManagedComponent( config.getDistanceField());
+        list.addToXCVManager( xcv);
 
         editMenu.add( xcv.getCutAction());
         editMenu.add( xcv.getCopyAction());
         editMenu.add( xcv.getPasteAction());
         editMenu.addMenuListener( xcv.getEditMenuListener());
 
-        //editMenu.addSeparator();
-        //editMenu.add( UIUtilities.createMenuItem( PreferencesFrame.showAction));
+        editMenu.addSeparator();
+        editMenu.add( UIUtilities.createMenuItem( PreferencesFrame.showAction));
         bar.add( editMenu);           
 
         menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
@@ -203,6 +174,19 @@ public class LookupFrame extends JFrame implements ActionListener {
         config.getSearchExpressionField().requestFocus();
 
         pack();
+
+        preferredSize = new Dimension
+            ( Math.max( super.getPreferredSize().width,
+                        JGloss.prefs.getInt( Preferences.WORDLOOKUP_WIDTH, 0)),
+              Math.max( super.getPreferredSize().height + 150,
+                        JGloss.prefs.getInt( Preferences.WORDLOOKUP_HEIGHT, 0)));
+        
+        addComponentListener( new ComponentAdapter() {
+                public void componentResized( ComponentEvent e) {
+                    JGloss.prefs.set( Preferences.WORDLOOKUP_WIDTH, getWidth());
+                    JGloss.prefs.set( Preferences.WORDLOOKUP_HEIGHT, getHeight());
+                }
+            });
     }
 
     public void actionPerformed( ActionEvent event) {
@@ -212,5 +196,12 @@ public class LookupFrame extends JFrame implements ActionListener {
     public void dispose() {
         super.dispose();
         searchThread.dispose();
+    }
+
+    public Dimension getPreferredSize() {
+        if (preferredSize == null)
+            return super.getPreferredSize();
+        else
+            return preferredSize;
     }
 } // class LookupFrame

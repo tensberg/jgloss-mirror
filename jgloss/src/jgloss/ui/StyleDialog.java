@@ -32,17 +32,16 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.text.html.StyleSheet;
 
 /**
  * Component which allows the user to edit visual-related preferences. This will normally embedded
  * in the application preferences dialog. There exists
  * a single application-wide instance which can be accessed through the
- * {@link #getComponent() getComponent()} method.
+ * {@link #getInstance() getInstance()} method.
  *
  * @author Michael Koch
  */
-public class StyleDialog extends Box {
+public class StyleDialog extends Box implements PreferencesPanel {
     /**
      * The single application-wide instance.
      */
@@ -53,135 +52,58 @@ public class StyleDialog extends Box {
      *
      * @return The StyleDialog component.
      */
-    public static StyleDialog getComponent() {
+    public static StyleDialog getStyleDialog() {
         if (box == null)
             box = new StyleDialog();
         return box;
     }
 
     /**
-     * CSS background-color property value for body color.
-     */
-    private final static String BACKGROUND_COLOR = "white";
-    /**
      * Four japanese characters used to test the fonts.
      */
-    private final static String JAPANESE_CHARS_TEST = "A\u3042\u30a2\u660e\u3002";
+    protected final static String JAPANESE_CHARS_TEST = "A\u3042\u30a2\u660e\u3002";
     /**
      * Default japanese font used if the generic fonts like SansSerif, Dialog etc. don't contain Japanese
      * characters.
      */
-    private static String knownJapaneseFont;
+    protected static String knownJapaneseFont;
 
     /**
      * Map from Swing L&F property keys to the default L&F fonts.
      */
-    private static Map defaultLFFonts;
+    protected static Map defaultLFFonts;
 
-    /**
-     * Adds a new style sheet which will then automatically track any changes made to the
-     * user settings. The stylesheet can have styles in addition to the ones set in the dialog
-     * by using <CODE>additionalStyles</CODE>, which is a mapping from a HTML tag name as string
-     * to a CSS style fragment. Supported tags are "body", "anno", "reading" and "trans".
-     *
-     * @param s The style sheet to add.
-     * @param additionalStyles Additional CSS styles.
-     */
-    public void addStyleSheet( StyleSheet s, Map additionalStyles) {
-        synchronized (styleSheets) {
-            styleSheets.add( s);
-            styleSheets.add( additionalStyles);
-            applyPreferences( s, additionalStyles);
-        }
-    }
-
-    /**
-     * Updates the additional styles of a style sheet.
-     *
-     * @param s The style sheet to update.
-     * @param additionalStyles Additional CSS styles.
-     */
-    public void updateAdditionalStyles( StyleSheet s, Map additionalStyles) {
-        synchronized (styleSheets) {
-            int i = styleSheets.indexOf( s);
-            if (i != -1) {
-                styleSheets.remove( i+1);
-                styleSheets.add( i+1, additionalStyles);
-                applyPreferences( s, additionalStyles);
-            }
-        }
-    }
-
-    /**
-     * Removes a style sheet from the list of managed style sheets. 
-     *
-     * @param s The style sheet to remove.
-     */
-    public void removeStyleSheet( StyleSheet s) {
-        synchronized (styleSheets) {
-            int i = styleSheets.indexOf( s);
-            if (i != -1) {
-                styleSheets.remove( i); // Style Sheet
-                styleSheets.remove( i); // additionalStyles
-                currentStyles.remove( s);
-            }
-        }
-    }
-
-    private JButton autodetect;
-
-    private JRadioButton generalFontDefault;
-    private JRadioButton generalFontCustom;
-
-    private JComboBox generalFont;
-    private JComboBox wordLookupFont;
-    private JComboBox textFont;
-    private JComboBox readingFont;
-    private JComboBox translationFont;
-
-    private JComboBox wordLookupFontSize;
-    private JComboBox textFontSize;
-    private JComboBox readingFontSize;
-    private JComboBox translationFontSize;
+    public String getTitle() { return JGloss.messages.getString( "style.title"); }
+    public Component getComponent() { return this; }
     
-    private JCheckBox textUseColor;
-    private JCheckBox readingUseColor;
-    private JCheckBox translationUseColor;
+    protected JButton autodetect;
 
-    private JButton textColor;
-    private JButton readingColor;
-    private JButton translationColor;
-    private JButton highlightColor;
+    protected JRadioButton generalFontDefault;
+    protected JRadioButton generalFontCustom;
 
-    /**
-     * The styles currently applied to the documents. Map from managed style sheet to style string.
-     * Will be updated when {@link #applyPreferences() applyPreferences} is called.
-     */
-    private Map currentStyles;
+    protected JComboBox generalFont;
+    protected JComboBox wordLookupFont;
 
-    /**
-     * The list of managed style sheets.
-     */
-    private java.util.List styleSheets;
-
+    protected JComboBox wordLookupFontSize;
+    
     /**
      * An Icon which paints itself as a single color.
      *
      * @author Michael Koch
      */
-    private static class ColorIcon implements Icon {
+    protected static class ColorIcon implements Icon {
         /**
          * Width of the icon.
          */
-        private int width;
+        protected int width;
         /**
          * Height of the icon.
          */
-        private int height;
+        protected int height;
         /**
          * Color of the icon.
          */
-        private Color color;
+        protected Color color;
         
         /**
          * Creates a new white ColorIcon with a size of 20x10.
@@ -243,9 +165,6 @@ public class StyleDialog extends Box {
     public StyleDialog() {
         super( BoxLayout.Y_AXIS);
 
-        currentStyles = new HashMap( 10);
-        styleSheets = new ArrayList( 10);
-
         // NOTE: getAvailableFontFamilyNames and getAllFonts do not list all available fonts
         // under JDK 1.4 and Linux (I have no idea why). Therefore, not all fonts may be available
         // from the font popups, and insertAndSelect is used whenever a value in a font
@@ -256,7 +175,7 @@ public class StyleDialog extends Box {
         autodetect = new JButton( JGloss.messages.getString( "style.autodetect"));
         autodetect.addActionListener( new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    autodetectFontsAction();
+                    autodetectFontsAction( getAutodetectedFonts());
                 }
             });
 
@@ -275,53 +194,9 @@ public class StyleDialog extends Box {
 
         wordLookupFont = new JComboBox( allFonts);
         wordLookupFont.setEditable( false);
-        textFont = new JComboBox( allFonts);
-        textFont.setEditable( false);
-        readingFont = new JComboBox( allFonts);
-        readingFont.setEditable( false);
-        translationFont = new JComboBox( allFonts);
-        translationFont.setEditable( false);
 
         wordLookupFontSize = new JComboBox( JGloss.prefs.getList( Preferences.FONTSIZES_WORDLOOKUP, ','));
         wordLookupFontSize.setEditable( true);
-        textFontSize = new JComboBox( JGloss.prefs.getList( Preferences.FONTSIZES_KANJI, ','));
-        textFontSize.setEditable( true);
-        readingFontSize = new JComboBox( JGloss.prefs.getList( Preferences.FONTSIZES_READING, ','));
-        readingFontSize.setEditable( true);
-        translationFontSize = new JComboBox( JGloss.prefs.getList
-                                             ( Preferences.FONTSIZES_TRANSLATION, ','));
-        translationFontSize.setEditable( true);
-
-        ActionListener colorActionListener = new ActionListener() {
-                public void actionPerformed( ActionEvent e) {
-                    doColorChooser( (JButton) e.getSource());
-                }
-            };
-        textColor = new JButton( new ColorIcon());
-        textColor.addActionListener( colorActionListener);
-        readingColor = new JButton( new ColorIcon());
-        readingColor.addActionListener( colorActionListener);
-        translationColor = new JButton( new ColorIcon());
-        translationColor.addActionListener( colorActionListener);
-
-        textUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
-        textUseColor.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
-                    textColor.setEnabled( textUseColor.isSelected());
-                }
-            });
-        readingUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
-        readingUseColor.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
-                    readingColor.setEnabled( readingUseColor.isSelected());
-                }
-            });
-        translationUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
-        translationUseColor.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
-                    translationColor.setEnabled( translationUseColor.isSelected());
-                }
-            });
 
         Box b;
         Box b2;
@@ -351,94 +226,13 @@ public class StyleDialog extends Box {
         b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( wordLookupFontSize);
-        b.add( UIUtilities.createSpaceEater( b2, true));
+        b.add( UIUtilities.createFlexiblePanel( b2, true));
         b.add( Box.createVerticalStrut( 7));
         p.add( b);
         this.add( p);
         this.add( Box.createVerticalStrut( 3));
 
-        // text
-        p = new JPanel( new GridLayout( 1, 1));
-        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
-                                                       ( "style.text")));
-        b = Box.createVerticalBox();
-        b2 = Box.createHorizontalBox();
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.font")));
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( textFont);
-        b2.add( Box.createHorizontalStrut( 5));
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( textFontSize);
-        b.add( UIUtilities.createSpaceEater( b2, true));
-        b.add( Box.createVerticalStrut( 7));
-        b2 = Box.createHorizontalBox();
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( textUseColor);
-        b2.add( textColor);
-        b.add( UIUtilities.createSpaceEater( b2, true));
-        p.add( b);
-        this.add( p);
-        this.add( Box.createVerticalStrut( 3));
-
-        // reading
-        p = new JPanel( new GridLayout( 1, 1));
-        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
-                                                       ( "style.reading")));
-        b = Box.createVerticalBox();
-        b2 = Box.createHorizontalBox();
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.font")));
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( readingFont);
-        b2.add( Box.createHorizontalStrut( 5));
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( readingFontSize);
-        b.add( UIUtilities.createSpaceEater( b2, true));
-        b.add( Box.createVerticalStrut( 7));
-        b2 = Box.createHorizontalBox();
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( readingUseColor);
-        b2.add( readingColor);
-        b.add( UIUtilities.createSpaceEater( b2, true));
-        p.add( b);
-        this.add( p);
-        this.add( Box.createVerticalStrut( 3));
-
-        // translation
-        p = new JPanel( new GridLayout( 1, 1));
-        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
-                                                       ( "style.translation")));
-        b = Box.createVerticalBox();
-        b2 = Box.createHorizontalBox();
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.font")));
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( translationFont);
-        b2.add( Box.createHorizontalStrut( 5));
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( translationFontSize);
-        b.add( UIUtilities.createSpaceEater( b2, true));
-        b.add( Box.createVerticalStrut( 7));
-        b2 = Box.createHorizontalBox();
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( translationUseColor);
-        b2.add( translationColor);
-        b.add( UIUtilities.createSpaceEater( b2, true));
-        p.add( b);
-        this.add( p);
-        
-        this.add( Box.createVerticalStrut( 2));
-        // highlight color
-        b = Box.createHorizontalBox();
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( new JLabel( JGloss.messages.getString( "style.highlight.color")));
-        b.add( Box.createHorizontalStrut( 3));
-        highlightColor = new JButton( new ColorIcon());
-        highlightColor.addActionListener( colorActionListener);
-        b.add( highlightColor);
-        b.add( Box.createHorizontalGlue());
-        this.add( b);
+        insertAdditionalControls( allFonts);
 
         // autodetect
         this.add( Box.createVerticalStrut( 3));
@@ -453,27 +247,7 @@ public class StyleDialog extends Box {
         loadPreferences();
     }
 
-    /**
-     * Displays the color chooser if a button with a color icon is selected.
-     * The color of the icon will be set to the selected color.
-     *
-     * @param b The button, which must have a <CODE>ColorIcon</CODE>.
-     */
-    private void doColorChooser( JButton b) {
-        String title;
-        if (b == highlightColor)
-            title = "style.highlight.colorchooser.title";
-        else
-            title = "style.text.colorchooser.title";
-
-        Color nc = JColorChooser.showDialog( SwingUtilities.getRoot( this),
-                                             JGloss.messages.getString( title),
-                                             ((ColorIcon) b.getIcon()).getColor());
-        if (nc != null) {
-            ((ColorIcon) b.getIcon()).setColor( nc);
-            b.repaint();
-        }                                     
-    }
+    protected void insertAdditionalControls( String[] allFonts) {}
 
     /**
      * Loads the preferences and initializes the dialog accordingly.
@@ -487,32 +261,9 @@ public class StyleDialog extends Box {
 
         insertAndSelect( generalFont, JGloss.prefs.getString( Preferences.FONT_GENERAL));
         insertAndSelect( wordLookupFont, JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP));
-        insertAndSelect( textFont, JGloss.prefs.getString( Preferences.FONT_TEXT));
-        insertAndSelect( readingFont, JGloss.prefs.getString( Preferences.FONT_READING));
-        insertAndSelect( translationFont, JGloss.prefs.getString( Preferences.FONT_TRANSLATION));
         
         wordLookupFontSize.setSelectedItem
             ( Integer.toString( JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12)));
-        textFontSize.setSelectedItem
-            ( Integer.toString( JGloss.prefs.getInt( Preferences.FONT_TEXT_SIZE, 12)));
-        readingFontSize.setSelectedItem
-            ( Integer.toString( JGloss.prefs.getInt( Preferences.FONT_READING_SIZE, 12)));
-        translationFontSize.setSelectedItem
-            ( Integer.toString( JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_SIZE, 12)));
-
-        textUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR, true));
-        readingUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR, true));
-        translationUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, 
-                                                                  true));
-
-        ((ColorIcon) textColor.getIcon()).setColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff))));
-        ((ColorIcon) readingColor.getIcon()).setColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff))));
-        ((ColorIcon) translationColor.getIcon()).setColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff))));
-        ((ColorIcon) highlightColor.getIcon()).setColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xffffff))));
     }
 
     /**
@@ -527,15 +278,6 @@ public class StyleDialog extends Box {
         font = (String) wordLookupFont.getSelectedItem();
         if (font != null)
             JGloss.prefs.set( Preferences.FONT_WORDLOOKUP, font);
-        font = (String) textFont.getSelectedItem();
-        if (font != null)
-            JGloss.prefs.set( Preferences.FONT_TEXT, font);
-        font = (String) readingFont.getSelectedItem();
-        if (font != null)
-            JGloss.prefs.set( Preferences.FONT_READING, font);
-        font = (String) translationFont.getSelectedItem();
-        if (font != null)
-            JGloss.prefs.set( Preferences.FONT_TRANSLATION, font);
 
         String size = (String) wordLookupFontSize.getSelectedItem();
         try {
@@ -543,44 +285,8 @@ public class StyleDialog extends Box {
             JGloss.prefs.set( Preferences.FONT_WORDLOOKUP_SIZE, s);
         } catch (Exception ex) { 
             ex.printStackTrace();
-            textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
+            wordLookupFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP_SIZE));
         }
-        size = (String) textFontSize.getSelectedItem();
-        try {
-            int s = Integer.parseInt( size);
-            JGloss.prefs.set( Preferences.FONT_TEXT_SIZE, s);
-        } catch (Exception ex) { 
-            ex.printStackTrace();
-            textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
-        }
-        size = (String) readingFontSize.getSelectedItem();
-        try {
-            int s = Integer.parseInt( size);
-            JGloss.prefs.set( Preferences.FONT_READING_SIZE, s);
-        } catch (Exception ex) { 
-            ex.printStackTrace();
-            textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
-        }
-        size = (String) translationFontSize.getSelectedItem();
-        try {
-            int s = Integer.parseInt( size);
-            JGloss.prefs.set( Preferences.FONT_TRANSLATION_SIZE, s);
-        } catch (Exception ex) { 
-            ex.printStackTrace();
-            textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
-        }
-
-        JGloss.prefs.set( Preferences.FONT_TEXT_USECOLOR, textUseColor.isSelected());
-        Color color = ((ColorIcon) textColor.getIcon()).getColor();
-        JGloss.prefs.set( Preferences.FONT_TEXT_BGCOLOR, color.getRGB() & 0xffffff);
-        JGloss.prefs.set( Preferences.FONT_READING_USECOLOR, readingUseColor.isSelected());
-        color = ((ColorIcon) readingColor.getIcon()).getColor();
-        JGloss.prefs.set( Preferences.FONT_READING_BGCOLOR, color.getRGB() & 0xffffff);
-        JGloss.prefs.set( Preferences.FONT_TRANSLATION_USECOLOR, translationUseColor.isSelected());
-        color = ((ColorIcon) translationColor.getIcon()).getColor();
-        JGloss.prefs.set( Preferences.FONT_TRANSLATION_BGCOLOR, color.getRGB() & 0xffffff);
-        color = ((ColorIcon) highlightColor.getIcon()).getColor();
-        JGloss.prefs.set( Preferences.ANNOTATION_HIGHLIGHT_COLOR, color.getRGB() & 0xffffff);
     }
 
     /**
@@ -589,12 +295,6 @@ public class StyleDialog extends Box {
     public void applyPreferences() {
         // apply custom font settings
         applyUIFont();
-
-        // apply document view styles
-        synchronized (styleSheets) {
-            for ( Iterator i=styleSheets.iterator(); i.hasNext(); )
-                applyPreferences( (StyleSheet) i.next(), (Map) i.next());
-        }
     }
 
     /**
@@ -630,88 +330,8 @@ public class StyleDialog extends Box {
         }
     }
 
-    /**
-     * Applies the settings from the application preferences to a single style sheet.
-     *
-     * @param s The style sheet.
-     * @param additionalStyles Style sheet-specific additional CSS styles.
-     */
-    private void applyPreferences( StyleSheet s, Map additionalStyles) {
-        if (s == null)
-            return;
-
-        String style = "body { background-color: " + BACKGROUND_COLOR + "; ";
-        if (JGloss.prefs.getString( Preferences.FONT_TEXT).length()!=0) {
-            style += "font-family: " + JGloss.prefs.getString( Preferences.FONT_TEXT) + "; ";
-        }
-        try {
-            int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
-            style += "font-size: " + size + "pt; ";
-        } catch (NumberFormatException ex) { ex.printStackTrace(); }
-        if (additionalStyles.containsKey( "body"))
-            style += additionalStyles.get( "body").toString();
-        style += "}\n";
-        
-        style += AnnotationTags.BASETEXT.getId() + " { ";
-        if (JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR, true)) {
-            style += "background-color: #" + Integer.toHexString
-                ( JGloss.prefs.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff)) + "; ";
-        }
-        else {
-            // this removes, among other settings, the current background color settings
-            s.removeStyle( AnnotationTags.BASETEXT.getId());
-        }
-        if (additionalStyles.containsKey( AnnotationTags.BASETEXT.getId()))
-            style += additionalStyles.get( AnnotationTags.BASETEXT.getId()).toString();
-        style += "}\n";
-
-        style += AnnotationTags.READING.getId() + " { ";
-        if (JGloss.prefs.getString( Preferences.FONT_READING).length()!=0) {
-            style += "font-family: " + JGloss.prefs.getString( Preferences.FONT_READING) + "; ";
-        }
-        try {
-            int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
-            style += "font-size: " + size + "pt; ";
-        } catch (NumberFormatException ex) { ex.printStackTrace(); }
-        if (JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR, true)) {
-            style += "background-color: #" + Integer.toHexString
-                ( JGloss.prefs.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff)) + "; ";
-        }
-        else {
-            style += "background-color: " + BACKGROUND_COLOR + "; ";
-        }
-        if (additionalStyles.containsKey( AnnotationTags.READING.getId()))
-            style += additionalStyles.get( AnnotationTags.READING.getId()).toString();
-        style += "}\n";
-
-        style += AnnotationTags.TRANSLATION.getId() + " { ";
-        if (JGloss.prefs.getString( Preferences.FONT_TRANSLATION).length()!=0) {
-            style += "font-family: " + JGloss.prefs.getString( Preferences.FONT_TRANSLATION) + "; ";
-        }
-        try {
-            int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
-            style += "font-size: " + size + "pt; ";
-        } catch (NumberFormatException ex) { ex.printStackTrace(); }
-        if (JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, true)) {
-            style += "background-color: #" + Integer.toHexString
-                ( JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff)) + "; ";
-        }
-        else {
-            style += "background-color: " + BACKGROUND_COLOR + "; ";
-        }
-
-        if (additionalStyles.containsKey( AnnotationTags.TRANSLATION.getId()))
-            style += additionalStyles.get( AnnotationTags.TRANSLATION.getId()).toString();
-        style += "}\n";
-
-        if (!style.equals( currentStyles.get( s))) { // only apply style if something changed
-            s.addRule( style);
-            currentStyles.put( s, style);
-        }
-
-        JGlossEditor.setHighlightColor
-            ( new Color( Math.max( 0, JGloss.prefs.getInt
-                                   ( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
+    protected JComboBox[] getAutodetectedFonts() {
+        return new JComboBox[] { wordLookupFont };
     }
 
     /**
@@ -719,19 +339,23 @@ public class StyleDialog extends Box {
      * {@link #autodetectFonts() autodetectFonts} in that it gives the user feedback on what
      * was changed and it tests all available fonts (which can be slow).
      */
-    private void autodetectFontsAction() {
+    protected void autodetectFontsAction( JComboBox[] fonts) {
         // Test if all selected fonts can display japanese characters, if yes, no further action
         // is neccessary.
         boolean canDisplayJapanese = 
             (canDisplayJapanese( "Dialog") && canDisplayJapanese( "DialogInput") &&
-            generalFontDefault.isSelected() ||
-            canDisplayJapanese( (String) generalFont.getSelectedItem()) &&
-            generalFontCustom.isSelected()) &&
-            canDisplayJapanese( (String) wordLookupFont.getSelectedItem()) &&
-            canDisplayJapanese( (String) textFont.getSelectedItem()) &&
-            canDisplayJapanese( (String) readingFont.getSelectedItem()) &&
-            canDisplayJapanese( (String) translationFont.getSelectedItem());
-
+             generalFontDefault.isSelected() ||
+             canDisplayJapanese( (String) generalFont.getSelectedItem()) &&
+             generalFontCustom.isSelected());
+        
+        if (canDisplayJapanese) {
+            for ( int i=0; i<fonts.length; i++) {
+                canDisplayJapanese = canDisplayJapanese( (String) fonts[i].getSelectedItem());
+                if (!canDisplayJapanese)
+                    break;
+            }
+        }
+        
         if (canDisplayJapanese) {
             // no configuration neccessary
             JOptionPane.showMessageDialog( this, 
@@ -754,14 +378,14 @@ public class StyleDialog extends Box {
         japaneseFont = null;
         if (canDisplayJapanese( (String) generalFont.getSelectedItem()))
             japaneseFont = (String) generalFont.getSelectedItem();
-        else if (canDisplayJapanese( (String) wordLookupFont.getSelectedItem()))
-            japaneseFont = (String) wordLookupFont.getSelectedItem();
-        else if (canDisplayJapanese( (String) textFont.getSelectedItem()))
-            japaneseFont = (String) textFont.getSelectedItem();
-        else if (canDisplayJapanese( (String) readingFont.getSelectedItem()))
-            japaneseFont = (String) readingFont.getSelectedItem();
-        else if (canDisplayJapanese( (String) translationFont.getSelectedItem()))
-            japaneseFont = (String) translationFont.getSelectedItem();
+        else {
+            for ( int i=0; i<fonts.length; i++) {
+                if (canDisplayJapanese( (String) fonts[i].getSelectedItem())) {
+                    japaneseFont = (String) wordLookupFont.getSelectedItem();
+                    break;
+                }
+            }
+        }
 
         if (japaneseFont != null) {
             selectJapaneseFont( japaneseFont);
@@ -797,7 +421,7 @@ public class StyleDialog extends Box {
      * font. Only the current dialog settings are modified, not the user preferences.
      * Also displays a dialog with the font name.
      */
-    private void selectJapaneseFont( String fontname) {
+    protected void selectJapaneseFont( String fontname) {
         if (canDisplayJapanese( "Dialog") && canDisplayJapanese( "DialogInput")) {
             generalFontDefault.setSelected( true);
         }
@@ -806,9 +430,6 @@ public class StyleDialog extends Box {
             insertAndSelect( generalFont, fontname);
         }
         insertAndSelect( wordLookupFont, fontname);
-        insertAndSelect( textFont, fontname);
-        insertAndSelect( readingFont, fontname);
-        insertAndSelect( translationFont, fontname);
 
         JOptionPane.showMessageDialog( this, 
                                        JGloss.messages.getString( "style.autodetect.selectedfont",
@@ -824,7 +445,7 @@ public class StyleDialog extends Box {
      * or selected by auto-detection which is to be selected, might not be in the model of the font
      * combo box.
      */
-    private void insertAndSelect( JComboBox box, Object object) {
+    protected void insertAndSelect( JComboBox box, Object object) {
         DefaultComboBoxModel model = (DefaultComboBoxModel) box.getModel();
         if (model.getIndexOf( object) == -1)
             model.insertElementAt( object, 0);
@@ -887,7 +508,7 @@ public class StyleDialog extends Box {
      * by the user. If no suitable font is found or n case of an interruption, 
      * <code>null</code> is returned.
      */
-    private String searchJapaneseFont() {
+    protected String searchJapaneseFont() {
         final Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getAllFonts();
         final ProgressMonitor monitor = new ProgressMonitor

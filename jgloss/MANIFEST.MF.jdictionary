@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Main-Class: jgloss.JGlossApp
+Main-Class: jgloss.JDictionaryApp
 
 Name: jgloss/
 Package-Title: jgloss

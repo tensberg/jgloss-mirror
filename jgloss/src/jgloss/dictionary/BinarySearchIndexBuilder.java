@@ -99,11 +99,9 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
                 tempIndex.limit( tempIndexInt.position()*4);
                 tempIndex.rewind();
 
-                System.err.println( tempIndexInt.position());
-                System.err.println( "Committing index");
+                System.err.println( tempIndexInt.position() + " entries");
                 System.err.println( "sorting index");
                 quicksortIndex( 0, tempIndexInt.position()-1, tempIndexInt);
-                System.err.println( "sorted index");
 
                 // copy index data from temp file to index container
                 try {

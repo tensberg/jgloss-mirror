@@ -27,6 +27,9 @@ import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.dictionary.*;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -40,41 +43,55 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     /**
      * Text field used to display the result as HTML text.
      */
-    protected JTextPane result;
+    protected JEditorPane resultFancy;
+    protected JTextArea resultPlain;
     protected JScrollPane resultScroller;
+
+    protected int fancyLimit;
 
     protected LookupModel model;
     protected boolean multipleDictionaries;
-    protected StringBuffer resultBuffer = new StringBuffer( 8192);
+    protected List resultBuffer;
+    protected StringBuffer resultTextBuffer = new StringBuffer( 8192);
+    protected int entriesInTextBuffer;
     protected int dictionaryEntries;
-    protected int dictionaryEntriesInBuffer;
     protected boolean previousDictionaryHasMatch;
-    protected boolean firstBufferFlush;
+    protected JLabel status;
 
-    protected final static int BUFFER_LIMIT = 100;
+    protected final static int BUFFER_LIMIT = 500;
 
     public LookupResultList() {
+        this( 200);
+    }
+
+    public LookupResultList( int _fancyLimit) {
         setLayout( new BorderLayout());
 
-        result = new JTextPane();
-        result.setContentType( "text/html");
-        result.setEditable( false);
-        ((HTMLEditorKit) result.getEditorKit()).getStyleSheet().addRule( STYLE);
-        ((HTMLEditorKit) result.getEditorKit()).getStyleSheet().addRule
+        fancyLimit = _fancyLimit;
+        resultFancy = new JEditorPane();
+        resultFancy.setContentType( "text/html");
+        resultFancy.setEditable( false);
+        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule( STYLE);
+        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
             ( "body { font-family: '" + JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP) +
               "'; font-size: " + JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12) + 
               "pt; }\n");
-        result.getKeymap().addActionForKeyStroke
-            ( KeyStroke.getKeyStroke( "pressed TAB"),
-              new AbstractAction() {
-                  public void actionPerformed( ActionEvent e) {
-                      transferFocus();
-                  }
-              });
 
-        resultScroller = new JScrollPane( result, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        this.add( resultScroller, BorderLayout.CENTER);
+        resultPlain = new JTextArea();
+        resultPlain.setFont( new Font( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP),
+                                       Font.PLAIN, 
+                                       JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12)));
+        resultPlain.setEditable( false);
+
+        Action transferFocus = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    transferFocus();
+                }
+            };
+        resultFancy.getKeymap().addActionForKeyStroke
+            ( KeyStroke.getKeyStroke( "pressed TAB"), transferFocus);
+        resultPlain.getKeymap().addActionForKeyStroke
+            ( KeyStroke.getKeyStroke( "pressed TAB"), transferFocus);
 
         // update display if user changed font
         JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
@@ -84,91 +101,204 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                         String fontname = JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP);
                         int size = JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12);
                         Font font = new Font( fontname, Font.PLAIN, size);
-                        ((HTMLEditorKit) result.getEditorKit()).getStyleSheet().addRule
+                        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
                             ( "body { font-family: '" + fontname +
                               "'; font-size: " + size +
                               "pt; }\n");
-                        result.setFont( font);
+                        resultFancy.setFont( font);
+                        resultPlain.setFont( font);
                     }
                 }
             });
+
+        resultScroller = new JScrollPane( resultFancy, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.add( resultScroller, BorderLayout.CENTER);
+        status = new JLabel();
+        this.add( status, BorderLayout.SOUTH);
     }
 
-    public JTextPane getResultPane() { return result; }
+    public void addToXCVManager( XCVManager manager) {
+        manager.addManagedComponent( resultFancy);
+        manager.addManagedComponent( resultPlain);
+    }
 
     public void startLookup( LookupModel _model) {
-        System.err.println( "starting lookup");
         model = _model;
         multipleDictionaries = model.getSelectedDictionaries().size() > 1;
         previousDictionaryHasMatch = true;
         dictionaryEntries = 0;
-        dictionaryEntriesInBuffer = 0;
-        resultBuffer.setLength( 0);
-        firstBufferFlush = true;
+        entriesInTextBuffer = 0;
+        resultBuffer = new ArrayList( fancyLimit);
     }
 
     public void dictionary( Dictionary d) {
-        if (!previousDictionaryHasMatch) {
-            resultBuffer.append( JGloss.messages.getString( "wordlookup.nomatches_dictionary"));
-            resultBuffer.append( "<br>\n");
-        }
-        if (multipleDictionaries) {
-            resultBuffer.append( JGloss.messages.getString( "wordlookup.matches"));
-            resultBuffer.append( "<font color=\"green\">");
-            resultBuffer.append( d.getName());
-            resultBuffer.append( "</font>:<br>\n");
-        }
-        previousDictionaryHasMatch = false;
+        if (!addToResultBuffer( d))
+            formatNow( d);
     }
 
     public void dictionaryEntry( DictionaryEntry de) {
-        previousDictionaryHasMatch = true;
-        resultBuffer.append( de.toString());
-        resultBuffer.append( "<br>\n");
-        dictionaryEntries++;
-        dictionaryEntriesInBuffer++;
-        if (dictionaryEntriesInBuffer > BUFFER_LIMIT)
-            flushBuffer();
+        if (!addToResultBuffer( de))
+            formatNow( de);
+
     }
 
     public void exception( SearchException ex) {
+        if (!addToResultBuffer( ex))
+            formatNow( ex);
+    }
+
+    public void note( String note) {
+        if (!addToResultBuffer( note))
+            formatNow( note);
+    }
+
+    protected boolean addToResultBuffer( Object o) {
+        if (resultBuffer == null)
+            return false;
+
+        resultBuffer.add( o);
+        if (resultBuffer.size() == fancyLimit)
+            flushBuffer( false);
+        return true;
+    }
+
+    protected void formatNow( Object o) {
+        if (o instanceof Dictionary)
+            format( (Dictionary) o, false);
+        else if (o instanceof DictionaryEntry)
+            format( (DictionaryEntry) o, false);
+        else if (o instanceof SearchException)
+            format( (SearchException) o, false);
+        else
+            format( String.valueOf( o), false);
+        if (++entriesInTextBuffer > BUFFER_LIMIT)
+            flushTextBuffer();
+    }   
+
+    protected void format( Dictionary d, boolean fancy) {
+        if (!previousDictionaryHasMatch) {
+            resultTextBuffer.append( JGloss.messages.getString( "wordlookup.nomatches_dictionary"));
+            if (fancy)
+                resultTextBuffer.append( "<br>");
+            resultTextBuffer.append( '\n');
+        }
+
+        if (multipleDictionaries) {
+            if (fancy) {
+                resultTextBuffer.append( "<b>");
+                resultTextBuffer.append
+                    ( JGloss.messages.getString( "wordlookup.matches",
+                                                 new String[] { "<font color=\"green\">" +
+                                                                d.getName() + "</font>" }));
+                resultTextBuffer.append( "</b><br>");
+            }
+            else {
+                resultTextBuffer.append( JGloss.messages.getString( "wordlookup.matches",
+                                                                    new String[] { d.getName() }));
+            }
+            resultTextBuffer.append( '\n');
+        }
+        
+        previousDictionaryHasMatch = false;
+    }
+
+    protected void format( DictionaryEntry de, boolean fancy) {
+        previousDictionaryHasMatch = true;
+        resultTextBuffer.append( de.toString());
+        if (fancy)
+            resultTextBuffer.append( "<br>");
+        resultTextBuffer.append( '\n');
+        dictionaryEntries++;
+    }
+
+    protected void format( SearchException ex, boolean fancy) {
         ex.printStackTrace();
+        
+        if (fancy)
+            resultTextBuffer.append( "<font color=\"red\">");
         if (ex instanceof UnsupportedSearchModeException) {
-            resultBuffer.append( JGloss.messages.getString( "wordlookup.unsupportedsearchmode"));
-            resultBuffer.append( "<br>\n");
+            resultTextBuffer.append( JGloss.messages.getString( "wordlookup.unsupportedsearchmode"));
         }
         else {
-            resultBuffer.append( "<font color=\"red\">");
-            resultBuffer.append( JGloss.messages.getString( "wordlookup.exception",
-                                                            new Object[] { ex.getClass().getName(),
-                                                                           ex.getLocalizedMessage() }));
-            resultBuffer.append( "</font>:<br>\n");
+            resultTextBuffer.append
+                ( JGloss.messages.getString( "wordlookup.exception",
+                                             new Object[] { ex.getClass().getName(),
+                                                            ex.getLocalizedMessage() }));
         }
+        if (fancy)
+            resultTextBuffer.append( "</font><br>");
+        resultTextBuffer.append( '\n');
+    }
+
+    protected void format( String note, boolean fancy) {
+        resultTextBuffer.append( '\n');
+        if (fancy)
+            resultTextBuffer.append( "<br><i>");
+        resultTextBuffer.append( note);
+        if (fancy)
+            resultTextBuffer.append( "</i>");
+        resultTextBuffer.append( '\n');
     }
 
     public void endLookup() {
-        flushBuffer();
+        if (resultBuffer != null)
+            flushBuffer( true);
+        else
+            flushTextBuffer();
+        updateStatusText( JGloss.messages.getString( "wordlookup.status.matches",
+                                                     new Object[] { new Integer( dictionaryEntries),
+                                                                    model.getSelectedSearchMode().
+                                                                    getName() }));
     }
 
-    protected void flushBuffer() {
-        final String bufferContent = resultBuffer.toString();
-        System.err.println( "flushing buffer");
+    protected void flushBuffer( final boolean fancy) {
+        for ( Iterator i=resultBuffer.iterator(); i.hasNext(); ) {
+            Object o = i.next();
+            if (o instanceof Dictionary)
+                format( (Dictionary) o, fancy);
+            else if (o instanceof DictionaryEntry)
+                format( (DictionaryEntry) o, fancy);
+            else if (o instanceof SearchException)
+                format( (SearchException) o, fancy);
+            else
+                format( String.valueOf( o), fancy);
+        }
+        resultBuffer = null;
+
+        if (fancy) {
+            // build complete html structure
+            resultTextBuffer.insert( 0, "<html><head></head><body>");
+            resultTextBuffer.append( "</body></html>");
+        }
+
+        final String bufferContent = resultTextBuffer.toString();
+        resultTextBuffer.setLength( 0);
+
         Runnable updater = new Runnable() {
                 public void run() {
-                    try {
-                        if (firstBufferFlush) {
-                            firstBufferFlush = false;
-                            HTMLDocument doc = (HTMLDocument) result.getEditorKit()
-                                .createDefaultDocument();
-                            doc.setTokenThreshold( 50);
-                            result.setDocument( doc);
-                            result.setCaretPosition( 0);
+                    if (fancy) {
+                        HTMLDocument doc = (HTMLDocument) resultFancy.getEditorKit()
+                            .createDefaultDocument();
+                        doc.setTokenThreshold( 50);
+                        resultFancy.setDocument( doc);
+
+                        if (resultScroller.getViewport().getView() != resultFancy) {
+                            resultScroller.setViewportView( resultFancy);
+                            resultPlain.setText( "");
                         }
-                        ((HTMLDocument) result.getDocument()).insertBeforeEnd
-                            ( result.getDocument().getDefaultRootElement()
-                              .getElement( 0).getElement( 0), bufferContent);
-                            result.setCaretPosition( 0);
-                    } catch (Exception ex) { ex.printStackTrace(); }
+                        
+                        resultFancy.setText( bufferContent);
+                        resultFancy.setCaretPosition( 0);
+                    }
+                    else {
+                        if (resultScroller.getViewport().getView() != resultPlain) {
+                            resultScroller.setViewportView( resultPlain);
+                            resultFancy.setText( "");
+                        }
+                        resultPlain.setText( bufferContent);
+                        resultPlain.setCaretPosition( 0);
+                    }
                 }
             };
 
@@ -177,8 +307,25 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         else try {
             EventQueue.invokeAndWait( updater);
         } catch (Exception ex) {}
-        
-        dictionaryEntriesInBuffer = 0;
-        resultBuffer.setLength( 0);
+    }
+
+    protected void flushTextBuffer() {
+        resultPlain.append( resultTextBuffer.toString());
+        resultTextBuffer.setLength( 0);
+        entriesInTextBuffer = 0;
+        updateStatusText( JGloss.messages.getString( "wordlookup.status.searching",
+                                                     new Object[] { new Integer( dictionaryEntries) }));
+    }
+
+    protected void updateStatusText( final String text) {
+        Runnable updater = new Runnable() {
+                public void run() {
+                    status.setText( text);
+                }
+            };
+        if (EventQueue.isDispatchThread())
+            updater.run();
+        else 
+            EventQueue.invokeLater( updater);
     }
 } // class LookupResultList

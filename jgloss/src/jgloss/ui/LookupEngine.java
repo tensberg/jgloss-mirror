@@ -29,9 +29,15 @@ import java.util.Iterator;
 
 public class LookupEngine {
     protected LookupResultHandler handler;
+    protected int dictionaryEntryLimit;
 
     public LookupEngine( LookupResultHandler _handler) {
+        this( _handler, Integer.MAX_VALUE);
+    }
+
+    public LookupEngine( LookupResultHandler _handler, int _dictionaryEntryLimit) {
         handler = _handler;
+        dictionaryEntryLimit = _dictionaryEntryLimit;
     }
 
     public LookupResultHandler getHandler() { return handler; }
@@ -56,17 +62,22 @@ public class LookupEngine {
         LookupResultFilter[] filters = (LookupResultFilter[]) model.getSelectedFilters()
             .toArray( new LookupResultFilter[0]);
 
+        int dictionaryEntries = 0;
+
         try {
-            for ( Iterator i=model.getSelectedDictionaries().iterator(); i.hasNext(); ) {
+            for ( Iterator i=model.getSelectedDictionaries().iterator(); i.hasNext() &&
+                      dictionaryEntries<dictionaryEntryLimit; ) {
                 Dictionary d = (Dictionary) i.next();
                 handler.dictionary( d);
                 try {
                     ResultIterator results = d.search( mode, parameters);
-                    results: while (results.hasNext()) try {
+                    results: while (dictionaryEntries<dictionaryEntryLimit &&
+                                    results.hasNext()) try {
                         if (Thread.interrupted())
                             throw new InterruptedException();
                         
                         DictionaryEntry de = results.next();
+                        dictionaryEntries++;
                         for ( int f=0; f<filters.length; f++) {
                             if (!filters[f].accept( de))
                                 continue results;

@@ -31,6 +31,7 @@ import jgloss.www.*;
 
 import java.io.*;
 import java.util.ResourceBundle;
+import java.util.Arrays;
 import java.text.MessageFormat;
 import java.awt.*;
 import java.awt.event.*;
@@ -43,7 +44,7 @@ import javax.swing.*;
  *
  * @author Michael Koch
  */
-public class JGloss {
+public abstract class JGloss {
     /**
      * Path to the file with message strings.
      */
@@ -97,6 +98,8 @@ public class JGloss {
         }
     } // class messages
 
+    protected static JGloss application;
+
     /**
      * The application-wide preferences. Use this to store and retrieve preferences.
      */
@@ -107,268 +110,135 @@ public class JGloss {
      */
     public static final Messages messages = new Messages( MESSAGES);
 
+    public static boolean exit() {
+        return application.doExit();
+    }
+
+    protected abstract boolean doExit();
+
     /**
-     * Starts JGloss.
+     * Returns the current directory. This usually is the directory which was last
+     * used in a file chooser. When called for the first time, the user's home directory
+     * is used.
      *
-     * @param args Arguments to the application.
+     * @return Path to the current directory.
      */
-    public static void main( String args[]) {
-        /*        try {
-            // register dictionaries
-            //DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
-            //DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
-            DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
-            DictionaryFactory.registerImplementation( WadokuJT.class, WadokuJT.implementation);
+    public static String getCurrentDir() {
+        if (currentDir == null)
+            currentDir = System.getProperty( "user.home");
 
-            // register text parsers
-            ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null).getName());
-            ParserSelector.registerParser( ChasenParser.class, 
-            new ChasenParser( null, null, null, false, false).getName());
-
-            // parse command line options
-            if (args.length > 0) {
-                if (args[0].equals( "-h") || args[0].equals( "--help") ||
-                    args[0].equals( "/?")) {
-                    System.err.println( messages.getString( "main.usage"));
-                    System.exit( 0);
-                }
-                else if (args[0].equals( "-i") || args[0].equals( "--createindex")) {
-                    for ( int i=1; i<args.length; i++) {
-                        // build an index for the given file if it is in a known dictionary format,
-                        // the dictionary class has a constructor which will not create the index
-                        // automatically and has a method buildIndex
-                        try {
-                            Class dicclass = DictionaryFactory.getImplementation( args[i])
-                                .getDictionaryClass( args[i]);
-                            // dicclass must have a constructor which takes a File argument with
-                            // the dictionary location and the boolean "false" meaning that
-                            // no index file should be created.
-                            Dictionary dic = (Dictionary) dicclass.getConstructor
-                                ( new Class[] { File.class, Boolean.TYPE}).newInstance
-                                ( new Object[] { new File( args[i]), Boolean.FALSE });
-                            // build index and write it to local directory
-                            String extension = dicclass.getField( "INDEX_EXTENSION")
-                                .get( dic).toString();
-                            File index = new File( new File( args[i]).getName() + extension);
-                            // dicclass must have a method buildIndex, which takes the location of
-                            // the index as parameter
-                            dicclass.getMethod( "buildIndex", new Class[] { File.class })
-                                .invoke( dic, new Object[] { index });
-                            dic.dispose();
-                        } catch (NoSuchFieldError ex1) {
-                            System.err.println( messages.getString
-                                                ( "main.createindex.noindex",
-                                                new String[] { args[i] }));
-                        } catch (NoSuchMethodException ex2) {
-                            System.err.println( messages.getString
-                                                ( "main.createindex.noindex",
-                                                new String[] { args[i] }));
-                        } catch (java.lang.reflect.InvocationTargetException ex3) {
-                            Throwable cause = ex3.getTargetException();
-                            System.err.println( messages.getString
-                                                ( "main.createindex.exception",
-                                                  new String[] { args[i],
-                                                                 cause.getClass().getName(),
-                                                                 cause.getLocalizedMessage() }));
-                        } catch (DictionaryFactory.NotSupportedException ex) {
-                            System.err.println( messages.getString
-                                                ( "main.format.unrecognized",
-                                                  new String[] { args[i] }));
-                        }
-                    }
-                    System.exit( 0);
-                }
-                else if (args[0].equals( "-f") || args[0].equals( "--format")) {
-                    for ( int i=1; i<args.length; i++) {
-                        try {
-                            DictionaryFactory.Implementation imp =
-                                DictionaryFactory.getImplementation( args[i]);
-                            System.out.println( messages.getString
-                                                ( "main.format",
-                                                  new String[] { args[i], imp.getName() }));
-                        } catch (DictionaryFactory.NotSupportedException ex) {
-                            System.out.println( messages.getString
-                                                ( "main.format.unrecognized",
-                                                  new String[] { args[i] }));
-                        }
-                    }
-                    System.exit( 0);
-                }
-                else if (args[0].equals( "-a") || args[0].equals( "--annotatehtml")) {
-                    if (args.length > 3) { 
-                        System.err.println( messages.getString( "main.usage"));
-                        System.exit( 1);
-                    }
-
-                    String[] fs = prefs.getPaths( Preferences.DICTIONARIES);
-                    Dictionary[] d = new Dictionary[fs.length];
-                    try {
-                        InputStreamReader in;
-                        Writer out;
-                        if (args.length == 1 || args[1].equals( "-"))
-                            in = CharacterEncodingDetector.getReader
-                                ( new BufferedInputStream( System.in));
-                        else
-                            in = CharacterEncodingDetector.getReader
-                                ( new BufferedInputStream( new FileInputStream( args[1])));
-                        if (args.length < 3 || args[2].equals( "-"))
-                            out = new BufferedWriter( new OutputStreamWriter
-                                ( System.out, in.getEncoding()));
-                        else {
-                            if (!args[1].equals( "-") &&
-                                new File( args[1]).equals( new File( args[2]))) {
-                                System.err.println( messages.getString( "main.annotatehtml.files"));
-                                System.exit( 1);
-                            }
-                            out = new BufferedWriter( new OutputStreamWriter
-                                ( new FileOutputStream( args[2]), in.getEncoding()));
-                        }
-
-
-                        for ( int i=0; i<fs.length; i++)
-                            d[i] = DictionaryFactory.createDictionary( fs[i]);                        
-                        Parser p = new KanjiParser( d, null);
-                        new HTMLAnnotator( p).annotate( "", in, out, new URLRewriter() {
-                                public String rewrite( String url) { return url; }
-                                public String rewrite( String url, String tag) { return url; }
-                                public String getDocumentBase() { return ""; }
-                                public void setDocumentBase( String docBase) {}
-                            });
-                        in.close();
-                        out.close();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        System.exit( 1);
-                    }
-
-                    System.exit( 0);
-                }
-                else if (args[0].startsWith( "-") || 
-                         File.separatorChar != '/' && args[0].startsWith( "/")) {
-                    System.err.println( messages.getString( "main.unknownoption",
-                                                            new String[] { args[0] }));
-                    System.err.println( messages.getString( "main.usage"));
-                    System.exit( 1);
-                }
-            }
-
-            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
-            
-            SplashScreen splash = new SplashScreen();
-            
-            // set default location of the chasen executable if this is the first start of JGloss
-            String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
-            if (chasen==null || chasen.length()==0)
-                prefs.set( Preferences.CHASEN_LOCATION, messages.getString
-                           ( File.separatorChar=='\\' ? 
-                             "chasen.location.windows" :
-                             "chasen.location.unix"));
-
-            splash.setInfo( messages.getString( "splashscreen.initPreferences"));
-            Chasen.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
-
-            // automatically set the fonts the first time JGloss is run
-            if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED, false)) {
-                StyleDialog.autodetectFonts();
-                JGloss.prefs.set( Preferences.FONT_AUTODETECTED, true);
-            }
-
-            // make sure the UI font is initialized before any UI elements are created
-            StyleDialog.applyUIFont();
-
-            splash.setInfo( messages.getString( "splashscreen.initMain"));
-            
-            Runtime.getRuntime().addShutdownHook
-                ( new Thread() {
-                        public void run() {
-                            Dictionary[] dicts = Dictionaries.getDictionaries( true);
-                            for ( int i=0; i<dicts.length; i++)
-                                dicts[i].dispose();
-                        }
-                    });
-
-            if (args.length == 0) {
-                if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-                    WordLookup.getFrame().show();
-                else
-                    new JGlossFrame();
-            }
-            else {
-                for ( int i=0; i<args.length; i++) {
-                    JGlossFrame f = new JGlossFrame();
-                    f.loadDocument( new File( args[i]));
-                }
-            }
-
-            // Initialize the preferences at startup. This includes loading the dictionaries.
-            // Do this in its own thread to decrease perceived initialization time.
-            new Thread() {
-                    public void run() {
-                        try {
-                            setPriority( Thread.MIN_PRIORITY);
-                        } catch (IllegalArgumentException ex) {}
-
-                        PreferencesFrame.getFrame();
-                        if (!prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-                            WordLookup.getFrame();
-                    }
-                }.start();
-
-            splash.close();
-        } catch (NoClassDefFoundError ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (NoSuchMethodError ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (ClassNotFoundException ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (Exception ex) {
-            displayError( messages.getString( "error.initialization.generic"), ex, true);
-            System.exit( 1);
-        }*/
+        return currentDir;
     }
 
     /**
-     * Exits JGloss. Before the application quits, the preferences will be saved.
-     * This method will be called when the last JGloss frame is closed. The method may return
-     * before the application quits to allow event processing to take place if it triggers an
-     * error dialog.
+     * Sets the current directory. This method should be called after the user has
+     * selected a file in a file chooser.
      *
-     * @return <CODE>false</CODE>, if the application will not quit.
+     * @param dir The new current directory.
      */
-    public static boolean exit() {
-        /*if (JGlossFrame.getFrameCount()>0 || WordLookup.getFrame().isVisible())
-          return false;*/
+    public static void setCurrentDir( String dir) {
+        currentDir = dir;
+    }
 
-        /*
-        // debug memory:
-        // clear all soft references to get a clean heap dump
-        System.err.println( "clearing heap");
-        java.util.List l = new java.util.LinkedList();
-        try {
-            while (true) {
-                l.add( new byte[100000]);
-            }
-        } catch (OutOfMemoryError er) {
-            l = null;
+    protected static void registerDictionaries() {
+        DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
+        DictionaryFactory.registerImplementation( WadokuJT.class, WadokuJT.implementation);
+        //DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
+        //DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
+    }
+
+    protected static void initUI() throws Exception {
+        UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
+            
+        // automatically set the fonts the first time JGloss is run
+        if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED, false)) {
+            StyleDialog.autodetectFonts();
+            JGloss.prefs.set( Preferences.FONT_AUTODETECTED, true);
         }
-        System.gc();
+        
+        // make sure the UI font is initialized before any UI elements are created
+        StyleDialog.applyUIFont();
+    }
 
-        // debug memory:
-        // Flush events. Sometimes, not all pending events have been processed yet, and
-        // these events keep references to UI objects. Remove these events to clear the memory.
-        System.err.println( "flushing all events");
-        while (Toolkit.getDefaultToolkit().getSystemEventQueue().peekEvent() != null) try {
-            System.err.println( Toolkit.getDefaultToolkit().getSystemEventQueue().getNextEvent());
-        } catch (InterruptedException ex) {}
-        System.gc();
-        */
+    protected static void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook
+            ( new Thread() {
+                    public void run() {
+                        Dictionary[] dicts = Dictionaries.getDictionaries( true);
+                        for ( int i=0; i<dicts.length; i++)
+                            dicts[i].dispose();
+                    }
+                });
+    }
 
-        System.exit( 0);
-
-        return true;
+    protected static void handleCommandLine( String[] args, String what) throws Exception {
+        // parse command line options
+        if (args.length > 0) {
+            if (args[0].equals( "-h") || args[0].equals( "--help") ||
+                args[0].equals( "/?")) {
+                System.err.println( messages.getString( "main.usage", new String[] { what }));
+                System.exit( 0);
+            }
+            else if (args[0].equals( "-i") || args[0].equals( "--createindex")) {
+                for ( int i=1; i<args.length; i++) {
+                    // build an index for the given file if it is in a known dictionary format,
+                    // the dictionary class has a constructor which will not create the index
+                    // automatically and has a method buildIndex
+                    try {
+                        Dictionary d = DictionaryFactory.createDictionary( args[i]);
+                        if (d instanceof IndexedDictionary &&
+                            !((IndexedDictionary) d).loadIndex()) {
+                            System.err.println( messages.getString
+                                                ( "main.createindex",
+                                                  new String[] { d.getName() }));
+                            ((IndexedDictionary) d).buildIndex();
+                        }
+                        else {
+                            System.err.println( messages.getString
+                                                ( "main.createindex.noindex", 
+                                                  new String[] { d.getName() }));
+                        }
+                        d.dispose();
+                    } catch (DictionaryFactory.NotSupportedException ex) {
+                        System.err.println( messages.getString
+                                            ( "main.format.unrecognized",
+                                              new String[] { args[i] }));
+                    } catch (Exception ex) {
+                        if (ex instanceof DictionaryFactory.InstantiationException)
+                            ex = (Exception) ex.getCause();
+                        System.err.println( messages.getString
+                                            ( "main.createindex.exception",
+                                              new String[] { args[i],
+                                                             ex.getClass().getName(),
+                                                             ex.getLocalizedMessage() }));
+                    }
+                }
+                System.exit( 0);
+            }
+            else if (args[0].equals( "-f") || args[0].equals( "--format")) {
+                for ( int i=1; i<args.length; i++) {
+                    try {
+                        DictionaryFactory.Implementation imp =
+                            DictionaryFactory.getImplementation( args[i]);
+                        System.out.println( messages.getString
+                                            ( "main.format",
+                                              new String[] { args[i], imp.getName() }));
+                    } catch (DictionaryFactory.NotSupportedException ex) {
+                        System.out.println( messages.getString
+                                            ( "main.format.unrecognized",
+                                              new String[] { args[i] }));
+                    }
+                }
+                System.exit( 0);
+            }
+            else if (args[0].startsWith( "-") || 
+                     File.separatorChar != '/' && args[0].startsWith( "/")) {
+                System.err.println( messages.getString( "main.unknownoption",
+                                                        new String[] { args[0] }));
+                System.err.println( messages.getString( "main.usage"));
+                System.exit( 1);
+            }
+        }
     }
 
     /**
@@ -378,7 +248,7 @@ public class JGloss {
      * @param t The exception which signalled the error.
      * @param fatal <code>true</code> if the application cannot be started because of the error.
      */
-    private static void displayError( String message, Throwable t, boolean fatal) {
+    protected static void displayError( String message, Throwable t, boolean fatal) {
         System.err.println( message);
         t.printStackTrace();
 
@@ -428,6 +298,7 @@ public class JGloss {
         
         Dimension d = f.getToolkit().getScreenSize();
         f.setLocation( (d.width-f.getWidth())/2, (d.height-f.getHeight())/2);
+        f.setSize( f.getPreferredSize());
         
         f.show();
         synchronized (f) {
@@ -437,28 +308,27 @@ public class JGloss {
         }
     }
 
-    /**
-     * Returns the current directory. This usually is the directory which was last
-     * used in a file chooser. When called for the first time, the user's home directory
-     * is used.
-     *
-     * @return Path to the current directory.
-     */
-    public static String getCurrentDir() {
-        if (currentDir == null)
-            currentDir = System.getProperty( "user.home");
+    protected static LookupFrame createLookupFrame() {
+        final LookupModel model = new LookupModel
+            ( Arrays.asList
+              ( new Object[] { ExpressionSearchModes.EXACT,
+                               ExpressionSearchModes.PREFIX,
+                               ExpressionSearchModes.SUFFIX,
+                               ExpressionSearchModes.ANY,
+                               DistanceSearchModes.NEAR,
+                               DistanceSearchModes.RADIUS }),
+              Arrays.asList( Dictionaries.getDictionaries( false)),
+              Arrays.asList( new Object[] { new AttributeResultFilter() }));
+        Dictionaries.addDictionaryListChangeListener
+            ( new Dictionaries.DictionaryListChangeListener() {
+                    public void dictionaryListChanged() {
+                        model.setDictionaries( Arrays.asList( Dictionaries.getDictionaries( false)));
+                    }
+                });
 
-        return currentDir;
-    }
-
-    /**
-     * Sets the current directory. This method should be called after the user has
-     * selected a file in a file chooser.
-     *
-     * @param dir The new current directory.
-     */
-    public static void setCurrentDir( String dir) {
-        currentDir = dir;
+        LookupFrame f = new LookupFrame( model);
+        f.setSize( f.getPreferredSize());
+        return f;
     }
 
     /**
@@ -467,7 +337,7 @@ public class JGloss {
      * @see PropertiesPreferences
      * @see JavaPreferences
      */
-    private static Preferences initPreferences() {
+    protected static Preferences initPreferences() {
         Preferences prefs = null;
         prefs = new JavaPreferences();
         // copy old settings if needed

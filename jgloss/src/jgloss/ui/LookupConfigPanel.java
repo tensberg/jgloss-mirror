@@ -65,6 +65,27 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     protected JButton search;
     protected ActionListener searchAction;
 
+    protected class DictionaryCellRenderer implements ListCellRenderer {
+        ListCellRenderer parent;
+
+        public DictionaryCellRenderer( ListCellRenderer _parent) {
+            parent = _parent;
+        }
+
+        public Component getListCellRendererComponent( JList list, Object value, int index,
+                                                       boolean isSelected, boolean cellHasFocus) {
+            boolean isEnabled = index<0 ||
+                index>=model.getDictionaryCount() ||
+                model.isDictionaryEnabled( index);
+
+            Component out = parent.getListCellRendererComponent
+                ( list, value, index, isSelected && isEnabled, cellHasFocus);
+            out.setEnabled( isEnabled);
+
+            return out;
+        }
+    } // class DictionaryCellRenderer
+    
     public LookupConfigPanel( LookupModel _model) {
         this( _model, null);
     }
@@ -152,9 +173,13 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
         // dictionary selection setup
         dictionaryChoice = new JComboBox();
-        dictionaryChoice.setActionCommand( DICTIONARY_ACTION_COMMAND);
+        dictionaryChoice.setRenderer( new DictionaryCellRenderer( dictionaryChoice.getRenderer()));
+        // avoid layout flickering by setting a reasonably sized prototype value
+        dictionaryChoice.setPrototypeDisplayValue( "aaaaaaaaaaaaaaaaaaaaaaaa");
+        dictionaryChoice.setActionCommand( DICTIONARY_CHOICE_ACTION_COMMAND);
         dictionaryChoice.addActionListener( this);
         dictionaryChoice.setEditable( false);
+
         ButtonGroup dictionaries = new ButtonGroup();
         dictionary = new JRadioButton();
         dictionary.setActionCommand( DICTIONARY_ACTION_COMMAND);
@@ -313,24 +338,35 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
      * been changed in the preferences window.
      */
     protected void updateDictionaryChoice() {
-        Object selected = dictionaryChoice.getSelectedItem();
-        dictionaryChoice.removeAllItems();
+        Object o = dictionaryChoice.getSelectedItem();
+        boolean seenSelectedItem = false;
         Dictionary[] d = model.getDictionaries();
-        int index = -1;
+        dictionaryChoice.removeAllItems();
         if (d.length == 0) {
             dictionaryChoice.addItem( JGloss.messages.getString( "wordlookup.nodictionary"));
+            dictionaryChoice.setEnabled( false);
         }
         else {
+            dictionaryChoice.setEnabled( true);
             for ( int i=0; i<d.length; i++) {
                 dictionaryChoice.addItem( d[i]);
-                if (selected!=null && d[i].equals( selected))
-                    index = i;
+                if (d[i].equals( o)) {
+                    dictionaryChoice.setSelectedIndex( i);
+                    seenSelectedItem = true;
+                }
             }
         }
-        
-        // restore old selection
-        if (index != -1)
-            dictionaryChoice.setSelectedIndex( index);
+
+
+        if (!seenSelectedItem) {
+            for ( int i=0; i<d.length; i++) {
+                if (model.isDictionaryEnabled( i)) {
+                    model.selectDictionary( i, true);
+                    dictionaryChoice.setSelectedIndex( i);
+                    break;
+                }
+            }
+        }
     }
 
     public LookupModel getModel() { return model; }
@@ -360,6 +396,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     }
 
     protected void updateSearchModeAvailability() {
+        System.err.println( "searchmode");
         for ( int i=0; i<searchModes.length; i++) {
             searchModes[i].setEnabled( model.isSearchModeEnabled( i));
         }
@@ -385,7 +422,11 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
             dictionary.setSelected( true);
             // since the model is not in multi-selection mode, there should always be
             // exactly one selection
-            dictionaryChoice.setSelectedItem( model.getSelectedDictionaries().get( 0));
+            try {
+                dictionaryChoice.setSelectedItem( model.getSelectedDictionaries().get( 0));
+            } catch (IndexOutOfBoundsException ex) {
+                // no dictionary in model, ignore
+            }
         }
     }
 
@@ -418,6 +459,8 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
             updateFilterAvailability();
         if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY))
             updateInputAvailability();
+        if (event.hasChanged( LookupChangeEvent.DICTIONARY_LIST_CHANGED))
+            updateDictionaryChoice();
 
         if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_SELECTION))
             updateSearchModeSelection();
@@ -484,7 +527,15 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
             model.selectAllDictionaries( action.getSource() != dictionary);
         }
         else if (action.getActionCommand().equals( DICTIONARY_CHOICE_ACTION_COMMAND)) {
-            model.selectDictionary( dictionaryChoice.getSelectedIndex(), true);
+            int choice = dictionaryChoice.getSelectedIndex();
+            if (!model.isDictionaryEnabled( choice))
+                try {
+                    dictionaryChoice.setSelectedItem( model.getSelectedDictionaries().get( 0));
+                } catch (IndexOutOfBoundsException ex) {
+                    // no dictionary in model, ignore
+                }
+            else
+                model.selectDictionary( dictionaryChoice.getSelectedIndex(), true);
         }
 
         enableStateChangeEvents = true;

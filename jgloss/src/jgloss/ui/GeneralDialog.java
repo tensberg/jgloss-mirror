@@ -43,11 +43,11 @@ import javax.swing.text.html.StyleSheet;
  * Component which allows the user to edit general preferences. This will normally embedded
  * in the application preferences dialog. There exists
  * a single application-wide instance which can be accessed through the
- * {@link #getComponent() getComponent()} method.
+ * {@link #getInstance() getInstance()} method.
  *
  * @author Michael Koch
  */
-public class GeneralDialog extends Box {
+public class GeneralDialog extends Box implements PreferencesPanel {
     /**
      * The single application-wide instance.
      */
@@ -58,7 +58,7 @@ public class GeneralDialog extends Box {
      *
      * @return The GeneralDialog component.
      */
-    public static synchronized GeneralDialog getComponent() {
+    public static synchronized GeneralDialog getInstance() {
         if (box == null)
             box = new GeneralDialog();
         return box;
@@ -167,6 +167,9 @@ public class GeneralDialog extends Box {
         loadPreferences();
         applyPreferences();
     }
+
+    public String getTitle() { JGloss.messages.getString( "general.title"); }
+    public Component getComponent() { return this; }
 
     /**
      * Loads the preferences and initializes the dialog accordingly.

@@ -45,7 +45,7 @@ import javax.swing.event.*;
  *
  * @author Michael Koch
  */
-public class Dictionaries extends JComponent {
+public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * The single application-wide instance.
      */
@@ -67,11 +67,11 @@ public class Dictionaries extends JComponent {
     /**
      * An EDICT editable by the user.
      */
-    private static UserDictionary userDictionary;
+    //private static UserDictionary userDictionary;
     /**
      * Implementation used to create the user dictionary.
      */
-    private static UserDictionary.Implementation userDictImplementation;
+    //private static UserDictionary.Implementation userDictImplementation;
 
     /**
      * Interface implemented by objects interested in notifications of changes in the
@@ -120,7 +120,7 @@ public class Dictionaries extends JComponent {
      *
      * @return The Dictionaries component.
      */
-    public static Dictionaries getComponent() {
+    public static Dictionaries getInstance() {
         synchronized (componentLock) {
             if (box == null)
                 box = new Dictionaries();
@@ -146,7 +146,7 @@ public class Dictionaries extends JComponent {
      */
     public static Dictionary[] getDictionaries( boolean waitForLoad) {
         if (waitForLoad) {
-            Dictionaries component = getComponent();
+            Dictionaries component = getInstance();
             // Guarantee that all dictionaries are loaded from the preferences before returning.
             // By synchronizing on component, guarantee mutual exclusivity with loadPreferences
             // and savePreferences
@@ -170,9 +170,9 @@ public class Dictionaries extends JComponent {
      * Returns the user dictionary. If the user dictionary creation failed <CODE>null</CODE>
      * will be returned.
      */
-    public static UserDictionary getUserDictionary() {
+    /*public static UserDictionary getUserDictionary() {
         return userDictionary;
-    }
+        }*/
 
     private final static List dictionaryListChangeListeners = new ArrayList( 4);
 
@@ -276,6 +276,10 @@ public class Dictionaries extends JComponent {
                     try {
                         final Dictionary d = DictionaryFactory
                             .createDictionary( descriptor);
+                        if (d instanceof IndexedDictionary) {
+                            if (!((IndexedDictionary) d).loadIndex())
+                                ((IndexedDictionary) d).buildIndex();
+                        }
                         if (d != null) {
                             EventQueue.invokeLater( new Runnable() {
                                     public void run() {
@@ -283,7 +287,7 @@ public class Dictionaries extends JComponent {
                                     }
                                 });
                         }
-                    } catch (DictionaryFactory.Exception ex) {
+                    } catch (Exception ex) {
                         // stack the errors and show them after all other dictionaries are
                         // loaded
                         errors.add( ex);
@@ -301,8 +305,7 @@ public class Dictionaries extends JComponent {
 
             // show error messages for dictionary load failures
             for ( Iterator i=errors.iterator(); i.hasNext(); )
-                showDictionaryError( (DictionaryFactory.Exception) i.next(),
-                                     (String) i.next());
+                showDictionaryError( (Exception) i.next(), (String) i.next());
         }
     }
 
@@ -378,11 +381,11 @@ public class Dictionaries extends JComponent {
                             down.setEnabled( true);
                         else
                             down.setEnabled( false);
-                        if (((DictionaryWrapper) dictionaries.getSelectedValue()).dictionary !=
-                            userDictionary)
+                        //if (((DictionaryWrapper) dictionaries.getSelectedValue()).dictionary !=
+                        //    userDictionary)
                             remove.setEnabled( true);
-                        else
-                            remove.setEnabled( false);
+                            //else
+                            //remove.setEnabled( false);
                     }
                 }
             });
@@ -414,13 +417,16 @@ public class Dictionaries extends JComponent {
         gc.insets = new Insets( 2, 2, 0, 2);
         add( p, gc);
 
-        if (userDictImplementation == null) {
+        /*if (userDictImplementation == null) {
             userDictImplementation = new UserDictionary.Implementation
                 ( System.getProperty( "user.home") + File.separator +
                   JGloss.prefs.getString( Preferences.USERDICTIONARY_FILE));
             DictionaryFactory.registerImplementation( UserDictionary.class, userDictImplementation);
-        }
+            }*/
     }
+
+    public String getTitle() { return JGloss.messages.getString( "dictionaries.title"); }
+    public Component getComponent() { return this; }
 
     /**
      * Runs the dialog to add a new dictionary to the list.
@@ -448,32 +454,39 @@ public class Dictionaries extends JComponent {
     /**
      * Show an error dialog for the dictionary exception.
      */
-    private void showDictionaryError( DictionaryFactory.Exception ex, String file) {
+    private void showDictionaryError( Exception ex, String file) {
         String msgid;
         String [] objects;
 
         if (ex instanceof DictionaryFactory.InstantiationException) {
-            Exception root = ((DictionaryFactory.InstantiationException) ex).getRootCause();
-            File f = new File( file);
-            if (root instanceof FileNotFoundException) {
-                msgid = "error.dictionary.filenotfound";
-                objects = new String[] { f.getName(), f.getAbsolutePath() };
-            }
-            else if (root instanceof IndexCreationException) {
-                msgid = "error.dictionary.jjdxnotavailable";
-                objects = new String[] { f.getAbsolutePath(), f.getParent() };
-            }
-            else {
-                msgid = "error.dictionary.ioerror";
-                objects = new String[] { f.getAbsolutePath() };
-            }
+            ex = ((DictionaryFactory.InstantiationException) ex).getRootCause();
         }
-        else { // DictionaryFactory.NotSupportedException
+
+        File f = new File( file);
+        if (ex instanceof FileNotFoundException) {
+            msgid = "error.dictionary.filenotfound";
+            objects = new String[] { f.getName(), f.getAbsolutePath() };
+        }
+        else if (ex instanceof IndexException) {
+            msgid = "error.dictionary.indexnotavailable";
+            objects = new String[] { f.getAbsolutePath(), f.getParent() };
+        }
+        else if (ex instanceof IOException) {
+            msgid = "error.dictionary.ioerror";
+            objects = new String[] { f.getAbsolutePath() };
+        }
+        else if (ex instanceof DictionaryFactory.NotSupportedException) {
             // dictionary format not supported
             msgid = "error.dictionary.format";
             objects = new String[] { new File( file).getAbsolutePath() };
         }
+        else {
+            msgid = "error.dictionary.exception";
+            objects = new String[] { f.getAbsolutePath(), ex.getLocalizedMessage(), 
+                                     ex.getClass().getName() };
+        }
 
+        ex.printStackTrace();
         JOptionPane.showConfirmDialog
             ( SwingUtilities.getRoot( this), JGloss.messages.getString
               ( msgid, objects),
@@ -526,19 +539,25 @@ public class Dictionaries extends JComponent {
         for ( int i=0; i<fs.length; i++) {
             try {
                 Dictionary d = DictionaryFactory.createDictionary( fs[i]);
+                if (d instanceof IndexedDictionary) {
+                    if (!((IndexedDictionary) d).loadIndex()) {
+                        System.err.println( "building index for dictionary " + d.getName());
+                        ((IndexedDictionary) d).buildIndex();
+                    }
+                }
                 synchronized (activeDictionaries) {
                     activeDictionaries.add( new DictionaryWrapper( fs[i], d));
                 }
                 fireDictionaryListChanged(); // fire for every loaded dictionary
-                if (d instanceof UserDictionary)
-                    userDictionary = (UserDictionary) d;
-            } catch (DictionaryFactory.Exception ex) {
+                /*if (d instanceof UserDictionary)
+                  userDictionary = (UserDictionary) d;*/
+            } catch (Exception ex) {
                 exceptions.add( ex);
                 exceptions.add( fs[i]);
             }
         }
         // insert the user dictionary if not already in the dictionary list
-        if (userDictionary == null) try {
+        /*if (userDictionary == null) try {
             userDictionary = (UserDictionary)
                 DictionaryFactory.createDictionary( userDictImplementation.getDescriptor());
             synchronized (activeDictionaries) {
@@ -548,13 +567,13 @@ public class Dictionaries extends JComponent {
         } catch (DictionaryFactory.Exception ex) {
             exceptions.add( ex);
             exceptions.add( userDictImplementation.getDescriptor());
-        }
+            }*/
         
         EventQueue.invokeLater( new Runnable() {
                 public void run() {
                     // show dialogs for all errors which occurred while the dictionaries were opened
                     for ( Iterator i=exceptions.iterator(); i.hasNext(); ) {
-                        showDictionaryError( (DictionaryFactory.Exception) i.next(), (String) i.next());
+                        showDictionaryError( (Exception) i.next(), (String) i.next());
                     }
                 }
             });

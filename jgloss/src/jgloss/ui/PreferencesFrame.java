@@ -69,17 +69,28 @@ public class PreferencesFrame {
      */
     private JFrame frame;
 
+    private PreferencesPanel[] panels;
+    
+    public static void createFrame( PreferencesPanel[] panels) {
+        synchronized (PreferencesFrame.class) {
+            prefs = new PreferencesFrame( panels);
+            PreferencesFrame.class.notifyAll();
+        }
+    }
+
     /**
-     * Returns the single application-wide preferences frame. If it is not yet constructed,
-     * the method will create it and block until it is finished.
+     * Returns the single application-wide preferences frame.
      *
      * @return The application-wide <CODE>PreferencesFrame</CODE> instance.
      */
-    public static synchronized PreferencesFrame getFrame() {
-        if (prefs == null)
-            prefs = new PreferencesFrame();
-
-        return prefs;
+    public static PreferencesFrame getFrame() {
+        synchronized (PreferencesFrame.class) {
+            if (prefs == null) try {
+                // wait until frame is created
+                PreferencesFrame.class.wait();
+            } catch (InterruptedException ex) {}
+            return prefs;
+        }
     }
 
     /**
@@ -92,7 +103,8 @@ public class PreferencesFrame {
     /**
      * Initializes the preferences frame.
      */
-    private PreferencesFrame() {
+    private PreferencesFrame( PreferencesPanel[] _panels) {
+        panels = _panels;
         frame = new JFrame( JGloss.messages.getString( "prefs.title"));
 
         JPanel main = new JPanel( new BorderLayout());
@@ -143,10 +155,9 @@ public class PreferencesFrame {
 
         JTabbedPane tab = new JTabbedPane();
         tab.setBorder( BorderFactory.createEmptyBorder( 0, 0, 10, 0));
-        tab.addTab( JGloss.messages.getString( "general.title"), GeneralDialog.getComponent());
-        tab.addTab( JGloss.messages.getString( "style.title"), StyleDialog.getComponent());
-        tab.addTab( JGloss.messages.getString( "dictionaries.title"), Dictionaries.getComponent());
-        tab.addTab( JGloss.messages.getString( "exclusions.title"), ExclusionList.getComponent());
+        for ( int i=0; i<panels.length; i++) {
+            tab.addTab( panels[i].getTitle(), panels[i].getComponent());
+        }
         main.add( tab, BorderLayout.CENTER);
 
         loadPreferences();
@@ -163,29 +174,23 @@ public class PreferencesFrame {
      * Saves the current settings to the application <CODE>Preferences</CODE> instance.
      */
     public void savePreferences() {
-        GeneralDialog.getComponent().savePreferences();
-        StyleDialog.getComponent().savePreferences();
-        ExclusionList.getComponent().savePreferences();
-        Dictionaries.getComponent().savePreferences();
+        for ( int i=0; i<panels.length; i++)
+            panels[i].savePreferences();
     }
 
     /**
      * Loads the settings to the application <CODE>Preferences</CODE> instance.
      */
     public void loadPreferences() {
-        GeneralDialog.getComponent().loadPreferences();
-        StyleDialog.getComponent().loadPreferences();
-        ExclusionList.getComponent().loadPreferences();
-        Dictionaries.getComponent().loadPreferences();
+        for ( int i=0; i<panels.length; i++)
+            panels[i].loadPreferences();
     }
 
     /**
      * Applies the settings from the <CODE>Preferences</CODE> to the application.
      */
     public void applyPreferences() {
-        GeneralDialog.getComponent().applyPreferences();
-        StyleDialog.getComponent().applyPreferences();
-        ExclusionList.getComponent().applyPreferences();
-        Dictionaries.getComponent().applyPreferences();
+        for ( int i=0; i<panels.length; i++)
+            panels[i].applyPreferences();
     }
 } // class PreferencesFrame

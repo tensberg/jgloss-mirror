@@ -41,7 +41,8 @@ ifndef NATIVE2ASCII
 endif
 
 RELEASE := 1.1
-DISTNAME := jgloss-$(RELEASE)
+JGLOSS_DISTNAME := jgloss-$(RELEASE)
+JDICTIONARY_DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.dictionary.attribute\
             jgloss.parser jgloss.util \
@@ -66,19 +67,26 @@ CLASSPATH := $(CLASSPATH):./src
 
 # List main class source file and all other class source files not referenced from main class
 # for compilation
-ROOT_SOURCES := src/jgloss/JGloss.java \
-                src/jgloss/JavaPreferences.java
+JGLOSS_SOURCES := src/jgloss/JGlossApp.java
+JDICTIONARY_SOURCES := src/jgloss/JDictionaryApp.java
 WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
 SOURCE_DIST := README.txt COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex
 # files and directories that go into the binary distribution, either in the JGloss jar file
 # or in the zip file.
-BINARY_DIST := README.txt COPYING ChangeLog jgloss data resources doc latex
+JGLOSS_BINARY_DIST := README.txt COPYING ChangeLog jgloss data resources doc latex
 # files that go into the binary distribution jar file
-BINARY_JAR := jgloss data resources
+JGLOSS_BINARY_JAR := jgloss data resources
 # files that go into the binary distribution zip file
-BINARY_ZIP := jgloss.jar README.txt COPYING ChangeLog doc latex
+JGLOSS_BINARY_ZIP := jgloss.jar README.txt COPYING ChangeLog doc latex
+# files and directories that go into the binary distribution, either in the JGloss jar file
+# or in the zip file.
+JDICTIONARY_BINARY_DIST := README.txt COPYING ChangeLog jgloss data resources doc
+# files that go into the binary distribution jar file
+JDICTIONARY_BINARY_JAR := jgloss data resources
+# files that go into the binary distribution zip file
+JDICTIONARY_BINARY_ZIP := jgloss.jar README.txt COPYING ChangeLog doc
 
 #
 # end configuration
@@ -90,10 +98,15 @@ vpath %.pdf doc
 vpath %.docbook doc.src
 vpath %.html doc/html
 
-.phony: dist dist-binary dist-source setup setup_www clean compile doc gen-javadoc jgloss jgloss-www resources
+.phony: dist dist-binary-jgloss dist-binary-jdictionary dist-source setup setup_www clean\
+        compile-jgloss compile-jdictionary doc gen-javadoc\
+        jgloss jdictionary jgloss-www resources
 
-jgloss: compile $(RESOURCES) setup
-	$(JAR) cfm jgloss.jar MANIFEST.MF $(BINARY_JAR)
+jgloss: compile-jgloss $(RESOURCES) setup
+	$(JAR) cfm jgloss.jar MANIFEST.MF $(JGLOSS_BINARY_JAR)
+
+jdictionary: compile-jdictionary $(RESOURCES) setup
+	$(JAR) cfm jdictionary.jar MANIFEST.MF.jdictionary $(JDICTIONARY_BINARY_JAR)
 
 jgloss-www: compile-www $(RESOURCES_WWW) setup_www
 	mkdir -p jgloss-www/WEB-INF/classes
@@ -101,29 +114,40 @@ jgloss-www: compile-www $(RESOURCES_WWW) setup_www
 	cp src/www/web.xml jgloss-www/WEB-INF
 	cp -r jgloss resources data jgloss-www/WEB-INF/classes
 
-dist: dist-source dist-binary
+dist: dist-source dist-binary-jdictionary dist-binary
 
-dist-binary: compile $(RESOURCES) setup doc
-	mkdir -p dist/$(DISTNAME)
-	cp -r $(BINARY_DIST) dist/$(DISTNAME)
-	cp -r data/templates dist/$(DISTNAME)/latex/
-	-cd dist/$(DISTNAME) && find -depth -name "CVS" -exec rm -r \{\} \;
-	cd dist/$(DISTNAME) && $(JAR) cfm jgloss.jar ../../MANIFEST.MF $(BINARY_JAR)
-	cd dist/$(DISTNAME) && rm -r $(filter-out $(BINARY_ZIP), $(BINARY_DIST))
-	cd dist && zip -q -r $(DISTNAME).zip $(DISTNAME)
-	cd dist && tar -czf $(DISTNAME).tgz $(DISTNAME)
-	rm -r dist/$(DISTNAME)
+dist-binary-jgloss: jgloss doc
+	mkdir -p dist/$(JGLOSS_DISTNAME)
+	cp -r $(JGLOSS_BINARY_DIST) dist/$(JGLOSS_DISTNAME)
+	cp -r data/templates dist/$(JGLOSS_DISTNAME)/latex/
+	-cd dist/$(JGLOSS_DISTNAME) && find -depth -name "CVS" -exec rm -r \{\} \;
+	cd dist/$(JGLOSS_DISTNAME) && $(JAR) cfm jgloss.jar ../../MANIFEST.MF $(JGLOSS_BINARY_JAR)
+	cd dist/$(JGLOSS_DISTNAME) && rm -r $(filter-out $(JGLOSS_BINARY_ZIP), $(JGLOSS_BINARY_DIST))
+	cd dist && zip -q -r $(JGLOSS_DISTNAME).zip $(JGLOSS_DISTNAME)
+	cd dist && tar -czf $(JGLOSS_DISTNAME).tgz $(JGLOSS_DISTNAME)
+	rm -r dist/$(JGLOSS_DISTNAME)
+
+dist-binary-jdictionary: jdictionary doc
+	mkdir -p dist/$(JDICTIONARY_DISTNAME)
+	cp -r $(JDICTIONARY_BINARY_DIST) dist/$(JDICTIONARY_DISTNAME)
+	cp -r data/templates dist/$(JDICTIONARY_DISTNAME)/latex/
+	-cd dist/$(JDICTIONARY_DISTNAME) && find -depth -name "CVS" -exec rm -r \{\} \;
+	cd dist/$(JDICTIONARY_DISTNAME) && $(JAR) cfm jgloss.jar ../../MANIFEST.MF $(JDICTIONARY_BINARY_JAR)
+	cd dist/$(JDICTIONARY_DISTNAME) && rm -r $(filter-out $(JDICTIONARY_BINARY_ZIP), $(JDICTIONARY_BINARY_DIST))
+	cd dist && zip -q -r $(JDICTIONARY_DISTNAME).zip $(JDICTIONARY_DISTNAME)
+	cd dist && tar -czf $(JDICTIONARY_DISTNAME).tgz $(JDICTIONARY_DISTNAME)
+	rm -r dist/$(JDICTIONARY_DISTNAME)
 
 dist-source: clean
-	mkdir -p dist/$(DISTNAME)
-	cp -r $(SOURCE_DIST) dist/$(DISTNAME)
-	-cd dist/$(DISTNAME) && find -depth \( -name "CVS" -or -name "*.class" \) -exec rm -r \{\} \;
-	-cd dist/$(DISTNAME)/src/resources/ && rm $(RESOURCES)
-	cd dist && zip -q -r $(DISTNAME)-src.zip $(DISTNAME)
-	cd dist && tar -czf $(DISTNAME)-src.tgz $(DISTNAME)
-	rm -r dist/$(DISTNAME)
+	mkdir -p dist/$(JGLOSS_DISTNAME)
+	cp -r $(SOURCE_DIST) dist/$(JGLOSS_DISTNAME)
+	-cd dist/$(JGLOSS_DISTNAME) && find -depth \( -name "CVS" -or -name "*.class" \) -exec rm -r \{\} \;
+	-cd dist/$(JGLOSS_DISTNAME)/src/resources/ && rm $(RESOURCES)
+	cd dist && zip -q -r $(JGLOSS_DISTNAME)-src.zip $(JGLOSS_DISTNAME)
+	cd dist && tar -czf $(JGLOSS_DISTNAME)-src.tgz $(JGLOSS_DISTNAME)
+	rm -r dist/$(JGLOSS_DISTNAME)
 
-all: jgloss jgloss-www
+all: jdictionary jgloss jgloss-www
 
 doc: jgloss.pdf index.html
 
@@ -148,8 +172,11 @@ setup_www:
 	mkdir -p data
 	cp $(addprefix src/data/, $(DATA_WWW)) data
 
-compile:
-	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(ROOT_SOURCES)
+compile-jgloss:
+	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(JGLOSS_SOURCES)
+
+compile-jdictionary:
+	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(JDICTIONARY_SOURCES)
 
 compile-www:
 	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(WWW_SOURCES)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -45,6 +45,8 @@ public abstract class DictionaryFactory {
         public Exception( String message) {
             super( message);
         }
+        public Exception( java.lang.Exception root) { super( root); }
+        public Exception( String message, java.lang.Exception root) { super( message, root); }
     } // class Exception
 
     /**
@@ -61,7 +63,6 @@ public abstract class DictionaryFactory {
      * Thrown when the instantiation of a dictionary failed.
      */
     public static class InstantiationException extends DictionaryFactory.Exception {
-        private java.lang.Exception rootCause;
         public InstantiationException() {
             super();
         }
@@ -69,15 +70,11 @@ public abstract class DictionaryFactory {
             super( message);
         }
         public InstantiationException( java.lang.Exception rootCause) {
-            super();
-            this.rootCause = rootCause;
+            super( rootCause);
         }
         public InstantiationException( String message, java.lang.Exception rootCause) {
-            super( message);
-            this.rootCause = rootCause;
+            super( message, rootCause);
         }
-
-        public java.lang.Exception getRootCause() { return rootCause; }
     } // class InstantiationException
 
     /**
