@@ -35,15 +35,7 @@ import javax.swing.text.*;
  *
  * @author Michael Koch
  */
-public class ReadingTranslationNode extends LeafNode {
-    /**
-     * The text contained in the reading or translation element.
-     */
-    private String readingText;
-    /**
-     * The descriptive text of this node.
-     */
-    private String description;
+public class ReadingTranslationNode extends EditableTextNode {
     /**
      * Flag if this models a reading or translation annotation.
      */
@@ -58,47 +50,17 @@ public class ReadingTranslationNode extends LeafNode {
      *               translation annotation.
      */
     public ReadingTranslationNode( InnerNode parent, boolean isReading) {
-        super( parent);
+        super( parent, JGloss.messages.getString( isReading ? "annotationeditor.reading" :
+                                                  "annotationeditor.translation"), "");
         this.isReading = isReading; // must be set before calling getElement()
         Element reading = getElement();
         try {
-            this.readingText = reading.getDocument().getText( reading.getStartOffset(),
-                                                              reading.getEndOffset()-
-                                                              reading.getStartOffset());
+            this.text = reading.getDocument().getText( reading.getStartOffset(),
+                                                       reading.getEndOffset()-
+                                                       reading.getStartOffset());
         } catch (BadLocationException ex) {
             ex.printStackTrace();
         }
-
-        description = JGloss.messages.getString( isReading ? "annotationeditor.reading" :
-                                                 "annotationeditor.translation");
-    }
-
-    /**
-     * Returns a string representation of this node. This is the description plus the 
-     * <CODE>readingText</CODE>.
-     *
-     * @return A string representation of this node.
-     */
-    public String toString() {
-        return description + readingText;
-    }
-
-    /**
-     * Returns the descriptive text for this node. This does not contain the <CODE>readingText</CODE>.
-     *
-     * @return The description of this node.
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Returns the reading text of this node.
-     *
-     * @return The reading text of this node.
-     */
-    public String getText() {
-        return readingText;
     }
 
     /**
@@ -112,8 +74,8 @@ public class ReadingTranslationNode extends LeafNode {
         if (text==null || text.length()==0)
             text = " "; // a minimal text must always be set so that the element will not be deleted
 
-        readingText = text;
-        getRootNode().getModel().nodeChanged( this);
+        super.setText( text);
+
         try {
             Element reading = getElement();
             int start = reading.getStartOffset();
@@ -127,11 +89,24 @@ public class ReadingTranslationNode extends LeafNode {
     }
 
     /**
+     * Returns the changeable text of this node. If the text equals " ", the empty string
+     * will be returned.
+     *
+     * @see #setText(String)
+     */
+    public String getText() {
+        if (" ".equals( text))
+            return "";
+        else
+            return text;
+    }
+
+    /**
      * Returns the element which displays the reading/translation in the JGloss document.
      * The element object may change if the annotations are manipulated, so you should not
      * use it over longer intervals.
      */
-    public Element getElement() {
+    private Element getElement() {
         if (isReading)
             return ((AnnotationNode) parent).getAnnotationElement().getElement( 0);
         else // translation
