@@ -30,7 +30,7 @@ import java.beans.*;
 /**
  * Management of the application-wide preferences. The preferences are a mapping from string
  * keys to string values. The class provides convenience methods for the storage and
- * retrieval of additional data types. If a user preference for a specific key, the value
+ * retrieval of additional data types. If a user preference for a specific key is not set, the value
  * from the default preferences in resources/preferences.properties (or a localized variant)
  * will be used. The preferences of the user will be stored in the file ".jgloss" in the users
  * home directory.

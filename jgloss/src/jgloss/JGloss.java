@@ -36,7 +36,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * Entry point for the JGloss application. Does the initialisation and manages access to
+ * Entry point for the JGloss application. Does the initialization and manages access to
  * localisation resources and preferences.
  *
  * @author Michael Koch

@@ -555,19 +555,23 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
         compactViewItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.compactview"));
         compactViewItem.setSelected( JGloss.prefs.getBoolean( Preferences.VIEW_COMPACTVIEW));
+        compactViewItem.setToolTipText( JGloss.messages.getString( "main.menu.compactview.tt"));
         compactViewItem.addActionListener( this);
         showReadingItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.showreading"));
         showReadingItem.setSelected( JGloss.prefs.getBoolean( Preferences.VIEW_SHOWREADING));
+        showReadingItem.setToolTipText( JGloss.messages.getString( "main.menu.showreading.tt"));
         showReadingItem.addActionListener( this);
         showTranslationItem = new JCheckBoxMenuItem( JGloss.messages.getString
                                                      ( "main.menu.showtranslation"));
         showTranslationItem.setSelected( JGloss.prefs.getBoolean
                                          ( Preferences.VIEW_SHOWTRANSLATION));
+        showTranslationItem.setToolTipText( JGloss.messages.getString( "main.menu.showtranslation.tt"));
         showTranslationItem.addActionListener( this);
         showAnnotationItem = new JCheckBoxMenuItem( JGloss.messages.getString
                                                     ( "main.menu.showannotation"));
         showAnnotationItem.setSelected( JGloss.prefs.getBoolean
                                         ( Preferences.VIEW_SHOWANNOTATION));
+        showAnnotationItem.setToolTipText( JGloss.messages.getString( "main.menu.showannotation.tt"));
         showAnnotationItem.addActionListener( this);
 
         menu = new JMenu( JGloss.messages.getString( "main.menu.view"));
