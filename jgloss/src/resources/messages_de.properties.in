@@ -26,7 +26,7 @@ error.no_message=(keine Information)
 error.loadPreferences=Beim Laden der Voreinstellungen ist ein Fehler aufgetreten:
 error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufgetreten:
 error.dictionary.title=Fehler beim Öffnen des Wörterbuchs
-error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei und die Indexdatei (".xjdx")\nlesbar sind.
+error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei {1}\n existiert und lesbar ist.
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.
 error.import.title=Fehler beim Importieren
 error.import.exception=Beim Import von {0} ist ein Fehler aufgetreten:\n{1}.
@@ -55,6 +55,12 @@ splashscreen.loadingPreferences=Lade Voreinstellungen
 splashscreen.initPreferences=Lade Wörterbücher
 splashscreen.initMain=Erstelle Anwendungsfenster
 
+main.usage=Benutzung: jgloss.JGloss [Optionen] Datei ...\n\
+Optionen:\n\
+\  -h, --help, /?  Zeigt diese Nachricht\n\
+\  -i, --createindex Erzeugt Indexdateien für die in der Kommandozeile\n\
+\                    angegebenen Wörterbuchdateien
+main.unknownoption=Unbekannte Option {0}
 main.title=JGloss
 
 main.menu.file=Datei
@@ -182,3 +188,9 @@ filefilter.html.description=HTML Dokumente (*.html)
 filefilter.latex.description=LaTeX Dokumente (*.tex)
 
 encodings.default=<auto>
+
+edict.buildindex=Erzeuge Index für Wörterbuch {0}.\nDies kann einige Zeit dauern.
+edict.load=Lade Wörterbuch {0}.
+edict.writejjdx=Schreibe JJDX Index für Wörterbuch {0}.
+edict.warning.jjdxversion=WARNUNG: Die Version der JJDX Indexdatei für {0} ist größer als die von dieser Version\von JGloss unterstützte.
+edict.error.writejjdx=Fehler beim Schreiben der JJDX Indexdatei: {0}, {1}
