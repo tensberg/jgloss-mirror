@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -23,7 +23,7 @@
 
 package jgloss.dictionary;
 
-import java.util.List;
+import java.util.Iterator;
 
 /**
  * Generic interface to a dictionary with an arbitrary backend.
@@ -31,32 +31,6 @@ import java.util.List;
  * @author Michael Koch
  */
 public interface Dictionary {
-    /**
-     * Only return matches which exactly match the search string.
-     */
-    short SEARCH_EXACT_MATCHES = 0;
-    /**
-     * Return all matches where the search string is a prefix of the match. 
-     */
-    short SEARCH_STARTS_WITH = 1;
-    /**
-     * Return all matches where the search string is a postfix of the match.
-     */
-    short SEARCH_ENDS_WITH = 2;
-    /**
-     * Return all matches where the search string is a substring of the match.
-     */
-    short SEARCH_ANY_MATCHES = 3;
-    /**
-     * Results must be {@link WordReadingPair WordReadingPair} or 
-     * {@link DictionaryEntry DictionaryEntry} instances.
-     */
-    short RESULT_DICTIONARY_ENTRIES = 0;
-    /**
-     * Results can be in a format specified by the dictionary.
-     */
-    short RESULT_NATIVE = 1;
-
     /**
      * Returns a short descriptive name of the dictionary. For dictionaries based
      * on a dictionary file this could be the filename.
@@ -68,24 +42,38 @@ public interface Dictionary {
     /**
      * Searches for entries in the dictionary.
      *
-     * @param expression The string to search for.
-     * @param searchmode Determines how the expression must match an entry.
-     *              One of {@link SEARCH_EXACT_MATCHES SEARCH_EXACT_MATCHES},
-     *              {@link SEARCH_STARTS_WITH SEARCH_STARTS_WITH},
-     *              {@link SEARCH_ENDS_WITH SEARCH_ENDS_WITH} or 
-     *              {@link SEARCH_ANY_MATCHES SEARCH_ANY_MATCHES}. Not every dictionary may support
-     *              all match modes.
-     * @param resultmode Determines the type of objects in the results list. One of
-     *             {@link RESULT_DICTIONARY_ENTRIES RESULT_DICTIONARY_ENTRIES} or
-     *             {@link RESULT_NATIVE RESULT_NATIVE}.
-     * @return A list of dictionary entries which match the expression given the search modes.
-     *         The type of objects in the list is determined by the result mode.
-     *         If no match is found, the empty list will be returned.
-     * @exception SearchException if there was an error during the search.
-     * @see DictionaryEntry
-     * @see WordReadingPair
+     * @param searchmode The requested search mode. The search mode must be supported by this
+     *                   dictionary.
+     * @param parameters Search parameters as required by the {@link SearchMode searchmode}.
+     *        The parameters must be valid for the selected search mode according to
+     *        {@link SearchParameters#isValid(Object[]) SearchParameters.isValid}.
+     * @exception SearchException if the search mode is not supported or there was an error 
+     *            during the search.
      */
-    List search( String expression, short searchmode, short resultmode) throws SearchException;
+    List search( SearchMode searchmode, Object[] parameters) throws SearchException;
+
+    /**
+     * Test if this dictionary supports searches of a certain type. If it fully supports the
+     * search mode, the search is executed according to the selected mode. If it is partially
+     * supported, the search result will be approximated using a different search mode. For example,
+     * an "any match" search could be approximated by a "starts with" or an "exact match" search,
+     * which will give some results but not find all possible matches. If a search mode is not 
+     * supported, calling
+     * {@link #search(SearchMode,Object[]) search) with this search mode will throw an exception.
+     *
+     * @param SearchMode The search mode to test.
+     * @param fully If <code>true</code>, test if the search mode is fully supported, if 
+     *        <code>false</code>, test if it is partially supported.
+     */
+    boolean supports( SearchMode searchmode, boolean fully);
+
+    /**
+     * Return the search fields for which a search of the given mode is supported for
+     * this dictionary implementation. If the given search mode is supported and takes
+     * a {@link SearchFieldSelection SearchFieldSelection} as parameter, at least one search field must be
+     * selected in the {@link SearchFieldSelection SearchFieldSelection} object returned.
+     */
+    SearchFieldSelection getSupportedFields( Searchmode searchmode);
 
     /**
      * Called when the dictionary is no longer needed. This gives the dictionary the

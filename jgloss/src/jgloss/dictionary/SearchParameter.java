@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -24,32 +24,23 @@
 package jgloss.dictionary;
 
 /**
- * Maps a reading to a Japanese word. Instances of this class can be used for a
- * dictionary which only contains word/reading entries. If a word has more than one
- * reading, use several instances of <CODE>WordReadingPair</CODE>.
+ * Interface describing a parameter of a search. Each search in a {@link Dictionary Dictionary}
+ * takes a {@link SearchMode search mode} argument and a set of parameters specified by the search
+ * mode. Instances of this interface describe a parameter type. Constant objects implementing
+ * this interface are used to define "well known" parameters, which should have user interface
+ * widgets to control their value.
  *
  * @author Michael Koch
- * @see Dictionary
+ * @see StandardSearchParameter
  */
-public interface WordReadingPair {
+public interface SearchParameter {
     /**
-     * Returns the Japanese word.
-     *
-     * @return The Japanese word.
+     * Get the class which objects used as values of this parameter type must be instances of.
      */
-    String getWord();
+    Class getParameterClass();
     /**
-     * Returns the reading of this word.
-     *
-     * @return The reading of this word. May be <CODE>null</CODE> if this word contains no
-     *         kanji.
+     * Return a short description of what this parameter controls. This could be as short as a single
+     * word.
      */
-    String getReading();
-
-    /**
-     * Returns the dictionary which contains this entry.
-     *
-     * @return The dictionary.
-     */
-    Dictionary getDictionary();
-} // interface WordReadingPair
+    String getDescription();
+} // interface SearchParameter
