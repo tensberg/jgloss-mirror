@@ -81,7 +81,7 @@ main.menu.export.mk=E
 main.menu.export.plaintext=Plain Text...
 main.menu.export.plaintext.mk=P
 main.menu.export.latex=LaTeX...
-main.menu.export.plaintext.mk=L
+main.menu.export.latex.mk=L
 main.menu.export.html=HTML...
 main.menu.export.html.mk=H
 main.menu.export.annotationlist=Annotation List...
@@ -195,7 +195,7 @@ export.latex.title=Export LaTeX
 
 about.frame.title=About JGloss
 about.title=JGloss
-about.text=A tool for making reading and understanding japanese texts easier.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
 
