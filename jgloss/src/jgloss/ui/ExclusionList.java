@@ -103,6 +103,14 @@ public class ExclusionList extends JPanel {
         exclusionList = new JList();
         exclusionList.setModel( new DefaultListModel());
         exclusionList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
+        // update display if user changed font
+        UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+                public void propertyChange( java.beans.PropertyChangeEvent e) { 
+                    if (e.getPropertyName().equals( "List.font")) {
+                        exclusionList.setFont( (Font) e.getNewValue());
+                    }
+                }
+            });
 
         final Action add = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {

@@ -6,10 +6,13 @@
 	- LaTeX export uses document title for page header.
 	- Keyboard shortcut: typing delete while an annotation node
 	  is selected clears the translation.
+	- Katakana words are no longer annotated with hiragana readings
+	  when a word/reading is selected.
 	- Fixed display of dictionary entries without readings in long
 	  word lookup results.
 	- Fixed saving of preferences on MacOS X.
 	- Fixed button sizes in dictionary and exclusion list preferences.
+	- Fixed adding annotation with reading but no translation.
 1.0: (2001/12/14)
 	- Improved handling of long result lists in word lookup dialog.
 	- Removed the dummy print menu item from the word lookup dialog.

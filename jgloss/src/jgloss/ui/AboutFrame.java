@@ -87,21 +87,20 @@ public class AboutFrame extends JFrame {
         area.setEditable( false);
         area.setOpaque( false);
 
-        Box b = Box.createVerticalBox();
-        b.add( label);
-        b.add( Box.createVerticalStrut( 10));
-        b.add( area);
-        JPanel p = new JPanel();
-        p.setLayout( new GridLayout( 1, 1));
-        p.setBorder( BorderFactory.createCompoundBorder
+        JPanel p = new JPanel( new BorderLayout());
+        p.add( label, BorderLayout.NORTH);
+        p.add( area, BorderLayout.CENTER);
+        JPanel p2 = new JPanel();
+        p2.setLayout( new GridLayout( 1, 1));
+        p2.setBorder( BorderFactory.createCompoundBorder
                      ( BorderFactory.createEmptyBorder( 5, 5, 5, 5),
                        BorderFactory.createCompoundBorder
                        ( BorderFactory.createEtchedBorder(),
                          BorderFactory.createEmptyBorder( 5, 5, 5, 5))));
-        p.add( b);
-        getContentPane().add( p, BorderLayout.CENTER);
+        p2.add( p);
+        getContentPane().add( p2, BorderLayout.CENTER);
 
-        b = Box.createHorizontalBox();
+        Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
         b.add( new JButton( new AbstractAction( JGloss.messages.getString( "about.showlicense")) {
                 public void actionPerformed( ActionEvent e) {

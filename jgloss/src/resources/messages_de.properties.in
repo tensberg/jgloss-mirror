@@ -2,7 +2,7 @@
 #
 # German localization of the JGloss messages.
 #
-# Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001/2002 Michael Koch (tensberg@gmx.net)
 #
 # This file is part of JGloss.
 #
@@ -285,7 +285,7 @@ export.latex.header=\
 export.latex.vocabulary=\ --- Vokabelliste
 
 about.frame.title=Über JGloss
-about.text=Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+about.text=Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\nCopyright (c) 2001/2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Lizenz anzeigen
 about.license.title=GNU General Public License
 

@@ -403,25 +403,12 @@ public class JGlossEditor extends JTextPane {
             tooltip.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2));
             tooltip.setBackground( tt.getBackground());
             tooltip.setForeground( tt.getForeground());
-            if (!JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
-                tooltip.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont
-                                                                ( "ToolTip.font")));
-            }
 
             // update display if user changed font
-            JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+            UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                     public void propertyChange( java.beans.PropertyChangeEvent e) { 
-                        if (e.getPropertyName().equals( Preferences.FONT_GENERAL_USEDEFAULT)) {
-                            if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT))
-                                tooltip.setFont( UIManager.getFont( "ToolTip.font"));
-                            else
-                                tooltip.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont
-                                                                                ( "ToolTip.font")));
-                        }
-                        else if (e.getPropertyName().equals( Preferences.FONT_GENERAL) &&
-                                 !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
-                            tooltip.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont
-                                                                            ( "ToolTip.font")));
+                        if (e.getPropertyName().equals( "ToolTip.font")) {
+                            tooltip.setFont( UIManager.getFont( "ToolTip.font"));
                         }
                     }
                 });

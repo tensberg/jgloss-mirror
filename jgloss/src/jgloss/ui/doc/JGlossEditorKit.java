@@ -345,9 +345,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
                     // yet another ugly alignment hack for annotations that start with
                     // an unannotated character.
                     if (showTranslation)
-                        return 0.26f;
+                        return 0.25f;
                     else
-                        return 0.38f;
+                        return 0.36f;
                 }
             }
             
@@ -593,7 +593,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * normal text to be correctly aligned with annotation views.
      */
     class VAdjustedView extends InlineView {
-        public static final float BASE_TEXT_ALIGNMENT = -0.17f;
+        public static final float BASE_TEXT_ALIGNMENT = -0.15f;
         public static final float ANNOTATED_TEXT_ALIGNMENT = 1f;
         public static final float DEFAULT_ALIGNMENT = Float.MAX_VALUE;
 

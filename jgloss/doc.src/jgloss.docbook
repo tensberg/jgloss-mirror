@@ -2,7 +2,7 @@
 <!ENTITY JGloss "<application>JGloss</application>">
 ]>
 
-<!-- JGloss User Guide (c) 2001 Michael Koch
+<!-- JGloss User Guide (c) 2001/2002 Michael Koch
 
  This file is part of JGloss.
 
@@ -30,8 +30,8 @@
       <firstname>Michael</firstname><surname>Koch</surname>
     </author>
     <edition>1.0</edition>
-    <copyright><year>2001</year><holder>Michael Koch</holder></copyright>
-    <pubdate>2001</pubdate>
+    <copyright><year>2001/2002</year><holder>Michael Koch</holder></copyright>
+    <pubdate>2002</pubdate>
   </bookinfo>
 
   <chapter><title>Introduction</title>

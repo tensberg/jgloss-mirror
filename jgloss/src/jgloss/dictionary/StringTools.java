@@ -58,6 +58,10 @@ public class StringTools {
         return (c>=0x3040 && c<0x30a0);
     }
 
+    public static boolean isKana( char c) {
+        return (c>=0x3040 && c<0x3100);
+    }
+
     public static boolean isCJKUnifiedIdeographs( char c) {
         return (c>=0x4e00 && c<0xa000);
     }

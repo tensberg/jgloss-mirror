@@ -1,5 +1,5 @@
-JGloss 1.0
-----------
+JGloss 1.0.1
+------------
 
 JGloss homepage: http://jgloss.sourceforge.net/
 
@@ -21,8 +21,10 @@ Known problems:
   - On Windows 98/ME the ChaSen window does not close automatically
     after a document is imported. You will have to close it by hand.
   - When using JGloss with KDE, the word annotation dialog will sometimes
-    be resized to a minimum when it is opened. This seems to be a problem
-    in the interaction between the interaction of Java and the KDE window
-    manager which I don't know how to fix.
+    be resized to a minimum when it is opened. Also, Java locks up if
+    the preference window is opened after a document is loaded and when
+    the print dialog opens. This seems to be a problem in the interaction 
+    between the interaction of Java and the KDE window manager which I don't 
+    know how to fix.
 
-(c) 2001 Michael Koch <tensberg@gmx.net>
+(c) 2001/2002 Michael Koch <tensberg@gmx.net>

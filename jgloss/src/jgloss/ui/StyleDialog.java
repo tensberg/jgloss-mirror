@@ -69,11 +69,34 @@ public class StyleDialog extends Box {
      */
     private static String defaultJapaneseFont;
 
+    /**
+     * Default L&F font.
+     */
     private static Font textFieldFont;
+    /**
+     * Default L&F font.
+     */
     private static Font treeFont;
+    /**
+     * Default L&F font.
+     */
     private static Font comboBoxFont;
+    /**
+     * Default L&F font.
+     */
     private static Font textAreaFont;
+    /**
+     * Default L&F font.
+     */
     private static Font textPaneFont;
+    /**
+     * Default L&F font.
+     */
+    private static Font toolTipFont;
+    /**
+     * Default L&F font.
+     */
+    private static Font listFont;
 
     /**
      * Adds a new style sheet which will then automatically track any changes made to the
@@ -481,10 +504,6 @@ public class StyleDialog extends Box {
      * Saves the current dialog settings.
      */
     public void savePreferences() {
-        // Order of the setting of the preferences of FONT_GENERAL and FONT_GENERAL_USEDEFAULT is
-        // important. If both settings are changed at the same time, the clients of the settings
-        // should only react to the second change event. This can be done by ignoring the FONT_GENERAL
-        // change if FONT_GENERAL_USEDEFAULT is false.
         String font = (String) generalFont.getSelectedItem();
         if (font != null)
             JGloss.prefs.set( Preferences.FONT_GENERAL, font);
@@ -551,6 +570,8 @@ public class StyleDialog extends Box {
                 UIManager.put( "ComboBox.font", comboBoxFont);
                 UIManager.put( "TextArea.font", textAreaFont);
                 UIManager.put( "TextPane.font", textPaneFont);
+                UIManager.put( "ToolTip.font", toolTipFont);
+                UIManager.put( "List.font", listFont);
             }
         }
         else {
@@ -561,6 +582,8 @@ public class StyleDialog extends Box {
                 comboBoxFont = UIManager.getFont( "ComboBox.font");
                 textAreaFont = UIManager.getFont( "TextArea.font");
                 textPaneFont = UIManager.getFont( "TextPane.font");
+                toolTipFont = UIManager.getFont( "ToolTip.font");
+                listFont = UIManager.getFont( "List.font");
             }
             // set custom font
             UIManager.put( "TextField.font", deriveGeneralFont( textFieldFont));
@@ -568,6 +591,8 @@ public class StyleDialog extends Box {
             UIManager.put( "ComboBox.font", deriveGeneralFont( comboBoxFont));
             UIManager.put( "TextArea.font", deriveGeneralFont( textAreaFont));
             UIManager.put( "TextPane.font", deriveGeneralFont( textPaneFont));
+            UIManager.put( "ToolTip.font", deriveGeneralFont( toolTipFont));
+            UIManager.put( "List.font", deriveGeneralFont( listFont));
         }
 
         // apply document view styles

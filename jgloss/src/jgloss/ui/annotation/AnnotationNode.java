@@ -294,11 +294,11 @@ public class AnnotationNode extends InnerNode {
         dictionaryform.setWord( newword);
         dictionaryform.setReading( newreading);
 
-        // only set the reading if the annotated word is not all hiragana
+        // only set the reading if the annotated word is not all kana
         boolean isHiragana = true;
         String annotatedWord = word.getWord();
         for ( int i=0; i<annotatedWord.length(); i++) {
-            if (!StringTools.isHiragana( annotatedWord.charAt( i))) {
+            if (!StringTools.isKana( annotatedWord.charAt( i))) {
                 isHiragana = false;
                 break;
             }
@@ -319,24 +319,27 @@ public class AnnotationNode extends InnerNode {
         // all child accesses should succeed.
 
         TreeNode tn = getChildAt( DICTIONARY_NODE_OFFSET); // first dictionary node
-
-        TreeNode tnc = tn.getChildAt( 0);
-        if (tnc instanceof TranslationNode) {
-            setWordFrom( ((TranslationNode) tnc).getTranslation());
-            
-            // If there are several readings with identical translations, the
-            // TranslationLeafNodes are only attached to the last TranslationNode.
-            // Search this TranslationNode.
-            
-            int i = 1;
-            while (tnc.getChildCount() == 0)
-                tnc = (TranslationNode) tn.getChildAt( i++);
-            
-            tnc = tnc.getChildAt( 0); // first translationLeafNode
-            getTranslationNode().setText( ((TranslationLeafNode) tnc).getTranslation());
+        
+        if (tn.getChildCount() > 0) {
+            // tn is a dictionary node with translation childs
+            TreeNode tnc = tn.getChildAt( 0);
+            if (tnc instanceof TranslationNode) {
+                setWordFrom( ((TranslationNode) tnc).getTranslation());
+                
+                // If there are several readings with identical translations, the
+                // TranslationLeafNodes are only attached to the last TranslationNode.
+                // Search this TranslationNode.
+                
+                int i = 1;
+                while (tnc.getChildCount() == 0)
+                    tnc = (TranslationNode) tn.getChildAt( i++);
+                
+                tnc = tnc.getChildAt( 0); // first translationLeafNode
+                getTranslationNode().setText( ((TranslationLeafNode) tnc).getTranslation());
+            }
         }
-        else if (tnc instanceof ReadingAnnotationNode)
-            setWordFrom( ((ReadingAnnotationNode) tnc).getReading());
+        else if (tn instanceof ReadingAnnotationNode)
+            setWordFrom( ((ReadingAnnotationNode) tn).getReading());
     }
 
     /**
