@@ -202,8 +202,6 @@ public class JGlossEditor extends JTextPane {
                         ( JGlossEditor.this, JGloss.messages.getString( "editor.addannotation.text"),
                           JGloss.messages.getString( "editor.addannotation.title"),
                           JOptionPane.QUESTION_MESSAGE, null, null, text);
-                    if (newText == null) // user cancelled
-                        newText = text; // use the original
                     return newText;
                 }
             };

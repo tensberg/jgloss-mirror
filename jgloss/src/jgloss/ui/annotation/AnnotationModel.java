@@ -58,7 +58,8 @@ public class AnnotationModel extends DefaultTreeModel {
          * for the dictionary lookup.
          *
          * @param text The original string.
-         * @return The string which will be looked up.
+         * @return The string which will be looked up. Returns <CODE>null</CODE> if the
+         *         lookup was cancelled.
          */
         String translate( String text);
     } // interface LookupTranslator
@@ -294,7 +295,15 @@ public class AnnotationModel extends DefaultTreeModel {
             String text = doc.getText( start, end-start);
 
             // look up the new annotation in the dictionaries.
-            List l = doc.getDictionaryParser().findTranslations( trans.translate( text), false);
+            String transText = trans.translate( text);
+            if (transText == null)
+                return null;
+
+            List l;
+            if (transText.length() > 0)
+                l = doc.getDictionaryParser().findTranslations( transText, false);
+            else
+                l = Collections.EMPTY_LIST;
 
             boolean paragraphSpaceInserted = false;
             if (start == paragraph.getStartOffset()) {
