@@ -183,7 +183,7 @@ public class JGlossServlet extends HttpServlet {
                                         ( ResourceBundle.getBundle( MESSAGES)
                                           .getString( "error.nodictionary"),
                                           new Object[] { DICTIONARIES }));
-        for ( Iterator i=split( d, File.pathSeparatorChar).iterator(); i.hasNext(); ) {
+        for ( Iterator i=split( d, ' ').iterator(); i.hasNext(); ) {
             d = (String) i.next();
             jgloss.dictionary.Dictionary dic = null;
             try {
@@ -221,7 +221,7 @@ public class JGlossServlet extends HttpServlet {
                                         ( ResourceBundle.getBundle( MESSAGES)
                                           .getString( "error.noprotocols"),
                                           new Object[] { ALLOWED_PROTOCOLS}));
-        allowedProtocols.addAll( split( p, ':'));
+        allowedProtocols.addAll( split( p, ','));
         // write log entry
         p = "";
         for ( Iterator i=allowedProtocols.iterator(); i.hasNext(); ) {
@@ -237,7 +237,7 @@ public class JGlossServlet extends HttpServlet {
         secureAllowedProtocols = new HashSet( 5);
         p = config.getInitParameter( SECURE_ALLOWED_PROTOCOLS);
         if (p != null)
-            secureAllowedProtocols.addAll( split( p, ':'));
+            secureAllowedProtocols.addAll( split( p, ','));
         // write log entry
         p = "";
         for ( Iterator i=secureAllowedProtocols.iterator(); i.hasNext(); ) {
@@ -257,6 +257,7 @@ public class JGlossServlet extends HttpServlet {
         noForwardHeaders.add( "upgrade");
         noForwardHeaders.add( "via");
         noForwardHeaders.add( "transfer-encoding");
+        noForwardHeaders.add( "keep-alive");
         // request header fields
         // range and if-range are not supported because rewriting changes the size of
         // files by an undetermined amount.
@@ -265,6 +266,9 @@ public class JGlossServlet extends HttpServlet {
         noForwardHeaders.add( "accept-encoding");
         noForwardHeaders.add( "authorization");
         noForwardHeaders.add( "referer"); // the referer header is treated specially
+        noForwardHeaders.add( "te");
+        noForwardHeaders.add( "trailers");
+        noForwardHeaders.add( "host");
         // response header fields
         noForwardHeaders.add( "accept-ranges");
         // entity header fields
@@ -273,18 +277,17 @@ public class JGlossServlet extends HttpServlet {
         noForwardHeaders.add( "content-md5");
         noForwardHeaders.add( "content-type");
 
-        // headers not in rfc1616
+        // headers not in rfc2616
         noForwardHeaders.add( "set-cookie");
         noForwardHeaders.add( "set-cookie2");
         noForwardHeaders.add( "cookie");
         noForwardHeaders.add( "cookie2");
-        noForwardHeaders.add( "keep-alive");
 
         // read supported types
         rewrittenContentTypes = new String[0];
         p = config.getInitParameter( REWRITTEN_TYPES);
         if (p != null) {
-            rewrittenContentTypes = (String[]) split( p, ':').toArray( rewrittenContentTypes);
+            rewrittenContentTypes = (String[]) split( p, ',').toArray( rewrittenContentTypes);
         }
         if (rewrittenContentTypes.length == 0) {
             rewrittenContentTypes = new String[1];
@@ -393,6 +396,8 @@ public class JGlossServlet extends HttpServlet {
         boolean allowFormDataForwarding = ((Boolean) oa[1]).booleanValue();
         String urlstring = (String) oa[2];
             
+        getServletContext().log( "received request for " + urlstring);
+
         // don't allow the servlet to call itself
         if (urlstring.toLowerCase().indexOf( req.getServletPath().toLowerCase()) != -1) {
             resp.sendError( HttpServletResponse.SC_FORBIDDEN,
@@ -461,7 +466,10 @@ public class JGlossServlet extends HttpServlet {
             }
         }
 
-        Cookie[] cookies = req.getCookies();
+        Cookie[] requestcookies = req.getCookies(); // will not be modified
+        Cookie[] cookies = requestcookies; // new cookies will be added when following redirects
+        HashMap newCookies = new HashMap( 30);
+
         boolean followingRedirect = false;
         // detect cycles in redirection
         Set redirects = new HashSet( 50);
@@ -479,6 +487,7 @@ public class JGlossServlet extends HttpServlet {
                 connection.setRequestProperty( "accept-encoding", acceptEncoding);
 
             if (forwardFormData && post && connection instanceof HttpURLConnection) {
+                getServletContext().log( "using POST");
                 ((HttpURLConnection) connection).setRequestMethod( "POST");
                 connection.setDoInput( true);
                 connection.setDoOutput( true);
@@ -525,8 +534,14 @@ public class JGlossServlet extends HttpServlet {
             if (connection instanceof HttpURLConnection) {
                 response = ((HttpURLConnection) connection).getResponseCode();
                 getServletContext().log( "response code " + response);
-                if ((response==301 || response==302 || response==307) && !post ||
-                    response==303) {
+                if ((response==301 || response==307) && post) {
+                    getServletContext().log( "POST: not following redirect");
+                }
+                if ((response==301 || response==307) && !post ||
+                    response==302 || response==303) {
+                    // Following a 302 redirection which originated from a POST violates
+                    // RFC2616, but since some servers expect this and 
+                    // HttpURLConnection does not use HTTP/1.1 this should be OK.
                     String location = connection.getHeaderField( "location");
                     if (location != null) try {
                         url = new URL( location);
@@ -540,13 +555,12 @@ public class JGlossServlet extends HttpServlet {
                                                      url.toString());
                         }
                         else if (!redirects.contains( url) &&
-                            // While rfc2616 does not set a limit on redirects, I want to
+                            // While RFC2616 does not set a limit on redirects, I want to
                             // avoid an endless number of redirects by a broken or malicious server.
                             redirects.size() < 30) {
                             followingRedirect = true;
                             redirects.add( url);
-                            if (response == 303) // use GET instead of POST when following
-                                post = false;
+                            post = false; // use GET instead of POST when following
                             getServletContext().log( "following redirect to " + location);
                         }
                     } catch (MalformedURLException ex) {
@@ -556,37 +570,45 @@ public class JGlossServlet extends HttpServlet {
             }
 
             if (forwardCookies) {
-                Map newCookies = 
-                    CookieTools.addResponseCookies( connection, resp, req.getServerName(),
-                                                    req.getContextPath() + req.getServletPath(),
-                                                    req.isSecure(), getServletContext());
-                if (followingRedirect && newCookies.size()>0) {
-                    // Add the newly generated cookies to the next redirection.
-                    // The new and old cookies have to be merged. For equality test a test
-                    // on the cookie name is sufficient because the domain/path/port/name is
-                    // encoded in the name.
-                    if (cookies != null) {
-                        for ( int i=0; i<cookies.length; i++)
-                            newCookies.put( cookies[i].getName(), cookies[i]);
+                CookieTools.parseResponseCookies( connection, newCookies, req.getServerName(),
+                                                  req.getContextPath() + req.getServletPath(),
+                                                  req.isSecure(), getServletContext());
+                if (newCookies.size() > 0) {
+                    if (followingRedirect) {
+                        // Add the newly generated cookies to the next redirection.
+                        // The old and new cookies have to be merged. For equality test a test
+                        // on the cookie name is sufficient because the domain/path/port/name is
+                        // encoded in the name.
+                        if (requestcookies != null) {
+                            Map mergedCookies = new HashMap( (requestcookies.length+newCookies.size())*2);
+                            for ( int i=0; i<cookies.length; i++)
+                                mergedCookies.put( cookies[i].getName(), cookies[i]);
+                            mergedCookies.putAll( newCookies);
+                            cookies = (Cookie[]) mergedCookies.values().toArray( cookies);
+                        }
+                        else
+                            cookies = (Cookie[]) newCookies.values().toArray( cookies);
                     }
-                    cookies = (Cookie[]) newCookies.values().toArray( cookies);
+                    else // add all new cookies to the response
+                        for ( Iterator i=newCookies.values().iterator(); i.hasNext(); )
+                            resp.addCookie( (Cookie) i.next());
                 }
             }
             
             if (!followingRedirect) {
                 forwardResponseHeaders( connection, req, resp);
 
-                if (response != 0)
+                if (response != 0) // == 0 if remote protocol was not http/https
                     resp.setStatus( response);
-                if (response == 304) // 304 Not Modified/empty response
+                if (response == 304) // 304 Not Modified: empty response
                     return;
 
                 String encoding = connection.getContentEncoding();
                 getServletContext().log( "Content-Encoding: " + encoding);
-                if (encoding != null)
-                    resp.setHeader( "Content-Encoding", encoding);
 
                 String type = connection.getContentType();
+                getServletContext().log( "content type " + type + " url " +
+                                         connection.getURL().toString());
                 boolean supported = false;
                 if (type != null) {
                     for ( int i=0; i<rewrittenContentTypes.length; i++)
@@ -595,8 +617,6 @@ public class JGlossServlet extends HttpServlet {
                             break;
                         }
                 }   
-                getServletContext().log( "content type " + type + " url " +
-                                         connection.getURL().toString());
                 if (supported) {
                     // If the content encoding cannot be decoded by the servlet,
                     // the content is tunneled to the browser.
@@ -608,8 +628,11 @@ public class JGlossServlet extends HttpServlet {
 
                 if (supported)
                     rewrite( connection, req, resp, rewriter);
-                else
+                else {
+                    if (encoding != null)
+                        resp.setHeader( "Content-Encoding", encoding);
                     tunnel( connection, req, resp);
+                }
             }
         } while (followingRedirect);
     }
@@ -662,16 +685,8 @@ public class JGlossServlet extends HttpServlet {
         try {
             resp.setContentType( "text/html; charset=" + reader.getEncoding());
 
-            // re-compress the generated content
-            OutputStream out = resp.getOutputStream();
-            if (usegzip)
-                out = new GZIPOutputStream( out);
-            else if (usedeflate)
-                out = new DeflaterOutputStream( out);
-            Writer writer = new OutputStreamWriter( out, reader.getEncoding());
-
-            annotator.annotate( reader, writer, rewriter);
-            writer.close();
+            // due to performance reasons, the servlet-client connection never uses compression
+            annotator.annotate( reader, resp.getWriter(), rewriter);
         } finally {
             in.close();
         }
@@ -689,17 +704,31 @@ public class JGlossServlet extends HttpServlet {
 
         // HTTP request headers
         if (connection.getURL().getProtocol().toLowerCase().startsWith( "http")) { // http and https
-            // Add the referrer, removing the servlet-encoding if neccessary.
-            // The referer remains the original URI if a redirect is followed.
-            String referer = req.getHeader( "referer");
-            if (referer!=null && referer.indexOf( req.getContextPath() + 
-                                                  req.getServletPath() + "/")!=-1) {
-                Object[] out = JGlossURLRewriter.parseEncodedPath( referer);
-                if (out != null) {
-                    connection.setRequestProperty( "referer", (String) out[2]);
-                    getServletContext().log( "referer: " + (String) out[2]);
-                }
+            // The host header contains the hostname of the JGloss-WWW server, but should
+            // contain the hostname of the remote server.
+            String host = connection.getURL().getHost();
+            if (host != null) {
+                connection.setRequestProperty( "Host", host);
+                getServletContext().log( "host header: " + host);
             }
+
+            // Add the referrer, removing the servlet-encoding if neccessary.
+            // The referrer remains the original URI if a redirect is followed.
+            String referer = req.getHeader( "referer");
+            if (referer != null) {
+                int index = referer.lastIndexOf( req.getServletPath() + "/");
+                if (index != -1) {
+                    referer = referer.substring( index+req.getServletPath().length());
+                    // the '/' is not removed
+                    Object[] out = JGlossURLRewriter.parseEncodedPath( referer);
+                    if (out != null)
+                        referer = (String) out[2];
+                }
+                connection.setRequestProperty( "referer", referer);
+                getServletContext().log( "referer: " + referer);
+            }
+            else
+                getServletContext().log( "no referrer");
 
             // According to the documentation, some servet containers don't allow getHeaderNames,
             // which returns null in that case.
@@ -745,21 +774,41 @@ public class JGlossServlet extends HttpServlet {
         }
     }
 
-    protected List split( String s, char c) {
+    /**
+     * Splits a string in a list of string. Whitespace at the beginning and end of
+     * an element in the list is removed.
+     * 
+     * @param s String containing a list of items.
+     * @param separator Character which separates the items. The special character ' ' means
+     *        split on any whitespace.
+     * @return List of strings with whitespace at beginning and end removed.
+     */
+    protected List split( String s, char separator) {
         List out = new LinkedList();
 
-        int from = 0;
-        int to = s.indexOf( c);
-        if (to == -1)
-            to = s.length();
-        while (from < to) {
-            out.add( s.substring( from, to).trim());
+        boolean inword = false;
+        StringBuffer word = new StringBuffer();
+        for ( int i=0; i<s.length(); i++) {
+            char c = s.charAt( i);
+            if (!inword) {
+                if (c <= 32) // skip whitespace before word start
+                    continue;
+                if (c == separator) // skip empty entries
+                    continue;
+                inword = true;
+            }
+            else if (c==separator || 
+                     separator==' ' && c<=32) { // separator ' ' means all whitespace chars
+                inword = false;
+                out.add( word.toString().trim());
+                word.delete( 0, word.length());
+            }
 
-            from = to + 1;
-            to = s.indexOf( c, from);
-            if (to == -1)
-                to = s.length();
+            if (inword)
+                word.append( c);
         }
+        if (inword)
+            out.add( word.toString().trim());
 
         return out;
     }
