@@ -183,9 +183,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
         public void parse( Reader r, HTMLEditorKit.ParserCallback cb,
                            boolean ignoreCharset) throws IOException {
             long t = System.currentTimeMillis();
-            super.parse( r, cb, true);
-            if (parser != null) {
-                parser.reset();
+            try {
+                super.parse( r, cb, true);
+            } finally {
+                if (parser != null) {
+                    parser.reset();
+                }
             }
         }
 

@@ -272,11 +272,16 @@ public class JGlossDocument extends HTMLDocument {
                         }
 
                         // try to find matching translation
+                        String hiraganaReading = StringTools.toHiragana( reading);
                         for ( int j=1; j<annotations.size(); j++) {
                             Parser.TextAnnotation annotation = (Parser.TextAnnotation) annotations.get( j);
                             if (annotation instanceof Translation) {
                                 DictionaryEntry de = ((Translation) annotation).getDictionaryEntry();
-                                if (de.getReading()!=null && de.getReading().startsWith( reading)) {
+                                String dr = de.getReading();
+                                if (dr == null)
+                                    dr = de.getWord();
+                                if (dr != null &&
+                                    StringTools.toHiragana( dr).startsWith( hiraganaReading)) {
                                     // the comparison is startsWith and not equals because it might
                                     // be an inflected verb.
                                     translation = de.getTranslations()[0];

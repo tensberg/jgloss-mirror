@@ -35,25 +35,6 @@ import java.io.*;
  * @author Michael Koch
  */
 public class ChasenParser implements Parser {
-    public static void main( String[] args) throws Exception {
-        System.out.println( isChasenExecutable( getDefaultExecutable()));
-        ChasenParser p = new ChasenParser
-            ( new Dictionary[] { new EDict( "/usr/share/edict/edict", true) }, null);
-        StringWriter w = new StringWriter();
-        BufferedReader r = new BufferedReader( new InputStreamReader
-            ( new FileInputStream( "/home/michael/japan/karinodouji/kari.noannotations.txt"), "EUC-JP"));
-        String line;
-        while ((line=r.readLine()) != null) {
-            w.write( line);
-            w.write( "\n");
-        }
-        r.close();
-        w.close();
-        
-        p.parse( w.toString().toCharArray());
-        p.reset();
-    }
-
     private final static ResourceBundle messages =
         ResourceBundle.getBundle( "resources/messages-dictionary");
 
@@ -63,9 +44,39 @@ public class ChasenParser implements Parser {
     private static String defaultChasenExecutable = "/usr/local/bin/chasen";
 
     /**
+     * Dummy dictionary which is used for Readings returned by chasen.
+     */
+    public static Dictionary DOCUMENT_DICTIONARY = new Dictionary() {
+            public String getName() { return PARSER_NAME; }
+            public List search( String expression, short mode) { return null; }
+            public void dispose() {}
+        };
+
+    /**
+     * Implementation of WordReadingPair which returns the <CODE>DOCUMENT_DICTIONARY</CODE> as
+     * dictionary.
+     */
+    private static class ChasenWordReading implements WordReadingPair {
+        private String word;
+        private String reading;
+        public ChasenWordReading( String word, String reading) {
+            this.word = word;
+            this.reading = reading;
+        }
+
+        public String getWord() { return word; }
+        public String getReading() { return reading; }
+        public Dictionary getDictionary() { return DOCUMENT_DICTIONARY; }
+    } // class ChasenWordReading
+    
+    /**
      * Path to chasen program.
      */
     private String chasenExecutable;
+    /**
+     * Name of the character encoding ChaSen uses on this computer.
+     */
+    private String platformEncoding;
     /**
      * Chasen process used to parse the text.
      */
@@ -258,8 +269,13 @@ public class ChasenParser implements Parser {
                                 continue;
                             }
 
-                            List translations = search( word, readingBase);
+                            List translations = search( word);
                             if (translations.size() != 0) {
+                                annotations.add( new Reading
+                                    ( parsePosition + from, to-from,
+                                      new ChasenWordReading( word, 
+                                                             StringTools.toHiragana( readingBase))));
+                                                                      
                                 for ( Iterator i=translations.iterator(); i.hasNext(); ) {
                                     WordReadingPair wrp = (WordReadingPair) i.next();
                                     if (wrp instanceof DictionaryEntry) {
@@ -320,10 +336,14 @@ public class ChasenParser implements Parser {
                             continue;
                         }
 
-                        List translations = search( surfaceBase, readingBase);
+                        List translations = search( surfaceBase);
                         if (translations.size() > 0) {
                             Conjugation c = getConjugation( surfaceInflected, surfaceBase,
                                                             partOfSpeech + "\u3001" + inflectedForm);
+                            annotations.add( new Reading
+                                ( parsePosition, surfaceInflected.length(),
+                                  new ChasenWordReading( surfaceBase,
+                                                         StringTools.toHiragana( readingBase)), c));
                             for ( Iterator i=translations.iterator(); i.hasNext(); ) {
                                 WordReadingPair wrp = (WordReadingPair) i.next();
                                 if (wrp instanceof DictionaryEntry) {
@@ -344,6 +364,7 @@ public class ChasenParser implements Parser {
             }
             System.out.println( "finished iteration");
         } catch (IOException ex) {
+            ex.printStackTrace();
             throw new SearchException( ex);
         }
         
@@ -423,12 +444,15 @@ public class ChasenParser implements Parser {
             chasen = Runtime.getRuntime().exec( chasenExecutable +
                                                 " -F %m\\t%H\\t%Tn\\t%Fn\\t%?T/%M/n/\\t%Y1\\n",
                                                 new String[] { "LANG=ja", "LC_ALL=ja_JP" });
-            chasenOut = new BufferedReader( new InputStreamReader( chasen.getInputStream(),
-                                                                   "EUC-JP"));
-            chasenIn = new BufferedWriter( new OutputStreamWriter( chasen.getOutputStream(),
-                                                                   "EUC-JP"));
+            InputStreamReader out = new InputStreamReader( chasen.getInputStream(),
+                                                           "JISAutoDetect");
+            chasenOut = new BufferedReader( new InputStreamReader
+                ( chasen.getInputStream(), getChasenPlatformEncoding()));
+            chasenIn = new BufferedWriter( new OutputStreamWriter
+                ( chasen.getOutputStream(), getChasenPlatformEncoding()));
         } catch (IOException ex) {
-            throw new SearchException( "error starting chasen");
+            throw new SearchException( "error starting chasen: " + ex.getClass().getName() + ", " 
+                                       + ex.getLocalizedMessage());
         }
     }
 
@@ -436,49 +460,22 @@ public class ChasenParser implements Parser {
      * Look up an entry in a dictionary. If a cache is used, it will be looked up there first, and
      * search results will be stored in the cache.
      */
-    private List search( String word, String preferredReading) throws SearchException {
+    private List search( String word) throws SearchException {
         List result = null;
-        String cacheKey = word + "_" + preferredReading;
 
         System.out.println( "looking up " + word);
-        if (lookupCache != null)
-            result = (List) lookupCache.get( cacheKey);
         if (lookupCache != null)
             result = (List) lookupCache.get( word);
 
         if (result == null) {
-            boolean readingFound = false;
             result = new ArrayList( dictionaries.length*2);
             for ( int i=0; i<dictionaries.length; i++) {
-                List r = dictionaries[i].search( word, Dictionary.SEARCH_EXACT_MATCHES);
-                // Reorder entries according to preferred reading.
-                int matches = 0;
-                for ( Iterator j=r.iterator(); j.hasNext(); ) {
-                    WordReadingPair wrp = (WordReadingPair) j.next();
-                    String reading = wrp.getReading();
-                    if (reading == null)
-                        reading = wrp.getWord();
-                    if (StringTools.toKatakana( reading).equals( preferredReading)) {
-                        if (readingFound)
-                            result.add( wrp);
-                        else
-                            result.add( matches, wrp);
-                        matches++;
-                        j.remove();
-                    }
-                }
-                if (matches>0 && !readingFound) {
-                    readingFound = true;
-                    result.addAll( matches, r);
-                }
-                else
-                    result.addAll( r); // append
+                result.addAll( dictionaries[i].search( word, Dictionary.SEARCH_EXACT_MATCHES));
             }
             if (lookupCache != null) {
                 if (result.size() > 0)
-                    lookupCache.put( cacheKey, result);
+                    lookupCache.put( word, result);
                 else {
-                    lookupCache.put( cacheKey, Collections.EMPTY_LIST);
                     lookupCache.put( word, Collections.EMPTY_LIST);
                 }
             }
@@ -511,5 +508,35 @@ public class ChasenParser implements Parser {
      */
     protected void finalize() {
         reset();
+    }
+
+    /**
+     * Test which character encoding ChaSen uses for its input and output streams. On
+     * Linux this will probably be EUC-JP and on Windows Shift-JIS. The test is done by running
+     * chasen with the -lf option, which makes it list the conjugation forms, and check the encoding
+     * of the output. The test is only done the first time the method is called, the result is
+     * cached and reused on further calls.
+     *
+     * @return Canonical name of the encoding, or <CODE>null</CODE if the test failed.
+     */
+    protected String getChasenPlatformEncoding() {
+        if (platformEncoding != null)
+            return platformEncoding;
+
+        try {
+            Process chasen = Runtime.getRuntime().exec( chasenExecutable + " -lf");
+            try {
+                chasen.waitFor();
+            } catch (InterruptedException ex) {}
+            InputStreamReader reader = CharacterEncodingDetector.getReader( chasen.getInputStream());
+            platformEncoding = reader.getEncoding();
+            reader.close();
+            chasen.getInputStream().close();
+            chasen.getErrorStream().close();
+            return platformEncoding;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 } // class ChasenParser
