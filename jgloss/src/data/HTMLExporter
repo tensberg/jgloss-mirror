@@ -14,13 +14,14 @@ whatever you want.
 $Id$
 -->
 
-
 <STYLE type="text/css">
 <!--
 span.an { cursor: pointer; }
 ruby, rbc, rtc, rb, rt { display: inline; }
 rt.re { ruby-position: before; }
 rt.tr { ruby-position: after; }
+div.popup { display: none; position: absolute; left: 0px; top: 0px; 
+            font-size: 70%; background-color: yellow; }
 //-->
 </STYLE>
 
@@ -36,7 +37,29 @@ rt.tr { ruby-position: after; }
 // annotations.
 var rubySupported = false;
 
+var reading_popup;
+var reading_popup_text;
+var translation_popup;
+var translation_popup_text;
+
 function setupDoc( backwardsCompatible, interactive) {
+    reading_popup = document.getElementById( "reading-popup");
+    if (reading_popup) {
+        for ( j=0; j<reading_popup.childNodes.length; j++) {
+            reading_popup_text = reading_popup.childNodes[j];
+            if (reading_popup_text.nodeType == 3)
+                break;
+        }
+    }
+    translation_popup = document.getElementById( "translation-popup");
+    if (translation_popup) {
+        for ( j=0; j<translation_popup.childNodes.length; j++) {
+            translation_popup_text = translation_popup.childNodes[j];
+            if (translation_popup_text.nodeType == 3)
+                break;
+        }
+    }
+
     if (document.getElementsByTagName) {
         // all hope is lost for browsers which don't support DOM Level 1
 
@@ -101,7 +124,8 @@ function setupDoc( backwardsCompatible, interactive) {
             var an = document.getElementsByTagName( "span");
             for ( i=0; i<an.length; i++) {
                 if (an[i].className == "an") {
-                    var ruby = "";
+                    var reading = -1;
+                    var translation = -1;
                     var first = true;
                     var j=0;
                     while (j<an[i].childNodes.length) {
@@ -113,7 +137,7 @@ function setupDoc( backwardsCompatible, interactive) {
                             else {
                                 var text = child.nodeValue;
                                 if (!backwardsCompatible) {
-                                    if (ruby.length == 0) {
+                                    if (reading == -1) {
                                         text = "《" + text + "》";
                                     }
                                     else {
@@ -123,7 +147,10 @@ function setupDoc( backwardsCompatible, interactive) {
                                         an[i].replaceChild( document.createTextNode( text),
                                                             child);
                                 }
-                                ruby += text;
+                                if (reading == -1)
+                                    reading = text;
+                                else
+                                    translation = text;
                                 if (interactive) {
                                     an[i].removeChild( child);
                                     continue;
@@ -132,8 +159,10 @@ function setupDoc( backwardsCompatible, interactive) {
                         }
                         j++;
                     }
-                    if (ruby.length > 0)
-                        an[i].setAttribute( "ruby", ruby);
+                    if (reading != -1)
+                        an[i].setAttribute( "reading", reading);
+                    if (translation != -1)
+                        an[i].setAttribute( "translation", translation);
                 }
             }
         }
@@ -141,13 +170,81 @@ function setupDoc( backwardsCompatible, interactive) {
 }
 
 function sp( el) {
-    if (el.getElementsByTagName)
+    if (el.style)
         el.style.color = "blue";
+
+    if (el.getElementsByTagName) {
+        // show floating window with annotation
+        // calculate position of element
+        var posX = 0;
+        var posY = 0;
+        var width = el.offsetWidth;
+        var height = el.offsetHeight;
+        var e = el;
+        while (e!=null && el!=window.document) {
+            posX += e.offsetLeft;
+            posY += e.offsetTop;
+            e = e.offsetParent;
+        }
+        
+        var reading = "";
+        var translation = "";
+        
+        var rts = el.getElementsByTagName( "rt");
+        if (rts.length > 0) {
+            for ( i=0; i<rts.length; i++) {
+                var rt = rts[i];
+                for ( j=0; j<rt.childNodes.length; j++) {
+                    if (rt.childNodes[j].nodeType == 3) {
+                        var text = rt.childNodes[j].nodeValue;
+                        if (rt.className == "re")
+                            reading = text;
+                        else
+                            translation = text;
+                    }
+                }
+            }
+        }
+        else if (el.getAttribute( "reading") != "" ||
+                 el.getAttribute( "translation") != "") {
+            reading = el.getAttribute( "reading");
+            translation = el.getAttribute( "translation");
+        }
+
+        if (reading.length>0 && reading.charAt( 0) == "《")
+            reading = reading.substring( 1, reading.length-1);
+        if (translation.length>0 && translation.charAt( 0) == "{")
+            translation = translation.substring( 1, translation.length-1);
+        if (reading_popup && reading_popup.style) {
+            reading_popup_text.nodeValue = reading;
+            reading_popup.style.left = posX;
+            reading_popup.style.top = posY - el.offsetHeight*0.7; // font-size of reading is 70%
+            if (reading_popup.style.top < 0)
+                reading_popup.style.top = 0;
+            reading_popup.style.display = "inline";
+            translation_popup_text.nodeValue = translation;
+            translation_popup.style.left = posX;
+            translation_popup.style.top = posY + el.offsetHeight + 2;
+            translation_popup.style.display = "inline";
+        }
+
+        var status = reading;
+        if (status.length > 0)
+            status += " ";
+        status += translation;
+        window.status = status;
+    }
 }
 
 function hp( el) {
-    if (el.getElementsByTagName)
+    if (el.style)
         el.style.color = el.parentNode.style.color;
+
+    // hide popup
+    if (reading_popup && reading_popup.style) {
+        reading_popup.style.display = "none";
+        translation_popup.style.display = "none";
+    }
 }
 
 // toggle annotation shown/hidden in interactive mode
@@ -169,7 +266,8 @@ function tp( el) {
                 }
             }
         }
-        else if (el.getAttribute( "ruby") != "") {
+        else if (el.getAttribute( "reading") != "" ||
+                 el.getAttribute( "translation") != "") {
             // el has only textNode children. The second stores the annotation
             var first = true;
             var hadAnnotation = false;
@@ -190,7 +288,8 @@ function tp( el) {
             // We want to toggle the display of the annotation, so add the annotation if it
             // was not removed.
             if (!hadAnnotation) {
-                el.appendChild( document.createTextNode( el.getAttribute( "ruby")));
+                el.appendChild( document.createTextNode( el.getAttribute( "reading")+
+                                                         el.getAttribute( "translation")));
             }
         }
     }
@@ -198,5 +297,6 @@ function tp( el) {
 
 //-->
 </SCRIPT>
+
 
 <!-- end of JGloss embedded file -->
