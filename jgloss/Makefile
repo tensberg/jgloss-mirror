@@ -57,6 +57,8 @@ RESOURCES_WWW := messages-www.properties messages-dictionary.properties \
                  messages-dictionary_de.properties \
                  messages-dictionary_fr.properties
 
+HTML_WWW := index.html converturl.js
+
 CLASSPATH := $(CLASSPATH):./src
 ROOT_SOURCE := src/jgloss/JGloss.java
 WWW_SOURCE := src/jgloss/www/JGlossServlet.java
@@ -88,7 +90,7 @@ jgloss: compile $(RESOURCES) setup
 
 jgloss-www: compile-www $(RESOURCES_WWW) setup_www
 	mkdir -p jgloss-www/WEB-INF/classes
-	cp src/www/index.html jgloss-www
+	cp $(addprefix src/www/,$(HTML_WWW)) jgloss-www
 	cp src/www/web.xml jgloss-www/WEB-INF
 	cp -r jgloss resources data jgloss-www/WEB-INF/classes
 
