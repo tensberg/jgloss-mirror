@@ -22,45 +22,47 @@
       <init-param>
         <param-name>dictionaries</param-name>
         <param-value>
-        /usr/share/edict/edict:
-        /usr/share/edict/compverb:
-        /usr/share/edict/4jwords:
-        /usr/share/edict/enamdict:
-        /usr/share/edict/j_places:
+        /usr/share/edict/edict
+        /usr/share/edict/compverb
+        /usr/share/edict/4jwords
+        /usr/share/edict/enamdict
+        /usr/share/edict/j_places
         /usr/share/edict/kanjidic
         </param-value>
         <description>
             List of dictionaries used by the servlets. The initialization of the
-            servlet will fail if one of the dictionaries can't be opened. The separator
-            character is the platform-dependent path separator (':' for Unix, ';' for Windows).
+            servlet will fail if one of the dictionaries can't be opened.
         </description>
       </init-param>
 
       <init-param>
         <param-name>allowed_protocols</param-name>
-        <param-value>http:ftp</param-value>
+        <param-value>http,ftp</param-value>
         <description>
             List of protocols which are allowed in the URLs used to access remote locations. Be careful
             with what you allow. If you allow "file", the user can access all files on the webserver
             to which the servlet has read access. If the user
             specifies a protocol which is not allowed by this configuration parameter, the
-            servlet will send a 403 "Forbidden" error. The separator character is a ':'.
+            servlet will send a 403 "Forbidden" error.
+            You should NOT put any secure protocols like https in this list 
+            (see the JGloss-WWW doumentation).
         </description>
       </init-param>
 
       <init-param>
         <param-name>secure_allowed_protocols</param-name>
-        <param-value>http:https:ftp</param-value>
+        <param-value>http,https,ftp</param-value>
         <description>
             This is the same as allowed_protocols, except this list will be used if the client is
             connected to the servlet through a secure protocol (e. g. https). If you do not set
-            this parameter, secure access is not allowed.
+            this parameter, access to remote sites using a secure connection between client
+            and servlet is not allowed.
         </description>
       </init-param>
 
       <init-param>
         <param-name>rewritten_types</param-name>
-        <param-value>text/html:text/xhtml</param-value>
+        <param-value>text/html</param-value>
         <description>
            List of MIME types which will be rewritten.
         </description>
@@ -86,9 +88,9 @@
         <param-value>true</param-value>
         <description>
             If this (and enable_cookie_forwarding) is set to 'true', cookies will be forwarded
-            from client to server even if the client-servlet connection is https but the
+            from client to server even if the client-servlet connection is secure but the
             servlet-remote server connection is not; and from server to client if the 
-            remote server-servlet connection is https but the servlet-client connection is not.
+            remote server-servlet connection is secure but the servlet-client connection is not.
             Regardless of the setting of this parameter, a cookie is never forwarded by the 
             servlet over a non-https connection if the 'secure' attribute of the cookie is set.
         </description>
@@ -123,14 +125,33 @@
         <param-name>response-buffer-size</param-name>
         <param-value>1024</param-value>
         <description>
-            Size in bytes of the response buffer. Set this to a low value if the servlet
-            accesses the remote servers through a slow connection to increase response time.
+            Size in bytes of the response buffer. Set this to a low value 
+            to increase response time if the servlet
+            accesses the remote servers through a slow connection. Set to -1 to use
+            the default buffer size defined by the servlet container.
         </description>
       </init-param>
+
+      <init-param>
+        <param-name>enable_compression</param-name>
+        <param-value>true</param-value>
+        <description>
+            If this is set to 'true', gzip and deflate content encodings are enabled by
+            the servlet. This uses more computing power but will decrease the network load
+            with servers which support this. Due to performance reasons, rewritten text
+            will never be compressed.
+        </description>
+      </init-param>
+
     </servlet>
 
     <servlet-mapping>
        <servlet-name>jgloss-www</servlet-name>
-       <url-pattern>/jgloss-www/*</url-pattern>
+       <url-pattern>/jgloss-www</url-pattern><!-- for query parameter calls -->
     </servlet-mapping>      
+
+    <servlet-mapping>
+       <servlet-name>jgloss-www</servlet-name>
+       <url-pattern>/jgloss-www/*</url-pattern><!-- for path-mapped calls -->
+    </servlet-mapping>
 </web-app>
