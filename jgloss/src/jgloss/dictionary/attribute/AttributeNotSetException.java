@@ -21,15 +21,12 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.dictionary.attribute;
 
-/**
- * Exception indicating that a dictionary file cannot be used because index creation failed.
- *
- * @author Michael Koch
- */
-public class IndexCreationException extends Exception {
-    public IndexCreationException() {
-        super();
+public class AttributeNotSetException extends Exception {
+    public AttributeNotSetException() {}
+
+    public AttributeNotSetException( String message) {
+        super( message);
     }
-} // class IndexCreationException
+} // class AttributeNotDefinedException

@@ -24,22 +24,17 @@
 package jgloss.dictionary;
 
 /**
- * Container storing the selection of the several searchable fields.
- * The word, reading and translation fields may be searched independently, and
- * some dictionary or search types may only support searching in some of the fields,
- * Additionally, searching in the translation field can be done in three modes. Usually
- * when specifying search parameters, the three translation search choices are mutually
- * exclusive. This class does not enforce the exclusiveness.
+ * Container storing information about search field and match mode selection states.
  *
  * @author Michael Koch
  */
 public class SearchFieldSelection {
     private boolean wordSelected = false;
     private boolean readingSelected = false;
-    private boolean translationExpressionSelected = false;
-    private boolean translationWordsSelected = false;
-    private boolean translationAnySelected = false;
     private boolean translationSelected = false;
+
+    private boolean matchField;
+    private boolean matchWord;
 
     /**
      * Creates a new instance in which none of the fields is selected.
@@ -49,56 +44,57 @@ public class SearchFieldSelection {
     /**
      * Toggle the selection value of a field.
      */
-    public void select( SearchField field, boolean selected) {
-        if (field == SearchField.WORD)
+    public void select( DictionaryEntryField field, boolean selected) {
+        if (field == DictionaryEntryField.WORD)
             wordSelected = selected;
-        else if (field == SearchField.READING)
+        else if (field == DictionaryEntryField.READING)
             readingSelected = selected;
-        else if (field == TranslationSearchField.EXPRESSION) {
-            translationExpressionSelected = selected;
-        }
-        else if (field == TranslationSearchField.WORDS) {
-            translationWordsSelected = selected;
-        }
-        else if (field == TranslationSearchField.ANY) {
-            translationAnySelected = selected;
+        else if (field == DictionaryEntryField.TRANSLATION) {
+            translationSelected = selected;
         }
         else
             throw new IllegalArgumentException();
-
-        translationSelected = translationExpressionSelected|
-            translationWordsSelected|translationAnySelected;
     }
 
     /**
      * Test if a field is selected.
      */
-    public boolean isSelected( SearchField field) {
-        if (field == SearchField.WORD)
+    public boolean isSelected( DictionaryEntryField field) {
+        if (field == DictionaryEntryField.WORD)
             return wordSelected;
-        else if (field == SearchField.READING)
+        else if (field == DictionaryEntryField.READING)
             return readingSelected;
-        else if (field == TranslationSearchField.EXPRESSION)
-            return translationExpressionSelected;
-        else if (field == TranslationSearchField.WORDS)
-            return translationWordsSelected;
-        else if (field == TranslationSearchField.ANY)
-            return translationAnySelected;
+        else if (field == DictionaryEntryField.TRANSLATION)
+            return translationSelected;
         else
             throw new IllegalArgumentException();        
     }
 
     /**
-     * Test if one of the translation search fields is selected.
+     * Test if the configuration of the object is valid as a search parameter.
+     * This is the case if at least one of the search fields is selected and
+     * exactly one of the match modes is selected.
      */
-    public boolean isTranslationSelected() {
-        return translationSelected;
+    public boolean isValid() {
+        return (wordSelected|readingSelected|translationSelected) &&
+            (matchField ^ matchWord);
     }
 
-    /**
-     * Test if any of the search fields is selected.
-     */
-    public boolean hasSelection() {
-        return wordSelected|readingSelected|translationSelected;
+    public void select( MatchMode mode, boolean selected) {
+        if (mode == MatchMode.FIELD)
+            matchField = selected;
+        else if (mode == MatchMode.WORD)
+            matchWord = selected;
+        else
+            throw new IllegalArgumentException();
+    }
+
+    public boolean isSelected( MatchMode mode) {
+        if (mode == MatchMode.FIELD)
+            return matchField;
+        else if (mode == MatchMode.WORD)
+            return matchWord;
+        else
+            throw new IllegalArgumentException();
     }
 } // class SearchFieldSelection

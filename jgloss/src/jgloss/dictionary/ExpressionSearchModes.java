@@ -28,7 +28,7 @@ package jgloss.dictionary;
  *
  * @author Michael Koch
  */
-public class ExpressionSearchModes {
+public class ExpressionSearchModes implements SearchMode {
     public static final SearchMode EXACT = new ExpressionSearchModes( "Exact match");
     public static final SearchMode PREFIX = new ExpressionSearchModes( "Starts with");
     public static final SearchMode SUFFIX = new ExpressionSearchModes( "Ends with");

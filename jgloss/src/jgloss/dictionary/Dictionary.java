@@ -50,15 +50,15 @@ public interface Dictionary {
      * @exception SearchException if the search mode is not supported or there was an error 
      *            during the search.
      */
-    List search( SearchMode searchmode, Object[] parameters) throws SearchException;
+    Iterator search( SearchMode searchmode, Object[] parameters) throws SearchException;
 
     /**
      * Test if this dictionary supports searches of a certain type. If it fully supports the
      * search mode, the search is executed according to the selected mode. If it is partially
      * supported, the search result will be approximated using a different search mode. For example,
      * an "any match" search could be approximated by a "starts with" or an "exact match" search,
-     * which will give some results but not find all possible matches. If a search mode is not 
-     * supported, calling
+     * which will give some results but not find all theroretically possible matches. If a search
+     * mode is not supported, calling
      * {@link #search(SearchMode,Object[]) search) with this search mode will throw an exception.
      *
      * @param SearchMode The search mode to test.
@@ -70,10 +70,14 @@ public interface Dictionary {
     /**
      * Return the search fields for which a search of the given mode is supported for
      * this dictionary implementation. If the given search mode is supported and takes
-     * a {@link SearchFieldSelection SearchFieldSelection} as parameter, at least one search field must be
+     * a {@link SearchFieldSelection SearchFieldSelection} parameter, at least one search field must be
      * selected in the {@link SearchFieldSelection SearchFieldSelection} object returned.
+     * 
+     *
+     * @exception IllegalArgumentException if the search mode is unsupported or does not take a 
+     *            {@link SearchFieldSelection SearchFieldSelection} as parameter.
      */
-    SearchFieldSelection getSupportedFields( Searchmode searchmode);
+    SearchFieldSelection getSupportedFields( SearchMode searchmode);
 
     /**
      * Called when the dictionary is no longer needed. This gives the dictionary the

@@ -28,10 +28,14 @@ package jgloss.dictionary;
  *
  * @author Michael Koch
  */
-public class IndexException extends Exception {
+public class IndexException extends SearchException {
     public IndexException() {}
 
     public IndexException( String message) {
         super( message);
+    }
+
+    public IndexException( Throwable rootCause) {
+        super( rootCause);
     }
 } // class IndexException

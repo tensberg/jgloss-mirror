@@ -153,7 +153,7 @@ public class EDictNIO extends FileBasedDictionary {
      * character.
      */
     protected int readCharacter( ByteBuffer buf) throws BufferUnderflowException {
-        int c = byteToUnsignedByte( buf.get());
+        int c = NumberTools.byteToUnsignedByte( buf.get());
         if (c < 128) { // 1-Byte ASCII
             // uppercase -> lowercase conversion
             if ((c >= 'A') && (c <= 'Z')) c |= 0x20;
@@ -165,9 +165,9 @@ public class EDictNIO extends FileBasedDictionary {
             else if (c == 0x8f) // JIS X 0212 3-Byte Kanji
                 threebyte = true;
             // read second byte
-            c = (c<<8) | byteToUnsignedByte( buf.get());
+            c = (c<<8) | NumberTools.byteToUnsignedByte( buf.get());
             if (threebyte) // read third byte
-                c = (c<<8) | byteToUnsignedByte( buf.get());
+                c = (c<<8) | NumberTools.byteToUnsignedByte( buf.get());
         }
 
         return c;

@@ -24,22 +24,17 @@
 package jgloss.dictionary;
 
 /**
- * Typesafe enumeration of search fields. Search fields are the fields of a dictionary entry
- * which may be searched: word, reading or translations. The translation additionally has
- * different search modes, which are enumerated in subclass 
- * {@link TranslationSearchField TranslationSearchField}.
+ * Thrown if {@link Dictionary#search(SearchMode,Object[]) Dictionary.search is called with a
+ * search mode not supported by that dictionary.
  *
  * @author Michael Koch
  */
-public class SearchField {
-    private String name;
+public class UnsupportedSearchModeException extends SearchException {
+    protected SearchMode searchmode;
 
-    public static final SearchField WORD = new SearchField( "WORD");
-    public static final SearchField READING = new SearchField( "READING");
-
-    protected SearchField( String _name) {
-        this.name = _name;
+    public UnsupportedSearchModeException( SearchMode _searchmode) {
+        this.searchmode = _searchmode;
     }
 
-    public String toString() { return name; }
-} // class SearchField
+    public SearchMode getSearchMode() { return searchmode; }
+} // class UnsupportedSearchModeException

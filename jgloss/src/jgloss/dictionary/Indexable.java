@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import java.nio.ByteBuffer;
+
 /**
  * Interface for classes which support indexing of words, usually {@link Dictionary Dictionary}
  * subclasses. {@link IndexBuilder IndexBuilder} and {@link Index Index} classes use the methods
@@ -60,7 +62,7 @@ public interface Indexable {
      *         <code>&gt;0</code> if it is greater and <code>0</code> if the entries at both
      *         positions is equal.
      */
-    int compare( int pos1, int pos2) throws SearchException;
+    int compare( int pos1, int pos2) throws IndexException;
     /**
      * Compare the data in a buffer to an index entry. The data in the byte buffer must be
      * encoded in a way that is compatible to the encoding of the index entries. For example,
@@ -76,13 +78,16 @@ public interface Indexable {
      *         <code>&gt;0</code> if it is greater and <code>0</code> buffer data and the entry
      *         are identical.
      */
-    int compare( ByteBuffer data, int position) throws SearchException;
+    int compare( ByteBuffer data, int position) throws IndexException;
     /**
-     * Decode the character at a given position in the index. Also returns the position of the
+     * Decode the character at a given position in the indexable data. Also returns the position of the
      * next character.
      *
-     * @param outResult The result of the method invocation will be stored in the provided object.
+     * @param outResult The result of the method invocation will be stored in the object.
      *                  This prevents the need to create an object every time the method is invoked.
+     *                  If <code>null</code> is passed, a new instance will be created.
      */
-    CharData getChar( int position, CharData outResult) throws SearchException;
+    CharData getChar( int position, CharData outResult) throws IndexException;
+
+    EncodedCharacterHandler getEncodedCharacterHandler();
 } // interface indexable

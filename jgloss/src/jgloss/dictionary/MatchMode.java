@@ -24,19 +24,25 @@
 package jgloss.dictionary;
 
 /**
- * Typesafe enumeration of the different search mode for the translation field search.
+ * Typesafe enumeration of match modes.
  *
  * @author Michael Koch
  */
-public class TranslationSearchField extends SearchField {
-    public static final TranslationSearchField EXPRESSION = 
-        new TranslationSearchField( "TRANSLATION_EXPRESSION");
-    public static final TranslationSearchField WORDS = 
-        new TranslationSearchField( "TRANSLATION_WORDS");
-    public static final TranslationSearchField ANY = 
-        new TranslationSearchField( "TRANSLATION_ANY");
+public class MatchMode {
+    private String name;
 
-    protected TranslationSearchField( String _name) {
-        super( _name);
+    /**
+     * Match against the whole entry field.
+     */
+    public static final MatchMode FIELD = new MatchMode( "FIELD");
+    /**
+     * Match against words in the entry field.
+     */
+    public static final MatchMode WORD = new MatchMode( "WORD");
+
+    protected MatchMode( String _name) {
+        this.name = _name;
     }
-} // class TranslationSearchField
+
+    public String toString() { return name; }
+} // class MatchMode

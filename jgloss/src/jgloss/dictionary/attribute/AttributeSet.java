@@ -23,6 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
+import java.util.Iterator;
+
 /**
  * Set of attribute key/object mappings used by {@link DictionaryEntry DictionaryEntry}.
  * Each attribute set may have parent sets from which key/value pairs may be inherited.
@@ -44,17 +46,17 @@ public interface AttributeSet {
      * @param key Attribute key for which the attribute is requested.
      * @param resolveInherited <code>true</code> if the attribute is searched in the parent sets too, 
      *                  <code>false</code> if inherited attributes should be ignored.
-     * @exception NotDefinedException if the attribute is not defined.
+     * @exception AttributeNotDefinedException if the attribute is not defined.
      */
-    Object getAttribute( Attribute key, boolean resolveInherited) throws NotDefinedException;
+    Object getAttribute( Attribute key, boolean resolveInherited) throws AttributeNotDefinedException;
     /**
      * Test if a given attribute is inherited from a parent attribute set.
      *
      * @return <code>true</code> if the attribute is inherited, <code>false</code> if the attribute
      *         is contained in this set.
-     * @exception NotDefinedException if the attribute is not defined in this set or a parent set.
+     * @exception AttributeNotDefinedException if the attribute is not defined in this set or a parent set.
      */
-    boolean isInherited( Attribute key) throws NotDefinedException;
+    boolean isInherited( Attribute key) throws AttributeNotDefinedException;
     /**
      * Returns an iteration of attribute keys defined in the attribute set.
      * 

@@ -36,65 +36,20 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * Base class for dictionaries stored in a local file with separate index file.
- * The J2 1.4 NIO API is used for file access.
- * <h3>JJDX index file format</h3>
  * <p>
- *   A JJDX index file is an array of byte offsets pointing to words in the corresponding
- *   dictionary file. Entries are sorted lexicographically to allow fast word lookup using
- *   binary search. The array is prefixed by a header containing information about the index file.
- *   The JJDX format itself is independent of a specific dictionary field format or character
- *   encoding.
- * </p>
- * <h4>JJDX file header</h4>
- * <p>
- *   The header of an index file consists of several fields containing information about
- *   the index file. Each field is a 4-byte long signed integer stored in big-endian byte order.
- * </p>
- * <table border="1"><tr><th>Field</th><th>Description</th><th>Since</th></tr>
- * <tr><td>Version</td>
- * <td>Version of this JJDX index file format</td>
- * <td>1001</td></tr>
- * <tr><td>Offset</td>
- * <td>
- *   Offset in bytes from the start of the index file to the first index entry.
- *   This is effectively the length of the header.
- *   The information can be used to find the first index entry even if the index
- *   format version differs from the one supported by this index.
- * </td><td>1001</td></tr>
- * <tr><td>Size</td>
- * <td>
- *   Number of index entries (excluding the header).
- *   The size of the index file is Offset+Size*4.
- * </td><td>1001</td></tr>
- * <tr><td>Byte-Order</td>
- * <td>
- *   Byte order used to store the index entries. 1 for big-endian, 2 for
- *   little-endian. (The header always uses big-endian.)
- * </td><td>2001</td></tr>
- * </table>
- * <p>
- *   Currently existing index file versions are 1001, used by JGloss 1.0.2 and earlier, and
- *   2001, used since JGloss 1.0.3.
- * </p>
- * <h4>Index entries</h4>
- * <p>
- *   Index entries are stored as an array of 4-byte long signed integers. Each index entry is the
- *   offset in bytes in the dictionary file to the indexed word (the length on the word is not
- *   specified in the index). The offset is 0-based. Since JJDX version 2001, the byte order
- *   of the index entries is specified in the header. Index entries in 1001 files are always stored 
- *   in big-endian format.
- * </p><p>
- *   Index entries are sorted lexicographically to enable fast lookups. 
- *   The precise rules of lexicographical comparison of two entries are not
- *   specified and depend on the dictionary implementation. For example, an implementation may
- *   apply uppercase to lowercase or katakana to hiragana conversion, changing the sorting order.
- *   If a different implementation wants to use the index file, it has to take care to replicate
- *   this behavior for searches to succeed.
+ * The class tries to provide a framework to implement dictionaries which are stored in a file.
+ * It is assumed that the dictionary file is a sequence of dictionary entries which are separated by
+ * byte-sized entry sepator markers. Each entry is again subdivided into several fields like word,
+ * reading or translation. Field division markers can be more complex. Common tasks like index
+ * management, searching and search type management are implemented in this class. Derived classes
+ * which implement specific dictionary formats must implement the abstract methods which deal
+ * with the differences in file formats, especially the parsing of dictionary entries to
+ * {@link DictionaryEntry DictionaryEntry} instances.
  * </p>
  *
  * @author Michael Koch
  */
-public abstract class FileBasedDictionary implements Dictionary {
+public abstract class FileBasedDictionary implements Dictionary, Indexable {
     /**
      * Generic implementation for file-based dictionaries. The {@link #isInstance(String) isInstance}
      * test reads some bytes from the file to test, converts them to a string using the
@@ -206,35 +161,6 @@ public abstract class FileBasedDictionary implements Dictionary {
     } // class Implementation
 
     /**
-     * Filename extension of a JJDX-format index. Will be added to the filename of the
-     * dictionary to derive the index file name.
-     */
-    public final static String INDEX_EXTENSION = ".jjdx";
-    /**
-     * Current version of the JJDX format.
-     */
-    public final static int JJDX_VERSION = 2001;
-    /**
-     * Field value meaning that the index is in big-endian format.
-     */
-    public final static int JJDX_BIG_ENDIAN = 1;
-    /**
-     * Field value meaning that the index is in little-endian format.
-     */
-    public final static int JJDX_LITTLE_ENDIAN = 2;
-    /**
-     * Offset in bytes to the first index entry in index version 2001. 4 header entries with
-     * 4 bytes each.
-     */
-    public final static int INDEX_OFFSET = 4*4;
-
-    /**
-     * Localizable message resource.
-     */
-    protected final static ResourceBundle messages = 
-        ResourceBundle.getBundle( "resources/messages-dictionary");
-
-    /**
      * File which holds the dictionary.
      */
     protected File dicfile;
@@ -243,7 +169,7 @@ public abstract class FileBasedDictionary implements Dictionary {
      */
     protected FileChannel dicchannel;
     /**
-     * Size of the dictionary in bytes. This equals dicchannel.size(), which is slow to access.
+     * Size of the dictionary in bytes. This equals dicchannel.size(), which is slow.
      */
     protected int dictionarySize;
     /**
@@ -256,47 +182,44 @@ public abstract class FileBasedDictionary implements Dictionary {
      */
     protected CharsetDecoder decoder;
     /**
-     * File which holds the dictionary index.
+     * Stores the character handler created by a call to 
+     * {@link #createCharacterHandler() createCharacterHandler} and used thorough this class.
      */
-    protected File indexfile;
-    /**
-     * Channel used to access the index.
-     */
-    protected FileChannel indexchannel;
-    /**
-     * View of the index file as int buffer.
-     */
-    protected IntBuffer index;
+    protected EncodedCharacterHandler characterHandler;
     /**
      * Name of the dictionary. This will be the filename of the dictionary file.
      */
     protected String name;
     /**
-     * Random number generator. Used for randomized quicksort in index creation.
+     * Container which stores the index data for this dictionary.
      */
-    protected static Random random = new Random();
+    protected IndexContainer indexContainer;
+    /**
+     * Binary search index which is used for expression searches.
+     */
+    protected Index binarySearchIndex;
+    /**
+     * Stores the supported search modes of this dictionary. Initialized in 
+     * {@link #initSearchModes() initSearchModes}.
+     */
+    protected Map supportedSearchModes;
     
     /**
-     * Initializes the dictionary by mapping the dictionary and file into memory and
-     * possibly creatig the indexfile if neccessary.
+     * Initializes the dictionary. The dictionary file is opened and mapped into memory.
+     * The index file is not loaded from the constructor. Before the dictionary can be used,
+     * {@link #loadIndex(boolean) loadIndex} must be successfully called.
      *
      * @dicfile File which holds the dictionary.
-     * @param createindex Flag if the index should be automatically created and written to disk
-     *                    if no index file exists. A write will not be attempted if the directory
-     *                    is not writable. If no index file exists and createindex is
-     *                    false, you have to call {@link #buildIndex(File) buildIndex} to create the
-     *                    index manually.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
-    protected FileBasedDictionary( File dicfile, boolean createindex) 
-        throws IOException, IndexCreationException {
-        this.dicfile = dicfile;
+    protected FileBasedDictionary( File _dicfile) 
+        throws IOException {
+        this.dicfile = _dicfile;
         name = dicfile.getName();
-        System.err.println( MessageFormat.format( messages.getString( "dictionary.load"),
-                                                  new String[] { name }));
 
+        characterHandler = getEncodedCharacterHandler();
         try {
-            decoder = Charset.forName( getEncoding()).newDecoder();
+            decoder = Charset.forName( characterHandler.getEncodingName()).newDecoder();
         } catch (UnsupportedCharsetException ex) {
             // bah...
             // leave decoder==null and use String constructor for byte->char conversion
@@ -307,205 +230,309 @@ public abstract class FileBasedDictionary implements Dictionary {
         dictionarySize = (int) dicchannel.size();
         dictionary = dicchannel.map( FileChannel.MapMode.READ_ONLY, 0, dictionarySize);
 
-        // prepare the index
-        indexfile = new File( dicfile.getAbsolutePath() + INDEX_EXTENSION);
-        // rebuild the index file if it does not exist or the dictionary file was modified
-        // after the index was created
-        if (!indexfile.exists() || dicfile.lastModified()>indexfile.lastModified()) {
-            if (createindex) try {
-                buildIndex( indexfile); // this also initializes the index member variables
-            } catch (IOException ex) {
-                throw new IndexCreationException();
-            }
-        }
-        else try {
-            indexchannel = new RandomAccessFile( indexfile, "r").getChannel();
-            MappedByteBuffer indexbuf = indexchannel.map
-                ( FileChannel.MapMode.READ_ONLY, 0, indexchannel.size());
-            // read index header
-            int version = indexbuf.getInt();
-            if (version > JJDX_VERSION) {
-                System.err.println( MessageFormat.format( messages.getString
-                                                          ( "edict.warning.jjdxversion"),
-                                                          new String[] { getName() }));
-            }
-            int offset = indexbuf.getInt();
-            int size = indexbuf.getInt();
-            
-            // sanity check the index file size
-            if (offset + size*4 != indexfile.length()) {
-                System.err.println( MessageFormat.format( messages.getString
-                                                          ( "edict.warning.jjdxsize"),
-                                                          new String[] { getName() }));
-                // throw an exception which will be caught by the enclosing block and
-                // trigger a rebuild of the index file
-                throw new Exception();
-            }
-            
-            ByteOrder order = ByteOrder.BIG_ENDIAN;
-            if (version >= JJDX_VERSION) { // byte order is introduced in JJDX 2001
-                if (indexbuf.getInt() == JJDX_LITTLE_ENDIAN)
-                    order = ByteOrder.LITTLE_ENDIAN;
-            }
-            
-            // move to index start
-            indexbuf.position( offset);
-            indexbuf.order( order);
-            index = indexbuf.asIntBuffer();
-        } catch (Exception ex) {
-            // the index file is broken, try to rebuild it
-            if (indexchannel != null)
-                indexchannel.close();
-            if (createindex) try {
-                buildIndex( indexfile);
-                return;
-            } catch (IOException ex2) {
-                dicchannel.close();
-                ex2.printStackTrace();
-            }
-            throw new IndexCreationException();
-        }
+        binarySearchIndex = new BinarySearchIndex();
+
+        initSearchModes();
     }
 
     /**
-     * Returns the name of the dictionary file encoding used by this dictionary.
+     * Initialize the map of search modes supported by this dictionary implementation.
      */
-    public abstract String getEncoding();
+    protected void initSearchModes() {
+        // For each search mode which is stored as key in the map, supports() will return true.
+        // For search modes which use a SearchFieldSelection parameter, the SearchFieldSelection
+        // is stored as value of the search mode key and getSupportedFields() will return this
+        // selection.
 
-    public List search( String expression, short searchmode, short resultmode) throws SearchException {
-        List result = new ArrayList( 10);
-        expression = escape( expression);
+        supportedSearchModes = new HashMap( 11);
+        
+        SearchFieldSelection fields = new SearchFieldSelection();
+        fields.select( DictionaryEntryField.WORD, true);
+        fields.select( DictionaryEntryField.READING, true);
+        fields.select( DictionaryEntryField.TRANSLATION, true);
+        fields.select( MatchMode.FIELD, true);
+        fields.select( MatchMode.WORD, true);
 
-        // do a binary search through the index file
+        supportedSearchModes.put( ExpressionSearchModes.EXACT, fields);
+        supportedSearchModes.put( ExpressionSearchModes.PREFIX, fields);
+        supportedSearchModes.put( ExpressionSearchModes.SUFFIX, fields);
+        supportedSearchModes.put( ExpressionSearchModes.ANY, fields);
+    }
+
+    public boolean supports( SearchMode mode, boolean fully) {
+        return supportedSearchModes.containsKey( mode);
+    }
+    
+    public SearchFieldSelection getSupportedFields( SearchMode mode) {
+        SearchFieldSelection fields = (SearchFieldSelection) supportedSearchModes.get( mode);
+        if (fields != null)
+            return fields;
+        else
+            throw new IllegalArgumentException();
+    }
+
+    /**
+     * Load the index file for the dictionary. This method must be called before searches can
+     * be performed. If loading the index fails, {@link #buildIndex() buildIndex} must be called
+     * to create the index file.
+     *
+     * @return <code>true</code> if the index was loaded successfully, <code>false</code> if
+     *         the index file does not exist, does not contain all needed index data or is
+     *         damaged. In this case, call {@link #buildIndex() buildIndex}.
+     * @exeption IOException if reading the index file failed.
+     */
+    public boolean loadIndex() throws IOException {
+        File indexFile = new File( name + FileIndexContainer.EXTENSION);
+
+        // rebuild the index if the dictionary was changed after the index was created
+        if (indexFile.lastModified() < dicfile.lastModified())
+            return false;
+
         try {
-            ByteBuffer exprbuf = ByteBuffer.wrap( expression.getBytes( getEncoding()));
-            byte[] entry = new byte[4096];
-            int match;
-            match = findMatch( exprbuf);
+            indexContainer = new FileIndexContainer( indexFile, false);
+            // insert tests for existence of additional index types here
+            if (indexContainer.hasIndex( binarySearchIndex.getType()))
+                return true;
+        } catch (FileNotFoundException ex) {
+            // no index file, create it
+        } catch (IndexException ex) {
+            // index file damaged, rebuild it
+            indexFile.delete();
+        }
+        // IOExceptions signal an error when accessing the index file and should not be caught here
 
-            if (match != -1) {
-                int firstmatch;
-                int lastmatch;
-                firstmatch = findMatch( exprbuf, match, true);
-                lastmatch = findMatch( exprbuf, match, false);
-                
-                // Several index entries can point to the same entry line. For example
-                // if a word contains the same kanji twice, and words with this kanji are looked up,
-                // one index entry is found for the first occurrence and one for the second. To prevent
-                // adding the entry multiple times, entries are stored in a set.
-                Set seenEntries = new HashSet( 51);
+        return false;
+    }
 
-                // read all matching entries
-                for ( match=firstmatch; match<=lastmatch; match++) {
-                    int matchstart = index.get( match);
-                    int start = matchstart; // start of entry (inclusive)
-                    int end = matchstart+1; // end of entry (exclusive)
-
-                    // test if entry matches search mode
-                    if (searchmode == SEARCH_EXACT_MATCHES ||
-                        searchmode == SEARCH_STARTS_WITH) {
-                        // test if preceeding character marks beginning of word entry
-                        if (start>0 && !isWordStart( start))
-                            continue;
-                    }
-                    if (searchmode == SEARCH_EXACT_MATCHES ||
-                        searchmode == SEARCH_ENDS_WITH) {
-                        // test if following character marks end of word entry
-                        if (start+exprbuf.capacity()+1<dictionarySize &&
-                            !isWordEnd( start+exprbuf.capacity()))
-                            continue;
-                    }
-
-                    // Find beginning of entry line by searching backwards for the entry separator.
-                    // Read bytes are stored back to front in entry array.
-                    byte b;
-                    try {
-                        int curr = entry.length-1;
-                        while (!isEntrySeparator( b=dictionary.get( start-1))) {
-                            try {
-                                entry[curr--] = b;
-                                start--;
-                            } catch (ArrayIndexOutOfBoundsException ex) {
-                                // array too small for entry; grow it
-                                byte[] entry2 = new byte[entry.length*2];
-                                System.arraycopy( entry, 0, entry2, entry.length, entry.length);
-                                entry = entry2;
-                                curr = entry.length-1;
-                                // since start is not decremented, the loop will be repeated at the
-                                // same position, with loop body succeeding this time
-                            }
-                        }
-                    } catch (IndexOutOfBoundsException ex) {
-                        // beginning of dictionary
-                    }
-
-                    // test if entry was already found through another index word
-                    Integer starti = new Integer( start);
-                    if (seenEntries.contains( starti))
-                        continue;
-                    else
-                        seenEntries.add( starti);
-                    
-                    // move read bytes to beginning of entry array
-                    try {
-                        System.arraycopy( entry, entry.length-(matchstart-start), entry, 0,
-                                          matchstart-start);
-                    } catch (IndexOutOfBoundsException ex) {
-                        // matchstart==start, no copying neccessary
-                    }
-                    // read match start char
-                    entry[matchstart - start] = dictionary.get( matchstart);
-
-                    // find end of entry line
-                    int entrylength = matchstart - start + 1;
-                    try {
-                        while (!isEntrySeparator( b=dictionary.get( end))) try {
-                            entry[entrylength++] = b;
-                            end++;
-                        } catch (ArrayIndexOutOfBoundsException ex) {
-                            // array too small for entry; grow it
-                            byte[] entry2 = new byte[entry.length*2];
-                            System.arraycopy( entry, 0, entry2, 0, entrylength);
-                            entry = entry2;
-                        }
-                    } catch (BufferUnderflowException ex) {
-                        // end of dictionary->end of entry
-                    }
-
-                    String entrystring;
-                    // NIO decoder is faster than new String(), but NIO character encoding support is limited
-                    if (decoder != null) {
-                        decoder.reset();
-                        entrystring = decoder.decode( ByteBuffer.wrap( entry, 0, entrylength)).toString();
-                    }
-                    else { // NIO does not support the required encoding
-                        entrystring = unescape( new String( entry, 0, entrylength, getEncoding()));
-                    }
-                    parseEntry( result, entrystring, start, matchstart, expression, exprbuf,
-                                searchmode, resultmode);
+    /**
+     * Rebuild the index file or add missing index data to an already existing index file.
+     * Building indexes may take a long time, so the user should be informed what is happening
+     * before this method is invoked.
+     */
+    public void buildIndex() throws IOException, IndexException {
+        File indexFile = new File( name + FileIndexContainer.EXTENSION);
+        indexContainer = new FileIndexContainer( indexFile, true);
+        try {
+            if (!indexContainer.hasIndex( binarySearchIndex.getType())) {
+                IndexBuilder builder = new BinarySearchIndexBuilder();
+                builder.startBuildIndex( indexContainer, this);
+                boolean commit = false;
+                try {
+                    addIndexTerms( builder);
+                    commit = true;
+                } finally {
+                    builder.endBuildIndex( commit);
                 }
             }
-        } catch (IOException ex) {
-            throw new SearchException( ex);
+            // put creation of additional index types here
+        } finally {
+            indexContainer.endEditing();
         }
-
-        return result;
     }
 
     /**
-     * Test if the character is the first character of an entry in the dictionary.
-     *
-     * @param offset Offset in the dictionary to the first byte of the entry. Guaranteed to be &gt;0 
+     * Create a character handler which understands the character encoding format used by this
+     * dictionary.
      */
-    protected abstract boolean isWordStart( int offset);
+    protected abstract EncodedCharacterHandler createCharacterHandler();
 
     /**
-     * Test if the character is the last character of an entry in the dictionary.
-     *
-     * @param offset Offset in the dictionary to the first byte after the entry.
-     *               Guaranteed to be &lt; dictionary size-1.
+     * Return a character handler which understands the character encoding format used by this
+     * dictionary.
      */
-    protected abstract boolean isWordEnd( int offset);
+    public EncodedCharacterHandler getCharacterHandler() {
+        return characterHandler;
+    }
+
+    public Iterator search( SearchMode searchmode, Object[] parameters) throws SearchException {
+        if (searchmode == ExpressionSearchModes.EXACT ||
+            searchmode == ExpressionSearchModes.PREFIX ||
+            searchmode == ExpressionSearchModes.SUFFIX ||
+            searchmode == ExpressionSearchModes.ANY) {
+            return searchExpression( searchmode, (String) parameters[0], 
+                                     (SearchFieldSelection) parameters[1]);
+        }
+
+        throw new UnsupportedSearchModeException( searchmode);
+    }
+
+    /**
+     * Implements search for expression search modes.
+     */
+    protected Iterator searchExpression( SearchMode searchmode, String expression,
+                                         SearchFieldSelection searchFields) 
+        throws SearchException {
+        expression = escape( expression);
+
+        try {
+            ByteBuffer exprbuf = ByteBuffer.wrap( expression.getBytes
+                                                  ( characterHandler.getEncodingName()));
+            return new ExpressionSearchIterator( searchmode, searchFields, exprbuf.limit(),
+                                                 binarySearchIndex.getEntryPositions
+                                                 ( this, exprbuf, null));
+        } catch (UnsupportedEncodingException ex) {
+            throw new SearchException( ex);
+        }
+    }
+    
+    /**
+     * Copy the data of a single dictionary entry from the dictionary buffer to a newly created
+     * buffer.
+     *
+     * @param matchstart Offset into the entry which is to be copied. This can point anywhere in the
+     *        entry, the method will search the start and end of the entry.
+     * @param entrybuf Buffer into which the entry data is copied. The returned byte buffer will
+     *        wrap this array. If <code>null</code>, a new byte array will be allocated.
+     * @param seenEntries Set of integers with start positions of entries which have already been copied.
+     *        If this is not <code>null</code>, and the set contains the start offset of the entry
+     *        pointed to by <code>matchstart</code>, <code>null</code> is returned instead of the
+     *        entry data. This can be used
+     *        by the caller of <code>copyEntry</code> to filter out duplicate entries.
+     * @param outOffsets Start and end offset of the entry in the dictionary buffer. If this is
+     *        an int array of size 2, the start offset (inclusive) will be written to index 0,
+     *        the end offset (exclusive) to index 1. May be <code>null</code>.
+     * @return A byte buffer containing the dictionary entry data. The buffer will wrap the
+     *         <code>entrybuf</code> buffer, its limit will be the length of the entry data and its
+     *         position will be the byte pointed to by <code>matchstart</code>.
+     */
+    protected ByteBuffer copyEntry( int matchstart, byte[] entrybuf, EntrySet seenEntries,
+                                    int[] outOffsets) {
+        if (entrybuf == null)
+            entrybuf = new byte[8192];
+
+        int start = matchstart; // start of entry (inclusive)
+        int end = matchstart+1; // end of entry (exclusive)
+        
+        // Find beginning of entry line by searching backwards for the entry separator.
+        // Read bytes are stored back to front in entry array.
+        byte b;
+        try {
+            int curr = entrybuf.length-1;
+            while (!isEntrySeparator( b=dictionary.get( start-1))) {
+                try {
+                    entrybuf[curr--] = b;
+                    start--;
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    // array too small for entry; grow it
+                    byte[] entrybuf2 = new byte[entrybuf.length*2];
+                    System.arraycopy( entrybuf, 0, entrybuf2, entrybuf.length, entrybuf.length);
+                    entrybuf = entrybuf2;
+                    curr = entrybuf.length-1;
+                    // since start is not decremented, the loop will be repeated at the
+                    // same position, with loop body succeeding this time
+                }
+            }
+        } catch (IndexOutOfBoundsException ex) {
+            // beginning of dictionary
+        }
+        
+        // test if entry was already found through another index word
+        // Several index entries can point to the same entry line. For example
+        // if a word contains the same kanji twice, and words with this kanji are looked up,
+        // one index entry is found for the first occurrence and one for the second. To prevent
+        // adding the entry multiple times, entries are stored in a set.
+        if (seenEntries!=null && seenEntries.contains( start)) {
+            return null;
+        }
+        
+        // move read bytes to beginning of entry array
+        try {
+            System.arraycopy( entrybuf, entrybuf.length-(matchstart-start), entrybuf, 0,
+                              matchstart-start);
+        } catch (IndexOutOfBoundsException ex) {
+            // matchstart==start, no copying neccessary
+        }
+        // read match start char
+        entrybuf[matchstart - start] = dictionary.get( matchstart);
+        
+        // find end of entry line
+        int entrylength = matchstart - start + 1;
+        try {
+            while (!isEntrySeparator( b=dictionary.get( end))) try {
+                entrybuf[entrylength++] = b;
+                end++;
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                // array too small for entry; grow it
+                byte[] entrybuf2 = new byte[entrybuf.length*2];
+                System.arraycopy( entrybuf, 0, entrybuf2, 0, entrylength);
+                entrybuf = entrybuf2;
+            }
+        } catch (BufferUnderflowException ex) {
+            // end of dictionary->end of entry
+        }
+
+        ByteBuffer out = ByteBuffer.wrap( entrybuf, 0, entrylength);
+        out.position( matchstart-start);
+
+        if (outOffsets != null) {
+            outOffsets[0] = start;
+            outOffsets[1] = end;
+        }
+
+        return out;
+    }
+
+    /**
+     * Create a {@link DictionaryEntry DictionaryEntry} object from the data stored in the byte
+     * buffer. The method converts the byte buffer data to a string and invokes
+     * {@link #parseEntry(String) parseEntry}.
+     */
+    protected DictionaryEntry createEntryFrom( ByteBuffer entry) 
+        throws SearchException {
+        
+        String entrystring;
+        // NIO decoder is faster than new String(), but NIO character encoding support is limited
+        if (decoder != null) {
+            try {
+                entrystring = decoder.decode( entry).toString();
+            } catch (CharacterCodingException ex) {
+                throw new SearchException( ex);
+            }
+        }
+        else { // NIO does not support the required encoding
+            try {
+                entrystring = unescape( new String( entry.array(), entry.arrayOffset(), entry.limit(), 
+                                                    characterHandler.getEncodingName()));
+            } catch (UnsupportedEncodingException ex) {
+                throw new SearchException( ex);
+            }
+        }
+        
+        return parseEntry( entrystring);
+    }
+    
+    /**
+     * Test if the character at the given location is the first in an entry field.
+     * 
+     * @param entry Buffer which holds the dictionary entry.
+     * @param location Location of the first byte of the character.
+     * @param field Field which the location is in.
+     */
+    protected abstract boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field);
+    /**
+     * Test if the character at the given location is the last in an entry field.
+     * 
+     * @param entry Buffer which holds the dictionary entry.
+     * @param location Location of the first byte of the character.
+     * @param field Field which the location is in.
+     */
+    protected abstract boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field);
+    /**
+     * Test if the character at the given location is the first in a word.
+     * 
+     * @param entry Buffer which holds the dictionary entry.
+     * @param location Location of the first byte of the character.
+     * @param field Field which the location is in.
+     */
+    protected abstract boolean isWordStart( ByteBuffer entry, int location, DictionaryEntryField field);
+    /**
+     * Test if the character at the given location is the last in a word.
+     * 
+     * @param entry Buffer which holds the dictionary entry.
+     * @param location Location of the first byte of the character.
+     * @param field Field which the location is in.
+     */
+    protected abstract boolean isWordEnd( ByteBuffer entry, int location, DictionaryEntryField field);
 
     /**
      * Test if the byte is the separator mark for two entries. This implementation uses
@@ -565,133 +592,19 @@ public abstract class FileBasedDictionary implements Dictionary {
     }
     
     /**
-     * Create <CODE>DictionaryEntries</CODE> from the entry string and add them to the
-     * result list. The parsing may create more than one dictionary entry. The method is
-     * passed information about what was matched and where in the dictionary the match was
-     * found so it can decide which entries to add.
+     * Create a {@link DictionaryEntry DictionaryEntry} object from the entry string from the dictionary.
      *
-     * @param result List to which new dictionary entries should be added.
-     * @param entry String from the dictionary file from which the dictionary entries should be
-     *              created. The entry is not unescaped, the {@link #unescape(String) unescape} method
-     *              must be called for each field if the dictionary needs escaping for special characters.
-     * @param entrystart Position in the dictionary of the first byte of the entry.
-     * @param where Position in the dictionary where the expression was found.
-     * @param expression The expression searched.
-     * @param exprbuf Byte Buffer wrapping the expression encoded using the dictionary's character
-     *                encoding.
-     * @param searchmode The search mode.
-     * @param resultmode Determines the wanted type of results.
+     * @param entry Entry string as found in the dictionary.
      */
-    protected abstract void parseEntry( List result, String entry, int entrystart, int where,
-                                        String expression, ByteBuffer exprbuf, short searchmode,
-                                        short resultmode);
+    protected abstract DictionaryEntry parseEntry( String entry);
     
-    /**
-     * Returns the index of an index entry which matches a word. If there is more than one match,
-     * it is not defined which match is returned. If no match is found, <code>-1</code>
-     * is returned.
-     */
-    protected int findMatch( ByteBuffer expression) {
-        // do a binary search
-        int from = 0;
-        int to = index.limit()-1;
-        int match = -1;
-        int curr;
-
-        // create an independent instance of dictionary to ensure thread safety
-        ByteBuffer dictionary = this.dictionary.duplicate();
-        // search matching entry
-        do {
-            curr = (to-from)/2 + from;
-
-            int c = compare( expression, 0, expression.capacity(), dictionary, index.get( curr));
-            if (c > 0)
-                from = curr+1;
-            else if (c < 0)
-                to = curr-1;
-            else
-                match = curr;
-        } while (from<=to && match==-1);
-
-        return match;
-    }
-
-    /**
-     * Searches the index backwards/forwards from a matching entry to the first/last match of an expression.
-     *
-     * @param expression Expression to match.
-     * @param match Offset in the index to a matching entry.
-     * @param first <CODE>true</CODE> if the first matching entry should be returned,
-     *              <CODE>false</CODE> if the last matching entry is returned.
-     * @return Offset in the index to the first/last matching entry.
-     */
-    protected int findMatch( ByteBuffer expression, int match, boolean first) {
-        int direction = first ? -1 : 1;
-        
-        // create an independent instance of dictionary to ensure thread safety
-        ByteBuffer dictionary = this.dictionary.duplicate();
-        try {
-            while (compare( expression, 0, expression.capacity(), dictionary, 
-                            index.get( match+direction)) == 0)
-                match += direction;
-        } catch (IndexOutOfBoundsException ex) {
-            // match is now either 0 or index.size - 1
-        }
-
-        return match;
-    }
-
     public void dispose() {
         try {
             dicchannel.close();
-            if (indexchannel != null)
-                indexchannel.close();
+            if (indexContainer != null)
+                indexContainer.close();
         } catch (IOException ex) {
             ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Create the index file for the dictionary.
-     *
-     * @param indexfile File to which the index should be saved.
-     */
-    public void buildIndex( File indexfile) throws IOException {
-        synchronized (dictionary) {
-            System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
-                                                      new String[] { getName() }));
-
-            this.indexfile = indexfile;
-            // delete old (invalid) index file if any
-            indexfile.delete();
-
-            DataOutputStream indexstream
-                = new DataOutputStream( new BufferedOutputStream( new FileOutputStream( indexfile)));
-            
-            // write index header (big endian format)
-            indexstream.writeInt( JJDX_VERSION);
-            indexstream.writeInt( INDEX_OFFSET); // offset to first index entry
-            indexstream.writeInt( 0); // number of index entries (currently unknown)
-            // use platform's native byte order
-            indexstream.writeInt( (ByteOrder.nativeOrder()==ByteOrder.BIG_ENDIAN) ? 
-                                  JJDX_BIG_ENDIAN : JJDX_LITTLE_ENDIAN);
-            
-            // add index entries
-            int entries = addIndexRange( indexstream, 0, (int) dictionarySize);
-
-            // reopen the index file for random access and map it into memory
-            indexstream.close();
-            RandomAccessFile indexra = new RandomAccessFile( indexfile, "rw");
-            // write number of entries
-            indexra.seek( 4*2);
-            indexra.writeInt( entries);
-            indexchannel = indexra.getChannel();
-            index = indexchannel.map( FileChannel.MapMode.READ_WRITE, INDEX_OFFSET,
-                                      indexchannel.size()-INDEX_OFFSET).order( ByteOrder.nativeOrder())
-                .asIntBuffer();
-
-            // sort index
-            quicksortIndex( 0, entries-1, dictionary, dictionary.duplicate());
         }
     }
 
@@ -703,186 +616,102 @@ public abstract class FileBasedDictionary implements Dictionary {
     public String getName() {
         return name;
     }
-
+    
     /**
      * Parses a subset of the dictionary file for index creation.
-     * <p>
-     * The method iterates over all characters in the range <CODE>start-end</CODE> by repeatedly
-     * calling {@link #readNextCharacter(boolean) readNextCharacter}, which decides if the character
-     * at the current position is part of an indexable word or not and how long the word has
-     * to be in order to be added to the index. Since the position of {@link #dictionary dictionary}
-     * is only modified in {@link #readNextCharacter(boolean) readNextCharacter}, the method may skip
-     * over an arbitrary number of bytes, e. g. to leave out non-indexable fields.
-     * At the end of an indexable word it is added to the index by a call to
-     * {@link #addIndexEntry(int) addIndexEntry}.
-     * </p>
      *
-     * @param out Output stream to which index entries will be appended.
-     * @param start Byte offset in the dictionary where the parsing should start (inclusive).
-     * @param end Byte offset in the dictionary where the parsing should end (exclusive).
      * @return The number of index entries created.
      */
-    protected int addIndexRange( DataOutputStream out, int start, int end) throws IOException {
+    protected int addIndexTerms( IndexBuilder builder) throws IOException, IndexException {
         int indexsize = 0;
-        dictionary.position( start);
-        boolean inWord = false;
-        int wordstart = start;
-        int wordlength = 0;
-        int wantedlength = 2;
-        try {
-            int character = 0;
-            skipEntries( dictionary, 0);
-            while (dictionary.position() < dictionarySize) {
-                int position = dictionary.position();
-                character = readCharacter( dictionary);
-                int type = isWordCharacter( character, inWord); // changes position
-                skipEntries( dictionary, character);
-                if (inWord) {
-                    if (type < 0) {
-                        // end of word; add index entry the current word is long enough
-                        if (wordlength >= wantedlength) {
-                            addIndexEntry( out, wordstart);
-                            indexsize++;
-                        }
-                        inWord = false;
-                    }
-                    else if (type == 0) {
-                        // since we are inWord, this is guaranteed not to be the first character
-                        // of an index word, the index entry won't be added once for type==0 and once
-                        // for type==-1 at the end of the word
-                        addIndexEntry( out, position);
+        dictionary.position( 0);
+        ArrayList entryStarts = new ArrayList( 25);
+        
+        DictionaryEntryField field = moveToNextField( dictionary, 0);
+        while (dictionary.position() < dictionarySize) {
+            boolean inWord = false;
+            int c;
+            CharacterClass clazz;
+            int entryStart;
+            DictionaryEntryField currentField = field;
+            do {
+                entryStart = dictionary.position();
+                c = characterHandler.convertCharacter( characterHandler.readCharacter( dictionary));
+                clazz = characterHandler.getCharacterClass( c, inWord);
+                field = moveToNextField( dictionary, c);
+            } while (clazz == CharacterClass.OTHER);
+            entryStarts.clear();
+            entryStarts.add( new Integer( entryStart));
+            if (clazz == CharacterClass.ROMAN_WORD)
+                inWord = true;
+
+            int entryLength = 1; // entry length in number of characters
+            int entryEnd;
+            CharacterClass clazz2;
+            do {
+                entryLength++;
+                entryEnd = dictionary.position();
+                c = characterHandler.convertCharacter( characterHandler.readCharacter( dictionary));
+                clazz2 = characterHandler.getCharacterClass( c, inWord);
+
+                if (clazz == CharacterClass.KANJI && clazz2==clazz)
+                    entryStarts.add( new Integer( dictionary.position()));
+            } while (clazz2 == clazz);
+            
+            if (clazz==CharacterClass.KANJI || 
+                clazz==CharacterClass.HIRAGANA ||
+                clazz==CharacterClass.KATAKANA ||
+                clazz==CharacterClass.ROMAN_WORD && entryLength >= 3) {
+                for ( int i=0; i<entryStarts.size(); i++) {
+                    entryStart = ((Integer) entryStarts.get( i)).intValue();
+                    if (builder.addEntry( entryStart, entryEnd-entryStart, currentField))
                         indexsize++;
-                        wordlength++;
-                    }
-                    else { // in normal word
-                        // use the minimum of all wanted lengths to decide if the word should be added
-                        if (type < wantedlength)
-                            type = wantedlength;
-                        wordlength++;
-                    }
-                }
-                else { // not in word
-                    if (type >= 0) {
-                        // start of word
-                        inWord = true;
-                        wordstart = position;
-                        wordlength = 1;
-                        wantedlength = type;
-                        // if type==0 (add index entry immediately) the short wantedlength guarantees
-                        // that an entry will be added at the end of the word
-                    }
                 }
             }
-        } catch (BufferUnderflowException ex) {
-            // end of the index reached in readNextCharacter
+            
+            field = moveToNextField( dictionary, c);
         }
-
+        
         return indexsize;
     }
-
+    
     /**
-     * Reads a character from the byte buffer, possibly modifying it. Modifications may be
-     * uppercase->lowercase or katakana->hiragana.
-     *
-     * @param buf Byte buffer from which the character should be read.
-     * @return The character read. The character does not have to be in unicode (Java character)
-     *         representation, as long as a comparison of two values returned by
-     *         the method equals the lexicographic comparison of the represented characters.
-     * @exception BufferUnderflowException When the end of the buffer is reached.
-     */
-    protected abstract int readCharacter( ByteBuffer buf) throws BufferUnderflowException;
-
-    /**
-     * Decide how a character should be treated for index creation.
-     *
-     * @param character The character to decide. This is a character returned by 
-     *                  {@link #readCharacter( ByteBuffer) readCharacter}, so it is not neccessary in
-     *                  unicode representation.
-     * @param inWord <CODE>true</CODE> if the current character follows a character in a indexable
-     *               word. This can be used to change the meaning of characters depending on their position.
-     * @return -1, if the character is not part of an indexable word; 0 if an index entry should
-     *         be created immediately at the character position; n (&gt;0): add an index entry
-     *         for the word containing this character if it has more than n characters.
-     */
-    protected abstract int isWordCharacter( int character, boolean inWord);
-
-    /**
-     * Skip an arbitrary number of characters during index creation. This method is called at index
+     * Skip to the next indexable field. This method is called at index
      * creation time before any character is read from the dictionary and after each read character.
-     * It can be used to skip entry fields which should not be indexed. This default implementation
-     * does nothing.
+     * It can be used to skip entry fields which should not be indexed.
      *
      * @param buf Skip entries in this buffer by moving the current position of the buffer.
      * @param character The last character read from the buffer, or 0 at the first invocation. The
-     *                  character format is dependent on {@link #readCharacter(ByteBuffer) readCharacter}
+     *                  character format is dependent on 
+     *                  {@link EncodedCharacterHandler#readCharacter(ByteBuffer) readCharacter}
      *                  and not neccessary unicode.
+     * @return The type of the field the method moved to.
      */
-    protected void skipEntries( ByteBuffer buf, int character) {}
+    protected abstract DictionaryEntryField moveToNextField( ByteBuffer buf, int character);
 
     /**
-     * Add a word entry to the index. This method will be called by 
-     * {@link #addIndexRange(int,int) addIndexRange} during index creation.
-     *
-     * @param out Output stream to which the index entry will be written. The integer values will 
-     *            be written in the operating system's byte order.
-     * @param offset Offset in the dictionary file where the word starts.
+     * Return the type of the entry field at the given location.
      */
-    protected void addIndexEntry( DataOutputStream out, int offset) throws IOException {
-        if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN)
-            out.writeInt( offset);
-        else { // shuffle bytes
-            out.write( offset); // writes the low eight bits of offset
-            offset >>>= 8;
-            out.write( offset);
-            offset >>>= 8;
-            out.write( offset);
-            offset >>>= 8;
-            out.write( offset);
+    protected abstract DictionaryEntryField getFieldType( ByteBuffer buf, int location);
+
+    public int compare( int pos1, int pos2) throws IndexException {
+        try {
+            return compare( dictionary, pos1, Integer.MAX_VALUE, dictionary.duplicate(), pos2);
+        } catch (java.nio.charset.CharacterCodingException ex) {
+            throw new IndexException( ex);
+        }
+    }
+
+    public int compare( ByteBuffer data, int position) throws IndexException {
+        try {
+            return compare( data, 0, data.limit(), dictionary, position);
+        } catch (CharacterCodingException ex) {
+            throw new IndexException( ex);
         }
     }
 
     /**
-     * Sorts a part of the index array using randomized quicksort. Call this with
-     * (0, index lenght-1) to sort the whole index.
-     */
-    protected void quicksortIndex( int left, int right, ByteBuffer buf1, ByteBuffer buf2) 
-        throws IOException {
-        if (left >= right)
-            return;
-
-        int middle = left + random.nextInt( right-left+1);
-        int mv = index.get( middle);
-        index.put( middle, index.get( left));
-
-        int l = left + 1; // l is the first index which compares greater mv
-        for ( int i=l; i<=right; i++) {
-            if (compare( buf1, mv, Integer.MAX_VALUE, buf2, index.get( i)) > 0) {
-                if (i > l) {
-                    int t = index.get( i);
-                    index.put( i, index.get( l));
-                    index.put( l, t);
-                }
-                l++;
-            }
-        }
-        l--;
-        index.put( left, index.get( l));
-        index.put( l, mv);
-        
-        // sorting the smaller subset first will keep the stack depth small
-        if (l < (left+right)/2) {
-            quicksortIndex( left, l-1, buf1, buf2);
-            quicksortIndex( l+1, right, buf1, buf2);
-        }
-        else {
-            quicksortIndex( l+1, right, buf1, buf2);
-            quicksortIndex( left, l-1, buf1, buf2);
-        }
-    }
-
-
-    /**
-     * Lexicographic comparison of to byte buffers.
+     * Lexicographic comparison of two byte buffers.
      *
      * @param buf1 First buffer to compare.
      * @param i1 Offset in the first buffer to the first string.
@@ -893,14 +722,15 @@ public abstract class FileBasedDictionary implements Dictionary {
      * @param i2 Offset in the second buffer to the second string.
      * @return -1 if i1&lt;i2, 1 if i1&gt;i2, 0 for equality.
      */
-    protected int compare( ByteBuffer buf1, int i1, int length, ByteBuffer buf2, int i2) {
+    protected int compare( ByteBuffer buf1, int i1, int length, ByteBuffer buf2, int i2) 
+        throws CharacterCodingException {
         buf1.position( i1);
         buf2.position( i2);
         int end = (int) Math.min( Integer.MAX_VALUE, (long) i1 + (long) length);
         try {
             while (buf1.position() < end) {
-                int b1 = readCharacter( buf1);
-                int b2 = readCharacter( buf2);
+                int b1 = characterHandler.readCharacter( buf1);
+                int b2 = characterHandler.readCharacter( buf2);
                 if (b1 < b2)
                     return -1;
                 else if (b1 > b2)
@@ -916,14 +746,124 @@ public abstract class FileBasedDictionary implements Dictionary {
         return 0; // equality
     }
 
-    /**
-     * Converts the byte value to an int with the value of the 8 bits
-     * interpreted as an unsigned byte.
-     *
-     * @param b The byte value to convert.
-     * @return The unsigned byte value of b.
-     */
-    protected final static int byteToUnsignedByte( byte b) {
-        return b & 0xff;
+    public Indexable.CharData getChar( int position, CharData result) throws IndexException {
+        if (result == null)
+            result = new Indexable.CharData();
+        dictionary.position( position);
+        try {
+            result.character = characterHandler.readCharacter( dictionary);
+        } catch (java.nio.charset.CharacterCodingException ex) {
+            throw new IndexException( ex);
+        }
+        result.position = dictionary.position();
+
+        return result;
     }
+
+    /**
+     * Iterator returning results from an expression search.
+     */
+    protected class ExpressionSearchIterator implements Iterator {
+        protected SearchMode searchmode;
+        protected SearchFieldSelection fields;
+        protected int expressionLength;
+        protected Index.Iterator matchingIndexEntries;
+        protected byte[] entrybuf = new byte[8192];
+        protected EntrySet seenEntries = new EntrySet();
+        protected int[] entryOffsets = new int[2];
+        protected DictionaryEntry nextEntry = null;
+
+        public ExpressionSearchIterator( SearchMode _searchmode, SearchFieldSelection _fields,
+                                         int _expressionLength,
+                                         Index.Iterator _matchingIndexEntries) {
+            this.searchmode = _searchmode;
+            this.fields = _fields;
+            this.expressionLength = _expressionLength;
+            this.matchingIndexEntries = _matchingIndexEntries;
+            generateNextEntry();
+        }
+
+        public boolean hasNext() { return nextEntry != null; }
+        public Object next() throws NoSuchElementException {
+            if (!hasNext())
+                throw new NoSuchElementException();
+            DictionaryEntry current = nextEntry;
+            generateNextEntry(); // changes nextEntry
+            return current;
+        }
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
+         * Set the {@link #nextEntry nextEntry} variable to the next dictionary entry matching
+         * the search. If there are no more entries, it will be set to <code>null</code>.
+         */
+        protected void generateNextEntry() {
+            nextEntry = null;
+            while (nextEntry==null && matchingIndexEntries.hasNext()) {
+                int match = matchingIndexEntries.next();
+
+                ByteBuffer entry = copyEntry( match, entrybuf, seenEntries, entryOffsets);
+                if (entry == null) // this entry has already been found
+                    continue;
+
+                match = entry.position(); // location of match in entry buffer
+                DictionaryEntryField field = getFieldType( entry, match);
+                try {
+                    if (!fields.isSelected( field))
+                        continue; // field is not selected by the user
+                } catch (IllegalArgumentException ex) {
+                    // field not WORD, READING or TRANSLATION
+                    continue;
+                }
+
+                // test if entry matches search mode
+                if (searchmode == ExpressionSearchModes.EXACT ||
+                    searchmode == ExpressionSearchModes.PREFIX) {
+                    // test if preceeding character marks beginning of word entry
+                    if (match>0 && 
+                        !(fields.isSelected( DictionaryEntryField.WORD) ? 
+                          isWordStart( entry, match, field) :
+                          isFieldStart( entry, match, field)))
+                        continue;
+                }
+                if (searchmode == ExpressionSearchModes.EXACT ||
+                    searchmode == ExpressionSearchModes.SUFFIX) {
+                    // test if following character marks end of word entry
+                    if (match+expressionLength+1<entry.limit() &&
+                        !(fields.isSelected( DictionaryEntryField.WORD) ? 
+                          isWordEnd( entry, match, field) :
+                          isFieldEnd( entry, match, field)))
+                        continue;
+                }
+                    
+                try {
+                    nextEntry = createEntryFrom( entry);
+                    seenEntries.add( entryOffsets[0]); // start offset of entry
+                } catch (SearchException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Set of integers which represent entry start indexes in the dictionary.
+     */
+    private static class EntrySet {
+        private HashSet entries;
+
+        public EntrySet() {
+            entries = new HashSet( 51);
+        }
+
+        public boolean contains( int entry) {
+            return (entries.contains( new Integer( entry)));
+        }
+
+        public void add( int entry) {
+            entries.add( new Integer( entry));
+        }
+    } // class EntrySet
 } // class FileBasedDictionary

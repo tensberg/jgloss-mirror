@@ -86,4 +86,9 @@ public interface EncodedCharacterHandler {
      * @return The character class of the tested character.
      */
     CharacterClass getCharacterClass( int character, boolean inWord);
+
+    /**
+     * Return the name of the encoding supported by this handler.
+     */
+    String getEncodingName();
 } // interface EncodedCharacterHandler

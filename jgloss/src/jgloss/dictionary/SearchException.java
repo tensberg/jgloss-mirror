@@ -29,8 +29,6 @@ package jgloss.dictionary;
  * @author Michael Koch
  */
 public class SearchException extends Exception {
-    private Exception rootCause;
-
     /**
      * Constructs a SearchException without a detail message.
      */
@@ -48,16 +46,7 @@ public class SearchException extends Exception {
     /**
      * Constructs a SearchException which wraps another exception.
      */
-    public SearchException( Exception rootCause) {
-        super( rootCause.getClass().getName() + ": " + rootCause.getMessage());
-        this.rootCause = rootCause;
-    }
-
-    /**
-     * Returns the exception which caused the search exception to be thrown.
-     * If there is no root exception, <code>null</code> will be returned.
-     */
-    public Exception getRootCause() {
-        return rootCause;
+    public SearchException( Throwable rootCause) {
+        super( rootCause);
     }
 } // class SearchException

@@ -36,9 +36,13 @@ public class CharacterClass {
      */
     public static final CharacterClass KANJI = new CharacterClass( "KANJI");
     /**
-     * The character is a kana character. This includes the katakana dash.
+     * The character is a hiragana character.
      */
-    public static final CharacterClass KANA = new CharacterClass( "KANA");
+    public static final CharacterClass HIRAGANA = new CharacterClass( "HIRAGANA");
+    /**
+     * The character is a katakana character. This includes the katakana dash.
+     */
+    public static final CharacterClass KATAKANA = new CharacterClass( "KATAKANA");
     /**
      * The character is part of a roman word. This includes all characters of the western
      * alphabet, may include numbers and other characters like dashes in the middle of a word.

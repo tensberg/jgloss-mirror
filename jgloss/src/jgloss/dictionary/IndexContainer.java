@@ -25,6 +25,7 @@ package jgloss.dictionary;
 
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Container which can store the data for several different index types. Each index type
@@ -47,6 +48,14 @@ public interface IndexContainer {
      * Can be called in access and edit mode.
      */
     boolean hasIndex( int indexType);
+
+    /**
+     * Return the byte order used by this index container for <code>ByteBuffers</code>.
+     * {@link Index Indexes} and {@link IndexBuilder IndexBuilders} should use this byte order
+     * to guarantee that the index file is portable. <code>ByteBuffers</code> returned by
+     * {@link getIndexData(int) getIndexData} are set to the byte order returned by this method.
+     */
+    ByteOrder getIndexByteOrder();
 
     /**
      * Fetch the index data for a particular index type for read access. {@link Index Index}

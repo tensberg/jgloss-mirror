@@ -32,37 +32,12 @@ package jgloss.dictionary;
  */
 public interface IndexBuilder {
     /**
-     * Typesafe enumeration of field types of dictionary entries. Used as parameter in method
-     * {@link IndexBuilder#addEntry IndexBuilder.addEntry}.
-     */
-    public class DictionaryField {
-        /**
-         * The index entry is in the word field of a dictionary entry.
-         */
-        public static final DictionaryField WORD = new DictionaryField( "WORD");
-        /**
-         * The index entry is in the reading field of a dictionary entry.
-         */
-        public static final DictionaryField READING = new DictionaryField( "READING");
-        /**
-         * The index entry is in the translation field of a dictionary entry.
-         */
-        public static final DictinoaryField TRANSLATION = new DictionaryField( "TRANSLATION");
-        /**
-         * The index entry is in some other field of a dictionary entry.
-         */
-        public static final DictionaryField OTHER = new DictionaryField( "OTHER");
-
-        private String type;
-
-        private DictionaryField( String _type) {
-            this.type = _type;
-        }
-
-        public String toString() { return type; }
-    } // class DictionaryField
-
-    void startBuildIndex( IndexContainer container, Indexable dictionary);
+     * Begin building a new index.
+     *
+     * @param container Container to which the index should be added.
+     * @param dictionary Dictionary in which the index entries are stored.
+     */ 
+    void startBuildIndex( IndexContainer container, Indexable dictionary) throws IndexException;
     /**
      * Add an entry to the index structure. This method is called repeatedly by the index
      * container.
@@ -72,8 +47,17 @@ public interface IndexBuilder {
      * @param length Length of the index entry, encoded in a 
      *               <code>Indexable</code>-dependent way. <code>(location+length)</code> is the
      *               first location not belonging to the index entry.
-     * @param field Dictionary entry field in which the index entry is contained.
+     * @param field Dictionary entry field in which the index entry is contained. The index builder
+     *              may ignore index entries for certain fields.
+     * @return <code>true</code> if the entry was added to the index, <code>false</code> if it
+     *         was ignored.
      */
-    void addEntry( int location, int length, DictionaryField field);
-    void endBuildIndex();
+    boolean addEntry( int location, int length, DictionaryEntryField field) throws IndexException;
+    /**
+     * End the index build.
+     *
+     * @param commit <code>true</code> if the generated index data should be stored, <code>false</code>
+     *        if some error occurred during index creation and the index data should be discarded.
+     */
+    void endBuildIndex( boolean commit) throws IndexException;
 } // interface IndexBuilder

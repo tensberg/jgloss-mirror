@@ -23,6 +23,9 @@
 
 package jgloss.dictionary;
 
+import java.nio.ByteBuffer;
+import java.util.NoSuchElementException;
+
 /**
  * An index is a store for locations in a dictionary which enables fast lookups of
  * entries matching certain parameters. Entry locations are encoded as positive integers,
@@ -47,7 +50,7 @@ public interface Index {
      */
     public interface Iterator {
         public boolean hasNext();
-        public int next();
+        public int next() throws NoSuchElementException;
     } // interface Iterator
 
     /**
@@ -63,7 +66,7 @@ public interface Index {
      * Sets the index container from which the index data is read. The container object must contain
      * index data of the type returned by {@link #getType() getType}.
      */
-    void setContainer( IndexContainer container);
+    void setContainer( IndexContainer container) throws IndexException ;
 
     /**
      * Returns an iterator over index entries matching certain criteria.
@@ -75,5 +78,5 @@ public interface Index {
      *                   index does not use additional search parameters.
      */
     Iterator getEntryPositions( Indexable dictionary, ByteBuffer expression,
-                                Object[] parameters);
+                                Object[] parameters) throws IndexException;
 } // interface index

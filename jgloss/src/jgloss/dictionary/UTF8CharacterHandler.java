@@ -87,8 +87,10 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
     public CharacterClass getCharacterClass( int c, boolean inWord) {
         if (c>=0x4e00 && c<0xa000)
             return CharacterClass.KANJI;
-        else if (c>=0x3000 && c<0x3100)
-            return CharacterClass.KANA; // katakana, hiragana
+        else if (c>=0x3040 && c<0x30a0)
+            return CharacterClass.HIRAGANA;
+        else if (c>=0x30a0 && c<0x3100)
+            return CharacterClass.KATAKANA;
         else if (c == '-')
             return (inWord ? CharacterClass.ROMAN_WORD : CharacterClass.OTHER);
         else if (Character.isLetterOrDigit( (char) c)) // any other characters
@@ -96,4 +98,6 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
         else
             return CharacterClass.OTHER; // not in word
     }
+
+    public String getEncodingName() { return "UTF-8"; }
 } // class UTF8EncodingConverter

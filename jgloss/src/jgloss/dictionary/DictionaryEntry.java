@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.dictionary.attribute.*;
+
 /**
  * Single entry in a dictionary which supports the {@link Dictionary Dictionary} interface.
  *

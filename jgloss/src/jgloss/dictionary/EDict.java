@@ -620,7 +620,7 @@ public class EDict implements Dictionary {
         boolean inword = false;
         int entry = 0;
         for ( int i=start; i<end; i++) {
-            int c = byteToUnsignedByte( dictionary[i]);
+            int c = NumberTools.byteToUnsignedByte( dictionary[i]);
             if (inword) {
                 if (!(alphaoreuc( (byte) c) || c=='-'|| c=='\\')) {
                     inword = false;
@@ -632,10 +632,11 @@ public class EDict implements Dictionary {
                         if (dictionary[entry] < 0) {
                             // add index entry for every kanji in word.
                             int j = entry + 2;
-                            if (byteToUnsignedByte( dictionary[entry]) == 0x8f) // JIS X 0212 3-Byte Kanji
+                            if (NumberTools.byteToUnsignedByte( dictionary[entry])
+                                == 0x8f) // JIS X 0212 3-Byte Kanji
                                 entry++;
                             while (j < i) {
-                                int cj = byteToUnsignedByte( dictionary[j]);
+                                int cj = NumberTools.byteToUnsignedByte( dictionary[j]);
                                 if (cj >= 0xb0 || cj == 0x8f) {
                                     addIndexEntry( j);
                                 }
@@ -729,8 +730,8 @@ public class EDict implements Dictionary {
         byteInChar = 1;
 
         for ( int i=0; i<len; i++) {
-            c1 = byteToUnsignedByte( str1[i+off1]);
-            c2 = byteToUnsignedByte( str2[i+off2]);
+            c1 = NumberTools.byteToUnsignedByte( str1[i+off1]);
+            c2 = NumberTools.byteToUnsignedByte( str2[i+off2]);
 
             if (backwardsCompatible) {
                 if ((i % 2) == 0) {
@@ -781,8 +782,8 @@ public class EDict implements Dictionary {
         byteInChar = 1;
 
         while (i1<dictionaryLength && i2<dictionaryLength) {
-            c1 = convertByteInChar( byteToUnsignedByte( dictionary[i1]), false);
-            c2 = convertByteInChar( byteToUnsignedByte( dictionary[i2]), true);
+            c1 = NumberTools.convertByteInChar( byteToUnsignedByte( dictionary[i1]), false);
+            c2 = NumberTools.convertByteInChar( byteToUnsignedByte( dictionary[i2]), true);
 
             if (c1 != c2) break;
 
@@ -917,17 +918,6 @@ public class EDict implements Dictionary {
         // what the hell...
         dictionary = null;
         index = null;
-    }
-
-    /**
-     * Converts the byte value to an int with the value of the 8 bits
-     * interpreted as an unsigned byte.
-     *
-     * @param b The byte value to convert.
-     * @return The unsigned byte value of b.
-     */
-    protected final static int byteToUnsignedByte( byte b) {
-        return b & 0xff;
     }
 
     public boolean equals( Object o) {
