@@ -718,14 +718,14 @@ public class JGlossServlet extends HttpServlet {
             if (referer != null) {
                 int index = referer.lastIndexOf( req.getServletPath() + "/");
                 if (index != -1) {
-                    referer = referer.substring( index+req.getServletPath().length());
                     // the '/' is not removed
-                    Object[] out = JGlossURLRewriter.parseEncodedPath( referer);
+                    Object[] out = JGlossURLRewriter.parseEncodedPath
+                        ( referer.substring( index+req.getServletPath().length()));
                     if (out != null)
                         referer = (String) out[2];
                 }
                 connection.setRequestProperty( "referer", referer);
-                getServletContext().log( "referer: " + referer);
+                getServletContext().log( "referer: " + referer + " (" + req.getHeader( "referer") + ")");
             }
             else
                 getServletContext().log( "no referrer");
@@ -779,7 +779,7 @@ public class JGlossServlet extends HttpServlet {
      * an element in the list is removed.
      * 
      * @param s String containing a list of items.
-     * @param separator Character which separates the items. The special character ' ' means
+     * @param separator Character which separates the items. The special character ' ' will
      *        split on any whitespace.
      * @return List of strings with whitespace at beginning and end removed.
      */
