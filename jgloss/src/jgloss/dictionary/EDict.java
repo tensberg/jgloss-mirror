@@ -238,13 +238,13 @@ public class EDict implements Dictionary {
                         c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[firstmatch],
                                      expr_euc.length, xjdxIndex);
                     if (c != 0) { // First non-matching entry. End search.
-                        firstmatch++;
                         break;
                     }
                     else {
                         firstmatch--;
                     }
                 }
+                firstmatch++;
                 // search forward for the last matching entry
                 while (lastmatch <= to) {
                     // read entry
@@ -253,13 +253,13 @@ public class EDict implements Dictionary {
                         c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[lastmatch],
                                      expr_euc.length, xjdxIndex);
                     if (c != 0) { // First non-matching entry. End search.
-                        lastmatch--;
                         break;
                     }
                     else {
                         lastmatch++;
                     }
                 }
+                lastmatch--;
 
                 // Several index entries can point to the same entry line. For example
                 // if a word contains the same kanji twice, and words with this kanji are looked up,
