@@ -561,11 +561,11 @@ public class JGlossFrame extends JPanel implements ActionListener {
         exportMenu = new JMenu( JGloss.messages.getString( "main.menu.export"));
         exportMenu.setMnemonic( JGloss.messages.getString( "main.menu.export.mk").charAt( 0));
         exportMenu.setEnabled( false);
-        exportMenu.add( UIUtilities.createMenuItem( exportXMLAction));
         exportMenu.add( UIUtilities.createMenuItem( exportHTMLAction));
         exportMenu.add( UIUtilities.createMenuItem( exportPlainTextAction));
         exportMenu.add( UIUtilities.createMenuItem( exportLaTeXAction));
         exportMenu.add( UIUtilities.createMenuItem( exportAnnotationListAction));
+        exportMenu.add( UIUtilities.createMenuItem( exportXMLAction));
         menu.add( exportMenu);
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( printAction));

@@ -700,6 +700,7 @@
           <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
         the annotations for hidden words will not be written to the generated document.
       </para>
+
       <sect2><title><acronym>HTML</acronym></title>
         <para>
           If you export the document in HTML format, the document can viewed in any web browser
@@ -785,6 +786,14 @@
           in the document. The dictionary form and the selected translation of the annotated 
           word is used. Annotations will only be written once, duplicate entries will be
           skipped. You can use the generated text as a basis for a vocabulary list.
+        </para>
+      </sect2>
+
+      <sect2><title>XML</title>
+        <para>
+          Export the JGloss document as XML document. Reading and translation annotations will
+          be embedded in special tags. You can transform the XML document to other formats
+          using XSL/XSLT stylesheets.
         </para>
       </sect2>
     </sect1>
