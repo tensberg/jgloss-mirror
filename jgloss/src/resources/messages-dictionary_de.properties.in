@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # German localization of the messages from jgloss.dictionary
 #
@@ -23,15 +23,84 @@
 # $Id$
 #
 
-dictionary.load=Lade Wörterbuch {0}.
+dictionary.load=Lade WÃ¶rterbuch {0}.
 
-edict.buildindex=Erzeuge Index für Wörterbuch {0}.\nDies kann einige Zeit dauern.
-edict.writejjdx=Schreibe JJDX Index für Wörterbuch {0}.
-edict.warning.jjdxversion=WARNUNG: Die Version der JJDX Indexdatei für {0} ist größer als die von dieser Version\von JGloss unterstützte.
-edict.warning.jjdxsize=WARNUNG: die Größe der JJDX Indexdatei für {0} stimmt nicht mit der\nim Index-Header angegebenen Größe überein.
-edict.error.writejjdx=Fehler beim Schreiben der JJDX Indexdatei: {0}, {1}
-edict.error.writedictionary=Fehler beim Schreiben der Wörterbuchdatei: {0}, {1}
+exception.malformedentry.message=Falsch geformter Eintrag in WÃ¶rterbuch {0}: "{1}"
+
+edict.error.writedictionary=Fehler beim Schreiben der WÃ¶rterbuchdatei: {0}, {1}
 edict.editable.name=EDICT (editierbar)
 
 kanjidic.nanori=(nanori, Namenslesung)
 kanjidic.radicalname=(Name des Radikals)
+
+# search mode name and descriptions
+# ExpressionSearchModes
+searchmode.exact.name=Exakte Ãœbereinstimmung
+searchmode.exact.desc=Finde WÃ¶rterbucheintrÃ¤ge, die exakt mit dem Suchwort Ã¼bereinstimmen
+searchmode.prefix.name=Beginnt mit Wort
+searchmode.prefix.desc=Finde WÃ¶rterbucheintrÃ¤ge, die mit dem Suchwort beginnen
+searchmode.suffix.name=Endet mit Wort
+searchmode.suffix.desc=Finde WÃ¶rterbucheintrÃ¤ge, die mit dem Suchwort enden
+searchmode.any.name=Beliebige Ãœbereinstimmung
+searchmode.any.desc=Finde WÃ¶rterbucheintrÃ¤ge, die das Suchwort enthalten
+
+# DistanceSearchModes
+searchmode.near.name=Suche nach Abstand
+searchmode.near.desc=Finde WÃ¶rterbucheintrÃ¤ge, die um einige Zeichen abweichen
+searchmode.radius.name=Suche nach Radius
+searchmode.radius.desc=Finde WÃ¶rterbucheintrÃ¤ge Ã¤hnlich dem Suchwort
+
+# standard attribute names
+
+att.part_of_speech.name=Art
+att.part_of_speech.desc=Wortart
+
+att.priority.name=Pri
+att.priority.desc=PrioritÃ¤t des Eintrags
+
+att.example.name=Bsp
+att.example.desc=Beispiel
+
+att.abbreviation.name=Abk
+att.abbreviation.desc=AbkÃ¼rzung
+
+att.reference.name=Verw
+att.reference.desc=Querverweis (siehe auch)
+
+att.synonym.name=Syn
+att.synonym.desc=Synonym (gleiche Bedeutung)
+
+att.antonym.name=Ant
+att.antonym.desc=Antonym (Gegenteil)
+
+att.usage.name=Benutzung
+att.usage.desc=Hinweis zur Benutzung
+
+att.category.name=Kategorie
+att.category.desc=Kategorie des Eintrags
+
+att.gairaigo.name=Gairaigo
+att.gairaigo.desc=Gairaigo (Lehnwort aus einer anderen Sprache)
+
+att.explanation.name=Erl
+att.explanation.desc=LÃ¤ngere ErlÃ¤uterung
+
+# attribute value examples
+example.priority=hoch
+example.reference=Beispiel
+example.abbreviation.lang=de
+example.abbreviation.word=Beispiel
+example.gairaigo.lang=de
+example.gairaigo.word=Beispiel
+example.information=lÃ¤ngere Beispielinformation
+
+# WadokuJT specific attributes
+
+wadoku.att.main_entry.name=HE
+wadoku.att.main_entry.desc=Haupteintrag
+
+wadoku.att.main_entry_ref.name=â†’HE
+wadoku.att.main_entry_ref.desc=Verweis zum Haupteintrag
+
+wadoku.att.alt_reading.name=AltL
+wadoku.att.alt_reading.desc=Verweis zu alternativer Lesung

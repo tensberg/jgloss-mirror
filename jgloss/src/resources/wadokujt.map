@@ -6,7 +6,7 @@
 # $Id$
 #
 # Format:
-# "attribute name" ATTRIBUTE_TYPE AttributeClass "att id (see attributes.properties.in)"
+# attribute~name ATTRIBUTE_TYPE AttributeClass attid (see attributes.properties.in)
 # a ~ in the attribute name is replaced by a space
 # Case in the attribute name does not matter
 # For every attribute id used in this file, the attribute definition must be present in

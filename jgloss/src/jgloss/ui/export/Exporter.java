@@ -198,7 +198,7 @@ class Exporter {
                     transformer.setOutputProperty( OutputKeys.ENCODING, 
                                                    String.valueOf(encoding.getValue()));
                 
-                setParameters(source,transformer);
+                setParameters(source, transformer);
 
                 transformer.transform( new DOMSource( doc), new StreamResult( out));
             } catch (Exception ex) {

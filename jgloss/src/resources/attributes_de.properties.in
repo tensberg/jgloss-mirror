@@ -1,0 +1,396 @@
+# Encoding: UTF-8
+#
+# German localization
+#
+# Attribute id to short (.s) and long (.l) name mapping used by
+# jgloss.dictionary.attribute.DefaultCategoryAttributeValue 
+# Author: Michael Koch <tensberg@gmx.net>;
+# pos and usage definitions and descriptions taken from the EDICT
+# dictionary file format definition (Copyright 2001 The Electronic
+# Dictionary Research and Development Group, Monash University)
+#
+# $Id$
+
+# parts of speech
+
+# example Part Of Speech entry
+pos.example.s=Adj
+pos.example.l=Adjektiv (keiyoushi)
+
+pos.adj.s=Adj
+pos.adj.l=Adjektiv (keiyoushi)
+
+pos.adv.s=Adv
+pos.adv.l=Adverb (fukushi)
+
+pos.adj-na.s=na-Adj
+pos.adj-na.l=Adjektivisches Nomen (keiyodoshi)
+
+pos.adj-no.s=no-Adj
+pos.adj-no.l=Adjektive die mit dem Partikel "no" benutzt werden können
+
+pos.adj-pn.s=Adj-pn
+pos.adj-pn.l=Attributivform (rentaishi)
+
+pos.adj-s.s=Adj-s
+pos.adj-s.l=spezielles Adjektiv (z.B. ookii)
+
+pos.adj-t.s=t-Adj
+pos.adj-t.l="taru" Adjektiv
+
+pos.aux.s=Hilf
+pos.aux.l=Hilfswort oder -phrase
+
+pos.aux-v.s=hilfv
+pos.aux-v.l=Hilfsverb
+
+pos.conj.s=Konj
+pos.conj.l=Konjuktion
+
+pos.int.s=Int
+pos.int.l=Interjektion (kandoushi)
+
+pos.n.s=S
+pos.n.l=Substantiv (gewöhnlich) (futsuumeishi)
+
+pos.n-adv.s=S-Adv
+pos.n-adv.l=Adverbielles Substantiv (fukushitekimeishi)
+
+pos.n-t.s=S-T
+pos.n-t.l=Substantiv (temporal) (jisoumeishi)
+
+pos.n-suf.s=S-Suf
+pos.n-suf.l=Substantiv, benutzt als Suffix
+
+pos.neg.s=Neg
+pos.neg.l=Negation (in einem verneinenden Satz, oder mit verneintem verb)
+
+pos.neg-v.s=Neg-v
+pos.neg-v.l=Verneintes Verb (wenn benutzt mit)
+
+pos.v1.s=v1
+pos.v1.l=Ichidan Verb
+
+pos.v1-i.s=v1-i
+pos.v1-i.l=-i Ichidan Verb
+
+pos.v1-e.s=v1-e
+pos.v1-e.l=-e Ichidan Verb
+
+pos.v5.s=v5
+pos.v5.l=Godan Verb (nicht vollständig klassifiziert)
+
+pos.v5u.s=v5u
+pos.v5u.l=Godan Verb mit `u' Endung
+
+pos.v5k.s=v5k
+pos.v5k.l=Godan Verb mit `ku' Endung
+
+pos.v5g.s=v5g
+pos.v5g.l=Godan Verb mit `gu' Endung
+
+pos.v5s.s=v5s
+pos.v5s.l=Godan Verb mit `su' Endung
+
+pos.v5t.s=v5t
+pos.v5t.l=Godan Verb mit `tsu' Endung
+
+pos.v5n.s=v5n
+pos.v5n.l=Godan Verb mit `nu' Endung
+
+pos.v5b.s=v5b
+pos.v5b.l=Godan Verb mit `bu' Endung
+
+pos.v5m.s=v5m
+pos.v5m.l=Godan Verb mit `mu' Endung
+
+pos.v5r.s=v5r
+pos.v5r.l=Godan Verb mit `ru' Endung
+
+pos.v5k-s.s=v5k-s
+pos.v5k-s.l=Godan Verb - Iku/Yuku Spezialklasse
+
+pos.v5z.s=v5z
+pos.v5z.l=Godan Verb - -zuru Spezialklasse (alternative Form von -jiru Verben)
+
+pos.v5aru.s=v5aru
+pos.v5aru.l=Godan Verb - -aru Spezialklasse
+
+pos.v5uru.s=v5uru
+pos.v5uru.l=Godan Verb - -uru Spezialklasse
+
+pos.vi.s=vi
+pos.vi.l=intransitive Verben
+
+pos.vs.s=vs
+pos.vs.l=Substantiv oder Partizip mit Hilfsverb suru
+
+pos.vs-s.s=vs-s
+pos.vs-s.l=suru Verb - Spezialklasse
+
+pos.vk.s=vk
+pos.vk.l=Kuru Verb - Spezialklasse
+
+pos.vt.s=vt
+pos.vt.l=transitive Verben
+
+# usage
+
+# example usage entry
+usage.example.s=Arch
+usage.example.l=Archaismus
+
+usage.arch.s=Arch
+usage.arch.l=Archaismus
+
+usage.col.s=Umg
+usage.col.l=Umgangssprache
+
+usage.fam.s=gel
+usage.fam.l=geläufige Sprache
+
+usage.fem.s=weibl
+usage.fem.l=weiblicher Ausdruck oder Sprache
+
+usage.hon.s=höfl
+usage.hon.l=ehrerbietig-höfliche Sprache (sonkeigo)
+
+usage.hum.s=besch
+usage.hum.l=bescheidene Sprache (kenjougo)
+
+usage.male.s=männl
+usage.male.l=männlicher Ausdruck oder Sprache
+
+usage.m-sl.s=m-sl
+usage.m-sl.l=Manga-Slang
+
+usage.obs.s=Alt
+usage.obs.l=veralteter Ausdruck
+
+usage.obsc.s=sel
+usage.obsc.l=seltener Ausdruck
+
+usage.pol.s=Höfl
+usage.pol.l=Höflichkeitsform (teineigo)
+
+usage.sl.s=Sl
+usage.sl.l=Slang
+
+usage.vulg.s=vulg
+usage.vulg.l=vulgärer Ausdruck oder Wort
+
+usage.X.s=X
+usage.X.l=grober oder unanständiger Ausdruck
+
+# categories
+
+# example category
+cat.example.s=Anat
+cat.example.l=Anatomie
+
+cat.anat.s=Anat
+cat.anat.l=anatomie
+
+cat.area.s=Gebiet
+cat.area.l=Name eines Gebiets
+
+cat.art.s=Kunst
+cat.art.l=Kunst
+
+cat.astron.s=Astron
+cat.astron.l=Astronomie
+
+cat.baseb.s=Baseb
+cat.baseb.l=Baseball
+
+cat.bibl.s=bibl
+cat.bibl.l=Biblischer Ausdruck
+
+cat.biol.s=Biol
+cat.biol.l=Biologie
+
+cat.bot.s=Bot
+cat.bot.l=Botanik
+
+cat.buddh.s=Buddh
+cat.buddh.l=Buddhismus
+
+cat.budo.s=Budô
+cat.budo.l=Budô (Kampfkünste)
+
+cat.business.s=Firma
+cat.business.l=Firmenname/geschäftl. Ausdruck
+
+cat.chem.s=Chem
+cat.chem.l=Chemie
+
+cat.chist.s=chin. Gesch.
+cat.chist.l=Chinesische Geschichte
+
+cat.christ.s=Christ
+cat.christ.l=Christentum
+
+cat.city.s=Stadt
+cat.city.l=Name einer Stadt
+
+cat.cloth.s=Kleidung
+cat.cloth.l=Kleidung
+
+cat.comp.s=Comp
+cat.comp.l=Computer/EDV-Ausdruck
+
+cat.cook.s=Koch
+cat.cook.l=Kochen
+
+cat.country.s=Land
+cat.country.l=Ländername
+
+cat.econ.s=Wirtsch
+cat.econ.l=Wirtschaft
+
+cat.elec.s=Elektrot
+cat.elec.l=Elektrotechnik
+
+cat.ento.s=Insekt
+cat.ento.l=Entomologie (Insektenkunde)
+
+cat.geol.s=Geol
+cat.geol.l=Geologie
+
+cat.gmyth.s=Gr. Myth.
+cat.gmyth.l=Griechische Mythologie
+
+cat.gram.s=Gram
+cat.gram.l=Grammatik
+
+cat.hist.s=Gesch
+cat.hist.l=Geschichte
+
+cat.ichthy.s=Fisch
+cat.ichthy.l=Ichthyologie (Fischkunde)
+
+cat.inst.s=Inst
+cat.inst.l=Musikinstrument
+
+cat.island.s=Insel
+cat.island.l=Inselname
+
+cat.jhist.s=J. Gesch.
+cat.jhist.l=Japanische Geschichte
+
+cat.kabuki.s=Kabuki
+cat.kabuki.l=Kabuki-bezogen
+
+cat.lang.s=Sprache
+cat.lang.l=Sprache
+
+cat.law.s=Jur
+cat.law.l=Rechtskunde
+
+cat.loc.s=Ort
+cat.loc.l=Ortsname
+
+cat.m-sl.s=M-Sl
+cat.m-sl.l=Manga-Slang
+
+cat.math.s=Math
+cat.math.l=Mathematik
+
+cat.med.s=Med
+cat.med.l=Medizin
+
+cat.met.s=Met
+cat.met.l=Meteorologie
+
+cat.mil.s=Mil
+cat.mil.l=Militär
+
+cat.min.s=Min
+cat.min.l=Mineralogie
+
+cat.moun.s=Berg
+cat.moun.l=Bergname
+
+cat.mname.s=M-Name
+cat.mname.l=Männervorname
+
+cat.mus.s=Mus
+cat.mus.l=Musik
+
+cat.name.s=Name
+cat.name.l=Name
+
+cat.nengo.s=nengô
+cat.nengo.l=nengô (Äraname)
+
+cat.no.s=nô
+cat.no.l=Nô-bezogen
+
+cat.optics.s=Opt
+cat.optics.l=Optik
+
+cat.org.s=Org
+cat.org.l=Organisation
+
+cat.orni.s=Vogel
+cat.orni.l=Ornithologie (Vogelkunde)
+
+cat.pers.s=Pers
+cat.pers.l=Persönlichkeit
+
+cat.pharm.s=Pharm
+cat.pharm.l=Pharmacie
+
+cat.phil.s=Phil
+cat.phil.l=Philologie
+
+cat.philos.s=Philos
+cat.philos.l=Philosophie
+
+cat.photo.s=Photo
+cat.photo.l=Photographie
+
+cat.phys.s=Phys
+cat.phys.l=Physik
+
+cat.pol.s=Pol
+cat.pol.l=Politik
+
+cat.print.s=Druck
+cat.print.l=Druckwesen
+
+cat.publ.s=Verlag
+cat.publ.l=Verlagsname
+
+cat.psych.s=Psych
+cat.psych.l=Psychologie
+
+cat.rel.s=Rel
+cat.rel.l=Religion
+
+cat.river.s=Fluss
+cat.river.l=Flussname
+
+cat.sea.s=Meer
+cat.sea.l=Meeresname
+
+cat.sports.s=Sport
+cat.sports.l=Sport-bezogen
+
+cat.sumo.s=Sumô
+cat.sumo.l=Sumô-bezogen
+
+cat.surn.s=Nachname
+cat.surn.l=Nachname
+
+cat.tenno.s=Tennô
+cat.tenno.l=Tennô (japanischer Kaiser)
+
+cat.theatre.s=Theater
+cat.theatre.l=Theater-bezogen
+
+cat.tm.s=Wz
+cat.tm.l=Warenzeichen
+
+cat.zoo.s=Zoo
+cat.zoo.l=Zoologie

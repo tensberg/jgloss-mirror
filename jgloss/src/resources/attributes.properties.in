@@ -6,9 +6,12 @@
 # pos and usage definitions and descriptions taken from the EDICT
 # dictionary file format definition (Copyright 2001 The Electronic
 # Dictionary Research and Development Group, Monash University)
+#
+# $Id$
 
 # parts of speech
 
+# example Part Of Speech entry
 pos.example.s=adj
 pos.example.l=adjective (keiyoushi)
 
@@ -131,6 +134,7 @@ pos.vt.l=transitive verb
 
 # usage
 
+# example usage entry
 usage.example.s=arch
 usage.example.l=archaism
 
@@ -178,6 +182,7 @@ usage.X.l=rude or X-rated term
 
 # categories
 
+# example category
 cat.example.s=anat
 cat.example.l=anatomy
 

@@ -37,7 +37,7 @@
     <docname name="document-filename" />
     <datetime name="generation-time" />
 
-    <list name="fontsize"
+    <list name="font-size"
       label-key="export.latex.fontsize"
       prefs-key="export.latex.fontsize">
       <listitem><value>10</value></listitem>

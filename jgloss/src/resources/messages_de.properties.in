@@ -37,11 +37,12 @@ error.loadPreferences=Beim Laden der Voreinstellungen ist ein Fehler aufgetreten
 error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufgetreten.
 error.dictionary.title=Fehler beim Öffnen des Wörterbuchs
 error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei {1}\n existiert und lesbar ist.
-error.dictionary.jjdxnotavailable=\
-Die JJDX-Indexdatei für das Wörterbuch {0} konnte\n\
+error.dictionary.indexnotavailable=\
+Die Indexdatei für das Wörterbuch {0} konnte\n\
 nicht geöffnet oder erzeugt werden. Überprüfen sie, ob das Verzeichnis\n\
 "{1}" zum Schreiben freigegeben ist.\n\
 Das Wörterbuch wird nicht verfügbar sein.
+error.dictionary.exception=Beim Öffnen des Wörterbuchs {0} ist ein Fehler aufgetreten.\nDas Wörterbuch wird nicht verfügbar sein.
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.\nDas Wörterbuch wird nicht verfügbar sein.
 error.dictionary.format=Die Datei {0} ist keine\nWörterbuchdatei in einem unterstützten Format.
 error.exclusions.save.title=Fehler beim Schreiben der Ausschluss-Liste
@@ -106,12 +107,12 @@ button.select=Auswählen
 button.select.mk=A
 button.annotate=Annotieren
 button.annotate.mk=A
+button.annotate.tt=Das ausgewählte Wort mit den angezeigten Ergebnissen annotieren
 button.add=Hinzufügen...
 button.add.mk=H
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<Erstelle Anwendungsfenster>
-splashscreen.loadingPreferences=Lade Voreinstellungen
 splashscreen.initPreferences=Lade Wörterbücher
 splashscreen.initMain=Erstelle Anwendungsfenster
 
@@ -132,9 +133,9 @@ Optionen:\n\
 main.unknownoption=Unbekannte Option {0}
 main.format=Das Format von {0} scheint {1} zu sein.
 main.format.unrecognized=Das Format von {0} wurde nicht erkannt.
+main.createindex=Erzeuge Index für Wörterbuch {0}. Dies kann einige Zeit dauern.
 main.createindex.noindex=Für das Wörterbuch {0} muß kein Index erstellt werden.
 main.createindex.exception=Die Indexdatei für {0} konnte nicht erstellt werden:\n{1} {2}
-main.annotatehtml.files=Die Ein- und Ausgabedatei müssen verschieden sein.
 main.title=JGloss
 main.renderingdocument=Erstelle Dokumentansicht...
 
@@ -155,27 +156,13 @@ main.menu.saveAs=Speichern unter...
 main.menu.saveAs.tt=Speichert das Dokument unter einem neuen Namen
 main.menu.export=Export
 main.menu.export.mk=E
-main.menu.export.plaintext=Plain Text...
-main.menu.export.plaintext.mk=P
-main.menu.export.plaintext.tt=Exportiert das Dokument als unformatierter Text
-main.menu.export.latex=LaTeX...
-main.menu.export.latex.mk=L
-main.menu.export.latex.tt=Exportiert das Dokument als LaTeX-Quelldatei
-main.menu.export.html=HTML...
-main.menu.export.html.mk=H
-main.menu.export.html.tt=Exportiert das Dokument als HTML-formatierte Datei
-main.menu.export.xml=XML...
-main.menu.export.xml.mk=X
-main.menu.export.xml.tt=Exportiert das Dokument als XML-formatierte Datei
-main.menu.export.annotationlist=Annotationsliste...
-main.menu.export.annotationlist.mk=A
-main.menu.export.annotationlist.tt=Exportiert die Liste der Annotationen in eine Textdatei
 main.menu.print=Drucken...
 main.menu.print.mk=D
 main.menu.print.tt=Druckt das Dokument
 main.menu.close=Schließen
 main.menu.close.mk=S
 main.menu.close.tt=Schließt das Dokument
+main.menu.edit=Bearbeiten
 main.menu.wordlookup=Wörterbuch
 main.menu.wordlookup.tt=Öffnet den Wörterbuch-Dialog
 main.menu.preferences=Voreinstellungen
@@ -194,36 +181,43 @@ main.menu.help=Hilfe
 main.menu.about=Über JGloss
 main.menu.about.mk=U
 main.menu.about.tt=Zeigt einen Dialog mit Informationen über JGloss
+main.menu.addannotation=Auswahl annotieren...
+main.menu.addannotation.mk=u
+main.menu.addannotation.tt=Annotatiert den ausgewählten Text
+main.menu.doctitle=Dokumenttitel...
+main.menu.doctitle.mk=D
+main.menu.doctitle.tt=Anzeige und Editieren des Dokumenttitels
 
 main.dialog.close.title=Änderungen speichern
 main.dialog.close.message=Änderungen an {0} speichern?
+main.dialog.addannotation.title=Auswahl annotieren
+main.dialog.doctitle.title=Dokumenttitel
+main.dialog.doctitle=Titel des Dokumentes:
 
-editor.menu.edit=Bearbeiten
-editor.menu.cut=Ausschneiden
-editor.menu.cut.mk=A
-editor.menu.cut.tt=Verschiebt die Auswahl in die Zwischenablage
-editor.menu.copy=Kopieren
-editor.menu.copy.mk=K
-editor.menu.copy.tt=Kopiert die Auswahl in die Zwischenablage
-editor.menu.paste=Einfügen
-editor.menu.paste.mk=E
-editor.menu.paste.tt=Fügt den Inhalt der Zwischenablage an der Cursorposition ein
+filter.mainentry.name=Nur Haupteinträge
+filter.mainentry.desc=Zeigt nur als Haupteinträge markierte Einträge (WadokuJT)
+filter.example.name=Nur Beispiele
+filter.example.desc=Zeigt nur als Beispiel markierte Einträge
+filter.priority.name=Nur Prioritätseinträge
+filter.priority.desc=Zeigt nur als Prioritätseinträge markierte Einträge (EDICT)
+
+xcv.menu.cut=Ausschneiden
+xcv.menu.cut.mk=A
+xcv.menu.cut.tt=Verschiebt die Auswahl in die Zwischenablage
+xcv.menu.copy=Kopieren
+xcv.menu.copy.mk=K
+xcv.menu.copy.tt=Kopiert die Auswahl in die Zwischenablage
+xcv.menu.paste=Einfügen
+xcv.menu.paste.mk=E
+xcv.menu.paste.tt=Fügt den Inhalt der Zwischenablage an der Cursorposition ein
+
 editor.menu.find=Suchen...
 editor.menu.find.mk=S
 editor.menu.find.tt=Sucht einen Text im Dokument
 editor.menu.findagain=Weitersuchen
 editor.menu.findagain.mk=W
 editor.menu.findagain.tt=Setzt eine vorherige Suche fort
-editor.menu.addannotation=Auswahl annotieren...
-editor.menu.addannotation.mk=u
-editor.menu.addannotation.tt=Fügt eine Annotation zum ausgewählten Text hinzu
-editor.menu.doctitle=Dokumenttitel...
-editor.menu.doctitle.mk=D
-editor.menu.doctitle.tt=Anzeige und Editieren des Dokumenttitels
 
-editor.dialog.addannotation.title=Auswahl annotieren
-editor.dialog.doctitle.title=Dokumenttitel
-editor.dialog.doctitle=Titel des Dokumentes:
 editor.dialog.find=Suchen nach:
 editor.dialog.find.title=Suchen
 editor.dialog.find.notfound=Der Text "{0}" wurde nicht im Dokument gefunden.
@@ -254,6 +248,7 @@ general.chasen.chooser.title=ChaSen-Programm auswählen
 general.parserselector=Zwischenablage Importieren Parser
 
 style.title=Darstellung
+style.fontsize_pt=pt
 style.autodetect=Zeichensätze automatisch konfigurieren
 style.autodetect.title=Zeichensatz Auto-Konfiguration
 style.autodetect.progress.description=Teste alle verfügbaren Zeichensätze.
@@ -317,14 +312,14 @@ parserselector.detectparagraphs.mk=A
 
 print.title=JGloss-Dokument
 
-annotationeditor.reading=Lesung:\ 
-annotationeditor.reading.kanji={0}:\ 
+annotationeditor.reading.base={0}:\ 
 annotationeditor.readings=Lesungen:
 annotationeditor.translation=Übersetzung:\ 
 annotationeditor.dictionaryform=Wörterbuchform:\ 
 annotationeditor.dictionaryform.none=(keine)
 annotationeditor.dictionaryform.word=Wort:\ 
 annotationeditor.dictionaryform.reading=Lesung:\ 
+annotationeditor.grammaticaltype=Gramm. Typ:\ 
 annotationeditor.readingannotation=Lesung aus {0}: {1}
 annotationeditor.menu.title=Annotation
 annotationeditor.menu.usereading=Diese Lesung benutzen
@@ -364,27 +359,34 @@ export.template.nodescription=Keine Beschreibung verfügbar.
 export.choosetemplate=Wählen sie eine Vorlage
 export.annotationlist.title=Annotationsliste exportieren
 export.annotationlist.header=\# Annotationsliste fuer {0}\n\# Zeichensatz: {1}\n
-export.writereading=Lesungen schreiben
+export.writereadings=Lesungen schreiben
 export.writetranslations=Übersetzungen schreiben
 export.writehidden=Ausgeblendete Annotationen schreiben
-export.plaintext.title=Plain Text exportieren
+
+export.text.title=Text exportieren
+export.text.menu=Plain Text...
+export.text.menu.mk=P
+export.text.menu.tt=Exportiert das Dokument als unformatierter Text
+export.text.voclist=Vokabelliste
+
+export.html.menu=HTML...
+export.html.menu.mk=H
+export.html.menu.tt=Exportiert das Dokument als HTML-formatierte Datei
 export.html.title=HTML exportieren
-export.html.interactive=Interaktives HTML
-export.html.backwardscompatible=Abwärtskompatibel
-export.xml.title=XML exportieren
+
+export.latex.menu=LaTeX...
+export.latex.menu.mk=L
+export.latex.menu.tt=Exportiert das Dokument als LaTeX-Quelldatei
 export.latex.title=LaTeX exportieren
 export.latex.fontsize=Fontgröße:
+export.latex.fontsize_pt=pt
 
-export.latex.templates=\
-/data/templates/platex-top_de.tex.tmpl:\
-/data/templates/platex-list_de.tex.tmpl:\
-/data/templates/platex-ruby_de.tex.tmpl:\
-/data/templates/latexcjk-top_de.tex.tmpl:\
-/data/templates/latexcjk-list_de.tex.tmpl:\
-/data/templates/latexcjk-ruby_de.tex.tmpl
+export.annotationlist.menu=Annotationsliste...
+export.annotationlist.menu.mk=A
+export.annotationlist.menu.tt=Exportiert die Liste der Annotationen in eine Textdatei
 
-about.frame.title=Über JGloss
-about.text=\
+jgloss.about.frame.title=Über JGloss
+jgloss.about.text=\
 Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\
 \nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\
 \n\
@@ -393,6 +395,8 @@ This is free software, and you are welcome to redistribute it\n\
 under certain conditions; select "Show License" for details.
 about.showlicense=Lizenz anzeigen
 about.license.title=GNU General Public License
+jdictionary.about.frame.title=Über JDictionary
+jdictionary.about.text=Ein Front-end für japanische Wörterbücher.\n\nCopyright (c) 2002,2003 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 
 preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
 preferences.header.obsolete=\
@@ -424,18 +428,6 @@ userdictionary.instance.name=Benutzerwörterbuch (editierbares EDICT)
 
 wordlookup.title=JGloss Wörterbuch
 wordlookup.searchoptions=Suchoptionen
-wordlookup.choice.exact=Exakte Übereinstimmung
-wordlookup.choice.exact.mk=E
-wordlookup.choice.exact.tt=Finde Wörterbucheinträge, die exakt mit dem Suchwort übereinstimmen
-wordlookup.choice.startswith=Beginnt mit Wort
-wordlookup.choice.startswith.mk=B
-wordlookup.choice.startswith.tt=Finde Wörterbucheinträge, die mit dem Suchwort beginnen
-wordlookup.choice.endswith=Endet mit Wort
-wordlookup.choice.endswith.mk=n
-wordlookup.choice.endswith.tt=Finde Wörterbucheinträge, die mit dem Suchwort enden
-wordlookup.choice.any=Beliebige Übereinstimmung
-wordlookup.choice.any.mk=i
-wordlookup.choice.any.tt=Finde Wörterbucheinträge, die das Suchwort enthalten
 wordlookup.choice.best=Beste Übereinstimmung
 wordlookup.choice.best.mk=t
 wordlookup.choice.best.tt=Versuche jede der obigen Suchoptionen, bis ein Treffer gefunden wurde
@@ -452,20 +444,55 @@ wordlookup.choice.alldictionaries.tt=Suche in allen Wörterbüchern
 wordlookup.enterexpression=Suchwort:
 wordlookup.enterexpression.mk=w
 wordlookup.enterexpression.tt=Suchwort hier eingeben
+wordlookup.enterdistance=Abstand:
+wordlookup.enterdistance.mk=t
+wordlookup.enterdistance.tt=Erlaubter Abstand zwischen Suchwort und Treffer
 wordlookup.search=Suchen
 wordlookup.search.mk=S
-wordlookup.search.tt=Finde Wörterbucheinträge, die das Suchwort enthalten
+wordlookup.search.tt=Finde Wörterbucheinträge, die den Suchwort enthalten
 wordlookup.clear=Löschen
 wordlookup.clear.mk=L
 wordlookup.clear.tt=Lösche das Suchwort-Eingabefeld
 wordlookup.result=Suchergebnis:
 
+wordlookup.searchfield=Suchfelder
+wordlookup.searchfield.word=Japanisch
+wordlookup.searchfield.reading=Lesung
+wordlookup.searchfield.translation=Übersetzung
+wordlookup.matchmode=Feldsuchmodus
+wordlookup.matchmode.field=Vergleiche Felder
+wordlookup.matchmode.word=Vergleiche Wörter
+wordlookup.filter=Resultate filtern
+wordlookup.status.searching=Suche... (bisher {0,number,integer} Treffer)
+wordlookup.status.matches={0,choice,0#Kein Eintrag|1#1 Eintrag|1<{0} Einträge} gefunden.
+
 wordlookup.nodictionary=<keine verfügbar>
-wordlookup.matches=Treffer in\ 
-wordlookup.matchesfor={0,choice,1#1 Eintrag|1<{0} Einträge} {2,choice,0#mit exakter Übereinstimmung für|1#beginnend mit|2#endend mit|3#mit beliebiger Übereinstimmung für} {1} gefunden:
-wordlookup.nomatches=Keine Einträge für {0} gefunden
+wordlookup.matches=Treffer in {0}:
+wordlookup.nomatches_dictionary=(keine Treffer)
+wordlookup.unsupportedsearchmode=(der ausgewählte Suchmodus wird nicht unterstützt)
+wordlookup.exception=(das Wörterbuch hat einen Fehler zurückgegeben: {1}, {0})
 wordlookup.inflection=Mögliche Inflektion: {0}, {1}->{2}
 wordlookup.clipboard=Zwischenablage
 wordlookup.clipboard.search=Inhalt der Zwischenablage automatisch suchen
+wordlookup.history.forward=Vorwärts
+wordlookup.history.forward.tt=zur folgenden Suche wechseln
+wordlookup.history.back=Zurück
+wordlookup.history.back.tt=zur vorherigen Suche wechseln
+wordlookup.reference=Referenz
+wordlookup.showlegend=Legende zeigen
+wordlookup.showlegend.tt=Zeigt eine Legende der von den Wörterbüchern benutzten Attribute
+wordlookup.legendframe.title=Wörterbuch-Attribut-Legende
+
+legend.dictionarychoice=Zeige Legende für\ 
+legend.dictionary=Von {0} benutzte Attribute
+legend.noattributes=(keine Attribute)
+legend.attribute={1}
+legend.attributeexample=Anzeigestil:\ 
+legend.values=Werte dieses Attributs:
+
+abbr.word=Abk. für "{0}"
+abbr.lang_and_word=Abk. für {0} "{1}"
+gairaigo.lang=aus dem {0}
+gairaigo.lang_and_word=von {0} "{1}"
 
 chasen.location.windows=C:\\Programme\\chasen21\\chasen.exe

@@ -14,54 +14,24 @@
   
   <xsl:output method="text" encoding="UTF-8" />
 
-  <xsl:param name="writetranslations" />
-  <xsl:param name="writereadings" />
-  <xsl:param name="voclist" />
+  <xsl:param name="document-filename" />
+  <xsl:param name="document-title" />
+  <xsl:param name="generation-time" />
+  <xsl:param name="encoding" />
 
   <xsl:template match="/">
     <xsl:apply-templates select="jgloss/body" />
   </xsl:template>
 
   <xsl:template match="body">
-    <xsl:apply-templates />
-    <xsl:if test="$voclist">
-      <xsl:text>
-        
-Vocabulary List
----------------
+    <xsl:text># annotation list for </xsl:text><xsl:value-of select="$document-filename" /><xsl:text>
+# Encoding: </xsl:text><xsl:value-of select="$encoding" /><xsl:text>
 
 </xsl:text>
-      <xsl:apply-templates select=".//anno" mode="voclist" />
-    </xsl:if>
+    <xsl:apply-templates select=".//anno" />
   </xsl:template>
 
   <xsl:template match="anno">
-    <xsl:apply-templates />
-    <xsl:if test="$writetranslations and string-length(@tr)>0">
-      <xsl:text>(</xsl:text><xsl:value-of select="@tr" /><xsl:text>)</xsl:text>
-    </xsl:if>
-  </xsl:template>
-
-  <xsl:template match="div">
-    <xsl:apply-templates />
-    <xsl:text>
-</xsl:text>
-  </xsl:template>
-
-  <xsl:template match="p">
-    <xsl:apply-templates />
-    <xsl:text>
-</xsl:text>
-  </xsl:template>
-  
-  <xsl:template match="rbase">
-    <xsl:value-of select="."/>
-    <xsl:if test="$writereadings and string-length(@re)>0">
-      <xsl:text>《</xsl:text><xsl:value-of select="@re" /><xsl:text>》</xsl:text>
-    </xsl:if>
-  </xsl:template>
-
-  <xsl:template match="anno" mode="voclist">
     <xsl:choose>
       <xsl:when test="string-length(@base)>0">
         <xsl:value-of select="@base" />
@@ -74,7 +44,7 @@ Vocabulary List
     </xsl:choose>
 
     <xsl:if test="string-length(@basere)>0 or count(rbase)>0">
-      <xsl:text> 《</xsl:text>
+      <xsl:text> [</xsl:text>
       <xsl:choose>
         <xsl:when test="string-length(@basere)>0">
           <xsl:value-of select="@basere" />
@@ -92,12 +62,13 @@ Vocabulary List
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
-      <xsl:text>》</xsl:text>
+      <xsl:text>]</xsl:text>
     </xsl:if>
 
     <xsl:if test="string-length(@tr)>0">
-      <xsl:text> </xsl:text>
+      <xsl:text> /</xsl:text>
       <xsl:value-of select="@tr" />
+      <xsl:text>/</xsl:text>
     </xsl:if>
 
     <xsl:text>

@@ -151,12 +151,6 @@ main.menu.saveAs.mk=A
 main.menu.saveAs.tt=Save the document under a new name
 main.menu.export=Export
 main.menu.export.mk=E
-main.menu.export.xml=XML...
-main.menu.export.xml.mk=X
-main.menu.export.xml.tt=Export the document as XML-formatted file
-main.menu.export.annotationlist=Annotation List...
-main.menu.export.annotationlist.mk=A
-main.menu.export.annotationlist.tt=Write the annotations to a text file
 main.menu.print=Print...
 main.menu.print.ak=control P
 main.menu.print.mk=P
@@ -371,7 +365,7 @@ annotationeditor.action.addtoexclusions.ak=E
 annotationeditor.action.addtodictionary.ak=U
 annotationeditor.action.hide.ak=H
 
-exporters=/data/export/html-descriptor.xml:/data/export/text-descriptor.xml:/data/export/latex-descriptor.xml
+exporters=/data/export/html-descriptor.xml:/data/export/text-descriptor.xml:/data/export/latex-descriptor.xml:/data/export/annotationlist-descriptor.xml
 export.encodings=Encoding:
 export.templates=Template:
 export.template.unmatchedbegin=No matching end marker for {0} in export template, line {1,number}.
@@ -408,6 +402,11 @@ export.latex.template.platex-ruby=pLaTeX - no translations
 export.latex.template.latexcjk-top=LaTeX-CJK - translations on page
 export.latex.template.latexcjk-list=LaTeX-CJK - transl. at end - hyperlinks
 export.latex.template.latexcjk-ruby=LaTeX-CJK - no translations
+
+export.annotationlist.menu=Annotation List...
+export.annotationlist.menu.mk=A
+export.annotationlist.menu.tt=Write the annotations to a text file
+export.annotationlist.title=Export annotation list
 
 jgloss.generator=JGloss 2 alpha 0
 jgloss.about.frame.title=About JGloss

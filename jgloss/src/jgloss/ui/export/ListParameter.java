@@ -35,6 +35,7 @@ import java.net.URL;
 import javax.swing.JLabel;
 import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.ComboBoxModel;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -55,6 +56,7 @@ class ListParameter extends UIParameter {
 
         public String getLabel() { return label; }
         public String getValue() { return value; }
+
         public String toString() { return label; }
     } // class Value
 
@@ -87,7 +89,26 @@ class ListParameter extends UIParameter {
     }
 
     public void loadFromPrefs() {
-        combobox.setSelectedItem( JGloss.prefs.getString( prefsKey, defaultValue));
+        // saveToPrefs stores the selected value, not the label
+        // Find the Value object corresponding to the stored preference
+        String selection = JGloss.prefs.getString( prefsKey, defaultValue);
+
+        ComboBoxModel model = combobox.getModel();
+        int selectedIndex = -1;
+        for (int i=0; i<model.getSize(); i++) {
+            if (((Value) model.getElementAt(i)).getValue().equals(selection)) {
+                selectedIndex = i;
+                break;
+            }
+        }
+
+        if (selectedIndex != -1) {
+            combobox.setSelectedIndex(selectedIndex);
+        }
+        else if (combobox.isEditable()) {
+            // set the prefs value as String
+            combobox.setSelectedItem(selection);
+        }
     }
 
     private Vector getItems( Element elem) {
