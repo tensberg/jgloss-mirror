@@ -95,6 +95,7 @@ public class JGlossServlet extends HttpServlet {
         dictionaries = (jgloss.dictionary.Dictionary[]) diclist.toArray( dictionaries);
 
         parser = new Parser( dictionaries);
+        parser.setIgnoreNewlines( true);
         try {
             annotator = new HTMLAnnotator( parser);
         } catch (IOException ex) {
@@ -111,6 +112,7 @@ public class JGlossServlet extends HttpServlet {
 
         Set tags = new HashSet( 3);
         tags.add( "a");
+        tags.add( "area");
         rewriter = new CgiUrlRewriter( "", null, REMOTE_URL, allowedProtocols, tags);
     }
 
@@ -201,9 +203,14 @@ public class JGlossServlet extends HttpServlet {
     protected void rewrite( URLConnection connection, HttpServletRequest req, HttpServletResponse resp) 
         throws ServletException, IOException {
         InputStreamReader in = CharacterEncodingDetector.getReader
-            ( connection.getInputStream(), connection.getContentEncoding());
+            ( new BufferedInputStream( connection.getInputStream()), connection.getContentEncoding());
         try {
             resp.setContentType( "text/html; charset=" + in.getEncoding());
+            String requrl = HttpUtils.getRequestURL( req).toString();
+            int end = requrl.indexOf( '?');
+            if (end == -1)
+                end = requrl.length();
+            rewriter.setCgiBase( requrl.substring( 0, end));
             rewriter.setDocBase( connection.getURL());
             annotator.annotate( in, resp.getWriter(), rewriter);
         } finally {
