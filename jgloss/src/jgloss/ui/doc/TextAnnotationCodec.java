@@ -97,6 +97,8 @@ public abstract class TextAnnotationCodec {
          * @return The name of the dictionary.
          */
         public String getName() { return name; }
+
+        public void dispose() {}
     }
 
     /**
@@ -170,24 +172,34 @@ public abstract class TextAnnotationCodec {
      * @return The annotation encoded as string.
      */
     public static String encode( Parser.TextAnnotation ta) {
-        String code = ta.getClass().getName() + FIELD_SEPARATOR 
+        String classname = ta.getClass().getName();
+        // change classname for backwards compatibility with V0.9
+        if (ta instanceof Reading)
+            classname += "_1.0";
+        String code = classname + FIELD_SEPARATOR 
             + ta.getStart() + FIELD_SEPARATOR + ta.getLength() + FIELD_SEPARATOR;
 
-        if (ta instanceof Reading)
-            code += ((Reading) ta).getReading() + FIELD_SEPARATOR;
-        else if (ta instanceof Translation) {
-            Translation t = (Translation) ta;
-            DictionaryEntry d = t.getDictionaryEntry();
-            Conjugation c = t.getConjugation();
+        if (ta instanceof Reading || ta instanceof Translation) {
+            AbstractAnnotation aa = (AbstractAnnotation) ta;
+            String word = aa.getWord();
+            String reading = aa.getReading();
+            Conjugation c = aa.getConjugation();
+            jgloss.dictionary.Dictionary d;
+            String[] translations = null;
+            if (ta instanceof Translation) {
+                translations = ((Translation) ta).getDictionaryEntry().getTranslations();
+                d = ((Translation) ta).getDictionaryEntry().getDictionary();
+            }
+            else
+                d = ((Reading) ta).getWordReadingPair().getDictionary();
 
-            code += d.getWord() + FIELD_SEPARATOR;
-            if (d.getReading() == null)
+            code += word + FIELD_SEPARATOR;
+            if (reading == null)
                 code += NULL_STRING;
             else
-                code += d.getReading();
+                code += reading;
             code += FIELD_SEPARATOR;
 
-            String[] translations = d.getTranslations();
             if (translations!=null) {
                 if (translations.length>0) {
                     code += translations[0];
@@ -198,7 +210,7 @@ public abstract class TextAnnotationCodec {
             else
                 code += NULL_STRING;
         
-            code += FIELD_SEPARATOR + d.getDictionary().getName() + FIELD_SEPARATOR;
+            code += FIELD_SEPARATOR + d.getName() + FIELD_SEPARATOR;
             if (c != null) {
                 code += c.getConjugatedForm() + FIELD_SEPARATOR +
                     c.getDictionaryForm() + FIELD_SEPARATOR +
@@ -254,18 +266,30 @@ public abstract class TextAnnotationCodec {
         int length = Integer.parseInt( code.substring( j+1, k));
         i = k + 1;
         if (c.equals( Reading.class.getName())) {
+            // This is left in for backwards compatibility with JGloss V0.9 files.
             j = code.indexOf( FIELD_SEPARATOR, i);
-            return new Reading( start, length, code.substring( i, j));
+            final String reading = code.substring( i, j);
+            final jgloss.dictionary.Dictionary d = getDictionary
+                ( JGloss.messages.getString( "parser.dictionary.document"));
+            return new Reading( start, length, 
+                                new WordReadingPair() {
+                                        public String getWord() { return reading; }
+                                        public String getReading() { return reading; }
+                                        public jgloss.dictionary.Dictionary getDictionary() {
+                                            return d;
+                                        }
+                                    }, null);
         }
-        else if (c.equals( Translation.class.getName())) {
+        else if (c.equals( Reading.class.getName()+"_1.0") || c.equals( Translation.class.getName())) {
             j = code.indexOf( FIELD_SEPARATOR, i);
-            String word = code.substring( i, j);
+            final String word = code.substring( i, j);
             i = j + 1;
 
             j = code.indexOf( FIELD_SEPARATOR, i);
-            String reading = code.substring( i, j);
-            if (reading.equals( NULL_STRING))
-                reading = null;
+            String reading2 = code.substring( i, j);
+            if (reading2.equals( NULL_STRING))
+                reading2 = null;
+            final String reading = reading2;
             i = j + 1;
 
             j = code.indexOf( FIELD_SEPARATOR, i);
@@ -290,7 +314,7 @@ public abstract class TextAnnotationCodec {
             }
 
             j = code.indexOf( FIELD_SEPARATOR, i);
-            String dictionary = code.substring( i, j);
+            final jgloss.dictionary.Dictionary dictionary = getDictionary( code.substring( i, j));
             i = j + 1;
 
             Conjugation conjugation = null;
@@ -306,10 +330,19 @@ public abstract class TextAnnotationCodec {
                 conjugation = new Conjugation( conjugatedForm, dictionaryForm, type);
             }
 
-            return new Translation( start, length, 
-                                    new DictionaryEntry( word, reading, translations,
-                                                         getDictionary( dictionary)),
-                                    conjugation);
+            if (translations != null) {
+                return new Translation( start, length, 
+                                        new DictionaryEntry( word, reading, translations,
+                                                             dictionary),
+                                        conjugation);
+            }
+            else {
+                return new Reading( start, length, new WordReadingPair() {
+                        public String getWord() { return word; }
+                        public String getReading() { return reading; }
+                        public jgloss.dictionary.Dictionary getDictionary() { return dictionary; }
+                    }, conjugation);
+            }
         }
         else {
             System.err.println( JGloss.messages.getString( "error.save.unknownannotation",

@@ -195,8 +195,8 @@ public class JGlossDocument extends HTMLDocument {
 
                     int talen = ta.getLength();
                     // if this is a conjugated verb, cut off the non-kanji part
-                    if (ta instanceof Translation) {
-                        Translation tr = (Translation) ta;
+                    if (ta instanceof AbstractAnnotation) {
+                        AbstractAnnotation tr = (AbstractAnnotation) ta;
                         if (tr.getConjugation() != null) {
                             talen -= tr.getConjugation().getConjugatedForm().length();
                         }
@@ -228,7 +228,13 @@ public class JGlossDocument extends HTMLDocument {
                     String translation = null;
                     if (ta instanceof Reading) {
                         // get reading from annotations
-                        reading = ((Reading) ta).getReading();
+                        Reading r = (Reading) ta;
+                        reading = r.getReading();
+                        Conjugation c = r.getConjugation();
+                        if (c != null)
+                            reading = reading.substring( 0, reading.length() - c
+                                                         .getDictionaryForm().length());
+
                         // try to find matching translation
                         for ( int j=1; j<annotations.size(); j++) {
                             Parser.TextAnnotation annotation = (Parser.TextAnnotation) annotations.get( j);
@@ -287,7 +293,8 @@ public class JGlossDocument extends HTMLDocument {
                     handleEndTag( AnnotationTags.ANNOTATION, pos);
 
                     from = ta.getStart() + talen;
-                    if (ta instanceof Reading) {
+                    if (ta instanceof Reading && from<data.length &&
+                        data[from]==parser.getReadingStart()) {
                         // skip reading annotation in original document
                         from += ((Reading) ta).getReading().length() + 2;
                     }
