@@ -131,7 +131,7 @@ public class JGloss {
                 else if (args[0].equals( "-i") || args[0].equals( "--createindex")) {
                     for ( int i=1; i<args.length; i++) {
                         EDict e = new EDict( args[i], false);
-                        e.buildIndex();
+                        e.buildIndex( true);
                         try {
                             // write index to local directory
                             e.saveJJDX( new File( e.getName() + EDict.JJDX_EXTENSION));
