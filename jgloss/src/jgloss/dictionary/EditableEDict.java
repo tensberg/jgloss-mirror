@@ -389,7 +389,7 @@ public class EditableEDict extends EDict {
             }
             else
                 saveJJDX( new File( dicfile + JJDX_EXTENSION));
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             System.err.println( MessageFormat.format( messages.getString( "edict.error.writejjdx"),
                                                       new String[] { ex.getClass().getName(),
                                                                      ex.getLocalizedMessage() }));
@@ -409,7 +409,7 @@ public class EditableEDict extends EDict {
                 o.write( dictionary, 0, dictionaryLength);
                 o.close();
             }
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             System.err.println( MessageFormat.format( messages.getString( "edict.error.writedictionary"),
                                                       new String[] { ex.getClass().getName(),
                                                                      ex.getLocalizedMessage() }));

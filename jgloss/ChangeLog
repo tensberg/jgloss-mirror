@@ -1,11 +1,12 @@
-1.0.1: (2002/01/09)
-	- Added function to set the document title.
+1.0.1: (2002/01/15)
+	- Added dialog to set the document title.
 	- LaTeX export uses document title for page header.
 	- Added user interface font selection to style preference panel.
 	- Font autodetection on first startup. JGloss tries to set
 	  reasonable default fonts depending on the system.
 	- Fixed display of dictionary entries without readings in long
 	  word lookup results.
+	- Fixed saving of preferences on MacOS X.
 	- Keyboard shortcut: typing delete while an annotation node
 	  is selected clears the translation.
 1.0: (2001/12/14)

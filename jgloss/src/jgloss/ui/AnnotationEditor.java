@@ -792,22 +792,11 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 hideAction.getValue( Action.NAME));
         am.put( hideAction.getValue( Action.NAME), hideAction);
 
-        if (!JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
-            setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "Tree.font")));
-        }
-
         // update display if user changed font
-        JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+        UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                 public void propertyChange( java.beans.PropertyChangeEvent e) { 
-                    if (e.getPropertyName().equals( Preferences.FONT_GENERAL_USEDEFAULT)) {
-                        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT))
-                            setFont( UIManager.getFont( "Tree.font"));
-                        else
-                            setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "Tree.font")));
-                    }
-                    else if (e.getPropertyName().equals( Preferences.FONT_GENERAL) &&
-                             !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
-                            setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "Tree.font")));
+                    if (e.getPropertyName().equals( "Tree.font")) {
+                        setFont( (Font) e.getNewValue());
                     }
                 }
             });

@@ -247,7 +247,15 @@ public class WordLookupPanel extends JPanel {
         resultFancy = new JTextPane();
         resultFancy.setContentType( "text/html");
         resultFancy.setEditable( false);
-        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule( STYLE);
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()
+                .addRule( STYLE);
+        }
+        else {
+            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
+                ( "body { font-family: " + JGloss.prefs.getString( Preferences.FONT_GENERAL)
+                  + "; }\n");
+        }
         resultFancy.getKeymap().addActionForKeyStroke
             ( KeyStroke.getKeyStroke( "pressed TAB"),
               new AbstractAction() {
@@ -300,16 +308,29 @@ public class WordLookupPanel extends JPanel {
                 }
             });
 
-        if (!JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT))
-            applyGeneralFontSetting();
-        
         // update display if user changed font
-        JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
-                public void propertyChange( java.beans.PropertyChangeEvent e) {
-                    if (e.getPropertyName().equals( Preferences.FONT_GENERAL) && 
-                        !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)
-                        || e.getPropertyName().equals( Preferences.FONT_GENERAL_USEDEFAULT))
-                        applyGeneralFontSetting();
+        UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+                public void propertyChange( java.beans.PropertyChangeEvent e) { 
+                    if (e.getPropertyName().equals( "ComboBox.font")) {
+                        expression.setFont( (Font) e.getNewValue());
+                    }
+                    else if (e.getPropertyName().equals( "TextArea.font")) {
+                        resultPlain.setFont( (Font) e.getNewValue());
+                    }
+                    else if (e.getPropertyName().equals( "TextPane.font")) {
+                        resultFancy.setFont( (Font) e.getNewValue());
+                        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+                            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()
+                                .removeStyle( "body");
+                            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()
+                                .addRule( STYLE);
+                        }
+                        else {
+                            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
+                                ( "body { font-family: " + JGloss.prefs.getString( Preferences.FONT_GENERAL)
+                                  + "; }\n");
+                        }
+                    }
                 }
             });
     }
@@ -643,28 +664,5 @@ public class WordLookupPanel extends JPanel {
             return super.getPreferredSize();
         else
             return preferredSize;
-    }
-
-    /**
-     * Set the fonts of the user interface elements according to the style preference settings.
-     */
-    private void applyGeneralFontSetting() {
-        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
-            // restore the L&F default settings
-            expression.setFont( UIManager.getFont( "ComboBox.font"));
-            resultPlain.setFont( UIManager.getFont( "TextArea.font"));
-            resultFancy.setFont( UIManager.getFont( "TextPane.font"));
-            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().removeStyle( "body");
-            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule( STYLE);
-        }
-        else {
-            // use the custom font set in the preferences
-            expression.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "ComboBox.font")));
-            resultPlain.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "TextArea.font")));
-            resultFancy.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "TextPane.font")));
-            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
-                ( "body { font-family: " + JGloss.prefs.getString( Preferences.FONT_GENERAL)
-                  + "; }\n");
-        }
     }
 } // class WordLookupPanel

@@ -274,7 +274,8 @@ public class ExclusionList extends Box {
                 w.newLine();
             }
             w.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
+            ex.printStackTrace();
             JOptionPane.showConfirmDialog
                 ( SwingUtilities.getRoot( box), JGloss.messages.getString
                   ( "error.exclusions.save", new String[] 
@@ -395,7 +396,7 @@ public class ExclusionList extends Box {
                     w.write( word, 0, word.length());
                     w.newLine();
                     w.close();
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     JOptionPane.showConfirmDialog
                         ( SwingUtilities.getRoot( box), JGloss.messages.getString
                           ( "error.exclusions.save", new String[] 

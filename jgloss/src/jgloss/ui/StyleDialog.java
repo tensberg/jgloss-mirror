@@ -69,6 +69,12 @@ public class StyleDialog extends Box {
      */
     private static String defaultJapaneseFont;
 
+    private static Font textFieldFont;
+    private static Font treeFont;
+    private static Font comboBoxFont;
+    private static Font textAreaFont;
+    private static Font textPaneFont;
+
     /**
      * Adds a new style sheet which will then automatically track any changes made to the
      * user settings. The stylesheet can have styles in addition to the ones set in the dialog
@@ -536,6 +542,35 @@ public class StyleDialog extends Box {
      * Applies the settings from the application preferences to all style sheets.
      */
     public void applyPreferences() {
+        // apply custom font settings
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+            // restore java default fonts
+            if (textFieldFont != null) {
+                UIManager.put( "TextField.font", textFieldFont);
+                UIManager.put( "Tree.font", treeFont);
+                UIManager.put( "ComboBox.font", comboBoxFont);
+                UIManager.put( "TextArea.font", textAreaFont);
+                UIManager.put( "TextPane.font", textPaneFont);
+            }
+        }
+        else {
+            // save java default fonts
+            if (textFieldFont == null) {
+                textFieldFont = UIManager.getFont( "TextField.font");
+                treeFont = UIManager.getFont( "Tree.font");
+                comboBoxFont = UIManager.getFont( "ComboBox.font");
+                textAreaFont = UIManager.getFont( "TextArea.font");
+                textPaneFont = UIManager.getFont( "TextPane.font");
+            }
+            // set custom font
+            UIManager.put( "TextField.font", deriveGeneralFont( textFieldFont));
+            UIManager.put( "Tree.font", deriveGeneralFont( treeFont));
+            UIManager.put( "ComboBox.font", deriveGeneralFont( comboBoxFont));
+            UIManager.put( "TextArea.font", deriveGeneralFont( textAreaFont));
+            UIManager.put( "TextPane.font", deriveGeneralFont( textPaneFont));
+        }
+
+        // apply document view styles
         synchronized (styleSheets) {
             for ( Iterator i=styleSheets.iterator(); i.hasNext(); )
                 applyPreferences( (StyleSheet) i.next(), (Map) i.next());
@@ -639,7 +674,7 @@ public class StyleDialog extends Box {
             return;
 
         // test general font
-        if (!canDisplayJapanese( "Dialog")) {
+        if (!canDisplayJapanese( "Dialog") || !canDisplayJapanese( "DialogInput")) {
             JGloss.prefs.set( Preferences.FONT_GENERAL_USEDEFAULT, false);
         }
         if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_GENERAL)))

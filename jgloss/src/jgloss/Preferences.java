@@ -306,16 +306,11 @@ public class Preferences {
      */
     public synchronized void store() throws IOException {
         if (changed) {
-            System.err.println( "Opening output stream");
             FileOutputStream out = new FileOutputStream( PREFS_FILE);
-            System.err.println( "Writing prefs");
             prefs.store( out, JGloss.messages.getString( "preferences.header"));
-            System.err.println( "Closing output stream");
             out.close();
             changed = false;
         }
-        else
-            System.err.println( "Preferences not changed");
     }
 
     /**
