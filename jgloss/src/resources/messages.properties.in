@@ -39,6 +39,7 @@ error.storePreferences=An error occurred while saving the preferences.
 error.dictionary.title=Error opening dictionary
 error.dictionary.filenotfound=The dictionary {0} could not be opened.\nCheck if the dictionary file {1}\nexists and is readable.
 error.dictionary.ioerror=An error occurred while loading\nthe dictionary {0}.
+error.dictionary.format=File {0} is not\na dictionary file in a supported format.
 error.import.title=Error while importing file
 error.import.exception=An error occurred while importing {0}.\nThe Java exception was {1} ({2}).
 error.export.title=Error while exporting file
@@ -70,8 +71,12 @@ main.usage=Usage: jgloss.JGloss [options] file ...\n\
 Options:\n\
 \  -h, --help, /?  Print this message\n\
 \  -i, --createindex Create index files for the dictionary files\n\
+\                    given on the command line\n\
+\  -f, --format      Prints the dictionary format of the files\n\
 \                    given on the command line
 main.unknownoption=Unknown option {0}
+main.format=The format of {0} seems to be {1}.
+main.format.unrecognized={0} is not a recognized dictionary format.
 main.title=JGloss
 
 main.menu.file=File
@@ -145,7 +150,7 @@ prefs.button.up=Move entry up
 prefs.button.down=Move entry down
 prefs.button.add=Add dictionary file...
 prefs.button.remove=Remove entry
-prefs.editor.enableediting=Enable direct editing (for adventurous users)
+prefs.editor.enableediting=Enable direct editing (buggy)
 
 dictionaries.title=Dictionaries
 dictionaries.chooser.title=Add dictionary files
@@ -175,7 +180,7 @@ print.title=Print document
 
 annotationeditor.reading=Reading:\ 
 annotationeditor.translation=Translation:\ 
-annotationeditor.readingannotation=Reading from document: {0}
+annotationeditor.readingannotation=Reading from {0}: {1}
 annotationeditor.menu.title=Annotation
 annotationeditor.menu.usereading=Use this Reading
 annotationeditor.menu.usetranslation=Use this Translation
@@ -248,9 +253,17 @@ vconj.21=adj., negative
 vconj.22=adj., negative, past
 vconj.23=adj., past
 vconj.24=plain verb or adjective
+vconj.25=adj., i->ku
+vconj.26=adj., i->na
+
+dictionary.load=Loading dictionary {0}.
 
 edict.buildindex=Building index for dictionary {0}.\nThis can take some time.
-edict.load=Loading dictionary {0}.
 edict.writejjdx=Writing JJDX index for dictionary {0}.
 edict.warning.jjdxversion=WARNING: the version number of the JJDX index for {0} is higher than the version supported by this version of JGloss.
 edict.error.writejjdx=Error while writing the JJDX file: {0}, {1}
+
+kanjidic.nanori=(nanori, name reading)
+kanjidic.radicalname=(name of radical)
+
+parser.dictionary.document=document
