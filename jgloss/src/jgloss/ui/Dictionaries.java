@@ -52,6 +52,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -449,7 +450,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             userDictImplementation = new UserDictionary.Implementation
                 ( System.getProperty( "user.home") + File.separator +
                   JGloss.prefs.getString( Preferences.USERDICTIONARY_FILE));
-            DictionaryFactory.registerImplementation( UserDictionary.class, userDictImplementation);
+            DictionaryFactory.registerImplementation( userDictImplementation);
             }*/
     }
 
@@ -483,43 +484,61 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * Show an error dialog for the dictionary exception.
      */
     private void showDictionaryError( Exception ex, String file) {
-        String msgid;
-        String [] objects;
-
         if (ex instanceof DictionaryFactory.InstantiationException) {
             ex = (Exception) ((DictionaryFactory.InstantiationException) ex).getCause();
         }
 
         File f = new File( file);
-        if (ex instanceof FileNotFoundException) {
-            msgid = "error.dictionary.filenotfound";
-            objects = new String[] { f.getName(), f.getAbsolutePath() };
-        }
-        else if (ex instanceof IndexException) {
-            msgid = "error.dictionary.indexnotavailable";
-            objects = new String[] { f.getAbsolutePath(), f.getParent() };
-        }
-        else if (ex instanceof IOException) {
-            msgid = "error.dictionary.ioerror";
-            objects = new String[] { f.getAbsolutePath() };
-        }
-        else if (ex instanceof DictionaryFactory.NotSupportedException) {
-            // dictionary format not supported
-            msgid = "error.dictionary.format";
-            objects = new String[] { new File( file).getAbsolutePath() };
+        String path = f.getAbsolutePath();
+        if (ex instanceof DictionaryFactory.NotSupportedException) {
+            int choice = JOptionPane.showOptionDialog(
+                SwingUtilities.getRoot(this),
+                JGloss.messages.getString("error.dictionary.format", new String[] { path }),
+                JGloss.messages.getString("error.dictionary.title"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null,
+                new String[] { JGloss.messages.getString("button.ok"), JGloss.messages.getString("button.why") }, null);     
+ 
+            if (choice == JOptionPane.NO_OPTION) { // this is really the Why? option
+                JTextArea text = new JTextArea(JGloss.messages.getString( "error.dictionary.reason", new String[] { path, ex.getMessage() }), 25, 55);
+                text.setEditable(false);
+                text.setLineWrap(true);
+                text.setWrapStyleWord(true);
+            
+                JOptionPane.showConfirmDialog
+                    ( SwingUtilities.getRoot( this), new JScrollPane(text),
+                      JGloss.messages.getString( "error.dictionary.title"),
+                      JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            }
         }
         else {
-            msgid = "error.dictionary.exception";
-            objects = new String[] { f.getAbsolutePath(), ex.getLocalizedMessage(), 
-                                     ex.getClass().getName() };
-        }
+            String msgid;
+            String [] objects;
 
-        ex.printStackTrace();
-        JOptionPane.showConfirmDialog
-            ( SwingUtilities.getRoot( this), JGloss.messages.getString
-              ( msgid, objects),
-              JGloss.messages.getString( "error.dictionary.title"),
-              JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            if (ex instanceof FileNotFoundException) {
+                msgid = "error.dictionary.filenotfound";
+                objects = new String[] { f.getName(), path };
+            }
+            else if (ex instanceof IndexException) {
+                msgid = "error.dictionary.indexnotavailable";
+                objects = new String[] { path, f.getParent() };
+            }
+            else if (ex instanceof IOException) {
+                msgid = "error.dictionary.ioerror";
+                objects = new String[] { path };
+            }
+            else {
+                msgid = "error.dictionary.exception";
+                objects = new String[] { path, ex.getLocalizedMessage(), 
+                                         ex.getClass().getName() };
+            }
+    
+            ex.printStackTrace();
+            JOptionPane.showConfirmDialog
+                ( SwingUtilities.getRoot( this), JGloss.messages.getString
+                  ( msgid, objects),
+                  JGloss.messages.getString( "error.dictionary.title"),
+                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**

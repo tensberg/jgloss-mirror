@@ -23,20 +23,19 @@
 
 package jgloss.dictionary;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * The dictionary factory is used to create instances of dictionaries based on a descriptor.
  * <P>
- * Every instance of the <CODE>Dictionary</CODE> interface must register an <CODE>Implementation</CODE>
+ * Every instance of the {@link Dictionary Dictionary} interface must register an 
+ * {@link DictionaryFactory#Implementation Implementation}
  * object. The objects are then used to find a matching dictionary implementation for a descriptor.
  * </P>
  *
  * @author Michael Koch
- * @see Dictionary
- * @see DictionaryFactory.Implementation
  */
 public abstract class DictionaryFactory {
     /**
@@ -80,10 +79,9 @@ public abstract class DictionaryFactory {
     } // class InstantiationException
 
     /**
-     * Map from <CODE>Class</CODE> objects of dictionary classes to <CODE>Implementation</CODE>
-     * objects describing the classes.
+     * Collection of dictionary implementations.
      */
-    private static Map implementations = new HashMap( 10);
+    private static Set implementations = new HashSet( 10);
 
     /**
      * Creates a dictionary instance based on the descriptor. The format of the descriptor
@@ -120,26 +118,24 @@ public abstract class DictionaryFactory {
 
         // search for implementation with greatest confidence that the descriptor is a
         // dictionary handled by the instance.
-        for ( Iterator i=implementations.entrySet().iterator(); i.hasNext(); ) {
-            Implementation ic = (Implementation) ((Map.Entry) i.next()).getValue();
-            float cc = ic.isInstance( descriptor);
-            if (cc > conf) {
+        String reasons = ""; // reasons for dictionary confidences
+        for ( Iterator i=implementations.iterator(); i.hasNext(); ) {
+            Implementation ic = (Implementation) i.next();
+            TestResult result = ic.isInstance( descriptor);
+            if (result.getConfidence() > conf) {
                 imp = ic;
-                conf = cc;
+                conf = result.getConfidence();
             }
+            
+            if (reasons.length() > 0)
+            	reasons += '\n';
+            reasons += ic.getName() + ":" + result.getReason();
         }
 
-        if (imp == null)
-            throw new NotSupportedException( descriptor);
+        if (imp == null) // zero confidence for all implementations
+            throw new NotSupportedException( reasons);
 
         return imp;
-    }
-
-    /**
-     * Returns the <CODE>Implementation</CODE> registered for a dictionary class.
-     */
-    public static Implementation getImplementation( Class dictionary) {
-        return (Implementation) implementations.get( dictionary);
     }
 
     /**
@@ -147,11 +143,10 @@ public abstract class DictionaryFactory {
      * <CODE>DictionaryFactory</CODE>. The registered implementation will be used
      * to match descriptors to the dictionary and create new instances of the dictionary.
      *
-     * @param dictionary <CODE>Class</CODE> of an implementation of <CODE>Dictionary</CODE>.
      * @param imp <CODE>Implementation</CODE> object which describes the implementation.
      */
-    public static void registerImplementation( Class dictionary, Implementation imp) {
-        implementations.put( dictionary, imp);
+    public static void registerImplementation(Implementation imp) {
+        implementations.add(imp);
     }
 
     /**
@@ -188,10 +183,9 @@ public abstract class DictionaryFactory {
          * </P>
          *
          * @param descriptor Descriptor of the dictionary to test.
-         * @return Confidence that the descriptor describes an instance of the <CODE>Dictionary</CODE>
-         *         implementation.
+         * @return Result of the test (confidence and reason).
          */
-        float isInstance( String descriptor);
+        TestResult isInstance( String descriptor);
         /**
          * Returns the maximum confidence value used by this implementation.
          */
@@ -218,4 +212,31 @@ public abstract class DictionaryFactory {
          */
         Class getDictionaryClass( String descriptor);
     } // interface Implementation
+    
+    /**
+     * Test result for {@link DictionaryFactory#Implementation}.
+     * 
+     * @author Michael Koch
+     */
+    public static class TestResult {
+    	private float confidence;
+    	private String reason;
+    	
+    	public TestResult(float _confidence, String _reason) {
+    		this.confidence = _confidence;
+    		this.reason = _reason;
+    	}
+    	
+    	/**
+    	 * Confidence of the descriptor pointing to an instance of this dictionary type.
+    	 * The higher the number, the greater the confidence.
+    	 * Returns {@link #ZERO_CONFIDENCE ZERO_CONFIDENCE} if the descriptor does not
+    	 * match this type.
+    	 */
+    	public float getConfidence() { return confidence; }
+    	/**
+    	 * Short description of how the confidence was calculated.
+    	 */
+    	public String getReason() { return reason; }
+    }
 } // class DictionaryFactory

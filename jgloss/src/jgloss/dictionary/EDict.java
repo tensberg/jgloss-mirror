@@ -53,7 +53,7 @@ import jgloss.dictionary.attribute.Priority;
 public class EDict extends FileBasedDictionary {
     public static void main( String[] args) throws Exception {
         System.err.println( "Creating edict");
-        IndexedDictionary d = new EDict( new java.io.File( args[0]));
+        IndexedDictionary d = new EDict( new java.io.File( args[0]), "EUC-JP");
         System.err.println( "Loading index");
         if (!d.loadIndex()) {
             System.err.println( "Building index");
@@ -82,8 +82,10 @@ public class EDict extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-    public final static DictionaryFactory.Implementation implementation = 
-        initImplementation();
+	public final static DictionaryFactory.Implementation implementationEUC = 
+		initImplementation("EDICT", "EUC-JP");
+	public final static DictionaryFactory.Implementation implementationUTF8 = 
+		initImplementation("EDICT (Unicode)", "UTF-8");
 
     /**
      * Returns a {@link FileBasedDictionary.Implementation FileBasedDictionary.Implementation}
@@ -92,7 +94,7 @@ public class EDict extends FileBasedDictionary {
      * be wrapped in a try/catch block.
      * 
      */
-    private static DictionaryFactory.Implementation initImplementation() {
+    private static DictionaryFactory.Implementation initImplementation(String name, String encoding) {
         try {
             // Explanation of the pattern:
             // The EDICT format is "word [reading] /translation/translation/.../", with
@@ -102,9 +104,13 @@ public class EDict extends FileBasedDictionary {
             // it is tested that the first char in the translation is not a Kanji
             // (InCJKUnifiedIdeographs)
             return new FileBasedDictionary.Implementation
-                ( "EDICT", "EUC-JP", true, Pattern.compile
+                ( name, encoding, true, Pattern.compile
                   ( "\\A\\S+?(\\s\\[.+?\\])?(\\s/)|/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
-                  1.0f, 4096, EDict.class.getConstructor( new Class[] { File.class }));
+                  1.0f, 4096, EDict.class.getConstructor( new Class[] { File.class, String.class })) {
+                        protected Object[] getConstructorParameters(String descriptor) {
+                            return new Object[] { new File(descriptor), this.encoding };
+                        }
+                  };
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -152,8 +158,8 @@ public class EDict extends FileBasedDictionary {
             public String toString() { return "_P_"; }
         };
 
-    public EDict( File dicfile) throws IOException {
-        super( dicfile);
+    public EDict( File dicfile, String encoding) throws IOException {
+        super( dicfile, encoding);
     }
     
     protected void initSupportedAttributes() {
@@ -161,10 +167,6 @@ public class EDict extends FileBasedDictionary {
         
         supportedAttributes.putAll( mapper.getAttributes());
         supportedAttributes.put( Attributes.PRIORITY, Collections.singleton( PRIORITY_VALUE));
-    }
-
-    protected EncodedCharacterHandler createCharacterHandler() {
-        return new EUCJPCharacterHandler();
     }
 
     protected boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field) {

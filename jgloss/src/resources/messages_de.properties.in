@@ -45,6 +45,14 @@ Das Wörterbuch wird nicht verfügbar sein.
 error.dictionary.exception=Beim Öffnen des Wörterbuchs {0} ist ein Fehler aufgetreten.\nDas Wörterbuch wird nicht verfügbar sein.
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.\nDas Wörterbuch wird nicht verfügbar sein.
 error.dictionary.format=Die Datei {0} ist keine\nWörterbuchdatei in einem unterstützten Format.
+error.dictionary.reason=\
+Die Datei {0} wurde mit jedem eingebauten Wörterbuch-Format getestet.\n\
+Nachfolgend ist eine Liste mit allen Formaten und dem Grund, warum das Format nicht erkannt wurde:\n\n\
+{1}\n\n\
+Mögliche Lösungen:\n\
+- Die Datei ist möglicherweise komprimiert. Dekomprimieren Sie sie mit zip oder gzip.\n\
+- Das Format hat sich möglicherweise geändert. Downloaden Sie die aktuelle Version der Wörterbuchdatei und von JGloss.\n\
+- Wenn die Wörterbuchdatei aktuell ist, unterstützt JGloss möglicherweise nicht das Wörterbuchformat. Bitte benachrichtigen Sie den Autor von JGloss.
 error.exclusions.save.title=Fehler beim Schreiben der Ausschluss-Liste
 error.exclusions.save=Beim Schreiben der Ausschluss-Liste nach\{0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1}, {2}.
 error.exclusions.load.title=Fehler beim Lesen der Ausschluß-Liste
@@ -110,6 +118,7 @@ button.annotate.mk=A
 button.annotate.tt=Das ausgewählte Wort mit den angezeigten Ergebnissen annotieren
 button.add=Hinzufügen...
 button.add.mk=H
+button.why=Warum?
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<Erstelle Anwendungsfenster>

@@ -225,9 +225,10 @@ public abstract class JGloss {
     }
 
     protected void registerDictionaries() {
-        DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
-        DictionaryFactory.registerImplementation( WadokuJT.class, WadokuJT.implementation);
-        DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
+        DictionaryFactory.registerImplementation(EDict.implementationEUC);
+        DictionaryFactory.registerImplementation(EDict.implementationUTF8);
+        DictionaryFactory.registerImplementation(WadokuJT.implementation);
+        DictionaryFactory.registerImplementation(KanjiDic.implementation);
     }
 
     protected void initUI() throws Exception {
@@ -297,8 +298,8 @@ public abstract class JGloss {
                                               new String[] { args[i], imp.getName() }));
                     } catch (DictionaryFactory.NotSupportedException ex) {
                         System.out.println( messages.getString
-                                            ( "main.format.unrecognized",
-                                              new String[] { args[i] }));
+                                            ( "error.dictionary.reason",
+                                              new String[] { args[i], ex.getMessage() }));
                     }
                 }
                 System.exit( 0);

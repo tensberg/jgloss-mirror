@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,9 +102,6 @@ public class WadokuJT extends FileBasedDictionary {
         //r.next();
         d.dispose();
     }
-
-    protected static final ResourceBundle NAMES = ResourceBundle.getBundle
-        ( "resources/messages-dictionary");
 
     public static final Attribute MAIN_ENTRY = new Attributes
         ( NAMES.getString( "wadoku.att.main_entry.name"),
@@ -273,7 +269,7 @@ public class WadokuJT extends FileBasedDictionary {
     protected final static Matcher ABBR_MATCHER = ABBR_PATTERN.matcher( "");
 
     public WadokuJT( File dicfile) throws IOException {
-        super( dicfile);
+        super( dicfile, "UTF-8");
     }
 
     protected void initSupportedAttributes() {

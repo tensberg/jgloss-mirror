@@ -42,6 +42,14 @@ error.dictionary.indexnotavailable=The index file for the dictionary {0} could n
 error.dictionary.ioerror=An error occurred while opening dictionary {0}.\nThe dictionary will not be available.
 error.dictionary.exception=An error occurred while opening dictionary {0}.\nThe dictionary will not be available.
 error.dictionary.format=The file {0} is not\na dictionary file in a supported format.
+error.dictionary.reason=\
+The file {0} was tested against each built-in dictionary format.\n\
+The following is a list of all formats and the reason the file was not recognized:\n\n\
+{1}\n\n\
+Possible solutions:\n\
+- The file might be compressed. Uncompress it with zip or gzip.\n\
+- The format might have changed. Try downloading a current version of the dictionary file and JGloss.\n\
+- If the dictionary file is current, JGloss might not support the dictionary format. Please contact the JGloss author.
 error.exclusions.save.title=Error writing exclusion list
 error.exclusions.save=An error occurred while writing the\nexclusion list to {0}.\nThe Java exception was {1}, {2}.
 error.exclusions.load.title=Error reading exclusion list
@@ -100,6 +108,7 @@ button.annotate.mk=A
 button.annotate.tt=Annotate the selected word with the results shown
 button.add=Add...
 button.add.mk=A
+button.why=Why?
 
 jgloss.title=JGloss
 jgloss.version=Version 2 alpha 1

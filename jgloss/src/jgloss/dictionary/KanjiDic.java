@@ -80,7 +80,9 @@ public class KanjiDic implements Dictionary {
      */
     public final static DictionaryFactory.Implementation implementation = 
         new DictionaryFactory.Implementation() {
-                public float isInstance( String descriptor) {
+                public DictionaryFactory.TestResult isInstance( String descriptor) {
+                    float confidence = ZERO_CONFIDENCE;
+                    String reason = "";
                     try {
                         BufferedReader r = new BufferedReader( new InputStreamReader( new FileInputStream
                             ( descriptor), "EUC-JP"));
@@ -95,12 +97,19 @@ public class KanjiDic implements Dictionary {
                         // test if second character is a space and is followed by a
                         // 4-digit hexadecimal number
                         if (lines<100 && l!=null && l.length()>7 && l.charAt( 1)==' ' &&
-                            Integer.parseInt( l.substring( 2, 6), 16)>0)
-                            return getMaxConfidence();
+                            Integer.parseInt( l.substring( 2, 6), 16)>0) {
+                            confidence = getMaxConfidence();
+                            reason = messages.getString("dictionary.reason.ok");
+                        }
+                        else {
+                            reason = messages.getString("dictionary.reason.pattern");
+                        }
                     } catch (IOException ex) {
+                        ex.printStackTrace();
+                        reason = messages.getString("dictionary.reason.file");
                     } catch (NumberFormatException ex) {}
                     
-                    return ZERO_CONFIDENCE;
+                    return new DictionaryFactory.TestResult(confidence, reason);
                 }
                 
                 public float getMaxConfidence() { return 1.0f; }

@@ -25,6 +25,11 @@
 
 dictionary.load=Loading dictionary {0}.
 
+dictionary.reason.read=Failed to read dictionary file.
+dictionary.reason.encoding=The character encoding of the dictionary file was detected as {0}, which is not the expected encoding {1}.
+dictionary.reason.pattern=The dictionary file does not start with the expected text pattern.
+dictionary.reason.ok=The dictionary file matches all criteria.
+
 exception.malformedentry.message=Malformed entry in dictionary {0}: "{1}"
 
 edict.error.writedictionary=Error while writing the dicionary file: {0}, {1}

@@ -40,12 +40,14 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.UnsupportedCharsetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import jgloss.dictionary.attribute.Attribute;
@@ -70,13 +72,20 @@ import jgloss.util.StringTools;
 public abstract class FileBasedDictionary implements IndexedDictionary, Indexable,
                                                      BaseEntry.MarkerDictionary {
     /**
+     * Localized messages and strings for the dictionary implementations. Stored in
+     * <code>resources/messages-dictionary</code>
+     */
+    protected static final ResourceBundle NAMES = ResourceBundle.getBundle
+        ( "resources/messages-dictionary");
+
+    /**
      * Generic implementation for file-based dictionaries. The {@link #isInstance(String) isInstance}
      * test reads some bytes from the file to test, converts them to a string using the
      * superclass-supplied encoding and tests it against a regular expression.
      */
     public static class Implementation implements DictionaryFactory.Implementation {
-        private String name;
-        private String encoding;
+        protected String name;
+        protected String encoding;
         private boolean doEncodingTest;
         private java.util.regex.Pattern pattern;
         private float maxConfidence;
@@ -120,7 +129,10 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * and the {@link #pattern pattern} is tested against it. If the pattern matches, the file
          * is accepted and {@link #maxConfidence maxConfidence} is returned.
          */
-        public float isInstance( String descriptor) {
+        public DictionaryFactory.TestResult isInstance( String descriptor) {
+			float confidence = ZERO_CONFIDENCE;
+			String reason = "";
+			
             try {
                 File dic = new File( descriptor);
                 int headlen = (int) Math.min( lookAtLength, dic.length());
@@ -132,14 +144,33 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                     in.close();
                 }
 
-                if (doEncodingTest && 
-                    !encoding.equals( CharacterEncodingDetector.guessEncodingName( buffer)))
-                    return ZERO_CONFIDENCE;
-                if (pattern.matcher( new String( buffer, encoding)).find())
-                    return maxConfidence;
-            } catch (IOException ex) {}
+				boolean encodingMatches = false;
+                if (doEncodingTest) {
+                	String bufferEncoding = CharacterEncodingDetector.guessEncodingName( buffer);
+					
+					encodingMatches = encoding.equals(bufferEncoding);
+					if (!encodingMatches) {
+                        reason = MessageFormat.format(NAMES.getString("dictionary.reason.encoding"),
+                            new String[] { bufferEncoding, encoding } );
+                    }
+                }
 
-            return ZERO_CONFIDENCE;
+				if (!doEncodingTest || encodingMatches) {
+	              	if (pattern.matcher( new String( buffer, encoding)).find()) {
+						confidence = maxConfidence;
+						reason = NAMES.getString("dictionary.reason.ok");
+					}
+					else {
+						reason = NAMES.getString("dictionary.reason.pattern");
+					}
+	            }
+            } catch (IOException ex) {
+            	confidence = ZERO_CONFIDENCE;
+            	reason = NAMES.getString("dictionary.reason.file");
+            	ex.printStackTrace();
+            }
+            
+            return new DictionaryFactory.TestResult(confidence, reason);
         }
 
         /**
@@ -161,7 +192,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             throws DictionaryFactory.InstantiationException {
             try {
                 return (Dictionary) dictionaryConstructor.newInstance
-                    ( new Object[] { new File( descriptor) });
+                    ( getConstructorParameters(descriptor));
             } catch (InvocationTargetException ex) {
                 throw new DictionaryFactory.InstantiationException
                     ( (Exception) ((InvocationTargetException) ex).getTargetException());
@@ -169,6 +200,18 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                 // should never happen
                 throw new DictionaryFactory.InstantiationException( ex);
             }
+        }
+
+        /**
+         * Constructs the Object array passed to the Dictionary constructor.
+         * Subclasses can override this method if the constructor takes more arguments.
+         * Default is a single File object constructed using the descriptor.
+         * 
+         * @param descriptor Dictionary descriptor passed to createInstance
+         * @return The Object array used to pass the arguments to the dictionary constructor.
+         */
+        protected Object[] getConstructorParameters(String descriptor) {
+            return new Object[] { new File(descriptor) };
         }
 
         public Class getDictionaryClass( String descriptor) {
@@ -210,7 +253,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Name of the dictionary. This will be the filename of the dictionary file.
      */
-    protected String name;
+    protected String name;    
+    
     protected File indexFile;
     /**
      * Container which stores the index data for this dictionary.
@@ -236,17 +280,18 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * The index file is not loaded from the constructor. Before the dictionary can be used,
      * {@link #loadIndex() loadIndex} must be successfully called.
      *
-     * @param dicfile File which holds the dictionary.
+     * @param _dicfile File which holds the dictionary.
+     * @param _encoding Character encoding of the dictionary file.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
-    protected FileBasedDictionary( File _dicfile) throws IOException {
+    protected FileBasedDictionary( File _dicfile, String _encoding) throws IOException {
         this.dicfile = _dicfile;
-        name = dicfile.getName();
+        this.name = _dicfile.getName();
         indexFile = new File( dicfile.getCanonicalPath() + FileIndexContainer.EXTENSION);
 
-        characterHandler = createCharacterHandler();
+        characterHandler = createCharacterHandler(_encoding);
         try {
-            decoder = Charset.forName( characterHandler.getEncodingName()).newDecoder();
+            decoder = Charset.forName(_encoding).newDecoder();
         } catch (UnsupportedCharsetException ex) {
             // bah...
             // leave decoder==null and use String constructor for byte->char conversion
@@ -378,10 +423,20 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     }
 
     /**
-     * Create a character handler which understands the character encoding format used by this
-     * dictionary.
+     * Create a character handler for the given character encoding.
+     * Creates a {@link EUCJPCharacterHandler EUCJPCharacterHandler} for encoding
+     * EUC-JP, or a {@link UTF8CharacterHandler UTF8CharacterHandler} for encoding "UTF-8".
+     * Throws an <code>IllegalArgumentException</code> otherwise.
+     * Subclasses may override this method to create custom character handlers.
      */
-    protected abstract EncodedCharacterHandler createCharacterHandler();
+    protected EncodedCharacterHandler createCharacterHandler(String encoding) {
+        if (encoding.equals("EUC-JP"))
+            return new EUCJPCharacterHandler();
+        else if (encoding.equals("UTF-8"))
+            return new UTF8CharacterHandler();
+        else
+            throw new IllegalArgumentException(encoding);
+    }
 
     /**
      * Return a character handler which understands the character encoding format used by this

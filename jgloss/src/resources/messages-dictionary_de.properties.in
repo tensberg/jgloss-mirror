@@ -25,6 +25,11 @@
 
 dictionary.load=Lade Wörterbuch {0}.
 
+dictionary.reason.read=Die Wörterbuchdatei kann nicht gelesen werden.
+dictionary.reason.encoding=Die Zeichen-Codierung der Wörterbuchdatei wurde erkannt als {0}. Erwartet wurde die Zeichen-Codierung {1}.
+dictionary.reason.pattern=Die Wörterbuchdatei fängt nicht mit dem erwarteten Textmuster an.
+dictionary.reason.ok=Die Wörterbuchdatei erfüllt alle Kriterien.
+
 exception.malformedentry.message=Falsch geformter Eintrag in Wörterbuch {0}: "{1}"
 
 edict.error.writedictionary=Fehler beim Schreiben der Wörterbuchdatei: {0}, {1}
