@@ -83,37 +83,41 @@ public class CustomFileView extends FileView {
     }
 
     public String getTypeDescription( File f) {
-        String name = f.getName().toLowerCase();
-        if (name.endsWith( ".jgloss"))
-            return JGLOSS_DESCRIPTION;
-        if (name.endsWith( ".xml"))
-            return XML_DESCRIPTION;
-        if (name.endsWith( ".htm") || name.endsWith( ".html"))
-            return HTML_DESCRIPTION;
-        if (name.endsWith( ".tex"))
-            return TEX_DESCRIPTION;
-        if (name.endsWith( ".txt"))
-            return TEXT_DESCRIPTION;
-        if (name.endsWith( ".tmpl"))
-            return TEMPLATE_DESCRIPTION;
+        if (f.isFile()) { // as opposed to a directory
+            String name = f.getName().toLowerCase();
+            if (name.endsWith( ".jgloss"))
+                return JGLOSS_DESCRIPTION;
+            if (name.endsWith( ".xml"))
+                return XML_DESCRIPTION;
+            if (name.endsWith( ".htm") || name.endsWith( ".html"))
+                return HTML_DESCRIPTION;
+            if (name.endsWith( ".tex"))
+                return TEX_DESCRIPTION;
+            if (name.endsWith( ".txt"))
+                return TEXT_DESCRIPTION;
+            if (name.endsWith( ".tmpl"))
+                return TEMPLATE_DESCRIPTION;
+        }
         
         return null; // let L&F file view determine the description
     }
 
     public Icon getIcon( File f) {
-        String name = f.getName().toLowerCase();
-        if (name.endsWith( ".jgloss"))
-            return JGLOSS_ICON;
-        if (name.endsWith( ".xml"))
-            return XML_ICON;
-        if (name.endsWith( ".htm") || name.endsWith( ".html"))
-            return HTML_ICON;
-        if (name.endsWith( ".tex"))
-            return TEX_ICON;
-        if (name.endsWith( ".txt"))
-            return TEXT_ICON;
-        if (name.endsWith( ".tmpl"))
-            return TEMPLATE_ICON;
+        if (f.isFile()) { // as opposed to a directory
+            String name = f.getName().toLowerCase();
+            if (name.endsWith( ".jgloss"))
+                return JGLOSS_ICON;
+            if (name.endsWith( ".xml"))
+                return XML_ICON;
+            if (name.endsWith( ".htm") || name.endsWith( ".html"))
+                return HTML_ICON;
+            if (name.endsWith( ".tex"))
+                return TEX_ICON;
+            if (name.endsWith( ".txt"))
+                return TEXT_ICON;
+            if (name.endsWith( ".tmpl"))
+                return TEMPLATE_ICON;
+        }
         
         return null; // let L&F file view determine the icon
     }

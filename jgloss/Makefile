@@ -163,7 +163,7 @@ compile-www:
 	cp -r doc.src/img doc
 	docbook2pdf -o doc -d $(shell pwd)/doc.src/stylesheet.dsl $<
 	rm -r doc/img
-	rm doc/jgloss.out
+	-rm doc/jgloss.out
 
 index.html: jgloss.docbook doc.src/stylesheet.dsl
 	mkdir -p doc/html
