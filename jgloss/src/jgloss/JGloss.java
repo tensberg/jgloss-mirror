@@ -108,6 +108,36 @@ public class JGloss {
      * @exception Exception if something goes wrong during the initialisation.
      */
     public static void main( String args[]) throws Exception {
+        if (args.length > 0) {
+            if (args[0].equals( "-h") || args[0].equals( "--help") ||
+                args[0].equals( "/?")) {
+                System.err.println( messages.getString( "main.usage"));
+                System.exit( 0);
+            }
+            else if (args[0].equals( "-i") || args[0].equals( "--createindex")) {
+                for ( int i=1; i<args.length; i++) {
+                    EDict e = new EDict( args[i], false);
+                    e.buildIndex();
+                    try {
+                        // write index to local directory
+                        e.saveJJDX( new File( e.getName() + EDict.JJDX_EXTENSION));
+                    } catch (IOException ex) {
+                        System.err.println( messages.getString( "edict.error.writejjdx",
+                                                                new String[] { ex.getClass().getName(),
+                                                                               ex.getLocalizedMessage() }));
+                        System.exit( 1);
+                    }
+                }
+                System.exit( 0);
+            }
+            else if (args[0].startsWith( "-") || args[0].startsWith( "/")) {
+                System.err.println( messages.getString( "main.unknownoption",
+                                                        new String[] { args[0] }));
+                System.err.println( messages.getString( "main.usage"));
+                System.exit( 1);
+            }
+        }
+
         UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
 
         SplashScreen splash = new SplashScreen();
@@ -122,7 +152,13 @@ public class JGloss {
         // Initialize the preferences at startup. This includes loading the dictionaries.
         PreferencesFrame.getFrame();
         splash.setInfo( messages.getString( "splashscreen.initMain"));
-        new JGlossFrame();
+        if (args.length == 0)
+            new JGlossFrame();
+        else
+            for ( int i=0; i<args.length; i++) {
+                JGlossFrame f = new JGlossFrame();
+                f.loadDocument( args[i]);
+            }
         splash.close();
     }
 
