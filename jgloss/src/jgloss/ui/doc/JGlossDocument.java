@@ -473,7 +473,7 @@ public class JGlossDocument extends HTMLDocument {
                         } catch (StringIndexOutOfBoundsException ex) {
                             System.err.println( "WARNING: unparseable word/base/reading " +
                                                 word + "/" + base + "/" + reading);
-                            wr = new String[][] { { word } };
+                            wr = new String[][] { { word, reading } };
                         }
                         if (wr.length==1 && wr[0].length==1) {
                             // Single word without reading. Since there has to be at least one

@@ -33,9 +33,10 @@
 \addtolength{\tw}{-20pt}
 \newcommand{\fn}[3]{\footnotetext{\makebox[\ww][l]{#1} \makebox[\rw][l]{#2} \parbox[t]{\tw}{#3}}}
 
-%begin text
-%ruby \\ruby{%word%}{%reading%}
+%document-text
+%reading \\ruby{%word%}{%reading%}
 %translation \\fn{%dictionary-word%}{%dictionary-reading%}{%translation%}
-%end text
+%paragraph-end \n\n\\bigskip\n\n
+%end document-text
 
 \end{document}

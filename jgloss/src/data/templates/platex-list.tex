@@ -20,9 +20,10 @@
 \pagestyle{myheadings}
 \markright{%document-title%}
     
-%begin text
-%ruby \\ruby{%word%}{%reading%}
-%end text
+%document-text
+%reading \\ruby{%word%}{%reading%}
+%paragraph-end \n\n\\bigskip\n\n
+%end document-text
 
 \newpage
 \small
@@ -38,9 +39,11 @@
 \addtolength{\tw}{-1.0\rw}
 \addtolength{\tw}{-4pt}
 \newcommand{\fn}[3]{\noindent \makebox[\ww][l]{#1} \makebox[\rw][l]{#2} \parbox[t]{\tw}{#3}}
+\newcommand{\para}[1]{\noindent \textbf{Paragraph #1}}
 
-%begin annotation-list
-%paragraph Paragraph %paragraph-number%\n
+%annotation-list
+%paragraph-start \\para{%paragraph-number%}\n\n
+%paragraph-end \n\n\\bigskip\n\n
 %translation \\fn{%word%}{%reading%}{%translation%}\n
 %end annotation-list
 

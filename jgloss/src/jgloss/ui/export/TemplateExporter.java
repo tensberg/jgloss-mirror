@@ -36,46 +36,167 @@ import javax.swing.text.*;
 
 /**
  * Export an annotated JGloss document using a format defined in a template.
+ * <p>
+ * A template is a text file, which can contain <em>variables</em> and 
+ * <em>insertion sections</em>. A variable has the form %name%. It can appear anywhere
+ * in the input text and is replaced by its value when the document is exported.
+ * </p><p>
+ * An insertion section is marked by <code>%section-name</code> and
+ * <code>%end section-name</code>, each on a single line. Between these markers are the
+ * <em>pattern definitions</em>. On export the insertion section is replaced by the
+ * document text or annotation list, with the patterns applied to the annotations.
+ * </p><p>
+ * A pattern definition has the form <code>%pattern-name pattern</code>.
+ * <code>pattern</code> can contain variable definitions and the escape sequences 
+ * <code>\\, \t, \n and \r</code>, which have the same meaning as in a Java string.
+ * What patterns can appear in an insertion section depends on the section definition.
+ * </p>
  *
  * @author Michael Koch
  */
 public abstract class TemplateExporter {
+    /**
+     * Marks an encoding declaration in a template file 
+     * read by {@link #getReader(InputStream) getReader}.
+     */
     public static final String ENCODING_HEADER = "% encoding:";
 
+    /**
+     * Character which marks the beginning of a variable.
+     */
     public static final char VARIABLE_START_MARKER = '%';
+    /**
+     * Character which marks the end of a variable.
+     */
     public static final char VARIABLE_END_MARKER = '%';
+    /**
+     * Variable: replaced by the file name of the exported document.
+     */
     public static final String DOCUMENT_FILENAME = "%document-filename%";
+    /**
+     * Variable: replaced by the time and date of the document generation.
+     */
     public static final String GENERATION_TIME = "%generation-time%";
+    /**
+     * Variable: replaced by the title of the document.
+     */
     public static final String DOCUMENT_TITLE = "%document-title%";
+    /**
+     * Variable: replaced by the longest dictionary word in the document.
+     */
     public static final String LONGEST_WORD = "%longest-word%";
+    /**
+     * Variable: replaced by the longest dictionary reading in the document.
+     */
     public static final String LONGEST_READING = "%longest-reading%";
 
-    public static final String BEGIN_TEXT = "%begin text";
-    public static final String BEGIN_ANNOTATION_LIST = "%begin annotation-list";
+    /**
+     * Text insertion section start marker. The document text is inserted in its place.<br>
+     * Allowed pattern definitions:
+     * <ul>
+     * <li>{@link #READING_PATTERN READING_PATTERN}</li>
+     * <li>{@link #TRANSLATION_PATTERN TRANSLATION_PATTERN}</li>
+     * <li>{@link #LINE_BREAK_PATTERN LINE_BREAK_PATTERN}</li>
+     * <li>{@link #PARAGRAPH_START_PATTERN PARAGRAPH_START_PATTERN}</li>
+     * <li>{@link #PARAGRAPH_END_PATTERN PARAGRAPH_END_PATTERN}</li>
+     * </ul>
+     */
+    public static final String BEGIN_TEXT = "%document-text";
+    /**
+     * Annotation list insertion section start marker. The list of annotations is inserted in 
+     * its place.
+     * Allowed pattern definitions:
+     * <ul>
+     * <li>{@link #TRANSLATION_PATTERN TRANSLATION_PATTERN}</li>
+     * <li>{@link #PARAGRAPH_START_PATTERN PARAGRAPH_START_PATTERN}</li>
+     * <li>{@link #PARAGRAPH_END_PATTERN PARAGRAPH_END_PATTERN}</li>
+     * </ul>
+     */
+    public static final String BEGIN_ANNOTATION_LIST = "%annotation-list";
+    /**
+     * Insertion section end marker.
+     */
     public static final String END = "%end";
+    /**
+     * Variable: replaced with the word part when used in a {@link #READING_PATTERN reading pattern}.
+     */
     public static final String WORD = "%word%";
+    /**
+     * Variable: replaced with the dictionary word when used in a 
+     * {@link #TRANSLATION_PATTERN translation pattern}.
+     */
     public static final String DICTIONARY_WORD = "%dictionary-word%";
+    /**
+     * Variable: replaced with the dictionary part when used in a {@link #READING_PATTERN reading pattern}.
+     */
     public static final String READING = "%reading%";
+    /**
+     * Variable: replaced with the dictionary reading when used in a 
+     * {@link #TRANSLATION_PATTERN translation pattern}.
+     */
     public static final String DICTIONARY_READING = "%dictionary-reading%";
+    /**
+     * Variable: replaced with the translation when used in a 
+     * {@link #TRANSLATION_PATTERN translation pattern}.
+     */
     public static final String TRANSLATION = "%translation%";
+    /**
+     * Variable: replaced with the paragraph number when used in a 
+     * {@link #PARAGRAPH_START_PATTERN paragraph start pattern}.
+     */
     public static final String PARAGRAPH_NUMBER = "%paragraph-number%";
 
-    public static final String RUBY_PATTERN = "%ruby";
+    /**
+     * Pattern name: the pattern is applied to every word/reading pair.
+     */
+    public static final String READING_PATTERN = "%reading";
+    /**
+     * Pattern name: the pattern is applied to every translation.
+     */
     public static final String TRANSLATION_PATTERN = "%translation";
-    public static final String PARAGRAPH_PATTERN = "%paragraph";
+    /**
+     * Pattern name: the pattern is applied to every line break.
+     */
+    public static final String LINE_BREAK_PATTERN = "%line-break";
+    /**
+     * Pattern name: the pattern is applied to every paragraph start.
+     */
+    public static final String PARAGRAPH_START_PATTERN = "%paragraph-start";
+    /**
+     * Pattern name: the pattern is applied to every paragraph end.
+     */
+    public static final String PARAGRAPH_END_PATTERN = "%paragraph-end";
 
-    protected static class Ruby {
+    /**
+     * Object inserted in the {@link #parsedText parsedText} list for every line
+     * break in the text.
+     */
+    protected static Object LINE_BREAK_MARKER = new Object();
+    /**
+     * Object inserted in the {@link #parsedText parsedText} list for every
+     * paragraph end in the text. An <code>Integer</code> object with the paragraph
+     * number is inserted for a paragraph start.
+     */
+    protected static Object PARAGRAPH_END_MARKER = new Object();
+
+    /**
+     * Representation of a word/reading pair in the segmented document.
+     */
+    protected static class Reading {
         private String[] data;
 
-        public Ruby( String word, String ruby) {
+        public Reading( String word, String ruby) {
             data = new String[] { word, ruby };
         }
 
         public String getWord() { return data[0]; }
         public String getReading() { return data[1]; }
         public String[] asArray() { return data; }
-    } // class Ruby
+    } // class Reading
 
+    /**
+     * Representation of a translation in the segmented document.
+     */
     protected static class Translation {
         private String[] data;
 
@@ -92,7 +213,7 @@ public abstract class TemplateExporter {
     /**
      * List of the document text, split in normal text, text with ruby, annotations and paragraph markers.
      * Normal text between two annotations is stored as a string. 
-     * Text with ruby is stored as {@link Ruby Ruby} instance. An annotation is stored
+     * Text with ruby is stored as {@link Reading Reading} instance. An annotation is stored
      * as a {@link Translation Translation} instance. For a paragraph start, an <code>Integer</code>  
      * with the paragraph number is stored.
      */
@@ -101,8 +222,20 @@ public abstract class TemplateExporter {
     protected String longestDictionaryWord = "";
     protected String longestDictionaryReading = "";
 
-    public TemplateExporter() {}
+    /**
+     * Creates a new template exporter instance.
+     */
+    protected TemplateExporter() {}
 
+    /**
+     * Prepare the document for export. The document text is parsed by calling 
+     * {@link #parseText(JGlossDocument,AnnotationModel,boolean) parseText} and the variable map
+     * is initialized. Subclasses should call this method from their <code>export</code> method,
+     * insert additional variables to the returned set and then call the
+     * {@link #export(Reader,Writer,Map) export} method of this class.
+     *
+     * @returns The map with initialized variables.
+     */
     protected Map prepareExport( JGlossDocument doc, String documentName, AnnotationModel model,
                                  boolean writeHidden) {
         parseText( doc, model, writeHidden);
@@ -110,7 +243,7 @@ public abstract class TemplateExporter {
         variables.put( DOCUMENT_FILENAME, documentName);
         variables.put( GENERATION_TIME, DateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.SHORT)
                        .format( new Date( System.currentTimeMillis())));
-        variables.put( DOCUMENT_TITLE, doc.getTitle());
+        variables.put( DOCUMENT_TITLE, escape( doc.getTitle()));
         variables.put( LONGEST_WORD, longestDictionaryWord);
         variables.put( LONGEST_READING, longestDictionaryReading);
 
@@ -126,164 +259,175 @@ public abstract class TemplateExporter {
         return variables;
     }
 
+    /**
+     * Export the document by reading the template and substituting all special sections.
+     */
     protected void export( Reader template, Writer out, Map variables) throws IOException {
         LineNumberReader templateLines = new LineNumberReader( template);
+        templateLines.setLineNumber( 1); // start counting at 1 and not 0
         String line;
         while ((line = templateLines.readLine()) != null) {
             if (line.startsWith( BEGIN_TEXT))
-                handleInsertText( templateLines, out, variables);
+                handleInsertionSection( templateLines, out, variables, true, true, true, true);
             else if (line.startsWith( BEGIN_ANNOTATION_LIST))
-                handleInsertAnnotationList( templateLines, out, variables);
+                handleInsertionSection( templateLines, out, variables, false, false, true, true);
             else
                 handleTemplateLine( line, out, variables);
         }
     }
 
+    /**
+     * Handle a normal template line by substituting all variables and writing it to the output
+     * writer.
+     */
     protected void handleTemplateLine( String line, Writer out, Map variables) throws IOException {
         out.write( substituteVariables( line, variables));
         out.write( '\n');
     }
 
-    protected void handleInsertText( LineNumberReader template, Writer out,
-                                     Map variables) throws IOException {
+    /**
+     * Handle an insertion section by reading the patterns and writing the selected parts 
+     * of the document text to the output writer.
+     */
+    protected void handleInsertionSection( LineNumberReader template, Writer out,
+                                           Map variables, boolean writeText, boolean writeReadings,
+                                           boolean writeTranslations, boolean writeParagraphs)
+        throws IOException {
         int startLineNumber = template.getLineNumber();
 
         String line;
-        String rubyPattern = null;
+        String readingPattern = null;
         String translationPattern = null;
+        String lineBreakPattern = null;
+        String paragraphStartPattern = null;
+        String paragraphEndPattern = null;
         try {
             while (!(line = template.readLine()).startsWith( END)) {
                 String pattern = null;
-                pattern = matchPatternDefinition( line, template.getLineNumber(),
-                                                  RUBY_PATTERN, rubyPattern);
-                if (pattern != null)
-                    rubyPattern = pattern;
-                else {
+                if (writeReadings) {
+                    pattern = matchPatternDefinition( line, template.getLineNumber(),
+                                                      READING_PATTERN, readingPattern);
+                    if (pattern != null)
+                        readingPattern = pattern;
+                }
+
+                if (pattern==null && writeTranslations) {
                     pattern = matchPatternDefinition
                         ( line, template.getLineNumber(), TRANSLATION_PATTERN, translationPattern);
                     if (pattern != null)
                         translationPattern = pattern;
                 }
+
+                if (pattern==null && writeText) {
+                    pattern = matchPatternDefinition
+                        ( line, template.getLineNumber(), LINE_BREAK_PATTERN, lineBreakPattern);
+                    if (pattern != null)
+                        lineBreakPattern = pattern;
+                }
+
+                if (pattern==null && (writeText || writeParagraphs)) {
+                    pattern = matchPatternDefinition
+                        ( line, template.getLineNumber(), PARAGRAPH_START_PATTERN, paragraphStartPattern);
+                    if (pattern != null)
+                        paragraphStartPattern = pattern;
+                }
+
+                if (pattern==null && (writeText || writeParagraphs)) {
+                    pattern = matchPatternDefinition
+                        ( line, template.getLineNumber(), PARAGRAPH_END_PATTERN, paragraphEndPattern);
+                    if (pattern != null)
+                        paragraphEndPattern = pattern;
+                }
+
                 if (pattern == null)
                     // one of the patterns must have matched,
                     // all other line contents are an error
-                    throw new IOException
+                    throw new TemplateException
                         ( JGloss.messages.getString
                           ( "export.template.unknownline",
-                            new Object[] { new Integer( template.getLineNumber()) }));
+                            new Object[] { new Integer( template.getLineNumber()) }),
+                          template.getLineNumber());
             }
         } catch (NullPointerException ex) {
             // template ended before %end marker was found
-            throw new IOException( JGloss.messages.getString
-                                   ( "export.template.unmatchedbegin",
-                                     new Object[] { BEGIN_TEXT, new Integer( startLineNumber) }));
+            throw new TemplateException( JGloss.messages.getString
+                                         ( "export.template.unmatchedbegin",
+                                           new Object[] { BEGIN_TEXT, new Integer( startLineNumber) }),
+                                         startLineNumber);
         }
 
-        // build message formats for ruby and translation pattern
-        MessageFormat rubyFormat = null;
-        if (rubyPattern != null)
-            rubyFormat = new MessageFormat( substituteVariables
-                                            ( quoteMessageFormat( rubyPattern), variables));
+        // replace line end and paragraph patterns by default values
+        if (lineBreakPattern == null)
+            lineBreakPattern = defaultLineBreakPattern();
+        lineBreakPattern = substituteVariables( quoteMessageFormat( lineBreakPattern), variables);
+        if (paragraphEndPattern == null)
+            paragraphEndPattern = defaultParagraphEndPattern();
+        paragraphEndPattern = substituteVariables( quoteMessageFormat( paragraphEndPattern), variables);
+
+        // build message formats for reading, translation and paragraph start pattern
+        MessageFormat readingFormat = null;
+        if (readingPattern != null)
+            readingFormat = new MessageFormat( substituteVariables
+                                               ( quoteMessageFormat( readingPattern), variables));
         MessageFormat translationFormat = null;
         if (translationPattern != null)
             translationFormat = new MessageFormat( substituteVariables
                                                    ( quoteMessageFormat( translationPattern), variables));
+        MessageFormat paragraphStartFormat = null;
+        Integer[] paragraphNumber = null;
+        if (paragraphStartPattern == null)
+            paragraphStartPattern = defaultParagraphStartPattern();
+        paragraphStartFormat = new MessageFormat( substituteVariables
+                                                  ( quoteMessageFormat( paragraphStartPattern), variables));
+        paragraphNumber = new Integer[1];
 
         // write the output text
         for ( Iterator i=parsedText.iterator(); i.hasNext(); ) {
             Object next = i.next();
             if (next instanceof String) {
                 // normal text
-                out.write( (String) next);
+                if (writeText)
+                    out.write( (String) next);
             }
-            else if (next instanceof Ruby) {
-                Ruby ruby = (Ruby) next;
-                if (rubyFormat != null)
-                    out.write( rubyFormat.format( ruby.asArray(), new StringBuffer(), null).toString());
-                else
-                    out.write( ruby.getWord());
+            else if (next instanceof Reading) {
+                if (writeReadings) {
+                    Reading reading = (Reading) next;
+                    if (readingFormat != null)
+                        out.write( readingFormat.format( reading.asArray(), new StringBuffer(), null)
+                                   .toString());
+                    else
+                        out.write( reading.getWord());
+                }
             }
             else if (next instanceof Translation) {
-                Translation translation = (Translation) next;
-                if (translationFormat != null)
-                    out.write( translationFormat.format( translation.asArray(), new StringBuffer(), null)
-                               .toString());
-            }
-        }
-        out.write( '\n');
-    }
-
-    protected void handleInsertAnnotationList( LineNumberReader template, Writer out,
-                                               Map variables) throws IOException {
-        int startLineNumber = template.getLineNumber();
-
-        String line;
-        String translationPattern = null;
-        String paragraphPattern = null;
-        try {
-            while (!(line = template.readLine()).startsWith( END)) {
-                String pattern;
-                pattern = matchPatternDefinition
-                    ( line, template.getLineNumber(), TRANSLATION_PATTERN, translationPattern);
-                if (pattern != null)
-                    translationPattern = pattern;
-                else {
-                    pattern = matchPatternDefinition
-                        ( line, template.getLineNumber(), PARAGRAPH_PATTERN, paragraphPattern);
-                    if (pattern != null)
-                        paragraphPattern = pattern;
+                if (writeTranslations) {
+                    Translation translation = (Translation) next;
+                    if (translationFormat != null)
+                        out.write( translationFormat.format( translation.asArray(), new StringBuffer(), null)
+                                   .toString());
                 }
-                if (pattern == null)
-                    // one of the patterns must have matched,
-                    // all other line contents are an error
-                    throw new IOException
-                        ( JGloss.messages.getString
-                          ( "export.template.unknownline",
-                            new Object[] { new Integer( template.getLineNumber()) }));
             }
-        } catch (NullPointerException ex) {
-            // template ended before %end marker was found
-            throw new IOException( JGloss.messages.getString
-                                   ( "export.template.unmatchedbegin",
-                                     new Object[] { BEGIN_TEXT, new Integer( startLineNumber) }));
-        }
-
-        // build message formats for ruby and translation pattern
-        MessageFormat translationFormat = null;
-        if (translationPattern != null)
-            translationFormat = new MessageFormat( substituteVariables
-                                                   ( quoteMessageFormat( translationPattern), variables));
-        MessageFormat paragraphFormat = null;
-        Integer[] paragraphNumber = null;
-        if (paragraphPattern != null) {
-            paragraphFormat = new MessageFormat( substituteVariables
-                                                 ( quoteMessageFormat( paragraphPattern), variables));
-            paragraphNumber = new Integer[1];
-        }
-
-        // write the output text
-        for ( Iterator i=parsedText.iterator(); i.hasNext(); ) {
-            Object next = i.next();
-            if (next instanceof Translation) {
-                Translation translation = (Translation) next;
-                if (translationFormat != null)
-                    out.write( translationFormat.format( translation.asArray(), new StringBuffer(), null)
-                               .toString());
-            }
-            else if (next instanceof Integer) {
-                if (paragraphPattern != null) {
+            else if (next instanceof Integer) { // paragraph start marker
+                if (writeText || writeParagraphs) {
                     paragraphNumber[0] = (Integer) next;
-                    out.write( paragraphFormat.format( paragraphNumber, new StringBuffer(), null)
+                    out.write( paragraphStartFormat.format( paragraphNumber, new StringBuffer(), null)
                                .toString());
                 }
             }
+            else if (next == PARAGRAPH_END_MARKER) {
+                if (writeText || writeParagraphs)
+                    out.write( paragraphEndPattern);
+            }
+            else if (next == LINE_BREAK_MARKER) {
+                if (writeText)
+                    out.write( lineBreakPattern);
+            }
         }
-        out.write( '\n');
     }
 
     /**
-     * Create a list of text segments. The text is segmented in normal text, word/ruby pairs
-     * and translations.
+     * Create a list of text segments. The text is segmented in normal text, word/ruby pairs,
+     * translations and paragraph starts.
      *
      * @param doc The document to write.
      * @param model Annotation model which contains the annotations of the document.
@@ -292,20 +436,26 @@ public abstract class TemplateExporter {
      */
     protected void parseText( JGlossDocument doc, AnnotationModel model, boolean writeHidden) {
         parsedText = new ArrayList( model.getAnnotationCount()*3 + 30);
+        int paragraph = 1; // current paragraph
+        // text starts with a paragraph
+        parsedText.add( new Integer( paragraph));
+
         String text = null;
         try {
             text = doc.getText( 0, doc.getLength());
         } catch (BadLocationException ex) {}
         
-        int paragraph = 1; // current paragraph
-        int prevend = 0; // end offset of the previous annotation
+        // root element is HTML, child 0 is HEAD, child 1 is body. Ignore text in HEAD by
+        // initializing prevend to start of body
+        Element body = doc.getDefaultRootElement().getElement( 1); 
+        int prevend = body.getStartOffset(); // end offset of the previous annotation
         for ( int i=0; i<model.getAnnotationCount(); i++) {
             AnnotationNode annotation = model.getAnnotationNode( i);
             Element ae = annotation.getAnnotationElement();
 
             // add text between annotations
             if (prevend < ae.getStartOffset())
-                parsedText.add( escape( text.substring( prevend, ae.getStartOffset())));
+                paragraph = addTextAndParagraphs( text.substring( prevend, ae.getStartOffset()), paragraph);
             prevend = ae.getEndOffset();
 
             // handle reading and word text
@@ -321,7 +471,7 @@ public abstract class TemplateExporter {
                         (!writeHidden && annotation.isHidden()))
                         parsedText.add( word);
                     else
-                        parsedText.add( new Ruby( word, reading));
+                        parsedText.add( new Reading( word, reading));
                 }
                 else { // BASETEXT element
                     parsedText.add( escape( text.substring( child.getStartOffset(),
@@ -345,18 +495,88 @@ public abstract class TemplateExporter {
         }
         // add the remaining text
         if (prevend < text.length())
-            parsedText.add( escape( text.substring( prevend, text.length())));
+            addTextAndParagraphs( text.substring( prevend, text.length()), paragraph);
 
+        // close last paragraph
+        if (parsedText.get( parsedText.size()-1) != PARAGRAPH_END_MARKER)
+            parsedText.add( PARAGRAPH_END_MARKER);
     }
 
+    /**
+     * Add unannotated text, line break and paragraph markers to the parsed text list.
+     * A \n in the document text is interpreted as paragraph marker. 
+     *
+     * @param text The text, possibly containing paragraph markers.
+     * @param paragraphNumber Number of the current paragraph.
+     * @return New paragraph number.
+     */
+    protected int addTextAndParagraphs( String text, int paragraphNumber) {
+        text = escape( text);
+        int from = 0;
+        int to;
+        while ((to = text.indexOf( '\n', from)) != -1) {
+            String p = text.substring( from, to);
+            if (p.length() > 0) {
+                if (parsedText.get( parsedText.size()-1) == PARAGRAPH_END_MARKER) {
+                    // p starts a new paragraph
+                    paragraphNumber++;
+                    // add paragraph start marker
+                    parsedText.add( new Integer( paragraphNumber));
+                }
+                parsedText.add( p);
+            }
+            // if the \n is immediately followed by another \n, it is considered
+            // to mark a paragraph break, otherwise a line break
+            to++;
+            if (to<text.length() && text.charAt( to)=='\n') {
+                // paragraph break
+                parsedText.add( PARAGRAPH_END_MARKER);
+                // skip over additional \n
+                while (to<text.length() && text.charAt( to)=='\n')
+                    to++;
+            }
+            else {
+                // line break
+                parsedText.add( LINE_BREAK_MARKER);
+            }
+
+            from = to;
+        }
+        // add remaining text (if any)
+        if (from < text.length()) {
+            if (parsedText.get( parsedText.size()-1) == PARAGRAPH_END_MARKER) {
+                // p starts a new paragraph
+                paragraphNumber++;
+                // add paragraph start marker
+                parsedText.add( new Integer( paragraphNumber));
+            }
+            parsedText.add( text.substring( from));
+        }
+        
+        return paragraphNumber;
+    }
+
+    /**
+     * Test if the line is a pattern definition of the specified pattern, and return the pattern.
+     *
+     * @param line Line from the template which may be a pattern definition.
+     * @param lineNumber Current line number of the pattern reader.
+     * @param name Pattern name including the pattern start marker "% ".
+     * @param definedPattern Value of the pattern if it is already defined. If this is not
+     *        <code>null</code> and the line redefines the pattern, a 
+     *        {@link TemplateException TemplateException} is thrown.
+     * @return The pattern, if it was defined, otherwise <code>null</code>.
+     * @exception TemplateException if an already defined pattern is redefined.
+     */
     protected String matchPatternDefinition( String line, int lineNumber, String name, 
-                                             String definedPattern) throws IOException {
+                                             String definedPattern) throws TemplateException {
         if (line.toLowerCase().startsWith( name)) {
             if (definedPattern != null)
-                throw new IOException
+                throw new TemplateException
                     ( JGloss.messages.getString
                       ( "export.template.patternredefined",
-                        new Object[] { new Integer( lineNumber) }));
+                        new Object[] { new Integer( lineNumber) }),
+                      lineNumber);
             return unescapePattern( line.substring( name.length() + 1));
         }
 
@@ -365,11 +585,11 @@ public abstract class TemplateExporter {
 
     /**
      * Substitute variables in a line with their values. Variable delimiters are
-     * {@link #VARIABLE_START_MARKER VARIABLE_START_MARKER} and 
+     * {@link #VARIABLE_START_MARKER VARIABLE_START_MARKER} and
      * {@link #VARIABLE_END_MARKER VARIABLE_END_MARKER}.
      *
      * @param line Line, possibly with variables to replace.
-     * @param substitutions Mapping from variable names to substitutions.
+     * @param substitutions Mapping from variable names to values.
      */
     protected String substituteVariables( String line, Map substitutions) {
         StringBuffer linebuf = null;
@@ -406,10 +626,36 @@ public abstract class TemplateExporter {
      * @param in The string to escape.
      * @return The escaped string.
      */
-    protected String escape( String in) {
-        return in;
-    }
+    protected String escape( String in) { return in; }
 
+    /**
+     * Default pattern inserted in the output for line breaks if none is specified in the template.
+     *
+     * @return A single \n.
+     */
+    protected String defaultLineBreakPattern() { return "\n"; }
+
+    /**
+     * Default pattern inserted in the output for paragraph starts if none is specified in the template.
+     *
+     * @return The empty string.
+     */
+    protected String defaultParagraphStartPattern() { return ""; }
+
+    /**
+     * Default pattern inserted in the output for paragraph ends if none is specified in the template.
+     *
+     * @return "\n\n".
+     */
+    protected String defaultParagraphEndPattern() { return "\n\n"; }
+
+    /**
+     * Creates a reader which reads a template definition from an input stream. If the template
+     * starts with a {@link #ENCODING_HEADER character encoding declaration} line, this encoding
+     * will be used and the declaration line will be skipped by the reader. Otherwise the
+     * {@link jgloss.dictionary.CharacterEncodingDetector character encoding detector} will be used
+     * to create the reader.
+     */
     public static InputStreamReader getReader( InputStream template) throws IOException {
         // look at the start of the input stream to find a encoding declaration
         int BUF_SIZE = ENCODING_HEADER.length() + 10;
@@ -446,8 +692,11 @@ public abstract class TemplateExporter {
         return CharacterEncodingDetector.getReader( in);
     }
 
+    /**
+     * Escapes the characters in the string which have a special meaning when used as a
+     * <code>MessageFormat</code>.
+     */
     protected static String quoteMessageFormat( String format) {
-        System.err.println( format);
         StringBuffer out = new StringBuffer( format.length() + 10);
         out.append( format);
         for ( int i=out.length()-1; i>=0; i--) {
@@ -460,10 +709,12 @@ public abstract class TemplateExporter {
             }
         }
 
-        System.err.println( out.toString());
         return out.toString();
     }
 
+    /**
+     * Replaces backslash-escapes in a pattern with the represented characters.
+     */
     protected String unescapePattern( String pattern) {
         StringBuffer out = new StringBuffer( pattern);
         for ( int i=0; i<out.length()-1; i++) {

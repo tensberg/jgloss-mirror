@@ -96,6 +96,7 @@ button.overwrite=Überschreiben
 button.choose=Auswählen...
 button.select=Auswählen
 button.annotate=Annotieren
+button.add=Hinzufügen...
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<Erstelle Anwendungsfenster>
@@ -335,6 +336,11 @@ annotationeditor.action.next=Nächste Annotation
 annotationeditor.action.previous=Vorherige Annotation
 
 export.encodings=Zeichensatz:
+export.templates=Format:
+export.template.unmatchedbegin=Kein Ende-Marker für {0} in Export-Format gefunden, Zeile {1,number}.
+export.template.patternredefined=Pattern erneut definiert in Export-Format, Zeile {0,number}.
+export.template.unknownline=Die Zeile {0,number} ist an dieser Stelle nicht im Export-Format erlaubt.
+export.choosetemplate=Wählen sie eine Vorlage
 export.annotationlist.title=Annotationsliste exportieren
 export.annotationlist.header=\# Annotationsliste fuer {0}\n\# Zeichensatz: {1}\n
 export.writereading=Lesungen schreiben
@@ -345,14 +351,9 @@ export.html.title=HTML exportieren
 export.html.interactive=Interaktives HTML
 export.html.backwardscompatible=Abwärtskompatibel
 export.latex.title=LaTeX exportieren
-export.latex.translationsonpage=Übersetzungen auf selber Seite
-export.latex.header=\
-% Dies ist ein EUC-JP-kodiertes japanisches LaTeX-Dokument,\n\
-% generiert von JGloss aus {0} am {1,date,medium}, {1,time,short}.\n\
-% Benutzen sie platex um die Datei zu verarbeiten.\n\
-% Beachten sie das die Datei ruby-annotation.sty, die JGloss beiliegt,\n\
-% installiert sein muss.\n\n
-export.latex.vocabulary=\ --- Vokabelliste
+export.latex.fontsize=Fontgröße:
+
+export.latex.templates=/data/templates/platex-top.tex:platex - Übers. auf selber Seite:/data/templates/platex-list.tex:platex - Übers. in Liste:/data/templates/platex-ruby.tex:platex - nur Lesungen
 
 about.frame.title=Über JGloss
 about.text=\
@@ -375,6 +376,7 @@ preferences.header.obsolete=\
 filefilter.description.jgloss=JGloss Dokumente (*.jgloss)
 filefilter.description.html=HTML Dokumente (*.html)
 filefilter.description.latex=LaTeX Dokumente (*.tex)
+filefilter.description.template=Export-Format (*.tmpl)
 
 fileview.description.jgloss=JGloss-Dokument
 fileview.description.html=HTML-Dokument

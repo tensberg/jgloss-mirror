@@ -133,7 +133,7 @@ public class WordNode extends InnerNode {
             // no need to split the reading/base.
             readings[0].setText( reading);
         }
-        else {
+        else try {
             // extract the reading of the kanji part(s) from the reading string and use them
             // for the new annotation.
             String[][] wr = StringTools.splitWordReading( baseWord, baseWord, reading);
@@ -155,6 +155,10 @@ public class WordNode extends InnerNode {
             for ( int i=readingIndex; i<readings.length; i++) {
                 readings[i].setText( "");
             }
+        } catch (StringIndexOutOfBoundsException ex) {
+            System.err.println( "WARNING: word " + baseWord + " does not match reading " +
+                                reading);
+            readings[0].setText( reading);
         }
     }
 

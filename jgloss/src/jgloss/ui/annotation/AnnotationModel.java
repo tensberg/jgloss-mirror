@@ -354,11 +354,11 @@ public class AnnotationModel extends DefaultTreeModel {
             String wordhtml = "";
             int baseStart = 0;
             boolean hasReading = false;
-            boolean inKanji = StringTools.isKanji( text.charAt( 0));
+            boolean inKanji = needsReading( text, 0);
             for ( int baseEnd=1; baseEnd<=text.length(); baseEnd++) {
                 if (inKanji) {
                     if (baseEnd == text.length() ||
-                        !StringTools.isKanji( text.charAt( baseEnd))) {
+                        !needsReading( text, baseEnd)) {
                         hasReading = true;
                         wordhtml += "<" + AnnotationTags.READING_BASETEXT.getId() + "><"
                             + AnnotationTags.READING.getId() + "> </" + AnnotationTags.READING.getId()
@@ -370,7 +370,7 @@ public class AnnotationModel extends DefaultTreeModel {
                     }
                 }
                 else if (baseEnd == text.length() ||
-                         StringTools.isKanji( text.charAt( baseEnd))) {
+                         needsReading( text, baseEnd)) {
                     wordhtml += "<" + AnnotationTags.BASETEXT + ">" + text.substring( baseStart, baseEnd)
                         + "</" + AnnotationTags.BASETEXT + ">";
                     inKanji = true;
@@ -408,6 +408,19 @@ public class AnnotationModel extends DefaultTreeModel {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Test if a character needs a reading annotation.
+     */
+    private boolean needsReading( String text, int pos) {
+        char c = text.charAt( pos);
+        return StringTools.isKanji( c) ||
+            // handle special case with infix katakana 'ke', which is read as 'ka' or 'ga'
+            // when used as counter or in place names, as in ikkagetsu or Sakuragaoka
+            (c=='\u30f6' || c=='\u30b1') && 
+            pos>0 && StringTools.isKanji( text.charAt( pos-1)) && 
+            pos+1<text.length() && StringTools.isKanji( text.charAt( pos+1));
     }
 
     /**

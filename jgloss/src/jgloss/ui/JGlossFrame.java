@@ -1471,8 +1471,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
     private void doExportLaTeX() {
         LaTeXExportFileChooser f = new LaTeXExportFileChooser( JGloss.getCurrentDir());
 
-        f.addTemplateChooser( Preferences.EXPORT_LATEX_TEMPLATE, Preferences.EXPORT_LATEX_USERTEMPLATES);
-        f.addFontSizeChooser( Preferences.EXPORT_LATEX_FONTSIZE);
         f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_LATEX_WRITEHIDDEN);
 
         int r = f.showSaveDialog( this);
@@ -1486,16 +1484,24 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 new LaTeXExporter().export
                     ( f.getTemplate(), doc, documentName, f.getFontSize(), 
                       (AnnotationModel) annotationEditor.getModel(),
-                      out, f.getWriteHidden());
+                      out, template.getEncoding(), f.getWriteHidden());
             } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showConfirmDialog
-                    ( this, JGloss.messages.getString
-                      ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getClass().getName(),
-                            ex.getLocalizedMessage() }),
-                      JGloss.messages.getString( "error.export.title"),
-                      JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                if (ex instanceof TemplateException) {
+                    JOptionPane.showConfirmDialog
+                        ( this, ex.getMessage(),
+                          JGloss.messages.getString( "error.export.title"),
+                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                }
+                else {
+                    ex.printStackTrace();
+                    JOptionPane.showConfirmDialog
+                        ( this, JGloss.messages.getString
+                          ( "error.export.exception", new Object[] 
+                              { documentPath, ex.getClass().getName(),
+                                ex.getLocalizedMessage() }),
+                          JGloss.messages.getString( "error.export.title"),
+                          JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                }
             } finally {
                 if (template != null) try {
                     template.close();

@@ -31,7 +31,11 @@ import java.awt.*;
 
 import javax.swing.*;
 
-
+/**
+ * File chooser with user interface elements typical for file export.
+ *
+ * @author Michael Koch
+ */
 public class ExportFileChooser extends SaveFileChooser {
     public static final int WRITE_READING = 0;
     public static final int WRITE_TRANSLATIONS = 1;
@@ -47,6 +51,12 @@ public class ExportFileChooser extends SaveFileChooser {
     protected JCheckBox writeHidden;
     protected JComboBox encodingChooser;
 
+    /**
+     * Creates a new file chooser for selecting a export output file.
+     *
+     * @param path Directory initially visible in the chooser.
+     * @param title Title of the dialog.
+     */
     public ExportFileChooser( String path, String title) {
         super( path);
         setDialogTitle( title);
@@ -54,6 +64,13 @@ public class ExportFileChooser extends SaveFileChooser {
         setFileView( CustomFileView.getFileView());
     }
 
+    /**
+     * Adds a user interface element to the dialog. The state of the element will be read from
+     * the JGloss preferences and stored if the file chooser selection is approved.
+     *
+     * @param type Type of the element to add. Every element type can only be added once.
+     * @param prefsKey Key under which the ui element state is stored in the JGloss preferences.
+     */
     public void addElement( int type, String prefsKey) {
         JComponent element = null;
         switch (type) {
@@ -81,6 +98,10 @@ public class ExportFileChooser extends SaveFileChooser {
             addCustomElement( element);
     }
 
+    /**
+     * Adds an arbitrary element to the file chooser. The element will be added below all previously
+     * added elements.
+     */
     public void addCustomElement( Component element) {
         if (accessory == null)
             createAccessory();
@@ -89,6 +110,9 @@ public class ExportFileChooser extends SaveFileChooser {
         accessory.add( Box.createVerticalStrut( 3));
     }
 
+    /**
+     * Runs the dialog. If the dialog is approved, the ui element settings will be saved.
+     */
     public int showSaveDialog( Component parent) {
         if (accessory != null) {
             JPanel container = new JPanel( new GridLayout( 1, 1));

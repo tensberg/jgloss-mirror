@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -52,6 +52,11 @@ public class PlainTextExporter {
                                boolean writeHidden) throws IOException {
         
         StringBuffer text = null;
+        // root element is HTML, child 0 is HEAD, child 1 is body. Ignore text in HEAD.
+        // Since all element start offsets are relative to the whole text and not to
+        // the body element, the whole text is extracted from the doc, but the HEAD part is
+        // deleted before writing it to out.
+        Element body = doc.getDefaultRootElement().getElement( 1); 
         try {
             text = new StringBuffer( doc.getText( 0, doc.getLength()));
         } catch (BadLocationException ex) {}
@@ -94,9 +99,12 @@ public class PlainTextExporter {
             }
         }
 
+        // delete characters not in body
+        text.delete( 0, body.getStartOffset());
+
         // Replace the two &nbsp;'s (non-breakable spaces) which were inserted 
         // by the HTMLifyReader for every Japanese space.
-        for ( int i=text.length()-1; i>=1; i-=1) {
+        for ( int i=text.length()-1; i>=1; i--) {
             if (text.charAt( i)=='\u00a0' &&
                 text.charAt( i-1)=='\u00a0' ) {
                 text.replace( i-1, i+1, "\u3000");

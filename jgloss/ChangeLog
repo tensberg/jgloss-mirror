@@ -1,8 +1,10 @@
-1.0.4: (2002/04/05)
+1.0.4: (2002/04/08)
 	- Added template-based LaTeX-export.
 	- Font and font size of word lookup result is now configurable.
-	- Added auto-configure option to style settings.
+	- Added font auto-configure option to style settings.
 	- Fixed reading generation for mixed Katakana-Kanji words.
+	- Fixed handling of infix ke which is read as ka in new annotation
+	  creation.
 	- Fixed font autodetection under J2SE 1.4.
 	- Fixed LaTeX export under J2SE 1.3.
 1.0.3: (2002/03/17)
