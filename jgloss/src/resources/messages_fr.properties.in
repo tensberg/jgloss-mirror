@@ -27,7 +27,7 @@ jgloss.mimetype=application/x-jgloss
 
 error.no_message=(aucun message)
 error.initialization.title=Erreur
-error.initialization={0}{1}\n\nL'exception Java était\n{2}: {3}.
+error.initialization={0}{1}\n\nL''exception Java était\n{2}: {3}.
 error.initialization.fatal=JGloss ne peut pas démarrer.\n\n
 error.initialization.generic=Une erreur a eu lieu durant l'initialisation.
 error.noclassdef=\
@@ -39,22 +39,22 @@ http://java.sun.com/j2se/1.3/jre/.
 error.loadPreferences=Une erreur a eu lieu pendant le chargement des préférences:
 error.storePreferences=Une erreur a eu lieu pendant la sauvegarde des préférences:
 error.dictionary.title=Erreur lors de l'ouverture du dictionnaire
-error.dictionary.filenotfound=Le dictionnaire {0} n'a pas pu être ouvert.\nVérifiez que le dictionnaire{1} existe et est lisible.
-error.dictionary.ioerror=Une erreur a eu lieu lors de l'ouverture\ndu dictionnaire {0}.
-error.dictionary.format=Le fichier {0} n'est pas\nun dictionnaire dans un format supporté.
+error.dictionary.filenotfound=Le dictionnaire {0} n''a pas pu être ouvert.\nVérifiez que le dictionnaire{1} existe et est lisible.
+error.dictionary.ioerror=Une erreur a eu lieu lors de l''ouverture\ndu dictionnaire {0}.
+error.dictionary.format=Le fichier {0} n''est pas\nun dictionnaire dans un format supporté.
 error.exclusions.save.title=Erreur lors de l'écriture de la liste d'exclusion
-error.exclusions.save=Une arreur a eu lieu lors de l'écriture de la\nliste d'exclusion dans {0}.\nL'exception  Java était {1}, {2}.
+error.exclusions.save=Une arreur a eu lieu lors de l''écriture de la\nliste d''exclusion dans {0}.\nL''exception  Java était {1}, {2}.
 error.exclusions.load.title=Erreur à la lecture de la liste d'exclusion
-error.exclusions.load=Une erreur a eu lieu à la lecture de la\nliste d'exclusion dans {0}.\nL'exclusion Java était {1}, {2}.
+error.exclusions.load=Une erreur a eu lieu à la lecture de la\nliste d''exclusion dans {0}.\nL''exclusion Java était {1}, {2}.
 error.import.title=Erreur lors de l'import du fichier
-error.import.exception=Une erreur a eu lieu durant l'import de {0}:\n{1}.
+error.import.exception=Une erreur a eu lieu durant l''import de {0}:\n{1}.
 error.export.title=Erreur lors de l'export du fichier
-error.export.exception=Une erreur a eu lieu durant l'export de:\n{0}.
+error.export.exception=Une erreur a eu lieu durant l''export de:\n{0}.
 error.load.title=Erreur de chargement de fichier
 error.load.exception=Une erreur a eu lieu durant le chargement de {0}:\n{1}.
 error.save.title=Erreur de sauvegarde de gichier
 error.save.exception=Une erreur a eu lieu durant la sauvegarde de {0}:\n{1}.
-error.save.unknownannotation=Abandon du type d'annotation inconnu {0}
+error.save.unknownannotation=Abandon du type d''annotation inconnu {0}
 
 button.ok=OK
 button.cancel=Annuler
@@ -79,10 +79,10 @@ Options:\n\
 \  -i, --createindex Crée des fichiers index pour le dictionnaire\n\
 \                    donné en ligne de commande\n\
 \  -f, --format      Imprime le format de dictionnaire des fichiers\n\
-\                    donnés en ligne de commande\n\
+\                    donnés en ligne de commande\n
 main.unknownoption=Option inconnue {0}
 main.format=Le format de {0} semble être {1}.
-main.format.unrecognized={0} n'est pas un format de dictionnaire connu.
+main.format.unrecognized={0} n''est pas un format de dictionnaire connu.
 main.title=JGloss
 
 main.menu.file=Fichier
@@ -223,7 +223,7 @@ annotationeditor.action.hide.ak=H
 
 export.encodings=Encodage:
 export.annotationlist.title=Exporter la liste d'annotation
-export.annotationlist.header=\# la liste d'annotation pour {0}\n\# Encodage: {1}\n
+export.annotationlist.header=\# la liste d''annotation pour {0}\n\# Encodage: {1}\n
 export.writereading=Écrire lectures
 export.writetranslations=Écrire traductions
 export.writehidden=écrire les annotations "masquées"
@@ -276,10 +276,10 @@ vconj.24=verbe infinitif ou adjectif
 
 dictionary.load=Chargement du dictionnaire {0}.
 
-edict.buildindex=Construction de l'index du dictionnaire {0}.\nCela peut prendre un certain temps.
-edict.writejjdx=Écriture de l'index JJDX pour le dictionnaire {0}.
-edict.warning.jjdxversion=WARNING: le numéro de version de l'index JJDX pour {0} est suppérieur à la version supportée par cette version de JGloss.
-edict.error.writejjdx=Erreur lors de l'écriture du fichier JJDX: {0}, {1}
+edict.buildindex=Construction de l''index du dictionnaire {0}.\nCela peut prendre un certain temps.
+edict.writejjdx=Écriture de l''index JJDX pour le dictionnaire {0}.
+edict.warning.jjdxversion=WARNING: le numéro de version de l''index JJDX pour {0} est suppérieur à la version supportée par cette version de JGloss.
+edict.error.writejjdx=Erreur lors de l''écriture du fichier JJDX: {0}, {1}
 
 kanjidic.nanori=(nanori, lecture du nom)
 kanjidic.radicalname=(nom du radical)
