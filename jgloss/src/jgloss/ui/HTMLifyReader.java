@@ -51,7 +51,7 @@ public class HTMLifyReader extends BufferedReader {
      * Keys are <CODE>Character</CODE> instances,
      * values strings with the entities used to replace the chars.
      */
-    private Map funnyChars;
+    private static Map funnyChars;
 
     /**
      * Constructs a new reader without inserting a HTML title for an underlying reader.
@@ -73,6 +73,20 @@ public class HTMLifyReader extends BufferedReader {
     public HTMLifyReader( Reader in, String title) throws IOException {
         super( in);
 
+        if (funnyChars == null) {
+            funnyChars = new HashMap( 10);
+            funnyChars.put( new Character( '&'), "&amp;");
+            funnyChars.put( new Character( '<'), "&lt;");
+            funnyChars.put( new Character( '>'), "&gt;");
+            funnyChars.put( new Character( '"'), "&quot;");
+            
+            // The following character is a Japanese space. When it apears in a document
+            // it is probably used to format the indention at the beginning of a paragraph.
+            // Unfortunately, the layout algorithm uses the space as a opportunity for breaking
+            // an overlong line. To prevent this I approximate it with two non-breakable spaces.
+            funnyChars.put( new Character( '\u3000'), "&nbsp;&nbsp;");
+        }
+
         line = "<HTML>\n<HEAD>\n";
         if (title != null)
             line += "<TITLE>" + replaceFunnyChars( title) + "</TITLE>\n";
@@ -82,18 +96,6 @@ public class HTMLifyReader extends BufferedReader {
         line += "<META http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" >\n";
 
         line +="</HEAD>\n<BODY>\n<P>";
-
-        funnyChars = new HashMap();
-        funnyChars.put( new Character( '&'), "&amp;");
-        funnyChars.put( new Character( '<'), "&lt;");
-        funnyChars.put( new Character( '>'), "&gt;");
-        funnyChars.put( new Character( '"'), "&quot;");
-
-        // The following character is a Japanese space. When it apears in a document
-        // it is probably used to format the indention at the beginning of a paragraph.
-        // Unfortunately, the layout algorithm uses the space as a opportunity for breaking
-        // an overlong line. To prevent this I approximate it with two non-breakable spaces.
-        funnyChars.put( new Character( '\u3000'), "&nbsp;&nbsp;");
     }
 
     public int read() throws IOException {
@@ -115,7 +117,7 @@ public class HTMLifyReader extends BufferedReader {
                 }
                 else {
                     if (next.trim().length() == 0)
-                        line = next + "\n";
+                        line = "</P><P>\n";
                     else
                         line = "" + next + "</P>\n<P>";
                 }
