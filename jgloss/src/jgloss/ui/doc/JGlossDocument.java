@@ -107,7 +107,7 @@ public class JGlossDocument extends HTMLDocument {
          * HTML/CSS. The action ensures that the correct element structure is created
          * but explicit or implied paragraphs are not interrupted.
          */
-        private class AnnotationAction extends HTMLDocument.HTMLReader.BlockAction {
+        private class AnnotationAction extends HTMLDocument.HTMLReader.TagAction {
             public void start(HTML.Tag t, MutableAttributeSet a) {
                 // Force the creation of an implied paragraph if needed.
                 // An annotation element must always be enclosed by an explicit or
