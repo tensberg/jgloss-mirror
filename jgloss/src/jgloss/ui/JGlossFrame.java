@@ -35,6 +35,7 @@ import jgloss.ui.html.AnnotationTags;
 import jgloss.ui.html.JGlossEditor;
 import jgloss.ui.html.JGlossEditorKit;
 import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.ui.html.AnnotationListSynchronizer;
 import jgloss.ui.xml.JGlossDocument;
 import jgloss.ui.xml.JGlossDocumentBuilder;
 import jgloss.util.CharacterEncodingDetector;
@@ -606,6 +607,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         addAnnotationAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
+                    annotateDocumentSelection();
                 }
             };
         addAnnotationAction.setEnabled( false);
@@ -1003,19 +1005,22 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 for ( int i=0; i<history.length; i+=2) try {
                     if (history[i].equals( model.getDocumentPath())) {
                         final int index = Integer.parseInt( history[i+1]);
-                        Runnable worker = new Runnable() {
-                                public void run() {
-                                    annotationList.setSelectedIndex( index);
-                                }
-                            };
-                        if (EventQueue.isDispatchThread())
-                            worker.run();
-                        else
-                            EventQueue.invokeLater( worker);
-                        break;
+                        if (index >= 0 && index < annotationList.getModel().getSize()) {
+                            Runnable worker = new Runnable() {
+                                    public void run() {
+                                        annotationList.setSelectedIndex( index);
+                                    }
+                                };
+                            if (EventQueue.isDispatchThread())
+                                worker.run();
+                            else
+                                EventQueue.invokeLater( worker);
+                            break;
+                        }
                     }
                 } catch (NumberFormatException ex) {
-                } catch (NullPointerException ex2) {}
+                } catch (NullPointerException ex) {
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1122,6 +1127,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                     docpane.setStyledDocument( htmlDoc);
                     AnnotationListModel annoModel = 
                         new AnnotationListModel( htmlDoc.getAnnotationElements());
+                    new AnnotationListSynchronizer(htmlDoc, annoModel);
                     model.setAnnotationListModel
                         ( annoModel);
                     annotationList.setAnnotationListModel( annoModel);
@@ -1352,25 +1358,30 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * the lookup panel.
      */
     public void caretUpdate( CaretEvent e) {
-        if (e.getDot() == e.getMark())
-            return; // no selection
-
-        int from;
-        int to;
-        if (e.getDot() < e.getMark()) {
-            from = e.getDot();
-            to = e.getMark();
+        if (e.getDot() == e.getMark()) {
+            // no selection
+            addAnnotationAction.setEnabled(false);
         }
         else {
-            from = e.getMark();
-            to = e.getDot();
-        }
+            addAnnotationAction.setEnabled(true);
+
+            int from;
+            int to;
+            if (e.getDot() < e.getMark()) {
+                from = e.getDot();
+                to = e.getMark();
+            }
+            else {
+                from = e.getMark();
+                to = e.getDot();
+            }
             
-        String selection = model.getHTMLDocument()
-            .getUnannotatedText(from,to);
-        if (selection.length() > 0)
-            lookupPanel.search( selection);
-    }
+            String selection = model.getHTMLDocument()
+                .getUnannotatedText(from,to);
+            if (selection.length() > 0)
+                lookupPanel.search( selection);
+        }
+    }        
 
     /**
      * Runs the print dialog and prints the document.
@@ -1559,7 +1570,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * Marks the document as changed and updates the save action accordingly.
      */
-    private void markChanged() {
+    protected void markChanged() {
         if (!model.isDocumentChanged()) {
             model.setDocumentChanged( true);
             if (model.getDocumentPath() != null)
@@ -1572,6 +1583,19 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      */
     protected void updateTitle() {
         frame.setTitle( model.getDocumentName() + ":" + JGloss.messages.getString( "main.title"));
+    }
+
+    protected void annotateDocumentSelection() {
+        int selectionStart = docpane.getSelectionStart();
+        int selectionEnd = docpane.getSelectionEnd();
+        if (selectionStart == selectionEnd)
+            return;
+
+        annotationList.clearSelection();
+        model.getHTMLDocument().addAnnotation(selectionStart, selectionEnd, kit);
+        annotationList.setSelectedIndex
+            (model.getAnnotationListModel().findAnnotationIndex
+             (selectionStart, AnnotationListModel.BIAS_NONE));
     }
 
     /**

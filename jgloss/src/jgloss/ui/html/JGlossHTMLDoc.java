@@ -422,18 +422,360 @@ public class JGlossHTMLDoc extends HTMLDocument {
         return new UnannotatedTextFetcher().getText(start, end).toString();
     }
 
+    public Element getParagraphElement(int offset) {
+        Element para = getDefaultRootElement();
+        while (!para.isLeaf() && 
+               !para.getAttributes().getAttribute(StyleConstants.NameAttribute)
+               .equals(AnnotationTags.ANNOTATION)) {
+            para = para.getElement(para.getElementIndex(offset));
+        }
+
+        // when the loop terminates, para is a child of the paragraph element
+        return para.getParentElement();
+    }
+
+    /**
+     * Returns the annotation element spanning the given element offset. If the offset is not
+     * in an annotation, <code>null</code> is returned.
+     */
+    public Element getAnnotationElement(int offset) {
+        Element anno = getDefaultRootElement();
+        while (!anno.isLeaf() && 
+               !anno.getAttributes().getAttribute(StyleConstants.NameAttribute)
+               .equals(AnnotationTags.ANNOTATION)) {
+            anno = anno.getElement(anno.getElementIndex(offset));
+        }
+
+        if (anno.isLeaf())
+            return null;
+        else
+            return anno;
+    }
+
+    /**
+     * Adds a new annotation for a part of the document. Since it is not possible to nest
+     * annotation elements, all annotations lying in that interval will be removed first. The
+     * annotation also cannot span paragraphs, so the interval will be shortened as needed.
+     *
+     * @param start Start offset of the interval to annotate.
+     * @param end End offset of the interval to annotate.
+     * @param editorKit Editor kit needed to insert the newly generated annotation element.
+     */
+    public void addAnnotation(int start, int end, JGlossEditorKit editorKit) {
+        try {
+            // find smallest enclosing element of start and don't allow annotation to
+            // cross it.
+            Element paragraph = getParagraphElement( start);
+            end = Math.min( end, paragraph.getEndOffset()-1);
+
+            // The start and end offsets will move around while we change the document.
+            // So wrap them in position objects, which adapt to changes.
+            Position startp = createPosition( start);
+            Position endp = createPosition( end);
+            
+            // remove any annotations in the area
+            removeAnnotations(start, end);
+
+            // The interval now only contains document plain text.
+            start = startp.getOffset();
+            end = endp.getOffset();
+            String text = getText( start, end-start);
+
+            // work around Document construction quirks
+            boolean paragraphSpaceInserted = false;
+            if (start == paragraph.getStartOffset()) {
+                insertAfterStart( paragraph, "&nbsp;");
+                start++;
+                startp = createPosition( start);
+                end = endp.getOffset();
+                paragraphSpaceInserted = true;
+            }
+
+            // If we insert new text directly after an annotation, the new annotation will 
+            // be made a child of the first one, which is not what we want. So insert an
+            // additional character if needed.
+            Element sae = getAnnotationElement(startp.getOffset()-1);
+            if (sae != null) {
+                insertAfterEnd( sae, "&nbsp;");
+            }
+            Element eae = getAnnotationElement(endp.getOffset()+1);
+            if (eae != null) {
+                insertBeforeStart( eae, "&nbsp;");
+                // the nbsp is inserted before endp, move endp to the left of the nbsp
+                endp = createPosition(endp.getOffset()-1);
+            }
+
+            // remove the old text
+            remove( startp.getOffset(), endp.getOffset()-startp.getOffset());
+
+            // construct the new annotation and insert it
+
+            // Split word in base/readings. Add a reading/base pair for every kanji substring of the
+            // word and a base element for every other substring. If there is no kanji substring, add
+            // a reading for the whole string since there has to be at least one reading.
+            StringBuffer wordhtml = new StringBuffer(128);
+            int baseStart = 0;
+            boolean hasReading = false;
+            boolean needsReading = needsReading( text, 0);
+            for ( int baseEnd=1; baseEnd<=text.length(); baseEnd++) {
+                if (needsReading) {
+                    if (baseEnd==text.length() || !needsReading(text, baseEnd)) {
+                        hasReading = true;
+
+                        appendTag(wordhtml, AnnotationTags.READING_BASETEXT, false);
+
+                        appendTag(wordhtml, AnnotationTags.READING, false);
+                        wordhtml.append(' ');
+                        appendTag(wordhtml, AnnotationTags.READING, true);
+
+                        appendTag(wordhtml, AnnotationTags.BASETEXT, false);
+                        wordhtml.append(text.substring( baseStart, baseEnd));
+                        appendTag(wordhtml, AnnotationTags.BASETEXT, true);
+
+                        appendTag(wordhtml, AnnotationTags.READING_BASETEXT, true);
+                        needsReading = false;
+                        baseStart = baseEnd;
+                    }
+                }
+                else if (baseEnd==text.length() || needsReading(text, baseEnd)) {
+                    appendTag(wordhtml, AnnotationTags.BASETEXT, false);
+                    wordhtml.append(text.substring( baseStart, baseEnd));
+                    appendTag(wordhtml, AnnotationTags.BASETEXT, true);
+                    needsReading = true;
+                    baseStart = baseEnd;
+                }
+            }
+
+            StringBuffer html = new StringBuffer(128);
+            html.append("<html><body><p>");
+            appendTag(html, AnnotationTags.ANNOTATION, false);
+            appendTag(html, AnnotationTags.WORD, false);
+
+            if (hasReading) {
+                html.append(wordhtml);
+            }
+            else {
+                // must have at least one reading, create it
+                appendTag(html, AnnotationTags.READING_BASETEXT, false);
+
+                appendTag(html, AnnotationTags.READING, false);
+                html.append(' ');
+                appendTag(html, AnnotationTags.READING, true);
+
+                html.append(wordhtml);
+
+                appendTag(html, AnnotationTags.READING_BASETEXT, true);
+            }
+
+            appendTag(html, AnnotationTags.WORD, true);
+            appendTag(html, AnnotationTags.TRANSLATION, false);
+            html.append(' ');
+            appendTag(html, AnnotationTags.TRANSLATION, true);
+            appendTag(html, AnnotationTags.ANNOTATION, true);
+
+            // The insertion will create a new annotation element and trigger a document changed
+            // event. The AnnotationListSynchronizer will react to this by creating a new
+            // annotation node.
+            // Unfortunately the HTMLDocument has no method for inserting HTML text at an
+            // arbitrary location. So we will have to use an editor kit.
+            editorKit.insertHTML( this, startp.getOffset(), html.toString(),
+                                  0, 0, AnnotationTags.ANNOTATION);
+
+            // remove the '\n\n' which the HTMLEditorKit insists on inserting
+            remove( endp.getOffset()-2, 2);
+
+            // remove the additional characters which were inserted above to work around
+            // document construction quirks
+            if (eae != null)
+                remove( eae.getStartOffset()-1, 1);
+            if (sae != null)
+                remove( sae.getEndOffset(), 1);
+            if (paragraphSpaceInserted)
+                remove( paragraph.getStartOffset(), 1);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Test if a japanese character needs a reading annotation.
+     */
+    private static boolean needsReading( String text, int pos) {
+        char c = text.charAt( pos);
+        return StringTools.isKanji( c) ||
+            // handle special case with infix katakana 'ke', which is read as 'ka' or 'ga'
+            // when used as counter or in place names, as in ikkagetsu or Sakuragaoka
+            (c=='\u30f6' || c=='\u30b1') && 
+            pos>0 && StringTools.isKanji( text.charAt( pos-1)) && 
+            pos+1<text.length() && StringTools.isKanji( text.charAt( pos+1));
+    }
+
+    /**
+     * Adds an opening or closing HTML tag to a string buffer.
+     */
+    private static void appendTag(StringBuffer buf, AnnotationTags tag, boolean endTag) {
+        buf.append('<');
+        if (endTag)
+            buf.append('/');
+        buf.append(tag.getId());
+        buf.append('>');
+    }
+
+    /**
+     * Remove all annotations which intersect the given region of the document.
+     */
+    public void removeAnnotations(int start, int end) {
+        new AnnotationRemover().removeAnnotations(start, end);
+    }
+
+    /**
+     * Remove an annotation element. This will replace the annotation element and the text it
+     * spans with just the unannotated plain text.
+     */
+    public void removeAnnotationElement(Element annotation) {
+        // get unannotated text
+        Element word = annotation.getElement(0);
+        Segment textSegment = new Segment();
+        StringBuffer unannotatedText = new StringBuffer(word.getEndOffset()-word.getStartOffset());
+        for (int i=0; i<word.getElementCount(); i++) {
+            Element basetext = word.getElement(i);
+            if (basetext.getName().equals(AnnotationTags.READING_BASETEXT.getId()))
+                basetext = basetext.getElement(1);
+            try {
+                getText(basetext.getStartOffset(),
+                        basetext.getEndOffset()-basetext.getStartOffset(),
+                        textSegment);
+            } catch (BadLocationException ex) { ex.printStackTrace(); }
+            unannotatedText.append(textSegment.array, textSegment.offset, textSegment.count);
+        }
+
+        // remove annotation element
+        try {
+            setOuterHTML(annotation, unannotatedText.toString());
+        } catch (Exception ex) { ex.printStackTrace(); }
+        // remove the newline which the stupid HTMLDocument.insertHTML insists on adding
+        try {
+            remove(annotation.getEndOffset()-1, 1);
+        } catch (BadLocationException ex) { ex.printStackTrace(); }
+    }
+
+    /**
+     * Recursively process the elements spanning a region of the document tree.
+     */
+    private abstract class TreeWalker {
+        protected Position start;
+        protected Position end;
+        protected boolean writeLock;
+        
+        /**
+         * Initialize the tree walker.
+         *
+         * @param _writeLock If <code>true</code>, the tree walker will aquire a write lock on the
+         *        HTML document prior to recursing over the tree, otherwise a read lock will be used.
+         */
+        protected TreeWalker(boolean _writeLock) {
+            writeLock = _writeLock;
+        }
+
+        /**
+         * Starts the walk over the tree. The start and end offsets specify the region of elements
+         * covered by the algorithm. This method will first aquire a read or write lock on the
+         * HTML document, call {@link #walk(Element) walk} with the default root element and afterwards
+         * release the lock held on the document.
+         */
+        protected void startWalk(int _start, int _end) {
+            try {
+                start = JGlossHTMLDoc.this.createPosition(_start);
+                end = JGlossHTMLDoc.this.createPosition(_end);
+            } catch (BadLocationException ex) { ex.printStackTrace(); }
+
+            if (writeLock)
+                JGlossHTMLDoc.this.writeLock();
+            else
+                JGlossHTMLDoc.this.readLock();
+
+            try {
+                walk(JGlossHTMLDoc.this.getDefaultRootElement());
+            } finally {
+                if (writeLock)
+                    JGlossHTMLDoc.this.writeUnlock();
+                else
+                    JGlossHTMLDoc.this.readUnlock();
+            }
+        }
+
+        protected void walk(Element elem) {
+            if (elem.getStartOffset() >= end.getOffset() || elem.getEndOffset() <= start.getOffset())
+                return;
+
+            boolean recurse = processElement(elem);
+            if (recurse)
+                recurse(elem);
+        }
+
+        /**
+         * Iterates forward over all children and calls {@link #walk(Element) walk} for every child.
+         * This method is called by {@link #walk(Element) walk} if {@link #processElement(Element)
+         * processElement} returns <code>true</code>.
+         */
+        protected void recurse(Element elem) {
+            for ( int i=0; i<elem.getElementCount(); i++)
+                walk(elem.getElement( i));
+        }
+
+        /**
+         * Process the element of the tree in some way. This method will only be called for an element
+         * if its region (the area between its start and end offset) intersects with the region
+         * specified by the {@link #start start} and {@link #end end} offsets of the walker object.
+         * If the element has children, the return value of the method determines if the algorithm
+         * should recurse over the children.
+         *
+         * @return <code>true</code> if the tree walker should recurse over the children of the element.
+         */
+        protected abstract boolean processElement(Element elem);
+    } // class TreeWalker
+
+    /**
+     * Remove all annotation elements intersecting a span of text in the document.
+     */
+    private class AnnotationRemover extends TreeWalker {
+        AnnotationRemover() {
+            super(true);
+        }
+
+        public void removeAnnotations(int _start, int _end) {
+            startWalk(_start, _end);
+        }
+
+        protected boolean processElement(Element elem) {
+            if (elem.getName().equals(AnnotationTags.ANNOTATION.getId())) {
+                removeAnnotationElement(elem);
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        /**
+         * Recurse over children backwards because children may be removed while the algorithm
+         * runs, changing the forward iteration order.
+         */
+        protected void recurse(Element elem) {
+            for ( int i=elem.getElementCount()-1; i>=0; i--)
+                walk(elem.getElement( i));            
+        }
+    } // class AnnotationRemover
+
     /**
      * Fetch a span of text from the document, leaving out text with is part of an annotation.
-     * This is a class-based implementation of a recursive algorithm which traverses the document
-     * tree.
      */
-    private class UnannotatedTextFetcher {
-        private int start;
-        private int end;
+    private class UnannotatedTextFetcher extends TreeWalker {
         private StringBuffer text;
         private Segment textSegment;
 
         UnannotatedTextFetcher() {
+            super(false);
             textSegment = new Segment();
             textSegment.setPartialReturn(true);
         }
@@ -442,22 +784,12 @@ public class JGlossHTMLDoc extends HTMLDocument {
          * Returns the unannotated text between the given start and end offsets.
          */
         public StringBuffer getText( int _start, int _end) {
-            System.err.println( _start + "/" + _end);
-            start = _start;
-            end = _end;
-            text = new StringBuffer(end - start);
-
-            JGlossHTMLDoc.this.readLock();
-            addUnannotatedText( getDefaultRootElement());
-            JGlossHTMLDoc.this.readUnlock();
-
+            text = new StringBuffer(_end - _start);
+            startWalk(_start, _end);
             return text;
         }
 
-        private void addUnannotatedText(Element elem) {
-            if (elem.getStartOffset() > end || elem.getEndOffset() < start)
-                return;
-            
+        protected boolean processElement(Element elem) {
             if (elem.getName().equals(HTML.Tag.CONTENT.toString())) {
                 // element spanning some text, add if the text is not part of an annotation
                 AttributeSet as = elem.getAttributes();
@@ -465,8 +797,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
                     !as.isDefined( AnnotationTags.TRANSLATION)) {
                     // copy the part of the element text which intersects with the requested
                     // text span to the string buffer
-                    int offset = Math.max(start,elem.getStartOffset());
-                    int length = Math.min(end,elem.getEndOffset())-offset;
+                    int offset = Math.max(start.getOffset(),elem.getStartOffset());
+                    int length = Math.min(end.getOffset(),elem.getEndOffset())-offset;
                     try {
                         // partial return is activated for the text segment, so we have
                         // to iterate until all segment fragments are copied
@@ -480,11 +812,10 @@ public class JGlossHTMLDoc extends HTMLDocument {
                         ex.printStackTrace();
                     }
                 }
+                return false;
             }
             else {
-                // recurse over children, which will have content nodes as descendants
-                for ( int i=0; i<elem.getElementCount(); i++)
-                    addUnannotatedText( elem.getElement( i));
+                return true; // recurse over children
             }
         }
     } // class UnannotatedTextFetcher

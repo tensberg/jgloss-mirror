@@ -78,7 +78,7 @@ public class Annotation {
         readings = (TextElement[]) readingsl.toArray( new TextElement[readingsl.size()]);
     }
 
-    Element getAnnotationElement() { return anno; }
+    public Element getAnnotationElement() { return anno; }
     
     public String getAnnotatedText() { return annotatedText; }
     public String getAnnotatedTextReading() { return annotatedTextReading; }

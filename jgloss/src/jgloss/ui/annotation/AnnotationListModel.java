@@ -26,6 +26,8 @@ package jgloss.ui.annotation;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Comparator;
+import java.util.Collections;
 
 import javax.swing.text.Element;
 
@@ -127,14 +129,52 @@ public class AnnotationListModel {
         return searchindex;
     }
 
-    public void insertAnnotation( int fromOffset, int toOffset, String dictionaryForm,
-                                  String dictionaryReading) {
+    /**
+     * Add an annotation node for an annotation element newly inserted into the JGloss HTML
+     * document.
+     */
+    public void addAnnotationFor(Element annoElement) {
+        Annotation anno = new Annotation(this, annoElement);
+        // The annotation list is in ascending order by element start offset.
+        // Find the index where the new annotation has to be inserted.
+        int insertionPoint = Collections.binarySearch
+            (annotations, anno, new Comparator() {
+                    public int compare(Object o1, Object o2) {
+                        // compare two annotations by their element start offset
+                        int so1 = ((Annotation) o1).getStartOffset();
+                        int so2 = ((Annotation) o2).getStartOffset();
+                        return so1-so2;
+                    }
+                });
+        insertionPoint = -1 - insertionPoint; // Collections.binarySearch returns (-(insertion point) - 1)
+        annotations.add(insertionPoint, anno);
+        fireAnnotationInserted(anno, insertionPoint);
     }
 
-    public void removeAnnotation( Annotation anno) {
-    }
-
-    public void removeAnnotation( int index) {
+    /**
+     * Remove the annotation node which represents an annotation element removed from the
+     * JGloss HTML document.
+     */
+    public void removeAnnotationFor(Element annoElement) {
+        // find the index of the Annotation object representing the annoElement by doing a
+        // binary search through the list of annotations, which is ordered by start offsets.
+        int annoOffset = Collections.binarySearch
+            (annotations, annoElement, new Comparator() {
+                    public int compare(Object o1, Object o2) {
+                        Element e1 = (o1 instanceof Element) ?
+                            (Element) o1 : ((Annotation) o1).getAnnotationElement();
+                        Element e2 = (o2 instanceof Element) ? 
+                            (Element) o2 : ((Annotation) o2).getAnnotationElement();
+                        return e1.getStartOffset()-e2.getStartOffset();
+                    }
+                });
+        try {
+            Annotation annotation = (Annotation) annotations.remove(annoOffset);
+            fireAnnotationRemoved(annotation, annoOffset);
+        } catch (IndexOutOfBoundsException ex) {
+            // element was not found, programming error
+            ex.printStackTrace();
+        }
     }
 
     public void addAnnotationListener( AnnotationListener l) {

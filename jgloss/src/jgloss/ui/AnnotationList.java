@@ -24,6 +24,7 @@
 package jgloss.ui;
 
 import jgloss.JGloss;
+import jgloss.ui.html.JGlossHTMLDoc;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.util.StringTools;
@@ -51,8 +52,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.InputMap;
 import javax.swing.ActionMap;
 import javax.swing.KeyStroke;
+import javax.swing.text.Element;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-public class AnnotationList extends JList implements MouseListener {
+public class AnnotationList extends JList implements MouseListener, ListSelectionListener {
     /**
      * Delegator for key events which only forwards <CODE>keyPressed</CODE> and <CODE>keyReleased</CODE>
      * events. In Swing 1.4, the <CODE>BasicTreeUI</CODE> key listener adds first letter navigation, 
@@ -86,7 +90,7 @@ public class AnnotationList extends JList implements MouseListener {
 
         public void keyTyped( KeyEvent event) {
             // ignore this event
-            // FIXME: if the keyTyped event is ever used for something useful in later releases,
+            // FIXME: if the keyTyped event is ever used for something useful in later Java releases,
             // this will break.
         }
     } // class KeyEventDelegator
@@ -125,10 +129,6 @@ public class AnnotationList extends JList implements MouseListener {
      */
     private Action removeAction;
     /**
-     * Action which removes all duplicates of the currently selected annotation.
-     */
-    private Action removeDuplicatesAction;
-    /**
      * Action which adds the word of the selected annotation to the list of excluded words.
      */
     private Action addToExclusionsAction;
@@ -148,39 +148,15 @@ public class AnnotationList extends JList implements MouseListener {
         removeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     int selection = getSelectedIndex();
-                    if (selection != -1)
-                        annotationList.removeAnnotation( selection);
+                    if (selection != -1) {
+                        Element annotation = annotationList.getAnnotation(selection)
+                            .getAnnotationElement();
+                        ((JGlossHTMLDoc) annotation.getDocument()).removeAnnotationElement(annotation);
+                    }
                 }
             };
         UIUtilities.initAction( removeAction, "annotationeditor.menu.remove");
         removeAction.setEnabled( false);
-        // Removes all annotations which are a duplicate of the currently selected annotation.
-        // A duplicate has the same kanji, reading and translation.
-        removeDuplicatesAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    Annotation selection = (Annotation) getSelectedValue();
-                    if (selection == null)
-                        return;
-
-                    String word = selection.getAnnotatedText();
-                    String reading = selection.getAnnotatedTextReading();
-                    String translation = selection.getTranslation();
-                    
-                    for ( int i=annotationList.getAnnotationCount()-1; i>=0; i--) {
-                        Annotation anno = annotationList.getAnnotation( i);
-                        if (word.equals( anno.getAnnotatedText()) &&
-                            equals( reading, anno.getAnnotatedTextReading()) &&
-                            equals( translation, selection.getTranslation()))
-                            annotationList.removeAnnotation( i);
-                    }
-                }
-
-                private boolean equals( Object o1, Object o2) {
-                    return (o1 == o2 || o1!=null && o1.equals( o2));
-                }
-            };
-        UIUtilities.initAction( removeDuplicatesAction, "annotationeditor.menu.removeduplicates");
-        removeDuplicatesAction.setEnabled( false);
         // add the word of the selected annotation to the list of excluded words
         // The word is added as it appears in the text and in its dictionary form
         addToExclusionsAction = new AbstractAction() {
@@ -249,8 +225,6 @@ public class AnnotationList extends JList implements MouseListener {
         pmenu = new JPopupMenu();
         menu.add( UIUtilities.createMenuItem( removeAction));
         pmenu.add( removeAction);
-        menu.add( UIUtilities.createMenuItem( removeDuplicatesAction));
-        pmenu.add( removeDuplicatesAction);
         menu.add( UIUtilities.createMenuItem( addToExclusionsAction));
         pmenu.add( addToExclusionsAction);
         menu.add( UIUtilities.createMenuItem( addToDictionaryAction));
@@ -308,10 +282,6 @@ public class AnnotationList extends JList implements MouseListener {
                 removeAction.getValue( Action.NAME));
         am.put( removeAction.getValue( Action.NAME), removeAction);
         im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
-                                        ( "annotationeditor.action.removeduplicates.ak")),
-                removeDuplicatesAction.getValue( Action.NAME));
-        am.put( removeDuplicatesAction.getValue( Action.NAME), removeDuplicatesAction);
-        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
                                         ( "annotationeditor.action.addtoexclusions.ak")),
                 addToExclusionsAction.getValue( Action.NAME));
         am.put( addToExclusionsAction.getValue( Action.NAME), addToExclusionsAction);
@@ -319,6 +289,8 @@ public class AnnotationList extends JList implements MouseListener {
                                         ( "annotationeditor.action.addtodictionary.ak")),
                 addToDictionaryAction.getValue( Action.NAME));
         am.put( addToDictionaryAction.getValue( Action.NAME), addToDictionaryAction);
+
+        addListSelectionListener(this);
     }
 
     public void setAnnotationListModel( AnnotationListModel _model) {
@@ -453,5 +425,16 @@ public class AnnotationList extends JList implements MouseListener {
             else
                 super.removeKeyListener( handler);
         }
+    }
+
+    /**
+     * Adapts the state of the annotation-specific actions in response to changes in the selection.
+     */
+    public void valueChanged(ListSelectionEvent e) {
+        boolean annoSelected = (getSelectedIndex() != -1);
+        removeAction.setEnabled(annoSelected);
+        addToExclusionsAction.setEnabled(annoSelected);
+        addToDictionaryAction.setEnabled(annoSelected);
+        clearTranslationAction.setEnabled(annoSelected);
     }
 } // class AnnotationList

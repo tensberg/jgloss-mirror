@@ -25,6 +25,7 @@ package jgloss.ui.html;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
+import jgloss.util.StringTools;
 import jgloss.ui.UIUtilities;
 import jgloss.ui.XCVManager;
 import jgloss.ui.AnnotationList;
@@ -126,6 +127,7 @@ public class JGlossEditor extends JTextPane {
     private final static String KEYMAP_TAB = "tab map";
 
     private JGlossHTMLDoc htmlDoc;
+
     private AnnotationList annotationList;
     /**
      * Object identifying the currently highlighted annotation in the <CODE>HighlightPainter</CODE>.

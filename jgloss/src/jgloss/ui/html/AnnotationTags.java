@@ -37,12 +37,12 @@ public class AnnotationTags extends HTML.Tag {
     public final static AnnotationTags ANNOTATION = new AnnotationTags( "anno", true, true);
     /**
      * A tag which contains the annotated word with reading annotations.
-     * Content-model: (BASE | READING_KANJI)*
+     * Content-model: (READING_BASETEXT | BASETEXT)*
      */
     public final static AnnotationTags WORD = new AnnotationTags( "word", true, true);
     /**
      * A tag which contains a word fragment with a reading annotation.
-     * Content-model: READING & KANJI
+     * Content-model: READING & BASETEXT
      */
     public final static AnnotationTags READING_BASETEXT = new AnnotationTags( "rb", true, true);
     /**
