@@ -40,29 +40,6 @@ import javax.swing.text.*;
  */
 public class LaTeXExporter {
     /**
-     * Map with LaTeX special characters which have to be escaped.
-     */
-    private final static Map funnyChars;
-
-    static {
-        funnyChars = new HashMap( 15);
-
-        // The characters \ { } have to be treated specially because they are used in the
-        // commands inserted by the exporter.
-        //funnyChars.put( new Character( '\\'), "$\\backslash$");
-        //funnyChars.put( new Character( '{'), "\\{");
-        //funnyChars.put( new Character( '}'), "\\}");
-
-        funnyChars.put( new Character( '$'), "\\$");
-        funnyChars.put( new Character( '#'), "\\#");
-        funnyChars.put( new Character( '%'), "\\%");
-        funnyChars.put( new Character( '&'), "\\&");
-        funnyChars.put( new Character( '_'), "\\_");
-        funnyChars.put( new Character( '~'), "\\verb/~/");
-        funnyChars.put( new Character( '^'), "\\verb/^/");
-    }
-
-    /**
      * Exports an annotated JGloss document as LaTeX-CJK file.
      *
      * @param doc The document to write.
@@ -77,20 +54,17 @@ public class LaTeXExporter {
                                boolean writeReading, boolean writeTranslations,
                                boolean writeHidden) throws IOException {
         
-        StringBuffer text = null;
+        String text = null;
         try {
-            text = new StringBuffer( doc.getText( 0, doc.getLength()));
+            text = doc.getText( 0, doc.getLength());
         } catch (BadLocationException ex) {
             // What ?
             ex.printStackTrace();
         }
+        StringBuffer outtext = new StringBuffer();
         
-        // The reading and translation annotations are embedded in text.
-        // They will be removed and depending on the settings of writeReading and 
-        // writeTranslations re-inserted in a new format.
-        // Iterate over all annotations. We have to do that from back to front because the index
-        // in the text changes.
-        for ( int i=model.getAnnotationCount()-1; i>=0; i--) {
+        int prevend = 0; // end offset of the previous annotation
+        for ( int i=0; i<model.getAnnotationCount(); i++) {
             AnnotationNode node = model.getAnnotationNode( i);
             Element ae = node.getAnnotationElement();
             int tstart = ae.getElement( 2).getStartOffset();
@@ -99,15 +73,30 @@ public class LaTeXExporter {
             int rstart = ae.getElement( 0).getStartOffset();
             int rend = ae.getElement( 0).getEndOffset();
             String reading = escape( text.substring( rstart, rend));
-            String base = escape( text.substring( rend, tstart));
+            String word = escape( text.substring( rend, tstart));
+
+            // add text between annotations
+            if (prevend < rstart)
+                outtext.append( escape( text.substring( prevend, rstart)));
+            prevend = tend;
+
+            // handle reading text
+            if (writeReading && !reading.equals( " ") &&
+                (writeHidden || !node.isHidden())) {
+                outtext.append( "\\ruby{" + word + "}{" + reading + "}");
+            }
+            else {
+                // discard the reading
+                outtext.append( word);
+            }
 
             // handle translation text
-            String footnote;
             if (writeTranslations && !translation.equals( " ") && 
                 (writeHidden || !node.isHidden())) {
+                String footnote;
                 // if the linked annotation entry is an inflected verb or adjective,
                 // output the full verb instead of just the kanji part
-                String nb = base;
+                String nb = word;
                 String nr = reading;
                 Parser.TextAnnotation ta = node.getLinkedAnnotation();
                 if (ta != null) {
@@ -121,52 +110,47 @@ public class LaTeXExporter {
                 if (nr!=null && !nr.equals( " "))
                     footnote += " " + nr;
                 footnote += " " + translation + "}";
-            }
-            else
-                footnote = ""; // remove translation
-            text.replace( tstart, tend, footnote);
 
-            // handle reading text
-            if (writeReading && !reading.equals( " ") &&
-                (writeHidden || !node.isHidden())) {
-                text.replace( rstart, tstart, "\\ruby{" + base + "}{" + reading + "}");
-            }
-            else {
-                // remove the old reading text
-                text.replace( rstart, rend, "");
+                outtext.append( footnote);
             }
         }
+        // add the remaining text
+        if (prevend < text.length())
+            outtext.append( escape( text.substring( prevend, text.length())));
 
         // Remove the &nbsp;'s (non-breakable spaces) and let LaTeX determine the insets.
         // Also insert an additional line for every \n, which is LaTeX's mark for a
-        // paragraph break and escape special characters.
-        // This has to be done after the text replacements because afterwards the character
-        // positions stored in the elements are not valid any more.
-        for ( int i=text.length()-1; i>=0; i-=1) {
-            if (text.charAt( i)=='\u00a0') {
-                text.deleteCharAt( i);
+        // paragraph break.
+        for ( int i=outtext.length()-1; i>=0; i-=1) {
+            if (outtext.charAt( i)=='\u00a0') {
+                outtext.deleteCharAt( i);
             }
-            else if (text.charAt( i)=='\n')
-                text.insert( i, '\n');
-            else {
-                String s = (String) funnyChars.get( new Character( text.charAt( i)));
-                if (s != null)
-                    text.replace( i, i+1, s);
-            }
+            else if (outtext.charAt( i)=='\n')
+                outtext.insert( i, '\n');
         }
 
-        out.write( "\\documentclass{" + JGloss.prefs.getString( Preferences.EXPORT_LATEX_DOCUMENTCLASS)
-                   + "}\n" + JGloss.prefs.getString( Preferences.EXPORT_LATEX_PREAMBLE));
-        if (writeReading)
-            out.write( "\\usepackage[overlap,CJK]{ruby-annotation}\n");
+        String preamble = "\\documentclass";
+        String opts = JGloss.prefs.getString( Preferences.EXPORT_LATEX_DOCUMENTCLASS_OPTIONS);
+        if (opts != null)
+            preamble += "[" + opts + "]";
+        preamble += "{" + JGloss.prefs.getString( Preferences.EXPORT_LATEX_DOCUMENTCLASS) + "}\n";
+        if (writeReading) {
+            preamble += "\\usepackage";
+            opts = JGloss.prefs.getString( Preferences.EXPORT_LATEX_RUBY_OPTIONS);
+            if (opts != null)
+                preamble += "[" + opts + "]";
+            preamble += "{ruby-annotation}\n";
+        }
+        preamble += JGloss.prefs.getString( Preferences.EXPORT_LATEX_PREAMBLE) + "\n";
+        out.write( preamble);
         out.write( "\\begin{document}\n\n");
 
-        out.write( text.toString());
+        out.write( outtext.toString());
         out.write( "\n\\end{document}\n");
     }
 
     /**
-     * Escapes the LaTeX special characters \, { and } by inserting a \.
+     * Escapes the LaTeX special characters.
      *
      * @param in The string to escape.
      * @param The escaped string.
@@ -174,9 +158,26 @@ public class LaTeXExporter {
     private static String escape( String in) {
         StringBuffer buf = new StringBuffer( in);
         for ( int i=buf.length()-1; i >= 0; i--) {
-            char c = buf.charAt( i);
-            if (c=='\\' || c=='{' || c=='}')
+            switch (buf.charAt( i)) {
+            case '{':
+            case '}':
+            case '$':
+            case '#':
+            case '%':
+            case '&':
+            case '_':
                 buf.insert( i, '\\');
+                break;
+            case '\\':
+                buf.replace( i, i+1, "$\\backslash$");
+                break;
+            case '~':
+                buf.replace( i, i+1, "\\verb/~/");
+                break;
+            case '^':
+                buf.replace( i, i+1, "\\verb/^/");
+                break;
+            }
         }
 
         return buf.toString();
