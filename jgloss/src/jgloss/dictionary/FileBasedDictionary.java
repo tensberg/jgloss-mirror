@@ -45,7 +45,7 @@ public abstract class FileBasedDictionary implements Dictionary {
     /**
      * Current version of the JJDX format.
      */
-    public final static int JJDX_VERSION = 1002;
+    public final static int JJDX_VERSION = 2001;
     /**
      * Field value meaning that the index is in big-endian format.
      */
@@ -55,7 +55,7 @@ public abstract class FileBasedDictionary implements Dictionary {
      */
     public final static int JJDX_LITTLE_ENDIAN = 2;
     /**
-     * Offset in bytes to the first index entry in index version 1002.
+     * Offset in bytes to the first index entry in index version 2001.
      */
     public final static int INDEX_OFFSET = 4*4;
     /**
@@ -152,10 +152,11 @@ public abstract class FileBasedDictionary implements Dictionary {
                 int offset = indexbuf.getInt();
                 int size = indexbuf.getInt();
                 ByteOrder order = ByteOrder.BIG_ENDIAN;
-                if (version == JJDX_VERSION) { // byte order is introduced in JJDX 1002
+                if (version == JJDX_VERSION) { // byte order is introduced in JJDX 2001
                     if (indexbuf.getInt() == JJDX_LITTLE_ENDIAN)
                         order = ByteOrder.LITTLE_ENDIAN;
                 }
+                System.err.println( "using " + order);
                 // move to index start
                 indexbuf.position( offset);
                 indexbuf.order( order);
@@ -175,7 +176,6 @@ public abstract class FileBasedDictionary implements Dictionary {
     public abstract String getEncoding();
 
     public List search( String expression, short mode) throws SearchException {
-        System.err.println( "searching " + expression);
         List result = new ArrayList( 10);
 
         // do a binary search through the index file
@@ -229,9 +229,16 @@ public abstract class FileBasedDictionary implements Dictionary {
                     ByteBuffer entrybuf = dictionary.slice();
                     entrybuf.position( index.get( match)-start);
                     // find end of entry line
-                    while (entrybuf.hasRemaining() && !isEntrySeparator( entrybuf.get()))
-                        ; // entrybuf.get() advances the loop
-                    entrybuf.position( entrybuf.position()-1); // move back to last byte of entry
+                    boolean moveBack = true;
+                    try {
+                        while (!isEntrySeparator( entrybuf.get()))
+                            ; // entrybuf.get() advances the loop
+                    } catch (BufferUnderflowException ex) {
+                        // end of buffer, can be safely ignored
+                        moveBack = false;
+                    }
+                    if (moveBack)
+                        entrybuf.position( entrybuf.position()-1); // move back to last byte of entry
                     entrybuf.flip(); // truncate the buffer to the end of the entry line
 
                     String entry;
@@ -342,14 +349,19 @@ public abstract class FileBasedDictionary implements Dictionary {
         }
     }
 
+    /**
+     * Create the index file for the dictionary.
+     *
+     * @param printMessage <CODE>true</CODE>, if an informational message should be printed on stderr.
+     */
     public void buildIndex( boolean printMessage) throws IOException {
         if (printMessage)
             System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
                                                       new String[] { getName() }));
 
-        FileChannel indexchannel = new RandomAccessFile( indexfile, "rw").getChannel();
+        indexchannel = new RandomAccessFile( indexfile, "rw").getChannel();
         MappedByteBuffer indexbuf = indexchannel.map( FileChannel.MapMode.READ_WRITE,
-                                                      0, 50004*4);
+                                                      0, 50004);
         
         // write index header
         System.err.println( "writing header");
@@ -357,6 +369,7 @@ public abstract class FileBasedDictionary implements Dictionary {
         indexbuf.putInt( INDEX_OFFSET); // offset to first index entry
         indexbuf.putInt( 0); // number of index entries (currently unknown)
         // use platform's native byte order
+        System.err.println( ByteOrder.nativeOrder());
         indexbuf.putInt( (ByteOrder.nativeOrder()==ByteOrder.BIG_ENDIAN) ? 
                          JJDX_BIG_ENDIAN : JJDX_LITTLE_ENDIAN);
         
@@ -378,8 +391,17 @@ public abstract class FileBasedDictionary implements Dictionary {
     }
 
     /**
-     * Parses a subset of the dictionary file for index creation. For each word which should
-     * get an index entry, {@link #addIndexEntry(int) addIndexEntry} is called.
+     * Parses a subset of the dictionary file for index creation.
+     * <p>
+     * The method iterates over all characters in the range <CODE>start-end</CODE> by repeatedly
+     * calling {@link #readNextCharacter() readNextCharacter}, which decides if the character
+     * at the current position is part of an indexable word or not and how long the word has
+     * to be in order to be added to the index. Since the position of {@link #dictionary dictionary}
+     * is only modified in {@link #readNextCharacter() readNextCharacter}, the method may skip
+     * over an arbitrary number of bytes, e. g. leave out non-indexable fields.
+     * At the end of an indexable word it is added to the index by a call to
+     * {@link #addIndexEntry(int) addIndexEntry}.
+     * </p>
      *
      * @param start Byte offset in the dictionary where the parsing should start (inclusive).
      * @param end Byte offset in the dictionary where the parsing should end (exclusive).
@@ -438,7 +460,8 @@ public abstract class FileBasedDictionary implements Dictionary {
     /**
      * Reads a character in the dictionary file and decides how it should be treated
      * for index creation. The character must be read from the current position of
-     * {@link #dictionary dictionary}.
+     * {@link #dictionary dictionary}. An arbitrary number of bytes may be skipped by the method
+     * after the character is read in order to skip over non-indexable dictionary fields.
      *
      * @return -1, if the character is not part of an indexable word; 0 if an index entry should
      *         be created immediately for the character position; n (&gt;0): add an index entry
@@ -457,9 +480,12 @@ public abstract class FileBasedDictionary implements Dictionary {
             index.put( offset);
         } catch (BufferOverflowException ex) {
             // increase file size
+            System.err.println( indexchannel);
+            int position = index.position();
             index = indexchannel.map( FileChannel.MapMode.READ_WRITE, INDEX_OFFSET,
                                       indexchannel.size()*2).order( ByteOrder.nativeOrder())
                 .asIntBuffer();
+            index.position( position+1);
             index.put( offset);
         }
     }
@@ -562,7 +588,7 @@ public abstract class FileBasedDictionary implements Dictionary {
             try {
                 b2 = byteToUnsignedByte( dictionary.get());
             } catch (BufferUnderflowException ex) {
-                // end of dictionary file
+                // end of dictionary file, dictionary string is prefix of str
                 return 1;
             }
             if (b1 < b2)

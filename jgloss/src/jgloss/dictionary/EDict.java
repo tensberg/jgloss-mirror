@@ -47,9 +47,9 @@ public class EDict implements Dictionary {
      */
     public final static String JJDX_EXTENSION = ".jjdx";
     /**
-     * Current version of the JJDX format.
+     * Version of the JJDX format supported by this implementation.
      */
-    public final static int JJDX_VERSION = 1001;
+    public final static int JJDX_VERSION = 2001;
 
     /**
      * Localizable message resource.
@@ -225,6 +225,7 @@ public class EDict implements Dictionary {
             if (match != -1) {
                 int firstmatch = findFirstMatch( expr_euc, match);
                 int lastmatch = findLastMatch( expr_euc, match);
+                //System.err.println( "Edict: " + firstmatch + "/" + lastmatch);
 
                 // Several index entries can point to the same entry line. For example
                 // if a word contains the same kanji twice, and words with this kanji are looked up,
@@ -492,11 +493,36 @@ public class EDict implements Dictionary {
         }
         int offset = is.readInt();
         int size = is.readInt();
-        is.skip( offset - 4*3); // should be 0 for version 1001 index
+        boolean swapBytes = false;
+        if (version >= 2001) {
+            // byte order was added in JJDX 2001
+            if (is.readInt() == 2) // little endian
+                swapBytes = true;
+            offset -= 4; // adjust offset for read int
+        }
+        System.err.println( "using " + (swapBytes ? "little" : "big") + " endian");
+            
+        is.skip( offset - 4*3); // should be 0 for version 2001 or 1001 index
         index = new int[size];
         indexLength = size;
-        for ( int i=0; i<size; i++)
+        for ( int i=0; i<size; i++) {
             index[i] = is.readInt();
+            if (swapBytes) { // adjust for endianness
+                // the bit-shift operators act all weird with signed integers, so mask the sign out
+                boolean signmsb = (index[i] & 0x80000000) != 0;
+                boolean signlsb = (index[i] & 0x80) != 0;
+                index[i] &= 0x7fffffff;
+                index[i] = 
+                    (index[i]&0xff000000)>>24 |
+                    (index[i]&0x00ff0000)>> 8 |
+                    (index[i]&0x0000ff00)<< 8 |
+                    (index[i]&0x000000ff)<<24;
+                if (signmsb)
+                    index[i] |= 0x80;
+                if (signlsb)
+                    index[i] |= 0x80000000;
+            }
+        }
         is.close();
     }
 
@@ -525,10 +551,11 @@ public class EDict implements Dictionary {
     }
 
     /**
-     * Creates an index for the EDICT dictionary. The dictionary file must have been already loaded.
+     * Creates a JJD index for the EDICT dictionary. The dictionary file must have been already loaded.
      * The method will call {@link #preBuildIndex() preBuildIndex}, 
      * {@link #addIndexRange(int,int) addIndexRange( 0, dictionaryLength)} and
      * {@link #postBuildIndex() postBuildIndex()}.
+     * For a specification of the JJDX index format see {@link FileBasedDictionary FileBasedDictionary}.
      *
      * @param printMessage Flag if an informational message should be printed to <CODE>System.err</CODE>.
      */
@@ -702,22 +729,26 @@ public class EDict implements Dictionary {
                     }
                     // We only need to test the type of c1, because if c1 and c2 are different,
                     // the equality test ends.
-                    if (c1 < 127)
+                    if (c1 < 127) {
                         type = ONE_BYTE;
+                        // convert uppercase->lowercase
+                        if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
+                        if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
+                    }
                     else {
                         if (c1 == 0x8f) // JIS X 0212 3-Byte Kanji
                             type = THREE_BYTES;
                         else
                             type = TWO_BYTES;
+                        b++;
                     }
-                    b++;
                 }
                 else if (b == type) // last byte in char, reset counter
                     b = 1;
+                else // only reached for 3-byte char
+                    b++;
             }
 
-            if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
-            if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
             if (c1 != c2) break;
         }
 
@@ -742,9 +773,9 @@ public class EDict implements Dictionary {
         int c1 = 0, c2 = 0;
 
         int b = 1; // byte in multibyte character
-        int ONE_BYTE = 1;
-        int TWO_BYTES = 2;
-        int THREE_BYTES = 3;
+        final int ONE_BYTE = 1;
+        final int TWO_BYTES = 2;
+        final int THREE_BYTES = 3;
         int type = ONE_BYTE;
 
         int i = 0;
@@ -762,22 +793,25 @@ public class EDict implements Dictionary {
                 }
                 // We only need to test the type of c1, because if c1 and c2 are different,
                 // the equality test ends.
-                if (c1 < 127)
+                if (c1 < 127) {
                     type = ONE_BYTE;
+                    // uppercase -> lowercase conversion
+                    if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
+                    if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
+                }
                 else {
                     if (c1 == 0x8f) // JIS X 0212 3-Byte Kanji
                         type = THREE_BYTES;
                     else
                         type = TWO_BYTES;
+                    b++;
                 }
-                b++;
             }
             else if (b == type) // last byte in char, reset counter
                 b = 1;
+            else // only reached for 3-byte char
+                b++;
 
-            // convert katakana to hiragana
-            if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
-            if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
             if (c1 != c2) break;
 
             i1++;

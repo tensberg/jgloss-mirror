@@ -108,4 +108,8 @@ public class GDict extends FileBasedDictionary {
         else
             return -1; // not in word
     }
+
+    public String toString() {
+        return "GDICT " + getName();
+    }
 } // class GDict

@@ -108,4 +108,35 @@ public class DictionaryEntry implements WordReadingPair {
 
         return out;
     }
+
+    /**
+     * Tests for equality with another object. The objects equal if the other object
+     * is an instance of <CODE>DictionaryEntry</CODE>, has identical word, reading
+     * and translations and comes from the same dictionary.
+     */
+    public boolean equals( Object o) {
+        try {
+            DictionaryEntry e = (DictionaryEntry) o;
+            if (!dictionary.equals( e.dictionary))
+                return false;
+            if (!word.equals( e.word))
+                return false;
+            if (reading==null && e.reading!=null)
+                return false;
+            if (reading!=null && e.reading==null)
+                return false;
+            if (!reading.equals( e.reading))
+                return false;
+            if (translation.length != e.translation.length)
+                return false;
+            for ( int i=0; i<translation.length; i++)
+                if (!translation[i].equals( e.translation[i]))
+                    return false;
+
+            return true;
+        } catch (ClassCastException ex) {
+            System.err.println( "classcastexception");
+            return false;
+        }
+    }
 } // class Entry

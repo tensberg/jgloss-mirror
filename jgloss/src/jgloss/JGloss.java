@@ -113,7 +113,7 @@ public class JGloss {
     public static void main( String args[]) {
         try {
             // register dictionaries
-            DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
+            DictionaryFactory.registerImplementation( EDictNIO.class, EDictNIO.implementation);
             DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
             DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
 
