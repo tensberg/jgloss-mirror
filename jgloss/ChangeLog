@@ -1,4 +1,4 @@
-1.0: (2001/07/21)
+0.9.2: (2001/07/23)
 	- Extreme speedup of EDICT lookups. The old entry match test was
 	  really broken.
 	- Added French translation, contributed by Alexandre Beraud.
@@ -9,7 +9,12 @@
 	- Added composite verb detection to parser.
 	- HTML export: files now show reading and translation in popup
 	  windows in browsers which support the neccessary JavaScript
-	  functions.
+	  functions, and in the status bar.
+	- Added command line option -a, which annotates Japanese words in
+	  a HTML page with dictionary entries.
+	- Creation of the preferences panel and loading of the dictionaries
+	  now happens in the background. This decreases the perceived
+	  startup time.
 	- Started working on a JGloss-WWW servlet, which adds annotations
 	  to Japanese web pages on the fly.
 0.9.1: (2001/07/13)
