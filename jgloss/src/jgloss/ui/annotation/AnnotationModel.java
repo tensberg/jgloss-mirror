@@ -269,15 +269,12 @@ public class AnnotationModel extends DefaultTreeModel {
         try {
             // find smallest enclosing element of start and don't allow annotation to
             // cross it.
-            Element el = doc.getDefaultRootElement();
-            Element elp = el;
-            while (el!=null && !(el.getAttributes().getAttribute( StyleConstants.NameAttribute)
-                                 .equals( AnnotationTags.ANNOTATION))
-                   && !(el instanceof AbstractDocument.LeafElement)) {
-                elp = el;
-                el = el.getElement( el.getElementIndex( start));
+            Element paragraph = doc.getParagraphElement( start);
+            if (paragraph.getAttributes().getAttribute( StyleConstants.NameAttribute)
+                .equals( AnnotationTags.ANNOTATION)) {
+                paragraph = paragraph.getParentElement();
             }
-            end = Math.min( end, elp.getEndOffset()-1);
+            end = Math.min( end, paragraph.getEndOffset()-1);
 
             // The start and end offsets will move around while we change the document.
             // So wrap them in position objects, which adapt to changes.
@@ -299,21 +296,38 @@ public class AnnotationModel extends DefaultTreeModel {
             // look up the new annotation in the dictionaries.
             List l = doc.getDictionaryParser().findTranslations( trans.translate( text));
 
+            boolean paragraphSpaceInserted = false;
+            if (start == paragraph.getStartOffset()) {
+                doc.insertAfterStart( paragraph, "&nbsp;");
+                start++;
+                startp = doc.createPosition( start);
+                end = endp.getOffset();
+                paragraphSpaceInserted = true;
+            }
+
             // remove the old text.
             doc.remove( start, end-start);
 
             // If we insert new text directly after an annotation, the new annotation will 
             // be made a child of the first one, which is not what we want. So insert an
             // additional character if needed.
-            AnnotationNode ann = findAnnotation( start-1);
-            Element ae = null;
-            if (ann != null)
-                ae = ann.getAnnotationElement();
-            if (ae != null) {
-                doc.insertAfterEnd( ae, "&nbsp;");
-                start++;
+            AnnotationNode ann = findAnnotation( startp.getOffset()-1);
+            Element sae = null;
+            if (ann != null) {
+                sae = ann.getAnnotationElement();
+                doc.insertAfterEnd( sae, "s");
             }
-
+            ann = findAnnotation( endp.getOffset());
+            Element eae = null;
+            if (ann != null) {
+                eae = ann.getAnnotationElement();
+                doc.insertBeforeStart( eae, "e");
+                start = startp.getOffset()-1;
+                startp = doc.createPosition( start);
+                end = endp.getOffset()-1;
+                endp = doc.createPosition( end);
+            }
+            
             // construct the new annotation and insert it
             text = "<html><body><p>"
                 + "<" + AnnotationTags.ANNOTATION.getId() + " " + JGlossDocument.TEXT_ANNOTATION
@@ -328,12 +342,18 @@ public class AnnotationModel extends DefaultTreeModel {
             // annotation node.
             // Unfortunately the JGlossDocument has no method for inserting HTML text at an
             // arbitrary location. So we will have to use an editor kit.
-            kit.insertHTML( doc, start, text, 0, 0, AnnotationTags.ANNOTATION);
+            kit.insertHTML( doc, startp.getOffset(), text, 0, 0, AnnotationTags.ANNOTATION);
 
             // remove the '\n\n' which the HTMLEditorKit insists on inserting
             doc.remove( endp.getOffset()-2, 2);
-            if (ae != null) // remove the additional space which we inserted above
-                doc.remove( start-1, 1);
+
+            if (eae != null) // remove the additional space which we inserted above
+                doc.remove( eae.getStartOffset()-1, 1);
+            if (sae != null) // remove the additional space which we inserted above
+                doc.remove( sae.getEndOffset(), 1);
+
+            if (paragraphSpaceInserted)
+                doc.remove( paragraph.getStartOffset(), 1);
 
             return findAnnotation( start);
         } catch (Exception ex) {
