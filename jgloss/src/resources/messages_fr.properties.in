@@ -63,7 +63,7 @@ button.discard=Abandonner
 button.close=Fermer
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9.1
+jgloss.version=Version 0.9.2
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<création de la fenêtre d'application>
@@ -77,7 +77,10 @@ Options:\n\
 \  -i, --createindex Crée des fichiers index pour le dictionnaire\n\
 \                    donné en ligne de commande\n\
 \  -f, --format      Imprime le format de dictionnaire des fichiers\n\
-\                    donnés en ligne de commande\n
+\                    donnés en ligne de commande\n\
+\  -p, --pastewindow Instead of opening a JGloss document, shows\n\
+\                    a window in which you can paste text which\n\
+\                    will be imported
 main.unknownoption=Option inconnue {0}
 main.format=Le format de {0} semble être {1}.
 main.format.unrecognized={0} n''est pas un format de dictionnaire connu.

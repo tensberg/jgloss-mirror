@@ -63,7 +63,7 @@ button.discard=Discard
 button.close=Close
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9.1
+jgloss.version=Version 0.9.2
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -77,7 +77,10 @@ Options:\n\
 \  -i, --createindex Create index files for the dictionary files\n\
 \                    given on the command line\n\
 \  -f, --format      Prints the dictionary format of the files\n\
-\                    given on the command line
+\                    given on the command line\n\
+\  -p, --pastewindow Instead of opening a JGloss document, shows\n\
+\                    a window in which you can paste text which\n\
+\                    will be imported
 main.unknownoption=Unknown option {0}
 main.format=The format of {0} seems to be {1}.
 main.format.unrecognized={0} is not a recognized dictionary format.
@@ -244,3 +247,6 @@ filefilter.html.description=HTML documents (*.html)
 filefilter.latex.description=LaTeX documents (*.tex)
 
 encodings.default=<auto>
+
+pasteimport.title=JGloss Import
+pasteimport.description=Text pasted in this area will be imported\nin a new JGloss document.

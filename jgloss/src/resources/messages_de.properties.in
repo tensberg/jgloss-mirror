@@ -62,7 +62,7 @@ button.discard=Verwerfen
 button.close=Schließen
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9.1
+jgloss.version=Version 0.9.2
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<Erstelle Anwendungsfenster>
@@ -76,7 +76,9 @@ Optionen:\n\
 \  -i, --createindex Erzeugt Indexdateien für die in der Kommandozeile\n\
 \                    angegebenen Wörterbuchdateien\n\
 \  -f, --format      Gibt das Wörterbuchformat für die in der Kommandozeile\n\
-\                    angegebenen Dateien aus.
+\                    angegebenen Dateien aus\n\
+\  -p, --pastewindow Öffnet anstatt einem JGloss-Dokument ein Fenster in\n\
+\                    das Text kopiert werden kann, der dann importiert wird
 main.unknownoption=Unbekannte Option {0}
 main.format=Das Format von {0} scheint {1} zu sein.
 main.format.unrecognized=Das Format von {0} ist nicht bekannt.
@@ -219,3 +221,6 @@ filefilter.html.description=HTML Dokumente (*.html)
 filefilter.latex.description=LaTeX Dokumente (*.tex)
 
 encodings.default=<auto>
+
+pasteimport.title=JGloss Import
+pasteimport.description=Text, der in dieses Fenster kopiert wird, wird in \nein neues JGloss-Dokument importiert.
