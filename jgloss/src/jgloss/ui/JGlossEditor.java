@@ -169,8 +169,6 @@ public class JGlossEditor extends JTextPane {
             p.add( p2, BorderLayout.EAST);
             getContentPane().add( p, BorderLayout.SOUTH);
 
-            WordLookupDialog.this.getRootPane().setDefaultButton( annotateButton);
-
             UIUtilities.setCancelAction( WordLookupDialog.this, cancelAction);
 
             pack();
@@ -193,6 +191,12 @@ public class JGlossEditor extends JTextPane {
                 return wordlookup.searchSelection( jgloss.dictionary.Dictionary.RESULT_DICTIONARY_ENTRIES);
             else
                 return null;
+        }
+
+        public void show() {
+            WordLookupDialog.this.getRootPane().setDefaultButton( wordlookup.getSearchButton());
+            wordlookup.getExpressionField().requestFocus();
+            super.show();
         }
     }
 

@@ -1,8 +1,11 @@
-1.0.6: (2002/07/29)
+1.0.6: (2002/07/30)
 	- Improved keyboard navigation.
 	- Added best match search option to word lookup.
 	- Added automatic lookup of clipboard content to word lookup.
 	- Added keyboard shortcut for Import Clipboard.
+	- Changed combo box in word lookup dialog to text field to
+	  work around a bug in the JRE 1.4 Windows Look & Feel. This
+	  fixes the need to push the "Search" button twice.
 	- Changed GDICT name to WadokuJT.
 	- Fixed access of A drive dialogs when using file dialogs with
 	  Windows and JRE 1.3.

@@ -191,6 +191,8 @@ public class WordLookup extends JFrame {
         setJMenuBar( bar);
 
         pack();
+
+        wordlookup.getExpressionField().requestFocus();
     }
 
     /**

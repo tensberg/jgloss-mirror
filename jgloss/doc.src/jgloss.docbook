@@ -125,24 +125,24 @@
           </varlistentry>
 
           <varlistentry>
-            <term><ulink url="http://www.bibiko.com/dlde.htm">WaDokuJT</ulink></term>
+            <term><ulink url="http://www.bibiko.com/dlde.htm">WadokuJT</ulink></term>
             <listitem>
               <para>
-                The WaDokuJiten is an extensive Japanese-German dictionary. 
-                To use it, download the file <filename>gdictutf.zip</filename> from
+                The WadokuJiten is an extensive Japanese-German dictionary. 
+                To use it, download the file <filename>WadokuJT.zip</filename> from
                 <ulink url="http://www.bibiko.com/dlde.htm">this page</ulink>, unzip it
-                and add the resulting file <filename>gdictutf.txt</filename> to the list of
+                and add the resulting file <filename>WadokuJT.txt</filename> to the list of
                 dictionaries used by &JGloss; in the dictionary dialog.
               </para>
               <para>
-                The WaDokuJT dictionary format is only supported if you have Java Version 1.4
+                The WadokuJT dictionary format is only supported if you have Java Version 1.4
                 installed, otherwise &JGloss; will display a "not a dictionary file" error
-                dialog. The WaDoku dictionary is also available converted to EDICT format from the same
+                dialog. The WadokuJT dictionary is also available converted to EDICT format from the same
                 location. The EDICT format however does not support umlauts and the
-                more detailed entry format of GDICT.
+                more detailed entry format of WadokuJT.
               </para>
               <para>
-                GDICT dictionaries need a JJDX index file.
+                WadokuJT dictionaries need a JJDX index file.
                 If no index file is found, it will be created automatically by &JGloss; and saved in the
                 dictionary directory. Should the index file creation fail, for example because the
                 directory is write-protected, the dictionary can't be used and an error message is
@@ -843,9 +843,18 @@
         searches for readings so you might not get all possible matches if you use this search mode.
       </para>
       <para>
+        The <guilabel>Best Match</guilabel> search option will automatically adapt the search mode
+        such that the least number of results are found. If a <guilabel>Best Match</guilabel> search is
+        performed, <guilabel>Exact matches</guilabel> will be tried first and if no results are found,
+        the other search options are tried one after the other until a match is found or all options
+        have been tried.
+      </para>
+      <para>
         The <guibutton>Use Deinflection</guibutton> checkbox enables the use of the verb/adjective
-        deinflection algorithm for the search expression. This might find entries for inflected
-        word forms, but may also yield confusing results.
+        deinflection algorithm for the search expression. The algorithm tries to derive the base form
+        of the search expression by looking at the hiragana ending. This might find entries for inflected
+        word forms, but may also yield confusing results, since the algorithm does only work for some
+        verb forms.
       </para>
       <para>
         You can limit the search to a single dictionary by selecting the 
@@ -853,6 +862,15 @@
         the popup menu to the right. If the <guibutton>Search all Dictionaries</guibutton> radio
         button is selected, all dictionaries made available to JGloss in the preferences will
         be searched.
+      </para>
+      <para>
+        If you use the &JGloss; word lookup dialog to look up words copied from other programs,
+        you might want to enable the <guilabel>automatically search clipboard content</guilabel>
+        option in the dialog window. If the option is selected, every time the JGloss window is
+        brought to the front, the content of the clipboard is entered in the
+        <guilabel>Search Expression</guilabel> field and searched using the current search settings.
+        This way you can look up words in other programs by simply selecting the word, copying it
+        to the clipboard and bringing the word lookup dialog to the foreground.
       </para>
     </sect1>
 

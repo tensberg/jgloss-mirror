@@ -68,7 +68,8 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
     /**
      * Widget in which the search expression is entered.
      */
-    protected JComboBox expression;
+    protected JTextField expression;
+    //protected JComboBox expression;
     /**
      * Text field used to display the result as plain text. This text field is used when there
      * are more than {@link #resultLimit resultLimit} results.
@@ -231,9 +232,15 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         c2 = new GridBagConstraints();
         c2.anchor = GridBagConstraints.WEST;
         c2.gridy = 0;
-        p.add( new JLabel( JGloss.messages.getString( "wordlookup.enterexpression")), c2);
-        expression = new JComboBox();
-        expression.setEditable( true);
+        JLabel expressionDescription = 
+            new JLabel( JGloss.messages.getString( "wordlookup.enterexpression"));
+        p.add( expressionDescription, c2);
+        //BUG: JComboBox changed to JTextField to work around a bug in the JRE 1.4 Windows L&F where
+        // the JComboBox would grab the focus again after losing it and thus preventing buttons
+        // from working immediately
+        //expression = new JComboBox();
+        //expression.setEditable( true);
+        expression = new JTextField();
 
         GridBagConstraints c3 = (GridBagConstraints) c2.clone();
         c3.fill = GridBagConstraints.HORIZONTAL;
@@ -241,25 +248,32 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         p.add( expression, c3);
         p.add( Box.createHorizontalStrut( 4), c2);
         
+        expressionDescription.setDisplayedMnemonic
+            ( JGloss.messages.getString( "wordlookup.enterexpression.mk").charAt( 0));
+        expressionDescription.setLabelFor( expression);
+
         Action searchAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     search();
+                    expression.requestFocus();
                 }
             };
+        searchAction.setEnabled( true);
         UIUtilities.initAction( searchAction, "wordlookup.search");
         search = new JButton( searchAction);
-        searchAction.setEnabled( true);
         p.add( search, c2);
         p.add( Box.createHorizontalStrut( 2), c2);
 
         Action clearAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    expression.setSelectedItem( null);
+                    //expression.setSelectedItem( null);
+                    expression.setText( "");
+                    expression.requestFocus();
                 }
             };
+        clearAction.setEnabled( true);
         UIUtilities.initAction( clearAction, "wordlookup.clear");
         JButton clear = new JButton( clearAction);
-        clearAction.setEnabled( true);
         p.add( clear, c2);
 
         add( p, c);
@@ -283,7 +297,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                       public void actionPerformed( ActionEvent e) {
                           transferFocus();
                       }
-                  });
+              });
 
         resultPlain = new JTextArea();
         resultPlain.setFont( new Font( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP),
@@ -296,7 +310,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                       public void actionPerformed( ActionEvent e) {
                           transferFocus();
                       }
-                  });
+              });
 
         p = new JPanel( new GridLayout( 1, 1));
         p.setBorder( BorderFactory.createCompoundBorder
@@ -345,7 +359,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             });
         UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                 public void propertyChange( java.beans.PropertyChangeEvent e) { 
-                    if (e.getPropertyName().equals( "ComboBox.font")) {
+                    if (e.getPropertyName().equals( /*"ComboBox.font"*/ "TextField.font")) {
                         expression.setFont( (Font) e.getNewValue());
                     }
                 }
@@ -388,7 +402,8 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
      * @param text The word which should be looked up.
      */
     public void search( String text) {
-        expression.setSelectedItem( text);
+        //expression.setSelectedItem( text);
+        expression.setText( text);
         search();
     }
 
@@ -412,10 +427,13 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
      * @return List of dictionary lookup results.
      */
     protected List searchSelection( short resultmode, boolean markDictionaries) {
-        if (expression.getSelectedItem() == null)
+        /*if (expression.getSelectedItem() == null)
             return Collections.EMPTY_LIST;
 
         String ex = expression.getSelectedItem().toString();
+        */
+
+        String ex = expression.getText();
         if (ex.length() == 0)
             return Collections.EMPTY_LIST;
 
@@ -506,12 +524,12 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             if (resultCount == 0) {
                 result.add( 0, JGloss.messages.getString
                             ( "wordlookup.nomatches",
-                              new Object[] { expression.getSelectedItem() }));
+                              new Object[] { /*expression.getSelectedItem()*/ expression.getText() }));
             }
             else {
                 result.add( 0, JGloss.messages.getString( "wordlookup.matchesfor",
                                                           new Object[] 
-                    { new Integer( resultCount), expression.getSelectedItem(), 
+                    { new Integer( resultCount), /*expression.getSelectedItem()*/ expression.getText(), 
                       new Integer( currentMode) }));
             }
         }
@@ -520,10 +538,14 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
     }
 
     protected void search() {
-        if (expression.getSelectedItem() == null)
+        /*if (expression.getSelectedItem() == null)
             return; // empty expression string
 
-        String ex = expression.getSelectedItem().toString();
+            String ex = expression.getSelectedItem().toString();*/
+        String ex = expression.getText();
+        if (ex.length() == 0)
+            return; // empty expression string
+
         List result = searchSelection( Dictionary.RESULT_NATIVE, true);
 
         // generate result text
@@ -631,7 +653,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         resultScroller.getViewport().setViewPosition( new Point( 0, 0));
             
         // remember the current search string
-        ex = expression.getSelectedItem().toString();
+        /*ex = expression.getSelectedItem().toString();
         expression.insertItemAt( ex, 0);
         int i = 1;
         while (i < expression.getItemCount()) {
@@ -643,7 +665,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         while (expression.getItemCount() > 30) {
             expression.removeItemAt( 30);
         }
-        expression.setSelectedItem( ex);
+        expression.setSelectedItem( ex);*/
     }
 
     /**
@@ -770,5 +792,13 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
      */
     public JButton getSearchButton() {
         return search;
+    }
+
+    /**
+     * Return the expression text field. Can be used to request focus for it when the
+     * dialog is shown.
+     */
+    public JTextField getExpressionField() {
+        return expression;
     }
 } // class WordLookupPanel
