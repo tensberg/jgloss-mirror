@@ -611,7 +611,7 @@ public class EDict implements Dictionary {
     protected void addIndexEntry( int offset) {
         if (indexLength == index.length) {
             // allocate more storage space
-            int[] tindex = new int[Math.max( Math.min( index.length*2, 10), 500*1024)];
+            int[] tindex = new int[Math.max( Math.min( index.length*2, 10), index.length + 500*1024)];
             System.arraycopy( index, 0, tindex, 0, index.length);
             index = tindex;
         }

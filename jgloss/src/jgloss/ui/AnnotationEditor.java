@@ -290,7 +290,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     ((AnnotationNode) tn).setLinkedAnnotation( annotation);
                 }
             };
-        JGlossFrame.initAction( useReadingAction, "annotationeditor.menu.usereading");
+        UIUtilities.initAction( useReadingAction, "annotationeditor.menu.usereading");
         useReadingAction.setEnabled( false);
         // use currently selected translation for this annotation
         useTranslationAction = new AbstractAction() {
@@ -306,7 +306,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     ((AnnotationNode) tn).getTranslationNode().setText( translation);
                 }
             };
-        JGlossFrame.initAction( useTranslationAction, "annotationeditor.menu.usetranslation");
+        UIUtilities.initAction( useTranslationAction, "annotationeditor.menu.usetranslation");
         useTranslationAction.setEnabled( false);
         // hide/unhide currently selected annotation
         hideAction = new AbstractAction() {
@@ -320,7 +320,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                         updateHideAction( (TreeNode) getSelectionPath().getLastPathComponent());
                 }
             };
-        JGlossFrame.initAction( hideAction, "annotationeditor.menu.hide");
+        UIUtilities.initAction( hideAction, "annotationeditor.menu.hide");
         hideAction.setEnabled( false);
         // remove the currently selected annotation
         removeAction = new AbstractAction() {
@@ -345,7 +345,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     }
                 }
             };
-        JGlossFrame.initAction( removeAction, "annotationeditor.menu.remove");
+        UIUtilities.initAction( removeAction, "annotationeditor.menu.remove");
         removeAction.setEnabled( false);
         // Removes all annotations which are a duplicate of the currently selected annotation.
         // A duplicate has the same kanji, reading and translation.
@@ -393,7 +393,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
 
                 }
             };
-        JGlossFrame.initAction( removeDuplicatesAction, "annotationeditor.menu.removeduplicates");
+        UIUtilities.initAction( removeDuplicatesAction, "annotationeditor.menu.removeduplicates");
         removeDuplicatesAction.setEnabled( false);
         // Makes all annotations with the same word as the current use the same reading and
         // translation.
@@ -424,7 +424,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     }
                 }
             };
-        JGlossFrame.initAction( equalizeAnnotationsAction, "annotationeditor.menu.equalize");
+        UIUtilities.initAction( equalizeAnnotationsAction, "annotationeditor.menu.equalize");
         equalizeAnnotationsAction.setEnabled( false);
         // add the word of the selected annotation to the list of excluded words
         addToExclusionsAction = new AbstractAction() {
@@ -437,7 +437,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     ExclusionList.addWord( word);
                 }
             };
-        JGlossFrame.initAction( addToExclusionsAction, "annotationeditor.menu.addtoexclusions");
+        UIUtilities.initAction( addToExclusionsAction, "annotationeditor.menu.addtoexclusions");
         addToExclusionsAction.setEnabled( false);
         // add the selected annotation to the user dictionary
         addToDictionaryAction = new AbstractAction() {
@@ -476,7 +476,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     }
                 }
             };
-        JGlossFrame.initAction( addToDictionaryAction, "annotationeditor.menu.addtodictionary");
+        UIUtilities.initAction( addToDictionaryAction, "annotationeditor.menu.addtodictionary");
         addToDictionaryAction.setEnabled( false);
         // Hide all annotations which are a duplicate of a previous annotation.
         // A duplicate has the same kanji, reading and translation.
@@ -501,7 +501,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     doc.getStyleSheet().addRule( AnnotationTags.ANNOTATION.getId() + " { }");
                 }
             };
-        JGlossFrame.initAction( hideDuplicatesAction, "annotationeditor.menu.hideduplicates");
+        UIUtilities.initAction( hideDuplicatesAction, "annotationeditor.menu.hideduplicates");
         hideDuplicatesAction.setEnabled( false);
         // make all hidden annotations visible
         unhideAction = new AbstractAction() {
@@ -517,31 +517,31 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     doc.getStyleSheet().addRule( AnnotationTags.ANNOTATION.getId() + " { }");
                 }
             };
-        JGlossFrame.initAction( unhideAction, "annotationeditor.menu.unhide");
+        UIUtilities.initAction( unhideAction, "annotationeditor.menu.unhide");
         unhideAction.setEnabled( false);
 
         menu = new JMenu( JGloss.messages.getString( "annotationeditor.menu.title"));
         pmenu = new JPopupMenu();
-        menu.add( JGlossFrame.createMenuItem( useReadingAction));
-        menu.add( JGlossFrame.createMenuItem( useTranslationAction));
+        menu.add( UIUtilities.createMenuItem( useReadingAction));
+        menu.add( UIUtilities.createMenuItem( useTranslationAction));
 
         menu.addSeparator();
-        menu.add( JGlossFrame.createMenuItem( hideAction));
+        menu.add( UIUtilities.createMenuItem( hideAction));
         pmenu.add( hideAction);
-        menu.add( JGlossFrame.createMenuItem( removeAction));
+        menu.add( UIUtilities.createMenuItem( removeAction));
         pmenu.add( removeAction);
-        menu.add( JGlossFrame.createMenuItem( removeDuplicatesAction));
+        menu.add( UIUtilities.createMenuItem( removeDuplicatesAction));
         pmenu.add( removeDuplicatesAction);
-        menu.add( JGlossFrame.createMenuItem( equalizeAnnotationsAction));
+        menu.add( UIUtilities.createMenuItem( equalizeAnnotationsAction));
         pmenu.add( equalizeAnnotationsAction);
-        menu.add( JGlossFrame.createMenuItem( addToExclusionsAction));
+        menu.add( UIUtilities.createMenuItem( addToExclusionsAction));
         pmenu.add( addToExclusionsAction);
-        menu.add( JGlossFrame.createMenuItem( addToDictionaryAction));
+        menu.add( UIUtilities.createMenuItem( addToDictionaryAction));
         pmenu.add( addToDictionaryAction);
         
         menu.addSeparator();
-        menu.add( JGlossFrame.createMenuItem( hideDuplicatesAction));
-        menu.add( JGlossFrame.createMenuItem( unhideAction));
+        menu.add( UIUtilities.createMenuItem( hideDuplicatesAction));
+        menu.add( UIUtilities.createMenuItem( unhideAction));
 
         addMouseListener( this);
 
@@ -594,7 +594,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     }
                 }
             };
-        JGlossFrame.initAction( nextAnnotationAction, "annotationeditor.action.next");
+        UIUtilities.initAction( nextAnnotationAction, "annotationeditor.action.next");
         // select the previous annotation
         Action previousAnnotationAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
@@ -625,7 +625,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     }
                 }
             };
-        JGlossFrame.initAction( previousAnnotationAction, "annotationeditor.action.previous");
+        UIUtilities.initAction( previousAnnotationAction, "annotationeditor.action.previous");
         // do something useful, based on the currenty selected node
         Action metaAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
@@ -650,7 +650,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     }
                 }
             };
-        JGlossFrame.initAction( metaAction, "annotationeditor.action.meta");
+        UIUtilities.initAction( metaAction, "annotationeditor.action.meta");
 
         // Add the key bindings for the actions to the annotation editor.
         // Since the metaAction uses a "released SPACE" and a "SPACE" action is also defined,

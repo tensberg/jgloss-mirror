@@ -65,3 +65,6 @@ kanjidic.nanori=(nanori, name reading)
 kanjidic.radicalname=(name of radical)
 
 parser.dictionary.document=document
+
+parser.kanji.name=Kanji
+parser.chasen.name=ChaSen

@@ -24,10 +24,13 @@
 package jgloss.ui;
 
 import jgloss.*;
+import jgloss.dictionary.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 import javax.swing.*;
 
@@ -48,9 +51,9 @@ public class ImportDialog extends JDialog {
      */
     private JComboBox encodings;
     /**
-     * Widget to select the reading annotation delimiters.
+     * Used for choosing the parser for this import.
      */
-    private JComboBox readingBrackets;
+    private ParserSelector parserSelector;
     /**
      * Result of the dialog run. <CODE>true</CODE> if the user hit OK.
      */
@@ -72,10 +75,12 @@ public class ImportDialog extends JDialog {
                 public void actionPerformed( ActionEvent e) {
                     result = true;
                     ImportDialog.this.hide();
+                    JGloss.prefs.set( Preferences.IMPORT_PARSER, 
+                                      parserSelector.getSelectedParser().getName());
                 }
             };
         ok.setEnabled( true);
-        JGlossFrame.initAction( ok, "button.import");
+        UIUtilities.initAction( ok, "button.import");
         final Action cancel = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     result = false;
@@ -83,7 +88,7 @@ public class ImportDialog extends JDialog {
                 }
             };
         cancel.setEnabled( true);
-        JGlossFrame.initAction( cancel, "button.cancel");
+        UIUtilities.initAction( cancel, "button.cancel");
         JButton bok = new JButton( ok);
         bok.setDefaultCapable( true);
         b.add( bok);
@@ -122,7 +127,7 @@ public class ImportDialog extends JDialog {
                 }
             };
         choosefile.setEnabled( true);
-        JGlossFrame.initAction( choosefile, "import.button.choosefile");
+        UIUtilities.initAction( choosefile, "import.button.choosefile");
         b2.add( new JButton( choosefile));
         b.add( b2);
         b.add( Box.createVerticalStrut( 10));
@@ -143,19 +148,23 @@ public class ImportDialog extends JDialog {
         b.add( b2);
         b.add( Box.createVerticalStrut( 5));
 
-        v = new java.util.Vector();
-        String s = JGloss.prefs.getString( Preferences.READING_BRACKET_CHARS);
-        for ( int i=0; i<s.length()-1; i+=2)
-            v.add( s.substring( i, i+2));
-        readingBrackets = new JComboBox( v);
-        readingBrackets.setEditable( true);
+        parserSelector = new ParserSelector( true);
+        parserSelector.setBorder( BorderFactory.createTitledBorder 
+                                  ( JGloss.messages.getString( "import.parserselector")));
+        try {
+            parserSelector.setSelected( Class.forName( JGloss.prefs.getString( Preferences.IMPORT_PARSER)));
+        } catch (ClassNotFoundException ex) {}
+        parserSelector.setEnabled( ChasenParser.class, ChasenParser.isChasenExecutable
+                                   ( ChasenParser.getDefaultExecutable()));
+        JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {
+                public void propertyChange( PropertyChangeEvent e) {
+                    if (e.getPropertyName().equals( Preferences.CHASEN_LOCATION))
+                        parserSelector.setEnabled( ChasenParser.class, ChasenParser.isChasenExecutable
+                                                   ( (String) e.getNewValue()));
+                };
+            });
 
-        b2 = Box.createHorizontalBox();
-        b2.add( new JLabel( JGloss.messages.getString( "import.readingbrackets")));
-        b2.add( Box.createHorizontalStrut( 3));
-        b2.add( readingBrackets);
-        b2.add( Box.createHorizontalGlue());
-        b.add( b2);
+        b.add( parserSelector);
         b.add( Box.createVerticalStrut( 10));
         b.add( Box.createVerticalGlue());
 
@@ -199,28 +208,9 @@ public class ImportDialog extends JDialog {
     }
 
     /**
-     * Returns the start delimiter of a reading annotation.
-     *
-     * @return The reading start delimiter, or '\0' if the user input is invalid.
+     * Creates a new parser instance using the parser class selected by the user.
      */
-    public char getReadingStart() {
-        String s = (String) readingBrackets.getSelectedItem();
-        if (s==null || s.length()<2)
-            return '\0';
-        else
-            return s.charAt( 0);
-    }
-
-    /**
-     * Returns the end delimiter of a reading annotation.
-     *
-     * @return The reading end delimiter, or '\0' if the user input is invalid.
-     */
-    public char getReadingEnd() {
-        String s = (String) readingBrackets.getSelectedItem();
-        if (s==null || s.length()<2)
-            return '\0';
-        else
-            return s.charAt( 1);
+    public Parser createParser( Dictionary[] dictionaries, java.util.Set exclusions) {
+        return parserSelector.createParser( dictionaries, exclusions);
     }
 } // class ImportDialog

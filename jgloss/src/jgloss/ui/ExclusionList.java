@@ -110,7 +110,7 @@ public class ExclusionList extends Box {
                 }
             };
         add.setEnabled( true);
-        JGlossFrame.initAction( add, "exclusions.button.add");
+        UIUtilities.initAction( add, "exclusions.button.add");
         final Action remove = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     int i = exclusionList.getSelectedIndex();
@@ -126,21 +126,21 @@ public class ExclusionList extends Box {
                 }
             };
         remove.setEnabled( false);
-        JGlossFrame.initAction( remove, "exclusions.button.remove");
+        UIUtilities.initAction( remove, "exclusions.button.remove");
         final Action export = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     exportList();
                 }
             };
         export.setEnabled( true);
-        JGlossFrame.initAction( export, "exclusions.button.export");
+        UIUtilities.initAction( export, "exclusions.button.export");
         final Action importA = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     importList();
                 }
             };
         importA.setEnabled( true);
-        JGlossFrame.initAction( importA, "exclusions.button.import");
+        UIUtilities.initAction( importA, "exclusions.button.import");
 
         JPanel p = new JPanel( new GridLayout( 0, 1));
         p.add( new JButton( add));
@@ -304,7 +304,7 @@ public class ExclusionList extends Box {
         encodings.setEditable( true);
         b.add( encodings);
         b.add( Box.createHorizontalStrut( 3));
-        p.add( JGlossFrame.createSpaceEater( b, false));
+        p.add( UIUtilities.createSpaceEater( b, false));
         f.setAccessory( p);
 
         int r = f.showSaveDialog( SwingUtilities.getRoot( box));

@@ -82,21 +82,21 @@ public class XCVManager {
                 }
             };
         cutAction.setEnabled( false);
-        JGlossFrame.initAction( cutAction, "editor.menu.cut");
+        UIUtilities.initAction( cutAction, "editor.menu.cut");
         copyAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     delegateeCopyAction.actionPerformed( e);
                 }
             };
         copyAction.setEnabled( false);
-        JGlossFrame.initAction( copyAction, "editor.menu.copy");
+        UIUtilities.initAction( copyAction, "editor.menu.copy");
         pasteAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     delegateePasteAction.actionPerformed( e);
                 }
             };
         pasteAction.setEnabled( false);
-        JGlossFrame.initAction( pasteAction, "editor.menu.paste");
+        UIUtilities.initAction( pasteAction, "editor.menu.paste");
 
         updateActions();
         editMenuListener = new MenuListener() {

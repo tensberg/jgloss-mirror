@@ -185,15 +185,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
             long t = System.currentTimeMillis();
             super.parse( r, cb, true);
             if (parser != null) {
-                t = System.currentTimeMillis() - t;
-                if (parser.getLookups()>10 && t>500) {
-                    // print some statistics 
-                    System.err.println( "time: " + t/1000f);
-                    System.err.println( "dictionary lookups: " + parser.getLookups());
-                    System.err.println( "cache hits: " + parser.getCacheHits());
-                    System.err.println( "cache gc: " + parser.getGarbageCollected());
-                    parser.clearCache();
-                }
+                parser.reset();
             }
         }
 

@@ -56,7 +56,7 @@ public class PreferencesFrame {
                     getFrame().show();
                 }
             };
-        JGlossFrame.initAction( showAction, "main.menu.preferences");
+        UIUtilities.initAction( showAction, "main.menu.preferences");
     }
 
     /**
@@ -106,7 +106,7 @@ public class PreferencesFrame {
                 }
             };
         ok.setEnabled( true);
-        JGlossFrame.initAction( ok, "button.ok");
+        UIUtilities.initAction( ok, "button.ok");
         final Action cancel = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     frame.hide();
@@ -115,7 +115,7 @@ public class PreferencesFrame {
                 }
             };
         cancel.setEnabled( true);
-        JGlossFrame.initAction( cancel, "button.cancel");
+        UIUtilities.initAction( cancel, "button.cancel");
         final Action apply = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     savePreferences();
@@ -123,7 +123,7 @@ public class PreferencesFrame {
                 }
             };
         apply.setEnabled( true);
-        JGlossFrame.initAction( apply, "button.apply");
+        UIUtilities.initAction( apply, "button.apply");
         b.add( new JButton( ok));
         b.add( Box.createHorizontalStrut( 5));
         b.add( new JButton( cancel));

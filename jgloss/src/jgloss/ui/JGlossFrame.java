@@ -90,8 +90,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                         else
                                             which = target;
                                         
-                                        which.importDocument( d.getSelection(), d.getReadingStart(), 
-                                                              d.getReadingEnd(), d.getEncoding());
+                                        which.importDocument
+                                            ( d.getSelection(),
+                                              d.createParser( Dictionaries.getDictionaries(),
+                                                              ExclusionList.getExclusions()),
+                                                              d.getEncoding());
                                         which.documentChanged = true;
                                     }
                                 }
@@ -99,7 +102,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     }
                 };
             importDocument.setEnabled( true);
-            initAction( importDocument, "main.menu.import"); 
+            UIUtilities.initAction( importDocument, "main.menu.import"); 
             importClipboard = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss import") {
@@ -113,7 +116,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     }
                 };
             importClipboard.setEnabled( false);
-            initAction( importClipboard, "main.menu.importclipboard"); 
+            UIUtilities.initAction( importClipboard, "main.menu.importclipboard"); 
             open = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss open") {
@@ -144,7 +147,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                         }
                 };
             open.setEnabled( true);
-            initAction( open, "main.menu.open"); 
+            UIUtilities.initAction( open, "main.menu.open"); 
             
             importClipboardListener = new MenuListener() {
                     public void menuSelected( MenuEvent e) {
@@ -380,49 +383,49 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 }
             };
         saveAction.setEnabled( false);
-        initAction( saveAction, "main.menu.save"); 
+        UIUtilities.initAction( saveAction, "main.menu.save"); 
         saveAsAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     saveDocumentAs();
                 }
             };
         saveAsAction.setEnabled( false);
-        initAction( saveAsAction, "main.menu.saveAs");
+        UIUtilities.initAction( saveAsAction, "main.menu.saveAs");
         exportPlainTextAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doExportPlainText();
                 }
             };
         exportPlainTextAction.setEnabled( false);
-        initAction( exportPlainTextAction, "main.menu.export.plaintext"); 
+        UIUtilities.initAction( exportPlainTextAction, "main.menu.export.plaintext"); 
         exportLaTeXAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doExportLaTeX();
                 }
             };
         exportLaTeXAction.setEnabled( false);
-        initAction( exportLaTeXAction, "main.menu.export.latex"); 
+        UIUtilities.initAction( exportLaTeXAction, "main.menu.export.latex"); 
         exportHTMLAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doExportHTML();
                 }
             };
         exportHTMLAction.setEnabled( false);
-        initAction( exportHTMLAction, "main.menu.export.html"); 
+        UIUtilities.initAction( exportHTMLAction, "main.menu.export.html"); 
         exportAnnotationListAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doExportAnnotationList();
                 }
             };
         exportAnnotationListAction.setEnabled( false);
-        initAction( exportAnnotationListAction, "main.menu.export.annotationlist"); 
+        UIUtilities.initAction( exportAnnotationListAction, "main.menu.export.annotationlist"); 
         printAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doPrint();
                 }
             };
         printAction.setEnabled( false);
-        initAction( printAction, "main.menu.print"); 
+        UIUtilities.initAction( printAction, "main.menu.print"); 
         closeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     if (askCloseDocument()) {
@@ -431,31 +434,31 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     }
                 }
             };
-        initAction( closeAction, "main.menu.close");
+        UIUtilities.initAction( closeAction, "main.menu.close");
         
         Actions actions = new Actions( this);
 
         // set up the menu bar
         JMenuBar bar = new JMenuBar();
         JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.file"));
-        menu.add( createMenuItem( actions.importDocument));
-        menu.add( createMenuItem( actions.importClipboard));
+        menu.add( UIUtilities.createMenuItem( actions.importDocument));
+        menu.add( UIUtilities.createMenuItem( actions.importClipboard));
         menu.addSeparator();
-        menu.add( createMenuItem( actions.open));
-        menu.add( createMenuItem( saveAction));
-        menu.add( createMenuItem( saveAsAction));
+        menu.add( UIUtilities.createMenuItem( actions.open));
+        menu.add( UIUtilities.createMenuItem( saveAction));
+        menu.add( UIUtilities.createMenuItem( saveAsAction));
         exportMenu = new JMenu( JGloss.messages.getString( "main.menu.export"));
         exportMenu.setMnemonic( JGloss.messages.getString( "main.menu.export.mk").charAt( 0));
         exportMenu.setEnabled( false);
-        exportMenu.add( createMenuItem( exportHTMLAction));
-        exportMenu.add( createMenuItem( exportPlainTextAction));
-        exportMenu.add( createMenuItem( exportLaTeXAction));
-        exportMenu.add( createMenuItem( exportAnnotationListAction));
+        exportMenu.add( UIUtilities.createMenuItem( exportHTMLAction));
+        exportMenu.add( UIUtilities.createMenuItem( exportPlainTextAction));
+        exportMenu.add( UIUtilities.createMenuItem( exportLaTeXAction));
+        exportMenu.add( UIUtilities.createMenuItem( exportAnnotationListAction));
         menu.add( exportMenu);
         menu.addSeparator();
-        menu.add( createMenuItem( printAction));
+        menu.add( UIUtilities.createMenuItem( printAction));
         menu.addSeparator();
-        menu.add( createMenuItem( closeAction));
+        menu.add( UIUtilities.createMenuItem( closeAction));
         bar.add( menu);
 
         menu.addMenuListener( actions.importClipboardListener);
@@ -470,10 +473,10 @@ public class JGlossFrame extends JFrame implements ActionListener {
                         WordLookup.getFrame().search( selection);
                 }
             };
-        initAction( wordLookupAction, "main.menu.wordlookup");
-        menu.add( createMenuItem( wordLookupAction));
+        UIUtilities.initAction( wordLookupAction, "main.menu.wordlookup");
+        menu.add( UIUtilities.createMenuItem( wordLookupAction));
         menu.addSeparator();
-        menu.add( createMenuItem( PreferencesFrame.showAction));
+        menu.add( UIUtilities.createMenuItem( PreferencesFrame.showAction));
         bar.add( menu);
 
         compactViewItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.compactview"));
@@ -509,108 +512,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
         bar.add( annotationEditor.getMenu());
 
         menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
-        menu.add( createMenuItem( AboutFrame.showAction));
+        menu.add( UIUtilities.createMenuItem( AboutFrame.showAction));
         bar.add( menu);
 
         setJMenuBar( bar);
 
         show();
-    }
-
-    /**
-     * Initializes an action with values taken from the messages resource bundle.
-     * The name of the action, keyboard shortcuts and the action tool tip will be
-     * initialized if they are available in the resource bundle. The key is taken as key to
-     * the name property, the accellerator key property will be accessed by adding ".ak",
-     * the mnemonic key property by adding ".mk" and the tooltip by adding ".tt" to the key.
-     *
-     * @param a The action to initialize.
-     * @param key The base key in the messages resource bundle.
-     * @see javax.swing.Action
-     */
-    public static void initAction( Action a, String key) {
-        a.putValue( Action.NAME, JGloss.messages.getString( key));
-
-        // accelerator key
-        String s = null;
-        try {
-            s = JGloss.messages.getString( key + ".ak");
-        } catch (MissingResourceException ex) {}
-        if (s!=null && s.length()>0)
-            a.putValue( Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( s));
-
-        // mnemonic key
-        try {
-            s = JGloss.messages.getString( key + ".mk");
-        } catch (MissingResourceException ex) {}
-        if (s!=null && s.length()>0) try {
-            a.putValue( Action.MNEMONIC_KEY, KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
-                        .get( null));
-        } catch (Exception ex) {
-            System.out.println( "Mnemonic Key " + s);
-            ex.printStackTrace();
-        }
-        
-        // tooltip
-        try {
-            s = JGloss.messages.getString( key + ".tt");
-        } catch (MissingResourceException ex) {}
-        if (s!=null && s.length()>0)
-            a.putValue( Action.SHORT_DESCRIPTION, s);
-    }
-
-    /**
-     * Creates a JMenuItem from an action. All properties from the action, including the
-     * accelerator key, will be taken from the action.
-     *
-     * @param a The action for which to create the menu item.
-     * @return The newly created menu item.
-     */
-    public static JMenuItem createMenuItem( Action a) {
-        JMenuItem item = new JMenuItem();
-        item.setAction( a);
-        KeyStroke stroke = (KeyStroke) a.getValue( Action.ACCELERATOR_KEY);
-        if (stroke != null)
-            item.setAccelerator( stroke);
-
-        return item;
-    }
-
-    /**
-     * Creates a container which will expand to fill all additional space in the enclosing
-     * container, without expanding the contained component.
-     *
-     * @param c The component which the space eater should contain.
-     * @param horizontal <CODE>true</CODE> if the container should grow horizontal, or
-     *                   <CODE>false</CODE> to make it grow vertical.
-     * @return The newly created space eater component.
-     */
-    public static JPanel createSpaceEater( Component c, boolean horizontal) {
-        JPanel se = new JPanel( new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = horizontal ? GridBagConstraints.VERTICAL : GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        se.add( c, gbc);
-        
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.gridheight = GridBagConstraints.REMAINDER;
-        if (horizontal) {
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.gridx = 1;
-            gbc.weightx = 1;
-        }
-        else {
-            gbc.fill = GridBagConstraints.VERTICAL;
-            gbc.gridy = 1;
-            gbc.weighty = 1;
-        }
-        se.add( Box.createGlue(), gbc);
-
-        return se;
     }
 
     /**
@@ -684,7 +591,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
                         ( new HTMLifyReader( in),
                           JGloss.messages.getString( "import.clipboard"),
                           JGloss.messages.getString( "import.clipboard"),
-                          new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                          GeneralDialog.getComponent().createImportClipboardParser
+                          ( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
                           true, len);
                     which.documentChanged = true;
                 }
@@ -711,15 +619,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * converted to HTML. The method will then call <CODE>loadDocument</CODE> with the newly created reader.
      *
      * @param path URL or path of the file to import.
-     * @param readingStart Character which delimits a reading annotation in the document. May be '\0' if
-     *                  it is unused.
-     * @param readingEnd Character which delimits a reading annotation in the document. May be '\0' if
-     *                it is unused.
+     * @param parser Parser used to annotate the text.
      * @param encoding Character encoding of the file. May be either <CODE>null</CODE> or the
      *                 value of the "encodings.default" resource to use autodetection.
      * @see #loadDocument(Reader,String,String,Parser,boolean,int)
      */
-    private void importDocument( String path, char readingStart, char readingEnd, String encoding) {
+    private void importDocument( String path, Parser parser, String encoding) {
         try {
             Reader in = null;
             int contentlength = 0;
@@ -764,9 +669,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
             if (!contenttype.equals( "text/html"))
                 in = new HTMLifyReader( in);
 
-            loadDocument( in, path, title, 
-                          new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions(),
-                                      readingStart, readingEnd), true,
+            loadDocument( in, path, title, parser, true,
                           CharacterEncodingDetector.guessLength( contentlength, encoding));
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -796,7 +699,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         try {
             loadDocument
                 ( new HTMLifyReader( new StringReader( text)), path, title,
-                  new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                  new KanjiParser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
                   true, text.length());
             documentChanged = true;
             if (setPath)
@@ -824,7 +727,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
             Reader in = new InputStreamReader( new FileInputStream( f), "UTF-8");
             documentPath = f.getAbsolutePath();
             loadDocument( in, documentPath, f.getName(), 
-                          new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()), false,
+                          null, false,
                           CharacterEncodingDetector.guessLength( (int) f.length(), "UTF-8"));
 
             // test the file version of the loaded document
@@ -1246,7 +1149,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
         writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_PLAINTEXT_WRITEREADING));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeReading, true));
+        b.add( UIUtilities.createSpaceEater( writeReading, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
@@ -1256,7 +1159,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         writeTranslations.setSelected( JGloss.prefs.getBoolean
                                        ( Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeTranslations, true));
+        b.add( UIUtilities.createSpaceEater( writeTranslations, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
@@ -1266,11 +1169,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
         writeHidden.setSelected( JGloss.prefs.getBoolean
                                  ( Preferences.EXPORT_PLAINTEXT_WRITEHIDDEN));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeHidden, true));
+        b.add( UIUtilities.createSpaceEater( writeHidden, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
-        p.add( createSpaceEater( b2, false));
+        p.add( UIUtilities.createSpaceEater( b2, false));
         f.setAccessory( p);
 
         int r = f.showSaveDialog( this);
@@ -1342,7 +1245,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
         writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_LATEX_WRITEREADING));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeReading, true));
+        b.add( UIUtilities.createSpaceEater( writeReading, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
@@ -1352,7 +1255,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         writeTranslations.setSelected( JGloss.prefs.getBoolean
                                        ( Preferences.EXPORT_LATEX_WRITETRANSLATIONS));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeTranslations, true));
+        b.add( UIUtilities.createSpaceEater( writeTranslations, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
@@ -1362,11 +1265,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
         writeHidden.setSelected( JGloss.prefs.getBoolean
                                  ( Preferences.EXPORT_LATEX_WRITEHIDDEN));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeHidden, true));
+        b.add( UIUtilities.createSpaceEater( writeHidden, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
-        p.add( createSpaceEater( b2, false));
+        p.add( UIUtilities.createSpaceEater( b2, false));
         f.setAccessory( p);
 
         int r = f.showSaveDialog( this);
@@ -1439,7 +1342,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         interactive.setSelected( JGloss.prefs.getBoolean
                                        ( Preferences.EXPORT_HTML_INTERACTIVE));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( interactive, true));
+        b.add( UIUtilities.createSpaceEater( interactive, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
@@ -1449,7 +1352,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         backwardsCompatible.setSelected( JGloss.prefs.getBoolean
                                        ( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( backwardsCompatible, true));
+        b.add( UIUtilities.createSpaceEater( backwardsCompatible, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
@@ -1457,7 +1360,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
         writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_HTML_WRITEREADING));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeReading, true));
+        b.add( UIUtilities.createSpaceEater( writeReading, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
         b2.add( Box.createVerticalStrut( 3));
@@ -1468,7 +1371,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         writeTranslations.setSelected( JGloss.prefs.getBoolean
                                        ( Preferences.EXPORT_HTML_WRITETRANSLATIONS));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeTranslations, true));
+        b.add( UIUtilities.createSpaceEater( writeTranslations, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
@@ -1478,11 +1381,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
         writeHidden.setSelected( JGloss.prefs.getBoolean
                                  ( Preferences.EXPORT_HTML_WRITEHIDDEN));
         b.add( Box.createHorizontalStrut( 3));
-        b.add( createSpaceEater( writeHidden, true));
+        b.add( UIUtilities.createSpaceEater( writeHidden, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
 
-        p.add( createSpaceEater( b2, false));
+        p.add( UIUtilities.createSpaceEater( b2, false));
         f.setAccessory( p);
 
         int r = f.showSaveDialog( this);
@@ -1553,7 +1456,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         encodings.setEditable( true);
         b.add( encodings);
         b.add( Box.createHorizontalStrut( 3));
-        p.add( createSpaceEater( b, false));
+        p.add( UIUtilities.createSpaceEater( b, false));
         f.setAccessory( p);
 
         int r = f.showSaveDialog( this);

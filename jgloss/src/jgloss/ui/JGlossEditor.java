@@ -215,9 +215,9 @@ public class JGlossEditor extends JTextPane {
 
         xcvManager = new XCVManager( this);
         editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
-        editMenu.add( JGlossFrame.createMenuItem( xcvManager.getCutAction()));
-        editMenu.add( JGlossFrame.createMenuItem( xcvManager.getCopyAction()));
-        editMenu.add( JGlossFrame.createMenuItem( xcvManager.getPasteAction()));
+        editMenu.add( UIUtilities.createMenuItem( xcvManager.getCutAction()));
+        editMenu.add( UIUtilities.createMenuItem( xcvManager.getCopyAction()));
+        editMenu.add( UIUtilities.createMenuItem( xcvManager.getPasteAction()));
         editMenu.addMenuListener( xcvManager.getEditMenuListener());
 
         if (source != null) {
@@ -290,8 +290,8 @@ public class JGlossEditor extends JTextPane {
                     }
                 };
             addAnnotationAction.setEnabled( false);
-            JGlossFrame.initAction( addAnnotationAction, "editor.menu.addannotation");
-            editMenu.add( JGlossFrame.createMenuItem( addAnnotationAction));
+            UIUtilities.initAction( addAnnotationAction, "editor.menu.addannotation");
+            editMenu.add( UIUtilities.createMenuItem( addAnnotationAction));
 
             addCaretListener( new CaretListener() {
                     public void caretUpdate( CaretEvent e) {

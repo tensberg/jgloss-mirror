@@ -273,13 +273,13 @@ public class StyleDialog extends Box {
         b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( textFontSize);
-        b.add( JGlossFrame.createSpaceEater( b2, true));
+        b.add( UIUtilities.createSpaceEater( b2, true));
         b.add( Box.createVerticalStrut( 7));
         b2 = Box.createHorizontalBox();
         b2.add( Box.createHorizontalStrut( 5));
         b2.add( textUseColor);
         b2.add( textColor);
-        b.add( JGlossFrame.createSpaceEater( b2, true));
+        b.add( UIUtilities.createSpaceEater( b2, true));
         p.add( b);
         this.add( p);
         this.add( Box.createVerticalStrut( 3));
@@ -297,13 +297,13 @@ public class StyleDialog extends Box {
         b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( readingFontSize);
-        b.add( JGlossFrame.createSpaceEater( b2, true));
+        b.add( UIUtilities.createSpaceEater( b2, true));
         b.add( Box.createVerticalStrut( 7));
         b2 = Box.createHorizontalBox();
         b2.add( Box.createHorizontalStrut( 5));
         b2.add( readingUseColor);
         b2.add( readingColor);
-        b.add( JGlossFrame.createSpaceEater( b2, true));
+        b.add( UIUtilities.createSpaceEater( b2, true));
         p.add( b);
         this.add( p);
         this.add( Box.createVerticalStrut( 3));
@@ -321,13 +321,13 @@ public class StyleDialog extends Box {
         b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( translationFontSize);
-        b.add( JGlossFrame.createSpaceEater( b2, true));
+        b.add( UIUtilities.createSpaceEater( b2, true));
         b.add( Box.createVerticalStrut( 7));
         b2 = Box.createHorizontalBox();
         b2.add( Box.createHorizontalStrut( 5));
         b2.add( translationUseColor);
         b2.add( translationColor);
-        b.add( JGlossFrame.createSpaceEater( b2, true));
+        b.add( UIUtilities.createSpaceEater( b2, true));
         p.add( b);
         this.add( p);
         

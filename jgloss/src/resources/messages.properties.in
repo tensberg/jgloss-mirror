@@ -71,6 +71,8 @@ The file format has changed since the last release and the\n\
 information in the file has been converted to the new format.\n\
 The new file format will be used when the file is saved.
 warning.load.notjgloss=The opened file does not seem to be a JGloss file.
+warning.chasen.title=ChaSen Selection Warning
+warning.chasen=The selected file was not recognized as the ChaSen\nexecutable. The ChaSen parser will not\nbe available.
 
 button.ok=OK
 button.cancel=Cancel
@@ -80,9 +82,11 @@ button.save=Save
 button.discard=Discard
 button.close=Close
 button.overwrite=Overwrite
+button.choose=Choose...
+button.select=Select
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9.2
+jgloss.version=Version 0.9.3
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -196,6 +200,9 @@ general.startup=On Startup
 general.startup.jglossframe=Open empty JGloss document
 general.startup.wordlookup=Open Word Lookup dialog
 general.editor.enableediting=Enable direct editing (buggy)
+general.chasen.label=ChaSen executable:
+general.chasen.chooser.title=Choose ChaSen executable
+general.parserselector=Import Clipboard Parser
 
 style.title=Style
 style.text=Text
@@ -222,10 +229,12 @@ import.title=Import file
 import.urlorfile=Enter the URL, or specify the file you want to import.
 import.button.choosefile=Choose file...
 import.encodings=Character encoding of file:
-import.readingbrackets=Brackets delimiting reading annotations:
+import.parserselector=Text Parser
 
 import.clipboard=clipboard
 load.progress=Loading {0}
+
+parserselector.readingbrackets=Brackets delimiting reading annotations:
 
 print.title=Print document
 

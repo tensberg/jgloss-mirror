@@ -77,10 +77,10 @@ public class SplashScreen {
         b2.add( Box.createHorizontalGlue());
         b.add( b2);
         version = new JLabel( JGloss.messages.getString( "jgloss.version"));
-        b.add( JGlossFrame.createSpaceEater( version, true));
+        b.add( UIUtilities.createSpaceEater( version, true));
         b2 = Box.createHorizontalBox();
         info = new JLabel( JGloss.messages.getString( "splashscreen.dummyinfo"));
-        b2.add( JGlossFrame.createSpaceEater( info, true));
+        b2.add( UIUtilities.createSpaceEater( info, true));
         b.add( b2);
         c.add( b);
         splash.getContentPane().add( c);

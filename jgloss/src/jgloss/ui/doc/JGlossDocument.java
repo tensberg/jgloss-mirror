@@ -343,7 +343,8 @@ public class JGlossDocument extends HTMLDocument {
 
                     from = ta.getStart() + talen;
                     if (ta instanceof Reading && from<data.length &&
-                        data[from]==parser.getReadingStart()) {
+                        parser instanceof ReadingAnnotationParser &&
+                        data[from]==((ReadingAnnotationParser) parser).getReadingStart()) {
                         // skip reading annotation in original document
                         from += ((Reading) ta).getReading().length() + 2;
                     }
@@ -358,7 +359,7 @@ public class JGlossDocument extends HTMLDocument {
             } catch (SearchException ex) {
                 // if the parser detected that the thread was interrupted,
                 // abort the whole import process
-                if (ex instanceof Parser.ParsingInterruptedException) {
+                if (ex instanceof ParsingInterruptedException) {
                     aborted = true;
                 }
                 else

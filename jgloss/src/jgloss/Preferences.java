@@ -81,6 +81,10 @@ public class Preferences {
 
     public static final String EDITOR_ENABLEEDITING = "editor.enableediting";
 
+    public static final String IMPORT_PARSER = "import.parser";
+    public static final String IMPORTCLIPBOARD_PARSER = "importclipboard.parser";
+    public static final String IMPORTCLIPBOARD_READINGBRACKETS = "importclipboard.readingbrackets";
+
     public static final String EXPORT_ENCODING = "export.encoding";
     public static final String EXPORT_PLAINTEXT_WRITEREADING = "export.plaintext.writereading";
     public static final String EXPORT_PLAINTEXT_WRITETRANSLATIONS = 
@@ -117,6 +121,8 @@ public class Preferences {
     public static final String WORDLOOKUP_SEARCHTYPE = "wordlookup.searchtype";
     public static final String WORDLOOKUP_DEINFLECTION = "wordlookup.deinflection";
     public static final String WORDLOOKUP_ALLDICTIONARIES = "wordlookup.alldictionaries";
+
+    public static final String CHASEN_LOCATION = "chasen.location";
     
     /**
      * Path to the user preferences file.

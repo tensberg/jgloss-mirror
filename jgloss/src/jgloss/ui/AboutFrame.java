@@ -49,7 +49,7 @@ public class AboutFrame extends JFrame {
                     getFrame().show();
                 }
             };
-        JGlossFrame.initAction( showAction, "main.menu.about");
+        UIUtilities.initAction( showAction, "main.menu.about");
     }
 
     /**

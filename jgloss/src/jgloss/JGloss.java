@@ -121,6 +121,11 @@ public class JGloss {
             DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
             DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
 
+            // register text parsers
+            ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null).getName());
+            ParserSelector.registerParser( ChasenParser.class, 
+                                           new ChasenParser( null, null, null, false).getName());
+
             // parse command line options
             if (args.length > 0) {
                 if (args[0].equals( "-h") || args[0].equals( "--help") ||
@@ -202,7 +207,7 @@ public class JGloss {
 
                         for ( int i=0; i<fs.length; i++)
                             d[i] = DictionaryFactory.createDictionary( fs[i]);                        
-                        Parser p = new Parser( d);
+                        Parser p = new KanjiParser( d);
                         new HTMLAnnotator( p).annotate( in, out, new URLRewriter() {
                                 public String rewrite( String url) { return url; }
                                 public String rewrite( String url, String tag) { return url; }
@@ -236,6 +241,7 @@ public class JGloss {
             }
             
             splash.setInfo( messages.getString( "splashscreen.initPreferences"));
+            ChasenParser.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
             // Initialize the preferences at startup. This includes loading the dictionaries.
             // Do this in its own thread to decrease perceived initialization time.
             new Thread() {

@@ -300,8 +300,13 @@ public class AnnotationModel extends DefaultTreeModel {
                 return null;
 
             List l;
-            if (transText.length() > 0)
-                l = doc.getDictionaryParser().findTranslations( transText, false);
+            if (transText.length() > 0) {
+                l = new ArrayList( 20);
+                jgloss.dictionary.Dictionary[] dictionaries = Dictionaries.getDictionaries();
+                for ( int i=0; i<dictionaries.length; i++)
+                    l.addAll( dictionaries[i].search( transText, 
+                                                      jgloss.dictionary.Dictionary.SEARCH_EXACT_MATCHES));
+            }
             else
                 l = Collections.EMPTY_LIST;
 

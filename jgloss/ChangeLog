@@ -1,5 +1,7 @@
-0.9.3: (2001/08/14)
+0.9.3: (2001/08/19)
 	- Fixed document name setting in save as.
+	- Fixed JJDX creation for dictionaries with more than 500.000
+	  index entries.
 0.9.2: (2001/08/13)
 	- Added dialog for looking up words in the dictionaries.
 	- Extreme speedup of EDICT lookups. The old entry match test was

@@ -52,7 +52,7 @@ public class WordLookup extends JFrame {
                     getFrame().show();
                 }
             };
-        JGlossFrame.initAction( showAction, "main.menu.wordlookup");
+        UIUtilities.initAction( showAction, "main.menu.wordlookup");
     }
 
     /**
@@ -173,7 +173,7 @@ public class WordLookup extends JFrame {
         p.add( dictionary);
         p.add( dictionaryChoice);
         p.add( allDictionaries);
-        p = JGlossFrame.createSpaceEater( p, false);
+        p = UIUtilities.createSpaceEater( p, false);
         p.setBorder( BorderFactory.createCompoundBorder
                     ( BorderFactory.createTitledBorder
                       ( JGloss.messages.getString( "wordlookup.dictionaryselection")),
@@ -206,7 +206,7 @@ public class WordLookup extends JFrame {
                 }
             };
         searchAction.setEnabled( true);
-        JGlossFrame.initAction( searchAction, "wordlookup.search");
+        UIUtilities.initAction( searchAction, "wordlookup.search");
         search = new JButton( searchAction);
         p.add( search, c2);
         p.add( Box.createHorizontalStrut( 2), c2);
@@ -225,7 +225,7 @@ public class WordLookup extends JFrame {
                 }
             };
         clearAction.setEnabled( true);
-        JGlossFrame.initAction( clearAction, "wordlookup.clear");
+        UIUtilities.initAction( clearAction, "wordlookup.clear");
         p.add( new JButton( clearAction), c2);
 
         content.add( p, c);
@@ -261,14 +261,14 @@ public class WordLookup extends JFrame {
                 }
             };
         printAction.setEnabled( false);
-        JGlossFrame.initAction( printAction, "main.menu.print"); 
+        UIUtilities.initAction( printAction, "main.menu.print"); 
         Action closeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     hide();
                     JGloss.exit();
                 }
             };
-        JGlossFrame.initAction( closeAction, "main.menu.close");
+        UIUtilities.initAction( closeAction, "main.menu.close");
 
         setDefaultCloseOperation( DO_NOTHING_ON_CLOSE);
         addWindowListener( new WindowAdapter() {
@@ -281,15 +281,15 @@ public class WordLookup extends JFrame {
         // setup menu bar
         JMenuBar bar = new JMenuBar();
         JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.file"));
-        menu.add( JGlossFrame.createMenuItem( JGlossFrame.actions.importDocument));
-        menu.add( JGlossFrame.createMenuItem( JGlossFrame.actions.importClipboard));
+        menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importDocument));
+        menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importClipboard));
         menu.addMenuListener( JGlossFrame.actions.importClipboardListener);
         menu.addSeparator();
-        menu.add( JGlossFrame.createMenuItem( JGlossFrame.actions.open));
+        menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.open));
         menu.addSeparator();
-        menu.add( JGlossFrame.createMenuItem( printAction));
+        menu.add( UIUtilities.createMenuItem( printAction));
         menu.addSeparator();
-        menu.add( JGlossFrame.createMenuItem( closeAction));
+        menu.add( UIUtilities.createMenuItem( closeAction));
         bar.add( menu);
 
         final JMenu editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
@@ -297,9 +297,9 @@ public class WordLookup extends JFrame {
         // There are two text areas in the dialog from which text can be cut/copied/pasted.
         // The following code manages the menu items based on the currently focused text components.
         XCVManager expressionXCV = new XCVManager( expression);
-        final JMenuItem cut1 = JGlossFrame.createMenuItem( expressionXCV.getCutAction());
-        final JMenuItem copy1 = JGlossFrame.createMenuItem( expressionXCV.getCopyAction());
-        final JMenuItem paste1 = JGlossFrame.createMenuItem( expressionXCV.getPasteAction());
+        final JMenuItem cut1 = UIUtilities.createMenuItem( expressionXCV.getCutAction());
+        final JMenuItem copy1 = UIUtilities.createMenuItem( expressionXCV.getCopyAction());
+        final JMenuItem paste1 = UIUtilities.createMenuItem( expressionXCV.getPasteAction());
         editMenu.add( cut1);
         editMenu.add( copy1);
         editMenu.add( paste1);
@@ -321,9 +321,9 @@ public class WordLookup extends JFrame {
         editMenu.addMenuListener( expressionXCV.getEditMenuListener());
 
         XCVManager resultXCV = new XCVManager( result);
-        final JMenuItem cut2 = JGlossFrame.createMenuItem( resultXCV.getCutAction());
-        final JMenuItem copy2 = JGlossFrame.createMenuItem( resultXCV.getCopyAction());
-        final JMenuItem paste2 = JGlossFrame.createMenuItem( resultXCV.getPasteAction());
+        final JMenuItem cut2 = UIUtilities.createMenuItem( resultXCV.getCutAction());
+        final JMenuItem copy2 = UIUtilities.createMenuItem( resultXCV.getCopyAction());
+        final JMenuItem paste2 = UIUtilities.createMenuItem( resultXCV.getPasteAction());
         result.addFocusListener( new FocusListener() {
                 public void focusGained( FocusEvent e) {
                     if (editMenu.getItem( 0) != cut2) {
@@ -340,11 +340,11 @@ public class WordLookup extends JFrame {
         editMenu.addMenuListener( resultXCV.getEditMenuListener());
         
         editMenu.addSeparator();
-        editMenu.add( JGlossFrame.createMenuItem( PreferencesFrame.showAction));
+        editMenu.add( UIUtilities.createMenuItem( PreferencesFrame.showAction));
         bar.add( editMenu);           
 
         menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
-        menu.add( JGlossFrame.createMenuItem( AboutFrame.showAction));
+        menu.add( UIUtilities.createMenuItem( AboutFrame.showAction));
         bar.add( menu);
 
         setJMenuBar( bar);

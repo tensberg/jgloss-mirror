@@ -24,6 +24,7 @@
 package jgloss.ui;
 
 import jgloss.*;
+import jgloss.dictionary.*;
 import jgloss.ui.doc.*;
 
 import java.util.*;
@@ -64,6 +65,13 @@ public class GeneralDialog extends Box {
     private JRadioButton startFrame;
     private JRadioButton startWordLookup;
 
+    private JTextField chasenLocation;
+
+    private ParserSelector importClipboardParserSelector;
+    private Class importClipboardParser;
+    private char readingStart;
+    private char readingEnd;
+
     /**
      * Creates the style dialog.
      */
@@ -85,8 +93,41 @@ public class GeneralDialog extends Box {
         all.add( p);
         all.add( Box.createVerticalStrut( 2));
 
-        // enable editing
+        importClipboardParserSelector = new ParserSelector( true);
+        importClipboardParserSelector.setBorder( BorderFactory.createTitledBorder 
+                                                 ( JGloss.messages.getString( "general.parserselector")));
+        all.add( importClipboardParserSelector);
+        all.add( Box.createVerticalStrut( 2));
+
         Box b = Box.createHorizontalBox();
+        b.add( Box.createHorizontalStrut( 3));
+        b.add( new JLabel( JGloss.messages.getString( "general.chasen.label")));
+        chasenLocation = new JTextField( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+        chasenLocation.setInputVerifier( new InputVerifier() {
+                private String lastInput = chasenLocation.getText();
+                public boolean verify( JComponent input) { return true; }
+                public boolean shouldYieldFocus( JComponent input) {
+                    if (!lastInput.equals( chasenLocation.getText())) {
+                        testChasenLocation();
+                        lastInput = chasenLocation.getText();
+                    }
+                    return true;
+                }
+            });
+        b.add( chasenLocation);
+        JButton chasenLocationChoice = new JButton( JGloss.messages.getString( "button.choose"));
+        chasenLocationChoice.addActionListener( new ActionListener() {
+                public void actionPerformed( ActionEvent e) {
+                    chooseChasenLocation();
+                }
+            });
+        b.add( chasenLocationChoice);
+        b.add( Box.createHorizontalStrut( 3));
+        all.add( b);
+        all.add( Box.createVerticalStrut( 2));
+
+        // enable editing
+        b = Box.createHorizontalBox();
         b.add( Box.createHorizontalStrut( 3));
         enableEditing = new JCheckBox( JGloss.messages.getString( "general.editor.enableediting"));
         b.add( enableEditing);
@@ -94,7 +135,7 @@ public class GeneralDialog extends Box {
         all.add( b);
         all.add( Box.createVerticalStrut( 2));
 
-        this.add( JGlossFrame.createSpaceEater( all, false));
+        this.add( UIUtilities.createSpaceEater( all, false));
 
         loadPreferences();
     }
@@ -109,6 +150,20 @@ public class GeneralDialog extends Box {
             startFrame.setSelected( true);
 
         enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
+        chasenLocation.setText( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+        importClipboardParserSelector.setEnabled( ChasenParser.class,
+                                                  ChasenParser.isChasenExecutable
+                                                  ( chasenLocation.getText()));
+        try {
+            importClipboardParserSelector.setSelected( Class.forName
+                                                       ( JGloss.prefs.getString
+                                                         ( Preferences.IMPORTCLIPBOARD_PARSER)));
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        importClipboardParserSelector.setReadingBrackets
+            ( JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS).charAt( 0),
+              JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS).charAt( 1));
     }
 
     /**
@@ -117,7 +172,51 @@ public class GeneralDialog extends Box {
     public void savePreferences() {
         JGloss.prefs.set( Preferences.STARTUP_WORDLOOKUP, startWordLookup.isSelected());
         JGloss.prefs.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
+        JGloss.prefs.set( Preferences.CHASEN_LOCATION, chasenLocation.getText());
+        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_PARSER,
+                          importClipboardParserSelector.getSelectedParser().getName());
+        if (importClipboardParserSelector.getReadingStart() != '\0' &&
+            importClipboardParserSelector.getReadingEnd() != '\0')
+            JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS,
+                              new String( new char[] { importClipboardParserSelector.getReadingStart(),
+                                                       importClipboardParserSelector.getReadingEnd() }));
     }
 
-    public void applyPreferences() {}
+    public void applyPreferences() {
+        ChasenParser.setDefaultExecutable( chasenLocation.getText());
+        importClipboardParser = importClipboardParserSelector.getSelectedParser();
+        readingStart = importClipboardParserSelector.getReadingStart();
+        readingEnd = importClipboardParserSelector.getReadingEnd();
+    }
+
+    public Parser createImportClipboardParser( jgloss.dictionary.Dictionary[] dictionaries,
+                                               Set exclusions) {
+        return ParserSelector.createParser( importClipboardParser, dictionaries, exclusions,
+                                            readingStart, readingEnd);
+    }
+
+    private void chooseChasenLocation() {
+        JFileChooser chooser = new JFileChooser( JGloss.getCurrentDir());
+        chooser.setDialogTitle( JGloss.messages.getString( "general.chasen.chooser.title"));
+        chooser.setFileHidingEnabled( true);
+        chooser.setMultiSelectionEnabled( false);
+        chooser.setFileSelectionMode( JFileChooser.FILES_ONLY);
+        int r = chooser.showDialog( this, JGloss.messages.getString( "button.select"));
+        if (r == JFileChooser.APPROVE_OPTION) {
+            chasenLocation.setText( chooser.getSelectedFile().getAbsolutePath());
+            testChasenLocation();
+        }
+    }
+
+    private void testChasenLocation() {
+        if (!ChasenParser.isChasenExecutable( chasenLocation.getText())) {
+            JOptionPane.showMessageDialog( this, JGloss.messages.getString
+                                           ( "warning.chasen"), JGloss.messages.getString
+                                           ( "warning.chasen.title"),
+                                           JOptionPane.WARNING_MESSAGE);
+            importClipboardParserSelector.setEnabled( ChasenParser.class, false);
+        }
+        else
+            importClipboardParserSelector.setEnabled( ChasenParser.class, true);
+    }
 } // class GeneralDialog
