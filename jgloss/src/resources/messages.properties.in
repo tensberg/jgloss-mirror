@@ -203,6 +203,10 @@ print.title=Print document
 
 annotationeditor.reading=Reading:\ 
 annotationeditor.translation=Translation:\ 
+annotationeditor.dictionaryform=Dictionary Form:\ 
+annotationeditor.dictionaryform.none=(none)
+annotationeditor.dictionaryform.word=Word:\ 
+annotationeditor.dictionaryform.reading=Reading:\ 
 annotationeditor.readingannotation=Reading from {0}: {1}
 annotationeditor.menu.title=Annotation
 annotationeditor.menu.usereading=Use this Reading
