@@ -1,9 +1,13 @@
-1.0.3: (2002/02/20)
-	- Use of Java 1.4 prefs API if available. Old .jgloss preference
+1.0.3: (2002/02/21)
+        - Rendering of the document pane is now done in the background.
+	- Document rendering speed improvement for J2SE 1.4.
+	- Decreased perceived startup time by deferring dictionary
+	  loading until after the main window is created.
+	- Use of J2SE 1.4 prefs API if available. Old .jgloss preference
 	  settings will be migrated automatically.
 1.0.2: (2002/02/17)
 	- Annotation editor now remembers it's width.
-	- Fixes for JDK 1.4 incompatibilities.
+	- Fixes for J2SE 1.4 incompatibilities.
 	- Fixed all tree nodes are editable bug.
 1.0.1: (2002/01/22)
 	- Added user interface font selection to style preference panel.

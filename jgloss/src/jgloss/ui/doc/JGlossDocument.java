@@ -691,7 +691,8 @@ public class JGlossDocument extends HTMLDocument {
      * @return A reader for a document.
      */
     public HTMLEditorKit.ParserCallback getReader( int pos) {
-        return new JGlossReader( pos);
+        reader = new JGlossReader( pos);
+        return reader;
     }
 
     /**

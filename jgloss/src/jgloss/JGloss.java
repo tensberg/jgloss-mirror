@@ -244,27 +244,14 @@ public class JGloss {
             // make sure the UI font is initialized before any UI elements are created
             StyleDialog.applyUIFont();
 
-            // Initialize the preferences at startup. This includes loading the dictionaries.
-            // Do this in its own thread to decrease perceived initialization time.
-            new Thread() {
-                    public void run() {
-                        try {
-                            setPriority( Math.max( getPriority()-10, Thread.MIN_PRIORITY));
-                        } catch (IllegalArgumentException ex) {}
-
-                        PreferencesFrame.getFrame();
-                        if (!prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-                            WordLookup.getFrame();
-                    }
-                }.start();
             splash.setInfo( messages.getString( "splashscreen.initMain"));
             
             Runtime.getRuntime().addShutdownHook
                 ( new Thread() {
                         public void run() {
-                            Dictionary[] dicts = Dictionaries.getDictionaries();
+                            Dictionary[] dicts = Dictionaries.getDictionaries( true);
                             for ( int i=0; i<dicts.length; i++)
-                            dicts[i].dispose();
+                                dicts[i].dispose();
                         }
                     });
 
@@ -280,6 +267,20 @@ public class JGloss {
                     f.loadDocument( new File( args[i]));
                 }
             }
+
+            // Initialize the preferences at startup. This includes loading the dictionaries.
+            // Do this in its own thread to decrease perceived initialization time.
+            new Thread() {
+                    public void run() {
+                        try {
+                            setPriority( Thread.MIN_PRIORITY);
+                        } catch (IllegalArgumentException ex) {}
+
+                        PreferencesFrame.getFrame();
+                        if (!prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
+                            WordLookup.getFrame();
+                    }
+                }.start();
 
             splash.close();
         } catch (NoClassDefFoundError ex) {
@@ -424,7 +425,7 @@ public class JGloss {
             }
             return prefs;
         } catch (NoClassDefFoundError ex) {
-            ex.printStackTrace();
+            // this is normal on J2SE 1.3. Fall through and return a PropertiesPreferences
         } catch (ClassNotFoundException ex1) {
             ex1.printStackTrace();
         } catch (IllegalAccessException ex2) {

@@ -186,6 +186,7 @@ public class ExclusionList extends JPanel {
         gc.fill= GridBagConstraints.NONE;
         gc.gridwidth = 1;
         gc.gridheight = 1;
+        gc.insets = new Insets( 2, 2, 0, 2);
         add( p, gc);
 
         String filename = getExclusionListFile();

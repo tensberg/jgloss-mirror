@@ -99,14 +99,14 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                         if (d.selectionIsFilename())
                                             which.importDocument
                                                 ( d.getSelection(),
-                                                  d.createParser( Dictionaries.getDictionaries(),
+                                                  d.createParser( Dictionaries.getDictionaries( true),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
                                                   d.getEncoding());
                                         else
                                             which.importString
                                                 ( d.getSelection(), 
-                                                  d.createParser( Dictionaries.getDictionaries(),
+                                                  d.createParser( Dictionaries.getDictionaries( true),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
                                                   JGloss.messages.getString( "import.textarea"),
@@ -384,7 +384,13 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                                     JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         docpane = new JGlossEditor( annotationEditor);
         docpane.setEditable( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
-        docpaneScroller = new JScrollPane( docpane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+        JLabel rendering = new JLabel( JGloss.messages.getString( "main.renderingdocument"),
+                                       JLabel.CENTER);
+        rendering.setBackground( Color.white);
+        rendering.setOpaque( true);
+        rendering.setFont( rendering.getFont().deriveFont( 18.0f));
+        docpaneScroller = new JScrollPane( rendering,
+                                           JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         docpane.setNextFocusableComponent( annotationEditor);
         annotationEditor.setNextFocusableComponent( docpane);
@@ -718,7 +724,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                           JGloss.messages.getString( "import.clipboard"),
                           JGloss.messages.getString( "import.clipboard"),
                           GeneralDialog.getComponent().createImportClipboardParser
-                          ( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                          ( Dictionaries.getDictionaries( true), ExclusionList.getExclusions()),
                           GeneralDialog.getComponent().createReadingAnnotationFilter(),
                           true, len);
                     which.documentChanged = true;
@@ -995,14 +1001,19 @@ public class JGlossFrame extends JFrame implements ActionListener {
             };
         t.start();
 
-        ProgressMonitor pm = new ProgressMonitor
+        final ProgressMonitor pm = new ProgressMonitor
             ( this, JGloss.messages.getString( "load.progress", 
                                                new Object[] { path }),
               null, 0, length);
         while (t.isAlive()) {
             try {
                 t.join( 1000);
-                pm.setProgress( ((JGlossDocument) doc).getParsePosition());
+                Runnable worker = new Runnable() {
+                        public void run() {
+                            pm.setProgress( ((JGlossDocument) doc).getParsePosition());
+                        }
+                    };
+                EventQueue.invokeLater( worker);
                 if (pm.isCanceled() || // cancel button of progress bar pressed
                     !deferWindowClosing) { // close button of document frame pressed
                     t.interrupt();
@@ -1030,8 +1041,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
         Runnable worker = new Runnable() {
                 public void run() {
-                    // Parser must be set to non-strict mode for editing to work.
-                    doc.setStrictParsing( false);
+                    final Cursor currentCursor = getCursor();
+                    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
                     docpane.setEditorKit( kit);
                     docpane.setStyledDocument( doc);
@@ -1048,6 +1059,83 @@ public class JGlossFrame extends JFrame implements ActionListener {
                         split.setDividerLocation( position);
                         split.setResizeWeight( position);
                     }
+                    
+                    // Layout document view in the background while still allowing user interaction
+                    // in other windows. Since Swing is single-threaded, this is somewhat complicated:
+                    // 1. A renderer thread is created, which prepares the docpane asynchronously to
+                    //    the event dispatch thread.
+                    // 2. After the preparation is done (this is the part that uses the most time), the
+                    //    docpane is installed in the docpaneScroller. This is done in the event dispatch
+                    //    thread
+                    // 3. The renderer thread is only started after the document window is drawn with
+                    //    the "Creating Document View" notice in the document window. To do this,
+                    //    renderer.start is wrapped in its own runnable and invoked later in the
+                    //    event thread
+                    final Thread renderer = new Thread() {
+                            public void run() {
+                                try {
+                                    setPriority( Math.max( getPriority()-3, Thread.MIN_PRIORITY));
+                                } catch (IllegalArgumentException ex) {}
+                                // the user may close the document before or during rendering,
+                                // so make sure that docpane is not set to null
+                                JGlossEditor dp = docpane;
+                                final JViewport port = new JViewport();
+                                if (dp != null) {
+                                    synchronized (dp) {
+                                        long time = System.currentTimeMillis();
+                                        // the docpane is not visible, and we are synched on it,
+                                        // so it is safe to set the size even though this is not 
+                                        // the event dispatch thread
+                                        dp.setSize( docpaneScroller.getViewport().getExtentSize().width,
+                                                    docpane.getPreferredSize().height);
+                                        // now the docpane is set to the correct width, call method again
+                                        // to set to correct height for the applied width
+                                        dp.setSize( docpaneScroller.getViewport().getExtentSize().width,
+                                                    docpane.getPreferredSize().height);
+                                        port.setView( dp);
+                                        System.err.println( "time for setSize(): " + 
+                                                            (System.currentTimeMillis()-time));
+                                    }
+                                }
+                                // installing the docpane in the scroller, which is already visible,
+                                // has to be done in the event dispatch thread
+                                Runnable installer = new Runnable() {
+                                        public void run() {
+                                            long time = System.currentTimeMillis();
+                                            JScrollPane ds = docpaneScroller;
+                                            JGlossEditor dp2 = docpane;
+                                            AnnotationEditor ae = annotationEditor;
+                                            if (ds!=null && dp2!=null && ae!=null) {
+                                                ds.setViewport( port);
+                                                validate();
+                                                dp2.followMouse( showAnnotationItem.isSelected(), false);
+                                                // scroll to selected annotation
+                                                AnnotationNode current = ae.getSelectedAnnotation();
+                                                if (current != null) {
+                                                    dp2.makeVisible( current.getAnnotationElement().
+                                                                     getStartOffset(),
+                                                                     current.getAnnotationElement().
+                                                                     getEndOffset());
+                                                }
+                                                setCursor( currentCursor);
+                                                System.err.println( "time for install(): " + 
+                                                                    (System.currentTimeMillis()-time));
+                                            }
+                                        }
+                                    };
+                                EventQueue.invokeLater( installer);
+                            }
+                        };
+                    // defer rendering the document until after the window is painted
+                    Runnable rendererStart = new Runnable() {
+                            public void run() {
+                                renderer.start();
+                            }
+                        };
+                    EventQueue.invokeLater( rendererStart);
+
+                    // Parser must be set to non-strict mode for editing to work.
+                    doc.setStrictParsing( false);
 
                     doc.setAddAnnotations( false);
                     exportMenu.setEnabled( true);
@@ -1060,8 +1148,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
                         // this means that the document is imported, save will behave like save as
                         saveAction.setEnabled( true);
                     saveAsAction.setEnabled( true);
-
-                    docpane.followMouse( showAnnotationItem.isSelected(), false);
 
                     // mark document as changed if some editing occurs
                     doc.addDocumentListener( new DocumentListener() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -369,11 +369,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * translation view is ignored and only the width of the word is returned.
          */
         public float getPreferredSpan( int axis) {
-            if (getParent() == null) {
-                System.err.println( "View invalid");
-                Thread.dumpStack();
-            }
-
             if (axis==View.X_AXIS && compactView)
                 // view 0 is the view for the WORD element
                 return getView( 0).getPreferredSpan( axis);
@@ -396,12 +391,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @return <CODE>true</CODE> if the hidden attribute is set.
          */
         public boolean isAnnotationHidden() {
-            if (JGlossDocument.HIDDEN_ATTRIBUTE_TRUE.equals
+            return (JGlossDocument.HIDDEN_ATTRIBUTE_TRUE.equals
                 (getElement().getAttributes()
-                 .getAttribute( JGlossDocument.HIDDEN_ATTRIBUTE)))
-                return true;
-
-            return false;
+                 .getAttribute( JGlossDocument.HIDDEN_ATTRIBUTE)));
         }
 
         /**
@@ -701,6 +693,29 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 return alignment;
         }
         
+        /**
+         * Overridden to always break the line at the last char. 
+         * <P>J2SE 1.4 introduces a new, more
+         * sophisticated way to choose where to break a line with class 
+         * <CODE>java.text.RuleBasedBreakIterator</CODE>. <CODE>GlyphView.getBreakWeight</CODE>
+         * uses this class to decide where to break a line. Unfortunately, this is a major
+         * performance bottleneck. Since the utility of this way of breaking lines for
+         * Japanese text is dubious at best, it is disabled in the overridden method.
+         * Unfortunately there is no cleaner API do do this.
+         */
+        public int getBreakWeight( int axis, float pos, float len) {
+            if (axis == View.X_AXIS) {
+                checkPainter();
+                int p0 = getStartOffset();
+                int p1 = getGlyphPainter().getBoundedPosition( this, p0, pos, len);
+                if (p1 == p0)
+                    return View.BadBreakWeight;
+                else
+                    return View.GoodBreakWeight;
+            }
+            else
+                return super.getBreakWeight(axis, pos, len);
+        }
     } // class VAdjustedView
 
     /**

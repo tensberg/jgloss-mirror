@@ -119,6 +119,7 @@ public class GeneralDialog extends Box {
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalStrut( 3));
         b.add( new JLabel( JGloss.messages.getString( "general.chasen.label")));
+        b.add( Box.createHorizontalStrut( 2));
         chasenLocation = new JTextField( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
         chasenLocation.setInputVerifier( new InputVerifier() {
                 private String lastInput = chasenLocation.getText();
@@ -132,6 +133,7 @@ public class GeneralDialog extends Box {
                 }
             });
         b.add( chasenLocation);
+        b.add( Box.createHorizontalStrut( 2));
         JButton chasenLocationChoice = new JButton( JGloss.messages.getString( "button.choose"));
         chasenLocationChoice.addActionListener( new ActionListener() {
                 public void actionPerformed( ActionEvent e) {

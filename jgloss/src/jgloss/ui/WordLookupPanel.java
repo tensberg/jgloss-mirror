@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -44,7 +44,7 @@ import javax.swing.text.html.HTMLEditorKit;
  *
  * @author Michael Koch
  */
-public class WordLookupPanel extends JPanel {
+public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryListChangeListener {
     protected final static String STYLE =
         "body { font-size: 12pt; color: black; background-color: white; }\n";
 
@@ -60,6 +60,8 @@ public class WordLookupPanel extends JPanel {
     protected JComboBox dictionaryChoice;
 
     protected JButton search;
+
+    private boolean updateListEventScheduled = false;
 
     /**
      * Widget in which the search expression is entered.
@@ -94,6 +96,12 @@ public class WordLookupPanel extends JPanel {
 
     protected Dimension preferredSize;
 
+    /**
+     * Creates a new word lookup panel.
+     *
+     * @param keepLastResult Flag if the user's last search result should be remembered for retrieval
+     *                       using {@link #getLastResult() getLastResult}.
+     */
     public WordLookupPanel( boolean keepLastResult) {
         this.resultLimit = JGloss.prefs.getInt( Preferences.WORDLOOKUP_RESULTLIMIT, 500);
         this.keepLastResult = keepLastResult;
@@ -180,6 +188,7 @@ public class WordLookupPanel extends JPanel {
         p.add( dictionary);
         p.add( dictionaryChoice);
         p.add( allDictionaries);
+
         p = UIUtilities.createSpaceEater( p, false);
         p.setBorder( BorderFactory.createCompoundBorder
                     ( BorderFactory.createTitledBorder
@@ -283,13 +292,7 @@ public class WordLookupPanel extends JPanel {
         p.add( resultScroller);
         add( p, c);
 
-        updateDictionaryChoice();
-        JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
-                public void propertyChange( java.beans.PropertyChangeEvent e) {
-                    if (e.getPropertyName().equals( Preferences.DICTIONARIES))
-                        updateDictionaryChoice();
-                }
-            });
+        Dictionaries.addDictionaryListChangeListener( this);
 
         xcvManager = new XCVManager( expression);
         xcvManager.addManagedComponent( resultFancy);
@@ -333,6 +336,9 @@ public class WordLookupPanel extends JPanel {
                     }
                 }
             });
+
+        // initialize dictionary list
+        updateDictionaryChoice();
     }
 
     /**
@@ -342,7 +348,7 @@ public class WordLookupPanel extends JPanel {
     protected void updateDictionaryChoice() {
         Object selected = dictionaryChoice.getSelectedItem();
         dictionaryChoice.removeAllItems();
-        Dictionary[] d = Dictionaries.getDictionaries();
+        Dictionary[] d = Dictionaries.getDictionaries( false);
         int index = -1;
         if (d.length == 0) {
             search.setEnabled( false);
@@ -356,7 +362,7 @@ public class WordLookupPanel extends JPanel {
             }
             search.setEnabled( true);
         }
-
+        
         // restore old selection
         if (index != -1)
             dictionaryChoice.setSelectedIndex( index);
@@ -414,7 +420,7 @@ public class WordLookupPanel extends JPanel {
         
         java.util.List result = new ArrayList( 500);
         if (allDictionaries.isSelected()) {
-            Dictionary[] d = Dictionaries.getDictionaries();
+            Dictionary[] d = Dictionaries.getDictionaries( true);
             for ( int i=0; i<d.length; i++) {
                 result.add( d[i].getName()); // mark beginning of next dictionary in results
                 lookupAll( d[i], ex, conjugations, hiragana, mode, result);
@@ -664,5 +670,29 @@ public class WordLookupPanel extends JPanel {
             return super.getPreferredSize();
         else
             return preferredSize;
+    }
+
+    /**
+     * Reflect changes in the loaded dictionary list by updating the dictionary choice combo box.
+     * This is done asynchronously if the current thread is not the event dispatch thread.
+     */
+    public void dictionaryListChanged() {
+        if (updateListEventScheduled)
+            // A list update is already pending, the new event can therefore be ignored.
+            return;
+
+        Runnable worker = new Runnable() {
+                public void run() {
+                    updateListEventScheduled = false;
+                    updateDictionaryChoice();
+                }
+            };
+        if (EventQueue.isDispatchThread()) {
+            worker.run();
+        }
+        else {
+            updateListEventScheduled = true;
+            EventQueue.invokeLater( worker);
+        }
     }
 } // class WordLookupPanel

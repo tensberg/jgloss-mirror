@@ -641,4 +641,12 @@ public class KanjiDic implements Dictionary {
     }
 
     public void dispose() {}
+
+    public boolean equals( Object o) {
+        try {
+            return new File(((EDict) o).dicfile).equals( new File( dicfile));
+        } catch (ClassCastException ex) {
+            return false;
+        }
+    }
 } // class KanjiDic

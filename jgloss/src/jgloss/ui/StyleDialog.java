@@ -545,7 +545,7 @@ public class StyleDialog extends Box {
     /**
      * Applies the UI font setting.
      */
-    public static void applyUIFont() {
+    public static synchronized void applyUIFont() {
         if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true)) {
             // restore java default fonts
             if (defaultLFFonts != null) {

@@ -93,7 +93,7 @@ button.select=Select
 button.annotate=Annotate
 
 jgloss.title=JGloss
-jgloss.version=Version 1.0.2
+jgloss.version=Version 1.0.3
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -118,6 +118,7 @@ main.format=The format of {0} seems to be {1}.
 main.format.unrecognized=The file {0} is not a dictionary file in a supported format.
 main.annotatehtml.files=The input and output file must be different.
 main.title=JGloss
+main.renderingdocument=Creating Document View...
 
 main.menu.file=File
 main.menu.import=Import...

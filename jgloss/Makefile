@@ -130,7 +130,7 @@ gen-javadoc:
                 -classpath "src:$(CLASSPATH)" \
                 -sourcepath src \
                 -windowtitle "JGloss documentation" -doctitle "JGloss documentation" \
-                -author -version \
+                -use -author -version \
                 $(PACKAGES)
 
 setup:

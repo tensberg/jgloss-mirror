@@ -49,7 +49,7 @@ class DictionaryNode extends InnerNode {
      * @param dictionary Name of the dictionary this node represents.
      */
     public DictionaryNode( InnerNode parent, String dictionary) {
-        super( parent, new Vector( Dictionaries.getComponent().getDictionaries().length));
+        super( parent, new Vector( Dictionaries.getComponent().getDictionaries( true).length));
         this.dictionary = dictionary;
     }
 

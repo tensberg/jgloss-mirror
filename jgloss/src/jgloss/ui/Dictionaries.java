@@ -28,6 +28,9 @@ import jgloss.dictionary.*;
 
 import java.io.*;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -53,18 +56,30 @@ public class Dictionaries extends JComponent {
      */
     private JList dictionaries;
     /**
-     * The selection of dictionaries currently stored in the preferences. This can be different
-     * from the list displayed to the user if he has not yet applied changes.
+     * List of {@link Dictionaries.DictionaryWrapper DictionaryWrapper } instances with
+     * dictionaries currently used in the application. This is the list of dictionaries
+     * returned by {@link #getDictionaries() getDictionaries()}.
+     * If the user has edited
+     * the dictionary list in the preference dialog, but not yet applied the changes,
+     * this list is different from the dictionary list displayed.
      */
-    private DefaultListModel dictionariesOrig;
+    private static List activeDictionaries = new ArrayList( 10);
     /**
      * An EDICT editable by the user.
      */
-    private UserDictionary userDictionary;
+    private static UserDictionary userDictionary;
     /**
      * Implementation used to create the user dictionary.
      */
-    private UserDictionary.Implementation userDictImplementation;
+    private static UserDictionary.Implementation userDictImplementation;
+
+    /**
+     * Interface implemented by objects interested in notifications of changes in the
+     * active dictionary list.
+     */
+    public static interface DictionaryListChangeListener {
+        void dictionaryListChanged();
+    } // interface DictionaryListChangeListener
 
     /**
      * Wrapper for a dictionary and its descriptor. Used as elements in the list model.
@@ -89,6 +104,15 @@ public class Dictionaries extends JComponent {
         public String toString() {
             return dictionary.toString();
         }
+
+        public boolean equals( Object o) {
+            try {
+                DictionaryWrapper d = (DictionaryWrapper) o;
+                return (d.descriptor.equals( descriptor) && d.dictionary.equals( dictionary));
+            } catch (ClassCastException ex) {
+                return false;
+            }
+        }
     }
 
     /**
@@ -96,32 +120,48 @@ public class Dictionaries extends JComponent {
      *
      * @return The Dictionaries component.
      */
-    public static synchronized Dictionaries getComponent() {
-        if (box == null)
-            box = new Dictionaries();
+    public static Dictionaries getComponent() {
+        synchronized (componentLock) {
+            if (box == null)
+                box = new Dictionaries();
+        }
+
         return box;
     }
+
+    /**
+     * Lock synchronized on in {@link #getComponent() getComponent}.
+     */
+    private static final Object componentLock = "component lock";
 
     /**
      * Returns the array of currently active dictionaries in the order in which they are
      * displayed. This can be different from the currently shown list if the user has not
      * yet applied changes.
      *
+     *
+     * @param waitForLoad If <CODE>true</CODE>, blocks until the dictionaries are initialized from
+     *                    the preferences.
      * @return Array of currently active dictionaries.
      */
-    public static Dictionary[] getDictionaries() {
-        synchronized (getComponent()) {
-            // this method might be called early in the initializiation process, so make sure
-            // that the preferences are initialized
-            if (getComponent().dictionariesOrig == null)
-                getComponent().loadPreferences();
-            
-            ListModel m = getComponent().dictionariesOrig;
-            Dictionary[] out = new Dictionary[m.getSize()];
-            for ( int i=0; i<m.getSize(); i++) {
-                out[i] = ((DictionaryWrapper) m.getElementAt( i)).dictionary;
+    public static Dictionary[] getDictionaries( boolean waitForLoad) {
+        if (waitForLoad) {
+            Dictionaries component = getComponent();
+            // Guarantee that all dictionaries are loaded from the preferences before returning.
+            // By synchronizing on component, guarantee mutual exclusivity with loadPreferences
+            // and savePreferences
+            synchronized (component) {
+                if (activeDictionaries.size() == 0)
+                    component.loadDictionariesFromPreferences();
             }
-            
+        }
+
+        synchronized (activeDictionaries) {
+            Dictionary[] out = new Dictionary[activeDictionaries.size()];
+            int index = 0;
+            for ( Iterator i=activeDictionaries.iterator(); i.hasNext(); )
+                out[index++] = ((DictionaryWrapper) i.next()).dictionary;
+
             return out;
         }
     }
@@ -131,7 +171,29 @@ public class Dictionaries extends JComponent {
      * will be returned.
      */
     public static UserDictionary getUserDictionary() {
-        return getComponent().userDictionary;
+        return userDictionary;
+    }
+
+    private final static List dictionaryListChangeListeners = new ArrayList( 4);
+
+    public static void addDictionaryListChangeListener( DictionaryListChangeListener listener) {
+        synchronized (dictionaryListChangeListeners) {
+            dictionaryListChangeListeners.add( listener);
+        }
+    }
+
+    public static void removeDictionaryListChangeListener( DictionaryListChangeListener listener) {
+        synchronized (dictionaryListChangeListeners) {
+            dictionaryListChangeListeners.remove( listener);
+        }
+    }
+
+    protected static void fireDictionaryListChanged() {
+        synchronized (dictionaryListChangeListeners) {
+            for ( Iterator i=dictionaryListChangeListeners.iterator(); i.hasNext(); ) {
+                ((DictionaryListChangeListener) i.next()).dictionaryListChanged();
+            }
+        }
     }
 
     /**
@@ -178,7 +240,6 @@ public class Dictionaries extends JComponent {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
                     DictionaryWrapper d = (DictionaryWrapper) m.remove( i);
-                    d.dictionary.dispose();
                     if (i < m.getSize())
                         dictionaries.setSelectedIndex( i);
                     else if (m.getSize() > 0)
@@ -240,12 +301,15 @@ public class Dictionaries extends JComponent {
         gc.fill= GridBagConstraints.NONE;
         gc.gridwidth = 1;
         gc.gridheight = 1;
+        gc.insets = new Insets( 2, 2, 0, 2);
         add( p, gc);
 
-        userDictImplementation = new UserDictionary.Implementation
-            ( System.getProperty( "user.home") + File.separator +
-              JGloss.prefs.getString( Preferences.USERDICTIONARY_FILE));
-        DictionaryFactory.registerImplementation( UserDictionary.class, userDictImplementation);
+        if (userDictImplementation == null) {
+            userDictImplementation = new UserDictionary.Implementation
+                ( System.getProperty( "user.home") + File.separator +
+                  JGloss.prefs.getString( Preferences.USERDICTIONARY_FILE));
+            DictionaryFactory.registerImplementation( UserDictionary.class, userDictImplementation);
+        }
     }
 
     /**
@@ -334,25 +398,61 @@ public class Dictionaries extends JComponent {
      * Makes the list of currently displayed dictionaries the active dictionaries. The list
      * will be stored in the preferences.
      */
-    public void savePreferences() {
-        Preferences p = JGloss.prefs;
-        synchronized (p) {
-            ListModel m = dictionaries.getModel();
-            // keep the original list of dictionaries in case the user cancels the dialog
-            dictionariesOrig = new DefaultListModel();
-            for ( int i=0; i<m.getSize(); i++)
-                dictionariesOrig.addElement( m.getElementAt( i));
+    public synchronized void savePreferences() {
+        ListModel model = dictionaries.getModel();
+        StringBuffer paths = new StringBuffer( model.getSize()*32);
+        List newDictionaries = new ArrayList( model.getSize());
 
-            // construct a string which consists of the paths to the dictionary files
-            String paths = "";
-            if (m.getSize() > 0) {
-                paths = ((DictionaryWrapper) m.getElementAt( 0)).descriptor;
-                for ( int i=1; i<m.getSize(); i++) {
-                    paths += File.pathSeparatorChar +
-                        ((DictionaryWrapper) m.getElementAt( i)).descriptor;
-                }
+        synchronized (model) {
+            for ( int i=0; i<model.getSize(); i++) {
+                newDictionaries.add( model.getElementAt( i));
+                if (paths.length() > 0)
+                    paths.append( File.pathSeparatorChar);
+                paths.append( ((DictionaryWrapper) model.getElementAt( i)).descriptor);
             }
-            p.set( Preferences.DICTIONARIES, paths);
+        }
+        synchronized (activeDictionaries) {
+            // dispose any dictionaries which are no longer active
+            for ( Iterator i=activeDictionaries.iterator(); i.hasNext(); ) {
+                DictionaryWrapper d = (DictionaryWrapper) i.next();
+                if (!newDictionaries.contains( d))
+                    d.dictionary.dispose();
+            }
+            activeDictionaries.clear();
+            activeDictionaries.addAll( newDictionaries);
+        }
+
+        JGloss.prefs.set( Preferences.DICTIONARIES, paths.toString());
+        fireDictionaryListChanged();
+    }
+
+    /**
+     * Initializes the list of active dictionaries from the dictionaries stored in the
+     * preferences. If the list in the preferences does not contain the user dictionary,
+     * it is inserted at the first position.
+     */
+    private synchronized void loadDictionariesFromPreferences() {
+        String[] fs = JGloss.prefs.getPaths( Preferences.DICTIONARIES);
+        for ( int i=0; i<fs.length; i++) {
+            Dictionary d = loadDictionary( fs[i]);
+            if (d != null) {
+                synchronized (activeDictionaries) {
+                    activeDictionaries.add( new DictionaryWrapper( fs[i], d));
+                }
+                fireDictionaryListChanged(); // fire for every loaded dictionary
+                if (d instanceof UserDictionary)
+                    userDictionary = (UserDictionary) d;
+            }
+        }
+        // insert the user dictionary if not already in the dictionary list
+        if (userDictionary == null) {
+            userDictionary = (UserDictionary)
+                loadDictionary( userDictImplementation.getDescriptor());
+            if (userDictionary != null)
+                synchronized (activeDictionaries) {
+                    activeDictionaries.add( 0, new DictionaryWrapper
+                        ( userDictImplementation.getDescriptor(), userDictionary));
+                }
         }
     }
 
@@ -360,35 +460,43 @@ public class Dictionaries extends JComponent {
      * Initializes the list of displayed dictionaries from the preferences setting.
      */
     public synchronized void loadPreferences() {
-        Preferences p = JGloss.prefs;
-        synchronized (p) {
-            // since creating the dictionaries from a file takes a long time, they are
-            // stored in a backup list for fast access if the user cancels the dialog.
-            if (dictionariesOrig == null) {
-                dictionariesOrig = new DefaultListModel();
-                String[] fs = p.getPaths( Preferences.DICTIONARIES);
-                for ( int i=0; i<fs.length; i++) {
-                    Dictionary d = loadDictionary( fs[i]);
-                    if (d != null) {
-                        dictionariesOrig.addElement( new DictionaryWrapper( fs[i], d));
-                        if (d instanceof UserDictionary)
-                            userDictionary = (UserDictionary) d;
-                    }
-                }
-                if (userDictionary == null) {
-                    userDictionary = (UserDictionary) 
-                        loadDictionary( userDictImplementation.getDescriptor());
-                    if (userDictionary != null)
-                        dictionariesOrig.insertElementAt( new DictionaryWrapper
-                            ( userDictImplementation.getDescriptor(), userDictionary), 0);
+        // activeDictionaries is only initialized from the preferences if it does not
+        // already contain dictionaries.
+        boolean prefsLoaded = false;
+        if (activeDictionaries.size() == 0) {
+            loadDictionariesFromPreferences();
+            prefsLoaded = true;
+        }
+        
+        // display the list of loaded dictionaries
+        final DefaultListModel model = new DefaultListModel();
+        synchronized (activeDictionaries) {
+            // discard any dictionaries loaded in the component but not in the active list
+            ListModel oldModel = dictionaries.getModel();
+            synchronized (oldModel) {
+                for ( int i=0; i<oldModel.getSize(); i++) {
+                    DictionaryWrapper d = (DictionaryWrapper) oldModel.getElementAt( i);
+                    if (!activeDictionaries.contains( d))
+                        d.dictionary.dispose();
                 }
             }
             
-            DefaultListModel m = new DefaultListModel();
-            for ( int i=0; i<dictionariesOrig.getSize(); i++)
-                m.addElement( dictionariesOrig.getElementAt( i));
-            dictionaries.setModel( m);
+            for ( Iterator i=activeDictionaries.iterator(); i.hasNext(); )
+                model.addElement( i.next());
         }
+        Runnable worker = new Runnable() {
+                public void run() {
+                    dictionaries.setModel( model);
+                }
+            };
+        if (!EventQueue.isDispatchThread())
+            EventQueue.invokeLater( worker);
+        else
+            worker.run();
+
+        if (!prefsLoaded)
+            fireDictionaryListChanged();
+        // otherwise loadDictionariesFromPreferences has already fired the event
     }
 
     /**

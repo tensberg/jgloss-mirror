@@ -880,4 +880,12 @@ public class EDict implements Dictionary {
     protected final static int byteToUnsignedByte( byte b) {
         return b & 0xff;
     }
+
+    public boolean equals( Object o) {
+        try {
+            return new File(((EDict) o).dicfile).equals( new File( dicfile));
+        } catch (ClassCastException ex) {
+            return false;
+        }
+    }
 } // class EDict
