@@ -29,50 +29,42 @@ package jgloss.dictionary;
  * @author Michael Koch
  * @see Parser
  */
-public class Reading implements Parser.TextAnnotation {
+public class Reading extends AbstractAnnotation {
     /**
-     * Start offset of this annotation in the parsed text.
+     * Word/Reading pair for the text.
      */
-    private int start;
-    /**
-     * Length of the annotated text.
-     */
-    private int length;
-    /**
-     * Reading for this text.
-     */
-    private String reading;
+    private WordReadingPair wordReadingPair;
 
     /**
      * Creates a new reading annotation.
      *
      * @param start Start offset of this annotation in the parsed text. 
      * @param length Length of the annotated text.
-     * @param reading Reading for this text.
+     * @param wrp Word/Reading pair of this entry.
      */
-    public Reading( int start, int length, String reading) {
-        this.start = start;
-        this.length = length;
-        this.reading = reading;
+    public Reading( int start, int length, WordReadingPair wrp) {
+        this( start, length, wrp, null);
     }
 
     /**
-     * Returns the start offset of this annotation in the parsed text. 
+     * Creates a new reading annotation.
      *
-     * @return The start offset.
+     * @param start Start offset of this annotation in the parsed text. 
+     * @param length Length of the annotated text.
+     * @param wrp Word/Reading pair of this entry.
+     * @param conjugation The conjugation which was used to derive the plain form for the dictionary
+     *                    lookup. May be <CODE>null</CODE>
      */
-    public int getStart() { return start; }
+    public Reading( int start, int length, WordReadingPair wrp, Conjugation conjugation) {
+        super( start, length, conjugation);
+        this.wordReadingPair = wrp;
+    }
+
+    public String getWord() { return wordReadingPair.getWord(); }
+    public String getReading() { return wordReadingPair.getReading(); }
+
     /**
-     * Returns the length of the annotated text.
-     *
-     * @return The length of the annotated text.
+     * Returns the Word/Reading pair of this entry.
      */
-    public int getLength() { return length; }
-    /**
-     * Returns the reading to use for the text delimited by <CODE>getStart()</CODE> and 
-     * <CODE>getLength()</CODE>.
-     *
-     * @return The reading.
-     */
-    public String getReading() { return reading; }
+    public WordReadingPair getWordReadingPair() { return wordReadingPair; }
 } // class Reading
