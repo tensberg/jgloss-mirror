@@ -22,11 +22,14 @@
 #
 # $Id$
 #
-error.nodictionary=No dictionaries have been defined.
+error.nodictionary=No dictionaries have been defined in parameter {0}.
 error.loaddictionary=Dictionary {0} could not be loaded.
 error.unknowndictionary={0} is not a dictionary in a recognized format.
-error.noprotocols=No allowed protocols were defined.
+error.noprotocols=No allowed protocols were defined in parameter {0}.
 error.nourl=No URL was specified in the request.
 error.malformedurl=The specified URL {0} is not a valid URL.
 error.protocolnotallowed=URLs with protocol {0} are not allowed.
 error.addressnotallowed=Access to {0} is not allowed.
+error.malformedrequest=The request URL {0} is invalid.
+error.unknownhost=Could not connect to {0}. The host {1} is not known.
+error.connect=Could not connect to {0}. The java exception was {1}, {2}.
