@@ -294,7 +294,7 @@ public class AnnotationModel extends DefaultTreeModel {
             String text = doc.getText( start, end-start);
 
             // look up the new annotation in the dictionaries.
-            List l = doc.getDictionaryParser().findTranslations( trans.translate( text));
+            List l = doc.getDictionaryParser().findTranslations( trans.translate( text), false);
 
             boolean paragraphSpaceInserted = false;
             if (start == paragraph.getStartOffset()) {
