@@ -708,8 +708,10 @@ public class StyleDialog extends Box {
      * Check if the font with the given name can display Japanese characters.
      */
     protected static boolean canDisplayJapanese( String fontName) {
-        return (new Font( fontName, Font.PLAIN, 1).canDisplayUpTo( JAPANESE_CHARS_TEST) ==
-                JAPANESE_CHARS_TEST.length());
+        Font font = new Font( fontName, Font.PLAIN, 1);
+        int length = font.canDisplayUpTo( JAPANESE_CHARS_TEST);
+        return (length == -1 || // all chars succeeded (according to canDisplayUpTo specification)
+                length == JAPANESE_CHARS_TEST.length()); // all chars succeeded (behavior in JRE1.3)
     }
 
     /**

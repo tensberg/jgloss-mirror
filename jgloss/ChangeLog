@@ -1,3 +1,5 @@
+1.0.4: (2002/03/22)
+	- Fixed font autodetection under J2SE 1.4.
 1.0.3: (2002/03/17)
 	- Added support for GDICT dictionaries (J2SE 1.4 required).
 	- Reimplementation of EDICT using the NIO API (J2SE 1.4 required).
