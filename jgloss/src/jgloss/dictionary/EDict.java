@@ -98,7 +98,7 @@ public class EDict implements Dictionary {
                             int i = l.indexOf( ' ');
                             // An entry in EDICT has the form
                             // word [reading] /translation1/translation2/.../
-                            // , where the reading is optional.
+                            // ([reading] is optional).
                             // An entry in the SKK dictionary has the form
                             // reading /word1/word2/.../
                             // To distinguish between the two formats I test if the
@@ -241,12 +241,26 @@ public class EDict implements Dictionary {
                     }
                 }
 
+                // Several index entries can point to the same entry line. For example
+                // if a word contains the same kanji twice, and words with this kanji are looked up,
+                // one index entry is found for the first occurrence and one for the second. To prevent
+                // adding the entry multiple times, entries are stored in a set.
+                Set seenEntries = new HashSet( 50);
+
                 // read all matching entries
                 do {
                     // find beginning of entry line
                     int start = index[match];
                     while (start>0 && dictionary[start-1]!=0x0a)
                         start--;
+
+                    Integer starti = new Integer( start);
+                    if (seenEntries.contains( starti)) {
+                        match++;
+                        continue;
+                    }
+                    else
+                        seenEntries.add( starti);
                     
                     int end = start + 1;
                     while (end<dictionary.length && dictionary[end]!=0x0a) {
@@ -351,6 +365,7 @@ public class EDict implements Dictionary {
                         case SEARCH_ANY_MATCHES:
                             addEntry = true;
                             break;
+
                         default:
                             throw new IllegalArgumentException( "Invalid search mode");
                         }
@@ -482,7 +497,7 @@ public class EDict implements Dictionary {
         
         // Search over the whole dictionary and add an index entry for every kanji/kana string and
         // every alphabetic string with length >= 3.
-        // This creates an index similar to the ones created by xjdxgen.
+        // This creates an index similar to one created by xjdxgen.
         boolean inword = false;
         int entry = 0;
         for ( int i=0; i<dictionary.length; i++) {
