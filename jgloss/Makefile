@@ -40,7 +40,7 @@ ifndef NATIVE2ASCII
   NATIVE2ASCII := native2ascii
 endif
 
-RELEASE := 0.9.5
+RELEASE := 1.0
 DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www
@@ -66,14 +66,14 @@ ROOT_SOURCE := src/jgloss/JGloss.java
 WWW_SOURCE := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
-SOURCE_DIST := README COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex-ruby
+SOURCE_DIST := README.txt COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex-ruby
 # files and directories that go into the binary distribution, either in the JGloss jar file
 # or in the zip file.
-BINARY_DIST := README COPYING ChangeLog jgloss data resources doc latex-ruby
+BINARY_DIST := README.txt COPYING ChangeLog jgloss data resources doc latex-ruby
 # files that go into the binary distribution jar file
 BINARY_JAR := jgloss data resources
 # files that go into the binary distribution zip file
-BINARY_ZIP := jgloss.jar README COPYING ChangeLog doc latex-ruby
+BINARY_ZIP := jgloss.jar README.txt COPYING ChangeLog doc latex-ruby
 
 #
 # end configuration

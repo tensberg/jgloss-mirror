@@ -73,7 +73,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         public final Action open;
         /**
          * Listens to open recent selections. Use with 
-         * {@link OpenRecentMenu#createDocumentMenu(File,FileSelectionListener) 
+         * {@link OpenRecentMenu#createDocumentMenu(File,OpenRecentMenu.FileSelectedListener) 
          *  OpenRecentMenu.createDocumentMenu}.
          */
         public final OpenRecentMenu.FileSelectedListener openRecentListener;
@@ -331,11 +331,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
      */
     private JCheckBoxMenuItem showAnnotationItem;
     /**
-     * Toggles the automatic scrolling of the annotation editor if the mouse hovers
-     * over an annotation.
-     */
-    private JCheckBoxMenuItem editorFollowsMouseItem;
-    /**
      * Listens to changes of the properties.
      */
     private PropertyChangeListener prefsListener;
@@ -564,18 +559,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
         showAnnotationItem.setSelected( JGloss.prefs.getBoolean
                                         ( Preferences.VIEW_SHOWANNOTATION));
         showAnnotationItem.addActionListener( this);
-        editorFollowsMouseItem = new JCheckBoxMenuItem( JGloss.messages.getString
-                                                        ( "main.menu.editorfollowsmouse"));
-        editorFollowsMouseItem.setSelected( JGloss.prefs.getBoolean
-                                            ( Preferences.VIEW_EDITORFOLLOWSMOUSE));
-        editorFollowsMouseItem.addActionListener( this);
 
         menu = new JMenu( JGloss.messages.getString( "main.menu.view"));
         menu.add( compactViewItem);
         menu.add( showReadingItem);
         menu.add( showTranslationItem);
         menu.add( showAnnotationItem);
-        menu.add( editorFollowsMouseItem);
         bar.add( menu);
 
         bar.add( annotationEditor.getMenu());
@@ -700,7 +689,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * @param filter Filter for fetching the reading annotations from a parsed document.
      * @param encoding Character encoding of the file. May be either <CODE>null</CODE> or the
      *                 value of the "encodings.default" resource to use autodetection.
-     * @see #loadDocument(Reader,String,String,Parser,boolean,int)
      */
     private void importDocument( String path, Parser parser, ReadingAnnotationFilter filter, 
                                  String encoding) {
@@ -966,8 +954,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
             saveAction.setEnabled( true);
         saveAsAction.setEnabled( true);
 
-        docpane.followMouse( showAnnotationItem.isSelected(),
-                             editorFollowsMouseItem.isSelected());
+        docpane.followMouse( showAnnotationItem.isSelected(), false);
 
         doc.addDocumentListener( new DocumentListener() {
                 public void insertUpdate(DocumentEvent e) {
@@ -1013,11 +1000,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 // force docpane to be re-layouted.
                 doc.getStyleSheet().addRule( AnnotationTags.TRANSLATION.getId() + " {}");
             }
-            else if (e.getSource()==showAnnotationItem || e.getSource()==editorFollowsMouseItem) {
+            else if (e.getSource()==showAnnotationItem) {
                 JGloss.prefs.set( Preferences.VIEW_SHOWANNOTATION, showAnnotationItem.isSelected());
-                JGloss.prefs.set( Preferences.VIEW_EDITORFOLLOWSMOUSE, editorFollowsMouseItem.isSelected());
-                docpane.followMouse( showAnnotationItem.isSelected(),
-                                     editorFollowsMouseItem.isSelected());
+                docpane.followMouse( showAnnotationItem.isSelected(), false);
             }
         }
     }
@@ -1389,7 +1374,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                   translationsOnPage.isSelected());
                 JGloss.prefs.set( Preferences.EXPORT_LATEX_WRITEHIDDEN,
                                   writeHidden.isSelected());
-                LaTeXExporter.export( doc, (AnnotationModel) annotationEditor.getModel(),
+                LaTeXExporter.export( doc, documentName, (AnnotationModel) annotationEditor.getModel(),
                                       out, writeReading.isSelected(), writeTranslations.isSelected(),
                                       translationsOnPage.isSelected(), writeHidden.isSelected());
             } catch (Exception ex) {

@@ -188,7 +188,8 @@ public class AnnotationNode extends InnerNode {
      * @return The text of the annotation.
      */
     public String getAnnotationText() {
-        String out = word.getReading() + "\n" + translation.toString();
+        String out = JGloss.messages.getString( "annotationeditor.reading") + " " +
+            word.getReading() + "\n" + translation.toString();
         for ( int i=2; i<children.size(); i++) {
             Object child = children.elementAt( i);
             if (child instanceof DictionaryNode) {

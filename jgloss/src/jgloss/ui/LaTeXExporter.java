@@ -43,6 +43,7 @@ public class LaTeXExporter {
      * Exports an annotated JGloss document as LaTeX-CJK file.
      *
      * @param doc The document to write.
+     * @param documentName Name of the document as chosen by the user.
      * @param model Annotation model which contains the annotations of the document.
      * @param out Writer to which the document will be written.
      * @param writeReading <CODE>true</CODE> if the reading annotations should be written.
@@ -53,7 +54,8 @@ public class LaTeXExporter {
      * @param writeHidden <CODE>true</CODE> if annotations marked as hidden should be written.
      * @exception IOException
      */
-    public static void export( JGlossDocument doc, AnnotationModel model, Writer out, 
+    public static void export( JGlossDocument doc, String documentName,
+                               AnnotationModel model, Writer out, 
                                boolean writeReading, boolean writeTranslations,
                                boolean translationsOnPage,
                                boolean writeHidden) throws IOException {
@@ -157,6 +159,9 @@ public class LaTeXExporter {
                 }
             }
         }
+        
+        out.write( JGloss.messages.getString( "export.latex.header", new Object[]
+            { documentName, new Date() }));
 
         String preamble = "\\documentclass";
         String opts = JGloss.prefs.getString( Preferences.EXPORT_LATEX_DOCUMENTCLASS_OPTIONS);

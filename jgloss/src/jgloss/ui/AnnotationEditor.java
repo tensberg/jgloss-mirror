@@ -49,7 +49,7 @@ import javax.swing.plaf.basic.BasicTreeUI;
 public class AnnotationEditor extends JTree implements TreeSelectionListener, MouseListener {
     /**
      * Variant of the default tree cell editor which returns an increased preferred width
-     * for {@link jgloss.ui.annoation.EditableTextNode editable text nodes}. This is neccessary
+     * for {@link jgloss.ui.annotation.EditableTextNode editable text nodes}. This is neccessary
      * because otherwise readings and translations won't display if the text length is increased.
      */
     private class AnnotationTreeCellRenderer extends DefaultTreeCellRenderer {

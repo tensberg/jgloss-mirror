@@ -104,7 +104,7 @@ public class StringTools {
 
     /**
      * Test if a string contains any kanji characters. The test is done using the 
-     * {@link isKanji(char) isKanji} method.
+     * {@link #isKanji(char) isKanji} method.
      */
     public static boolean containsKanji( String word) {
         for ( int i=0; i<word.length(); i++) {

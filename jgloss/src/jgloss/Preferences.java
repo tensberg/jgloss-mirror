@@ -76,7 +76,6 @@ public class Preferences {
     public static final String VIEW_SHOWREADING = "view.showreading";
     public static final String VIEW_SHOWTRANSLATION = "view.showtranslation";
     public static final String VIEW_SHOWANNOTATION = "view.showannotation";
-    public static final String VIEW_EDITORFOLLOWSMOUSE = "view.editorfollowsmouse";
     public static final String VIEW_ANNOTATIONEDITORHIDDEN = "view.annotationeditorhidden";
 
     public static final String EDITOR_ENABLEEDITINGCHECKBOX = "editor.enableeditingcheckbox";

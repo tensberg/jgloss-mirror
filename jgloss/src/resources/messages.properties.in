@@ -87,7 +87,7 @@ button.select=Select
 button.annotate=Annotate
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9.5
+jgloss.version=Version 1.0
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -100,7 +100,7 @@ Options:\n\
 \  -h, --help, /?     Print this message\n\
 \  -i, --createindex  Create index files for the dictionary files\n\
 \                     given on the command line\n\
-\  -f, --format       Prints the dictionary format of the files\n\
+\  -f, --format       Prints the format of the dictionary files\n\
 \                     given on the command line\n\
 \  -p, --pastewindow  Instead of opening a JGloss document, shows\n\
 \                     a window in which you can paste text which\n\
@@ -113,7 +113,7 @@ Options:\n\
 \                     stdin/stdout will be used.
 main.unknownoption=Unknown option {0}
 main.format=The format of {0} seems to be {1}.
-main.format.unrecognized={0} is not a recognized dictionary format.
+main.format.unrecognized=The file {0} is not a dictionary file in a supported format.
 main.annotatehtml.files=The input and output file must be different.
 main.title=JGloss
 
@@ -162,7 +162,6 @@ main.menu.compactview=Compact View
 main.menu.showreading=Show Readings
 main.menu.showtranslation=Show Translations
 main.menu.showannotation=Show Annotation Tooltips
-main.menu.editorfollowsmouse=Annotations Follow Mouse
 main.menu.help=Help
 main.menu.about=About JGloss
 main.menu.about.mk=A
@@ -306,7 +305,13 @@ export.html.title=Export HTML
 export.html.interactive=Interactive HTML
 export.html.backwardscompatible=Backwards Compatible
 export.latex.title=Export LaTeX
-export.latex.translationsonpage=Put translation on same page as word
+export.latex.translationsonpage=Place translation on same page as word
+export.latex.header=\
+% This is an EUC-JP encoded Japanese LaTeX document generated\n\
+% by JGloss from {0} on {1,date,medium}, {1,time,medium}.\n\
+% Use platex to process this file.\n\
+% Note that the file ruby-annotation.sty which comes with JGloss\n\
+% must be installed.\n\n
 
 about.frame.title=About JGloss
 about.title=JGloss

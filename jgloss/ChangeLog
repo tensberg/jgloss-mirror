@@ -1,4 +1,4 @@
-0.9.5: (2001/12/11)
+1.0: (2001/12/14)
 	- Improved handling of long result lists in word lookup dialog.
 	- Removed the dummy print menu item from the word lookup dialog.
 	- Fixed exception thrown if the document window is closed while
@@ -31,6 +31,11 @@
 	- Added Use Reading/Translation entry to annotation context menu.
 	- Clicking in unannotated text now deselects the current annotation.
 	- Delete key on a reading or translation node now clears the text.
+	- Dictionaries preferences now prevents adding the same dictionary 
+	  file twice.
+	- Removed the Annotations Follow Mouse setting, since it no longer
+	  makes sense with the changes in the annotation editor behavior.
+	- Fixed display of reading in annotation popups.
 0.9.4: (2001/11/07)
 	- Improved handling of reading annotations in imported text;
 	  ChaSen parser can now be used with texts with reading annotations.

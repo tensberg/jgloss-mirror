@@ -85,7 +85,7 @@ public class ParserSelector extends JPanel {
      * @param showReadingAnnotationSelector If this is <CODE>true</CODE>, a widget will be shown
      *        which lets the user choose the brackets which delimit reading annotations. The widget
      *        is only active if the currently selected parser is a 
-     *        {@link jgloss.Dictionary.ReadingAnnotationParser ReadingAnnotationParser}.
+     *        {@link jgloss.dictionary.ReadingAnnotationParser ReadingAnnotationParser}.
      */
     public ParserSelector( boolean showReadingAnnotationSelector) {
         this( showReadingAnnotationSelector, '\0', '\0');
@@ -97,7 +97,7 @@ public class ParserSelector extends JPanel {
      * @param showReadingAnnotationSelector If this is <CODE>true</CODE>, a widget will be shown
      *        which lets the user choose the brackets which delimit reading annotations. The widget
      *        is only active if the currently selected parser is a 
-     *        {@link jgloss.Dictionary.ReadingAnnotationParser ReadingAnnotationParser}.
+     *        {@link jgloss.dictionary.ReadingAnnotationParser ReadingAnnotationParser}.
      * @param readingStart Start character of a reading annotation.
      * @param readingEnd End character of a reading annotation.
      */

@@ -1,3 +1,26 @@
+/*
+ * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ *
+ * This file is part of JGloss.
+ *
+ * JGloss is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * JGloss is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with JGloss; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id$
+ *
+ */
+
 package jgloss.ui;
 
 import jgloss.JGloss;
@@ -44,14 +67,17 @@ public class PasteImportFrame extends JFrame implements TextListener {
      */
     public void textValueChanged( TextEvent e) {
         String text = pastearea.getText();
-        if (text.length() < 3 || // ignore single key inputs
-            text.equals( JGloss.messages.getString( "pasteimport.standby"))) // avoid recursive calls
+        if (text.length() < 5 || // ignore single key inputs
+            text.equals( JGloss.messages.getString( "pasteimport.standby"))) { // avoid recursive calls
+            if (text.length()>0 && text.length()<5) // clear single key strokes
+                pastearea.setText( "");
             return;
+        }
         pastearea.setEditable( false);
         pastearea.setText( JGloss.messages.getString( "pasteimport.standby"));
 
-        // construct a new string the hacky way because AWT ignores the
-        // charset when pasting japanese text from the X primary selection
+        // construct a new string the hacky way because sometimes the charset is ignored
+        // when pasting japanese text from the X primary selection
         byte[] tb = new byte[text.length()];
         boolean convert = true;
         for ( int i=0; i<text.length(); i++) {

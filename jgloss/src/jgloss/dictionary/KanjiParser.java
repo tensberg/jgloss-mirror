@@ -103,7 +103,6 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
      * @return A list with annotations for the text. If no annotations were created, the empty
      *         list will be returned.
      * @exception SearchException If an error occurrs during a dictionary lookup.
-     * @see #findTranslations(int,String,String,String,boolean,boolean,boolean)
      */
     public List parse( char[] text) throws SearchException {
         List out = new ArrayList( text.length/3);
@@ -298,7 +297,6 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
      *                    repeat the search with the remaining suffix of <CODE>word</CODE>
      * @return A list of reading and translation annotations for the search word.
      * @exception SearchException If a dictionary lookup failed.
-     * @see #findTranslations(int,String,String,String,boolean,boolean,boolean)
      * @see Reading
      * @see Translation
      */

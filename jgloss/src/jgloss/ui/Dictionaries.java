@@ -27,6 +27,7 @@ import jgloss.*;
 import jgloss.dictionary.*;
 
 import java.io.*;
+import java.util.Enumeration;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -249,12 +250,22 @@ public class Dictionaries extends Box {
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
             File[] fs = chooser.getSelectedFiles();
+            DefaultListModel model = (DefaultListModel) dictionaries.getModel();
             for ( int i=0; i<fs.length; i++) {
                 String descriptor = fs[i].getAbsolutePath();
-                Dictionary d = loadDictionary( descriptor);
-                if (d != null)
-                    ((DefaultListModel) dictionaries.getModel())
-                        .addElement( new DictionaryWrapper( descriptor, d));
+                // check if the dictionary is already added
+                boolean alreadyAdded = false;
+                for ( Enumeration e=model.elements(); e.hasMoreElements(); ) {
+                    if (((DictionaryWrapper) e.nextElement()).descriptor.equals( descriptor)) {
+                        alreadyAdded = true;
+                        break;
+                    }
+                }
+                if (!alreadyAdded) {
+                    Dictionary d = loadDictionary( descriptor);
+                    if (d != null)
+                        model.addElement( new DictionaryWrapper( descriptor, d));
+                }
             }
             JGloss.prefs.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
                               .getAbsolutePath());

@@ -75,7 +75,7 @@ public interface Parser {
     /**
      * Clears any caches which may have been filled during parsing. Call this after you have
      * parsed some text to reclaim the memory. This also resets the occurrence cache used when
-     * {@link setAnnotateFirstOccurrenceOnly(boolean) setAnnotateFirstOccurenceOnly} is set to
+     * {@link #setAnnotateFirstOccurrenceOnly(boolean) setAnnotateFirstOccurenceOnly} is set to
      * <CODE>true</CODE>.
      */
     void reset();

@@ -469,7 +469,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
         /**
          * Calculates the preferred span by summing up the preferred span of all child views.
-         * For reading/base views, the {@link ReadingBaseView#getRealXSpan() real horizontal
+         * For reading/base views, the {@link JGlossEditorKit.ReadingBaseView#getRealXSpan() real horizontal
          * span} is used instead of the one returned by <CODE>getPreferredSpan</CODE> so that
          * the word will always have enough space to display the whole reading.
          */

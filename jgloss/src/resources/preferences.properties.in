@@ -39,7 +39,7 @@ openrecent.files=
 reading.bracket.chars=�ԡաΡϡڡ�
 
 encodings=ISO-2022-JP,EUC-JP,SHIFT_JIS,UTF-8
-export.encoding=ISO-2022-JP
+export.encoding=SHIFT_JIS
 fontsizes.kanji=9,11,12,13,14,15,16,18,20,24
 fontsizes.reading=6,7,8,9,10,11,12,13,14,15,16,18
 fontsizes.translation=4,5,6,7,8,9,10,11,12,13,14,15,16
@@ -61,7 +61,6 @@ view.compactview=false
 view.showreading=true
 view.showtranslation=true
 view.showannotation=false
-view.editorfollowsmouse=false
 view.annotationeditorhidden=false
 
 editor.enableeditingcheckbox=false
@@ -84,11 +83,11 @@ export.html.writetranslations=true
 export.html.backwardscompatible=true
 export.html.writehidden=false
 export.latex.writereading=true
-export.latex.writetranslations=false
+export.latex.writetranslations=true
 export.latex.translationsonpage=true
 export.latex.writehidden=false
 export.latex.documentclass=jarticle
-export.latex.documentclass.options=10pt
+export.latex.documentclass.options=11pt
 export.latex.preamble=\\usepackage{pslatex}\n\\renewcommand{\\thefootnote}{}\n
 export.latex.ruby.options=overlap,CJK
 

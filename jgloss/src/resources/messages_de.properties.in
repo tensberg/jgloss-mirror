@@ -96,8 +96,8 @@ Optionen:\n\
 \  -h, --help, /?     Zeigt diese Nachricht\n\
 \  -i, --createindex  Erzeugt Indexdateien für die in der Kommandozeile\n\
 \                     angegebenen Wörterbuchdateien\n\
-\  -f, --format       Gibt das Wörterbuchformat für die in der Kommandozeile\n\
-\                     angegebenen Dateien aus\n\
+\  -f, --format       Gibt das Format der in der Kommandozeile angegebenen\n\
+\                     Wörterbuchdateien aus\n\
 \  -a, --annotatehtml Annotiert eine HTML-Datei mit Wörterbucheinträgen für\n\
 \                     japanische Wörter. Die Annotationen werden im Browser\n\
 \                     mit Hilfe von JavaScript dargestellt.\n\
@@ -145,7 +145,6 @@ main.menu.compactview=Kompakte Anzeige
 main.menu.showreading=Lesungen anzeigen
 main.menu.showtranslation=Übersetzungen anzeigen
 main.menu.showannotation=Zeige Annotations-Tooltips
-main.menu.editorfollowsmouse=Annotationen folgen Maus
 main.menu.help=Hilfe
 main.menu.about=Über JGloss
 main.menu.about.mk=U
@@ -261,7 +260,7 @@ annotationeditor.action.previous=Vorherige Annotation
 
 export.encodings=Zeichensatz:
 export.annotationlist.title=Annotationsliste exportieren
-export.annotationlist.header=\# Annotationsliste für {0}\n\# Zeichensatz: {1}\n
+export.annotationlist.header=\# Annotationsliste fuer {0}\n\# Zeichensatz: {1}\n
 export.writereading=Lesungen schreiben
 export.writetranslations=Übersetzungen schreiben
 export.writehidden=Ausgeblendete Annotationen schreiben
@@ -271,6 +270,12 @@ export.html.interactive=Interaktives HTML
 export.html.backwardscompatible=Abwärtskompatibel
 export.latex.title=LaTeX exportieren
 export.latex.translationsonpage=Übersetzungen auf selber Seite
+export.latex.header=\
+% Dies ist ein EUC-JP-kodiertes japanisches LaTeX-Dokument,\n\
+% generiert von JGloss aus {0} am {1,date,medium}, {1,time,medium}.\n\
+% Benutzen sie platex um die Datei zu verarbeiten.\n\
+% Beachten sie das die Datei ruby-annotation.sty, die JGloss beiliegt,\n\
+% installiert sein muss.\n\n
 
 about.frame.title=Über JGloss
 about.title=JGloss
