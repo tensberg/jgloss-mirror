@@ -80,11 +80,13 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
         resultFancy = new JEditorPane();
         resultFancy.setContentType( "text/html");
         resultFancy.setEditable( false);
-        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule( STYLE);
-        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
+        HTMLEditorKit kit = new HTMLEditorKit();
+        kit.getStyleSheet().addRule( STYLE);
+        kit.getStyleSheet().addRule
             ( "body { font-family: '" + JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP) +
               "'; font-size: " + JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12) + 
               "pt; }\n");
+        resultFancy.setEditorKit( kit);
 
         resultPlain = new JTextArea();
         resultPlain.setFont( new Font( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP),
@@ -127,6 +129,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
         this.add( status, BorderLayout.SOUTH);
 
         references = new HashMap( fancyLimit*4+1);
+
         htmlFormatter = DictionaryEntryFormat.createHTMLFormatter( this, references);
         plainFormatter = DictionaryEntryFormat.createFormatter();
     }
@@ -157,7 +160,6 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
     }
 
     private void startLookup() {
-        references.clear();
         previousDictionaryHasMatch = true;
         dictionaryEntries = 0;
         entriesInTextBuffer = 0;
@@ -210,26 +212,28 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
 
     protected void format( Dictionary d, boolean fancy) {
         if (!previousDictionaryHasMatch) {
+            if (fancy)
+                resultTextBuffer.append( "<p>");
             resultTextBuffer.append( JGloss.messages.getString( "wordlookup.nomatches_dictionary"));
             if (fancy)
-                resultTextBuffer.append( "<br>");
-            resultTextBuffer.append( '\n');
+                resultTextBuffer.append( "</p>");
+            resultTextBuffer.append( "\n\n");
         }
 
         if (multipleDictionaries) {
             if (fancy) {
-                resultTextBuffer.append( "<b>");
+                resultTextBuffer.append( "<h4>");
                 resultTextBuffer.append
                     ( JGloss.messages.getString( "wordlookup.matches",
                                                  new String[] { "<font color=\"green\">" +
                                                                 d.getName() + "</font>" }));
-                resultTextBuffer.append( "</b><br>");
+                resultTextBuffer.append( "</h4>");
             }
             else {
                 resultTextBuffer.append( JGloss.messages.getString( "wordlookup.matches",
                                                                     new String[] { d.getName() }));
             }
-            resultTextBuffer.append( '\n');
+            resultTextBuffer.append( "\n\n");
         }
         
         previousDictionaryHasMatch = false;
@@ -238,13 +242,14 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
     protected void format( DictionaryEntry de, boolean fancy) {
         previousDictionaryHasMatch = true;
         if (fancy) {
+            resultTextBuffer.append( "<p>");
             htmlFormatter.format( de, resultTextBuffer);
-            resultTextBuffer.append( "<br>");
+            resultTextBuffer.append( "</p>");
         }
         else
             plainFormatter.format( de, resultTextBuffer);
 
-        resultTextBuffer.append( '\n');
+        resultTextBuffer.append( "\n\n");
         dictionaryEntries++;
     }
 
@@ -252,7 +257,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
         ex.printStackTrace();
         
         if (fancy)
-            resultTextBuffer.append( "<font color=\"red\">");
+            resultTextBuffer.append( "<p><font color=\"red\">");
         if (ex instanceof UnsupportedSearchModeException) {
             resultTextBuffer.append( JGloss.messages.getString( "wordlookup.unsupportedsearchmode"));
         }
@@ -263,18 +268,17 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
                                                             ex.getLocalizedMessage() }));
         }
         if (fancy)
-            resultTextBuffer.append( "</font><br>");
-        resultTextBuffer.append( '\n');
+            resultTextBuffer.append( "</font></p>>");
+        resultTextBuffer.append( "\n\n");
     }
 
     protected void format( String note, boolean fancy) {
-        resultTextBuffer.append( '\n');
         if (fancy)
-            resultTextBuffer.append( "<br><i>");
+            resultTextBuffer.append( "<p><i>");
         resultTextBuffer.append( note);
         if (fancy)
-            resultTextBuffer.append( "</i>");
-        resultTextBuffer.append( '\n');
+            resultTextBuffer.append( "</i></p>");
+        resultTextBuffer.append( "\n\n");
     }
 
     public void endLookup() {
@@ -306,41 +310,32 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
             resultTextBuffer.append( "</body></html>");
         }
 
-        final String bufferContent = resultTextBuffer.toString();
+        final JTextComponent target = fancy ? (JTextComponent) resultFancy : 
+            (JTextComponent) resultPlain;
+
+        if (resultScroller.getViewport().getView() != target) {
+            Runnable updater = new Runnable() {
+                    public void run() {
+                        resultScroller.setViewportView( target);
+                    }
+                };
+            
+            if (EventQueue.isDispatchThread())
+                updater.run();
+            else try {
+                EventQueue.invokeAndWait( updater);
+            } catch (Exception ex) {}
+
+            // preserve memory by deleting the old text from the unused view
+            // setText is thread-safe
+            if (fancy)
+                resultPlain.setText( "");
+            else
+                resultFancy.setText( "");
+        }
+
+        target.setText( resultTextBuffer.toString());
         resultTextBuffer.setLength( 0);
-
-        Runnable updater = new Runnable() {
-                public void run() {
-                    if (fancy) {
-                        HTMLDocument doc = (HTMLDocument) resultFancy.getEditorKit()
-                            .createDefaultDocument();
-                        //doc.setTokenThreshold( 150);
-                        resultFancy.setDocument( doc);
-
-                        if (resultScroller.getViewport().getView() != resultFancy) {
-                            resultScroller.setViewportView( resultFancy);
-                            resultPlain.setText( "");
-                        }
-                        
-                        resultFancy.setText( bufferContent);
-                        resultFancy.setCaretPosition( 0);
-                    }
-                    else {
-                        if (resultScroller.getViewport().getView() != resultPlain) {
-                            resultScroller.setViewportView( resultPlain);
-                            resultFancy.setText( "");
-                        }
-                        resultPlain.setText( bufferContent);
-                        resultPlain.setCaretPosition( 0);
-                    }
-                }
-            };
-
-        if (EventQueue.isDispatchThread())
-            updater.run();
-        else try {
-            EventQueue.invokeAndWait( updater);
-        } catch (Exception ex) {}
     }
 
     protected void flushTextBuffer() {
@@ -373,5 +368,21 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
 
     public String getMarkAfter() {
         return "</font>";
+    }
+
+    public static class ViewState {
+        private Point resultScrollerPosition;
+
+        private ViewState( Point _resultScrollerPosition) {
+            resultScrollerPosition = _resultScrollerPosition;
+        }
+    }
+
+    public ViewState saveViewState() {
+        return new ViewState( resultScroller.getViewport().getViewPosition());
+    }
+
+    public void restoreViewState( ViewState state) {
+        resultScroller.getViewport().setViewPosition( state.resultScrollerPosition);
     }
 } // class LookupResultList

@@ -36,6 +36,7 @@ public class AsynchronousLookupEngine extends LookupEngine {
         private boolean inLookup = false;
         
         private LookupModel model;
+        private Runnable runAfterLookup;
 
         public SearchThread() {
             super( "lookup engine search thread");
@@ -56,6 +57,8 @@ public class AsynchronousLookupEngine extends LookupEngine {
                         Thread.interrupted();
                     }
                     doLookupSuper( model);
+                    if (runAfterLookup != null)
+                        runAfterLookup.run();
                     synchronized (LOOKUP_LOCK) {
                         inLookup = false;
                         // clear lingering interrupted flag
@@ -65,8 +68,7 @@ public class AsynchronousLookupEngine extends LookupEngine {
             }
         }
 
-        public void newSearch( LookupModel _model) {
-            model = _model;
+        public void newSearch( LookupModel _model, Runnable _runAfterLookup) {
             // abort current search (if any)
             synchronized (LOOKUP_LOCK) {
                 if (inLookup) {
@@ -75,6 +77,8 @@ public class AsynchronousLookupEngine extends LookupEngine {
             }
             // start new search
             synchronized (THREAD_LOCK) {
+                model = _model;
+                runAfterLookup = _runAfterLookup;
                 THREAD_LOCK.notify();
             }
         }
@@ -87,6 +91,8 @@ public class AsynchronousLookupEngine extends LookupEngine {
             } catch (InterruptedException ex) {}
             if (SearchThread.this.isAlive())
                 System.err.println( "WARNING: LookupFrame search thread still alive");
+            model = null;
+            runAfterLookup = null;
         }
     } // class SearchThread
     
@@ -103,12 +109,16 @@ public class AsynchronousLookupEngine extends LookupEngine {
     }
 
 
+    public void doLookup( LookupModel model) {
+        doLookup( model, null);
+    }
+
     /**
      * Initiate a new lookup, which will be performed in its own thread. The method will return
      * immediately. If another search is currently executing, it will be aborted.
      */
-    public void doLookup( LookupModel model) {
-        searchThread.newSearch( model);
+    public void doLookup( LookupModel model, Runnable runAfterLookup) {
+        searchThread.newSearch( model, runAfterLookup);
     }
 
     private void doLookupSuper( LookupModel model) throws InterruptedException {

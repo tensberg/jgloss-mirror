@@ -498,9 +498,9 @@ public class KanjiDic implements Dictionary {
     }
 
     public boolean supports( SearchMode searchmode, boolean fully) {
-        if (searchmode==ExpressionSearchModes.EXACT)
+        if (fully && searchmode==ExpressionSearchModes.EXACT)
             return true;
-        else if (fully && searchmode instanceof ExpressionSearchModes)
+        else if (searchmode instanceof ExpressionSearchModes)
             return true;
         else
             return false;

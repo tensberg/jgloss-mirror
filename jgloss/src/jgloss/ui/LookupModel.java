@@ -478,7 +478,7 @@ public class LookupModel implements Cloneable {
                 StateWrapper wrapperd = (StateWrapper) j.next();
                 Dictionary dic = (Dictionary) wrapperd.getObject();
                 if (wrapperd.isEnabled() && (allDictionariesSelected || wrapperd.isSelected()) &&
-                    !dic.supports( mode, !(allDictionariesSelected || multiDictionarySelection))) {
+                    !dic.supports( mode, false)) {
                     if (wrapper.isEnabled()) {
                         wrapper.setEnabled( false);
                         changed = true;

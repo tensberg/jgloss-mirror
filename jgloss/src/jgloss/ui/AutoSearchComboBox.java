@@ -268,8 +268,8 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
                     dontConfigureEditor = true;
                     ((ReplaceableItemsComboBoxModel) getModel()).replaceItems( newItems);
                     dontConfigureEditor = false;
-                    items = null;
-                    AutoSearchComboBox.this.showPopup();
+                    AutoSearchComboBox.this.setPopupVisible(false);
+                    AutoSearchComboBox.this.setPopupVisible(true);
                 }
             };
 

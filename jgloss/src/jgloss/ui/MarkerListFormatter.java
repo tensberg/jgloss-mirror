@@ -53,6 +53,7 @@ public class MarkerListFormatter extends ListFormatter {
     } // interface Group
 
     protected Group group;
+    protected String markedText;
 
     public MarkerListFormatter( Group _group, ListFormatter _formatter) {
         super( _formatter);
@@ -80,13 +81,22 @@ public class MarkerListFormatter extends ListFormatter {
         group = _group;
     }
 
+    public ListFormatter newList( StringBuffer _buffer, int _length) {
+        markedText = group.getMarkedText();
+        if (markedText!=null && markedText.length()!=0) {
+            markedText = StringTools.toHiragana( markedText.toLowerCase());
+        }
+        else
+            markedText = null;
+
+        return super.newList( _buffer, _length);
+    }
+
     protected void doAppendItem( Object item) {
-        String markedText = group.getMarkedText();
-        if (markedText==null || markedText.length()==0) {
+        if (markedText == null) {
             super.doAppendItem( item);
             return;
-        }   
-        markedText = StringTools.toHiragana( markedText.toLowerCase());
+        }
 
         String markBefore = group.getMarkBefore();
         String markAfter = group.getMarkAfter();
@@ -95,7 +105,7 @@ public class MarkerListFormatter extends ListFormatter {
         StringBuffer tempBuffer = new StringBuffer( s);        
         String sN = StringTools.toHiragana( s.toLowerCase());
 
-        int from = tempBuffer.length()-1;
+        int from = sN.length()-1;
         while ((from=sN.lastIndexOf( markedText, from)) != -1) {
             tempBuffer.insert( from+markedText.length(), markAfter);
             tempBuffer.insert( from, markBefore);

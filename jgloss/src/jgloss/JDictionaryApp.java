@@ -33,6 +33,10 @@ import jgloss.ui.*;
  */
 public class JDictionaryApp extends JGloss {
     public static void main( String args[]) {
+        JFrame f = new JFrame( "test");
+        JTextPane p = new JTextPane();
+        p.setContentType( "text/html");
+
         application = new JDictionaryApp();
 
         try {

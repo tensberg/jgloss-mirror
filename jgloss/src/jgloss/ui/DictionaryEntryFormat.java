@@ -70,8 +70,8 @@ class DictionaryEntryFormat {
 
         out.addWordFormat( new MarkerListFormatter( group, word));
         out.addReadingFormat( new MarkerListFormatter( group, reading));
-        out.addTranslationFormat( new MarkerListFormatter( group, rom), 
-                                  new MarkerListFormatter( group, crm),
+        out.addTranslationFormat( new ListFormatter( rom), 
+                                  new ListFormatter( crm),
                                   new MarkerListFormatter( group, syn));
 
         addAttributeFormats( out);

@@ -90,7 +90,7 @@ public class JGlossApp extends JGloss {
                             ( new PreferencesPanel[] { GeneralDialog.getInstance(),
                                                        DocumentStyleDialog.getDocumentStyle(),
                                                        Dictionaries.getInstance(),
-                                                       ExclusionList.getInstance()));
+                                                       ExclusionList.getInstance() } );
                         if (!prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
                             WordLookup.getFrame();
                     }
