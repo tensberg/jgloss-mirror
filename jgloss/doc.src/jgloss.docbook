@@ -29,7 +29,7 @@
     <author>
       <firstname>Michael</firstname><surname>Koch</surname>
     </author>
-    <edition>0.9</edition>
+    <edition>1.0-pre</edition>
     <copyright><year>2001</year><holder>Michael Koch</holder></copyright>
     <pubdate>2001</pubdate>
     <publisher>
@@ -103,11 +103,11 @@
       <para>
         If you want to use the automatic annotation function, you will need some dictionaries.
         &JGloss; currently supports dictionaries in the 
-        <ulink url="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDict format</ulink>.
+        <ulink url="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDICT format</ulink>.
         You will also have to create the <filename>xjdx</filename> index files for the dictionaries.
         A tool for this does not come with &JGloss;, you can use the tool coming with 
         <application>XJDIC</application>, <application>GJiten</application> or some other package
-        supporting EDict.
+        supporting EDICT.
       </para>
     </sect1>
 
@@ -836,7 +836,7 @@
           In this dialog you can set the dictionaries which are used when importing a text
           or adding annotations to a document manually. Click the 
           <guibutton>Add dictionary file</guibutton> to add one or more new dictionaries to
-          the list. &JGloss; currently supports dictionaries in the EDict format. The directory
+          the list. &JGloss; currently supports dictionaries in the EDICT format. The directory
           must also contain the <filename>xjdx</filename> index file associated with the
           dictionary file (see <xref linkend="sect.whatyouneed">). Select a dictionary from
           the list and push <guibutton>Remove entry</guibutton> to remove it.
@@ -869,24 +869,25 @@
         <para>
           <ulink url="http://www.dgs.monash.edu.au/~jwb/Japanese.html">Jim Breen's Japanese Page</ulink>.
           Here you will find lots of interesting links, among them links to dictionaries
-          in EDict format.
+          in EDICT format.
         </para>
       </listitem>
       <listitem>
         <para>
-          The <ulink url="http://www.dgs.monash.edu.au/~jwb/wwwjdic.html">WWWJDIC</ulink>.
+          The <ulink url="http://www.dgs.monash.edu.au/~jwb/wwwjdic.html">WWWJDIC</ulink>, an online
+          dictionary with text parsing funtionality.
         </para>
       </listitem>
       <listitem>
         <para>
           The <ulink url="http://www.csse.monash.edu.au/~jwb/xjdic/"><application>XJDIC
-            </application></ulink> application.
+            </application></ulink> dictionary application.
         </para>
       </listitem>
       <listitem>
         <para>
           <ulink url="http://gjiten.sourceforge.net/"><application>GJiten</application></ulink>, a dictionary
-          program for Linux which uses EDict.
+          program for Linux which uses EDICT.
         </para>
       </listitem>
       <listitem>
