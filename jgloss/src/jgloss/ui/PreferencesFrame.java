@@ -105,6 +105,7 @@ public class PreferencesFrame {
         final Action apply = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     savePreferences();
+                    applyPreferences();
                 }
             };
         apply.setEnabled( true);
