@@ -57,7 +57,7 @@
       </para>
       <para>
         &JGloss; is written in Java. It should work on any computer with support
-        for the Java 2 Version 1.3 or 1.4 platform.
+        for the Java 2 Version 1.3/1.4 platform.
       </para>
     </sect1>
     <sect1><title>Credits</title>
@@ -861,10 +861,11 @@
         </para>
         <note>
           <para>
-            On Windows systems, an empty console window is visible while ChaSen is running, unless
+            If you use JRE 1.3 on Windows systems, an empty console window is visible while ChaSen
+            is running, unless
             JGloss is started from the command line. Under Windows 98/ME, the ChaSen program does not
             terminate automatically. You will have to close the ChaSen window manually after the text
-            is parsed.
+            is parsed. This does not happen with the JRE 1.4.
           </para>
         </note>
       </sect2>

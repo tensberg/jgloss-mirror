@@ -490,7 +490,7 @@ public class WordLookupPanel extends JPanel {
                         off = lcmatch.lastIndexOf( lcex, off-1);
                     }
 
-                    resultText.append( match);
+                    resultText.append( match.toString());
                     resultText.append( "<br>\n");
                 }
                 else {

@@ -1,5 +1,5 @@
-1.0.2: (2002/02/15)
-	- Annotation editor now remembers its width.
+1.0.2: (2002/02/17)
+	- Annotation editor now remembers it's width.
 	- Fixes for JDK 1.4 incompatibilities.
 	- Fixed all tree nodes are editable bug.
 1.0.1: (2002/01/22)

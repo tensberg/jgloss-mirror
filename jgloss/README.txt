@@ -1,4 +1,4 @@
-JGloss 1.0.1
+JGloss 1.0.2
 ------------
 
 JGloss homepage: http://jgloss.sourceforge.net/
@@ -8,7 +8,7 @@ words in a Japanese text document. This can be done automatically and manually.
 The document can be exported as plain text with annotations, HTML or LaTeX.
 
 JGloss is written in Java. It should work on any computer with support for
-the Java 2 Version 1.3 platform. It is distributed under the terms of the
+the Java 2 Version 1.3/1.4 platform. It is distributed under the terms of the
 GNU General Public License.
 
 If this is the binary release, you can find the documentation in the folder
@@ -18,14 +18,17 @@ executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
 Known problems:
-  - On Windows 98/ME the ChaSen window does not close automatically
-    after a document is imported. You will have to close it by hand.
-  - When using JGloss with KDE, the word annotation dialog will sometimes
-    be resized to a minimum when it is opened. Also, Java locks up if
+  - When the ChaSen parser with JRE 1.3 on Windows 98/ME/XP, a window pops
+    up while ChaSen runs. This does not happen with JRE 1.4.
+  - On Windows 98/ME when using JRE 1.3 the ChaSen window does not close 
+    automatically after a document is imported. You will have to close it by hand.
+    Use JRE 1.4 instead.
+  - When using JGloss with JRE 1.3 and KDE, the word annotation dialog will
+    sometimes be resized to a minimum when it is opened. Also, Java locks up if
     the preference window is opened after a document is loaded and when
     the print dialog opens. This seems to be a problem in the interaction 
     between the interaction of Java and the KDE window manager which I don't 
-    know how to fix.
+    know how to fix. Use JRE 1.4 instead.
   - On Linux force-quitting JGloss by typing Control-C or using kill -HUP
     sometimes doesn't work.
   - The custom user interface font chosen in the style dialog is applied
