@@ -88,7 +88,7 @@ public class SKKDictionary implements Dictionary {
                             int i = l.indexOf( ' ');
                             // An entry in EDICT has the form
                             // word [reading] /translation1/translation2/.../
-                            // , where the reading is optional.
+                            // ([reading] is optional).
                             // An entry in the SKK dictionary has the form
                             // reading /word1/word2/.../
                             // To distinguish between the two formats I test if the
