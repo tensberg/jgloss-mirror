@@ -30,7 +30,9 @@ import java.util.*;
 
 /**
  * Dictionary implementation for dictionaries in EDICT format with
- * associated xjdx index.
+ * associated xjdx or jjdx index. For a documentation of the format see
+ * <a href="http://www.csse.monash.edu.au/~jwb/edict_doc.html">
+ * http://www.csse.monash.edu.au/~jwb/edict_doc.html</a>.
  *
  * @author Michael Koch
  */
@@ -53,27 +55,75 @@ public class EDict implements Dictionary {
     /**
      * Path to the dictionary file.
      */
-    private String dicfile;
+    protected String dicfile;
     /**
      * Name of the dictionary. This will be the filename of the dictionary file.
      */
-    private String name;
+    protected String name;
     /**
      * Array containing the content of the dictionary file.
      */
-    private byte[] dictionary;
+    protected byte[] dictionary;
     /**
-     * Array containing the content of the xjdx file associated with the dictionary file.
+     * Array containing the content of the xjdx/jjdx file associated with the dictionary file.
      */
-    private int[] index;
+    protected int[] index;
     /**
-     * Flag if index is in XJDX format;
+     * Flag if index is in XJDX or JJDX format.
      */
-    private boolean xjdxIndex;
+    protected boolean xjdxIndex;
+
+    /**
+     * Object describing this implementation of the <CODE>Dictionary</CODE> interface. The
+     * Object can be used to register this class with the <CODE>DictionaryFactory</CODE>, or
+     * test if a descriptor matches this class.
+     *
+     * @see DictionaryFactory
+     */
+    public final static DictionaryFactory.Implementation implementation = 
+        new DictionaryFactory.Implementation() {
+                public float isInstance( String descriptor) {
+                    try {
+                        BufferedReader r = new BufferedReader( new InputStreamReader( new FileInputStream
+                            ( descriptor), "EUC-JP"));
+                        String l;
+                        int lines = 0;
+                        do {
+                            l = r.readLine();
+                            lines++;
+                            // skip empty lines and comments
+                        } while (l!=null && (l.length()==0 || l.charAt( 0)<128) && lines<100);
+                        r.close();
+                        if (l!=null && lines<100) {
+                            int i = l.indexOf( ' ');
+                            // An entry in EDICT has the form
+                            // word [reading] /translation1/translation2/.../
+                            // , where the reading is optional.
+                            // An entry in the SKK dictionary has the form
+                            // reading /word1/word2/.../
+                            // To distinguish between the two formats I test if the
+                            // first character after the '/' is ISO-8859-1 or not.
+                            if (i!=-1 && i<l.length()-2 && 
+                                (l.charAt( i+1)=='[' ||
+                                 l.charAt( i+1)=='/' && l.charAt( i+2)<256))
+                                return getMaxConfidence();
+                        }
+                    } catch (Exception ex) {}
+                    return ZERO_CONFIDENCE;
+                }
+                
+                public float getMaxConfidence() { return 1.0f; }
+                
+                public Dictionary createInstance( String descriptor) throws IOException {
+                    return new EDict( descriptor, true);
+                }
+
+                public String getName() { return "EDICT"; }
+            };
 
     /**
      * Creates a new dictionary from a dictionary file in EDICT format and the associated
-     * xjdx index file.
+     * xjdx or jjdx index file.
      *
      * @param dicfile Path to a file in EDICT format.
      * @param createindex Flag if the index should be automatically created and written to disk
@@ -88,7 +138,7 @@ public class EDict implements Dictionary {
 
         File f = new File( dicfile);
         name = f.getName();
-        System.err.println( JGloss.messages.getString( "edict.load",
+        System.err.println( JGloss.messages.getString( "dictionary.load",
                                                        new String[] { name }));
         dictionary = new byte[(int) f.length()];
         InputStream is = new BufferedInputStream( new FileInputStream( f));
@@ -117,9 +167,7 @@ public class EDict implements Dictionary {
             buildIndex();
             try {
                 jindex.createNewFile();
-                if (jindex.canWrite()) {
-                    saveJJDX( jindex);
-                }
+                saveJJDX( jindex);
             } catch (IOException ex) {
                 System.err.println( JGloss.messages.getString
                                     ( "edict.error.writejjdx",
@@ -148,6 +196,7 @@ public class EDict implements Dictionary {
         // do a binary search through the index file
         try {
             byte[] expr_euc = expression.getBytes( "EUC-JP");
+            List translationlist = new ArrayList( 10);
 
             // do a binary search
             int from = 0;
@@ -234,7 +283,7 @@ public class EDict implements Dictionary {
                                 reading = entry.substring( i+1, j);
                         } // else: no reading
                         // translations
-                        List translationlist = new ArrayList( 10);
+                        translationlist.clear();
                         i = entry.indexOf( '/', i);
                         if (i == -1) {
                             System.err.println( "WARNING: " + dicfile +
@@ -321,7 +370,7 @@ public class EDict implements Dictionary {
     /**
      * Loads an XJDX-format index for the dictionary. 
      */
-    private void loadXJDX( File indexfile) throws IOException {
+    protected void loadXJDX( File indexfile) throws IOException {
         /* The xjdx files are created by a platform-dependent C program. They
            consist of an array of unsigned longs with indexes into the EDICT file.
            On an ix86 box, the format of an array element is 4-byte
@@ -364,7 +413,7 @@ public class EDict implements Dictionary {
      *
      * @param indexfile The file which contains the index.
      */
-    private void loadJJDX( File indexfile) throws IOException {
+    protected void loadJJDX( File indexfile) throws IOException {
         // JJDX consists of 4 byte long signed integers, with most significant byte first.
         // The first integer is the version of the index format.
         // The second integer is the offset in bytes from the start of the file
@@ -484,7 +533,7 @@ public class EDict implements Dictionary {
      * @param b The character to test.
      * @param return <CODE>true</CODE>, if the character is alphanumeric or EUC.
      */
-    private final static boolean alphaoreuc( byte b) {
+    protected final static boolean alphaoreuc( byte b) {
         int c = byteToUnsignedByte( b);
 
         if (c>=65 && c<= 90 || c>=97 && c<=122)
@@ -512,8 +561,8 @@ public class EDict implements Dictionary {
      * @param backwardsCompatible Flag if the comparison should be backwards compatible to
      *        an index generated by xjdxgen from xjdic 2.3.
      */
-    private final int Kstrcmp( byte[] str1, int off1, int len1, 
-                         byte[] str2, int off2, int len2, boolean backwardsCompatible) {
+    protected final int Kstrcmp( byte[] str1, int off1, int len1, 
+                                 byte[] str2, int off2, int len2, boolean backwardsCompatible) {
         int c1 = 0, c2 = 0;
 
         int len = Math.min( len1, len2);
@@ -586,7 +635,7 @@ public class EDict implements Dictionary {
      * @param backwardsCompatible Flag if the comparison should be backwards compatible to
      *        an index generated by xjdxgen from xjdic 2.3.
      */
-    private final int Kstrcmp( int i1, int i2, boolean backwardsCompatible) {
+    protected final int Kstrcmp( int i1, int i2, boolean backwardsCompatible) {
         int c1 = 0, c2 = 0;
 
         boolean endc1 = false;
@@ -692,12 +741,20 @@ public class EDict implements Dictionary {
     }
 
     /**
-     * Returns a string representation of this dictionary. This will be the name of is.
+     * Returns a string representation of this dictionary.
      *
      * @return A string representation of this dictionary.
      */
     public String toString() {
-        return name;
+        return "EDICT " + name;
+    }
+
+    public void dispose() {
+        // Free the arrays for garbage collection. This is not really needed
+        // because the method should be called just before the object is destroyed, but
+        // what the hell...
+        dictionary = null;
+        index = null;
     }
 
     /**
@@ -707,7 +764,7 @@ public class EDict implements Dictionary {
      * @param b The byte value to convert.
      * @return The unsigned byte value of b.
      */
-    private final static int byteToUnsignedByte( byte b) {
+    protected final static int byteToUnsignedByte( byte b) {
         return b & 0xff;
     }
 } // class EDict
