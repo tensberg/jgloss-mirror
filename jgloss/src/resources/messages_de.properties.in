@@ -53,6 +53,24 @@ error.save.title=Fehler beim Speichern
 error.save.exception=Beim Speichern von {0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1} ({2}).
 error.save.unknownannotation=Lasse unbekannten Annotationstyp {0} aus
 
+warning.load.title=Warnung
+warning.load.version.larger.major=\
+Die geöffnete Datei wurde von JGloss {0}.{1} erzeugt. Das Dateiformat\n\
+hat sich geändert und die Datei wird mit dieser Version von JGloss\n\
+nicht richtig funktionieren. Sie finden Informationen über die\n\
+neue Version bei http://jgloss.sourceforge.net.
+warning.load.version.larger.minor=\
+Die geöffnete Datei wurde von JGloss {0}.{1} erzeugt. Das Dateiformat\n\
+hat sich geändert und nicht alle Informationen aus der Datei werden\n\
+in dieser Version von JGloss benutzt. Sie finden Informationen über die\n\
+neue Version bei http://jgloss.sourceforge.net.
+warning.load.version.smaller=\
+Die geöffnete Datei wurde von einer früheren Version von JGloss\n\
+erzeugt. Das Dateiformat hat sich seit dieser Version geändert\n\
+und die Information in dieser Datei wurde in das neue Format\n\
+konvertiert. Beim Speichern wird das neue Format benutzt.
+warning.load.notjgloss=Die geöffnete Datei scheint keine\nJGloss-Datei zu sein.
+
 button.ok=OK
 button.cancel=Abbrechen
 button.apply=Anwenden

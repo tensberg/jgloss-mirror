@@ -54,6 +54,24 @@ error.save.title=Error while saving file
 error.save.exception=An error occurred while saving {0}.\nThe Java exception was {1}, {2}.
 error.save.unknownannotation=Skipping unknown annotation type {0}
 
+warning.load.title=Warning
+warning.load.version.larger.major=\
+The opened file was created by JGloss {0}.{1}. The file format\n\
+has changed and the file will not work properly with this\n\
+version of JGloss. You can find information about the\n\
+new version at http://jgloss.sourceforge.net/.
+warning.load.version.larger.minor=\
+The opened file was created by JGloss {0}.{1}. The file format\n\
+has changed and not all information of the file will be used in this\n\
+version of JGloss. You can find information about the\n\
+new version at http://jgloss.sourceforge.net/.
+warning.load.version.smaller=\
+The opened file was created by an earlier version of JGloss.\n\
+The file format has changed since the last release and the\n\
+information in the file has been converted to the new format.\n\
+The new file format will be used when the file is saved.
+warning.load.notjgloss=The opened file does not seem to be a JGloss file.
+
 button.ok=OK
 button.cancel=Cancel
 button.apply=Apply

@@ -175,7 +175,8 @@ public abstract class TextAnnotationCodec {
         String classname = ta.getClass().getName();
         // change classname for backwards compatibility with V0.9
         if (ta instanceof Reading)
-            classname += "_1.0";
+            classname += "_" + JGlossWriter.FORMAT_MAJOR_VERSION + "." + 
+                JGlossWriter.FORMAT_MINOR_VERSION;
         String code = classname + FIELD_SEPARATOR 
             + ta.getStart() + FIELD_SEPARATOR + ta.getLength() + FIELD_SEPARATOR;
 
@@ -281,7 +282,10 @@ public abstract class TextAnnotationCodec {
                                         }
                                     }, null);
         }
-        else if (c.equals( Reading.class.getName()+"_1.0") || c.equals( Translation.class.getName())) {
+        else if (c.equals( Reading.class.getName()+
+                           "_" + JGlossWriter.FORMAT_MAJOR_VERSION + "." + 
+                           JGlossWriter.FORMAT_MINOR_VERSION) || 
+                 c.equals( Translation.class.getName())) {
             j = code.indexOf( FIELD_SEPARATOR, i);
             final String word = code.substring( i, j);
             i = j + 1;

@@ -86,6 +86,21 @@ public class JGlossDocument extends HTMLDocument {
      * Flag if the reader should add annotations when constructing a document.
      */
     private boolean addAnnotations;
+    /**
+     * Version of the creator of the parsed document, as seen in the meta generator tag.
+     * <code>-1</code> if unknown.
+     */
+    private int jglossVersion;
+    /**
+     * Major version of the jgloss file format, as seen in the meta generator tag.
+     * <code>-1</code> if unknown.
+     */
+    private int fileFormatMajorVersion;
+    /**
+     * Minor version of the jgloss file format, as seen in the meta generator tag.
+     * <code>-1</code> if unknown.
+     */
+    private int fileFormatMinorVersion;
 
     /**
      * Stores a newline character as a char array. Used by the <CODE>JGlossReader</CODE>.
@@ -361,7 +376,7 @@ public class JGlossDocument extends HTMLDocument {
          * @param a Attributes of the tag.
          * @param pos Position in the document.
          */
-        public void handleStartTag( HTML.Tag t, MutableAttributeSet a, int pos) {           
+        public void handleStartTag( HTML.Tag t, MutableAttributeSet a, int pos) {
             // In a JGloss document the annotation attribute will be encoded as a
             // string. Decode it here.
             if (a.isDefined( TEXT_ANNOTATION) && 
@@ -391,6 +406,24 @@ public class JGlossDocument extends HTMLDocument {
         }
 
         /**
+         * Handle the meta "generator" tag, which sets the file version.
+         */
+        public void handleSimpleTag( HTML.Tag t, MutableAttributeSet a, int pos) {
+            if (t.equals( HTML.Tag.META) &&
+                a.containsAttribute( HTML.Attribute.NAME, "generator")) {
+                Integer[] version = JGlossWriter.parseFileVersionString
+                    ( (String) a.getAttribute( HTML.Attribute.CONTENT));
+                if (version != null) {
+                    jglossVersion = version[0].intValue();
+                    fileFormatMajorVersion = version[1].intValue();
+                    fileFormatMinorVersion = version[2].intValue();
+                }
+            }
+
+            super.handleSimpleTag( t, a, pos);
+        }
+
+        /**
          * Handles an error in paring the document. This will print the error to
          * <CODE>System.err</CODE>.
          *
@@ -398,7 +431,7 @@ public class JGlossDocument extends HTMLDocument {
          * @param pos Position at which the error occured.
          */
         public void handleError( String errorMsg, int pos) {
-            //System.err.println( errorMsg + " at " + pos);
+            System.err.println( errorMsg + " at " + pos);
         }
 
         /**
@@ -444,6 +477,10 @@ public class JGlossDocument extends HTMLDocument {
         setParser( htmlparser);
         this.parser = parser;
         this.addAnnotations = addAnnotations;
+
+        jglossVersion = -1;
+        fileFormatMinorVersion = -1;
+        fileFormatMajorVersion = -1;
     }
 
     /**
@@ -588,6 +625,12 @@ public class JGlossDocument extends HTMLDocument {
                 ex.printStackTrace();
             }
             attr.removeAttribute( LINKED_ANNOTATION);
+
+            // Set file version. LINKED_ANNOTATION attributes were only used in JGloss 0.9 and
+            // 0.9.1, which had no file versioning mechanism.
+            jglossVersion = 91;
+            fileFormatMajorVersion = 1;
+            fileFormatMinorVersion = 0;
         }
 
         writeUnlock();
@@ -611,5 +654,34 @@ public class JGlossDocument extends HTMLDocument {
 
         fireChangedUpdate( new DefaultDocumentEvent
             ( 0, 0, javax.swing.event.DocumentEvent.EventType.CHANGE));
+    }
+
+    /**
+     * Returns the version of JGloss which created the parsed document. This is initialized from
+     * the meta "generator" tag in the document. If there was no generator tag in the parsed
+     * document, <code>-1</code> will be returned.
+     */
+    public int getJGlossVersion() {
+        return jglossVersion;
+    }
+
+    /**
+     * Returns the major version number of the JGloss file format of the parsed document. 
+     * This is initialized from
+     * the meta "generator" tag in the document. If there was no generator tag in the parsed
+     * document, <code>-1</code> will be returned.
+     */
+    public int getFileFormatMajorVersion() {
+        return fileFormatMajorVersion;
+    }
+
+    /**
+     * Returns the minor version number of the JGloss file format of the parsed document. 
+     * This is initialized from
+     * the meta "generator" tag in the document. If there was no generator tag in the parsed
+     * document, <code>-1</code> will be returned.
+     */
+    public int getFileFormatMinorVersion() {
+        return fileFormatMinorVersion;
     }
 } // class JGlossDocument

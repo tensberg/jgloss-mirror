@@ -446,11 +446,12 @@ public class WordLookup extends JFrame {
             
         if (result.length() == 0) {
             result.append( JGloss.messages.getString( "wordlookup.nomatches",
-                                                      new String[] { ex }));
+                                                      new Object[] { expression.getSelectedItem() }));
         }
         else
             result.insert( 0, JGloss.messages.getString( "wordlookup.matchesfor",
-                                                         new String[] { ex }) + "<br>\n");
+                                                         new Object[] { expression.getSelectedItem() })
+                           + "<br>\n");
 
         result.insert( 0, "<html><head></head><body>");
         result.append( "</body></html>");

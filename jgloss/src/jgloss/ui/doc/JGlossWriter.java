@@ -41,6 +41,24 @@ import javax.swing.text.html.*;
  */
 public class JGlossWriter extends HTMLWriter {
     /**
+     * Current version of JGloss. Will be written to the generator meta-tag
+     * of the generated file.
+     */
+    public static int JGLOSS_VERSION = 92;
+    
+    /**
+     * Major version of the JGloss file format. The major version is changed if a
+     * new file format revision has changes incompatible to previous versions.
+     */
+    public static int FORMAT_MAJOR_VERSION = 1;
+    /**
+     * Minor version of the JGloss file format. The minor version is changed if a new
+     * file format revision is changed in a way that it still is compatible to earlier
+     * formats.
+     */
+    public static int FORMAT_MINOR_VERSION = 1;
+
+    /**
      * Document which will be written.
      */
     protected JGlossDocument doc;
@@ -56,6 +74,13 @@ public class JGlossWriter extends HTMLWriter {
     protected boolean skipLineSeparator;
     
     /**
+     * Flag if the generator meta tag already exists in the document. If not, it will be
+     * generated when the document is written. The generator will contain the version of
+     * JGloss and of the JGloss file format.
+     */
+    protected boolean generatorTagExists;
+
+    /**
      * Creates a new writer for a JGloss document which outputs to the given writer.
      * The writer must support the full charset of the characters used in the document.
      *
@@ -67,6 +92,34 @@ public class JGlossWriter extends HTMLWriter {
         super( out, doc);
         this.encoding = encoding;
         this.doc = doc;
+
+        generatorTagExists = false;
+        // search for existing meta tag
+        Element e = doc.getDefaultRootElement();
+        // search the "body" element
+        int i = 0;
+        while (i < e.getElementCount()) {
+            Element ec = e.getElement( i);
+            if (ec.getName().equalsIgnoreCase( HTML.Tag.HEAD.toString()) || 
+                ec.getName().equalsIgnoreCase( HTML.Tag.IMPLIED.toString())) {
+                // poor man's recursion
+                e = ec;
+                i = 0;
+                continue;
+            }
+            else if (ec.getAttributes().containsAttribute
+                     ( StyleConstants.NameAttribute, HTML.Tag.META)) {
+                AttributeSet attr = ec.getAttributes();
+                if (attr.containsAttribute( HTML.Attribute.NAME, "generator")) {
+                    doc.setAttribute( (MutableAttributeSet) attr, HTML.Attribute.CONTENT,
+                                      getFileVersionString());
+                    generatorTagExists = true;
+                    break;
+                }
+            }
+
+            i++;
+        }
     }
 
     /**
@@ -115,10 +168,8 @@ public class JGlossWriter extends HTMLWriter {
      * @exception java.io.IOException if an error occurs during writing.
      */
     protected void writeAttributes( AttributeSet attr) throws IOException {
-        if (attr.isDefined( StyleConstants.NameAttribute) &&
-            attr.getAttribute( StyleConstants.NameAttribute).equals( HTML.Tag.META)) {
-            if (attr.isDefined( HTML.Attribute.HTTPEQUIV) &&
-                attr.getAttribute( HTML.Attribute.HTTPEQUIV).equals( "content-type")) {
+        if (attr.containsAttribute( StyleConstants.NameAttribute, HTML.Tag.META)) {
+            if (attr.containsAttribute( HTML.Attribute.HTTPEQUIV, "content-type")) {
                 // META-Tag, replace the charset with the one of the writer
                 doc.setAttribute( (MutableAttributeSet) attr, HTML.Attribute.CONTENT, 
                                   "text/html; charset=" + getCharacterEncoding());
@@ -165,10 +216,18 @@ public class JGlossWriter extends HTMLWriter {
      * for annotation elements.
      */
     protected void endTag( Element elem) throws IOException {
+        if (elem.getName().equals( HTML.Tag.HEAD.toString()) && !generatorTagExists) {
+            String generator = "<meta name=\"generator\" content=\"" + getFileVersionString() +
+                "\">\n";
+            nonEscapedOutput( generator.toCharArray(), 0, generator.length());
+        }
+
         if (elem.getAttributes()
             .getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.ANNOTATION))
             skipLineSeparator = true;
+
         super.endTag( elem);
+
         skipLineSeparator = false;
     }
 
@@ -208,5 +267,65 @@ public class JGlossWriter extends HTMLWriter {
     protected void writeLineSeparator() throws IOException {
         if (!skipLineSeparator)
             super.writeLineSeparator();
+    }
+
+    /**
+     * Returns the file format version string. This string will be embedded in a generator
+     * meta tag in the written JGloss document.
+     *
+     * @return The file format string, containing the current JGloss version and the version of
+     *         the JGloss file format.
+     */
+    public static String getFileVersionString() {
+        return "JGloss " + (JGLOSS_VERSION/100) + "." + (JGLOSS_VERSION%100) + 
+            "; file format version " +
+            FORMAT_MAJOR_VERSION + "." + FORMAT_MINOR_VERSION;
+    }
+
+    /**
+     * Parse the file version generated by {@link #getFileVersionString getFileVersionString}.
+     *
+     * @param version The version string.
+     * @return Array of three <CODE>Integers</CODE>: JGloss version (*100), file format major version
+     *         and file format minor version; or <CODE>null</CODE> if the version string could not be
+     *         parsed.
+     */
+    public static Integer[] parseFileVersionString( String version) {
+        Integer[] out = new Integer[3];
+
+        int i = version.indexOf( ';');
+        // get the JGloss version
+        if (i==-1 || i==version.length()-1)
+            return null;
+        String v = version.substring( 0, i).trim();
+        int j = v.lastIndexOf( ' ');
+        if (j == -1)
+            return null;
+        try {
+            out[0] = new Integer( (int) (Double.parseDouble( v.substring( j+1))*100));
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+
+        // get the file format version
+        j = version.indexOf( ';', i+1); // currently not used, but might be introduced in later versions
+        if (j == -1)
+            j = version.length();
+        v = version.substring( i+1, j).trim();
+        j = v.lastIndexOf( ' ');
+        if (j == -1)
+            return null;
+        v = v.substring( j+1);
+        j = v.indexOf( '.');
+        if (j == -1)
+            return null;
+        try {
+            out[1] = new Integer( v.substring( 0, j)); // major version
+            out[2] = new Integer( v.substring( j+1)); // minor version
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+
+        return out;
     }
 } // class JGlossWriter

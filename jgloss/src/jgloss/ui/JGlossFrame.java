@@ -812,6 +812,41 @@ public class JGlossFrame extends JFrame implements ActionListener {
             loadDocument( in, documentPath, f.getName(), 
                           new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()), false,
                           CharacterEncodingDetector.guessLength( (int) f.length(), "UTF-8"));
+
+            // test the file version of the loaded document
+            String formatWarning = null;
+            if (doc.getJGlossVersion() != -1) {
+                if (doc.getFileFormatMajorVersion() > JGlossWriter.FORMAT_MAJOR_VERSION)
+                    formatWarning = JGloss.messages.getString
+                        ( "warning.load.version.larger.major",
+                          new Object[] { new Integer( doc.getJGlossVersion()/100),
+                                         new Integer( doc.getJGlossVersion()%100) });
+                else if (doc.getFileFormatMajorVersion() == JGlossWriter.FORMAT_MAJOR_VERSION &&
+                         doc.getFileFormatMinorVersion() > JGlossWriter.FORMAT_MINOR_VERSION)
+                    formatWarning = JGloss.messages.getString
+                        ( "warning.load.version.larger.minor",
+                          new Object[] { new Integer( doc.getJGlossVersion()/100),
+                                         new Integer( doc.getJGlossVersion()%100) });
+                else if (doc.getFileFormatMajorVersion() < JGlossWriter.FORMAT_MAJOR_VERSION ||
+                         doc.getFileFormatMajorVersion() == JGlossWriter.FORMAT_MAJOR_VERSION &&
+                         doc.getFileFormatMinorVersion() < JGlossWriter.FORMAT_MINOR_VERSION)
+                    formatWarning = JGloss.messages.getString
+                        ( "warning.load.version.smaller");
+                // else format == current format
+            }
+            else
+                formatWarning = JGloss.messages.getString( "warning.load.notjgloss");
+
+            if (formatWarning != null) {
+                JOptionPane.showConfirmDialog
+                    ( this, formatWarning,
+                      JGloss.messages.getString( "warning.load.title"),
+                      JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+                // force a save as since the document format has changed
+                documentPath = null;
+                documentChanged = true;
+                saveAction.setEnabled( true); // will behave like save as
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
@@ -826,7 +861,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
     /**
      * Loads a document into this JGlossFrame. This will completely set up the frame for editing.
      * This can be used to either open a JGloss document or to import some Japanese text, depending
-     * of the setting of <CODE>addAnnotations</CODE>.
+     * of the setting of <CODE>addAnnotations</CODE>. The document must be in JGloss or HTML format.
      *
      * @param in The reader from which to load the document.
      * @param path The location of the document which was used to create the reader.

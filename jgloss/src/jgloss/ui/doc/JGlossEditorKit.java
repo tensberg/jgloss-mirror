@@ -185,7 +185,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
             long t = System.currentTimeMillis();
             super.parse( r, cb, true);
             if (parser != null) {
-                if (parser.getLookups() > 100) {
+                if (parser.getLookups() > 200) {
                     // print some statistics 
                     System.out.println( "time: " + (System.currentTimeMillis()-t)/1000f);
                     System.out.println( "dictionary lookups: " + parser.getLookups());
@@ -614,6 +614,16 @@ public class JGlossEditorKit extends HTMLEditorKit {
             // in the source, and there is no way for other program to inquire it,
             // so I put it in the preferences to make it easily changeable.
             dtd = DTD.getDTD( JGloss.prefs.getString( Preferences.DTD_DEFAULT));
+
+            // there seems to be a bug in the parser where the REQUIRED content attribute is
+            // not recognized even if is there. This only leads to a call of handleError and
+            // otherwise has no effect, but I remove the REQUIRED modifier anyway
+            AttributeList al = dtd.getElement( "meta").getAttributes();
+            while (al != null) {
+                if (al.getName().equals( "content"))
+                    al.modifier = 0;
+                al = al.getNext();
+            }
             
             // add custom elements
             // #pcdata*
@@ -630,8 +640,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
                                    DTD.MODEL, false, false, pcdata, null, null, null);
             
-            AttributeList al = new AttributeList( JGlossDocument.HIDDEN_ATTRIBUTE, DTD.CDATA, 
-                                                  0, null, null, null);
+            al = new AttributeList( JGlossDocument.HIDDEN_ATTRIBUTE, DTD.CDATA, 
+                                    0, null, null, null);
             // LINKED_ANNOTATION is only kept for compatibility with JGloss 0.9.1 documents
             al = new AttributeList( JGlossDocument.LINKED_ANNOTATION, DTD.CDATA, 0, null, null, al);
             al = new AttributeList( JGlossDocument.DICTIONARY_WORD, DTD.CDATA, 0, null, null, al);
