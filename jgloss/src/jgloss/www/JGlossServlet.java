@@ -27,6 +27,7 @@ import jgloss.dictionary.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.zip.*;
 import java.net.*;
 import java.text.MessageFormat;
 
@@ -84,6 +85,10 @@ public class JGlossServlet extends HttpServlet {
      * Initialization parameter name.
      */
     public final static String RESPONSE_BUFFER_SIZE = "response-buffer-size";
+    /**
+     * Initialization parameter name.
+     */
+    public final static String ENABLE_COMPRESSION = "enable_compression";
 
     /**
      * CGI parameter name.
@@ -121,9 +126,9 @@ public class JGlossServlet extends HttpServlet {
      */
     private String[] rewrittenContentTypes;
     /**
-     * Set of request and response header keys which will be forwarded.
+     * Set of request and response header keys which will not be forwarded.
      */
-    private Set forwardedHeaders;
+    private Set noForwardHeaders;
 
     /**
      * Flag if cookie forwarding should be enabled globally. If enabled, it can still
@@ -150,6 +155,10 @@ public class JGlossServlet extends HttpServlet {
      * the default size.
      */
     private int responseBufferSize;
+    /**
+     * Flag if compression content encodings should be enabled.
+     */
+    private boolean enableCompression;
 
     public JGlossServlet() {}
 
@@ -240,25 +249,37 @@ public class JGlossServlet extends HttpServlet {
             p = "none";
         getServletContext().log( "secure allowed protocols: " + p);
 
-        // Set of all headers which are forwarded in forwardRequestHeaders or
-        // forwardResponseHeaders.
-        /*forwardedHeaders = new HashSet( 30);
-        forwardedHeaders.put( "cache-control");
-        forwardedHeaders.put( "date");
-        forwardedHeaders.put( "pragma");
-        forwardedHeaders.put( "warning");
-        forwardedHeaders.put( "accept");
-        forwardedHeaders.put( "accept-charset");
-        forwardedHeaders.put( "accept-language");
-        forwardedHeaders.put( "accept-encoding");
-        forwardedHeaders.put( "expect");
-        forwardedHeaders.put( "if-match");
-        forwardedHeaders.put( "if-modified-since");
-        forwardedHeaders.put( "if-none-match");
-        forwardedHeaders.put( "if-unmodified-since");
-        forwardedHeaders.put( "");
-        forwardedHeaders.put( "");*/
-        
+        // Set of all headers which are not forwarded in forwardRequestHeaders or
+        // forwardResponseHeaders. All unknown headers must be forwarded as per rfc2616.
+        noForwardHeaders = new HashSet( 20);
+        // general header fields
+        noForwardHeaders.add( "connection"); // the content of this field is currently not handled
+        noForwardHeaders.add( "upgrade");
+        noForwardHeaders.add( "via");
+        noForwardHeaders.add( "transfer-encoding");
+        // request header fields
+        // range and if-range are not supported because rewriting changes the size of
+        // files by an undetermined amount.
+        noForwardHeaders.add( "range");
+        noForwardHeaders.add( "if-range");
+        noForwardHeaders.add( "accept-encoding");
+        noForwardHeaders.add( "authorization");
+        noForwardHeaders.add( "referer"); // the referer header is treated specially
+        // response header fields
+        noForwardHeaders.add( "accept-ranges");
+        // entity header fields
+        noForwardHeaders.add( "content-encoding");
+        noForwardHeaders.add( "content-length");
+        noForwardHeaders.add( "content-md5");
+        noForwardHeaders.add( "content-type");
+
+        // headers not in rfc1616
+        noForwardHeaders.add( "set-cookie");
+        noForwardHeaders.add( "set-cookie2");
+        noForwardHeaders.add( "cookie");
+        noForwardHeaders.add( "cookie2");
+        noForwardHeaders.add( "keep-alive");
+
         // read supported types
         rewrittenContentTypes = new String[0];
         p = config.getInitParameter( REWRITTEN_TYPES);
@@ -302,6 +323,9 @@ public class JGlossServlet extends HttpServlet {
             responseBufferSize = -1;
             getServletContext().log( "response buffer size not set, using default size");
         }
+
+        enableCompression = "true".equals( config.getInitParameter( ENABLE_COMPRESSION));
+        getServletContext().log( "content compression " + (enableCompression ? "enabled" : "disabled"));
     }
 
     public void destroy() {
@@ -442,6 +466,8 @@ public class JGlossServlet extends HttpServlet {
         // detect cycles in redirection
         Set redirects = new HashSet( 50);
         redirects.add( url);
+        String acceptEncoding = buildAcceptEncoding( req.getHeader( "accept-encoding"));
+        getServletContext().log( "accept-encoding: " + acceptEncoding);
         do {
             JGlossURLRewriter rewriter = new JGlossURLRewriter
                 ( req.getContextPath() + req.getServletPath(),
@@ -449,7 +475,9 @@ public class JGlossServlet extends HttpServlet {
                   allowCookieForwarding, allowFormDataForwarding);
 
             URLConnection connection = url.openConnection();
-            
+            if (acceptEncoding != null)
+                connection.setRequestProperty( "accept-encoding", acceptEncoding);
+
             if (forwardFormData && post && connection instanceof HttpURLConnection) {
                 ((HttpURLConnection) connection).setRequestMethod( "POST");
                 connection.setDoInput( true);
@@ -493,8 +521,9 @@ public class JGlossServlet extends HttpServlet {
             
             // test redirect directive
             followingRedirect = false;
+            int response = 0;
             if (connection instanceof HttpURLConnection) {
-                int response = ((HttpURLConnection) connection).getResponseCode();
+                response = ((HttpURLConnection) connection).getResponseCode();
                 getServletContext().log( "response code " + response);
                 if ((response==301 || response==302 || response==307) && !post ||
                     response==303) {
@@ -524,9 +553,6 @@ public class JGlossServlet extends HttpServlet {
                         getServletContext().log( "malformed url " + location + "/" + ex.getMessage());
                     }
                 }
-                
-                if (!followingRedirect)
-                    resp.setStatus( response);
             }
 
             if (forwardCookies) {
@@ -546,9 +572,20 @@ public class JGlossServlet extends HttpServlet {
                     cookies = (Cookie[]) newCookies.values().toArray( cookies);
                 }
             }
-            forwardResponseHeaders( connection, req, resp);
             
             if (!followingRedirect) {
+                forwardResponseHeaders( connection, req, resp);
+
+                if (response != 0)
+                    resp.setStatus( response);
+                if (response == 304) // 304 Not Modified/empty response
+                    return;
+
+                String encoding = connection.getContentEncoding();
+                getServletContext().log( "Content-Encoding: " + encoding);
+                if (encoding != null)
+                    resp.setHeader( "Content-Encoding", encoding);
+
                 String type = connection.getContentType();
                 boolean supported = false;
                 if (type != null) {
@@ -560,6 +597,15 @@ public class JGlossServlet extends HttpServlet {
                 }   
                 getServletContext().log( "content type " + type + " url " +
                                          connection.getURL().toString());
+                if (supported) {
+                    // If the content encoding cannot be decoded by the servlet,
+                    // the content is tunneled to the browser.
+                    // Multiple encodings are currently not supported and may lead to wrong
+                    // behavior.
+                    supported = encoding==null || encoding.endsWith( "gzip") || 
+                        encoding.endsWith( "deflate") || encoding.equals( "identity");
+                }
+
                 if (supported)
                     rewrite( connection, req, resp, rewriter);
                 else
@@ -576,6 +622,7 @@ public class JGlossServlet extends HttpServlet {
             resp.setContentType( connection.getContentType());
         if (connection.getContentLength() > 0)
             resp.setContentLength( connection.getContentLength());
+
         InputStream in = connection.getInputStream();
         OutputStream out = resp.getOutputStream();
         try {
@@ -593,13 +640,38 @@ public class JGlossServlet extends HttpServlet {
     protected void rewrite( URLConnection connection, HttpServletRequest req, HttpServletResponse resp,
                             URLRewriter rewriter) 
         throws ServletException, IOException {
-        InputStreamReader in = CharacterEncodingDetector.getReader
-            ( new BufferedInputStream( connection.getInputStream()), connection.getContentEncoding(),
-              5000);
+        InputStream in = new BufferedInputStream( connection.getInputStream());
+        // Decode the content.
+        // Multiple encodings are currently not supported and may lead to wrong
+        // behavior.
+        String encoding = connection.getContentEncoding();
+        boolean usegzip = false;
+        boolean usedeflate = false;
+        if (encoding != null) {
+            if (encoding.endsWith( "gzip"))
+                usegzip = true;
+            else if (encoding.endsWith( "deflate"))
+                usedeflate = true;
+        }
+        if (usegzip)
+            in = new GZIPInputStream( in);
+        else if (usedeflate)
+            in = new InflaterInputStream( in);
+        
+        InputStreamReader reader = CharacterEncodingDetector.getReader( in, null, 5000);
         try {
-            resp.setContentType( "text/html; charset=" + in.getEncoding());
+            resp.setContentType( "text/html; charset=" + reader.getEncoding());
 
-            annotator.annotate( in, resp.getWriter(), rewriter);
+            // re-compress the generated content
+            OutputStream out = resp.getOutputStream();
+            if (usegzip)
+                out = new GZIPOutputStream( out);
+            else if (usedeflate)
+                out = new DeflaterOutputStream( out);
+            Writer writer = new OutputStreamWriter( out, reader.getEncoding());
+
+            annotator.annotate( reader, writer, rewriter);
+            writer.close();
         } finally {
             in.close();
         }
@@ -614,6 +686,37 @@ public class JGlossServlet extends HttpServlet {
         via += req.getProtocol() + " " +
             req.getServerName() + ":" + req.getServerPort();
         connection.setRequestProperty( "Via", via);
+
+        // HTTP request headers
+        if (connection.getURL().getProtocol().toLowerCase().startsWith( "http")) { // http and https
+            // Add the referrer, removing the servlet-encoding if neccessary.
+            // The referer remains the original URI if a redirect is followed.
+            String referer = req.getHeader( "referer");
+            if (referer!=null && referer.indexOf( req.getContextPath() + 
+                                                  req.getServletPath() + "/")!=-1) {
+                Object[] out = JGlossURLRewriter.parseEncodedPath( referer);
+                if (out != null) {
+                    connection.setRequestProperty( "referer", (String) out[2]);
+                    getServletContext().log( "referer: " + (String) out[2]);
+                }
+            }
+
+            // According to the documentation, some servet containers don't allow getHeaderNames,
+            // which returns null in that case.
+            for ( Enumeration names=req.getHeaderNames(); names!=null && names.hasMoreElements(); ) {
+                String name = (String) names.nextElement();
+                if (!noForwardHeaders.contains( name.toLowerCase())) {
+                    StringBuffer value = new StringBuffer();
+                    for ( Enumeration values=req.getHeaders( name); values.hasMoreElements(); ) {
+                        if (value.length() > 0)
+                            value.append( ',');
+                    value.append( (String) values.nextElement());
+                    }
+                    connection.setRequestProperty( name, value.toString());
+                    getServletContext().log( "request header " + name + ": " + value.toString());
+                }
+            }
+        }
     }
 
     protected void forwardResponseHeaders( URLConnection connection, HttpServletRequest req,
@@ -626,6 +729,20 @@ public class JGlossServlet extends HttpServlet {
         via += req.getProtocol() + " " +
         req.getServerName() + ":" + req.getServerPort();
         resp.setHeader( "Via", via);
+
+        // HTTP response headers
+        if (connection.getURL().getProtocol().toLowerCase().startsWith( "http")) { // http and https
+            int i = 1; // header fields are 1-based
+            String name;
+            while ((name = connection.getHeaderFieldKey( i)) != null) {
+                if (!noForwardHeaders.contains( name.toLowerCase())) {
+                    resp.addHeader( name, connection.getHeaderField( i));
+                    getServletContext().log( "response header " + name + ": " +
+                                             connection.getHeaderField( i));
+                }
+                i++;
+            }
+        }
     }
 
     protected List split( String s, char c) {
@@ -647,4 +764,36 @@ public class JGlossServlet extends HttpServlet {
         return out;
     }
 
+    /**
+     * Build the Accept-Encoding header sent to the remote server. The accepted encodings are
+     * a subset of the encodings understood by the client and the servlet. Currently the "q" attribute
+     * is not supported.
+     */
+    protected String buildAcceptEncoding( String acceptEncoding) {
+        if (!enableCompression)
+            return "identity";
+
+        if (acceptEncoding == null)
+            return null; // don't set the header
+
+        boolean usegzip;
+        boolean usedeflate;
+        if (acceptEncoding.indexOf( '*') != -1) {
+            usegzip = true;
+            usedeflate = true;
+        }
+        else {
+            usegzip = (acceptEncoding.indexOf( "gzip") != -1);
+            usedeflate = (acceptEncoding.indexOf( "deflate") != -1);
+        }
+
+        StringBuffer out = new StringBuffer( 30);
+        if (usegzip)
+            out.append( "gzip,");
+        if (usedeflate)
+            out.append( "deflate,");
+        out.append( "identity");
+
+        return out.toString();
+    }
 } // class JGlossServlet
