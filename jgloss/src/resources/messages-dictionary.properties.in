@@ -36,6 +36,23 @@ edict.editable.name=EDICT (editable)
 kanjidic.nanori=(nanori, name reading)
 kanjidic.radicalname=(name of radical)
 
+# search mode name and descriptions
+# ExpressionSearchModes
+searchmode.exact.name=Exact Matches
+searchmode.exact.desc=Find dictionary entries exactly matching the search expression
+searchmode.prefix.name=Starts With Expression
+searchmode.prefix.desc=Find dictionary entries starting with the search expression
+searchmode.suffix.name=Ends With Expression
+searchmode.suffix.desc=Find dictionary entries ending with the search expression
+searchmode.any.name=Any Match
+searchmode.any.desc=Find dictionary entries containing the search expression anywhere
+
+# DistanceSearchModes
+searchmode.near.name=Match Near
+searchmode.near.desc=Match words differing in some characters
+searchmode.radius.name=Match Radius
+searchmode.radius.desc=Match words similar to the search expression
+
 # standard attribute names
 
 att.part_of_speech.name=POS

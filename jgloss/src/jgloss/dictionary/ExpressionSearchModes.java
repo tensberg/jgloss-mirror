@@ -28,23 +28,22 @@ package jgloss.dictionary;
  *
  * @author Michael Koch
  */
-public class ExpressionSearchModes implements SearchMode {
-    public static final SearchMode EXACT = new ExpressionSearchModes( "Exact match");
-    public static final SearchMode PREFIX = new ExpressionSearchModes( "Starts with");
-    public static final SearchMode SUFFIX = new ExpressionSearchModes( "Ends with");
-    public static final SearchMode ANY = new ExpressionSearchModes( "Any match");
+public class ExpressionSearchModes extends AbstractSearchMode {
+    public static final SearchMode EXACT = new ExpressionSearchModes( "exact");
+    public static final SearchMode PREFIX = new ExpressionSearchModes( "prefix");
+    public static final SearchMode SUFFIX = new ExpressionSearchModes( "suffix");
+    public static final SearchMode ANY = new ExpressionSearchModes( "any");
 
     private String name;
+    private String description;
     
     private final static SearchParameters PARAMETERS = new SearchParameters
         ( new SearchParameter[] { StandardSearchParameter.EXPRESSION,
                                   StandardSearchParameter.SEARCH_FIELDS });
 
-    private ExpressionSearchModes( String _name) {
-        this.name = _name;
+    private ExpressionSearchModes( String _id) {
+        super( _id);
     }
-
-    public String getName() { return name; }
 
     /**
      * Parameters are {@link StandardSearchParameter.EXPRESSION EXPRESSION} and

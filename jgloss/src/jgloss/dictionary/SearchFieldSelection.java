@@ -28,7 +28,7 @@ package jgloss.dictionary;
  *
  * @author Michael Koch
  */
-public class SearchFieldSelection {
+public class SearchFieldSelection implements Cloneable {
     private boolean wordSelected = false;
     private boolean readingSelected = false;
     private boolean translationSelected = false;
@@ -106,5 +106,44 @@ public class SearchFieldSelection {
             return matchWord;
         else
             throw new IllegalArgumentException();
+    }
+
+    public SearchFieldSelection or( SearchFieldSelection sfs) {
+        wordSelected |= sfs.wordSelected;
+        readingSelected |= sfs.readingSelected;
+        translationSelected |= sfs.translationSelected;
+        matchField |= sfs.matchField;
+        matchWord |= sfs.matchWord;
+
+        return this;
+    }
+
+    public SearchFieldSelection and( SearchFieldSelection sfs) {
+        wordSelected &= sfs.wordSelected;
+        readingSelected &= sfs.readingSelected;
+        translationSelected &= sfs.translationSelected;
+        matchField &= sfs.matchField;
+        matchWord &= sfs.matchWord;
+
+        return this;
+    }
+
+    public boolean equals( Object o) {
+        return (o instanceof SearchFieldSelection &&
+                equals( (SearchFieldSelection) o));
+    }
+
+    public boolean equals( SearchFieldSelection sfs) {
+        return wordSelected == sfs.wordSelected &&
+            readingSelected == sfs.readingSelected &&
+            translationSelected == sfs.translationSelected &&
+            matchField == sfs.matchField &&
+            matchWord == sfs.matchWord;
+    }
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException ex) { return null; }
     }
 } // class SearchFieldSelection

@@ -29,9 +29,9 @@ package jgloss.dictionary;
  *
  * @author Michael Koch
  */
-public class DistanceSearchModes implements SearchMode {
-    public static final SearchMode NEAR = new DistanceSearchModes( "Match near");
-    public static final SearchMode PREFIX = new DistanceSearchModes( "Radius");
+public class DistanceSearchModes extends AbstractSearchMode {
+    public static final SearchMode NEAR = new DistanceSearchModes( "near");
+    public static final SearchMode RADIUS = new DistanceSearchModes( "radius");
 
     private String name;
     
@@ -40,11 +40,9 @@ public class DistanceSearchModes implements SearchMode {
                                   StandardSearchParameter.SEARCH_FIELDS,
                                   StandardSearchParameter.DISTANCE });
 
-    private DistanceSearchModes( String _name) {
-        this.name = _name;
+    private DistanceSearchModes( String id) {
+        super( id);
     }
-
-    public String getName() { return name; }
 
     /**
      * Parameters are {@link StandardSearchParameter.EXPRESSION EXPRESSION}, 

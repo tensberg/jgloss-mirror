@@ -24,8 +24,7 @@
 package jgloss.dictionary.attribute;
 
 import jgloss.dictionary.SearchException;
-
-import java.util.Iterator;
+import jgloss.dictionary.ResultIterator;
 
 /**
  * Reference to other dictionary entries.
@@ -42,7 +41,7 @@ public interface ReferenceAttributeValue extends AttributeValue {
      * be empty (for example if at attribute value instantiation time it can't be easily checked if
      * the referenced entry exists).
      */
-    Iterator getReferencedEntries() throws SearchException;
+    ResultIterator getReferencedEntries() throws SearchException;
     /**
      * Return the title of the reference. This is usually the word field of the referenced entry.
      */

@@ -80,8 +80,8 @@ public class WadokuJT extends FileBasedDictionary {
         formatter.addAttributeFormat( Attributes.EXPLANATION, new DefaultAttributeFormatter
                                       ( " (", ")", "", false, new ListFormatter( ",")), false);
 
-        java.util.Iterator r = d.search( ExpressionSearchModes.ANY,
-                                         new Object[] { args[1], f });
+        ResultIterator r = d.search( ExpressionSearchModes.ANY,
+                                     new Object[] { args[1], f });
         System.err.println( "Matches:");
         StringBuffer out = new StringBuffer( 128);
         while (r.hasNext()) {

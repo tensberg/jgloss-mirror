@@ -113,7 +113,7 @@ public class JGloss {
      * @param args Arguments to the application.
      */
     public static void main( String args[]) {
-        try {
+        /*        try {
             // register dictionaries
             //DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
             //DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
@@ -123,7 +123,7 @@ public class JGloss {
             // register text parsers
             ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null).getName());
             ParserSelector.registerParser( ChasenParser.class, 
-                                           new ChasenParser( null, null, null, false, false).getName());
+            new ChasenParser( null, null, null, false, false).getName());
 
             // parse command line options
             if (args.length > 0) {
@@ -327,7 +327,7 @@ public class JGloss {
         } catch (Exception ex) {
             displayError( messages.getString( "error.initialization.generic"), ex, true);
             System.exit( 1);
-        }
+        }*/
     }
 
     /**
@@ -339,8 +339,8 @@ public class JGloss {
      * @return <CODE>false</CODE>, if the application will not quit.
      */
     public static boolean exit() {
-        if (JGlossFrame.getFrameCount()>0 || WordLookup.getFrame().isVisible())
-            return false;
+        /*if (JGlossFrame.getFrameCount()>0 || WordLookup.getFrame().isVisible())
+          return false;*/
 
         /*
         // debug memory:
@@ -469,36 +469,19 @@ public class JGloss {
      */
     private static Preferences initPreferences() {
         Preferences prefs = null;
-        try {
-            // Test for availability of JDK1.4 prefs API
-            // We have to use instantiation via Class.forName, because otherwise the Java VM
-            // dies while JGloss is initialized on Java 1.3 because the java.util.prefs classes
-            // can't be found
-            prefs = (Preferences) Class.forName( "jgloss.JavaPreferences").newInstance();
-            // copy old settings if needed
-            if (!prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, false) &&
-                new File( PropertiesPreferences.PREFS_FILE).exists()) {
-                PropertiesPreferences prop = new PropertiesPreferences();
-                prop.copyPreferences( prefs);
-                // write note about migration in old prefs file
-                try {
-                    prop.store( ResourceBundle.getBundle( MESSAGES)
-                                .getString( "preferences.header.obsolete"));
-                } catch (IOException ex) {}
-                prefs.set( Preferences.PREFERENCES_MIGRATED, true);
-            }
-        } catch (NoClassDefFoundError ex) {
-            // this is normal on J2SE 1.3. Fall through and return a PropertiesPreferences
-        } catch (ClassNotFoundException ex1) {
-            ex1.printStackTrace();
-        } catch (IllegalAccessException ex2) {
-            ex2.printStackTrace();
-        } catch (InstantiationException ex3) {
-            ex3.printStackTrace();
+        prefs = new JavaPreferences();
+        // copy old settings if needed
+        if (!prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, false) &&
+            new File( PropertiesPreferences.PREFS_FILE).exists()) {
+            PropertiesPreferences prop = new PropertiesPreferences();
+            prop.copyPreferences( prefs);
+            // write note about migration in old prefs file
+            try {
+                prop.store( ResourceBundle.getBundle( MESSAGES)
+                            .getString( "preferences.header.obsolete"));
+            } catch (IOException ex) {}
+            prefs.set( Preferences.PREFERENCES_MIGRATED, true);
         }
-
-        if (prefs == null) // JavaPreferences not available
-            prefs = new PropertiesPreferences(); // use properties-based prefs
 
         // migrate export.encoding, which was used in JGloss 1.0.3 and earlier
         String encoding = prefs.getString( "export.encoding");

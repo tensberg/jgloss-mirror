@@ -27,6 +27,7 @@ import jgloss.dictionary.SearchException;
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.SearchParameters;
+import jgloss.dictionary.ResultIterator;
 
 import java.util.Iterator;
 
@@ -50,7 +51,7 @@ public class SearchReference implements ReferenceAttributeValue {
         searchParameters = _searchParameters;
     }   
 
-    public Iterator getReferencedEntries() throws SearchException {
+    public ResultIterator getReferencedEntries() throws SearchException {
         return dictionary.search( searchMode, searchParameters);
     }
 

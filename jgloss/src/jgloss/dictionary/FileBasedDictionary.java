@@ -343,7 +343,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         return characterHandler;
     }
 
-    public Iterator search( SearchMode searchmode, Object[] parameters) throws SearchException {
+    public ResultIterator search( SearchMode searchmode, Object[] parameters) throws SearchException {
         if (searchmode == ExpressionSearchModes.EXACT ||
             searchmode == ExpressionSearchModes.PREFIX ||
             searchmode == ExpressionSearchModes.SUFFIX ||
@@ -358,8 +358,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Implements search for expression search modes.
      */
-    protected Iterator searchExpression( SearchMode searchmode, String expression,
-                                         SearchFieldSelection searchFields) 
+    protected ResultIterator searchExpression( SearchMode searchmode, String expression,
+                                               SearchFieldSelection searchFields) 
         throws SearchException {
         expression = escape( expression);
 
@@ -850,7 +850,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Iterator returning results from an expression search.
      */
-    protected class ExpressionSearchIterator implements Iterator {
+    protected class ExpressionSearchIterator implements ResultIterator {
         protected SearchMode searchmode;
         protected SearchFieldSelection fields;
         protected int expressionLength;
@@ -862,7 +862,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         public ExpressionSearchIterator( SearchMode _searchmode, SearchFieldSelection _fields,
                                          int _expressionLength,
-                                         Index.Iterator _matchingIndexEntries) {
+                                         Index.Iterator _matchingIndexEntries) throws SearchException {
             this.searchmode = _searchmode;
             this.fields = _fields;
             this.expressionLength = _expressionLength;
@@ -870,8 +870,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             generateNextEntry();
         }
 
-        public boolean hasNext() { return nextEntry != null; }
-        public Object next() throws NoSuchElementException {
+        public boolean hasNext() throws SearchException { return nextEntry != null; }
+        public DictionaryEntry next() throws SearchException, NoSuchElementException {
             if (!hasNext())
                 throw new NoSuchElementException();
             DictionaryEntry current = nextEntry;
@@ -886,7 +886,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * Set the {@link #nextEntry nextEntry} variable to the next dictionary entry matching
          * the search. If there are no more entries, it will be set to <code>null</code>.
          */
-        protected void generateNextEntry() {
+        protected void generateNextEntry() throws SearchException {
             nextEntry = null;
             while (nextEntry==null && matchingIndexEntries.hasNext()) {
                 int match = matchingIndexEntries.next();
@@ -930,12 +930,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                         continue;
                 }
                     
-                try {
-                    nextEntry = createEntryFrom( entry, entryOffsets[0]);
-                    seenEntries.add( entryOffsets[0]); // start offset of entry
-                } catch (SearchException ex) {
-                    ex.printStackTrace();
-                }
+                nextEntry = createEntryFrom( entry, entryOffsets[0]);
+                seenEntries.add( entryOffsets[0]); // start offset of entry
             }
         }
     }

@@ -137,15 +137,10 @@ public class UIUtilities {
     }
 
     /**
-     * Creates a container which will expand to fill all additional space in the enclosing
+     * Creates a panel which will expand to fill all additional space in the enclosing
      * container, without expanding the contained component.
-     *
-     * @param c The component which the space eater should contain.
-     * @param horizontal <CODE>true</CODE> if the container should grow horizontal, or
-     *                   <CODE>false</CODE> to make it grow vertical.
-     * @return The newly created space eater component.
      */
-    public static JPanel createSpaceEater( Component c, boolean horizontal) {
+    public static JPanel createFlexiblePanel( Component c, boolean horizontal) {
         JPanel se = new JPanel( new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = horizontal ? GridBagConstraints.VERTICAL : GridBagConstraints.HORIZONTAL;

@@ -57,8 +57,8 @@ public class EDict extends FileBasedDictionary {
         f.select( DictionaryEntryField.TRANSLATION, true);
         f.select( MatchMode.WORD, true);
 
-        java.util.Iterator r = d.search( ExpressionSearchModes.ANY,
-                                         new Object[] { args[1], f });
+        ResultIterator r = d.search( ExpressionSearchModes.ANY,
+                                     new Object[] { args[1], f });
         System.err.println( "Matches:");
         while (r.hasNext())
             System.err.println( r.next().toString());

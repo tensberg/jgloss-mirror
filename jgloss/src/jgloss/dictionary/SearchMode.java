@@ -39,6 +39,10 @@ public interface SearchMode {
      */
     String getName();
     /**
+     * Return a short explanation of the search mode. This could be used e.g. for tooltips.
+     */
+    String getDescription();
+    /**
      * Return the list of parameters which are needed for a search using this search mode
      * to be executed.
      */

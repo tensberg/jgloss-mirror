@@ -50,7 +50,7 @@ public interface Dictionary {
      * @exception SearchException if the search mode is not supported or there was an error 
      *            during the search.
      */
-    Iterator search( SearchMode searchmode, Object[] parameters) throws SearchException;
+    ResultIterator search( SearchMode searchmode, Object[] parameters) throws SearchException;
 
     /**
      * Test if this dictionary supports searches of a certain type. If it fully supports the

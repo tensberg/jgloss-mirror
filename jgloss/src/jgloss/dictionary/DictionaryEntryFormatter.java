@@ -50,7 +50,7 @@ public class DictionaryEntryFormatter {
         public static final Position BEFORE_WORDS = new Position( "BEFORE_WORDS");
         public static final Position AFTER_WORDS = new Position( "AFTER_WORDS");
         public static final Position BEFORE_WORD = new Position( "BEFORE_WORD");
-        public static final Position AFTER_WORD = new Position( "AFTER_WORD");2
+        public static final Position AFTER_WORD = new Position( "AFTER_WORD");
         public static final Position BEFORE_READINGS = new Position( "BEFORE_READINGS");
         public static final Position AFTER_READINGS = new Position( "AFTER_READINGS");
         public static final Position BEFORE_READING = new Position( "BEFORE_READING");

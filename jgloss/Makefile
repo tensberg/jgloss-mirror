@@ -43,7 +43,8 @@ endif
 RELEASE := 1.1
 DISTNAME := jgloss-$(RELEASE)
 
-PACKAGES := jgloss jgloss.dictionary jgloss.parser jgloss.util \
+PACKAGES := jgloss jgloss.dictionary jgloss.dictionary.attribute\
+            jgloss.parser jgloss.util \
             jgloss.ui jgloss.ui.doc jgloss.ui.annotation \
             jgloss.www
 
