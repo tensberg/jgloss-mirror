@@ -32,9 +32,6 @@
     <edition>1.0-pre</edition>
     <copyright><year>2001</year><holder>Michael Koch</holder></copyright>
     <pubdate>2001</pubdate>
-    <publisher>
-      <publishername>Professor Daravon Publications</publishername>
-    </publisher>
   </bookinfo>
 
   <chapter><title>Introduction</title>
@@ -90,8 +87,8 @@
       <para>
         &JGloss; is a Java application. To run it, you will need a Java implementation that
         conforms to the Java 2 Version 1.3 specifications, <abbrev>e. g.</abbrev> Sun's
-        <ulink url="http://java.sun.com/j2se/1.3/jre">
-          <application>Java Runtime Environment 1.3</application></ulink>(<acronym>JRE</acronym>).
+        <ulink url="http://java.sun.com/j2se/1.3/jre/">
+          <application>Java Runtime Environment 1.3</application></ulink> (<acronym>JRE</acronym>).
         Make sure that you have the international version. I have not tested JGloss with
         the JRE 1.4 Beta.
       </para>
@@ -103,13 +100,49 @@
       </para>
       <para>
         If you want to use the automatic annotation function, you will need some dictionaries.
-        &JGloss; currently supports dictionaries in the 
-        <ulink url="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDICT format</ulink>.
-        &JGloss; also needs index files for the dictionaries. It can use the <acronym>XJDX</acronym>
-        index files created by programs like <application>XJDIC</application> or 
-        <application>GJiten</application>, or index files in it's own format, <acronym>JJDX</acronym>.
-        If no index file is found, an index will be automatically created and written to disk if the
-        dictionary directory is writable.
+        Currently supported dictionary formats are:
+        <variablelist>
+          <varlistentry>
+            <term><ulink url="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDICT</ulink></term>
+            <listitem>
+              <para>
+                EDICT dictionaries are Japanese to English word dictionaries. You can download them
+                from the 
+                <ulink url="http://ftp.cc.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil">
+                  Monash Nihongo FTP Archive</ulink>. Each dictionary also needs an index file.
+                &JGloss; can use the <acronym>XJDX</acronym> index files used by <abbrev>e. g.</abbrev>
+                <application>XJDIC</application> or <application>GJiten</application>, or
+                index files in its own format <acronym>JJDX</acronym>. 
+                If no index file is found, it will automatically be created.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <variablelist>
+          <varlistentry>
+            <term><ulink url="http://ftp.cc.monash.edu.au/pub/nihongo/kanjidic_doc.html">KANJIDIC
+              </ulink></term>
+            <listitem>
+              <para>
+                KANJIDIC dictionaries store information for individual kanji, among other things
+                readings and translations. You can find KANJIDIC dictionaries at the same location
+                as the EDICT dictionaries.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <variablelist>
+          <varlistentry>
+            <term><ulink url="http://openlab.ring.gr.jp/skk/">SKK</ulink></term>
+            <listitem>
+              <para>
+                The SKK dictionaries provide a mapping from readings to words (no translations).
+                They are usually used for Japanese input methods, but &JGloss; uses them
+                to look up readings for kanji words.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
       </para>
     </sect1>
 
@@ -120,7 +153,7 @@
         To start &JGloss; from a shell, change to the directory which contains the 
         <acronym>JAR</acronym> file and enter <userinput>java -jar jgloss.jar</userinput>.
         JGloss has some command line options, which can be added to the command line:
-        <userinput>java -jar jgloss.jar [options] file ...</userinput>.
+        <userinput>java -jar jgloss.jar [option] file ...</userinput>.
         <variablelist><title>Options</title>
           <varlistentry>
             <term><option>-h</option></term>
@@ -144,6 +177,15 @@
                 user has no write permissions for the dictionary directory, you can log in
                 as a privileged user (<abbrev>e. g.</abbrev> root) and use this option to create
                 the index files.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><option>-f</option></term>
+            <term><option>--format</option></term>
+            <listitem>
+              <para>
+                Prints the dictionary format of the files given on the command line.
               </para>
             </listitem>
           </varlistentry>
@@ -198,7 +240,8 @@
     <sect1><title>Do It Yourself</title>
       <para>
         This section describes how to build &JGloss; from the sources. You do not need to read
-        it if you just want to use &JGloss;.
+        it if you just want to use &JGloss; and have downloaded the binary release
+        ( no <filename>-src</filename> ending).
       </para>
       <para>
         To build the &JGloss; JAR file, you have to have the
@@ -400,7 +443,8 @@
         during importing and used used as reading
         annotation. They are shown in the <guimenuitem>Reading from document</guimenuitem> items.
         Selecting one and hitting <keycap>space</keycap> will make it the reading of the
-        annotation.
+        annotation. If you are using a dictionary which provides readings but no translations,
+        entries from this dictionary will also be displayed this way.
       </para>
       <para>
         For every dictionary in which an entry for the annotated word is found, an item
@@ -408,7 +452,7 @@
         dictionary word and reading will be shown, and under that one item for every translation.
         If you select a reading and hit <keycap>space</keycap>, the reading will be made the new
         reading of the annotation, and likewise for a translation. If a dictionary entry was found
-        using the verb/adjective de-inflection algorithm, the item will show the dictionary form
+        using verb/adjective de-inflection, the item will show the dictionary form
         of the word and in brackets the grammatical form in which the word appears in the document.
         Note that this algorithm may show wrong grammatical forms and therefore this feature
         should not always be trusted.
@@ -426,8 +470,8 @@
         Selecting <guimenuitem>Import</guimenuitem> will show the 
         <guilabel>Import File</guilabel> dialog. In the text field you can enter
         an HTTP URL or the file name of a local document. The document should be plain text.
-        There is some support for importing <acronym>HTML</acronym> documents, but
-        the layout usually does not work very well. If you hit the <guibutton>Choose File</guibutton>
+        There is some support for importing <acronym>HTML</acronym> documents, but it will work
+        only for simple layouts. If you hit the <guibutton>Choose File</guibutton>
         button, a file chooser dialog will pop up and let you select a local file.
         The character encoding of the file can be selected in the 
         <guilabel>Character encoding ...</guilabel> popup menu. You can usually
@@ -815,7 +859,26 @@
             </listitem>
           </varlistentry>
 
-          <varlistentry><term>Hide Duplicates</term>
+          <varlistentry><term>Remove Anno. & Duplicates</term>
+            <listitem>
+              <para>
+                Removes the annotation from the currently selected word, and all duplicate
+                annotations. An annotation is a duplicate if it has the same word, reading
+                and translation as the selected entry. 
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Add to Exclusions</term>
+            <listitem>
+              <para>
+                Adds the word of the currently selected annotation to the list of
+                words excluded from automatic annotation. See <xref linkend="sect.prefs.exclusions">.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Hide all Duplicates</term>
             <listitem>
               <para>
                 This will make all annotations hidden which are duplicates of a previous
@@ -840,9 +903,10 @@
 
     <sect1 id="sect.preferences"><title>The Preferences Dialog</title>
       <para>
-        The preferences dialog contains two tabs, one for setting the visual appearance
-        of the application and one for selecting the dictionaries used when importing
-        a document. You can access the dialog by selecting <guimenuitem>Preferences</guimenuitem>
+        The preferences dialog contains three tabs, one for setting the visual appearance
+        of the application, one for selecting the dictionaries used when importing
+        a document and one for managing the list of words excluded from annotation.
+        You can access the dialog by selecting <guimenuitem>Preferences</guimenuitem>
         from the <guimenu>Edit</guimenu> menu.
       </para>
       <sect2 id="sect.prefs.general"><title>General</title>
@@ -868,14 +932,13 @@
           editor.
         </para>
       </sect2>
-      <sect2><title>Dictionaries</title>
+      <sect2 id="sect.prefs.dictionaries"><title>Dictionaries</title>
         <para>
           In this dialog you can set the dictionaries which are used when importing a text
           or adding annotations to a document manually. Click the 
           <guibutton>Add dictionary file</guibutton> to add one or more new dictionaries to
-          the list. &JGloss; currently supports dictionaries in the EDICT format. The directory
-          must also contain the <filename>xjdx</filename> index file associated with the
-          dictionary file (see <xref linkend="sect.whatyouneed">). Select a dictionary from
+          the list. &JGloss; currently supports dictionaries in EDICT, KANJIDIC and SKK format. 
+          Select a dictionary from
           the list and push <guibutton>Remove entry</guibutton> to remove it.
         </para>
         <para>
@@ -884,6 +947,14 @@
           you should put your favorite dictionary first in the list. Select one of the dictionaries
           and push <guibutton>Move entry up</guibutton> and <guibutton>Move entry down</guibutton>
           do move it to the desired position.
+        </para>
+      </sect2>
+      <sect2 id="sect.prefs.exclusions"><title>Exclusions</title>
+        <para>
+          This dialog lets you manage the list of words excluded from automatic annotation.
+          When you import a document, no annotations will be added for the words in
+          this list. You can export and import the list by using the correspondent buttons.
+          The format of the list is simply one word per line.
         </para>
       </sect2>
     </sect1>
@@ -941,7 +1012,7 @@
       </listitem>
       <listitem>
         <para>
-          The <ulink url="http://java.sun.com/j2se/">Java download page</ulink> from SUN.
+          The <ulink url="http://java.sun.com/j2se/">Java download page</ulink> from Sun.
         </para>
       </listitem>
     </itemizedlist>
