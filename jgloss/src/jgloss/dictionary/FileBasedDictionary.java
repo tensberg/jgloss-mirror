@@ -49,7 +49,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author Michael Koch
  */
-public abstract class FileBasedDictionary implements Dictionary, Indexable {
+public abstract class FileBasedDictionary implements IndexedDictionary, Indexable {
     /**
      * Generic implementation for file-based dictionaries. The {@link #isInstance(String) isInstance}
      * test reads some bytes from the file to test, converts them to a string using the
@@ -207,7 +207,7 @@ public abstract class FileBasedDictionary implements Dictionary, Indexable {
     /**
      * Initializes the dictionary. The dictionary file is opened and mapped into memory.
      * The index file is not loaded from the constructor. Before the dictionary can be used,
-     * {@link #loadIndex(boolean) loadIndex} must be successfully called.
+     * {@link #loadIndex() loadIndex} must be successfully called.
      *
      * @dicfile File which holds the dictionary.
      * @exception IOException if the dictionary or the index file cannot be read.
@@ -271,17 +271,7 @@ public abstract class FileBasedDictionary implements Dictionary, Indexable {
             throw new IllegalArgumentException();
     }
 
-    /**
-     * Load the index file for the dictionary. This method must be called before searches can
-     * be performed. If loading the index fails, {@link #buildIndex() buildIndex} must be called
-     * to create the index file.
-     *
-     * @return <code>true</code> if the index was loaded successfully, <code>false</code> if
-     *         the index file does not exist, does not contain all needed index data or is
-     *         damaged. In this case, call {@link #buildIndex() buildIndex}.
-     * @exeption IOException if reading the index file failed.
-     */
-    public boolean loadIndex() throws IOException {
+    public boolean loadIndex() throws IndexException {
         File indexFile = new File( name + FileIndexContainer.EXTENSION);
 
         // rebuild the index if the dictionary was changed after the index was created
@@ -298,21 +288,18 @@ public abstract class FileBasedDictionary implements Dictionary, Indexable {
         } catch (IndexException ex) {
             // index file damaged, rebuild it
             indexFile.delete();
+        } catch (IOException ex) {
+            // IOExceptions signal an error when accessing the index file and should not be caught here
+            throw new IndexException( ex);
         }
-        // IOExceptions signal an error when accessing the index file and should not be caught here
 
         return false;
     }
 
-    /**
-     * Rebuild the index file or add missing index data to an already existing index file.
-     * Building indexes may take a long time, so the user should be informed what is happening
-     * before this method is invoked.
-     */
-    public void buildIndex() throws IOException, IndexException {
+    public void buildIndex() throws IndexException {
         File indexFile = new File( name + FileIndexContainer.EXTENSION);
-        indexContainer = new FileIndexContainer( indexFile, true);
         try {
+            indexContainer = new FileIndexContainer( indexFile, true);
             if (!indexContainer.hasIndex( binarySearchIndex.getType())) {
                 IndexBuilder builder = new BinarySearchIndexBuilder();
                 builder.startBuildIndex( indexContainer, this);
@@ -325,6 +312,8 @@ public abstract class FileBasedDictionary implements Dictionary, Indexable {
                 }
             }
             // put creation of additional index types here
+        } catch (IOException ex) {
+            throw new IndexException( ex);
         } finally {
             indexContainer.endEditing();
         }

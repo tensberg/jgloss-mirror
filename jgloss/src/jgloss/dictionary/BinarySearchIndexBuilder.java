@@ -59,10 +59,10 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
         }
     }
                                                                                   
-    public boolean addEntry( int location, int length, DictionaryField field) throws IndexException {
-        if (field == DictionaryField.WORD ||
-            field == DictionaryField.READING ||
-            field == DictionaryField.TRANSLATION) {
+    public boolean addEntry( int location, int length, DictionaryEntryField field) throws IndexException {
+        if (field == DictionaryEntryField.WORD ||
+            field == DictionaryEntryField.READING ||
+            field == DictionaryEntryField.TRANSLATION) {
             try {
                 if (indexContainer.getIndexByteOrder() == ByteOrder.BIG_ENDIAN)
                     tempIndex.writeInt( location);
