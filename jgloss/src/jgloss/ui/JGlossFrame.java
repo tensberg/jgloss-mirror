@@ -723,7 +723,8 @@ public class JGlossFrame implements ActionListener {
                 in = new HTMLifyReader( in);
 
             loadDocument( in, path, title, 
-                          new Parser( Dictionaries.getDictionaries(), readingStart, readingEnd), true,
+                          new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions(),
+                                      readingStart, readingEnd), true,
                           CharacterEncodingDetector.guessLength( contentlength, encoding));
         } catch (Exception ex) {
             ex.printStackTrace();
