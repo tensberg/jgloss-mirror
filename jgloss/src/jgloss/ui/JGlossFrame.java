@@ -189,6 +189,11 @@ public class JGlossFrame implements ActionListener {
     private static int framecount;
 
     /**
+     * Returns the number of currently open JGlossFrames.
+     */
+    public static int getFrameCount() { return framecount; }
+
+    /**
      * A file filter which will accept JGloss documents.
      */
     public static final javax.swing.filechooser.FileFilter jglossFileFilter = 
@@ -727,6 +732,39 @@ public class JGlossFrame implements ActionListener {
                           new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions(),
                                       readingStart, readingEnd), true,
                           CharacterEncodingDetector.guessLength( contentlength, encoding));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showConfirmDialog
+                ( frame, JGloss.messages.getString
+                  ( "error.import.exception", new Object[] 
+                      { path, ex.getClass().getName(),
+                        ex.getLocalizedMessage() }),
+                  JGloss.messages.getString( "error.import.title"),
+                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Creates a new annotated document by reading the original text from a string.
+     * The method can only be applied on a <CODE>JGlossFrame</CODE> with no open document.
+     *
+     * @param text The text which will be imported.
+     * @param title Title of the newly created document.
+     * @param path Path to the document.
+     * @param setPath If <CODE>true</CODE>, the {@link #documentPath documentPath} variable will
+     *        be set to the <CODE>path</CODE> parameter. Use this if path denotes a the file to
+     *        which the newly created document should be written. If <CODE>false</CODE>,
+     *        <CODE>path</CODE> will only be used in informational messages to the user during import.
+     */
+    public void importString( String text, String title, String path, boolean setPath) {
+        try {
+            loadDocument
+                ( new HTMLifyReader( new StringReader( text)), path, title,
+                  new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                  true, text.length());
+            documentChanged = true;
+            if (setPath)
+                this.documentPath = path;
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
