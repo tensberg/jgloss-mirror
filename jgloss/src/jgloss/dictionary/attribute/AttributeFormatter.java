@@ -23,29 +23,19 @@
 
 package jgloss.dictionary.attribute;
 
-import jgloss.dictionary.DictionaryEntry;
-
 /**
- * Attributes which encapsulate extended informations for dictionary entries.
- * Singleton instances of classes implementing this interface are used as keys in
- * {@link AttributeSet AttributeSets}. The attribute instance provides a description of itself
- * and can render attribute values as string.
+ * Format an attribute and its value as a string.
  *
  * @author Michael Koch
  */
-public interface Attribute {
+public interface AttributeFormatter {
     /**
-     * Return a short name describing the attribute to the user.
+     * Format an attribute and its value as a string.
+     *
+     * @param val Value of the attribute. May be <code>null</code> if the attribute is set but
+     *            has no value.
+     * @param buf String buffer in which the formatted attribute is written.
+     * @return The string buffer passed in.
      */
-    String getName();
-    /**
-     * Return a short description explaining the attribute to the user.
-     */
-    String getDescription();
-
-    boolean canHaveValue();
-
-    Class getAttributeValueClass();
-
-    boolean appliesTo( DictionaryEntry.AttributeGroup group);
-} // interface Attribute
+    StringBuffer format( Attribute att, ValueList val, StringBuffer buf);
+} // interface AttributeFormatter

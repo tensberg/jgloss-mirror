@@ -252,12 +252,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         supportedSearchModes = new HashMap( 11);
         
-        SearchFieldSelection fields = new SearchFieldSelection();
-        fields.select( DictionaryEntryField.WORD, true);
-        fields.select( DictionaryEntryField.READING, true);
-        fields.select( DictionaryEntryField.TRANSLATION, true);
-        fields.select( MatchMode.FIELD, true);
-        fields.select( MatchMode.WORD, true);
+        SearchFieldSelection fields = new SearchFieldSelection( true, true, true, true, true);
 
         supportedSearchModes.put( ExpressionSearchModes.EXACT, fields);
         supportedSearchModes.put( ExpressionSearchModes.PREFIX, fields);

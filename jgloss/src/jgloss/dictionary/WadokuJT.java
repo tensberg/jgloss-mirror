@@ -24,6 +24,7 @@
 package jgloss.dictionary;
 
 import jgloss.util.StringTools;
+import jgloss.util.ListFormatter;
 import jgloss.dictionary.attribute.*;
 
 import java.io.*;
@@ -63,11 +64,32 @@ public class WadokuJT extends FileBasedDictionary {
         f.select( DictionaryEntryField.TRANSLATION, true);
         f.select( MatchMode.WORD, true);
 
+        DictionaryEntryFormatter formatter = new DictionaryEntryFormatter
+            ( new ListFormatter( "", "; ", ""),
+              new ListFormatter( " [", ": ", "]"),
+              new ListFormatter( "", " ", ".", " (n) ", ". (n) ", "."),
+              new ListFormatter( "", "; ", ""),
+              new ListFormatter( "", "/", ""));
+        formatter.addAttributeFormat( Attributes.PART_OF_SPEECH,
+                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3,
+                                      new DefaultAttributeFormatter
+                                      ( " (", ")", "", false, new ListFormatter( ",")));
+        formatter.addAttributeFormat( Attributes.EXAMPLE,
+                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3,
+                                      new DefaultAttributeFormatter( " {", "}", "", true, null));
+        formatter.addAttributeFormat( Attributes.EXPLANATION, new DefaultAttributeFormatter
+                                      ( " (", ")", "", false, new ListFormatter( ",")), false);
+
         java.util.Iterator r = d.search( ExpressionSearchModes.ANY,
                                          new Object[] { args[1], f });
         System.err.println( "Matches:");
-        while (r.hasNext())
-            System.err.println( r.next().toString());
+        StringBuffer out = new StringBuffer( 128);
+        while (r.hasNext()) {
+            out.setLength( 0);
+            DictionaryEntry de = (DictionaryEntry) r.next();
+            System.err.println( de);
+            System.err.println( formatter.format( de, out).toString());
+        }
         //r.next();
         d.dispose();
     }
@@ -78,21 +100,21 @@ public class WadokuJT extends FileBasedDictionary {
     public static final Attribute MAIN_ENTRY = new Attributes
         ( NAMES.getString( "wadoku.att.main_entry.name"),
           NAMES.getString( "wadoku.att.main_entry.desc"),
-          false, false, null,
+          false, null,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute MAIN_ENTRY_REF = new Attributes
         ( NAMES.getString( "wadoku.att.main_entry_ref.name"),
           NAMES.getString( "wadoku.att.main_entry_ref.desc"),
-          false, false, null,
+          false, null,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute ALT_READING = new Attributes
         ( NAMES.getString( "wadoku.att.alt_reading.name"),
           NAMES.getString( "wadoku.att.alt_reading.desc"),
-          false, true, ReferenceAttributeValue.class, 
+          false, ReferenceAttributeValue.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 

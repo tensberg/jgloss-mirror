@@ -130,16 +130,7 @@ abstract class BaseEntry implements DictionaryEntry {
     public AttributeSet getTranslationAttributes( int rom, int crm, int synonym) {
         if (synonym != 0)
             throw new IllegalArgumentException();
-        try {
-            if (crm<0 || crm >= translations[rom].length)
-                throw new IllegalArgumentException();
-            if (translationRomA[rom] != null)
-                return emptySet.setParent( translationRomA[rom]);
-            else
-                return emptySet.setParent( translationA);
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException();
-        }
+        return getTranslationAttributes( rom, crm);
     }
 
     public AttributeSet getTranslationAttributes( int rom, int crm) {
@@ -158,7 +149,7 @@ abstract class BaseEntry implements DictionaryEntry {
     public AttributeSet getTranslationAttributes( int rom) {
         try {
             if (translationRomA[rom] != null)
-                return emptySet.setParent( translationRomA[rom]);
+                return translationRomA[rom];
             else
                 return emptySet.setParent( translationA);
         } catch (ArrayIndexOutOfBoundsException ex) {

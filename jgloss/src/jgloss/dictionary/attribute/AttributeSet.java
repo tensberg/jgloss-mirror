@@ -50,9 +50,8 @@ public interface AttributeSet {
      * @param key Attribute key for which the attribute is requested.
      * @param resolveInherited <code>true</code> if the attribute is searched in the parent sets too, 
      *                  <code>false</code> if inherited attributes should be ignored.
-     * @exception AttributeNotSetException if the attribute is not defined.
      */
-    ValueList getAttribute( Attribute key, boolean resolveInherited) throws AttributeNotSetException;
+    ValueList getAttribute( Attribute key, boolean resolveInherited);
     /**
      * Test if a given attribute is inherited from a parent attribute set.
      *
@@ -73,4 +72,9 @@ public interface AttributeSet {
      * Get the parent attribute set of this set. Returns <code>null</code> if this is a root set.
      */
     AttributeSet getParent();
+    /**
+     * Test if there are any attributes defined in this set. Inherited attributes are not taken
+     * into account.
+     */
+    boolean isEmpty();
 } // interface AttributeSet

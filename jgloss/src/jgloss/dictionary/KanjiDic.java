@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -469,7 +469,16 @@ public class KanjiDic implements Dictionary {
      * fully supported, the other search modes will return a superset of exact match search,
      * but not all matches which should be returned.
      */
-    public List search( String expression, short searchmode, short resultmode) {
+    public Iterator search( SearchMode mode, Object[] parameters) throws SearchException {
+        if (mode instanceof ExpressionSearchModes)
+            return searchExpression( mode, (String) parameters[0], 
+                                     (SearchFieldSelection) parameters[1]);
+        else
+            throw new UnsupportedSearchModeException( mode);
+    }
+
+    public Iterator searchExpression( SearchMode mode, String expression, 
+                                      SearchFieldSelection fields) {
         List result = new ArrayList( 10);
 
         Object o = entries.get( expression);
@@ -484,6 +493,19 @@ public class KanjiDic implements Dictionary {
         }
 
         return result;
+    }
+
+    public boolean supports( SearchMode searchmode, boolean fully) {
+        if (searchmode==ExpressionSearchModes.EXACT)
+            return true;
+        else if (fully && searchmode instanceof ExpressionSearchModes)
+            return true;
+        else
+            return false;
+    }
+
+    public SearchFieldSelection getSupportedFields( SearchMode searchmode) {
+        return new SearchFieldSelection( true, true, true, true, false);
     }
 
     /**

@@ -87,10 +87,29 @@ public class DefaultAttributeSet implements AttributeSet {
         public String toString() { return "[_" + value.toString() + ']'; }
     } // class SingleValueList
 
+    protected class NestedValueList implements ValueList {
+        private ValueList base;
+        private ValueList parent;
+
+        public NestedValueList( ValueList _base, ValueList _parent) {
+            base = _base;
+            parent = _parent;
+        }
+    
+        public int size() { return base.size() + parent.size(); }
+        
+        public AttributeValue get( int index) {
+            if (index < base.size())
+                return base.get( index);
+            else
+                return parent.get( index-base.size());
+        }
+
+        public String toString() { return "[/" + base.toString() + parent.toString() + "]"; }
+    } // class NestedValueList
+
     protected AttributeSet parent = null;
     protected Map attributes = null;
-    protected SingleValueList singleList = new SingleValueList( null);
-
     public DefaultAttributeSet() {
     }
 
@@ -112,8 +131,8 @@ public class DefaultAttributeSet implements AttributeSet {
             Object v = attributes.get( key);
             if (v instanceof MutableValueList)
                 return ((MutableValueList) v).contains( value);
-            else // v is AttributeValue
-                return v.equals( value);
+            else // v is SingleValueList
+                return ((SingleValueList) v).get( 0).equals( value);
         }
         else if (resolveInherited && parent!=null)
             return parent.contains( key, value, true);
@@ -121,19 +140,29 @@ public class DefaultAttributeSet implements AttributeSet {
             return false;
     }
 
-    public ValueList getAttribute( Attribute key, boolean resolveInherited) 
-        throws AttributeNotSetException {
+    public ValueList getAttribute( Attribute key, boolean resolveInherited) {
+        ValueList base = null;
+        ValueList parentv = null;
+
+        if (resolveInherited && parent!=null)
+            parentv = parent.getAttribute( key, true);
+
         if (attributes!=null && attributes.containsKey( key)) {
-            Object v =  attributes.get( key);
-            if (v instanceof ValueList)
-                return (ValueList) v;
-            else
-                return singleList.set( (AttributeValue) v);
+            Object v = attributes.get( key);
+            if (v != null) {
+                if (v instanceof ValueList)
+                    base = (ValueList) v;
+                else
+                    base = new SingleValueList( (AttributeValue) v);
+            }
         }
-        else if (resolveInherited && parent!=null)
-            return parent.getAttribute( key, true);
+
+        if (parentv == null)
+            return base; // this also covers the case where base==parentv==null (att not set)
+        else if (base == null)
+            return parentv; // just inherited attributes
         else
-            throw new AttributeNotSetException( key);
+            return new NestedValueList( base, parentv);
     }
 
     public boolean isInherited( Attribute key) throws AttributeNotSetException {
@@ -175,15 +204,15 @@ public class DefaultAttributeSet implements AttributeSet {
         Object v = attributes.get( key);
 
         if (v == null)
-            attributes.put( key, value);
+            attributes.put( key, value!=null ? new SingleValueList( value) : null);
         else if (value == null)
             // nothing to be done, since attibute already set
             return;
         else if (v instanceof MutableValueList)
             ((MutableValueList) v).add( value);
-        else { // AttributeValue
+        else { // SingleValueList
             MutableValueList list = new MutableValueList();
-            list.add( (AttributeValue) v);
+            list.add( ((ValueList) v).get( 0));
             list.add( value);
             attributes.put( key, list);
         }

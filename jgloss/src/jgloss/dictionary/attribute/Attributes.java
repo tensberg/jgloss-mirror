@@ -39,14 +39,15 @@ public class Attributes implements Attribute {
     public static final Attribute PART_OF_SPEECH = new Attributes
         ( NAMES.getString( "att.part_of_speech.name"),
           NAMES.getString( "att.part_of_speech.desc"),
-          true, false, PartOfSpeech.class, 
+          true, PartOfSpeech.class, 
           new DictionaryEntry.AttributeGroup[] 
-            { DictionaryEntry.AttributeGroup.WORD });
+            { DictionaryEntry.AttributeGroup.GENERAL,
+              DictionaryEntry.AttributeGroup.WORD });
 
     public static final Attribute PRIORITY = new Attributes
         ( NAMES.getString( "att.priority.name"),
           NAMES.getString( "att.priority.desc"),
-          true, true, Priority.class, 
+          true, Priority.class, 
           new DictionaryEntry.AttributeGroup[] 
           { DictionaryEntry.AttributeGroup.GENERAL,
             DictionaryEntry.AttributeGroup.TRANSLATION });
@@ -54,42 +55,42 @@ public class Attributes implements Attribute {
     public static final Attribute EXAMPLE = new Attributes
         ( NAMES.getString( "att.example.name"),
           NAMES.getString( "att.example.desc"),
-          false, false, null, 
+          false, null, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute ABBREVIATION = new Attributes
         ( NAMES.getString( "att.abbreviation.name"),
           NAMES.getString( "att.abbreviation.desc"),
-          false, false, ReferenceAttributeValue.class, 
+          false, ReferenceAttributeValue.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute REFERENCE = new Attributes
         ( NAMES.getString( "att.reference.name"),
           NAMES.getString( "att.reference.desc"),
-          false, true, ReferenceAttributeValue.class, 
+          false, ReferenceAttributeValue.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute SYNONYM = new Attributes
         ( NAMES.getString( "att.synonym.name"),
           NAMES.getString( "att.synonym.desc"),
-          false, true, ReferenceAttributeValue.class, 
+          false, ReferenceAttributeValue.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute ANTONYM = new Attributes
         ( NAMES.getString( "att.antonym.name"),
           NAMES.getString( "att.antonym.desc"),
-          false, true, ReferenceAttributeValue.class, 
+          false, ReferenceAttributeValue.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute USAGE = new Attributes
         ( NAMES.getString( "att.usage.name"),
           NAMES.getString( "att.usage.desc"),
-          true, true, Usage.class, 
+          true, Usage.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL,
               DictionaryEntry.AttributeGroup.TRANSLATION });
@@ -97,7 +98,7 @@ public class Attributes implements Attribute {
     public static final Attribute CATEGORY = new Attributes
         ( NAMES.getString( "att.category.name"),
           NAMES.getString( "att.category.desc"),
-          true, true, Category.class, 
+          true, Category.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL,
               DictionaryEntry.AttributeGroup.TRANSLATION });
@@ -105,30 +106,28 @@ public class Attributes implements Attribute {
     public static final Attribute GAIRAIGO = new Attributes
         ( NAMES.getString( "att.gairaigo.name"),
           NAMES.getString( "att.gairaigo.desc"),
-          false, true, Gairaigo.class, 
+          false, Gairaigo.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute EXPLANATION = new Attributes
         ( NAMES.getString( "att.explanation.name"),
           NAMES.getString( "att.explanation.desc"),
-          false, true, InformationAttributeValue.class,
+          false, InformationAttributeValue.class,
           new DictionaryEntry.AttributeGroup[]
             { DictionaryEntry.AttributeGroup.TRANSLATION });
 
     protected String name;
     protected String description;
     protected boolean canHaveValue;
-    protected boolean inheritable;
     protected Class valueClass;
     protected DictionaryEntry.AttributeGroup[] groups;
 
-    public Attributes( String _name, String _description, boolean _canHaveValue, boolean _inheritable,
+    public Attributes( String _name, String _description, boolean _canHaveValue,
                        Class _valueClass, DictionaryEntry.AttributeGroup[] _groups) {
         this.name = _name;
         this.description = _description;
         this.canHaveValue = _canHaveValue;
-        this.inheritable = _inheritable;
         this.valueClass = _valueClass;
         this.groups = _groups;
     }
@@ -138,8 +137,6 @@ public class Attributes implements Attribute {
     public String getDescription() { return description; }
 
     public boolean canHaveValue() { return canHaveValue; }
-
-    public boolean isInheritable() { return inheritable; }
 
     public Class getAttributeValueClass() { return valueClass; }
 

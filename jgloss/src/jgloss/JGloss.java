@@ -118,7 +118,7 @@ public class JGloss {
             //DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
             //DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
             DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
-            DictionaryFactory.registerImplementation( WaDokuJT.class, WaDokuJT.implementation);
+            DictionaryFactory.registerImplementation( WadokuJT.class, WadokuJT.implementation);
 
             // register text parsers
             ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null).getName());
