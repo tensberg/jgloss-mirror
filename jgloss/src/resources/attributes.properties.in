@@ -1,0 +1,161 @@
+# Encoding: ISO-8859-1
+#
+# Attribute id to short (.s) and long (.l) name mapping used by
+# jgloss.dictionary.attribute.DefaultCategoryAttributeValue 
+# Author: Michael Koch <tensberg@gmx.net>; definitions and descriptions
+# taken from the EDICT dictionary file format definition (Copyright
+# 2001 The Electronic Dictionary Research and Development Group, Monash
+# University)
+
+pos.adj.s=adj
+pos.adj.l=adjective (keiyoushi)
+
+pos.adv.s=adv
+pos.adv.l=adverb (fukushi)
+
+pos.adj-na.s=adj-na
+pos.adj-na.l=adjectival nouns or quasi-adjectives (keiyodoshi)
+
+pos.adj-no.s=adj-no
+pos.adj-no.l=nouns which may take the genitive case particle "no"
+
+pos.adj-pn.s=adj-pn
+pos.adj-pn.l=pre-noun adjectival (rentaishi)
+
+pos.adj-s.s=adj-s
+pos.adj-s.l=special adjective (e.g. ookii)
+
+pos.adj-t.s=adj-t
+pos.adj-t.l="taru" adjective
+
+pos.aux.s=aux
+pos.aux.l=auxiliary word or phrase
+
+pos.aux-v.s=aux-v
+pos.aux-v.l=auxiliary verb
+
+pos.conj.s=conj
+pos.conj.l=conjunction
+
+pos.n.s=n
+pos.n.l=noun (common) (futsuumeishi)
+
+pos.n-adv.s=n-adv
+pos.n-adv.l=adverbial noun (fukushitekimeishi)
+
+pos.n-t.s=n-t
+pos.n-t.l=noun (temporal) (jisoumeishi)
+
+pos.n-suf.s=n-suf
+pos.n-suf.l=noun, used as a suffix
+
+pos.neg.s=neg
+pos.neg.l=negative (in a negative sentence, or with negative verb)
+
+pos.neg-v.s=neg-v
+pos.neg-v.l=negative verb (when used with)
+
+pos.v1.s=v1
+pos.v1.l=Ichidan verb
+
+pos.v5.s=v5
+pos.v5.l=Godan verb (not completely classified)
+
+pos.v5u.s=v5u
+pos.v5u.l=Godan verb with `u' ending
+
+pos.v5k.s=v5k
+pos.v5k.l=Godan verb with `ku' ending
+
+pos.v5g.s=v5g
+pos.v5g.l=Godan verb with `gu' ending
+
+pos.v5s.s=v5s
+pos.v5s.l=Godan verb with `su' ending
+
+pos.v5t.s=v5t
+pos.v5t.l=Godan verb with `tsu' ending
+
+pos.v5n.s=v5n
+pos.v5n.l=Godan verb with `nu' ending
+
+pos.v5b.s=v5b
+pos.v5b.l=Godan verb with `bu' ending
+
+pos.v5m.s=v5m
+pos.v5m.l=Godan verb with `mu' ending
+
+pos.v5r.s=v5r
+pos.v5r.l=Godan verb with `ru' ending
+
+pos.v5k-s.s=v5k-s
+pos.v5k-s.l=Godan verb - Iku/Yuku special class
+
+pos.v5z.s=v5z
+pos.v5z.l=Godan verb - -zuru special class (alternative form of -jiru verbs)
+
+pos.v5aru.s=v5aru
+pos.v5aru.l=Godan verb - -aru special class
+
+pos.v5uru.s=v5uru
+pos.v5uru.l=Godan verb - -uru special class
+
+pos.vi.s=vi
+pos.vi.l=intransitive verb
+
+pos.vs.s=vs
+pos.vs.l=noun or participle which takes the aux. verb suru
+
+pos.vs-s.s=vs-s
+pos.vs-s.l=suru verb - special class
+
+pos.vk.s=vk
+pos.vk.l=Kuru verb - special class
+
+pos.vt.s=vt
+pos.vt.l=transitive verb
+
+usage.arch.s=arch
+usage.arch.l=archaism
+
+usage.col.s=col
+usage.col.l=colloquialism
+
+usage.fam.s=fam
+usage.fam.l=familiar language
+
+usage.fem.s=fem
+usage.fem.l=female term or language
+
+usage.hon.s=hon
+usage.hon.l=honorific or respectful (sonkeigo) language
+
+usage.hum.s=hum
+usage.hum.l=humble (kenjougo) language
+
+usage.MA.s=MA
+usage.MA.l=martial arts term
+
+usage.male.s=male
+usage.male.l=male term or language
+
+usage.m-sl.s=m-sl
+usage.m-sl.l=manga slang
+
+usage.obs.s=obs
+usage.obs.l=obsolete term
+
+usage.obsc.s=obsc
+usage.obsc.l=obscure term
+
+usage.pol.s=pol
+usage.pol.l=polite (teineigo) language
+
+usage.sl.s=sl
+usage.sl.l=slang
+
+usage.vulg.s=vulg
+usage.vulg.l=vulgar expression or word
+
+usage.X.s=X
+usage.X.l=rude or X-rated term

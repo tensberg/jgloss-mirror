@@ -24,6 +24,7 @@
 package jgloss.dictionary;
 
 import jgloss.dictionary.attribute.AttributeSet;
+import jgloss.dictionary.attribute.DefaultAttributeSet;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,8 +34,15 @@ public class EDictEntry implements DictionaryEntry {
     protected String reading;
     protected String[][] translations;
     protected Dictionary dictionary;
+    protected AttributeSet generalA;
+    protected AttributeSet wordA;
+    protected AttributeSet translationA;
+    protected AttributeSet[] translationRomA;
+    protected DefaultAttributeSet emptySet = new DefaultAttributeSet( null);
 
-    public EDictEntry( String _word, String _reading, List _translations, Dictionary _dictionary) {
+    public EDictEntry( String _word, String _reading, List _translations,
+                       AttributeSet _generalA, AttributeSet _wordA, AttributeSet _translationA,
+                       List _translationRomA, Dictionary _dictionary) {
         this.word = _word;
         this.reading = _reading;
         this.translations = new String[_translations.size()][];
@@ -43,11 +51,18 @@ public class EDictEntry implements DictionaryEntry {
             List crm = (List) i.next();
             translations[rom++] = (String[]) crm.toArray( new String[crm.size()]);
         }
+
+        this.generalA = _generalA;
+        this.wordA = _wordA;
+        this.translationA = _translationA;
+        translationRomA = new AttributeSet[_translationRomA.size()];
+        translationRomA = (AttributeSet[]) _translationRomA.toArray( translationRomA);
+
         this.dictionary = _dictionary;
     }
 
-    public AttributeSet getEntryAttributes() {
-        return null;
+    public AttributeSet getGeneralAttributes() {
+        return generalA;
     }
  
     public String getWord( int alternative) {
@@ -62,11 +77,11 @@ public class EDictEntry implements DictionaryEntry {
         if (alternative != 0)
             throw new IllegalArgumentException();
 
-        return null;
+        return emptySet.setParent( wordA);
     }
 
     public AttributeSet getWordAttributes() {
-        return null;
+        return wordA;
     }
 
     public String getReading( int alternative) {
@@ -81,11 +96,11 @@ public class EDictEntry implements DictionaryEntry {
         if (alternative != 0)
             throw new IllegalArgumentException();
 
-        return null;
+        return emptySet.setParent( getReadingAttributes());
     }
 
     public AttributeSet getReadingAttributes() {
-        return null;
+        return emptySet.setParent( generalA);
     }
 
     public String getTranslation( int rom, int crm, int synonym) {
@@ -111,29 +126,52 @@ public class EDictEntry implements DictionaryEntry {
     public int getTranslationSynonymCount( int rom, int crm) { return 1; }
 
     public AttributeSet getTranslationAttributes( int rom, int crm, int synonym) {
-        return null;
+        if (synonym != 0)
+            throw new IllegalArgumentException();
+        try {
+            if (crm<0 || crm >= translations[rom].length)
+                throw new IllegalArgumentException();
+            return emptySet.setParent( translationRomA[rom]);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public AttributeSet getTranslationAttributes( int rom, int crm) {
-        return null;
+        try {
+            if (crm<0 || crm >= translations[rom].length)
+                throw new IllegalArgumentException();
+            return emptySet.setParent( translationRomA[rom]);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public AttributeSet getTranslationAttributes( int rom) {
-        return null;
+        try {
+            return translationRomA[rom];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public AttributeSet getTranslationAttributes() {
-        return null;
+        return translationA;
     }
 
     public Dictionary getDictionary() { return dictionary; }
 
     public String toString() {
         StringBuffer out = new StringBuffer( 30);
+        out.append( generalA.toString());
+        out.append( ' ');
+        out.append( wordA.toString());
+        out.append( ' ');
         out.append( word);
         out.append( " [");
         out.append( reading);
-        out.append( ']');
+        out.append( "] ");
+        out.append( translationA);
         for ( int i=0; i<translations.length; i++) {
             out.append( ' ');
             if (translations.length > 1) {
@@ -141,6 +179,8 @@ public class EDictEntry implements DictionaryEntry {
                 out.append( i+1);
                 out.append( ") ");
             }
+            out.append( translationRomA[i]);
+            out.append( ' ');
             for ( int j=0; j<translations[i].length; j++) {
                 if (j > 0)
                     out.append( "; ");

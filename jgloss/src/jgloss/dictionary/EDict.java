@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.dictionary.attribute.*;
+
 import java.io.*;
 import java.nio.*;
 import java.nio.charset.CharacterCodingException;
@@ -55,8 +57,8 @@ public class EDict extends FileBasedDictionary {
         f.select( DictionaryEntryField.TRANSLATION, true);
         f.select( MatchMode.WORD, true);
 
-        java.util.Iterator r = d.search( ExpressionSearchModes.EXACT,
-                               new Object[] { args[1], f });
+        java.util.Iterator r = d.search( ExpressionSearchModes.ANY,
+                                         new Object[] { args[1], f });
         System.err.println( "Matches:");
         while (r.hasNext())
             System.err.println( r.next().toString());
@@ -95,6 +97,20 @@ public class EDict extends FileBasedDictionary {
                   ( "\\A\\S+?(\\s\\[.+?\\])?\\s/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
                   1.0f, 4096, EDict.class.getConstructor( new Class[] { File.class }));
         } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    protected final static AttributeMapper mapper = initMapper();
+
+    private static AttributeMapper initMapper() {
+        try {
+            Reader r = new InputStreamReader( EDict.class.getResourceAsStream( "/resources/edict.map"));
+            AttributeMapper mapper = new AttributeMapper( new LineNumberReader( r));
+            r.close();
+            return mapper;
+        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
@@ -237,6 +253,17 @@ public class EDict extends FileBasedDictionary {
         List crm = new ArrayList( 10);
         rom.add( crm);
 
+        DefaultAttributeSet generalA = new DefaultAttributeSet();
+        DefaultAttributeSet wordA = new DefaultAttributeSet( generalA);
+        DefaultAttributeSet translationA = new DefaultAttributeSet( generalA);
+        List roma = new ArrayList( 10);
+        DefaultAttributeSet translationromA = new DefaultAttributeSet( translationA);
+        roma.add( translationromA);
+
+        // ROM markers and entry attributes are written in brackets before the translation text.
+        // Attributes which are placed in the first translation before the first ROM marker apply
+        // to the whole entry, the other attributes only apply to the ROM.
+        boolean seenROM = false;
         int start = 0;
         do {
             int end = translations.indexOf( '/', start);
@@ -244,17 +271,19 @@ public class EDict extends FileBasedDictionary {
                 end = translations.length();
 
             String translation = translations.substring( start, end);
+
             BRACKET_MATCHER.reset( translation);
             int matchend = 0;
+
             while (BRACKET_MATCHER.find()) {
                 matchend = BRACKET_MATCHER.end();
 
-                // ROM marker or POS
-                String group = BRACKET_MATCHER.group( 1);
+                String att = BRACKET_MATCHER.group( 1);
+                
                 boolean isNumber = true;
-                for ( int i=0; i<group.length(); i++) {
-                    if (group.charAt( i)<'1' ||
-                        group.charAt( i)>'9') {
+                for ( int i=0; i<att.length(); i++) {
+                    if (att.charAt( i)<'1' ||
+                        att.charAt( i)>'9') {
                         isNumber = false;
                         break;
                     }
@@ -264,7 +293,43 @@ public class EDict extends FileBasedDictionary {
                     if (crm.size() > 0) {
                         crm = new ArrayList( 10);
                         rom.add( crm);
+                        translationromA = new DefaultAttributeSet( translationA);
+                        roma.add( translationromA);
                     }
+                    seenROM = true;
+                }
+                else {
+                    // attribute list separated by ','
+                    int startc = 0;
+                    do {
+                        int endc = att.indexOf( ',', startc);
+                        if (endc == -1)
+                            endc = att.length();
+                        AttributeMapper.Mapping mapping = mapper.getMapping( att.substring( startc, endc));
+                        if (mapping != null) {
+                            Attribute a = mapping.getAttribute();
+                            if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
+                                (!seenROM || 
+                                 !a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION))) {
+                                generalA.putAttribute( a, mapping.getValue());
+                            }
+                            else if (a.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
+                                wordA.putAttribute( a, mapping.getValue());
+                            }
+                            else if (a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
+                                if (seenROM)
+                                    translationromA.putAttribute( a, mapping.getValue());
+                                else
+                                    translationA.putAttribute( a, mapping.getValue());
+                            }
+                            else {
+                                // should not happen, edict does not support READING attributes
+                                System.err.println( "illegal attribute type");
+                            }
+                        }
+                        
+                        startc = endc + 1;
+                    } while (startc < att.length());
                 }
             }
 
@@ -276,7 +341,7 @@ public class EDict extends FileBasedDictionary {
             start = end+1;
         } while (start < translations.length());
 
-        return new EDictEntry( word, reading, rom, this);
+        return new EDictEntry( word, reading, rom, generalA, wordA, translationA, roma, this);
     }
     
     public String toString() {

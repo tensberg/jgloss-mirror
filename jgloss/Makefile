@@ -51,11 +51,7 @@ DATA_WWW := HTMLAnnotator vconj
 
 ICONS := jgloss.png html.png tex.png txt.png chasen.png template.png
 
-RESOURCES := messages.properties messages-dictionary.properties messages-parser.properties \
-             messages_de.properties messages-dictionary_de.properties messages-parser_de.properties \
-             messages_fr.properties messages-dictionary_fr.properties messages-parser_fr.properties \
-             jgloss-ui-HTMLifyReader.properties \
-             preferences.properties
+RESOURCES := $(basename $(notdir $(wildcard src/resources/*.in)))
 
 RESOURCES_WWW := messages-www.properties messages-dictionary.properties \
                  messages-dictionary_de.properties \
@@ -93,7 +89,7 @@ vpath %.pdf doc
 vpath %.docbook doc.src
 vpath %.html doc/html
 
-.phony: dist dist-binary dist-source setup setup_www clean compile doc gen-javadoc jgloss jgloss-www
+.phony: dist dist-binary dist-source setup setup_www clean compile doc gen-javadoc jgloss jgloss-www resources
 
 jgloss: compile $(RESOURCES) setup
 	$(JAR) cfm jgloss.jar MANIFEST.MF $(BINARY_JAR)
@@ -173,6 +169,8 @@ index.html: jgloss.docbook doc.src/stylesheet.dsl
 	mkdir -p doc/html
 	cp -r doc.src/img doc/html
 	docbook2html -o doc/html -d $(shell pwd)/doc.src/stylesheet.dsl $<
+
+resources: $(RESOURCES)
 
 clean:
 	-rm -r jgloss resources data dist doc javadoc jgloss.jar jgloss-www

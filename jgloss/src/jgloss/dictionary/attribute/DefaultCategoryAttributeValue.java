@@ -56,10 +56,10 @@ abstract class DefaultCategoryAttributeValue implements CategoryAttributeValue {
     }
     
     public String getId() { return id; }
-    public String toString() { return '(' + id + ')'; }
-
     public String getShortName() { return shortName; }
     public String getLongName() { return longName; }
+
+    public String toString() { return shortName; }
 
     /**
      * Return the resource bundle from which the attribute value names will be fetched.

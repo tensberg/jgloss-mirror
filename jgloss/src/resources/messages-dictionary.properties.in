@@ -35,3 +35,26 @@ edict.editable.name=EDICT (editable)
 
 kanjidic.nanori=(nanori, name reading)
 kanjidic.radicalname=(name of radical)
+
+# standard attribute names
+
+att.part_of_speech.name=POS
+att.part_of_speech.desc=part of speech
+
+att.priority.name=pri
+att.priority.desc=priority of entry
+
+att.example.name=ex
+att.example.desc=example
+
+att.abbreviation.name=abbr
+att.abbreviation.desc=abbreviation
+
+att.synonym.name=syn
+att.synonym.desc=synonym (equal meaning)
+
+att.antonym.name=ant
+att.antonym.desc=antonym (opposite meaning)
+
+att.usage.name=usage
+att.usage.desc=usage hint

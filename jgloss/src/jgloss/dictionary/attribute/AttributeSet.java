@@ -48,7 +48,7 @@ public interface AttributeSet {
      *                  <code>false</code> if inherited attributes should be ignored.
      * @exception AttributeNotSetException if the attribute is not defined.
      */
-    AttributeValue getAttribute( Attribute key, boolean resolveInherited) throws AttributeNotSetException;
+    ValueList getAttribute( Attribute key, boolean resolveInherited) throws AttributeNotSetException;
     /**
      * Test if a given attribute is inherited from a parent attribute set.
      *

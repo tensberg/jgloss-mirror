@@ -32,9 +32,25 @@ import jgloss.dictionary.attribute.*;
  */
 public interface DictionaryEntry {
     /**
+     * Typesafe enumeration of attribute groups dictionary entries have.
+     */
+    public static class AttributeGroup {
+        public static final AttributeGroup GENERAL = new AttributeGroup( "GENERAL");
+        public static final AttributeGroup WORD = new AttributeGroup( "WORD");
+        public static final AttributeGroup READING = new AttributeGroup( "READING");
+        public static final AttributeGroup TRANSLATION = new AttributeGroup( "TRANSLATION");
+
+        private String name;
+
+        private AttributeGroup( String _name) { this.name = _name; }
+
+        public String toString() { return name; }
+    } // class AttributeGroup
+
+    /**
      * Return the set of attributes which apply to the whole entry.
      */
-    AttributeSet getEntryAttributes();
+    AttributeSet getGeneralAttributes();
  
     /**
      * Return one spelling variant of the entry word. Each entry word may have several spelling

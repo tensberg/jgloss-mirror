@@ -23,6 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
+import jgloss.util.NullIterator;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,10 +49,10 @@ public class DefaultAttributeSet implements AttributeSet {
             return false;
     }
 
-    public AttributeValue getAttribute( Attribute key, boolean resolveInherited) 
+    public ValueList getAttribute( Attribute key, boolean resolveInherited) 
         throws AttributeNotSetException {
         if (attributes!=null && attributes.containsKey( key))
-            return (AttributeValue) attributes.get( key);
+            return (ValueList) attributes.get( key);
         else if (resolveInherited && parent!=null)
             return parent.getAttribute( key, true);
         else
@@ -75,15 +77,49 @@ public class DefaultAttributeSet implements AttributeSet {
             return NullIterator.INSTANCE;
     }
 
+    /**
+     * Set the parent attribute set used to resolve inherited attributes.
+     *
+     * @return This attribute set.
+     */
+    public DefaultAttributeSet setParent( AttributeSet _parent) {
+        this.parent = _parent;
+        return this;
+    }
+
     public AttributeSet getParent() { return parent; }
 
     public void putAttribute( Attribute key, AttributeValue value) {
         if (attributes == null)
-            attributes = new HashSet( 11);
+            attributes = new HashMap( 11);
         attributes.put( key, value);
+    }
+
+    public void putAttributes( Attribute key, ValueList values) {
+        if (attributes == null)
+            attributes = new HashMap( 11);
+        if (!attributes.containsKey( 
     }
 
     public boolean isEmpty() {
         return attributes == null;
+    }
+
+    public String toString() {
+        if (attributes == null)
+            return "()";
+
+        StringBuffer out = new StringBuffer( 128);
+        out.append( '(');
+        for ( Iterator i=attributes.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry entry = (Map.Entry) i.next();
+            out.append( entry.getKey().toString());
+            out.append( ':');
+            out.append( entry.getValue().toString());
+            if (i.hasNext())
+                out.append( ',');
+        }
+        out.append( ')');
+        return out.toString();
     }
 } // class DefaultAttributeSet

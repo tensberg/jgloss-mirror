@@ -23,6 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
+import jgloss.dictionary.DictionaryEntry;
+
 /**
  * Attributes which encapsulate extended informations for dictionary entries.
  * Singleton instances of classes implementing this interface are used as keys in
@@ -46,4 +48,6 @@ public interface Attribute {
     boolean isInheritable();
 
     Class getAttributeValueClass();
+
+    boolean appliesTo( DictionaryEntry.AttributeGroup group);
 } // interface Attribute

@@ -909,10 +909,10 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                     continue;
                 }
 
-                System.err.println( isFieldStart( entry, match, field));
+                /*System.err.println( isFieldStart( entry, match, field));
                 System.err.println( isFieldEnd( entry, match+expressionLength, field));
                 System.err.println( isWordStart( entry, match, field));
-                System.err.println( isWordEnd( entry, match+expressionLength, field));
+                System.err.println( isWordEnd( entry, match+expressionLength, field));*/
                 // test if entry matches search mode
                 if (searchmode == ExpressionSearchModes.EXACT ||
                     searchmode == ExpressionSearchModes.PREFIX) {

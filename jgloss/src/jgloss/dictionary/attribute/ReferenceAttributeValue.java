@@ -21,7 +21,9 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.dictionary.attribute;
+
+import jgloss.dictionary.DictionaryEntryRef;
 
 public interface ReferenceAttributeValue extends AttributeValue {
     DictionaryEntryRef getReference();
