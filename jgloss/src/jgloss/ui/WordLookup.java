@@ -161,6 +161,7 @@ public class WordLookup extends JFrame {
         JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.file"));
         menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importDocument));
         menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importClipboard));
+        addWindowListener( JGlossFrame.actions.importClipboardListener);
         menu.addMenuListener( JGlossFrame.actions.importClipboardListener);
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.open));

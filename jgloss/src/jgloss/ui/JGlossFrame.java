@@ -67,7 +67,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
          * Menu listener which will update the state of the import clipboard
          * action when the menu is selected.
          */
-        public final MenuListener importClipboardListener;
+        public final ImportClipboardListener importClipboardListener;
         /**
          * Opens a document created by JGloss in an empty JGlossFrame.
          */
@@ -193,30 +193,9 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     }
                 };
 
-            importClipboardListener = new MenuListener() {
-                    public void menuSelected( MenuEvent e) {
-                        // enable the import clipboard menu item if the clipboard contains some text
-                        Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard()
-                            .getContents( this);
-                        boolean enabled = false;
-                        if (t != null) {
-                            if (t.isDataFlavorSupported( DataFlavor.stringFlavor))
-                                enabled = true;
-                            else if (t.getClass().getName().equals( "sun.awt.motif.X11Selection")) try {
-                                // With the X11 implementation of Java, getting the transfer data
-                                // succeeds even if isDataFlavorSupported returns false.
-                                t.getTransferData( DataFlavor.stringFlavor);
-                                enabled = true;
-                            } catch (UnsupportedFlavorException ex) {
-                            } catch (IOException ex) {}
-                        }
-                        importClipboard.setEnabled( enabled);
-                    }
-                    public void menuDeselected( MenuEvent e) {}
-                    public void menuCanceled( MenuEvent e) {}
-                };
+            importClipboardListener = new ImportClipboardListener( importClipboard);
         }
-    }
+    } // class Actions
 
     /**
      * Static instance of the actions which can be used by other classes. If an action
@@ -224,6 +203,35 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * action.
      */
     public final static Actions actions = new Actions( null);
+
+    /**
+     * Updates the status of the import clipboard action correspoding to certain events.
+     * The import clipboard action should only be enabled if the system clipboard contains a
+     * string. This listener checks the status of the clipboard and updates the action state if
+     * the window the listener is attached to is brought to the foreground and/or if the menu the
+     * listener is attached to is expanded.
+     */
+    private static class ImportClipboardListener extends WindowAdapter implements MenuListener {
+        private Action importClipboard;
+
+        public ImportClipboardListener( Action _importClipboard) {
+            this.importClipboard = _importClipboard;
+        }
+
+        private void checkUpdate() {
+            // enable the import clipboard menu item if the clipboard contains some text
+            importClipboard.setEnabled( UIUtilities.clipboardContainsString());
+        }
+
+        public void windowActivated( WindowEvent e) {
+            checkUpdate();
+        }
+        public void menuSelected( MenuEvent e) {
+            checkUpdate();
+        }
+        public void menuDeselected( MenuEvent e) {}
+        public void menuCanceled( MenuEvent e) {}
+    } // class ImportClipboardListener
 
     /**
      * Open recent menu used for JGloss documents. The instance is shared between instances of
@@ -573,6 +581,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
         menu.add( UIUtilities.createMenuItem( closeAction));
         bar.add( menu);
 
+        frame.addWindowListener( actions.importClipboardListener);
         menu.addMenuListener( actions.importClipboardListener);
 
         menu = docpane.getEditMenu();
@@ -1108,18 +1117,19 @@ public class JGlossFrame extends JPanel implements ActionListener {
                                 // the user may close the document before or during rendering,
                                 // so make sure that docpane is not set to null
                                 JGlossEditor dp = docpane;
+                                JScrollPane ds = docpaneScroller;
                                 final JViewport port = new JViewport();
-                                if (dp != null) {
+                                if (dp!=null && ds!=null) {
                                     synchronized (dp) {
                                         // the docpane is not visible, and we are synched on it,
                                         // so it is safe to set the size even though this is not 
                                         // the event dispatch thread
-                                        dp.setSize( docpaneScroller.getViewport().getExtentSize().width,
-                                                    docpane.getPreferredSize().height);
+                                        dp.setSize( ds.getViewport().getExtentSize().width,
+                                                    dp.getPreferredSize().height);
                                         // now the docpane is set to the correct width, call method again
                                         // to set to correct height for the applied width
-                                        dp.setSize( docpaneScroller.getViewport().getExtentSize().width,
-                                                    docpane.getPreferredSize().height);
+                                        dp.setSize( ds.getViewport().getExtentSize().width,
+                                                    dp.getPreferredSize().height);
                                         port.setView( dp);
                                     }
                                 }

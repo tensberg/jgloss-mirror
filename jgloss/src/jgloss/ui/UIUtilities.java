@@ -28,6 +28,8 @@ import jgloss.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.*;
+import java.io.IOException;
 
 import javax.swing.*;
 
@@ -198,5 +200,30 @@ public class UIUtilities {
             ( KeyStroke.getKeyStroke( "ESCAPE"), "cancelAction");
         ((JPanel) c.getContentPane()).getActionMap().put
             ( "cancelAction", cancelAction);
+    }
+
+    /**
+     * Test if the system clipboard currently contains a transferrable object which can be
+     * accessed as string.
+     *
+     * @return <code>true</code> if the system clipboard contains a string.
+     */
+    public static boolean clipboardContainsString() {
+        Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard()
+            .getContents( null);
+        boolean containsString = false;
+        if (t != null) {
+            if (t.isDataFlavorSupported( DataFlavor.stringFlavor))
+                containsString = true;
+            else if (t.getClass().getName().equals( "sun.awt.motif.X11Selection")) try {
+                // With the X11 implementation of Java, getting the transfer data
+                // succeeds even if isDataFlavorSupported returns false.
+                t.getTransferData( DataFlavor.stringFlavor);
+                containsString = true;
+            } catch (UnsupportedFlavorException ex) {
+            } catch (IOException ex) {}
+        }
+
+        return containsString;
     }
 } // class UIUtilities
