@@ -216,6 +216,14 @@ public class HTMLExporter extends JGlossWriter {
             }
         }            
 
+        if ((writeReading || writeTranslations) &&
+            elem.getAttributes().getAttribute( StyleConstants.NameAttribute)
+            .equals( HTML.Tag.BODY)) {
+            // write DIV for floating popup
+            write( "<div id=\"reading-popup\" class=\"popup\">placeholder</div>\n");
+            write( "<div id=\"translation-popup\" class=\"popup\">placeholder</div>\n");
+        }
+
         super.endTag( elem);
     }
 
