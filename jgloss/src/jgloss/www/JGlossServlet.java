@@ -271,6 +271,7 @@ public class JGlossServlet extends HttpServlet {
         noForwardHeaders.add( "host");
         // response header fields
         noForwardHeaders.add( "accept-ranges");
+        noForwardHeaders.add( "location"); // handled separately
         // entity header fields
         noForwardHeaders.add( "content-encoding");
         noForwardHeaders.add( "content-length");
@@ -282,6 +283,7 @@ public class JGlossServlet extends HttpServlet {
         noForwardHeaders.add( "set-cookie2");
         noForwardHeaders.add( "cookie");
         noForwardHeaders.add( "cookie2");
+        noForwardHeaders.add( "proxy-connection");
 
         // read supported types
         rewrittenContentTypes = new String[0];
@@ -420,7 +422,7 @@ public class JGlossServlet extends HttpServlet {
             }
         }
 
-        URL url;
+        URL url; // url pointing to the remote server
         try {
             url = new URL( urlstring);
         } catch (MalformedURLException ex) {
@@ -444,16 +446,18 @@ public class JGlossServlet extends HttpServlet {
             getServletContext().log( "protocol not allowed accessing " + url.toString());
             return;
         }
+        boolean remoteIsHttp = protocol.equals( "http") || protocol.equals( "https");
 
-        boolean forwardCookies = (protocol.equals( "http") || protocol.equals( "https")) &&
-            enableCookieForwarding && allowCookieForwarding &&
-            (enableCookieSecureInsecureForwarding ||
-             !"https".equalsIgnoreCase( url.getProtocol()) 
-             || req.isSecure());
-        boolean forwardFormData = (protocol.equals( "http") || protocol.equals( "https")) &&
+        // cookie forwarding works in two directions, and the secure-to-insecure test
+        // is different in each direction and will be done further down
+        boolean forwardCookies = remoteIsHttp &&
+            enableCookieForwarding && allowCookieForwarding;
+        // form data is only forwarded in one direction, so the secure-to-insecure test
+        // can be done here
+        boolean forwardFormData = remoteIsHttp &&
             enableFormDataForwarding && allowFormDataForwarding &&
             (enableFormDataSecureInsecureForwarding ||
-             !req.isSecure() || "https".equalsIgnoreCase( url.getProtocol()));
+             !req.isSecure() || url.getProtocol().equals( "https"));
 
         // add query parameters which may have been appended by a GET form
         if (forwardFormData) {
@@ -466,175 +470,120 @@ public class JGlossServlet extends HttpServlet {
             }
         }
 
-        Cookie[] requestcookies = req.getCookies(); // will not be modified
-        Cookie[] cookies = requestcookies; // new cookies will be added when following redirects
-        HashMap newCookies = new HashMap( 30);
+        JGlossURLRewriter rewriter = new JGlossURLRewriter
+            ( req.getContextPath() + req.getServletPath(),
+              url, connectionAllowedProtocols,
+              allowCookieForwarding, allowFormDataForwarding);
+        
+        // prepare the connection to the remote server
+        URLConnection connection = url.openConnection();
 
-        boolean followingRedirect = false;
-        // detect cycles in redirection
-        Set redirects = new HashSet( 50);
-        redirects.add( url);
+        if (forwardFormData && post && remoteIsHttp) {
+            getServletContext().log( "using POST");
+
+            try {
+                ((HttpURLConnection) connection).setRequestMethod( "POST");
+            } catch (ClassCastException ex) {
+                // there is no guarantee that connection is really a subclass of HttpURLConnection
+                getServletContext().log( "failed to set method POST: " + ex.getMessage());
+            }
+
+            connection.setDoInput( true);
+            connection.setDoOutput( true);
+        }
+
         String acceptEncoding = buildAcceptEncoding( req.getHeader( "accept-encoding"));
         getServletContext().log( "accept-encoding: " + acceptEncoding);
-        do {
-            JGlossURLRewriter rewriter = new JGlossURLRewriter
-                ( req.getContextPath() + req.getServletPath(),
-                  url, connectionAllowedProtocols,
-                  allowCookieForwarding, allowFormDataForwarding);
+        if (acceptEncoding != null)
+            connection.setRequestProperty( "Accept-Encoding", acceptEncoding);
 
-            URLConnection connection = url.openConnection();
-            if (acceptEncoding != null)
-                connection.setRequestProperty( "accept-encoding", acceptEncoding);
+        forwardRequestHeaders( connection, req);
 
-            if (forwardFormData && post && connection instanceof HttpURLConnection) {
-                getServletContext().log( "using POST");
-                ((HttpURLConnection) connection).setRequestMethod( "POST");
-                connection.setDoInput( true);
-                connection.setDoOutput( true);
-            }
+        if (forwardCookies &&
+            (enableCookieSecureInsecureForwarding ||
+             !req.isSecure() || url.getProtocol().equals( "https")))
+            CookieTools.addRequestCookies( connection, req.getCookies(), getServletContext());
+
+        // open the connection to the remote server
+        try {
+            connection.connect();
+        } catch (UnknownHostException ex) {
+            resp.sendError( HttpServletResponse.SC_BAD_GATEWAY,
+                            MessageFormat.format
+                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                              .getString( "error.unknownhost"),
+                              new Object[] { url.toExternalForm(), url.getHost() } ));
+            return;
+        } catch (IOException ex) {
+            resp.sendError( HttpServletResponse.SC_BAD_GATEWAY,
+                            MessageFormat.format
+                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                              .getString( "error.connect"),
+                              new Object[] { url.toExternalForm(), ex.getClass().getName(),
+                                             ex.getMessage() } ));
+            return;
+        }
+
+        // forward the form data of a post request
+        if (forwardFormData && post && remoteIsHttp) {
+            InputStream is = req.getInputStream();
+            OutputStream os = connection.getOutputStream();
+            byte[] buf = new byte[512];
+            int len;
+            while ((len=is.read( buf)) != -1)
+                os.write( buf, 0, len);
+            is.close();
+            os.close();
+        }
             
-            forwardRequestHeaders( connection, req);
-            if (forwardCookies)
-                CookieTools.addRequestCookies( connection, cookies, getServletContext());
-            
+        // process the remote server response
+        forwardResponseHeaders( connection, req, resp, rewriter);
+        if (forwardCookies &&
+            (enableCookieSecureInsecureForwarding ||
+             req.isSecure() || !url.getProtocol().equals( "https")))
+            CookieTools.addResponseCookies( connection, resp, req.getServerName(),
+                                            req.getContextPath() + req.getServletPath(),
+                                            req.isSecure(), getServletContext());
+
+        if (remoteIsHttp) {
+            // forward the response code
             try {
-                connection.connect();
-            } catch (UnknownHostException ex) {
-                resp.sendError( HttpServletResponse.SC_BAD_GATEWAY,
-                                MessageFormat.format
-                                ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
-                                  .getString( "error.unknownhost"),
-                                  new Object[] { url.toExternalForm(), url.getHost() } ));
-                return;
-            } catch (IOException ex) {
-                resp.sendError( HttpServletResponse.SC_BAD_GATEWAY,
-                                MessageFormat.format
-                                ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
-                                  .getString( "error.connect"),
-                                  new Object[] { url.toExternalForm(), ex.getClass().getName(),
-                                                 ex.getMessage() } ));
-                return;
-            }
-
-            if (forwardFormData && post && 
-                connection instanceof HttpURLConnection) {
-                InputStream is = req.getInputStream();
-                OutputStream os = connection.getOutputStream();
-                byte[] buf = new byte[512];
-                int len;
-                while ((len=is.read( buf)) != -1)
-                    os.write( buf, 0, len);
-                is.close();
-                os.close();
-            }
-            
-            // test redirect directive
-            followingRedirect = false;
-            int response = 0;
-            if (connection instanceof HttpURLConnection) {
-                response = ((HttpURLConnection) connection).getResponseCode();
+                int response = ((HttpURLConnection) connection).getResponseCode();
                 getServletContext().log( "response code " + response);
-                if ((response==301 || response==307) && post) {
-                    getServletContext().log( "POST: not following redirect");
-                }
-                if ((response==301 || response==307) && !post ||
-                    response==302 || response==303) {
-                    // Following a 302 redirection which originated from a POST violates
-                    // RFC2616, but since some servers expect this and 
-                    // HttpURLConnection does not use HTTP/1.1 this should be OK.
-                    String location = connection.getHeaderField( "location");
-                    if (location != null) try {
-                        url = new URL( location);
-                        if (!connectionAllowedProtocols.contains( url.getProtocol())) {
-                            resp.sendError( HttpServletResponse.SC_FORBIDDEN,
-                                            MessageFormat.format
-                                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
-                                              .getString( "error.forwardprotocolnotallowed"),
-                                              new Object[] { url.toString(), url.getProtocol() } ));
-                            getServletContext().log( "forward protocol not allowed accessing " +
-                                                     url.toString());
-                        }
-                        else if (!redirects.contains( url) &&
-                            // While RFC2616 does not set a limit on redirects, I want to
-                            // avoid an endless number of redirects by a broken or malicious server.
-                            redirects.size() < 30) {
-                            followingRedirect = true;
-                            redirects.add( url);
-                            post = false; // use GET instead of POST when following
-                            getServletContext().log( "following redirect to " + location);
-                        }
-                    } catch (MalformedURLException ex) {
-                        getServletContext().log( "malformed url " + location + "/" + ex.getMessage());
-                    }
-                }
-            }
-
-            if (forwardCookies) {
-                CookieTools.parseResponseCookies( connection, newCookies, req.getServerName(),
-                                                  req.getContextPath() + req.getServletPath(),
-                                                  req.isSecure(), getServletContext());
-                if (newCookies.size() > 0) {
-                    if (followingRedirect) {
-                        // Add the newly generated cookies to the next redirection.
-                        // The old and new cookies have to be merged. For equality test a test
-                        // on the cookie name is sufficient because the domain/path/port/name is
-                        // encoded in the name.
-                        if (requestcookies != null) {
-                            Map mergedCookies = new HashMap( (requestcookies.length+newCookies.size())*2);
-                            for ( int i=0; i<cookies.length; i++)
-                                mergedCookies.put( cookies[i].getName(), cookies[i]);
-                            mergedCookies.putAll( newCookies);
-                            cookies = (Cookie[]) mergedCookies.values().toArray( cookies);
-                        }
-                        else
-                            cookies = (Cookie[]) newCookies.values().toArray( cookies);
-                    }
-                    else // add all new cookies to the response
-                        for ( Iterator i=newCookies.values().iterator(); i.hasNext(); )
-                            resp.addCookie( (Cookie) i.next());
-                }
-            }
-            
-            if (!followingRedirect) {
-                forwardResponseHeaders( connection, req, resp);
-
-                if (response != 0) // == 0 if remote protocol was not http/https
-                    resp.setStatus( response);
-                if (response == 304) // 304 Not Modified: empty response
+                resp.setStatus( response);
+                if (response == 304) // 304 Not Modified: empty response body
                     return;
-
-                String encoding = connection.getContentEncoding();
-                getServletContext().log( "Content-Encoding: " + encoding);
-
-                String type = connection.getContentType();
-                getServletContext().log( "content type " + type + " url " +
-                                         connection.getURL().toString());
-                boolean supported = false;
-                if (type != null) {
-                    for ( int i=0; i<rewrittenContentTypes.length; i++)
-                        if (type.startsWith( rewrittenContentTypes[i])) {
-                            supported = true;
-                            break;
-                        }
-                }   
-                if (supported) {
-                    // If the content encoding cannot be decoded by the servlet,
-                    // the content is tunneled to the browser.
-                    // Multiple encodings are currently not supported and may lead to wrong
-                    // behavior.
-                    supported = encoding==null || encoding.endsWith( "gzip") || 
-                        encoding.endsWith( "deflate") || encoding.equals( "identity");
-                }
-
-                if (supported)
-                    rewrite( connection, req, resp, rewriter);
-                else {
-                    if (encoding != null)
-                        resp.setHeader( "Content-Encoding", encoding);
-                    tunnel( connection, req, resp);
-                }
+            } catch (ClassCastException ex) {
+                // there is no guarantee that connection is really a subclass of HttpURLConnection
+                getServletContext().log( "failed to read response code: " + ex.getMessage());
             }
-        } while (followingRedirect);
+        }
+
+        String type = connection.getContentType();
+        getServletContext().log( "content type " + type + " url " +
+                                 connection.getURL().toString());
+        boolean supported = false;
+        if (type != null) {
+            for ( int i=0; i<rewrittenContentTypes.length; i++)
+                if (type.startsWith( rewrittenContentTypes[i])) {
+                    supported = true;
+                    break;
+                }
+        }   
+        if (supported) {
+            // If the content encoding cannot be decoded by the servlet,
+            // the content is tunneled to the browser.
+            // Multiple encodings are currently not supported and may lead to wrong
+            // behavior.
+            String encoding = connection.getContentEncoding();
+            supported = encoding==null || encoding.endsWith( "gzip") || 
+                encoding.endsWith( "deflate") || encoding.equals( "identity");
+        }
+
+        if (supported)
+            rewrite( connection, req, resp, rewriter);
+        else
+            tunnel( connection, req, resp);
     }
 
     protected void tunnel( URLConnection connection, HttpServletRequest req, HttpServletResponse resp) 
@@ -645,6 +594,8 @@ public class JGlossServlet extends HttpServlet {
             resp.setContentType( connection.getContentType());
         if (connection.getContentLength() > 0)
             resp.setContentLength( connection.getContentLength());
+        if (connection.getContentEncoding() != null)
+            resp.setHeader( "Content-Encoding", connection.getContentEncoding());
 
         InputStream in = connection.getInputStream();
         OutputStream out = resp.getOutputStream();
@@ -668,18 +619,12 @@ public class JGlossServlet extends HttpServlet {
         // Multiple encodings are currently not supported and may lead to wrong
         // behavior.
         String encoding = connection.getContentEncoding();
-        boolean usegzip = false;
-        boolean usedeflate = false;
         if (encoding != null) {
             if (encoding.endsWith( "gzip"))
-                usegzip = true;
+                in = new GZIPInputStream( in);
             else if (encoding.endsWith( "deflate"))
-                usedeflate = true;
+                in = new InflaterInputStream( in);
         }
-        if (usegzip)
-            in = new GZIPInputStream( in);
-        else if (usedeflate)
-            in = new InflaterInputStream( in);
         
         InputStreamReader reader = CharacterEncodingDetector.getReader( in, null, 5000);
         try {
@@ -703,7 +648,7 @@ public class JGlossServlet extends HttpServlet {
         connection.setRequestProperty( "Via", via);
 
         // HTTP request headers
-        if (connection.getURL().getProtocol().toLowerCase().startsWith( "http")) { // http and https
+        if (connection.getURL().getProtocol().startsWith( "http")) { // http and https
             // The host header contains the hostname of the JGloss-WWW server, but should
             // contain the hostname of the remote server.
             String host = connection.getURL().getHost();
@@ -713,7 +658,6 @@ public class JGlossServlet extends HttpServlet {
             }
 
             // Add the referrer, removing the servlet-encoding if neccessary.
-            // The referrer remains the original URI if a redirect is followed.
             String referer = req.getHeader( "referer");
             if (referer != null) {
                 int index = referer.lastIndexOf( req.getServletPath() + "/");
@@ -749,18 +693,32 @@ public class JGlossServlet extends HttpServlet {
     }
 
     protected void forwardResponseHeaders( URLConnection connection, HttpServletRequest req,
-                                           HttpServletResponse resp) {
+                                           HttpServletResponse resp, URLRewriter rewriter) {
         String via = connection.getHeaderField( "Via");
         if (via == null)
             via = "";
         else
             via += ", ";
         via += req.getProtocol() + " " +
-        req.getServerName() + ":" + req.getServerPort();
+            req.getServerName() + ":" + req.getServerPort();
         resp.setHeader( "Via", via);
 
         // HTTP response headers
-        if (connection.getURL().getProtocol().toLowerCase().startsWith( "http")) { // http and https
+        if (connection.getURL().getProtocol().startsWith( "http")) { // http and https
+            // change the location header from a redirect response to point to the servlet
+            String location = connection.getHeaderField( "location");
+            if (location != null) {
+                getServletContext().log( "location: " + location);
+                try {
+                    location = rewriter.rewrite( location);
+                } catch (MalformedURLException ex) {
+                    getServletContext().log( "malformed location");
+                }
+                resp.setHeader( "Location", location);
+                getServletContext().log( "new location: " + location);
+            }
+
+            // forward all other headers
             int i = 1; // header fields are 1-based
             String name;
             while ((name = connection.getHeaderFieldKey( i)) != null) {
@@ -775,7 +733,7 @@ public class JGlossServlet extends HttpServlet {
     }
 
     /**
-     * Splits a string in a list of string. Whitespace at the beginning and end of
+     * Splits a string in a list of strings. Whitespace at the beginning and end of
      * an element in the list is removed.
      * 
      * @param s String containing a list of items.
