@@ -82,11 +82,11 @@ public interface EncodedCharacterHandler {
 
     /**
      * Modify a character returned by {@link readCharacter(ByteBuffer) readCharacter} to make
-     * different character classes to compare equal. This is used for searching and indexing to
+     * different character classes compare equal. This is used for searching and indexing to
      * treat certain character classes as identical with respect to comparison. Examples are
      * uppercase and lowercase western characters, or katakana and hiragana. What characters
      * are converted is dependent of the class implementing this interface and may be
-     * configured by modifying the classes state.
+     * configured by modifying the object's state.
      *
      * @param character The character to convert, as returned by 
      *                  {@link readCharacter(ByteBuffer) readCharacter}.

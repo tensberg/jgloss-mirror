@@ -69,8 +69,8 @@ public interface Indexable {
      * if index entries are stored by the <code>Indexable</code> class as EUC-JP encoded
      * text, the buffer must also contain EUC-JP encoded text. The ordering by this
      * <code>compare</code> method must be consistent with {@link #compare(int,int) compare(int,int)}.
-     * The only allowed difference is that comparisons may be truncated to the length of the buffer.
-     * That is, a comparison may return equality even if the index entry is longer than the data
+     * The only allowed difference is that comparisons may be truncated to the length of the buffer;
+     * i. e., a comparison may return equality even if the index entry is longer than the data
      * in the buffer (the buffer data is a prefix of the index entry). This is allowed to make
      * substring searches possible.
      *

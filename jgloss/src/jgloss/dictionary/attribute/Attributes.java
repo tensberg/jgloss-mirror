@@ -68,21 +68,21 @@ public class Attributes implements Attribute {
     public static final Attribute REFERENCE = new Attributes
         ( NAMES.getString( "att.reference.name"),
           NAMES.getString( "att.reference.desc"),
-          true, true, ReferenceAttributeValue.class, 
+          false, true, ReferenceAttributeValue.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute SYNONYM = new Attributes
         ( NAMES.getString( "att.synonym.name"),
           NAMES.getString( "att.synonym.desc"),
-          true, true, ReferenceAttributeValue.class, 
+          false, true, ReferenceAttributeValue.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute ANTONYM = new Attributes
         ( NAMES.getString( "att.antonym.name"),
           NAMES.getString( "att.antonym.desc"),
-          true, true, ReferenceAttributeValue.class, 
+          false, true, ReferenceAttributeValue.class, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
@@ -101,6 +101,20 @@ public class Attributes implements Attribute {
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL,
               DictionaryEntry.AttributeGroup.TRANSLATION });
+
+    public static final Attribute GAIRAIGO = new Attributes
+        ( NAMES.getString( "att.gairaigo.name"),
+          NAMES.getString( "att.gairaigo.desc"),
+          false, true, Gairaigo.class, 
+          new DictionaryEntry.AttributeGroup[] 
+            { DictionaryEntry.AttributeGroup.GENERAL });
+
+    public static final Attribute EXPLANATION = new Attributes
+        ( NAMES.getString( "att.explanation.name"),
+          NAMES.getString( "att.explanation.desc"),
+          false, true, InformationAttributeValue.class,
+          new DictionaryEntry.AttributeGroup[]
+            { DictionaryEntry.AttributeGroup.TRANSLATION });
 
     protected String name;
     protected String description;

@@ -1,0 +1,16 @@
+# mapping from language abbreviation to ISO 639:1988 language code
+# for the WadokuJT
+#
+# Author: Michael Koch
+# $Id$
+
+dtsch.          de
+engl.           en
+franz.          fr
+ital.           it
+lat.            lt
+span.           es
+russ.           ru
+griech.         el
+arab.           ar
+jap.-engl.      je

@@ -1,4 +1,4 @@
-# Encoding: ISO-8859-1
+# Encoding: UTF-8
 #
 # Default localization for messages in JGloss.
 #
@@ -50,6 +50,9 @@ att.example.desc=example
 att.abbreviation.name=abbr
 att.abbreviation.desc=abbreviation
 
+att.reference.name=ref
+att.reference.desc=reference
+
 att.synonym.name=syn
 att.synonym.desc=synonym (equal meaning)
 
@@ -61,3 +64,23 @@ att.usage.desc=usage hint
 
 att.category.name=category
 att.category.desc=category of the entry
+
+att.gairaigo.name=gairaigo
+att.gairaigo.desc=loan word from other language
+
+att.explanation.name=exp
+att.explanation.desc=longer explanation
+
+# WadokuJT specific attributes
+
+wadoku.att.main_entry.name=ME
+wadoku.att.main_entry.desc=main entry
+
+wadoku.att.main_entry_ref.name=→ME
+wadoku.att.main_entry_ref.desc=reference to main entry
+
+wadoku.att.alt_reading.name=altr
+wadoku.att.alt_reading.desc=reference to alternative reading
+
+gairaigo.je.name=Japanese-English
+gairaigo.ainu.name=Ainu

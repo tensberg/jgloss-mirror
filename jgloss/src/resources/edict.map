@@ -3,174 +3,74 @@
 # Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
 # $Id$
 
-#abbr       abbreviation
 abbr    ABBREVIATION
 
-#adj        adjective (keiyoushi)
-adj     PART_OF_SPEECH  PartOfSpeech    adj
+adj     PART_OF_SPEECH  PartOfSpeech    adj #adjective (keiyoushi)
+adj-na  PART_OF_SPEECH  PartOfSpeech    adj-na #adjectival nouns or quasi-adjectives (keiyodoshi)
+adj-no  PART_OF_SPEECH  PartOfSpeech    adj-no #nouns which may take the genitive case particle "no"
+adj-pn  PART_OF_SPEECH  PartOfSpeech    adj-pn #pre-noun adjectival (rentaishi)
+adj-s   PART_OF_SPEECH  PartOfSpeech    adj-s #special adjective (e.g. ookii)
+adj-t   PART_OF_SPEECH  PartOfSpeech    adj-t #"taru" adjective
+adv     PART_OF_SPEECH  PartOfSpeech    adv #adverb (fukushi)
+aux     PART_OF_SPEECH  PartOfSpeech    aux #auxiliary word or phrase
+aux-v   PART_OF_SPEECH  PartOfSpeech    aux-v #auxiliary verb
+conj    PART_OF_SPEECH  PartOfSpeech    conj #conjunction
+int     PART_OF_SPEECH  PartOfSpeech    int #interjection (kandoushi)
+n       PART_OF_SPEECH  PartOfSpeech    n #noun (common) (futsuumeishi)
+n-adv   PART_OF_SPEECH  PartOfSpeech    n-adv #adverbial noun (fukushitekimeishi)
+n-suf   PART_OF_SPEECH  PartOfSpeech    n-suf #noun, used as a suffix
+n-t     PART_OF_SPEECH  PartOfSpeech    n-t #noun (temporal) (jisoumeishi)
+neg     PART_OF_SPEECH  PartOfSpeech    neg #negative (in a negative sentence, or with negative verb)
+neg-v   PART_OF_SPEECH  PartOfSpeech    neg-v #negative verb (when used with)
+v1      PART_OF_SPEECH  PartOfSpeech    v1 #Ichidan verb
+v5      PART_OF_SPEECH  PartOfSpeech    v5 #Godan verb (not completely classified)
+v5aru   PART_OF_SPEECH  PartOfSpeech    v5aru #Godan verb - -aru special class
+v5b     PART_OF_SPEECH  PartOfSpeech    v5b #Godan verb with `bu' ending
+v5g     PART_OF_SPEECH  PartOfSpeech    v5g #Godan verb with `gu' ending
+v5k     PART_OF_SPEECH  PartOfSpeech    v5k #Godan verb with `ku' ending
+v5k-s   PART_OF_SPEECH  PartOfSpeech    v5k-s #Godan verb - Iku/Yuku special class
+v5m     PART_OF_SPEECH  PartOfSpeech    v5m #Godan verb with `mu' ending
+v5n     PART_OF_SPEECH  PartOfSpeech    v5n #Godan verb with `nu' ending
+v5r     PART_OF_SPEECH  PartOfSpeech    v5r #Godan verb with `ru' ending
+v5s     PART_OF_SPEECH  PartOfSpeech    v5s #Godan verb with `su' ending
+v5t     PART_OF_SPEECH  PartOfSpeech    v5t #Godan verb with `tsu' ending
+v5u     PART_OF_SPEECH  PartOfSpeech    v5u #Godan verb with `u' ending
+v5uru   PART_OF_SPEECH  PartOfSpeech    v5uru #Godan verb - Uru old class verb (old form of Eru)
+v5z     PART_OF_SPEECH  PartOfSpeech    v5z #Godan verb - -zuru special class (alternative form of -jiru verbs)
+vi      PART_OF_SPEECH  PartOfSpeech    vi #intransitive verb
+vk      PART_OF_SPEECH  PartOfSpeech    vk #Kuru verb - special class
+vs      PART_OF_SPEECH  PartOfSpeech    vs #noun or participle which takes the aux. verb suru
+vs-s    PART_OF_SPEECH  PartOfSpeech    vs-s #suru verb - special class
+vt      PART_OF_SPEECH  PartOfSpeech    vt #transitive verb
 
-#adv        adverb (fukushi)
-adv     PART_OF_SPEECH  PartOfSpeech    adv
-
-#adj-na    adjectival nouns or quasi-adjectives (keiyodoshi)
-adj-na  PART_OF_SPEECH  PartOfSpeech    adj-na
-
-#adj-no    nouns which may take the genitive case particle "no"
-adj-no  PART_OF_SPEECH  PartOfSpeech    adj-no
-
-#adj-pn     pre-noun adjectival (rentaishi)
-adj-pn  PART_OF_SPEECH  PartOfSpeech    adj-pn
-
-#adj-s      special adjective (e.g. ookii)
-adj-s   PART_OF_SPEECH  PartOfSpeech    adj-s
-
-#adj-t      "taru" adjective
-adj-t   PART_OF_SPEECH  PartOfSpeech    adj-t
-
-#arch       archaism
-arch    USAGE           Usage           arch
-
-#aux        auxiliary word or phrase
-aux     PART_OF_SPEECH  PartOfSpeech    aux
-
-#aux-v      auxiliary verb
-aux-v   PART_OF_SPEECH  PartOfSpeech    aux-v
-
-#conj       conjunction
-conj    PART_OF_SPEECH  PartOfSpeech    conj
-
-#col        colloquialism 
-col     USAGE           Usage           col
+MA      USAGE           Usage           MA #martial arts term
+X       USAGE           Usage           X #rude or X-rated term (not displayed in educational software)
+arch    USAGE           Usage           arch #archaism
+col     USAGE           Usage           col #colloquialism
+fam     USAGE           Usage           fam #familiar language
+fem     USAGE           Usage           fem #female term or language
+hon     USAGE           Usage           hon #honorific or respectful (sonkeigo) language 
+hum     USAGE           Usage           hum #humble (kenjougo) language
+m-sl    USAGE           Usage           m-sl #manga slang
+male    USAGE           Usage           male #male term or language
+obs     USAGE           Usage           obs #obsolete term
+obsc    USAGE           Usage           obsc #obscure term
+pol     USAGE           Usage           pol #polite (teineigo) language
+sl      USAGE           Usage           sl #slang
+vulg    USAGE           Usage           vulg #vulgar expression or word
 
 #exp        Expressions (phrases, clauses, etc.)
 #ek         exclusively kanji, rarely just in kana
-#fam        familiar language 
-fam     USAGE           Usage           fam
-
-#fem        female term or language
-fem     USAGE           Usage           fem
-
 #gikun      gikun (meaning) reading
 #gram       grammatical term
-#hon        honorific or respectful (sonkeigo) language 
-hon     USAGE           Usage           hon
-
-#hum        humble (kenjougo) language 
-hum     USAGE           Usage           hum
-
 #id         idiomatic expression 
-#int        interjection (kandoushi)
 #iK         word containing irregular kanji usage
 #ik         word containing irregular kana usage
 #io         irregular okurigana usage
-#MA         martial arts term
-MA      USAGE           Usage           MA
-
-#male       male term or language
-male    USAGE           Usage           male
-
-#m-sl       manga slang
-m-sl    USAGE           Usage           m-sl
-
-#n          noun (common) (futsuumeishi)
-n       PART_OF_SPEECH  PartOfSpeech    n
-
-#n-adv      adverbial noun (fukushitekimeishi)
-n-adv   PART_OF_SPEECH  PartOfSpeech    n-adv
-
-#n-t        noun (temporal) (jisoumeishi)
-n-t     PART_OF_SPEECH  PartOfSpeech    n-t
-
-#n-suf     noun, used as a suffix
-n-suf   PART_OF_SPEECH  PartOfSpeech    n-suf
-
-#neg        negative (in a negative sentence, or with negative verb)
-neg     PART_OF_SPEECH  PartOfSpeech    neg
-
-#neg-v      negative verb (when used with)
-neg-v   PART_OF_SPEECH  PartOfSpeech    neg-v
-
-#obs        obsolete term
-obs     USAGE           Usage           obs
-
-#obsc       obscure term
-obsc    USAGE           Usage           obsc
-
 #oK         word containing out-dated kanji 
 #ok         out-dated or obsolete kana usage
-#pol        polite (teineigo) language 
-pol     USAGE           Usage           pol
-
 #pref       prefix 
 #qv         quod vide (see another entry)
-#sl         slang
-sl      USAGE           Usage           sl
-
 #suf        suffix 
 #uK         word usually written using kanji alone 
 #uk         word usually written using kana alone 
-#v1         Ichidan verb
-v1      PART_OF_SPEECH  PartOfSpeech    v1
-
-#v5         Godan verb (not completely classified)
-v5      PART_OF_SPEECH  PartOfSpeech    v5
-
-#v5u        Godan verb with `u' ending
-v5u     PART_OF_SPEECH  PartOfSpeech    v5u
-
-#v5k        Godan verb with `ku' ending
-v5k     PART_OF_SPEECH  PartOfSpeech    v5k
-
-#v5g        Godan verb with `gu' ending
-v5g     PART_OF_SPEECH  PartOfSpeech    v5g
-
-#v5s        Godan verb with `su' ending
-v5s     PART_OF_SPEECH  PartOfSpeech    v5s
-
-#v5t        Godan verb with `tsu' ending
-v5t     PART_OF_SPEECH  PartOfSpeech    v5t
-
-#v5n        Godan verb with `nu' ending
-v5n     PART_OF_SPEECH  PartOfSpeech    v5n
-
-#v5b        Godan verb with `bu' ending
-v5b     PART_OF_SPEECH  PartOfSpeech    v5b
-
-#v5m        Godan verb with `mu' ending
-v5m     PART_OF_SPEECH  PartOfSpeech    v5m
-
-#v5r        Godan verb with `ru' ending
-v5r     PART_OF_SPEECH  PartOfSpeech    v5r
-
-#v5k-s      Godan verb - Iku/Yuku special class
-v5k-s   PART_OF_SPEECH  PartOfSpeech    v5k-s
-
-#v5z        Godan verb - -zuru special class (alternative form of -jiru verbs)
-v5z     PART_OF_SPEECH  PartOfSpeech    v5z
-
-#v5aru      Godan verb - -aru special class
-v5aru   PART_OF_SPEECH  PartOfSpeech    v5aru
-
-#v5uru      Godan verb - Uru old class verb (old form of Eru)
-v5uru   PART_OF_SPEECH  PartOfSpeech    v5uru
-
-#vi         intransitive verb 
-vi      PART_OF_SPEECH  PartOfSpeech    vi
-
-#vs         noun or participle which takes the aux. verb suru
-vs      PART_OF_SPEECH  PartOfSpeech    vs
-
-#vs-s       suru verb - special class
-vs-s    PART_OF_SPEECH  PartOfSpeech    vs-s
-
-#vk         Kuru verb - special class
-vk      PART_OF_SPEECH  PartOfSpeech    vk
-
-#vt         transitive verb
-vt      PART_OF_SPEECH  PartOfSpeech    vt
-
-#vulg       vulgar expression or word 
-vulg    USAGE           Usage           vulg
-
-#X          rude or X-rated term (not displayed in educational software)
-X       USAGE           Usage           X

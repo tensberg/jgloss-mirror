@@ -39,6 +39,9 @@ pos.aux-v.l=auxiliary verb
 pos.conj.s=conj
 pos.conj.l=conjunction
 
+pos.int.s=int
+pos.int.l=interjection (kandoushi)
+
 pos.n.s=n
 pos.n.l=noun (common) (futsuumeishi)
 
@@ -59,6 +62,12 @@ pos.neg-v.l=negative verb (when used with)
 
 pos.v1.s=v1
 pos.v1.l=Ichidan verb
+
+pos.v1-i.s=v1-i
+pos.v1-i.l=-i Ichidan verb
+
+pos.v1-e.s=v1-e
+pos.v1-e.l=-e Ichidan verb
 
 pos.v5.s=v5
 pos.v5.l=Godan verb (not completely classified)

@@ -23,6 +23,13 @@
 
 package jgloss.dictionary.attribute;
 
-public interface InformationAttributeValue implements AttributeValue {
-    public String getInformation();
-} // interface InformationAttributeValue
+public class InformationAttributeValue implements AttributeValue {
+    protected String information;
+
+    public InformationAttributeValue( String _information) {
+        information = _information;
+    }
+
+    public String getInformation() { return information; }
+    public String toString() { return '"' + information + '"'; }
+} // class InformationAttributeValue

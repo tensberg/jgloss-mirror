@@ -85,7 +85,7 @@ public class DefaultAttributeSet implements AttributeSet {
 
         public int size() { return 1; }
         public String toString() { return "[_" + value.toString() + ']'; }
-    }
+    } // class SingleValueList
 
     protected AttributeSet parent = null;
     protected Map attributes = null;
@@ -173,8 +173,12 @@ public class DefaultAttributeSet implements AttributeSet {
         if (attributes == null)
             attributes = new HashMap( 11);
         Object v = attributes.get( key);
+
         if (v == null)
             attributes.put( key, value);
+        else if (value == null)
+            // nothing to be done, since attibute already set
+            return;
         else if (v instanceof MutableValueList)
             ((MutableValueList) v).add( value);
         else { // AttributeValue

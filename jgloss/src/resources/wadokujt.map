@@ -2,6 +2,7 @@
 # Encoding: UTF-8
 #
 # Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+# Written with help from Hans-Jörg Bibiko
 # $Id$
 
 Bsp.            EXAMPLE
@@ -16,3 +17,37 @@ Persönlichk.    CATEGORY        Category        pers
 Pharm.          CATEGORY        Category        pharm
 Psych.          CATEGORY        Category        psych
 Rel.            CATEGORY        Category        rel
+
+五      PART_OF_SPEECH PartOfSpeech  v5         #5st. Verb
+他      PART_OF_SPEECH PartOfSpeech  vt         #trans.
+自      PART_OF_SPEECH PartOfSpeech  vi         #intrans.
+名      PART_OF_SPEECH PartOfSpeech  n          #N.
+サ変    PART_OF_SPEECH PartOfSpeech  vs         #Verb mit suru
+形      PART_OF_SPEECH PartOfSpeech  adj        #Adj.
+連体    PART_OF_SPEECH PartOfSpeech  adj-pn     #Attrib.
+副      PART_OF_SPEECH PartOfSpeech  adv        #Adv.
+上一    PART_OF_SPEECH PartOfSpeech  v1-i       #1st. Verb auf -i
+下一    PART_OF_SPEECH PartOfSpeech  v1-e       #1st. Verb auf -e
+文例    EXAMPLE                                 #Beispielsatz
+・ス    PART_OF_SPEECH PartOfSpeech  vs         #als Verb mit suru
+ノ      PART_OF_SPEECH PartOfSpeech  adj-no     #-no
+感      PART_OF_SPEECH PartOfSpeech  int        #Interj.
+#代      PART_OF_SPEECH PartOfSpeech  #Pron.
+接      PART_OF_SPEECH PartOfSpeech  conj       #Konj.
+#尾      PART_OF_SPEECH PartOfSpeech  #Suff.
+接助    PART_OF_SPEECH PartOfSpeech  conj       #Konj.
+助動    PART_OF_SPEECH PartOfSpeech  aux        #Hilfsverb
+#助詞    PART_OF_SPEECH PartOfSpeech  #Part.
+助      PART_OF_SPEECH PartOfSpeech  aux        #Hilfsverb
+#頭      PART_OF_SPEECH PartOfSpeech  #Präf.
+#字      PART_OF_SPEECH PartOfSpeech  #Sonderz.
+#ダ      PART_OF_SPEECH PartOfSpeech  #-da
+#ナ      PART_OF_SPEECH PartOfSpeech  #-na
+#ト      PART_OF_SPEECH PartOfSpeech  #-to
+タル    PART_OF_SPEECH PartOfSpeech  adj-t      #-taru
+#連語    PART_OF_SPEECH PartOfSpeech  #Zus.
+#・      PART_OF_SPEECH PartOfSpeech  # und
+#掲示    PART_OF_SPEECH PartOfSpeech  #Schild
+#諺      PART_OF_SPEECH PartOfSpeech  #Sprichwort
+#文句    PART_OF_SPEECH PartOfSpeech  #Redewendung
+#カ変    PART_OF_SPEECH PartOfSpeech  #irr. Verb der ka-Reihe.

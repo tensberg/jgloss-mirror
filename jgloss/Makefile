@@ -53,7 +53,7 @@ ICONS := jgloss.png html.png tex.png txt.png chasen.png template.png
 
 RESOURCES := $(basename $(notdir $(wildcard src/resources/*.in)))
 
-DICTIONARY_MAPS := edict.map wadokujt.map
+DICTIONARY_MAPS := edict.map wadokujt.map wadokujt-gairaigo.map
 
 RESOURCES_WWW := messages-www.properties messages-dictionary.properties \
                  messages-dictionary_de.properties \

@@ -35,7 +35,7 @@ public interface IndexedDictionary extends Dictionary {
      * @return <code>true</code> if the index was loaded successfully, <code>false</code> if
      *         the index does not exist, does not contain all needed index data or is
      *         damaged. In this case, {@link #buildIndex() buildIndex} must be called.
-     * @exeption IndexException if reading the index failed for an unforeseeable reason.
+     * @exception IndexException if reading the index failed for an unforeseeable reason.
      *           In this case, calling {@link #buildIndex() buildIndex} will likely also fail
      *           and the dictionary object can't be used.
      */
