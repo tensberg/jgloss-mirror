@@ -23,6 +23,29 @@
 
 package jgloss.dictionary.attribute;
 
-public interface ContextChangeAttributeValue extends AttributeValue {
-    String getChangedContext( String context);
-} // interface ContextChangeAttributeValue
+/**
+ * Attribute list which stores a single value.
+ *
+ * @author Michael Koch
+ */
+public class SingletonValueList implements ValueList {
+    private AttributeValue value;
+
+    public SingletonValueList( AttributeValue _value) {
+        this.value = _value;
+    }
+
+    public SingletonValueList set( AttributeValue _value) {
+        this.value = _value;
+        return this;
+    }
+
+    public AttributeValue get( int index) {
+        if (index != 0)
+            throw new IllegalArgumentException();
+        return value;
+    }
+
+    public int size() { return 1; }
+    public String toString() { return "[_" + value.toString() + ']'; }
+} // class SingletonValueList

@@ -104,7 +104,7 @@ public class AttributeResultFilter implements LookupResultFilter {
     }
 
     public boolean enableFor( Dictionary dic) { 
-        return dic.supports( attribute);
+        return dic.getSupportedAttributes().contains( attribute);
     }
 
     public String getName() { return name; }

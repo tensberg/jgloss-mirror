@@ -37,7 +37,7 @@ public interface CategoryAttributeValue extends AttributeValue {
      */
     public String getShortName();
     /**
-     * Long name or short explanation of this value. The name should be localized to the user's
+     * Long name or explanation of this value. The name should be localized to the user's
      * language. Example: "manga slang" for a manga slang expression.
      */
     public String getLongName();

@@ -23,7 +23,9 @@
 
 package jgloss.ui;
 
+import jgloss.Preferences;
 import jgloss.dictionary.*;
+import jgloss.util.StringTools;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -619,5 +621,109 @@ public class LookupModel implements Cloneable {
             out.add( ((StateWrapper) i.next()).clone());
         }
         return out;
+    }
+
+    protected final static String PREF_SEARCHMODE = ".searchmode";
+    protected final static String PREF_DICTIONARY_SELECTION = ".dictionary_selection";
+    protected final static String PREF_ALL_DICTIONARIES_SELECTED = ".all_dictionaries_selected";
+    protected final static String PREF_MULTI_DICTIONARY_MODE = ".multi_dictionary_mode";
+    protected final static String PREF_FILTER_SELECTION = ".filter_selection";
+    protected final static String PREF_SEARCHFIELD_WORD = ".searchfield.word";
+    protected final static String PREF_SEARCHFIELD_READING = ".searchfield.reading";
+    protected final static String PREF_SEARCHFIELD_TRANSLATION = ".searchfield.translation";
+    protected final static String PREF_SEARCHFIELD_MATCH_FIELD = ".searchfield.match_field";
+    protected final static String PREF_SEARCHEXPRESSION = ".searchexpression";
+    protected final static String PREF_DISTANCE = ".distance";
+
+    public void saveToPreferences( Preferences prefs, String prefix) {
+        prefs.set( prefix + PREF_SEARCHMODE, getSelectedSearchModeIndex());
+
+        StringBuffer buf = new StringBuffer();
+        for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
+            buf.append( String.valueOf( ((StateWrapper) i.next()).isSelected()));
+            if (i.hasNext())
+                buf.append( ":");
+        }
+        prefs.set( prefix + PREF_DICTIONARY_SELECTION, buf.toString());
+
+        prefs.set( prefix + PREF_ALL_DICTIONARIES_SELECTED, allDictionariesSelected);
+        prefs.set( prefix + PREF_MULTI_DICTIONARY_MODE, multiDictionaryMode);
+        
+        buf.setLength( 0);
+        for ( Iterator i=filters.iterator(); i.hasNext(); ) {
+            buf.append( String.valueOf( ((StateWrapper) i.next()).isSelected()));
+            if (i.hasNext())
+                buf.append( ":");
+        }
+        prefs.set( prefix + PREF_FILTER_SELECTION, buf.toString());
+
+        prefs.set( prefix + PREF_SEARCHFIELD_WORD, searchFields.isSelected
+                   ( DictionaryEntryField.WORD));
+        prefs.set( prefix + PREF_SEARCHFIELD_READING, searchFields.isSelected
+                   ( DictionaryEntryField.READING));
+        prefs.set( prefix + PREF_SEARCHFIELD_TRANSLATION, searchFields.isSelected
+                   ( DictionaryEntryField.TRANSLATION));
+        prefs.set( prefix + PREF_SEARCHFIELD_MATCH_FIELD, searchFields.isSelected
+                   ( MatchMode.FIELD));
+        prefs.set( prefix + PREF_SEARCHEXPRESSION, searchExpression);
+        prefs.set( prefix + PREF_DISTANCE, distance);
+    }
+
+    public void loadFromPreferences( Preferences prefs, String prefix) {
+        int searchmode = prefs.getInt( prefix + PREF_SEARCHMODE, 0);
+        if (searchmode<0 || searchmode>=searchModes.size())
+            searchmode = 0; // select first search mode
+        for ( int i=0; i<searchModes.size(); i++) {
+            ((StateWrapper) searchModes.get( i)).setSelected( i==searchmode);
+        }
+
+        String[] dictionarySelection = StringTools.split
+            ( prefs.getString( prefix + PREF_DICTIONARY_SELECTION), ':');
+        synchronized (dictionaries) {
+            for ( int i=0; i<Math.min( dictionarySelection.length, dictionaries.size()); i++) {
+                ((StateWrapper) dictionaries.get( i)).setSelected( Boolean.valueOf
+                                                                   ( dictionarySelection[i])
+                                                                   .booleanValue());
+            }
+        }
+
+        allDictionariesSelected = prefs.getBoolean( prefix + PREF_ALL_DICTIONARIES_SELECTED, 
+                                                    allDictionariesSelected);
+        multiDictionaryMode = prefs.getBoolean( prefix + PREF_MULTI_DICTIONARY_MODE, 
+                                                multiDictionaryMode);
+
+        String[] filterSelection = StringTools.split
+            ( prefs.getString( prefix + PREF_FILTER_SELECTION), ':');
+        for ( int i=0; i<Math.min( filterSelection.length, filters.size()); i++) {
+            ((StateWrapper) filters.get( i)).setSelected( Boolean.valueOf
+                                                          ( filterSelection[i]).booleanValue());
+        }
+
+        searchFields.select( DictionaryEntryField.WORD,
+                             prefs.getBoolean( prefix + PREF_SEARCHFIELD_WORD,
+                                               searchFields.isSelected( DictionaryEntryField.WORD)));
+        searchFields.select( DictionaryEntryField.READING,
+                             prefs.getBoolean( prefix + PREF_SEARCHFIELD_READING,
+                                               searchFields.isSelected( DictionaryEntryField.READING)));
+        searchFields.select( DictionaryEntryField.TRANSLATION,
+                             prefs.getBoolean( prefix + PREF_SEARCHFIELD_TRANSLATION,
+                                               searchFields.isSelected
+                                               ( DictionaryEntryField.TRANSLATION)));
+        searchFields.select( MatchMode.FIELD,
+                             prefs.getBoolean( prefix + PREF_SEARCHFIELD_MATCH_FIELD,
+                                               searchFields.isSelected( MatchMode.FIELD)));
+        searchFields.select( MatchMode.WORD,
+                             !prefs.getBoolean( prefix + PREF_SEARCHFIELD_MATCH_FIELD,
+                                                !searchFields.isSelected( MatchMode.FIELD)));
+
+        searchExpression = prefs.getString( prefix + PREF_SEARCHEXPRESSION);
+        distance = prefs.getInt( prefix + PREF_DISTANCE, distance);
+
+        SearchMode mode = getSelectedSearchMode();
+        updateDictionaryAvailability( mode);
+        updateSearchModeAvailability();
+        updateSearchParametersAvailability( mode);
+        updateSearchFieldsAvailability( mode);
+        updateFilterAvailability();
     }
 } // class LookupModel

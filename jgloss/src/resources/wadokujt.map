@@ -1,23 +1,82 @@
-# Mapping from WadokuJT tag markers to attributes
 # Encoding: UTF-8
+# Mapping from WadokuJT tag markers to attributes
 #
 # Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
 # Written with help from Hans-Jörg Bibiko
 # $Id$
+#
+# Format:
+# "attribute name" ATTRIBUTE_TYPE AttributeClass "att id (see attributes.properties.in)"
+# a ~ in the attribute name is replaced by a space
 
 Bsp.            EXAMPLE
 
 Anat.           CATEGORY        Category        anat
+Astron.         CATEGORY        Category        astron
+Baseb.          CATEGORY        Category        baseb
+Bergn.          CATEGORY        Category        moun
 Bibel           CATEGORY        Category        bibl
+bild.~Kunst     CATEGORY        Category        art
+Biol.           CATEGORY        Category        biol
+Bot.            CATEGORY        Category        bot
+Buddh.          CATEGORY        Category        buddh
+Chem.           CATEGORY        Category        chem
 Christent.      CATEGORY        Category        christ
+Druckw.         CATEGORY        Category        print
 EDV             CATEGORY        Category        comp
+Elektrot.       CATEGORY        Category        elec
+Familienn.      CATEGORY        Category        surn
+Firmenn.        CATEGORY        Category        business
+Fischk.         CATEGORY        Category        ichthy
+Flussn.         CATEGORY        Category        river
+Fotog.          CATEGORY        Category        photo
+Gebietsn.       CATEGORY        Category        area
+Gesch.          CATEGORY        Category        hist
+Geol.           CATEGORY        Category        geol
+Gramm.          CATEGORY        Category        gram
+Griech.~Mythol. CATEGORY        Category        gmyth
+Insektenk.      CATEGORY        Category        ento
+Inseln.         CATEGORY        Category        island
+Kabuki          CATEGORY        Category        kabuki
+Kleidung        CATEGORY        Category        cloth
+Kochk.          CATEGORY        Category        cook
+Ländern         CATEGORY        Category        country
+männl.~Vorname  CATEGORY        Category        mname
+Math.           CATEGORY        Category        math
 Med.            CATEGORY        Category        med
+Meeresn.        CATEGORY        Category        sea
+Meteor.         CATEGORY        Category        met
+Milit.          CATEGORY        Category        mil
+Mineral.        CATEGORY        Category        min
+Mus.            CATEGORY        Category        mus
+Musikinst.      CATEGORY        Category        inst
+Name            CATEGORY        Category        name
 Nengô           CATEGORY        Category        nengo
+Nô              CATEGORY        Category        no
+Optik           CATEGORY        Category        optics
+Org.            CATEGORY        Category        org
+Ortsn.          CATEGORY        Category        loc
 Persönlichk.    CATEGORY        Category        pers
 Pharm.          CATEGORY        Category        pharm
+Philos.         CATEGORY        Category        philos
+Phys.           CATEGORY        Category        phys
+Pol.            CATEGORY        Category        pol
 Psych.          CATEGORY        Category        psych
+Rechtsk.        CATEGORY        Category        law
 Rel.            CATEGORY        Category        rel
+Sport           CATEGORY        Category        sports
+Sprache         CATEGORY        Category        lang
 Sprachw.        CATEGORY        Category        phil
+Stadtn.         CATEGORY        Category        city
+Sumô            CATEGORY        Category        sumo
+Tennô           CATEGORY        Category        tenno
+Theat.          CATEGORY        Category        theatre
+Theater         CATEGORY        Category        theatre
+Verlagsn.       CATEGORY        Category        publ
+Vogelk.         CATEGORY        Category        orni
+Wirtsch.        CATEGORY        Category        econ
+Wz.             CATEGORY        Category        tm
+Zool.           CATEGORY        Category        zoo
 
 五      PART_OF_SPEECH PartOfSpeech  v5         #5st. Verb
 他      PART_OF_SPEECH PartOfSpeech  vt         #trans.

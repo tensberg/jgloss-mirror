@@ -99,8 +99,6 @@ public abstract class JGloss {
         }
     } // class messages
 
-    protected static JGloss application;
-
     /**
      * The application-wide preferences. Use this to store and retrieve preferences.
      */
@@ -111,9 +109,69 @@ public abstract class JGloss {
      */
     public static final Messages messages = new Messages( MESSAGES);
 
+    protected static JGloss application;
+
+    protected LookupModel mainLookupModel;
+
     public static boolean exit() {
         return application.doExit();
     }
+
+    JGloss() {}
+
+    protected void init( String[] args) {
+        application = this;
+        try {
+            registerDictionaries();
+
+            handleCommandLine( args);
+
+            initUI();
+
+            SplashScreen splash = new SplashScreen( getApplicationName());
+
+            splash.setInfo( messages.getString( "splashscreen.initMain"));
+
+            Runtime.getRuntime().addShutdownHook
+                ( new Thread() {
+                        public void run() {
+                            shutdownHook();
+                        }
+                    });
+
+            showMainWindow( args);
+
+            new Thread() {
+                public void run() {
+                    try {
+                        setPriority( Thread.MIN_PRIORITY);
+                    } catch (IllegalArgumentException ex) {}
+
+                    backgroundCreateDialogs();
+                }
+            }.start();
+
+            splash.close();
+        } catch (NoClassDefFoundError ex) {
+            displayError( messages.getString( "error.noclassdef"), ex, true);
+            System.exit( 1);
+        } catch (NoSuchMethodError ex) {
+            displayError( messages.getString( "error.noclassdef"), ex, true);
+            System.exit( 1);
+        } catch (ClassNotFoundException ex) {
+            displayError( messages.getString( "error.noclassdef"), ex, true);
+            System.exit( 1);
+        } catch (Exception ex) {
+            displayError( messages.getString( "error.initialization.generic"), ex, true);
+            System.exit( 1);
+        }
+    }
+
+    protected abstract String getApplicationName();
+
+    protected abstract void showMainWindow( String[] args) throws Exception;
+
+    protected abstract PreferencesPanel[] getPreferencesPanels();
 
     protected abstract boolean doExit();
 
@@ -141,14 +199,14 @@ public abstract class JGloss {
         currentDir = dir;
     }
 
-    protected static void registerDictionaries() {
+    protected void registerDictionaries() {
         DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
         DictionaryFactory.registerImplementation( WadokuJT.class, WadokuJT.implementation);
         DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
         //DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
     }
 
-    protected static void initUI() throws Exception {
+    protected void initUI() throws Exception {
         UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
             
         // automatically set the fonts the first time JGloss is run
@@ -161,23 +219,13 @@ public abstract class JGloss {
         StyleDialog.applyUIFont();
     }
 
-    protected static void registerShutdownHook() {
-        Runtime.getRuntime().addShutdownHook
-            ( new Thread() {
-                    public void run() {
-                        Dictionary[] dicts = Dictionaries.getDictionaries( true);
-                        for ( int i=0; i<dicts.length; i++)
-                            dicts[i].dispose();
-                    }
-                });
-    }
-
-    protected static void handleCommandLine( String[] args, String what) throws Exception {
+    protected void handleCommandLine( String[] args) throws Exception {
         // parse command line options
         if (args.length > 0) {
             if (args[0].equals( "-h") || args[0].equals( "--help") ||
                 args[0].equals( "/?")) {
-                System.err.println( messages.getString( "main.usage", new String[] { what }));
+                System.err.println( messages.getString( "main.usage", 
+                                                        new String[] { getApplicationName() }));
                 System.exit( 0);
             }
             else if (args[0].equals( "-i") || args[0].equals( "--createindex")) {
@@ -309,8 +357,8 @@ public abstract class JGloss {
         }
     }
 
-    protected static LookupFrame createLookupFrame() {
-        final LookupModel model = new LookupModel
+    protected LookupFrame createLookupFrame() {
+        mainLookupModel = new LookupModel
             ( Arrays.asList
               ( new Object[] { ExpressionSearchModes.EXACT,
                                ExpressionSearchModes.PREFIX,
@@ -334,22 +382,38 @@ public abstract class JGloss {
         Dictionaries.addDictionaryListChangeListener
             ( new Dictionaries.DictionaryListChangeListener() {
                     public void dictionaryListChanged() {
-                        model.setDictionaries( Arrays.asList( Dictionaries.getDictionaries( false)));
+                        mainLookupModel.setDictionaries
+                            ( Arrays.asList( Dictionaries.getDictionaries( false)));
                     }
                 });
+        mainLookupModel.loadFromPreferences( prefs, "wordlookup");
 
-        LookupFrame f = new LookupFrame( model);
+        LookupFrame f = new LookupFrame( mainLookupModel);
         f.setSize( f.getPreferredSize());
         return f;
     }
 
+    protected void shutdownHook() {
+        Dictionary[] dicts = Dictionaries.getDictionaries( true);
+        for ( int i=0; i<dicts.length; i++)
+            dicts[i].dispose();
+        if (mainLookupModel != null) {
+            mainLookupModel.saveToPreferences( prefs, "wordlookup");
+        }
+    }
+
+    protected void backgroundCreateDialogs() {
+        PreferencesFrame.createFrame
+            ( getPreferencesPanels());
+    }
+    
     /**
      * Return a Preference implementation appropriate for the current Java VM.
      *
      * @see PropertiesPreferences
      * @see JavaPreferences
      */
-    protected static Preferences initPreferences() {
+    private static Preferences initPreferences() {
         Preferences prefs = null;
         prefs = new JavaPreferences();
         // copy old settings if needed

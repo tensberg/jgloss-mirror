@@ -397,7 +397,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
     protected void updateFilterSelection() {
         for ( int i=0; i<filters.length; i++) {
-            filters[i].setSelected( model.isFilterSelected( i));
+            filters[i].setSelected( model.isFilterSelected( i) && model.isFilterEnabled( i));
         }
     }
 
@@ -410,16 +410,18 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     protected void updateDictionarySelection() {
         if (model.isAllDictionariesSelected()) {
             allDictionaries.setSelected( true);
+            dictionaryChoice.setEnabled( false);
         }
         else {
             dictionary.setSelected( true);
+            dictionaryChoice.setEnabled( true);
+        }
+        try {
             // since the model is not in multi-selection mode, there should always be
             // exactly one selection
-            try {
-                dictionaryChoice.setSelectedItem( model.getSelectedDictionaries().get( 0));
-            } catch (IndexOutOfBoundsException ex) {
-                // no dictionary in model, ignore
-            }
+            dictionaryChoice.setSelectedItem( model.getSelectedDictionaries().get( 0));
+        } catch (IndexOutOfBoundsException ex) {
+            // no dictionary in model, ignore
         }
     }
 

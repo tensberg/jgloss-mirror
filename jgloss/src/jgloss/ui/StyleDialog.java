@@ -37,7 +37,7 @@ import javax.swing.event.*;
  * Component which allows the user to edit visual-related preferences. This will normally embedded
  * in the application preferences dialog. There exists
  * a single application-wide instance which can be accessed through the
- * {@link #getInstance() getInstance()} method.
+ * {@link #getStyleDialog() getStyleDialog()} method.
  *
  * @author Michael Koch
  */

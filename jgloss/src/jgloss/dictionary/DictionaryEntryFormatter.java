@@ -123,46 +123,43 @@ public class DictionaryEntryFormatter {
     }
 
     public void addAttributeFormat( Attribute att, AttributeFormatter format, boolean before) {
+        addAttributeFormat( att, format, before ? Position.BEFORE_ENTRY : Position.AFTER_ENTRY,
+                            before);
+    }
+
+    public void addAttributeFormat( Attribute att, AttributeFormatter format,
+                                    Position generalAttributePosition, boolean before) {
         if (att.appliesTo( DictionaryEntry.AttributeGroup.GENERAL)) {
-            addAttributeFormat( att, before ? Position.BEFORE_ENTRY : Position.AFTER_ENTRY,
-                                format);
+            addAttributeFormat( att, format, generalAttributePosition);
         }
 
         if (att.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
-            addAttributeFormat( att, 
-                                before ? Position.BEFORE_WORDS : Position.AFTER_WORDS,
-                                format);
-            addAttributeFormat( att, 
-                                before ? Position.BEFORE_WORD : Position.AFTER_WORD,
-                                format);
+            addAttributeFormat( att, format,
+                                before ? Position.BEFORE_WORDS : Position.AFTER_WORDS);
+            addAttributeFormat( att, format,
+                                before ? Position.BEFORE_WORD : Position.AFTER_WORD);
         }
 
         if (att.appliesTo( DictionaryEntry.AttributeGroup.READING)) {
-            addAttributeFormat( att, 
-                                before ? Position.BEFORE_READINGS : Position.AFTER_READINGS,
-                                format);
-            addAttributeFormat( att, 
-                                before ? Position.BEFORE_READING : Position.AFTER_READING,
-                                format);
+            addAttributeFormat( att, format,
+                                before ? Position.BEFORE_READINGS : Position.AFTER_READINGS);
+            addAttributeFormat( att, format,
+                                before ? Position.BEFORE_READING : Position.AFTER_READING);
         }
 
         if (att.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
-            addAttributeFormat( att, 
-                                before ? Position.BEFORE_TRANSLATIONS : Position.AFTER_TRANSLATIONS,
-                                format);
-            addAttributeFormat( att, 
-                                before ? Position.BEFORE_ROM : Position.AFTER_ROM,
-                                format);
-            addAttributeFormat( att, 
-                                before ? Position.BEFORE_CRM : Position.AFTER_CRM,
-                                format);
-            addAttributeFormat( att, 
-                                before ? Position.BEFORE_TRANSLATION : Position.AFTER_TRANSLATION,
-                                format);
+            addAttributeFormat( att, format,
+                                before ? Position.BEFORE_TRANSLATIONS : Position.AFTER_TRANSLATIONS);
+            addAttributeFormat( att, format,
+                                before ? Position.BEFORE_ROM : Position.AFTER_ROM);
+            addAttributeFormat( att, format,
+                                before ? Position.BEFORE_CRM : Position.AFTER_CRM);
+            addAttributeFormat( att, format,
+                                before ? Position.BEFORE_TRANSLATION : Position.AFTER_TRANSLATION);
         }
     }
 
-    public void addAttributeFormat( Attribute att, Position pos, AttributeFormatter formatter) {
+    public void addAttributeFormat( Attribute att, AttributeFormatter formatter, Position pos) {
         List fl = (List) attributeFormats.get( pos);
         if (fl == null) { // first attribute at this position
             fl = new ArrayList( 3);

@@ -23,6 +23,8 @@
 
 package jgloss;
 
+import jgloss.ui.*;
+
 /**
  * Base class for launching the full application, including the word lookup and document parser
  * part.
@@ -36,80 +38,49 @@ public class JGlossApp extends JGloss {
      * @param args Arguments to the application.
      */
     public static void main( String args[]) {
-        application = new JGlossApp();
-        try {
-            registerDictionaries();
+        new JGlossApp().init( args);
+    }
 
-            // register text parsers
-            ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null).getName());
-            ParserSelector.registerParser( ChasenParser.class, 
-            new ChasenParser( null, null, null, false, false).getName());
-            
-            handleCommandLine( args);
+    protected String getApplicationName() { return "jgloss"; }
 
-            initUI();
+    protected void registerDictionaries() {
+        super.registerDictionaries();
 
-            SplashScreen splash = new SplashScreen( "jgloss");
-            
-            splash.setInfo( messages.getString( "splashscreen.initPreferences"));
-            // set default location of the chasen executable if this is the first start of JGloss
-            String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
-            if (chasen==null || chasen.length()==0)
-                prefs.set( Preferences.CHASEN_LOCATION, messages.getString
-                           ( File.separatorChar=='\\' ? 
-                             "chasen.location.windows" :
-                             "chasen.location.unix"));
-            Chasen.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+        // register text parsers
+        ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null).getName());
+        ParserSelector.registerParser( ChasenParser.class, 
+                                       new ChasenParser( null, null, null, false, false).getName());
 
-            splash.setInfo( messages.getString( "splashscreen.initMain"));
-            
-            registerShutdownHook();
+        // set default location of the chasen executable if this is the first start of JGloss
+        String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
+        if (chasen==null || chasen.length()==0)
+            prefs.set( Preferences.CHASEN_LOCATION, messages.getString
+                       ( File.separatorChar=='\\' ? 
+                         "chasen.location.windows" :
+                         "chasen.location.unix"));
+        Chasen.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+    }
 
-            if (args.length == 0) {
-                if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-                    WordLookup.getFrame().show();
-                else
-                    new JGlossFrame();
-            }
-            else {
-                for ( int i=0; i<args.length; i++) {
-                    JGlossFrame f = new JGlossFrame();
-                    f.loadDocument( new File( args[i]));
-                }
-            }
+    protected PreferencesPanel[] getPreferencesPanels() {
+        return new PreferencesPanel[] { GeneralDialog.getInstance(),
+                                        DocumentStyleDialog.getDocumentStyle(),
+                                        Dictionaries.getInstance(),
+                                        ExclusionList.getInstance() };
+    }
 
-            // Initialize the preferences at startup. This includes loading the dictionaries.
-            // Do this in its own thread to decrease perceived initialization time.
-            new Thread() {
-                    public void run() {
-                        try {
-                            setPriority( Thread.MIN_PRIORITY);
-                        } catch (IllegalArgumentException ex) {}
-
-                        PreferencesFrame.createFrame
-                            ( new PreferencesPanel[] { GeneralDialog.getInstance(),
-                                                       DocumentStyleDialog.getDocumentStyle(),
-                                                       Dictionaries.getInstance(),
-                                                       ExclusionList.getInstance() } );
-                        if (!prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-                            WordLookup.getFrame();
-                    }
-                }.start();
-
-            splash.close();
-        } catch (NoClassDefFoundError ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (NoSuchMethodError ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (ClassNotFoundException ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (Exception ex) {
-            displayError( messages.getString( "error.initialization.generic"), ex, true);
-            System.exit( 1);
+    protected void showMainWindow( String[] args) throws Exception {
+        if (args.length == 0) {
+            if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
+                WordLookup.getFrame().show();
+            else
+                new JGlossFrame();
         }
+        else {
+            for ( int i=0; i<args.length; i++) {
+                JGlossFrame f = new JGlossFrame();
+                f.loadDocument( new File( args[i]));
+            }
+        }   
     }
 
     /**

@@ -65,28 +65,6 @@ public class DefaultAttributeSet implements AttributeSet {
         }
     } // class MutableValueList
 
-    protected class SingleValueList implements ValueList {
-        private AttributeValue value;
-
-        public SingleValueList( AttributeValue _value) {
-            this.value = _value;
-        }
-
-        public SingleValueList set( AttributeValue _value) {
-            this.value = _value;
-            return this;
-        }
-
-        public AttributeValue get( int index) {
-            if (index != 0)
-                throw new IllegalArgumentException();
-            return value;
-        }
-
-        public int size() { return 1; }
-        public String toString() { return "[_" + value.toString() + ']'; }
-    } // class SingleValueList
-
     protected class NestedValueList implements ValueList {
         private ValueList base;
         private ValueList parent;
@@ -132,8 +110,8 @@ public class DefaultAttributeSet implements AttributeSet {
             Object v = attributes.get( key);
             if (v instanceof MutableValueList)
                 return ((MutableValueList) v).contains( value);
-            else // v is SingleValueList
-                return ((SingleValueList) v).get( 0).equals( value);
+            else // v is SingletonValueList
+                return ((SingletonValueList) v).get( 0).equals( value);
         }
         else if (resolveInherited && parent!=null)
             return parent.contains( key, value, true);
@@ -154,7 +132,7 @@ public class DefaultAttributeSet implements AttributeSet {
                 if (v instanceof ValueList)
                     base = (ValueList) v;
                 else
-                    base = new SingleValueList( (AttributeValue) v);
+                    base = new SingletonValueList( (AttributeValue) v);
             }
         }
 
@@ -205,13 +183,13 @@ public class DefaultAttributeSet implements AttributeSet {
         Object v = attributes.get( key);
 
         if (v == null)
-            attributes.put( key, value!=null ? new SingleValueList( value) : null);
+            attributes.put( key, value!=null ? new SingletonValueList( value) : null);
         else if (value == null)
             // nothing to be done, since attibute already set
             return;
         else if (v instanceof MutableValueList)
             ((MutableValueList) v).add( value);
-        else { // SingleValueList
+        else { // SingletonValueList
             MutableValueList list = new MutableValueList();
             list.add( ((ValueList) v).get( 0));
             list.add( value);

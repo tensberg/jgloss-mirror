@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Dictionary implementation for dictionaries in EDICT format 
@@ -150,8 +151,8 @@ public class EDict extends FileBasedDictionary {
     protected void initSupportedAttributes() {
         super.initSupportedAttributes();
         
-        supportedAttributes.addAll( mapper.getAttributes());
-        supportedAttributes.add( Attributes.PRIORITY);
+        supportedAttributes.putAll( mapper.getAttributes());
+        supportedAttributes.put( Attributes.PRIORITY, Collections.singleton( PRIORITY_VALUE));
     }
 
     protected EncodedCharacterHandler createCharacterHandler() {
@@ -351,7 +352,7 @@ public class EDict extends FileBasedDictionary {
                                 }
                                 else {
                                     // should not happen, edict does not support READING attributes
-                                    System.err.println( "illegal attribute type");
+                                    System.err.println( "EDICT warning: illegal attribute type");
                                 }
                             }
                             else {

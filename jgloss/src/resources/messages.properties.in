@@ -499,7 +499,20 @@ wordlookup.history.forward=Forward
 wordlookup.history.forward.tt=switch to next lookup result
 wordlookup.history.back=Back
 wordlookup.history.back.tt=switch to previous lookup result
+wordlookup.reference.ref=reference
 wordlookup.reference.syn=synonym
+wordlookup.reference.ant=antonym
+wordlookup.reference.ar=alternative reading
+wordlookup.showlegend=Show Legend
+wordlookup.showlegend.tt=Show a legend of the attributes used by the dictionaries
+wordlookup.legendframe.title=Dictionary Attribute Legend
+
+legend.dictionarychoice=Show legend for\ 
+legend.dictionary=Attributes used by {0}
+legend.noattributes=(no attributes)
+legend.attribute={1}
+legend.attributeexample=Display style:\ 
+legend.values=values of this attribute:
 
 # default location of the chasen binary for different platforms
 chasen.location.unix=/usr/local/bin/chasen

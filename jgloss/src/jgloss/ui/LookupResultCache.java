@@ -25,7 +25,7 @@ package jgloss.ui;
 
 import jgloss.dictionary.*;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -35,8 +35,8 @@ import java.util.Iterator;
  *
  * @author Michael Koch
  */
-public class LookupResultCache implements LookupResultHandler {
-    private List cache;
+public class LookupResultCache implements LookupResultHandler, Cloneable {
+    protected Collection cache;
     private LookupResultHandler forwardTo;
     
     public LookupResultCache() {
@@ -50,20 +50,34 @@ public class LookupResultCache implements LookupResultHandler {
 
     public LookupResultCache( String description, ResultIterator dictionaryEntries) 
         throws SearchException {
-        cache = new ArrayList( 1000);
-        cache.add( description);
-        while (dictionaryEntries.hasNext()) try {
-            cache.add( dictionaryEntries.next().getReference());
-        } catch (SearchException ex) {
-            cache.add( ex);
-        }
+        this();
+        setData( description, dictionaryEntries);
     }
 
     public void setForwardTo( LookupResultHandler _forwardTo) {
         forwardTo = _forwardTo;
     }
 
+    public void setData( String description, ResultIterator dictionaryEntries)
+        throws SearchException {
+        cache.clear();
+        cache.add( description);
+        while (dictionaryEntries.hasNext()) try {
+            cache.add( dictionaryEntries.next().getReference());
+        } catch (SearchException ex) {
+            cache.add( ex);
+        }        
+    }
+
     public void clear() { cache.clear(); }
+
+    public boolean isEmpty() { return cache.isEmpty(); }
+
+    public int size() { return cache.size(); }
+
+    public void replay() {
+        replay( forwardTo);
+    }
 
     public void replay( LookupResultHandler handler) {
         if (cache.size() == 0)
@@ -98,12 +112,14 @@ public class LookupResultCache implements LookupResultHandler {
     }
 
     public void startLookup( String description) {
+        cache.clear();
         cache.add( description);
         if (forwardTo != null)
             forwardTo.startLookup( description);
     }
 
     public void startLookup( LookupModel model) {
+        cache.clear();
         cache.add( model);
         if (forwardTo != null)
             forwardTo.startLookup( model);
@@ -136,5 +152,15 @@ public class LookupResultCache implements LookupResultHandler {
     public void endLookup() {
         if (forwardTo != null)
             forwardTo.endLookup();
+    }
+
+    public Object clone() {
+        try {
+            LookupResultCache out = (LookupResultCache) super.clone();
+            out.cache = new ArrayList( out.cache);
+            return out;
+        } catch (CloneNotSupportedException ex) {
+            return null;
+        }
     }
 } // class LookupResultCache

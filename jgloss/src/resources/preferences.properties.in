@@ -41,7 +41,7 @@ openrecent.files=
 # Delimiters for reading annotations
 reading.bracket.chars=�ԡաΡϡڡ�
 
-encodings=ISO-2022-JP,EUC-JP,SHIFT_JIS,UTF-8,UTF-16,UTF-16BE,UTF-16LE
+encodings=SHIFT_JIS,EUC-JP,ISO-2022-JP,UTF-8,UTF-16,UTF-16BE,UTF-16LE
 fontsizes.wordlookup=9,11,12,13,14,15,16,18
 fontsizes.kanji=9,11,12,13,14,15,16,18,20,24
 fontsizes.reading=6,7,8,9,10,11,12,13,14,15,16,18
@@ -121,14 +121,17 @@ leftclick.tooltip=false
 wordlookup.width=0
 wordlookup.height=0
 
-wordlookup.searchtype=0
-wordlookup.deinflection=true
-wordlookup.alldictionaries=true
-# Limit for the number of results the word lookup panel will show
-# with the HTML renderer, otherwise the plain text renderer
-# is used
-wordlookup.resultlimit=500
-wordlookup.searchclipboard=false
+wordlookup.searchmode=0
+wordlookup.dictionary_selection=
+wordlookup.all_dictionaries_selected=true
+wordlookup.multi_selection_mode=false
+wordlookup.filter_selection=
+wordlookup.searchfield.word=true
+wordlookup.searchfield.reading=true
+wordlookup.searchfield.translation=true
+wordlookup.searchfield.match_field=true
+wordlookup.searchexpression=
+wordlookup.distance=1
 
 # remember selected annotation in document
 history.selection=

@@ -41,8 +41,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
 
-public class LookupResultList extends JPanel implements LookupResultHandler,
-                                                        MarkerListFormatter.Group {
+public class LookupResultList extends JPanel implements LookupResultHandler {
     protected final static String STYLE = "body { color: black; background-color: white; }\n";
 
     /**
@@ -55,6 +54,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
     protected int fancyLimit;
 
     protected DictionaryEntryFormatter htmlFormatter;
+    protected MarkerListFormatter.Group markerGroup;
     protected DictionaryEntryFormatter plainFormatter;
     
     protected boolean multipleDictionaries;
@@ -67,10 +67,10 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
     protected String searchExpression;
     protected Map references;
 
-    protected final static int BUFFER_LIMIT = 1000;
+    protected final static int BUFFER_LIMIT = 500;
 
     public LookupResultList() {
-        this( 1000);
+        this( 300);
     }
 
     public LookupResultList( int _fancyLimit) {
@@ -93,6 +93,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
                                        Font.PLAIN, 
                                        JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12)));
         resultPlain.setEditable( false);
+        resultPlain.setLineWrap( true);
+        resultPlain.setWrapStyleWord( true);
 
         Action transferFocus = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
@@ -130,7 +132,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
 
         references = new HashMap( fancyLimit*4+1);
 
-        htmlFormatter = DictionaryEntryFormat.createHTMLFormatter( this, references);
+        markerGroup = new MarkerListFormatter.Group( "<font color=\"blue\">", "</font>");
+        htmlFormatter = DictionaryEntryFormat.createHTMLFormatter( markerGroup, references);
         plainFormatter = DictionaryEntryFormat.createFormatter();
     }
 
@@ -160,6 +163,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
     }
 
     private void startLookup() {
+        markerGroup.setMarkedText( searchExpression);
         previousDictionaryHasMatch = true;
         dictionaryEntries = 0;
         entriesInTextBuffer = 0;
@@ -356,18 +360,6 @@ public class LookupResultList extends JPanel implements LookupResultHandler,
             updater.run();
         else 
             EventQueue.invokeLater( updater);
-    }
-
-    public String getMarkedText() {
-        return searchExpression;
-    }
-
-    public String getMarkBefore() {
-        return "<font color=\"blue\">";
-    }
-
-    public String getMarkAfter() {
-        return "</font>";
     }
 
     public static class ViewState {

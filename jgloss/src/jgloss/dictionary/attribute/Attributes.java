@@ -24,8 +24,10 @@
 package jgloss.dictionary.attribute;
 
 import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.ResultIterator;
 
 import java.util.ResourceBundle;
+import java.util.NoSuchElementException;
 
 /**
  * Collection of standard attributes.
@@ -36,10 +38,36 @@ public class Attributes implements Attribute {
     protected static final ResourceBundle NAMES = ResourceBundle.getBundle
         ( "resources/messages-dictionary");
 
+    public static final Priority EXAMPLE_PRIORITY_VALUE = 
+        new Priority() {
+            public String getPriority() { return NAMES.getString( "example.priority"); }
+            public int compareTo( Priority p) {
+                throw new IllegalArgumentException();
+            }
+        };
+
+    public static final ReferenceAttributeValue EXAMPLE_REFERENCE_VALUE =
+        new ReferenceAttributeValue() {
+            public String getReferenceTitle() { return NAMES.getString( "example.reference"); }
+            public ResultIterator getReferencedEntries() {
+                return new ResultIterator() {
+                        public boolean hasNext() { return false; }
+                        public DictionaryEntry next() { throw new NoSuchElementException(); }
+                    };
+            }
+        };
+
+    public static final Gairaigo EXAMPLE_GAIRAIGO_VALUE =
+        new Gairaigo( NAMES.getString( "example.gairaigo.lang"), 
+                      NAMES.getString( "example.gairaigo.word"));
+
+    public static final InformationAttributeValue EXAMPLE_INFORMATION_VALUE =
+        new InformationAttributeValue( NAMES.getString( "example.information"));
+
     public static final Attribute PART_OF_SPEECH = new Attributes
         ( NAMES.getString( "att.part_of_speech.name"),
           NAMES.getString( "att.part_of_speech.desc"),
-          true, PartOfSpeech.class, 
+          PartOfSpeech.class, PartOfSpeech.get( "example"),
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL,
               DictionaryEntry.AttributeGroup.WORD });
@@ -47,7 +75,7 @@ public class Attributes implements Attribute {
     public static final Attribute PRIORITY = new Attributes
         ( NAMES.getString( "att.priority.name"),
           NAMES.getString( "att.priority.desc"),
-          true, Priority.class, 
+          Priority.class, EXAMPLE_PRIORITY_VALUE,
           new DictionaryEntry.AttributeGroup[] 
           { DictionaryEntry.AttributeGroup.GENERAL,
             DictionaryEntry.AttributeGroup.TRANSLATION });
@@ -55,42 +83,45 @@ public class Attributes implements Attribute {
     public static final Attribute EXAMPLE = new Attributes
         ( NAMES.getString( "att.example.name"),
           NAMES.getString( "att.example.desc"),
-          false, null, 
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute ABBREVIATION = new Attributes
         ( NAMES.getString( "att.abbreviation.name"),
           NAMES.getString( "att.abbreviation.desc"),
-          false, ReferenceAttributeValue.class, 
+          ReferenceAttributeValue.class,
+          EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute REFERENCE = new Attributes
         ( NAMES.getString( "att.reference.name"),
           NAMES.getString( "att.reference.desc"),
-          false, ReferenceAttributeValue.class, 
+          ReferenceAttributeValue.class,
+          EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute SYNONYM = new Attributes
         ( NAMES.getString( "att.synonym.name"),
           NAMES.getString( "att.synonym.desc"),
-          false, ReferenceAttributeValue.class, 
+          ReferenceAttributeValue.class,
+          EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute ANTONYM = new Attributes
         ( NAMES.getString( "att.antonym.name"),
           NAMES.getString( "att.antonym.desc"),
-          false, ReferenceAttributeValue.class, 
+          ReferenceAttributeValue.class,
+          EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute USAGE = new Attributes
         ( NAMES.getString( "att.usage.name"),
           NAMES.getString( "att.usage.desc"),
-          true, Usage.class, 
+          Usage.class, Usage.get( "example"),
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL,
               DictionaryEntry.AttributeGroup.TRANSLATION });
@@ -98,7 +129,7 @@ public class Attributes implements Attribute {
     public static final Attribute CATEGORY = new Attributes
         ( NAMES.getString( "att.category.name"),
           NAMES.getString( "att.category.desc"),
-          true, Category.class, 
+          Category.class, Category.get( "example"),
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL,
               DictionaryEntry.AttributeGroup.TRANSLATION });
@@ -106,14 +137,14 @@ public class Attributes implements Attribute {
     public static final Attribute GAIRAIGO = new Attributes
         ( NAMES.getString( "att.gairaigo.name"),
           NAMES.getString( "att.gairaigo.desc"),
-          false, Gairaigo.class, 
+          Gairaigo.class, EXAMPLE_GAIRAIGO_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute EXPLANATION = new Attributes
         ( NAMES.getString( "att.explanation.name"),
           NAMES.getString( "att.explanation.desc"),
-          false, InformationAttributeValue.class,
+          InformationAttributeValue.class, EXAMPLE_INFORMATION_VALUE,
           new DictionaryEntry.AttributeGroup[]
             { DictionaryEntry.AttributeGroup.TRANSLATION });
 
@@ -121,15 +152,22 @@ public class Attributes implements Attribute {
     protected String description;
     protected boolean canHaveValue;
     protected Class valueClass;
+    protected AttributeValue exampleAttributeValue;
     protected DictionaryEntry.AttributeGroup[] groups;
 
-    public Attributes( String _name, String _description, boolean _canHaveValue,
-                       Class _valueClass, DictionaryEntry.AttributeGroup[] _groups) {
-        this.name = _name;
-        this.description = _description;
-        this.canHaveValue = _canHaveValue;
-        this.valueClass = _valueClass;
-        this.groups = _groups;
+    public Attributes( String _name, String _description, DictionaryEntry.AttributeGroup[] _groups) {
+        this( _name, _description, null, null, _groups);
+    }
+
+    public Attributes( String _name, String _description,
+                       Class _valueClass, AttributeValue _exampleAttributeValue,
+                       DictionaryEntry.AttributeGroup[] _groups) {
+        name = _name;
+        description = _description;
+        canHaveValue = _valueClass != null;
+        valueClass = _valueClass;
+        exampleAttributeValue = _exampleAttributeValue;
+        groups = _groups;
     }
 
     public String getName() { return name; }
@@ -139,6 +177,8 @@ public class Attributes implements Attribute {
     public boolean canHaveValue() { return canHaveValue; }
 
     public Class getAttributeValueClass() { return valueClass; }
+
+    public AttributeValue getExampleValue() { return exampleAttributeValue; }
 
     public boolean appliesTo( DictionaryEntry.AttributeGroup _group) {
         for ( int i=0; i<groups.length; i++)

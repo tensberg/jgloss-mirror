@@ -42,10 +42,20 @@ public interface Attribute {
      * Return a short description explaining the attribute to the user.
      */
     String getDescription();
-
+    /**
+     * Returns <code>true</code> if the attribute can have values.
+     */
     boolean canHaveValue();
-
+    /**
+     * Returns the class of attribute values this attribute uses.
+     */
     Class getAttributeValueClass();
-
+    /**
+     * Returns an example value of the type this attribute uses.
+     */
+    AttributeValue getExampleValue();
+    /**
+     * Test if this attribute type is applicable to an attribute group.
+     */
     boolean appliesTo( DictionaryEntry.AttributeGroup group);
 } // interface Attribute

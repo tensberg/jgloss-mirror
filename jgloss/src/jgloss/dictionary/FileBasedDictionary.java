@@ -214,7 +214,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Set of attributes supported by this dictionary implementation. Initialized in
      * {@link #initSupportedAttributes() initSupportedAttributes}.
      */
-    protected Set supportedAttributes;
+    protected Map supportedAttributes;
     
     /**
      * Initializes the dictionary. The dictionary file is opened and mapped into memory.
@@ -274,15 +274,26 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * an empty set. Derived classes should add their supported attributes.
      */
     protected void initSupportedAttributes() {
-        supportedAttributes = new HashSet( 11);
+        supportedAttributes = new HashMap( 11);
     }
 
     public boolean supports( SearchMode mode, boolean fully) {
         return supportedSearchModes.containsKey( mode);
     }
 
-    public boolean supports( Attribute attribute) {
-        return supportedAttributes.contains( attribute);
+    public Set getSupportedAttributes() {
+        return supportedAttributes.keySet();
+    }
+
+    public Set getAttributeValues( Attribute att) {
+        if (!supportedAttributes.containsKey( att))
+            return null;
+
+        Set out = (Set) supportedAttributes.get( att);
+        if (out == null)
+            return Collections.EMPTY_SET;
+        else
+            return out;
     }
     
     public SearchFieldSelection getSupportedFields( SearchMode mode) {

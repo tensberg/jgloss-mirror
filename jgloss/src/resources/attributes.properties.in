@@ -9,6 +9,9 @@
 
 # parts of speech
 
+pos.example.s=adj
+pos.example.l=adjective (keiyoushi)
+
 pos.adj.s=adj
 pos.adj.l=adjective (keiyoushi)
 
@@ -128,6 +131,9 @@ pos.vt.l=transitive verb
 
 # usage
 
+usage.example.s=arch
+usage.example.l=archaism
+
 usage.arch.s=arch
 usage.arch.l=archaism
 
@@ -175,35 +181,200 @@ usage.X.l=rude or X-rated term
 
 # categories
 
-cat.nengo.s=nengô
-cat.nengo.l=nengô (era name)
+cat.example.s=anat
+cat.example.l=anatomy
 
-cat.pers.s=pers
-cat.pers.l=personage
+cat.anat.s=anat
+cat.anat.l=anatomy
 
-cat.comp.s=comp
-cat.comp.l=computer term
+cat.area.s=area
+cat.area.l=area name
 
-cat.rel.s=rel
-cat.rel.l=religious
+cat.art.s=art
+cat.art.l=fine arts
+
+cat.astron.s=astron
+cat.astron.l=astronomy
+
+cat.baseb.s=baseb
+cat.baseb.l=baseball
 
 cat.bibl.s=bibl
 cat.bibl.l=bible
 
-cat.psych.s=psych
-cat.psych.l=psychological term
+cat.biol.s=biol
+cat.biol.l=biology
+
+cat.bot.s=bot
+cat.bot.l=botany
+
+cat.buddh.s=buddh
+cat.buddh.l=Buddhism
+
+cat.business.s=business
+cat.business.l=business-related
+
+cat.chem.s=chem
+cat.chem.l=chemistry
 
 cat.christ.s=christ
 cat.christ.l=Christianity
 
-cat.anat.s=anat
-cat.anat.l=anatomy term
+cat.city.s=city
+cat.city.l=city name
+
+cat.cloth.s=cloth
+cat.cloth.l=clothing
+
+cat.comp.s=comp
+cat.comp.l=computer term
+
+cat.cook.s=cook
+cat.cook.l=cooking
+
+cat.country.s=country
+cat.country.l=country name
+
+cat.econ.s=econ
+cat.econ.l=economy
+
+cat.elec.s=elec
+cat.elec.l=electrical engineering
+
+cat.ento.s=insect
+cat.ento.l=entomology (insect studies)
+
+cat.geol.s=geol
+cat.geol.l=geology
+
+cat.gmyth.s=gmyth
+cat.gmyth.l=Greek mythology
+
+cat.gram.s=gram
+cat.gram.l=grammar
+
+cat.hist.s=hist
+cat.hist.l=history
+
+cat.ichthy.s=fish
+cat.ichthy.l=ichthyology (fish studies)
+
+cat.inst.s=inst
+cat.inst.l=musical instrument
+
+cat.island.s=island
+cat.island.l=island name
+
+cat.kabuki.s=kabuki
+cat.kabuki.l=kabuki-related
+
+cat.lang.s=lang
+cat.lang.l=language
+
+cat.law.s=law
+cat.law.l=law-related
+
+cat.loc.s=loc
+cat.loc.l=location name
+
+cat.math.s=math
+cat.math.l=mathematics
 
 cat.med.s=med
-cat.med.l=medical term
+cat.med.l=medicine
+
+cat.met.s=met
+cat.met.l=meteorology
+
+cat.mil.s=mil
+cat.mil.l=military
+
+cat.min.s=min
+cat.min.l=mineralogy
+
+cat.moun.s=moun
+cat.moun.l=mountain name
+
+cat.mname.s=mname
+cat.mname.l=male first name
+
+cat.mus.s=mus
+cat.mus.l=musics
+
+cat.name.s=name
+cat.name.l=name
+
+cat.nengo.s=nengô
+cat.nengo.l=nengô (era name)
+
+cat.no.s=nô
+cat.no.l=nô-related
+
+cat.optics.s=opt
+cat.optics.l=optics
+
+cat.org.s=org
+cat.org.l=organization
+
+cat.orni.s=bird
+cat.orni.l=ornithology (bird studies)
+
+cat.pers.s=pers
+cat.pers.l=personage
 
 cat.pharm.s=pharm
-cat.pharm.l=pharmaceutical term
+cat.pharm.l=pharmacy
 
 cat.phil.s=phil
 cat.phil.l=philology
+
+cat.philos.s=philos
+cat.philos.l=philosophy
+
+cat.photo.s=photo
+cat.photo.l=photography
+
+cat.phys.s=phys
+cat.phys.l=physics
+
+cat.pol.s=pol
+cat.pol.l=politics
+
+cat.print.s=print
+cat.print.l=printing
+
+cat.publ.s=publisher
+cat.publ.l=publishing house name
+
+cat.psych.s=psych
+cat.psych.l=psychology
+
+cat.rel.s=rel
+cat.rel.l=religion
+
+cat.river.s=river
+cat.river.l=river name
+
+cat.sea.s=sea
+cat.sea.l=sea name
+
+cat.sports.s=sports
+cat.sports.l=sports-related
+
+cat.sumo.s=sumô
+cat.sumo.l=sumô-related
+
+cat.surn.s=s
+cat.surn.l=surname
+
+cat.tenno.s=tennô
+cat.tenno.l=tennô (Japanese emperor)
+
+cat.theatre.s=theatre
+cat.theatre.l=theatre-related
+
+cat.tm.s=tm
+cat.tm.l=trademark
+
+cat.zoo.s=zoo
+cat.zoo.l=zoology

@@ -506,7 +506,8 @@ public class KanjiDic implements Dictionary {
             return false;
     }
 
-    public boolean supports( Attribute att) { return false; }
+    public Set getSupportedAttributes() { return Collections.EMPTY_SET; }
+    public Set getAttributeValues( Attribute att) { return null; }
 
     public SearchFieldSelection getSupportedFields( SearchMode searchmode) {
         return new SearchFieldSelection( true, true, true, true, false);
@@ -544,7 +545,8 @@ public class KanjiDic implements Dictionary {
     public boolean equals( Object o) {
         try {
             return new File(((KanjiDic) o).dicfile).equals( new File( dicfile));
-        } catch (ClassCastException ex) {
+        } catch (Exception ex) {
+            // NullPointer or ClassCast
             return false;
         }
     }

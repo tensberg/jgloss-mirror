@@ -70,4 +70,9 @@ abstract class DefaultCategoryAttributeValue implements CategoryAttributeValue {
      * Return a string which will be used as prefix to the resource key.
      */
     protected abstract String getResourcePrefix();
+
+    public boolean equals( Object o) {
+        return (o!=null && o instanceof DefaultCategoryAttributeValue &&
+                ((DefaultCategoryAttributeValue) o).id.equals( id));
+    }
 } // class DefaultCategoryAttributeValue

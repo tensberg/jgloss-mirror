@@ -26,38 +26,82 @@ package jgloss.ui;
 import jgloss.util.ListFormatter;
 import jgloss.util.StringTools;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 /**
  * List formatter which will add some additional text to the list items, if they
- * contain a certain chooseable string. Since several instances of this class are
- * usually used in a group which share a single configuration, the interface
- * {@link Group Group} is used to access this shared state.
+ * contain a certain chooseable string.
+ *
+ * @author Michael Koch
  */
 public class MarkerListFormatter extends ListFormatter {
     /**
-     * Shared state of a group of marker list formatters.
+     * Group of marker list formatters which share a common configuration.
      */
-    public interface Group {
-        /**
-         * Get the string to which some additional text should be added if it occurrs
-         * in a list item.
-         */
-        String getMarkedText();
-        /**
-         * Get the string which should be added before each occurrence the marked text.
-         */
-        String getMarkBefore();
-        /**
-         * Get the string which should be added after each occurrence the marked text.
-         */
-        String getMarkAfter();
-    } // interface Group
+    public static class Group {
+        private List formatters = new ArrayList( 5);
+        private String markedText;
+        private String textBefore;
+        private String textAfter;
 
-    protected Group group;
+        public Group() {
+            this( null, "", "");
+        }
+
+        public Group( String _textBefore, String _textAfter) {
+            this( null, _textBefore, _textAfter);
+        }
+
+        public Group( String _markedText, String _textBefore, String _textAfter) {
+            if (markedText != null)
+                markedText = normalize( _markedText);
+            textBefore = _textBefore;
+            textAfter = _textAfter;
+        }
+
+        public void add( MarkerListFormatter formatter) {
+            formatters.add( formatter);
+            formatter.setMarkedText( markedText);
+            formatter.setTextBefore( textBefore);
+            formatter.setTextAfter( textAfter);
+        }
+
+        public void remove( MarkerListFormatter formatter) {
+            formatters.remove( formatter);
+        }
+
+        public void setMarkedText( String _markedText) {
+            markedText = normalize( _markedText);
+            for ( Iterator i=formatters.iterator(); i.hasNext(); )
+                ((MarkerListFormatter) i.next()).setMarkedText( _markedText);
+        }
+
+        public void setTextBefore( String _textBefore) {
+            textBefore = _textBefore;
+            for ( Iterator i=formatters.iterator(); i.hasNext(); )
+                ((MarkerListFormatter) i.next()).setTextBefore( _textBefore);
+        }
+
+        public void setTextAfter( String _textAfter) {
+            textAfter = _textAfter;
+            for ( Iterator i=formatters.iterator(); i.hasNext(); )
+                ((MarkerListFormatter) i.next()).setTextBefore( _textAfter);
+        }
+
+        public String getMarkedText() { return markedText; }
+        public String getTextBefore() { return textBefore; }
+        public String getTextAfter() { return textAfter; }
+    } // class Group
+
     protected String markedText;
+    protected String textBefore;
+    protected String textAfter;
 
     public MarkerListFormatter( Group _group, ListFormatter _formatter) {
         super( _formatter);
-        group = _group;
+        _group.add( this);
     }
 
     public MarkerListFormatter( Group _group, String _listBetween) {
@@ -78,19 +122,24 @@ public class MarkerListFormatter extends ListFormatter {
                                 String _multiListBetween, String _multiListAfter) {
         super( _emptyList, _singleListBefore, _singleListAfter,
                _multiListBefore, _multiListBetween, _multiListAfter);
-        group = _group;
+        _group.add( this);
     }
 
-    public ListFormatter newList( StringBuffer _buffer, int _length) {
-        markedText = group.getMarkedText();
-        if (markedText!=null && markedText.length()!=0) {
-            markedText = StringTools.toHiragana( markedText.toLowerCase());
-        }
-        else
-            markedText = null;
-
-        return super.newList( _buffer, _length);
+    public void setMarkedText( String _markedText) {
+        markedText = _markedText;
     }
+
+    public void setTextBefore( String _textBefore) {
+        textBefore = _textBefore;
+    }
+
+    public void setTextAfter( String _textAfter) {
+        textAfter = _textAfter;
+    }
+
+    public String getMarkedText() { return markedText; }
+    public String getTextBefore() { return textBefore; }
+    public String getTextAfter() { return textAfter; }
 
     protected void doAppendItem( Object item) {
         if (markedText == null) {
@@ -98,20 +147,21 @@ public class MarkerListFormatter extends ListFormatter {
             return;
         }
 
-        String markBefore = group.getMarkBefore();
-        String markAfter = group.getMarkAfter();
-
         String s = String.valueOf( item);
         StringBuffer tempBuffer = new StringBuffer( s);        
-        String sN = StringTools.toHiragana( s.toLowerCase());
+        String sN = normalize( s);
 
         int from = sN.length()-1;
         while ((from=sN.lastIndexOf( markedText, from)) != -1) {
-            tempBuffer.insert( from+markedText.length(), markAfter);
-            tempBuffer.insert( from, markBefore);
+            tempBuffer.insert( from+markedText.length(), textAfter);
+            tempBuffer.insert( from, textBefore);
             from--;
         }
 
         buffer.append( tempBuffer);
+    }
+
+    protected static final String normalize( String in) {
+        return in != null ? StringTools.toHiragana( in.toLowerCase()) : null;
     }
 } // class MarkerListFormatter

@@ -32,56 +32,19 @@ import jgloss.ui.*;
  * @author Michael Koch
  */
 public class JDictionaryApp extends JGloss {
-    public static void main( String args[]) {
-        JFrame f = new JFrame( "test");
-        JTextPane p = new JTextPane();
-        p.setContentType( "text/html");
+    public static void main( String[] args) {
+        new JDictionaryApp().init( args);
+    }
 
-        application = new JDictionaryApp();
+    protected String getApplicationName() { return "jdictionary"; }
 
-        try {
-            registerDictionaries();
+    protected void showMainWindow( String[] args) throws Exception {
+        createLookupFrame().show();
+    }
 
-            handleCommandLine( args, "jdictionary");
-
-            initUI();
-
-            SplashScreen splash = new SplashScreen( "jdictionary");
-            
-            splash.setInfo( messages.getString( "splashscreen.initMain"));
-            
-            registerShutdownHook();
-
-            createLookupFrame().show();
-
-            // Initialize the preferences at startup. This includes loading the dictionaries.
-            // Do this in its own thread to decrease perceived initialization time.
-            new Thread() {
-                    public void run() {
-                        try {
-                            setPriority( Thread.MIN_PRIORITY);
-                        } catch (IllegalArgumentException ex) {}
-
-                        PreferencesFrame.createFrame
-                            ( new PreferencesPanel[] { StyleDialog.getStyleDialog(),
-                                                       Dictionaries.getInstance() });
-                    }
-                }.start();
-
-            splash.close();
-        } catch (NoClassDefFoundError ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (NoSuchMethodError ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (ClassNotFoundException ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (Exception ex) {
-            displayError( messages.getString( "error.initialization.generic"), ex, true);
-            System.exit( 1);
-        }
+    protected PreferencesPanel[] getPreferencesPanels() {
+        return new PreferencesPanel[] { StyleDialog.getStyleDialog(),
+                                        Dictionaries.getInstance() };
     }
 
     protected boolean doExit() {

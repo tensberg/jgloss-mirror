@@ -58,7 +58,7 @@ public class AttributeMapper {
     }
 
     protected Map mappings;
-    protected Set allAttributes;
+    protected Map allAttributes;
     
     /**
      * Initializes a new mapping from dictionary-specific id's to attribute/value objects by
@@ -66,7 +66,7 @@ public class AttributeMapper {
      */
     public AttributeMapper( LineNumberReader mapping) throws IOException {
         mappings = new HashMap( 61);
-        allAttributes = new HashSet( 61);
+        allAttributes = new HashMap( 61);
 
         String line;
 
@@ -82,6 +82,7 @@ public class AttributeMapper {
                 lineMatcher.reset( line);
                 if (lineMatcher.matches()) {
                     String id = lineMatcher.group( 1);
+                    id = id.replace( '~', ' ');
 
                     String attributeS = lineMatcher.group( 2);
                     Class attClass = Attributes.class;
@@ -135,7 +136,12 @@ public class AttributeMapper {
                     }
 
                     mappings.put( id, new Mapping( attribute, attValue));
-                    allAttributes.add( attribute);
+                    Set attValues = (Set) allAttributes.get( attribute);
+                    if (attValues == null) {
+                        attValues = new HashSet( 11);
+                        allAttributes.put( attribute, attValues);
+                    }
+                    attValues.add( attValue);
                 }
                 else
                     throw new IOException( "Invalid line " + mapping.getLineNumber());
@@ -151,5 +157,5 @@ public class AttributeMapper {
         return (Mapping) mappings.get( id);
     }
 
-    public Set getAttributes() { return Collections.unmodifiableSet( allAttributes); }
+    public Map getAttributes() { return Collections.unmodifiableMap( allAttributes); }
 } // class AttributeMapper

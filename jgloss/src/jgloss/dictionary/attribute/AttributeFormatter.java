@@ -34,7 +34,7 @@ public interface AttributeFormatter {
      *
      * @param val Value of the attribute. May be <code>null</code> if the attribute is set but
      *            has no value.
-     * @param buf String buffer in which the formatted attribute is written.
+     * @param buf String buffer to which the formatted attribute is appended.
      * @return The string buffer passed in.
      */
     StringBuffer format( Attribute att, ValueList val, StringBuffer buf);

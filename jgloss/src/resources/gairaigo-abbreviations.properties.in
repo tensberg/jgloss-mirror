@@ -1,0 +1,25 @@
+# Encoding: ISO-8859-1
+#
+# Mapping from language code to abbreviated language names
+# used by jgloss.dictionary.attribute.GairaigoFormatter
+#
+# Author: Michael Koch <tensberg@gmx.net>
+# $Id$
+
+format.short=from {0}
+format.long=from {0} "{1}"
+
+ai=Ainu
+ar=Arab.
+de=Ger.
+el=Greek
+en=Engl.
+es=Span.
+fr=Fr.
+it=Ital.
+je=Jap.-Engl.
+lt=Lat.
+nl=Dutch
+pt=Port.
+ru=Russ.
+zh=Chin.

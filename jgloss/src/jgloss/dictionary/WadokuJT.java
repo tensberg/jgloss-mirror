@@ -71,12 +71,12 @@ public class WadokuJT extends FileBasedDictionary {
               new ListFormatter( "", "; ", ""),
               new ListFormatter( "", "/", ""));
         formatter.addAttributeFormat( Attributes.PART_OF_SPEECH,
-                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3,
                                       new DefaultAttributeFormatter
-                                      ( " (", ")", "", false, new ListFormatter( ",")));
+                                      ( " (", ")", "", false, new ListFormatter( ",")),
+                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         formatter.addAttributeFormat( Attributes.EXAMPLE,
-                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3,
-                                      new DefaultAttributeFormatter( " {", "}", "", true, null));
+                                      new DefaultAttributeFormatter( " {", "}", "", true, null),
+                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         formatter.addAttributeFormat( Attributes.EXPLANATION, new DefaultAttributeFormatter
                                       ( " (", ")", "", false, new ListFormatter( ",")), false);
 
@@ -100,21 +100,20 @@ public class WadokuJT extends FileBasedDictionary {
     public static final Attribute MAIN_ENTRY = new Attributes
         ( NAMES.getString( "wadoku.att.main_entry.name"),
           NAMES.getString( "wadoku.att.main_entry.desc"),
-          false, null,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute MAIN_ENTRY_REF = new Attributes
         ( NAMES.getString( "wadoku.att.main_entry_ref.name"),
           NAMES.getString( "wadoku.att.main_entry_ref.desc"),
-          false, null,
+          ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute ALT_READING = new Attributes
         ( NAMES.getString( "wadoku.att.alt_reading.name"),
           NAMES.getString( "wadoku.att.alt_reading.desc"),
-          false, ReferenceAttributeValue.class, 
+          ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
@@ -266,14 +265,15 @@ public class WadokuJT extends FileBasedDictionary {
     protected void initSupportedAttributes() {
         super.initSupportedAttributes();
         
-        supportedAttributes.addAll( mapper.getAttributes());
-        supportedAttributes.add( Attributes.GAIRAIGO);
-        supportedAttributes.add( Attributes.EXPLANATION);
-        supportedAttributes.add( Attributes.SYNONYM);
-        supportedAttributes.add( Attributes.ANTONYM);
-        supportedAttributes.add( ALT_READING);
-        supportedAttributes.add( MAIN_ENTRY);
-        supportedAttributes.add( MAIN_ENTRY_REF);
+        supportedAttributes.putAll( mapper.getAttributes());
+        supportedAttributes.put( Attributes.GAIRAIGO, null);
+        supportedAttributes.put( Attributes.EXPLANATION, null);
+        supportedAttributes.put( Attributes.REFERENCE, null);
+        supportedAttributes.put( Attributes.SYNONYM, null);
+        supportedAttributes.put( Attributes.ANTONYM, null);
+        supportedAttributes.put( ALT_READING, null);
+        supportedAttributes.put( MAIN_ENTRY, null);
+        supportedAttributes.put( MAIN_ENTRY_REF, null);
     }
 
     protected EncodedCharacterHandler createCharacterHandler() {
@@ -516,7 +516,7 @@ public class WadokuJT extends FileBasedDictionary {
                                 ex.substring( GAIRAIGO_MATCHER.end());
                         }
                         else {
-                            System.err.println( "WadokuJT WARNING: unrecognized language " +
+                            System.err.println( "WadokuJT warning: unrecognized language " +
                                                 lang);
                         }
                     }
@@ -643,7 +643,7 @@ public class WadokuJT extends FileBasedDictionary {
                     if (tc == '\u2192')
                         type = ALT_READING;
                     else if (tc == '\u21d2')
-                        type = Attributes.SYNONYM;
+                        type = Attributes.REFERENCE;
                     else
                         type = Attributes.ANTONYM;
                     generalA.addAttribute( type, new SearchReference

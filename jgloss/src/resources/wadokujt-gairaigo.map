@@ -1,16 +1,18 @@
-# mapping from language abbreviation to ISO 639:1988 language code
-# for the WadokuJT
+# Mapping from language abbreviation to ISO 639:1988 language code
+# for the WadokuJT. All abbreviations must be in lowercase.
 #
 #
-# Author: Michael Koch
+# Author: Michael Koch <tensberg@gmx.net>
 # $Id$
 
+ainu            ai
 arab.           ar
+chin.           zh
 dtsch.          de
 engl.           en
 franz.          fr
 griech.         el
-Holl.           nl
+holl.           nl
 ital.           it
 jap.-engl.      je
 lat.            lt

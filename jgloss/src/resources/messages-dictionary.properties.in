@@ -65,7 +65,7 @@ att.abbreviation.name=abbr
 att.abbreviation.desc=abbreviation
 
 att.reference.name=ref
-att.reference.desc=reference
+att.reference.desc=cross-reference (see also)
 
 att.synonym.name=syn
 att.synonym.desc=synonym (equal meaning)
@@ -80,10 +80,17 @@ att.category.name=category
 att.category.desc=category of the entry
 
 att.gairaigo.name=gairaigo
-att.gairaigo.desc=loan word from other language
+att.gairaigo.desc=gairaigo (loan word from other language)
 
 att.explanation.name=exp
 att.explanation.desc=longer explanation
+
+# attribute value examples
+example.priority=high
+example.reference=example
+example.gairaigo.lang=en
+example.gairaigo.word=example
+example.information=example information
 
 # WadokuJT specific attributes
 
