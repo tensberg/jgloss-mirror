@@ -2,14 +2,16 @@
 	- Extreme speedup of EDICT lookups. The old entry match test was
 	  really broken.
 	- Added French translation, contributed by Alexandre Beraud.
-	- Speed improvements in parser and edict.
+	- Added paste import window. Text pasted in this window will be
+	  imported in a new JGloss document. This is mainly useful
+	  for working with the X primary selection. It is accessible with
+	  the -p command line option.
 	- Added composite verb detection to parser.
 	- HTML export: files now show reading and translation in popup
 	  windows in browsers which support the neccessary JavaScript
 	  functions.
 	- Started working on a JGloss-WWW servlet, which adds annotations
-	  to Japanese web pages on the fly. This is similar to the
-	  Rikai server (http://www.rikai.com).
+	  to Japanese web pages on the fly.
 0.9.1: (2001/07/13)
 	- Added support for KANJIDIC dictionaries.
 	- Added support for SKK word-reading dictionaries.
