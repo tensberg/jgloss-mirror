@@ -49,6 +49,10 @@
   ;; Generate footnotes for ULinks?
   #t)
 
+(define bop-footnotes
+  ;; Make "bottom-of-page" footnotes?
+  #t)
+
 ]]>
 
 <![%html;[

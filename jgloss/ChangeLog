@@ -1,4 +1,4 @@
-1.0: (2001/07/08)
+0.9.1: (2001/07/11)
 	- Added support for KANJIDIC dictionaries.
 	- Added support for SKK word-reading dictionaries.
 	- Added command line option for dictionary format detection.

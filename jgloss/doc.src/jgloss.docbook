@@ -29,7 +29,7 @@
     <author>
       <firstname>Michael</firstname><surname>Koch</surname>
     </author>
-    <edition>1.0-pre</edition>
+    <edition>0.9.1</edition>
     <copyright><year>2001</year><holder>Michael Koch</holder></copyright>
     <pubdate>2001</pubdate>
   </bookinfo>
@@ -977,13 +977,14 @@
         <para>
           <ulink url="http://www.dgs.monash.edu.au/~jwb/Japanese.html">Jim Breen's Japanese Page</ulink>.
           Here you will find lots of interesting links, among them links to dictionaries
-          in EDICT format.
+          in EDICT and KANJIDIC format.
         </para>
       </listitem>
       <listitem>
         <para>
           A direct link to the 
-          <ulink url="http://ftp.cc.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil">EDICT dictionaries
+          <ulink url="http://ftp.cc.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil">EDICT 
+            and KANJIDIC dictionaries
           </ulink>.
         </para>
       </listitem>
