@@ -45,7 +45,7 @@ DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www
 
-DATA := vconj HTMLExporter COPYING
+DATA := vconj HTMLExporter HTMLAnnotator COPYING
 DATA_WWW := HTMLAnnotator vconj
 
 RESOURCES := messages.properties messages-dictionary.properties \
