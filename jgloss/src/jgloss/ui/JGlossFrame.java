@@ -825,6 +825,10 @@ public class JGlossFrame implements ActionListener {
 
         docpane.setEditorKit( kit);
         docpane.setStyledDocument( doc);
+
+        annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
+        annotationEditor.expandNonHidden();
+
         doc.setAddAnnotations( false);
         exportMenu.setEnabled( true);
         exportPlainTextAction.setEnabled( true);
@@ -836,9 +840,6 @@ public class JGlossFrame implements ActionListener {
                                   // save as
             saveAction.setEnabled( true);
         saveAsAction.setEnabled( true);
-
-        annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
-        annotationEditor.expandAll();
 
         docpane.followMouse( showAnnotationItem.isSelected(),
                              editorFollowsMouseItem.isSelected());
