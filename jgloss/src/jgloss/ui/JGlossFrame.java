@@ -1023,29 +1023,51 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 }
             });
 
-        docpane.setEditorKit( kit);
-        docpane.setStyledDocument( doc);
-        annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
+        Runnable worker = new Runnable() {
+                public void run() {
+                    docpane.setEditorKit( kit);
+                    docpane.setStyledDocument( doc);
+                    annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
+                    
+                    getContentPane().removeAll();
+                    getContentPane().add( split);
+                    getContentPane().validate();
+                    if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN))
+                        split.setDividerLocation( 1.0f);
 
-        getContentPane().removeAll();
-        getContentPane().add( split);
-        getContentPane().validate();
-        if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN))
-            split.setDividerLocation( 1.0f);
+                    doc.setAddAnnotations( false);
+                    exportMenu.setEnabled( true);
+                    exportPlainTextAction.setEnabled( true);
+                    exportLaTeXAction.setEnabled( true);
+                    exportHTMLAction.setEnabled( true);
+                    exportAnnotationListAction.setEnabled( true);
+                    printAction.setEnabled( true);
+                    if (documentPath == null) 
+                        // this means that the document is imported, save will behave like save as
+                        saveAction.setEnabled( true);
+                    saveAsAction.setEnabled( true);
 
-        doc.setAddAnnotations( false);
-        exportMenu.setEnabled( true);
-        exportPlainTextAction.setEnabled( true);
-        exportLaTeXAction.setEnabled( true);
-        exportHTMLAction.setEnabled( true);
-        exportAnnotationListAction.setEnabled( true);
-        printAction.setEnabled( true);
-        if (documentPath == null) 
-            // this means that the document is imported, save will behave like save as
-            saveAction.setEnabled( true);
-        saveAsAction.setEnabled( true);
-
-        docpane.followMouse( showAnnotationItem.isSelected(), false);
+                    docpane.followMouse( showAnnotationItem.isSelected(), false);
+                }
+            };
+        if (EventQueue.isDispatchThread()) {
+            worker.run();
+        }
+        else {
+            try {
+                EventQueue.invokeAndWait( worker);
+            } catch (InterruptedException ex) {
+                // What? Should not happen.
+                ex.printStackTrace();
+            } catch (java.lang.reflect.InvocationTargetException ex) {
+                if (ex.getTargetException() instanceof IOException)
+                    throw (IOException) ex.getTargetException();
+                else if (ex.getTargetException() instanceof RuntimeException)
+                    throw (RuntimeException) ex.getTargetException();
+                else // should not happen
+                    ex.printStackTrace();
+            }
+        }
 
         doc.addDocumentListener( new DocumentListener() {
                 public void insertUpdate(DocumentEvent e) {

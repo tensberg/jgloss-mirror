@@ -57,7 +57,7 @@
       </para>
       <para>
         &JGloss; is written in Java. It should work on any computer with support
-        for the Java 2 Version 1.3 platform.
+        for the Java 2 Version 1.3 or 1.4 platform.
       </para>
     </sect1>
     <sect1><title>Credits</title>
@@ -90,11 +90,10 @@
     <sect1 id="sect.whatyouneed"><title>What you need</title>
       <para>
         &JGloss; is a Java application. To run it, you will need a Java implementation that
-        conforms to the Java 2 Version 1.3 specifications, <abbrev>e. g.</abbrev> Sun's
+        conforms to the Java 2 Version 1.3 or 1.4 specifications, <abbrev>e. g.</abbrev> Sun's
         <ulink url="http://java.sun.com/j2se/1.3/jre/">
           <application>Java Runtime Environment 1.3</application></ulink> (<acronym>JRE</acronym>).
-        Make sure that you install the international version. I have not tested JGloss with
-        the JRE 1.4 Beta.
+        Make sure that you install the international version.
       </para>
       <para>
         Your computer system should already be configured to work with Japanese text. You must
@@ -312,9 +311,9 @@
       </para>
       <para>
         To build the &JGloss; JAR file, you have to have the
-        <ulink url="http://java.sun.com/j2se/1.3/">
-        <application>Java Development Kit 1.3</application></ulink> from Sun (or something compatible) 
-        installed (I have not tested &JGloss; with the JDK 1.4 Beta). To create the
+        <ulink url="http://java.sun.com/j2se/1.4/">
+        <application>Java Development Kit 1.4</application></ulink> from Sun (or something compatible) 
+        installed. To create the
         documentation files from <filename>jgloss.docbook</filename>
         you need the DocBook 4.1 DTD and various DocBook tools. Look for them at
         the <ulink url="http://www.oasis-open.org/docbook/">OASIS site</ulink>, 

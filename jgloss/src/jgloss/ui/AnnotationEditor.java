@@ -161,6 +161,53 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     }
 
     /**
+     * Delegator for key events which only forwards <CODE>keyPressed</CODE> and <CODE>keyReleased</CODE>
+     * events. In Swing 1.4, the <CODE>BasicTreeUI</CODE> key listener adds first letter navigation, 
+     * triggered by a <CODE>keyTyped</CODE> event. Since this behavior conflicts with the 
+     * <CODE>AnnotationEditor</CODE> keyboard navigation, the listener is wrapped by this delegator,
+     * which ignores the <CODE>keyTyped</CODE> events.
+     */
+    private static class KeyEventDelegator implements KeyListener {
+        /**
+         * Fetch the delegator created for the given delegatee. This will remove the delegator
+         * from the map of created delegators.
+         */
+        private static KeyEventDelegator fetchDelegator( KeyListener delegatee) {
+            KeyEventDelegator delegator = (KeyEventDelegator) delegators.remove( delegatee);
+            return delegator;
+        }
+
+        /**
+         * Map from delegatees to created delegators.
+         */
+        private final static java.util.Map delegators = new HashMap( 7);
+
+        private KeyListener delegatee;
+
+        public KeyEventDelegator( KeyListener delegatee) {
+            this.delegatee = delegatee;
+            delegators.put( delegatee, this);
+        }
+        
+        public KeyListener getDelegatee() { return delegatee; }
+
+        public void keyPressed( KeyEvent event) {
+            delegatee.keyPressed( event);
+        }
+
+        public void keyReleased( KeyEvent event) {
+            delegatee.keyReleased( event);
+        }
+
+        public void keyTyped( KeyEvent event) {
+            // ignore this event
+            // FIXME: if the keyTyped event is ever used for something useful in later releases,
+            // this will break.
+        }
+    } // class
+
+
+    /**
      * The model which this JTree displays. Kept here as member variable to prevent the constant
      * typecasting.
      */
@@ -391,6 +438,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     AnnotationNode selection = (AnnotationNode) tn;
                     int index = model.getIndexOfChild( model.getRoot(), selection);
                     selection.removeAnnotation();
+
                     // select the following annotation node (or previous if it was the last)
                     if (index >= model.getChildCount( model.getRoot()))
                         index--;
@@ -943,8 +991,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     public void valueChanged( TreeSelectionEvent e) {
         if (e.getNewLeadSelectionPath() != null) {
             if (e.getNewLeadSelectionPath() != e.getOldLeadSelectionPath()) {
-                TreeNode tn = (TreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
-                
+                TreeNode tn = (TreeNode) e.getNewLeadSelectionPath().getLastPathComponent();                
                 updateActions( tn);
                 
                 TreeNode selection = tn;
@@ -1277,5 +1324,33 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      */
     public AnnotationNode getLastSelectedAnnotation() {
         return lastSelectedAnnotation;
+    }
+
+    /**
+     * Wraps the handler in a <CODE>KeyEventDelegator</CODE>.
+     *
+     * @see AnnotationEditor.KeyEventDelegator
+     */
+    public void addKeyListener( KeyListener handler) {
+        if (handler instanceof BasicTreeUI.KeyHandler) {
+            super.addKeyListener( new KeyEventDelegator( handler));
+        }
+        else
+            super.addKeyListener( handler);
+    }
+
+    /**
+     * Removes the <CODE>KeyEventDelegator</CODE> which wraps the handler.
+     *
+     * @see AnnotationEditor.KeyEventDelegator
+     */
+    public void removeKeyListener( KeyListener handler) {
+        if (handler instanceof BasicTreeUI.KeyHandler) {
+            KeyListener delegator = KeyEventDelegator.fetchDelegator( handler);
+            if (delegator != null)
+                super.removeKeyListener( delegator);
+            else
+                super.removeKeyListener( handler);
+        }
     }
 } // class AnnotationEditor

@@ -272,9 +272,9 @@ public class AnnotationNode extends InnerNode {
     public void removeAnnotation() {
         try {
             JGlossDocument doc = ((JGlossDocument) annotation.getDocument());
-            doc.setOuterHTML( annotation, word.getWord());
-            // remove the newline which the stupid HTMLDocument.insertHTML insists on adding
-            doc.remove( annotation.getEndOffset()-1, 1);
+            int start = annotation.getStartOffset();
+            doc.remove( start, annotation.getEndOffset()-start);
+            doc.insertString( start, word.getWord(), null);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
