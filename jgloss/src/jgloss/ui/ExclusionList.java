@@ -400,8 +400,8 @@ public class ExclusionList extends Box {
                           JGloss.messages.getString( "error.exclusions.save.title"),
                           JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
                 }
+                ((DefaultListModel) exclusionList.getModel()).addElement( word);
             }
         }
-        ((DefaultListModel) exclusionList.getModel()).addElement( word);
     }
 } // class Dictionaries
