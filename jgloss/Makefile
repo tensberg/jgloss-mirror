@@ -29,7 +29,7 @@ ifndef JAVAC
 endif
 
 ifndef JAVAC_FLAGS
-  JAVAC_FLAGS := -deprecation -O -g
+  JAVAC_FLAGS := -deprecation -g
 endif
 
 ifndef JAR
@@ -44,6 +44,9 @@ RELEASE := 0.9.1
 DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www
+
+DATA := vconj HTMLExporter COPYING
+DATA_WWW := HTMLAnnotator vconj
 
 RESOURCES := messages.properties messages-dictionary.properties \
              messages_de.properties messages-dictionary_de.properties \
@@ -78,16 +81,16 @@ vpath %.pdf doc
 vpath %.docbook doc.src
 vpath %.html doc/html
 
-.phony: dist dist-binary dist-source setup clean compile doc gen-javadoc jar jgloss-www
+.phony: dist dist-binary dist-source setup setup_www clean compile doc gen-javadoc jgloss jgloss-www
 
-jar: compile $(RESOURCES) setup
+jgloss: compile $(RESOURCES) setup
 	$(JAR) cfm jgloss.jar MANIFEST.MF $(BINARY_JAR)
 
-jgloss-www: compile-www $(RESOURCES_WWW)
+jgloss-www: compile-www $(RESOURCES_WWW) setup_www
 	mkdir -p jgloss-www/WEB-INF/classes
 	cp src/www/index.html jgloss-www
 	cp src/www/web.xml jgloss-www/WEB-INF
-	cp -r jgloss resources jgloss-www/WEB-INF/classes
+	cp -r jgloss resources data jgloss-www/WEB-INF/classes
 
 dist: dist-source dist-binary
 
@@ -110,7 +113,7 @@ dist-source: clean gen-javadoc
 	cd dist && tar -czf $(DISTNAME)-src.tgz $(DISTNAME)
 	rm -r dist/$(DISTNAME)
 
-all: compile $(RESOURCES) setup doc gen-javadoc
+all: jgloss jgloss-www
 
 doc: jgloss.pdf index.html
 
@@ -124,7 +127,12 @@ gen-javadoc:
                 $(PACKAGES)
 
 setup:
-	cp -r src/data .
+	mkdir -p data
+	cp $(addprefix src/data/, $(DATA)) data
+
+setup_www:
+	mkdir -p data
+	cp $(addprefix src/data/, $(DATA_WWW)) data
 
 compile:
 	$(JAVAC) $(JAVAC_FLAGS) -d . -classpath "$(CLASSPATH)" $(ROOT_SOURCE)
@@ -137,7 +145,6 @@ compile-www:
 %.properties: %.properties.in
 	mkdir -p resources
 	$(NATIVE2ASCII) -encoding $(shell sed -n -e "/^# *Encoding:/s/.*Encoding:\(.*\)/\1/p" $<) $< resources/$@
-	cp resources/$@ src/resources/$@
 
 %.pdf: %.docbook doc.src/stylesheet.dsl
 	mkdir -p doc
