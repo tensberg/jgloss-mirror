@@ -135,12 +135,18 @@ public class JGlossURLRewriter implements URLRewriter {
 
     /**
      * Parses the path info part of a call to the JGloss-WWW servlet.
+     *
+     * @param path The pathinfo part of the call to the servlet.
+     * @return Array of Boolean/Boolean/String with meaning allow cookie forwarding/
+     *         allow form data forwarding/base URL; or <code>null</code> if the URL is not
+     *         in the expected format.
      */
     public static Object[] parseEncodedPath( String path) {
         Object[] out = new Object[3];
 
         // path includes the leading '/'
-        if (path.length()<4 || path.charAt( 3)!='/') {
+        if (path.length()<5 || // base URL must have length at least one
+            path.charAt( 3)!='/') {
             return null;
         }
 
