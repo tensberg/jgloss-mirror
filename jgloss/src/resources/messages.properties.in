@@ -196,7 +196,7 @@ editor.addannotation.title=Annotate selection
 editor.dialog.find=Search for:
 editor.dialog.find.title=Find
 editor.dialog.find.notfound=The text "{0}" was not found in the document.
-editor.dialog.findagain.notfound=No further occurrences of "{0}" were found.
+editor.dialog.findagain.notfound=No further occurrence of "{0}" was found.
 
 prefs.title=Preferences
 

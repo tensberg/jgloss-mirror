@@ -163,10 +163,19 @@ editor.menu.copy=Kopieren
 editor.menu.copy.mk=K
 editor.menu.paste=Einfügen
 editor.menu.paste.mk=E
+editor.menu.find=Suchen...
+editor.menu.find.mk=S
+editor.menu.findagain=Weitersuchen
+editor.menu.find.mk=r
 editor.menu.addannotation=Auswahl annotieren...
 editor.menu.addannotation.mk=u
 editor.addannotation.text=Bitte geben sie das Wort ein das für\ndie neue Annotation in den Wörterbüchern\nnachgesehen wird:
 editor.addannotation.title=Auswahl annotieren
+
+editor.dialog.find=Suchen nach:
+editor.dialog.find.title=Suchen
+editor.dialog.find.notfound=Der Text "{0}" wurde nicht im Dokument gefunden.
+editor.dialog.findagain.notfound=Kein weiteres Vorkommen von "{0}" wurde gefunden.
 
 prefs.title=Voreinstellungen
 

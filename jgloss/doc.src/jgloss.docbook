@@ -1042,6 +1042,25 @@
             </listitem>
           </varlistentry>
 
+          <varlistentry><term>Find</term>
+            <listitem>
+              <para>
+                Search for some text in the document. The search will always start at the beginning
+                of the document. If the text found is part of an annotation, the annotation will be
+                selected.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Find Again</term>
+            <listitem>
+              <para>
+                Searches for the next occurrence of the text from the last search. The search will
+                start at the position where the last occurrence was found.
+              </para>
+            </listitem>
+          </varlistentry>
+
           <varlistentry><term>Annotate Selection</term>
             <listitem>
               <para>
