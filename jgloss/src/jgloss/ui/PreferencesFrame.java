@@ -61,7 +61,7 @@ public class PreferencesFrame {
      *
      * @return The application-wide <CODE>PreferencesFrame</CODE> instance.
      */
-    public static PreferencesFrame getFrame() {
+    public static synchronized PreferencesFrame getFrame() {
         if (prefs == null)
             prefs = new PreferencesFrame();
 
