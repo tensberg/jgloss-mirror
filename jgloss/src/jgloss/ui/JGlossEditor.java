@@ -82,7 +82,7 @@ public class JGlossEditor extends JTextPane {
                     while (updated) {
                         try {
                             // we don't want to react to every mouse movement event, so
-                            // wait for 500ms of no action until the last mouse event is
+                            // wait for 500ms with no action until the last mouse event is
                             // processed.
                             sleep( 500);
                             synchronized (this) {
@@ -168,7 +168,6 @@ public class JGlossEditor extends JTextPane {
             p.add( p2, BorderLayout.EAST);
             getContentPane().add( p, BorderLayout.SOUTH);
             pack();
-            this.setSize( this.getPreferredSize().width, this.getPreferredSize().height + 100);
         }
 
         /**
@@ -398,20 +397,23 @@ public class JGlossEditor extends JTextPane {
             UIUtilities.initAction( addAnnotationAction, "editor.menu.addannotation");
             findAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
-                        String text = JOptionPane.showInputDialog
+                        Object result = JOptionPane.showInputDialog
                             ( SwingUtilities.getRoot( JGlossEditor.this), 
                               JGloss.messages.getString( "editor.dialog.find"),
                               JGloss.messages.getString( "editor.dialog.find.title"),
-                              JOptionPane.PLAIN_MESSAGE);
-                        if (text!=null && text.length()>0) {
-                            try {
-                                int where = find( text, 0);
-                                lastFindText = text;
-                                if (where != -1) {
-                                    lastFindPosition = where;
-                                    findAgainAction.setEnabled( true);
-                                }
-                            } catch (BadLocationException ex) {}
+                              JOptionPane.PLAIN_MESSAGE, null, null, getSelectedText());
+                        if (result != null) {
+                            String text = result.toString();
+                            if (text.length()>0) {
+                                try {
+                                    int where = find( text, 0);
+                                    lastFindText = text;
+                                    if (where != -1) {
+                                        lastFindPosition = where;
+                                        findAgainAction.setEnabled( true);
+                                    }
+                                } catch (BadLocationException ex) {}
+                            }
                         }
                     }
                 };

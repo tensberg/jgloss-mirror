@@ -28,6 +28,17 @@ import java.io.*;
 
 /**
  * Parser implementation which annotates kanji words.
+ * <P>
+ * The parser will look for a character which is either a kanji or katakana. Then it
+ * will search for the first character which is not a kanji/katakana. If this word
+ * consists of katakana characters, it will be looked up immediately and the result added
+ * to the annotation list. If it is a kanji word, if the following
+ * character is the reading annotation start delimiter,  all following characters until the
+ * reading annotation end delimiter are treated as reading for the word. 
+ * Hiragana characters directly following the word or the reading annotation will be used as possible
+ * verb/adjective inflections. The <CODE>findTranslation</CODE> method will then be called
+ * with this word/reading/hiragana tuple and the result added to the annotation list.
+ * </P>
  *
  * @author Michael Koch
  */
@@ -87,17 +98,6 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
 
     /**
      * Parses the text, returning a list with annotations for words in the text.
-     * <P>
-     * The parser will look for a character which is either a kanji or katakana. Then it
-     * will search for the first character which is not a kanji/katakana. If this word
-     * consists of katakana characters, it will be looked up immediately and the result added
-     * to the annotation list. If it is a kanji word, if the following
-     * character is the reading annotation start delimiter,  all following characters until the
-     * reading annotation end delimiter are treated as reading for the word. 
-     * Hiragana characters directly following the word or the reading annotation will be used as possible
-     * verb/adjective inflections. The <CODE>findTranslation</CODE> method will then be called
-     * with this word/reading/hiragana tuple and the result added to the annotation list.
-     * </P>
      *
      * @param text The text to parse.
      * @return A list with annotations for the text. If no annotations were created, the empty

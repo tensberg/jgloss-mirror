@@ -610,9 +610,9 @@ public class JGlossDocument extends HTMLDocument {
          * @param errorMsg The error message.
          * @param pos Position at which the error occured.
          */
-        public void handleError( String errorMsg, int pos) {
+        /*public void handleError( String errorMsg, int pos) {
             System.err.println( errorMsg + " at " + pos);
-        }
+            }*/
 
         /**
          * Returns the current position in the loading document.

@@ -79,6 +79,7 @@ public class Preferences {
     public static final String VIEW_EDITORFOLLOWSMOUSE = "view.editorfollowsmouse";
     public static final String VIEW_ANNOTATIONEDITORHIDDEN = "view.annotationeditorhidden";
 
+    public static final String EDITOR_ENABLEEDITINGCHECKBOX = "editor.enableeditingcheckbox";
     public static final String EDITOR_ENABLEEDITING = "editor.enableediting";
 
     public static final String IMPORT_PARSER = "import.parser";
@@ -112,6 +113,7 @@ public class Preferences {
     public static final String EXPORT_LATEX_WRITEREADING = "export.latex.writereading";
     public static final String EXPORT_LATEX_WRITETRANSLATIONS = 
         "export.latex.writetranslations";
+    public static final String EXPORT_LATEX_TRANSLATIONSONPAGE = "export.latex.translationsonpage";
     public static final String EXPORT_LATEX_WRITEHIDDEN = 
         "export.latex.writehidden";    
 
@@ -120,6 +122,8 @@ public class Preferences {
 
     public static final String STARTUP_WORDLOOKUP = "startup.wordlookup";
 
+    public static final String WORDLOOKUP_WIDTH = "wordlookup.width";
+    public static final String WORDLOOKUP_HEIGHT = "wordlookup.height";
     public static final String WORDLOOKUP_SEARCHTYPE = "wordlookup.searchtype";
     public static final String WORDLOOKUP_DEINFLECTION = "wordlookup.deinflection";
     public static final String WORDLOOKUP_ALLDICTIONARIES = "wordlookup.alldictionaries";

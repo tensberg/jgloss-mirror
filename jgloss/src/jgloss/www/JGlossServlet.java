@@ -105,14 +105,6 @@ public class JGlossServlet extends HttpServlet {
 
     private jgloss.dictionary.Dictionary[] dictionaries;
     /**
-     * Parser used to annotate text.
-     */
-    private Parser parser;
-    /**
-     * Used to rewrite web pages.
-     */
-    private HTMLAnnotator annotator;
-    /**
      * Set of protocols allowed in remote urls.
      */
     private Set allowedProtocols;
@@ -205,10 +197,11 @@ public class JGlossServlet extends HttpServlet {
         dictionaries = new jgloss.dictionary.Dictionary[diclist.size()];
         dictionaries = (jgloss.dictionary.Dictionary[]) diclist.toArray( dictionaries);
 
-        parser = new KanjiParser( dictionaries, null);
+        // construct a throwaway annotator to test for a misconfiguration in the initializer
+        Parser parser = new KanjiParser( dictionaries, null);
         parser.setIgnoreNewlines( true);
         try {
-            annotator = new HTMLAnnotator( parser);
+            HTMLAnnotator annotator = new HTMLAnnotator( parser);
         } catch (IOException ex) {
             throw new ServletException( ex);
         }
@@ -634,6 +627,9 @@ public class JGlossServlet extends HttpServlet {
             resp.setContentType( "text/html; charset=" + reader.getEncoding());
 
             // due to performance reasons, the servlet-client connection never uses compression
+            Parser parser = new KanjiParser( dictionaries, null);
+            parser.setIgnoreNewlines( true);
+            HTMLAnnotator annotator = new HTMLAnnotator( parser);
             annotator.annotate( rewriter.getDocumentBase(), reader, resp.getWriter(), rewriter);
         } finally {
             in.close();

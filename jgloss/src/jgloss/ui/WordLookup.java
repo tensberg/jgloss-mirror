@@ -85,12 +85,12 @@ public class WordLookup extends JFrame {
         getContentPane().add( wordlookup);
 
         // create actions
-        Action printAction = new AbstractAction() {
+        /*Action printAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                 }
             };
         printAction.setEnabled( false);
-        UIUtilities.initAction( printAction, "main.menu.print"); 
+        UIUtilities.initAction( printAction, "main.menu.print"); */
         Action closeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     hide();
@@ -118,8 +118,8 @@ public class WordLookup extends JFrame {
         openRecent = JGlossFrame.OPEN_RECENT.createMenu( JGlossFrame.actions.openRecentListener);
         menu.add( openRecent);
         menu.addSeparator();
-        menu.add( UIUtilities.createMenuItem( printAction));
-        menu.addSeparator();
+        /*menu.add( UIUtilities.createMenuItem( printAction));
+          menu.addSeparator();*/
         menu.add( UIUtilities.createMenuItem( closeAction));
         bar.add( menu);
 
@@ -141,7 +141,6 @@ public class WordLookup extends JFrame {
         setJMenuBar( bar);
 
         pack();
-        setSize( getPreferredSize().width, getPreferredSize().height + 100);
     }
 
     /**

@@ -41,8 +41,22 @@ public class HTMLAnnotator {
      */
     private final static String SCRIPT_RESOURCE = "/data/HTMLAnnotator";
 
+    /**
+     * Parser used for the document.
+     */
     private Parser parser;
-    private String script;
+    /**
+     * JavaScript segment inserted in the generated document.
+     */
+    private static String script;
+    /**
+     * HTML tag ID used for the next annotation inserted in the document.
+     */
+    private int antid;
+    /**
+     * Map from previously generated annotation texts to their corresponding ids.
+     */
+    private Map generatedAnnotations;
 
     /**
      * Constructs an annotator which uses the given parser and the default 
@@ -54,17 +68,24 @@ public class HTMLAnnotator {
     public HTMLAnnotator( Parser parser) throws IOException {
         this( parser, null);
 
+        generatedAnnotations = new HashMap();
+
         // read the default script
-        Reader resource = new InputStreamReader
-            ( HTMLAnnotator.class.getResourceAsStream( HTMLAnnotator.SCRIPT_RESOURCE), "UTF-8");
-        char[] buf = new char[4096];
-        StringBuffer scriptbuf = new StringBuffer();
-        int r;
-        while ((r=resource.read( buf)) != -1) {
-            scriptbuf.append( buf, 0, r);
+        if (script == null) {
+            synchronized (this) {
+                Reader resource = new InputStreamReader
+                    ( HTMLAnnotator.class.getResourceAsStream( HTMLAnnotator.SCRIPT_RESOURCE), "UTF-8");
+                char[] buf = new char[4096];
+                StringBuffer scriptbuf = new StringBuffer();
+                int r;
+                while ((r=resource.read( buf)) != -1) {
+                    scriptbuf.append( buf, 0, r);
+                }
+
+                resource.close();
+                script = scriptbuf.toString();
+            }
         }
-        resource.close();
-        script = scriptbuf.toString();
     }
 
     /**
@@ -94,6 +115,7 @@ public class HTMLAnnotator {
         boolean scriptWritten = false;
         boolean inBody = false;
         boolean inTag = false;
+        boolean inForm = false;
         char quote = '\0';
         int commentchar = 0;
         boolean inComment = false;
@@ -140,6 +162,8 @@ public class HTMLAnnotator {
                     }
                     if (tag.equals( "body"))
                         inBody = true;
+                    else if (tag.equals( "form"))
+                        inForm = true;
                     else if (tag.equals( "/html"))
                         inBody = false;
                     else if (tag.equals( "/body")) {
@@ -149,6 +173,8 @@ public class HTMLAnnotator {
                         out.write( "\n<div id=\"popup\" class=\"popup\" style=\"position: absolute;\">" + 
                                    "<pre id=\"annotation\"></pre></div>\n");
                     }
+                    else if (tag.equals( "/form"))
+                        inForm = false;
                     rewriteURL( tag, text, rewriter);
 
                     out.write( text.toString());
@@ -157,7 +183,7 @@ public class HTMLAnnotator {
             }
             else {
                 if (c=='<' || c=='\n') {
-                    if (inBody) {
+                    if (inBody && !inForm) {
                         annotateText( out, text);
                     }
                     else
@@ -202,11 +228,7 @@ public class HTMLAnnotator {
                 if (a.getStart() >= end) {
                     // new annotated word; write the previous annotated word
                     if (anno.length() > 0) { // == 0 for first annotation in list
-                        out.write( "<span class=\"an\" onMouseOver=\"sp(this,&quot;");
-                        out.write( anno.toString());
-                        out.write( "&quot;)\" onMouseOut=\"hp(this)\">");
-                        out.write( chars, start, end-start);
-                        out.write( "</span>");
+                        out.write( generateAnnotatedWord( anno.toString(), chars, start, end-start));
                         anno.delete( 0, anno.length());
                     }
                         
@@ -223,13 +245,9 @@ public class HTMLAnnotator {
                 addAnnotationText( anno, a, prevannotation);
             }
             // write the last annotation
-            if (anno.length() > 0) { // == 0 for first annotation in list
-                out.write( "<span class=\"an\" onMouseOver=\"sp(this,&quot;");
-                out.write( anno.toString());
-                out.write( "&quot;)\" onMouseOut=\"hp(this)\">");
-                out.write( chars, start, end-start);
-                out.write( "</span>");
-            }
+            if (anno.length() > 0) // == 0 for first annotation in list
+                out.write( generateAnnotatedWord( anno.toString(), chars, start, end-start));
+
             // write the remaining text
             if (end < chars.length)
                 out.write( chars, end, chars.length-end);
@@ -307,13 +325,12 @@ public class HTMLAnnotator {
         }
     
         // escape special characters
-        for ( int i=text.length()-1; i>=0; i--) {
+        for ( int i=text.length()-2; i>=0; i--) {
             switch (text.charAt( i)) {
             case '"':
-                text.replace( i, i+1, "\\&quot;");
+                text.replace( i, i+1, "\\\"");
                 break;
             case '&':
-                text.insert( i+1, "amp;");
                 break;
             }
         }
@@ -408,5 +425,40 @@ public class HTMLAnnotator {
         }
 
         return tag;
+    }
+
+    /**
+     * Generate a HTML fragment which wraps the annotated word with a tag which triggers the
+     * display of the annotation in the web browser.
+     *
+     * @param annotation Annotation text.
+     * @param text Text in which the annotated word appears.
+     * @param wordStart Start offset of the annotated word in the text.
+     * @param wordLength Length of the word.
+     */
+    protected String generateAnnotatedWord( String annotation, char[] text, int wordStart,
+                                            int wordLength) {
+        StringBuffer out = new StringBuffer( annotation.length() + wordLength + 20);
+        // look up ID of this annotation text if already generated
+        Integer id = null;
+        id = (Integer) generatedAnnotations.get( annotation);
+        if (id == null) {
+            // new annotation text, insert annotation in document
+            id = new Integer( antid);
+            out.append( "<script language=\"JavaScript\">ra(");
+            out.append( antid);
+            out.append( ", \"");
+            out.append( annotation);
+            out.append( "\");</script>");
+            generatedAnnotations.put( annotation, id);
+            antid++;
+        }
+        out.append( "<span class=\"an\" onMouseOver=\"sp(this,&quot;");
+        out.append( id.toString());
+        out.append( "&quot;)\" onMouseOut=\"hp(this)\">");
+        out.append( text, wordStart, wordLength);
+        out.append( "</span>");
+
+        return out.toString();
     }
 } // class HTMLAnnotator

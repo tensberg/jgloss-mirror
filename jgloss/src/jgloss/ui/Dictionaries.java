@@ -244,6 +244,7 @@ public class Dictionaries extends Box {
         chooser.setFileHidingEnabled( true);
         chooser.setMultiSelectionEnabled( true);
         chooser.setDialogTitle( JGloss.messages.getString( "dictionaries.chooser.title"));
+        chooser.setFileView( CustomFileView.getFileView());
         int result = chooser.showDialog( SwingUtilities.getRoot( box), JGloss.messages.getString
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {

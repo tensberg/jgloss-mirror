@@ -129,6 +129,7 @@ public class ImportDialog extends JDialog {
                 public void actionPerformed( ActionEvent e) {
                     JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
                     f.setFileHidingEnabled( true);
+                    f.setFileView( CustomFileView.getFileView());
                     int r = f.showOpenDialog( ImportDialog.this);
                     if (r == JFileChooser.APPROVE_OPTION) {
                         selection.setText( f.getSelectedFile().getAbsolutePath());

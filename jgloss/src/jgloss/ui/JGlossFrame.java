@@ -131,6 +131,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                     JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
                                     f.addChoosableFileFilter( jglossFileFilter);
                                     f.setFileHidingEnabled( true);
+                                    f.setFileView( CustomFileView.getFileView());
                                     int r = f.showOpenDialog( target);
                                     if (r == JFileChooser.APPROVE_OPTION) {
                                         JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
@@ -257,6 +258,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * <CODE>true</CODE> if the document was modified since the last save.
      */
     private boolean documentChanged = false;
+    /**
+     * Defer a window closing event until the frame object is in a safe state. This is used while
+     * the <CODE>loadDocument</CODE> method is executing.
+     */
+    private boolean deferWindowClosing = false;
 
     /**
      * Saves the document.
@@ -349,7 +355,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
      */
     public static final javax.swing.filechooser.FileFilter jglossFileFilter = 
         new ExtensionFileFilter( "jgloss", 
-                                 JGloss.messages.getString( "filefilter.jgloss.description"));
+                                 JGloss.messages.getString( "filefilter.description.jgloss"));
 
     /**
      * Creates a new JGlossFrame which does not contain a document. The user can add a document
@@ -366,7 +372,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                                     JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         docpane = new JGlossEditor( annotationEditor);
         docpane.setEditable( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
-        docpaneScroller = new JScrollPane( docpane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        docpaneScroller = new JScrollPane( docpane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         docpane.setNextFocusableComponent( annotationEditor);
         annotationEditor.setNextFocusableComponent( docpane);
@@ -404,12 +410,22 @@ public class JGlossFrame extends JFrame implements ActionListener {
             });
         addWindowListener( new WindowAdapter() {
                 public void windowClosing( WindowEvent e) {
-                    if (askCloseDocument())
-                        dispose();
+                    synchronized (this) {
+                        if (deferWindowClosing) {
+                            // Another thread is currently executing loadDocument.
+                            // Defer the closing of the window until the frame object is in a safe state.
+                            // The loadDocument method is responsible for closing the window.
+                            deferWindowClosing = false;
+                        }
+                        else {
+                            if (askCloseDocument())
+                                closeDocument();
+                        }
+                    }
                 }
 
                 public void windowClosed( WindowEvent e) {
-                    if (jglossFrames.size() == 0) {
+                    if (jglossFrames.size() == 0) { // no more open documents
                         JGloss.exit();
                     }
                 }
@@ -451,7 +467,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         exportLaTeXAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doExportLaTeX();
-                }
+                } 
             };
         exportLaTeXAction.setEnabled( false);
         UIUtilities.initAction( exportLaTeXAction, "main.menu.export.latex"); 
@@ -479,8 +495,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         closeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     if (askCloseDocument()) {
-                        hide();
-                        dispose();
+                        closeDocument();
                     }
                 }
             };
@@ -607,13 +622,21 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 break;
 
             case 2: // cancel
-            default: // propably CLOSED_OPTION
+            default: // probably CLOSED_OPTION
                 // leave documentChanged untouched to prevent closing the window
                 break;
             }                                   
         }
 
         return !documentChanged;
+    }
+
+    /**
+     * Close the document window and clean up associated resources.
+     */
+    private void closeDocument() {
+        hide();
+        dispose();
     }
 
     /**
@@ -787,41 +810,48 @@ public class JGlossFrame extends JFrame implements ActionListener {
                           null, null, false,
                           CharacterEncodingDetector.guessLength( (int) f.length(), "UTF-8"));
 
-            // test the file version of the loaded document
-            String formatWarning = null;
-            if (doc.getJGlossVersion() != -1) {
-                if (doc.getFileFormatMajorVersion() > JGlossWriter.FILE_FORMAT_MAJOR_VERSION)
-                    formatWarning = JGloss.messages.getString
-                        ( "warning.load.version.larger.major",
-                          new Object[] { new Integer( doc.getJGlossVersion()/100),
-                                         new Integer( doc.getJGlossVersion()%100) });
-                else if (doc.getFileFormatMajorVersion() == JGlossWriter.FILE_FORMAT_MAJOR_VERSION &&
-                         doc.getFileFormatMinorVersion() > JGlossWriter.FILE_FORMAT_MINOR_VERSION)
-                    formatWarning = JGloss.messages.getString
-                        ( "warning.load.version.larger.minor",
-                          new Object[] { new Integer( doc.getJGlossVersion()/100),
-                                         new Integer( doc.getJGlossVersion()%100) });
-                else if (doc.getFileFormatMajorVersion() < JGlossWriter.FILE_FORMAT_MAJOR_VERSION ||
-                         doc.getFileFormatMajorVersion() == JGlossWriter.FILE_FORMAT_MAJOR_VERSION &&
-                         doc.getFileFormatMinorVersion() < JGlossWriter.FILE_FORMAT_MINOR_VERSION)
-                    formatWarning = JGloss.messages.getString
-                        ( "warning.load.version.smaller");
-                // else format == current format
-            }
-            else
-                formatWarning = JGloss.messages.getString( "warning.load.notjgloss");
+            synchronized (this) { // prevent closing of document while post-processing
+                if (doc == null) {
+                    // document window was closed by the user while document was loading
+                    return;
+                }
 
-            if (formatWarning != null) {
-                JOptionPane.showConfirmDialog
-                    ( this, formatWarning,
-                      JGloss.messages.getString( "warning.load.title"),
-                      JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
-                // force a save as since the document format has changed
-                documentPath = null;
-                documentChanged = true;
-                saveAction.setEnabled( true); // will behave like save as
+                // test the file version of the loaded document
+                String formatWarning = null;
+                if (doc.getJGlossVersion() != -1) {
+                    if (doc.getFileFormatMajorVersion() > JGlossWriter.FILE_FORMAT_MAJOR_VERSION)
+                        formatWarning = JGloss.messages.getString
+                            ( "warning.load.version.larger.major",
+                              new Object[] { new Integer( doc.getJGlossVersion()/100),
+                                             new Integer( doc.getJGlossVersion()%100) });
+                    else if (doc.getFileFormatMajorVersion() == JGlossWriter.FILE_FORMAT_MAJOR_VERSION &&
+                             doc.getFileFormatMinorVersion() > JGlossWriter.FILE_FORMAT_MINOR_VERSION)
+                        formatWarning = JGloss.messages.getString
+                            ( "warning.load.version.larger.minor",
+                              new Object[] { new Integer( doc.getJGlossVersion()/100),
+                                             new Integer( doc.getJGlossVersion()%100) });
+                    else if (doc.getFileFormatMajorVersion() < JGlossWriter.FILE_FORMAT_MAJOR_VERSION ||
+                             doc.getFileFormatMajorVersion() == JGlossWriter.FILE_FORMAT_MAJOR_VERSION &&
+                             doc.getFileFormatMinorVersion() < JGlossWriter.FILE_FORMAT_MINOR_VERSION)
+                        formatWarning = JGloss.messages.getString
+                            ( "warning.load.version.smaller");
+                    // else format == current format
+                }
+                else
+                    formatWarning = JGloss.messages.getString( "warning.load.notjgloss");
+                
+                if (formatWarning != null) {
+                    JOptionPane.showConfirmDialog
+                        ( this, formatWarning,
+                          JGloss.messages.getString( "warning.load.title"),
+                          JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+                    // force a save as since the document format has changed
+                    documentPath = null;
+                    documentChanged = true;
+                    saveAction.setEnabled( true); // will behave like save as
+                }
+                OPEN_RECENT.addDocument( f);
             }
-            OPEN_RECENT.addDocument( f);
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
@@ -852,6 +882,10 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                ReadingAnnotationFilter filter,
                                boolean addAnnotations, int length) 
         throws IOException {
+        // Prevent the windowClosing event from directly closing the window.
+        // If a windowClosing event is registered while the loadDocument method is executing,
+        // the deferWindowClosing flag will be cleared.
+        deferWindowClosing = true;
         documentLoaded = true;
 
         kit = new JGlossEditorKit( parser, filter, addAnnotations, compactViewItem.isSelected(),
@@ -893,7 +927,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
             try {
                 t.join( 1000);
                 pm.setProgress( ((JGlossDocument) doc).getParsePosition());
-                if (pm.isCanceled()) {
+                if (pm.isCanceled() || // cancel button of progress bar pressed
+                    !deferWindowClosing) { // close button of document frame pressed
                     t.interrupt();
                     stin.stop();
                     t.join();
@@ -901,12 +936,17 @@ public class JGlossFrame extends JFrame implements ActionListener {
             } catch (InterruptedException ex) {}
         }
         in.close();
+        pm.close();
+
+        if (!deferWindowClosing) {
+            // close button of document frame pressed while document was loading
+            closeDocument();
+            return;
+        }
 
         docpane.setEditorKit( kit);
         docpane.setStyledDocument( doc);
-
         annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
-        //annotationEditor.expandNonHidden();
 
         getContentPane().removeAll();
         getContentPane().add( split);
@@ -941,7 +981,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 }
             });
 
-        pm.close();
+        if (!deferWindowClosing) {
+            // close button of document frame pressed while document was loading
+            closeDocument();
+        }
+        deferWindowClosing = false;
     }
 
     /**
@@ -1103,7 +1147,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 }
                 job.end();
                 docpaneScroller.getViewport().setView( docpane);
-                documentLoaded = true;
             }
         }
         
@@ -1149,6 +1192,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JFileChooser f = new SaveFileChooser( path);
         f.setFileHidingEnabled( true);
         f.addChoosableFileFilter( jglossFileFilter);
+        f.setFileView( CustomFileView.getFileView());
         int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
             documentPath =  f.getSelectedFile().getAbsolutePath();
@@ -1179,6 +1223,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
         f.setDialogTitle( JGloss.messages.getString( "export.plaintext.title"));
         f.setFileHidingEnabled( true);
+        f.setFileView( CustomFileView.getFileView());                            
 
         // setup the encoding chooser
         JPanel p = new JPanel();
@@ -1272,9 +1317,10 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
         f.setDialogTitle( JGloss.messages.getString( "export.latex.title"));
         f.setFileHidingEnabled( true);
+        f.setFileView( CustomFileView.getFileView());
         f.setFileFilter( new ExtensionFileFilter( "tex", 
                                                   JGloss.messages.getString
-                                                  ( "filefilter.latex.description")));
+                                                  ( "filefilter.description.latex")));
 
         // setup the encoding chooser
         JPanel p = new JPanel();
@@ -1302,7 +1348,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         b2.add( b);
 
         b = Box.createHorizontalBox();
-        JCheckBox writeTranslations = 
+        final JCheckBox writeTranslations = 
             new JCheckBox( JGloss.messages.getString( "export.writetranslations"));        
         writeTranslations.setSelected( JGloss.prefs.getBoolean
                                        ( Preferences.EXPORT_LATEX_WRITETRANSLATIONS));
@@ -1310,6 +1356,23 @@ public class JGlossFrame extends JFrame implements ActionListener {
         b.add( UIUtilities.createSpaceEater( writeTranslations, true));
         b.add( Box.createHorizontalStrut( 3));
         b2.add( b);
+
+        b = Box.createHorizontalBox();
+        final JCheckBox translationsOnPage = 
+            new JCheckBox( JGloss.messages.getString( "export.latex.translationsonpage"));        
+        translationsOnPage.setSelected( JGloss.prefs.getBoolean
+                                        ( Preferences.EXPORT_LATEX_TRANSLATIONSONPAGE));
+        translationsOnPage.setEnabled( writeTranslations.isSelected());
+        b.add( Box.createHorizontalStrut( 24));
+        b.add( UIUtilities.createSpaceEater( translationsOnPage, true));
+        b.add( Box.createHorizontalStrut( 3));
+        b2.add( b);
+        writeTranslations.addItemListener
+            ( new ItemListener() {
+                    public void itemStateChanged( ItemEvent e) {
+                        translationsOnPage.setEnabled( writeTranslations.isSelected());
+                    }
+                });
 
         b = Box.createHorizontalBox();
         JCheckBox writeHidden = 
@@ -1341,7 +1404,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                   writeHidden.isSelected());
                 LaTeXExporter.export( doc, (AnnotationModel) annotationEditor.getModel(),
                                       out, writeReading.isSelected(), writeTranslations.isSelected(),
-                                      writeHidden.isSelected());
+                                      translationsOnPage.isSelected(), writeHidden.isSelected());
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
@@ -1369,7 +1432,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
         f.setDialogTitle( JGloss.messages.getString( "export.html.title"));
         f.setFileHidingEnabled( true);
         f.setFileFilter( new ExtensionFileFilter
-            ( "html", JGloss.messages.getString( "filefilter.html.description")));
+            ( "html", JGloss.messages.getString( "filefilter.description.html")));
+        f.setFileView( CustomFileView.getFileView());
 
         // setup the encoding chooser
         JPanel p = new JPanel();
@@ -1490,6 +1554,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         JFileChooser f = new SaveFileChooser( path);
         f.setDialogTitle( JGloss.messages.getString( "export.annotationlist.title"));
         f.setFileHidingEnabled( true);
+        f.setFileView( CustomFileView.getFileView());
 
         // setup the encoding chooser
         JPanel p = new JPanel();
@@ -1565,7 +1630,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Dispose resources associated with the JGloss document.
      */
     public void dispose() {
-        // try to dump as many references as possible to ensure that the objects are garbage collected
+        // dump as many references as possible to ensure that the objects are garbage collected
         jglossFrames.remove( this);   
         JGloss.prefs.removePropertyChangeListener( prefsListener);
         if (doc != null)

@@ -301,6 +301,7 @@ export.html.title=Export HTML
 export.html.interactive=Interactive HTML
 export.html.backwardscompatible=Backwards Compatible
 export.latex.title=Export LaTeX
+export.latex.translationsonpage=Put translation on same page as word
 
 about.frame.title=About JGloss
 about.title=JGloss
@@ -310,9 +311,14 @@ about.license.title=GNU General Public License
 
 preferences.header=This file contains the preferences for the application JGloss.
 
-filefilter.jgloss.description=JGloss documents (*.jgloss)
-filefilter.html.description=HTML documents (*.html)
-filefilter.latex.description=LaTeX documents (*.tex)
+filefilter.description.jgloss=JGloss documents (*.jgloss)
+filefilter.description.html=HTML documents (*.html)
+filefilter.description.latex=LaTeX documents (*.tex)
+
+fileview.description.jgloss=JGloss document
+fileview.description.html=HTML document
+fileview.description.tex=LaTeX document
+fileview.description.text=Text document
 
 filechooser.overwrite.title=Overwrite file?
 filechooser.overwrite=The selected file "{0}" already exists. Overwrite?

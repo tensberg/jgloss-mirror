@@ -128,13 +128,17 @@ public class GeneralDialog extends Box {
         all.add( Box.createVerticalStrut( 2));
 
         // enable editing
-        b = Box.createHorizontalBox();
-        b.add( Box.createHorizontalStrut( 3));
-        enableEditing = new JCheckBox( JGloss.messages.getString( "general.editor.enableediting"));
-        b.add( enableEditing);
-        b.add( Box.createHorizontalGlue());
-        all.add( b);
-        all.add( Box.createVerticalStrut( 2));
+        if ( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITINGCHECKBOX)) {
+            // this is a "hidden" control because the direct editing feature is buggy and can
+            // break the current document if not used with care.
+            b = Box.createHorizontalBox();
+            b.add( Box.createHorizontalStrut( 3));
+            enableEditing = new JCheckBox( JGloss.messages.getString( "general.editor.enableediting"));
+            b.add( enableEditing);
+            b.add( Box.createHorizontalGlue());
+            all.add( b);
+            all.add( Box.createVerticalStrut( 2));
+        }
 
         this.add( UIUtilities.createSpaceEater( all, false));
 
@@ -150,7 +154,8 @@ public class GeneralDialog extends Box {
         else
             startFrame.setSelected( true);
 
-        enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
+        if (enableEditing != null)
+            enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
         chasenLocation.setText( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
         importClipboardParserSelector.setEnabled( ChasenParser.class,
                                                   ChasenParser.isChasenExecutable
@@ -177,7 +182,8 @@ public class GeneralDialog extends Box {
      */
     public void savePreferences() {
         JGloss.prefs.set( Preferences.STARTUP_WORDLOOKUP, startWordLookup.isSelected());
-        JGloss.prefs.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
+        if (enableEditing != null)
+            JGloss.prefs.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
         JGloss.prefs.set( Preferences.CHASEN_LOCATION, chasenLocation.getText());
         JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_PARSER,
                           importClipboardParserSelector.getSelectedParser().getName());
@@ -219,6 +225,7 @@ public class GeneralDialog extends Box {
         chooser.setFileHidingEnabled( true);
         chooser.setMultiSelectionEnabled( false);
         chooser.setFileSelectionMode( JFileChooser.FILES_ONLY);
+        chooser.setFileView( CustomFileView.getFileView());
         int r = chooser.showDialog( this, JGloss.messages.getString( "button.select"));
         if (r == JFileChooser.APPROVE_OPTION) {
             chasenLocation.setText( chooser.getSelectedFile().getAbsolutePath());

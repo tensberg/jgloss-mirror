@@ -47,18 +47,24 @@ public class LaTeXExporter {
      * @param out Writer to which the document will be written.
      * @param writeReading <CODE>true</CODE> if the reading annotations should be written.
      * @param writeTranslations <CODE>true</CODE> if the translation annotations should be written.
+     * @param translationsOnPage <CODE>true</CODE> if translations should be placed on the same page
+     *                           as the word, or in a separate list at the end of the text. This flag
+     *                           is ignored if <CODE>writeTranslations</CODE> is <CODE>false</CODE>.
      * @param writeHidden <CODE>true</CODE> if annotations marked as hidden should be written.
      * @exception IOException
      */
     public static void export( JGlossDocument doc, AnnotationModel model, Writer out, 
                                boolean writeReading, boolean writeTranslations,
+                               boolean translationsOnPage,
                                boolean writeHidden) throws IOException {
-        
         String text = null;
         try {
             text = doc.getText( 0, doc.getLength());
         } catch (BadLocationException ex) {}
         StringBuffer outtext = new StringBuffer( text.length());
+        StringBuffer translations = new StringBuffer();
+        String longestword = "";
+        String longestreading = "";
         
         int prevend = 0; // end offset of the previous annotation
         for ( int i=0; i<model.getAnnotationCount(); i++) {
@@ -96,17 +102,33 @@ public class LaTeXExporter {
                                                          ae.getElement( 1).getEndOffset()));
             if (writeTranslations && !translation.equals( " ") && 
                 (writeHidden || !annotation.isHidden())) {
-                String footnote;
                 // if the linked annotation entry is an inflected verb or adjective,
                 // output the full verb instead of just the kanji part
                 String nb = annotation.getDictionaryFormNode().getWord();
                 String nr = annotation.getDictionaryFormNode().getReading();
-                footnote = "\\footnotetext{" + nb;
-                if (nr!=null && !nr.equals( " "))
-                    footnote += " " + nr;
-                footnote += " " + translation + "}";
 
-                outtext.append( footnote);
+                if (translationsOnPage) {
+                    // place translation as footnote on the current page
+                    String footnote;
+                    footnote = "\\footnotetext{" + nb;
+                    if (nr!=null && !nr.equals( " "))
+                        footnote += " " + nr;
+                    footnote += " " + translation + "}";
+                    outtext.append( footnote);
+                }
+                else {
+                    // place translation in separate list
+                    if (translations.length() > 0)
+                        translations.append( " \\\\\n");
+                    translations.append( nb + " \\> ");
+                    if (nr!=null && !nr.equals( " "))
+                        translations.append( nr);
+                    translations.append( " \\> " + translation);
+                    if (longestword.length() < nb.length())
+                        longestword = nb;
+                    if (longestreading.length() < nr.length())
+                        longestreading = nr;
+                }
             }
         }
         // add the remaining text
@@ -120,8 +142,18 @@ public class LaTeXExporter {
             if (outtext.charAt( i)=='\u00a0') {
                 outtext.deleteCharAt( i);
             }
-            else if (outtext.charAt( i)=='\n')
-                outtext.insert( i, '\n');
+            else if (outtext.charAt( i)=='\n') {
+                if (i>0 && outtext.charAt( i-1)=='\n') {
+                    // an empty paragraph in the original document,
+                    // probably used as a separator. Insert some blank
+                    // space in the LaTeX document.
+                    outtext.insert( i, "\\bigskip\n");
+                }
+                else {
+                    // End of a paragraph in the original document. Generate LaTeX paragraph end mark.
+                    outtext.insert( i, '\n');
+                }
+            }
         }
 
         String preamble = "\\documentclass";
@@ -141,6 +173,17 @@ public class LaTeXExporter {
         out.write( "\\begin{document}\n\n");
 
         out.write( outtext.toString());
+
+        // append translation list
+        if (!translationsOnPage && translations.length() > 0) {
+            out.write( "\n\n\\newpage\n\\small\\begin{tabbing}\n");
+            // place tab stops by using the longest word and reading as measure
+            out.write( longestword + "---\\=" + longestreading + "---\\=\\kill\n");
+
+            out.write( translations.toString());
+            out.write( "\n\\end{tabbing}\n");
+        }
+
         out.write( "\n\\end{document}\n");
     }
 

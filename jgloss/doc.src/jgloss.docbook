@@ -71,6 +71,7 @@
         The character encoding detection uses code from Yasuhiro Tonooka's 
         <application>kcc</application> (Kanji Code Converter) program.
         The French localization is contributed by Alexandre Beraud.
+        The file chooser icons are taken from <ulink url="http://artists.kde.org">the KDE project</ulink>.
       </para>
     </sect1>
     <sect1><title>License</title>
@@ -141,7 +142,7 @@
             <listitem>
               <para>
                 The SKK dictionaries provide a mapping from readings to words (no translations).
-                They are usually used for Japanese input methods, but &JGloss; can use them
+                They are usually used by Japanese input methods, but &JGloss; can use them
                 to look up readings for kanji words.
               </para>
             </listitem>
@@ -699,12 +700,14 @@
             http://www.enel.ucalgary.ca/People/far/howto/gs-ttf.html</ulink>. 
           <application>dvips</application> will also have to be configured to know about the Japanese
           fonts if you want to convert the generated dvi file to Postscript.
-          The generated document uses the ruby macro for reading annotations. You can find it
-          in the <filename>latex-ruby</filename> folder of &JGloss;.
+          The generated document uses the ruby macro <filename>ruby-annotation.sty</filename>
+          for reading annotations.
+          You can find it in the <filename>latex-ruby</filename> folder of &JGloss;.
         </para>
         <para>
-          The generated document contains footnotes for every annotated word. The footnote
-          will show the dictionary form of the word and the selected translation.
+          If you select the <guilabel>Put translation on same page as word</guilabel> option,
+          translation annotations will be generated as footnotes on the page on which the word appears.
+          Otherwise, a list of translations will be put at the end of the document.
           With the <guilabel>write "hidden" annotations</guilabel> you can control how to
           treat annotations which are marked as <link linkend="sect.menu.annotation">
             <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
@@ -822,7 +825,7 @@
           It is slower than the Kanji parser, but will annotate hiragana words as
           well as kanji and katakana words. It also does a better job of deinflecting verbs and
           adjectives. You can download ChaSen
-          from <ulink url="http://chasen.aist-nara.ac.jp/">http://chasen.aist-nara.ac.jp/</ulink>.
+          from <ulink url="http://chasen.aist-nara.ac.jp/">the ChaSen homepage</ulink>.
           After installation, you have to set the path to the chasen executable in the 
           <link linkend="sect.prefs.general">preferences dialog</link>. It is usually
           <filename>/usr/local/bin/chasen</filename> under Unix or 
@@ -841,7 +844,7 @@
           <para>
             On Windows systems, an empty console window is visible while ChaSen is running, unless
             JGloss is started from the command line. Under Windows 98, the ChaSen program does not
-            correctly terminate. You will have to close the ChaSen window manually after the text
+            terminate automatically. You will have to close the ChaSen window manually after the text
             is parsed.
           </para>
         </note>
@@ -868,6 +871,7 @@
           ChaSen parser program in the <guilabel>ChaSen executable</guilabel> text field.
           If the program can not be found, the ChaSen parser will not be available.
         </para>
+        <!-- Enable direct editing is now a hidden feature because of its bugs and potential danger
         <para>
           If you select the <guilabel>Enable direct editing</guilabel> checkbox, you can
           edit the text in the document view like you would in a text editor. Unfortunately
@@ -878,6 +882,7 @@
           document, either as source in a normal text editor or by loading it into an HTML
           editor.
         </para>
+        -->
       </sect2>
       <sect2 id="sect.prefs.style"><title>Style</title>
         <para>
@@ -983,8 +988,8 @@
               <note>
                 <para>
                   The &JGloss; file format is basically HTML with a few custom tags. You can open
-                  the file in a HTML editor to edit the text of the document, but be careful not
-                  to change any of the special tags and attributes.
+                  the file in a HTML editor to edit the text of the document, but be careful and 
+                  don't change any of the special tags and attributes.
                 </para>
               </note>
             </listitem>

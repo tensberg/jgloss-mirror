@@ -29,10 +29,16 @@ var popup = null;
 var annotation = null;
 var annotation_text = null;
 
-function sp( el, text) {
+var annotations = new Array();
+
+function ra( id, text) {
+        annotations[id] = text;
+}
+
+function sp( el, id) {
     if (el.style)
         el.style.color = "blue";
-    
+
     if (!popup) {
         // Browser with DOM-Support
         popup = document.getElementById( "popup");
@@ -69,7 +75,7 @@ function sp( el, text) {
     }
     
     // With Konqueror 2.1, simply setting annotation_text.nodeValue=text does not work.
-    var annotation_text_n = document.createTextNode( text);
+    var annotation_text_n = document.createTextNode( annotations[id]);
     annotation.replaceChild( annotation_text_n, annotation_text);
     annotation_text = annotation_text_n;
     popup.style.top = posY + height;

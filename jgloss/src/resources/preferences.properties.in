@@ -64,6 +64,7 @@ view.showannotation=false
 view.editorfollowsmouse=false
 view.annotationeditorhidden=false
 
+editor.enableeditingcheckbox=false
 editor.enableediting=false
 
 annotation.highlight.color=16743034
@@ -84,6 +85,7 @@ export.html.backwardscompatible=true
 export.html.writehidden=false
 export.latex.writereading=true
 export.latex.writetranslations=false
+export.latex.translationsonpage=true
 export.latex.writehidden=false
 export.latex.documentclass=jarticle
 export.latex.documentclass.options=10pt
@@ -94,6 +96,10 @@ exclusions.file=.jgloss-exclusions
 userdictionary.file=.jgloss-userdictionary
 
 startup.wordlookup=false
+
+# actual minimum size of the word lookup frame will be determined at runtime
+wordlookup.width=0
+wordlookup.height=0
 
 wordlookup.searchtype=0
 wordlookup.deinflection=true

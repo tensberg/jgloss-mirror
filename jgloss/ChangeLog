@@ -1,9 +1,23 @@
-0.9.5: (2001/11/15)
+0.9.5: (2001/12/03)
 	- Improved handling of long result lists in word lookup dialog.
+	- Removed the dummy print menu item from the word lookup dialog.
+	- Fixed exception thrown if the document window is closed while
+	  a document is loaded.
+	- Removed the "enable direct editing" entry from the preferences
+	  dialog since this feature is buggy and can break the document
+	  if not used with care. If you still want to use it, add the
+	  line "editor.enableeditingcheckbox=true" to the ".jgloss"
+	  preferences file.
+	- Verb inflection in word lookup dialog will not be used any
+	  longer for hiragana-only search expressions.
+	- Find dialog defaults to currently selected text.
+	- Added file chooser icons for known file types.
+	- LaTeX export can now alternatively put translations at the end of
+	  the document.
+	- Word lookup window now remembers its size.
 0.9.4: (2001/11/07)
 	- Improved handling of reading annotations in imported text;
-	  ChaSen parser can now be used with texts with reading
-	  annotations.
+	  ChaSen parser can now be used with texts with reading annotations.
 	- Changed annotation editor to only expand tree for selected
 	  annotation. This speeds up document display and decreases
 	  memory usage.

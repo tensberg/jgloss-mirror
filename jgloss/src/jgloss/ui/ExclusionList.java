@@ -290,6 +290,7 @@ public class ExclusionList extends Box {
         JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
         f.setDialogTitle( JGloss.messages.getString( "exclusions.export.title"));
         f.setFileHidingEnabled( true);
+        f.setFileView( CustomFileView.getFileView());
 
         // setup the encoding chooser
         JPanel p = new JPanel();
@@ -348,6 +349,7 @@ public class ExclusionList extends Box {
         JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
         f.setDialogTitle( JGloss.messages.getString( "exclusions.import.title"));
         f.setFileHidingEnabled( true);
+        f.setFileView( CustomFileView.getFileView());
         int r = f.showOpenDialog( SwingUtilities.getRoot( box));
         if (r == JFileChooser.APPROVE_OPTION) try {
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());

@@ -345,7 +345,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
                     // yet another ugly alignment hack for annotations that start with
                     // an unannotated character.
                     if (showTranslation)
-                        return 0.28f;
+                        return 0.26f;
                     else
                         return 0.38f;
                 }
@@ -373,7 +373,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the minimum span of the view.
          */
         public float getMinimumSpan( int axis) {
-            if (axis == View.X_AXIS)
+            if (axis==View.X_AXIS && getView( 1)!=null)
                 // view 1 is the view for the BASETEXT element
                 return getView( 1).getMinimumSpan( axis);
             else
@@ -385,7 +385,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * is returned and the width of the reading ignored. This allows bases to align properly.
          */
         public float getPreferredSpan( int axis) {
-            if (axis == View.X_AXIS)
+            if (axis==View.X_AXIS && getView( 1)!=null)
                 // view 1 is the view for the BASETEXT element
                 return getView( 1).getPreferredSpan( axis);
             else
@@ -741,7 +741,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * @return The new document.
      */
     public Document createDefaultDocument() {
-        return new JGlossDocument( getParser(), parser, readingFilter, addAnnotations);
+        JGlossDocument doc = new JGlossDocument( getParser(), parser, readingFilter, addAnnotations);
+        return doc;
     }
 
     /**

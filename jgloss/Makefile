@@ -48,6 +48,8 @@ PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotatio
 DATA := vconj HTMLExporter HTMLAnnotator COPYING
 DATA_WWW := HTMLAnnotator vconj
 
+ICONS := jgloss.png html.png tex.png txt.png
+
 RESOURCES := messages.properties messages-dictionary.properties \
              messages_de.properties messages-dictionary_de.properties \
              messages_fr.properties messages-dictionary_fr.properties \
@@ -129,6 +131,8 @@ gen-javadoc:
                 $(PACKAGES)
 
 setup:
+	mkdir -p resources/icons
+	cp $(addprefix src/resources/icons/, $(ICONS)) resources/icons
 	mkdir -p data
 	cp $(addprefix src/data/, $(DATA)) data
 

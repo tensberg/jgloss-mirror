@@ -92,6 +92,8 @@ public class WordLookupPanel extends JPanel {
 
     protected XCVManager xcvManager;
 
+    protected Dimension preferredSize;
+
     public WordLookupPanel( boolean keepLastResult) {
         this.resultLimit = JGloss.prefs.getInt( Preferences.WORDLOOKUP_RESULTLIMIT, 500);
         this.keepLastResult = keepLastResult;
@@ -284,6 +286,19 @@ public class WordLookupPanel extends JPanel {
         xcvManager = new XCVManager( expression);
         xcvManager.addManagedComponent( resultFancy);
         xcvManager.addManagedComponent( resultPlain);
+
+        preferredSize = new Dimension
+            ( Math.max( super.getPreferredSize().width,
+                        JGloss.prefs.getInt( Preferences.WORDLOOKUP_WIDTH, 0)),
+              Math.max( super.getPreferredSize().height + 150,
+                        JGloss.prefs.getInt( Preferences.WORDLOOKUP_HEIGHT, 0)));
+        
+        addComponentListener( new ComponentAdapter() {
+                public void componentResized( ComponentEvent e) {
+                    JGloss.prefs.set( Preferences.WORDLOOKUP_WIDTH, getWidth());
+                    JGloss.prefs.set( Preferences.WORDLOOKUP_HEIGHT, getHeight());
+                }
+            });
     }
 
     /**
@@ -352,7 +367,9 @@ public class WordLookupPanel extends JPanel {
             while (i>0 && Character.UnicodeBlock.of( ex.charAt( i-1)).equals
                    ( Character.UnicodeBlock.HIRAGANA))
                 i--;
-            if (i < ex.length()) {
+            // If the search expression is only hiragana, i is now == 0, and deinflection should
+            // not be used.
+            if (i>0 && i<ex.length()) {
                 hiragana = ex.substring( i);
                 conjugations = Conjugation.findConjugations( hiragana);
                 if (conjugations != null) {
@@ -605,5 +622,12 @@ public class WordLookupPanel extends JPanel {
      */
     public java.util.List getLastResult() {
         return lastResult;
+    }
+
+    public Dimension getPreferredSize() {
+        if (preferredSize == null)
+            return super.getPreferredSize();
+        else
+            return preferredSize;
     }
 } // class WordLookupPanel
