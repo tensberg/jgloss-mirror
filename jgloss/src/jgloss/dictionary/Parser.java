@@ -224,7 +224,7 @@ public class Parser {
      * @return A list with annotations for the text. If no annotations were created, the empty
      *         list will be returned.
      * @exception SearchException If an error occurrs during a dictionary lookup.
-     * @see #findTranslations(int,String,String,String,boolean,boolean)
+     * @see #findTranslations(int,String,String,String,boolean,boolean,boolean)
      */
     public List parse( String text) throws SearchException {
         return parse( text.toCharArray());
@@ -248,7 +248,7 @@ public class Parser {
      * @return A list with annotations for the text. If no annotations were created, the empty
      *         list will be returned.
      * @exception SearchException If an error occurrs during a dictionary lookup.
-     * @see #findTranslations(int,String,String,String,boolean,boolean)
+     * @see #findTranslations(int,String,String,String,boolean,boolean,boolean)
      */
     public List parse( char[] text) throws SearchException {
         List out = new ArrayList( text.length/3);
@@ -400,7 +400,7 @@ public class Parser {
      * @return A list of reading and translation annotations for the search word.
      * @exception SearchException If a dictionary lookup failed.
      * @param useExclusions <CODE>true</CODE> if words in the exclusion list should be ignored.
-     * @see #findTranslations(int,String,String,String,boolean,boolean)
+     * @see #findTranslations(int,String,String,String,boolean,boolean,boolean)
      * @see Reading
      * @see Translation
      */
@@ -419,7 +419,7 @@ public class Parser {
      * @param useExclusions <CODE>true</CODE> if words in the exclusion list should be ignored.
      * @return A list of reading and translation annotations for the search word.
      * @exception SearchException If a dictionary lookup failed.
-     * @see #findTranslations(int,String,String,String,boolean,boolean)
+     * @see #findTranslations(int,String,String,String,boolean,boolean,boolean)
      * @see Reading
      * @see Translation
      */
@@ -445,7 +445,7 @@ public class Parser {
      * @param useExclusions <CODE>true</CODE> if words in the exclusion list should be ignored.
      * @return A list of reading and translation annotations for the search word.
      * @exception SearchException If a dictionary lookup failed.
-     * @see #findTranslations(int,String,String,String,boolean,boolean)
+     * @see #findTranslations(int,String,String,String,boolean,boolean,boolean)
      * @see Reading
      * @see Translation
      */
@@ -495,7 +495,6 @@ public class Parser {
     private List findTranslations( int wordStart, String word, final String reading,
                                    String inflection, boolean tryPrefixes,
                                    boolean trySuffixes, boolean useExclusions) throws SearchException {
-        //System.out.println( "Looking up " + word + ":" + reading + ":" + inflection);
         List translations = new ArrayList( 6);
         if (reading!=null && reading.length()>0) {
             final String fword = word;
@@ -512,6 +511,7 @@ public class Parser {
 
         boolean stop = false;
         while (!stop) {
+            //System.out.println( "Looking up " + word + ":" + reading + ":" + inflection);
             stop = true;
 
             boolean match = false;
