@@ -243,10 +243,30 @@
         English locale settings).
       </para>
       <para>
+        On Windows and MacOS X systems no font configuration should be neccessary.
+        The first time JGloss is run, it tries to determine which font to use for displaying Japanese
+        characters. If the Java default fonts don't contain Japanese characters, it tests if one of
+        the fonts <emphasis>MS Gothic</emphasis>, <emphasis>MS Mincho</emphasis> or
+        <emphasis>Osaka</emphasis> is available and configures itself to use it.
+        If none of the fonts work, no configuration is done and the default settings are kept. In this
+        case Japanese characters will not display correctly.
+        Read <xref linkend="sect.prefs.style"> for information on how to select fonts manually,
+        or read on for information on how to change the Java default fonts.
+      </para>
+      <para>
+        Ths following paragraphs describe how to change the Java default font settings to use
+        Japanese fonts. The descriptions apply to Sun's Java Runtime, other implementations may
+        differ. Following these instructions should not be neccessary on Windows and MacOS X
+        Systems since a custom font can be used, but have to be used on X11 Systems (blame the
+        X font handling for that).
+      </para>
+      <para>
         The easiest way to get Java to use Japanese fonts is to set the 
         <envar>user.language</envar> parameter to <literal>ja</literal>: start &JGloss; as
-        <userinput>java -Duser.language=ja -jar jgloss.jar</userinput>. Unfortunately, at
-        least on my Linux box, this will not make Java use the
+        <userinput>java -Duser.language=ja -jar jgloss.jar</userinput>. This will make
+        Java read the font definition from the <filename>font.properties.ja</filename> file
+        of the JVM installation, and only works if the fonts used in the file are available.
+        Unfortunately, at least on my Linux box, this will not make Java use the
         Japanese input method. On <application>Unix</application> systems, a second way is to
         set the <envar>LANG</envar> environment variable to <literal>ja_JP</literal>
         in a shell and then run &JGloss; from that shell. This will also make Java recognize
@@ -659,7 +679,9 @@
       <sect2><title><acronym>HTML</acronym></title>
         <para>
           If you export the document in HTML format, the document can viewed in any web browser
-          that supports display of Japanese characters. The markup defined in the
+          that supports display of Japanese characters. 
+          The document title set in JGloss will be used as the title of the HTML document.
+          The markup defined in the
           <citetitle>Ruby Annotation</citetitle> specification is used to embed the annotations,
           browsers which support it will render the annotations above/below the annotated words.
         </para>
@@ -704,6 +726,7 @@
           The exported document uses the ruby macro <filename>ruby-annotation.sty</filename>
           for reading annotations.
           You can find it in the <filename>latex-ruby</filename> folder of &JGloss;.
+          The document title set in JGloss will be used as page header.
         </para>
         <para>
           If you select the <guilabel>Place translation on same page as word</guilabel> option,
@@ -785,8 +808,7 @@
         JGloss can use two different parsers for the automatic annotation of Japanese text, the
         Kanji parser and the ChaSen parser. Select the parser by clicking the respective radio
         button. The ChaSen parser will only be available if the chasen program is installed 
-        and set in the <guilabel>General</guilabel> section of the 
-        <link linkend="sect.prefs.general">Preferences dialog</link>.
+        (see below).
       </para>
       <para>
         If the <guilabel>annotate first occurrence</guilabel> option is selected, each word in a
@@ -891,9 +913,15 @@
       </sect2>
       <sect2 id="sect.prefs.style"><title>Style</title>
         <para>
-          Here you can set the appearance of annotated words in the document view.
-          Select a font by using the popup menu. Note that not all fonts in the list
-          can display Japanese characters. The font size can be selected from the
+          The <guilabel>Japanese User Interface Font</guilabel> lets you choose the font used
+          in the display elements of JGloss. If the default Java fonts don't contain Japanese
+          characters or you want to use a different font, select the
+          <guilabel>Use this font</guilabel> radio button and choose a font from the list.
+          Note that not all fonts in the list can display Japanese characters.
+        </para>
+        <para>
+          The other font selection options determine the fonts used in the document view.
+          Select a font by using the popup menu. The font size can be selected from the
           popup menu to the right, or you can enter the font size manually if it is not in
           the list. You can select a different background color by clicking on the button
           with the color label, or disable the use of a background color by unchecking the
@@ -1088,6 +1116,15 @@
                 these annotations will be deleted. Also, an annotation cannot span paragraphs.
                 If text from more than one paragraph is selected, the annotation will end at
                 the end of the first paragraph.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry><term>Document Title</term>
+            <listitem>
+              <para>
+                Brings up a dialog which lets you set the title of the document. The title
+                is used when the document is exported in HTML or LaTeX format.
               </para>
             </listitem>
           </varlistentry>

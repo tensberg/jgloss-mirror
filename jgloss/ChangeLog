@@ -1,14 +1,15 @@
-1.0.1: (2002/01/15)
-	- Added dialog to set the document title.
-	- LaTeX export uses document title for page header.
+1.0.1: (2002/01/16)
 	- Added user interface font selection to style preference panel.
 	- Font autodetection on first startup. JGloss tries to set
 	  reasonable default fonts depending on the system.
+	- Added dialog to set the document title.
+	- LaTeX export uses document title for page header.
+	- Keyboard shortcut: typing delete while an annotation node
+	  is selected clears the translation.
 	- Fixed display of dictionary entries without readings in long
 	  word lookup results.
 	- Fixed saving of preferences on MacOS X.
-	- Keyboard shortcut: typing delete while an annotation node
-	  is selected clears the translation.
+	- Fixed button sizes in dictionary and exclusion list preferences.
 1.0: (2001/12/14)
 	- Improved handling of long result lists in word lookup dialog.
 	- Removed the dummy print menu item from the word lookup dialog.

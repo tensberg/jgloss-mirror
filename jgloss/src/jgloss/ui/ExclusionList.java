@@ -42,7 +42,7 @@ import javax.swing.event.*;
  *
  * @author Michael Koch
  */
-public class ExclusionList extends Box {
+public class ExclusionList extends JPanel {
     /**
      * The single application-wide instance.
      */
@@ -96,7 +96,7 @@ public class ExclusionList extends Box {
      * Creates a new instance of dictionaries.
      */
     private ExclusionList() {
-        super( BoxLayout.X_AXIS);
+        setLayout( new GridBagLayout());
 
         exclusions = new HashSet( 20);
         // construct the dictionaries list editor
@@ -142,13 +142,6 @@ public class ExclusionList extends Box {
         importA.setEnabled( true);
         UIUtilities.initAction( importA, "exclusions.button.import");
 
-        JPanel p = new JPanel( new GridLayout( 0, 1));
-        p.add( new JButton( add));
-        p.add( new JButton( remove));
-        p.add( new JButton( export));
-        p.add( new JButton( importA));
-        p.add( Box.createVerticalGlue());
-
         exclusionList.addListSelectionListener( new ListSelectionListener() {
                 public void valueChanged( ListSelectionEvent e) {
                     if (exclusionList.isSelectionEmpty()) {
@@ -161,9 +154,31 @@ public class ExclusionList extends Box {
             });
 
         JScrollPane scroller = new JScrollPane( exclusionList);
-        add( scroller);
-        add( Box.createHorizontalStrut( 5));
-        add( p);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.anchor = GridBagConstraints.NORTHWEST;
+        gc.fill = GridBagConstraints.BOTH;
+        gc.gridx = 0;
+        gc.gridy = 0;
+        gc.weightx = 2;
+        gc.weighty = 2;
+        gc.gridwidth = 1;
+        gc.gridheight = GridBagConstraints.REMAINDER;
+        gc.insets = new Insets( 0, 0, 0, 5);
+        add( scroller, gc);
+
+        JPanel p = new JPanel( new GridLayout( 0, 1));
+        p.add( new JButton( add));
+        p.add( new JButton( remove));
+        p.add( new JButton( export));
+        p.add( new JButton( importA));
+        gc = new GridBagConstraints();
+        gc.anchor = GridBagConstraints.NORTH;
+        gc.gridx = 1;
+        gc.gridy = GridBagConstraints.RELATIVE;
+        gc.fill= GridBagConstraints.NONE;
+        gc.gridwidth = 1;
+        gc.gridheight = 1;
+        add( p, gc);
 
         String filename = getExclusionListFile();
         if (new File( filename).exists())

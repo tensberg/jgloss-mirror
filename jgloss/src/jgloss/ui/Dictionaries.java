@@ -42,7 +42,7 @@ import javax.swing.event.*;
  *
  * @author Michael Koch
  */
-public class Dictionaries extends Box {
+public class Dictionaries extends JComponent {
     /**
      * The single application-wide instance.
      */
@@ -111,7 +111,7 @@ public class Dictionaries extends Box {
      */
     public static Dictionary[] getDictionaries() {
         synchronized (getComponent()) {
-            // this method might be called early in the initialziation process, so make sure
+            // this method might be called early in the initializiation process, so make sure
             // that the preferences are initialized
             if (getComponent().dictionariesOrig == null)
                 getComponent().loadPreferences();
@@ -138,7 +138,8 @@ public class Dictionaries extends Box {
      * Creates a new instance of dictionaries.
      */
     private Dictionaries() {
-        super( BoxLayout.X_AXIS);
+        setLayout( new GridBagLayout());
+
         // construct the dictionaries list editor
         dictionaries = new JList();
         dictionaries.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
@@ -188,12 +189,6 @@ public class Dictionaries extends Box {
             };
         remove.setEnabled( false);
         UIUtilities.initAction( remove, "dictionaries.button.remove");
-        JPanel p = new JPanel( new GridLayout( 0, 1));
-        p.add( new JButton( add));
-        p.add( new JButton( remove));
-        p.add( new JButton( up));
-        p.add( new JButton( down));
-        p.add( Box.createVerticalGlue());
 
         dictionaries.addListSelectionListener( new ListSelectionListener() {
                 public void valueChanged( ListSelectionEvent e) {
@@ -222,9 +217,30 @@ public class Dictionaries extends Box {
             });
 
         JScrollPane scroller = new JScrollPane( dictionaries);
-        add( scroller);
-        add( Box.createHorizontalStrut( 5));
-        add( p);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.anchor = GridBagConstraints.NORTHWEST;
+        gc.fill = GridBagConstraints.BOTH;
+        gc.gridx = 0;
+        gc.gridy = 0;
+        gc.weightx = 2;
+        gc.weighty = 2;
+        gc.gridwidth = 1;
+        gc.gridheight = GridBagConstraints.REMAINDER;
+        gc.insets = new Insets( 0, 0, 0, 5);
+        add( scroller, gc);
+        JPanel p = new JPanel( new GridLayout( 0, 1));
+        p.add( new JButton( add));
+        p.add( new JButton( remove));
+        p.add( new JButton( up));
+        p.add( new JButton( down));
+        gc = new GridBagConstraints();
+        gc.anchor = GridBagConstraints.NORTH;
+        gc.gridx = 1;
+        gc.gridy = GridBagConstraints.RELATIVE;
+        gc.fill= GridBagConstraints.NONE;
+        gc.gridwidth = 1;
+        gc.gridheight = 1;
+        add( p, gc);
 
         userDictImplementation = new UserDictionary.Implementation
             ( System.getProperty( "user.home") + File.separator +
