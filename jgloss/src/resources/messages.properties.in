@@ -40,14 +40,18 @@ error.dictionary.title=Error opening dictionary
 error.dictionary.filenotfound=The dictionary {0} could not be opened.\nCheck if the dictionary file {1}\nexists and is readable.
 error.dictionary.ioerror=An error occurred while loading\nthe dictionary {0}.
 error.dictionary.format=File {0} is not\na dictionary file in a supported format.
+error.exclusions.save.title=Error writing exclusion list
+error.exclusions.save=An error occurred while writing the\nexclusion list to {0}.\nThe Java exception was {1}, {2}.
+error.exclusions.load.title=Error reading exclusion list
+error.exclusions.load=An error occurred while reading the\nexclusion list from {0}.\nThe Java exception was {1}, {2}.
 error.import.title=Error while importing file
-error.import.exception=An error occurred while importing {0}.\nThe Java exception was {1} ({2}).
+error.import.exception=An error occurred while importing {0}.\nThe Java exception was {1}, {2}.
 error.export.title=Error while exporting file
-error.export.exception=An error occurred while exporting.\nThe Java exception was {0} ({1}).
+error.export.exception=An error occurred while exporting.\nThe Java exception was {0}, {1}.
 error.load.title=Error while loading file
-error.load.exception=An error occurred while loading {0}.\nThe Java exception was {1} ({2}).
+error.load.exception=An error occurred while loading {0}.\nThe Java exception was {1}, {2}.
 error.save.title=Error while saving file
-error.save.exception=An error occurred while saving {0}.\nThe Java exception was {1} ({2}).
+error.save.exception=An error occurred while saving {0}.\nThe Java exception was {1}, {2}.
 error.save.unknownannotation=Skipping unknown annotation type {0}
 
 button.ok=OK
@@ -146,24 +150,14 @@ editor.addannotation.text=Please enter the word to look up in\nthe dictionaries 
 editor.addannotation.title=Annotate selection
 
 prefs.title=Preferences
-prefs.button.up=Move entry up
-prefs.button.down=Move entry down
-prefs.button.add=Add dictionary file...
-prefs.button.remove=Remove entry
-prefs.editor.enableediting=Enable direct editing (buggy)
 
 dictionaries.title=Dictionaries
 dictionaries.chooser.title=Add dictionary files
 dictionaries.chooser.button.add=Add
-
-import.title=Import file
-import.urlorfile=Enter the URL, or specify the file you want to import.
-import.button.choosefile=Choose file...
-import.encodings=Character encoding of file:
-import.readingbrackets=Brackets delimiting reading annotations:
-
-import.clipboard=clipboard
-load.progress=Loading {0}
+dictionaries.button.up=Move entry up
+dictionaries.button.down=Move entry down
+dictionaries.button.add=Add dictionary file...
+dictionaries.button.remove=Remove entry
 
 style.title=General
 style.text=Text
@@ -175,6 +169,26 @@ style.text.usecolor=set background color:
 style.text.colorchooser.title=Choose background color
 style.highlight.color=Highlight color for annotations:
 style.highlight.colorchooser.title=Annotation highlight
+style.editor.enableediting=Enable direct editing (buggy)
+
+exclusions.title=Exclusions
+exclusions.button.add=Add word...
+exclusions.button.remove=Remove word
+exclusions.button.export=Export list...
+exclusions.button.import=Import list...
+exclusions.add.title=Add word
+exclusions.add=Enter the word to add to the exclusion list.
+exclusions.export.title=Export exclusion list
+exclusions.import.title=Import exclusion list
+
+import.title=Import file
+import.urlorfile=Enter the URL, or specify the file you want to import.
+import.button.choosefile=Choose file...
+import.encodings=Character encoding of file:
+import.readingbrackets=Brackets delimiting reading annotations:
+
+import.clipboard=clipboard
+load.progress=Loading {0}
 
 print.title=Print document
 
@@ -187,8 +201,10 @@ annotationeditor.menu.usetranslation=Use this Translation
 annotationeditor.menu.hide=Hide Annotation
 annotationeditor.menu.show=Show Annotation
 annotationeditor.menu.remove=Remove Annotation
+annotationeditor.menu.removeduplicates=Remove Duplicates
+annotationeditor.menu.addtoexclusions=Add to Exclusions
 annotationeditor.menu.add=Add Annotation
-annotationeditor.menu.hideduplicates=Hide Duplicates
+annotationeditor.menu.hideduplicates=Hide all Duplicates
 annotationeditor.menu.unhide=Show all Annotations
 annotationeditor.entry.hidden=\ (hidden)
 
@@ -199,6 +215,8 @@ annotationeditor.action.previous.ak=P
 annotationeditor.action.meta=Do something useful
 annotationeditor.action.meta.ak=SPACE
 annotationeditor.action.remove.ak=R
+annotationeditor.action.removeduplicates.ak=D
+annotationeditor.action.addtoexclusions.ak=E
 annotationeditor.action.hide.ak=H
 
 export.encodings=Encoding:
