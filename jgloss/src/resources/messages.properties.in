@@ -407,12 +407,13 @@ preferences.header.obsolete=\
 # This file can be safely deleted.
 
 filefilter.description.jgloss=JGloss documents (*.jgloss)
-filefilter.description.html=HTML documents (*.html)
 filefilter.description.xml=XML documents (*.xml)
+filefilter.description.html=HTML documents (*.html)
 filefilter.description.latex=LaTeX documents (*.tex)
 filefilter.description.template=Export template (*.tmpl)
 
 fileview.description.jgloss=JGloss document
+fileview.description.xml=XML document
 fileview.description.html=HTML document
 fileview.description.tex=LaTeX document
 fileview.description.text=Text document

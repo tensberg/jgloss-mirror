@@ -49,12 +49,14 @@ public class CustomFileView extends FileView {
     }
 
     protected static String JGLOSS_DESCRIPTION;
+    protected static String XML_DESCRIPTION;
     protected static String HTML_DESCRIPTION;
     protected static String TEX_DESCRIPTION;
     protected static String TEXT_DESCRIPTION;
     protected static String TEMPLATE_DESCRIPTION;
 
     protected static Icon JGLOSS_ICON;
+    protected static Icon XML_ICON;
     protected static Icon HTML_ICON;
     protected static Icon TEX_ICON;
     protected static Icon TEXT_ICON;
@@ -64,6 +66,7 @@ public class CustomFileView extends FileView {
         if (JGLOSS_DESCRIPTION == null) {
             // initialize static members
             JGLOSS_DESCRIPTION = JGloss.messages.getString( "fileview.description.jgloss");
+            XML_DESCRIPTION = JGloss.messages.getString( "fileview.description.xml");
             HTML_DESCRIPTION = JGloss.messages.getString( "fileview.description.html");
             TEX_DESCRIPTION = JGloss.messages.getString( "fileview.description.tex");
             TEXT_DESCRIPTION = JGloss.messages.getString( "fileview.description.text");
@@ -71,6 +74,7 @@ public class CustomFileView extends FileView {
 
             JGLOSS_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/jgloss.png"));
             HTML_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/html.png"));
+            XML_ICON = HTML_ICON; // no individual icon for now
             TEX_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/tex.png"));
             TEXT_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/txt.png"));
             TEMPLATE_ICON = new ImageIcon( CustomFileView.class.getResource
@@ -82,6 +86,8 @@ public class CustomFileView extends FileView {
         String name = f.getName().toLowerCase();
         if (name.endsWith( ".jgloss"))
             return JGLOSS_DESCRIPTION;
+        if (name.endsWith( ".xml"))
+            return XML_DESCRIPTION;
         if (name.endsWith( ".htm") || name.endsWith( ".html"))
             return HTML_DESCRIPTION;
         if (name.endsWith( ".tex"))
@@ -98,6 +104,8 @@ public class CustomFileView extends FileView {
         String name = f.getName().toLowerCase();
         if (name.endsWith( ".jgloss"))
             return JGLOSS_ICON;
+        if (name.endsWith( ".xml"))
+            return XML_ICON;
         if (name.endsWith( ".htm") || name.endsWith( ".html"))
             return HTML_ICON;
         if (name.endsWith( ".tex"))

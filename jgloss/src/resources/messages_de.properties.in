@@ -383,11 +383,13 @@ preferences.header.obsolete=\
 # Unix). Diese Datei kann problemlos gelöscht werden.
 
 filefilter.description.jgloss=JGloss Dokumente (*.jgloss)
+filefilter.description.xml=XML Dokumente (*.xml)
 filefilter.description.html=HTML Dokumente (*.html)
 filefilter.description.latex=LaTeX Dokumente (*.tex)
 filefilter.description.template=Export-Format (*.tmpl)
 
 fileview.description.jgloss=JGloss-Dokument
+fileview.description.xml=XML-Dokument
 fileview.description.html=HTML-Dokument
 fileview.description.tex=LaTeX-Dokument
 fileview.description.text=Textdokument
