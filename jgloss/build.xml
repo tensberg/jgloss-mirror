@@ -22,31 +22,72 @@
  $Id$
 
 -->
-<project name="JGloss" default="compile-jgloss" basedir=".">
-	<description>
-	Build file for the JGloss project
-	</description>
+<project name="JGloss" default="jgloss" basedir=".">
+  <description>
+    Build file for the JGloss project
+  </description>
 
-	<!-- JGloss uses javamake for compilation. Download javamake from http://www.experimentalstuff.com/Technologies/JavaMake/index.html -->
-	<taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
+  <!-- global properties -->
+  <property name="release" value="2.0a3" />
+  
+  <property name="jgloss-distname" value="jgloss-${release}" />
+  <property name="jdictionary-distname" value="jdictionary-${release}" />
 
-	<!-- global properties -->
-	<property name="release" value="2.0a3" />
-	
-	<property name="jgloss-distname" value="jgloss-${release}" />
-	<property name="jdictionary-distname" value="jdictionary-${release}" />
+  <property name="source" value="src" />
+  <property name="build" value="build" />
+  <property name="dist" value="dist" />
+  
+  <property name="jgloss-sources"
+    value="jgloss/JGlossApp.java
+    jgloss/ui/export/XSLTExporter.java
+    jgloss/ui/export/LaTeXExporter.java" />
 
-	<property name="source" value="src" />
-	<property name="build" value="build" />
-	
-	<property name="jgloss-sources"
-			  value="jgloss/JGlossApp.java
-                     jgloss/ui/export/XSLTExporter.java
-                     jgloss/ui/export/LaTeXExporter.java" />
+  <property name="build.compiler" value="jikes" />
 
-    <!-- targets -->
-	<target name="compile-jgloss">
-		<mkdir dir="${build}" />
-		<javac srcdir="${source}" destdir="${build}" includes="${jgloss-sources}"  />
-	</target>
+  <!-- targets -->
+  <target name="jgloss" depends="compile-jgloss,resources,data">
+    <jar destfile="jgloss.jar" basedir="${build}" manifest="MANIFEST.MF" />
+  </target>
+
+  <target name="compile-jgloss">
+    <mkdir dir="${build}" />
+    <depend srcdir="${source}" destdir="${build}" cache="dependencies" closure="yes" />
+    <javac srcdir="${source}" destdir="${build}" includes="${jgloss-sources}" />
+  </target>
+
+  <target name="resources" depends="properties,maps,icons" />
+
+  <target name="properties">
+    <native2ascii encoding="UTF-8" src="${source}/resources" dest="${build}/resources" includes="**/*.properties.in">
+      <mapper type="glob" from="*.properties.in" to="*.properties" />
+    </native2ascii>
+  </target>
+
+  <target name="maps">
+    <copy todir="${build}/resources">
+      <fileset dir="${source}/resources">
+        <include name="*.map" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="icons">
+    <copy todir="${build}/resources/icons">
+      <fileset dir="${source}/resources/icons" />
+    </copy>
+  </target>
+
+  <target name="data">
+    <copy todir="${build}/data">
+      <fileset dir="${source}/data" />
+    </copy>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build}" />
+    <delete dir="${dist}" />
+    <delete>
+      <fileset dir="." includes="*.jar" />
+    </delete>
+  </target>
 </project>
