@@ -60,7 +60,7 @@ public class CookieTools {
      * @param connection URL connection on which the cookies will be forwarded. The connect method
      *                   must not have been already called.
      * @param cookies Cookies taken from the client request.
-     * @see #parseResponseCookies(URLConnection,Map,String,String,boolean,context)
+     * @see #addResponseCookies(URLConnection,HttpServletResponse,String,String,boolean,ServletContext)
      */
     public static void addRequestCookies( URLConnection connection, Cookie[] cookies,
                                           ServletContext context) {
@@ -134,7 +134,8 @@ public class CookieTools {
                     path.startsWith( cpath)) {
                     name = name.substring( i3 + 1);
 
-                    cookietext.append( ';');
+                    // some servers require the space after the semicolon
+                    cookietext.append( "; ");
                     cookietext.append( name);
                     cookietext.append( '=');
                     cookietext.append( c.getValue());
@@ -167,6 +168,8 @@ public class CookieTools {
             cookietext.insert( 0, "$Version=" + maxVersion);
             connection.setRequestProperty( "Cookie", cookietext.toString());
             context.log( "sending Cookie: " + cookietext.toString());
+            if (maxVersion > 1) // send highest understood version number
+                connection.setRequestProperty( "Cooke2", "1");
         }
     }
     
@@ -178,20 +181,20 @@ public class CookieTools {
      * this serves as a simple equality test on cookies, with new cookies replacing older ones.
      *
      * @param connection URL connection from which the cookies will be read.
-     * @param cookies Map from cookie name to cookies. The map may already contain cookies.
+     * @param resp Response to which the cookies will be added.
      * @param servletDomain Domain name of the servlet container.
      * @param servletPath Path to the servlet on the servlet container.
      * @param secure <CODE>true</CODE> if the connection between servlet and client is secure.
      * @return The cookies map passed into the method.
      */
-    public static Map parseResponseCookies( URLConnection connection, Map cookies,
-                                            String servletDomain, String servletPath, boolean secure,
-                                            ServletContext context) {
+    public static void addResponseCookies( URLConnection connection, HttpServletResponse resp,
+                                           String servletDomain, String servletPath, boolean secure,
+                                           ServletContext context) {
         context.log( "parsing response cookies");
         URL url = connection.getURL();
         String host = url.getHost();
         if (host==null || host.length()==0)
-            return cookies;
+            return;
         String path = url.getPath();
         if (path==null || path.length()==0)
             path = "/";
@@ -336,11 +339,9 @@ public class CookieTools {
                         c.setComment( (String) cookie.get( "comment"));
                 }
 
-                cookies.put( c.getName(), c);
+                resp.addCookie( c);
             }
         }
-
-        return cookies;
     }
         
     /**
