@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # Convert a LaTeX export template compatible with JGloss 1.0 to
-# a XSLT style sheet usable with the JGloss 2.0 export mechanism.
+# a XSLT style sheet usable with the JGloss 2 export mechanism.
 
 # Author: Michael Koch
 # This file is in the public domain
@@ -111,7 +111,7 @@ $replacements{'word'} = <<'END';
 </xsl:text><xsl:value-of select="." /><xsl:text>
 END
 $replacements{'reading'} = <<'END';
-</xsl:text><xsl:value-of select="." /><xsl:text>
+</xsl:text><xsl:value-of select="@re" /><xsl:text>
 END
 $replacements{'dictionary-word'} = <<'END';
 </xsl:text><xsl:value-of select="$base" /><xsl:text>
@@ -127,7 +127,7 @@ $replacements{'paragraph-number'} = <<'END';
 END
 
 foreach (keys(%replacements)) {
-    chop $replacements{$_};
+    chomp $replacements{$_};
 }
 
 sub main {
@@ -210,14 +210,14 @@ sub handleDocumentText {
     </xsl:template>
 
     <xsl:template match="anno" mode="$mode">
-      <xsl:apply-templates />
+      <xsl:apply-templates mode="$mode" />
 
       <xsl:variable name="base">
-        <xsl:apply-templates mode="base" />
+        <xsl:apply-templates select="." mode="base" />
       </xsl:variable>
 
       <xsl:variable name="basere">
-        <xsl:apply-templates mode="basere" />
+        <xsl:apply-templates select="." mode="basere" />
       </xsl:variable>
 
       <xsl:text>$patterns{'translation'}</xsl:text>
@@ -244,13 +244,13 @@ sub handleAnnotationList {
     
     readPatternDefinitions(\%patterns);
 
-    print "</xsl:text><xsl:apply-templates select=\".//p\" mode=\"$mode\" /><xsl:text>";
+    print "</xsl:text><xsl:apply-templates select=\"./div\" mode=\"$mode\" /><xsl:text>";
 
     # output XSLT definition
     return <<"END_XSLT";
     <!-- pattern definitions for annotation list $annotationListCount -->
 
-    <xsl:template match="p" mode="$mode">
+    <xsl:template match="div" mode="$mode">
       <xsl:text>$patterns{'paragraph-start'}</xsl:text>
       <xsl:apply-templates select=".//anno" mode="$mode" />
       <xsl:text>$patterns{'paragraph-end'}</xsl:text>
@@ -258,11 +258,11 @@ sub handleAnnotationList {
 
     <xsl:template match="anno" mode="$mode">
       <xsl:variable name="base">
-        <xsl:apply-templates mode="base" />
+        <xsl:apply-templates select="." mode="base" />
       </xsl:variable>
 
       <xsl:variable name="basere">
-        <xsl:apply-templates mode="basere" />
+        <xsl:apply-templates select="." mode="basere" />
       </xsl:variable>
 
       <xsl:text>$patterns{'translation'}</xsl:text>

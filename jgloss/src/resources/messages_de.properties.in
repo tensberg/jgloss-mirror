@@ -178,15 +178,20 @@ main.menu.showtranslation.tt=Schaltet die Anzeige der Übersetzungen ein/aus
 main.menu.showannotation=Zeige Annotations-Tooltips
 main.menu.showannotation.tt=Schaltet die Anzeige der Annotations-Tooltips ein/aus
 main.menu.help=Hilfe
-main.menu.about=Über JGloss
-main.menu.about.mk=U
-main.menu.about.tt=Zeigt einen Dialog mit Informationen über JGloss
 main.menu.addannotation=Auswahl annotieren...
 main.menu.addannotation.mk=u
 main.menu.addannotation.tt=Annotatiert den ausgewählten Text
 main.menu.doctitle=Dokumenttitel...
 main.menu.doctitle.mk=D
 main.menu.doctitle.tt=Anzeige und Editieren des Dokumenttitels
+
+jgloss.main.menu.about=Über JGloss
+jgloss.main.menu.about.mk=U
+jgloss.main.menu.about.tt=Zeigt einen Dialog mit Informationen über JGloss
+
+jdictionary.main.menu.about=Über JDictionary
+jdictionary.main.menu.about.mk=U
+jdictionary.main.menu.about.tt=Zeigt einen Dialog mit Informationen über JDictionary
 
 main.dialog.close.title=Änderungen speichern
 main.dialog.close.message=Änderungen an {0} speichern?
@@ -388,7 +393,7 @@ export.annotationlist.menu.tt=Exportiert die Liste der Annotationen in eine Text
 jgloss.about.frame.title=Über JGloss
 jgloss.about.text=\
 Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\
-\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\
+\nCopyright (c) 2001-2003 Michael Koch (tensberg@gmx.net)\n\
 \n\
 JGloss comes with ABSOLUTELY NO WARRANTY.\n\
 This is free software, and you are welcome to redistribute it\n\
@@ -396,7 +401,7 @@ under certain conditions; select "Show License" for details.
 about.showlicense=Lizenz anzeigen
 about.license.title=GNU General Public License
 jdictionary.about.frame.title=Über JDictionary
-jdictionary.about.text=Ein Front-end für japanische Wörterbücher.\n\nCopyright (c) 2002,2003 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+jdictionary.about.text=Ein Front-end für japanische Wörterbücher.\n\nCopyright (c) 2002-2003 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 
 preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
 preferences.header.obsolete=\

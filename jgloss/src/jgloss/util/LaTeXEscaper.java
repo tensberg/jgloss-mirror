@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Escapes LaTeX special characters in a string.
+ * Escapes LaTeX special characters.
  *
  * @author Michael Koch
  */
@@ -49,8 +49,7 @@ public class LaTeXEscaper extends AbstractEscaper {
         DEFAULT_ESCAPE_MAP.put( new Character('~'), "\\verb|~|");
         DEFAULT_ESCAPE_MAP.put( new Character('^'), "\\verb|^|");
         DEFAULT_ESCAPE_MAP.put( new Character('\\'), "$\\backslash$");
-        // replace a non-breakable space with a normal space and let LaTeX handle the layout
-        DEFAULT_ESCAPE_MAP.put( new Character('\u00a0'), " ");
+        DEFAULT_ESCAPE_MAP.put( new Character('\u00a0'), "~"); // non-breakable space
 
         UMLAUT_ESCAPE_MAP = new HashMap(DEFAULT_ESCAPE_MAP);
         // German umlauts

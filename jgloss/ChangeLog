@@ -1,5 +1,7 @@
-2.0 Alpha 1:
+2.0 Alpha 1 (2003/02/23):
 	- fixed JGloss startup with uninitialized prefs.
+	- Fixed HTML export.
+	- Added LaTeX export.
 2.0 Alpha 0: (2003/02/16)
 	- Extended dictionary functionality.
 	- Document window now includes word lookup panel.

@@ -40,7 +40,7 @@ ifndef NATIVE2ASCII
   NATIVE2ASCII := native2ascii
 endif
 
-RELEASE := 2.0a0
+RELEASE := 2.0a1
 JGLOSS_DISTNAME := jgloss-$(RELEASE)
 JDICTIONARY_DISTNAME := jdictionary-$(RELEASE)
 

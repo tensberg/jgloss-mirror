@@ -1,0 +1,56 @@
+%encoding: EUC-JP
+%short-description: LaTeX-CJK - translations on page
+%description
+% Generate a latex input file which uses the CJK macro package.
+% Translations are put in a footnote on the page where the
+% word appears.
+%end description
+% This is a EUC-JP encoded Japanese LaTeX document generated
+% by JGloss from %document-filename% on %generation-time%.
+% The CJK macro package must be installed to process this file.
+%
+% template-author: Michael Koch <tensberg@gmx.net>
+% The template file may be freely redistributed unmodified
+% or modified.
+% $Id$
+
+\documentclass[%font-size%pt]{article}
+
+\usepackage{CJK}
+\usepackage[overlap,CJK]{ruby}
+
+\renewcommand{\thefootnote}{}
+
+\begin{document}
+\begin{CJK*}[dnp]{JIS}{min}
+\CJKtilde
+
+\renewcommand{\rubysize}{0.5}
+\renewcommand{\rubysep}{-0.3ex}
+
+\newlength{\ww}
+\settowidth{\ww}{%longest-word%--}
+\newlength{\rw}
+\settowidth{\rw}{%longest-reading%--}
+
+\newlength{\tw}
+\setlength{\tw}{\textwidth}
+\addtolength{\tw}{-1.0\ww}
+\addtolength{\tw}{-1.0\rw}
+% I don't know where the -22pt come from, but if they are not subtracted,
+% latex complains about overfull \hboxes
+\addtolength{\tw}{-22pt}
+
+\pagestyle{myheadings}
+\markright{%document-title%}
+\newcommand{\fn}[3]{\footnotetext{\makebox[\ww][l]{#1} \makebox[\rw][l]{#2} \parbox[t]{\tw}{#3}}}
+
+%document-text
+%reading: \\ruby{%word%}{%reading%}
+%translation: \\fn{%dictionary-word%}{%dictionary-reading%}{%translation%}
+%paragraph-end: \n\n\\bigskip\n\n
+%end document-text
+
+\end{CJK*}
+
+\end{document}
