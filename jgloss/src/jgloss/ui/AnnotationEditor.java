@@ -336,6 +336,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                         path[1] = (TreeNode) model.getChild( model.getRoot(), index);
                         setSelectionPath( new TreePath( path));
                     }
+                    else {
+                        updateActions( null);
+                    }
                 }
             };
         JGlossFrame.initAction( removeAction, "annotationeditor.menu.remove");
@@ -348,24 +351,36 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     while (!(tn instanceof AnnotationNode))
                         tn = tn.getParent();
                     AnnotationNode selection = (AnnotationNode) tn;
+                    int index = model.getIndexOfChild( model.getRoot(), selection);
+
                     String kanji = selection.getKanjiText();
                     String reading = selection.getReadingNode().getText();
                     String translation = selection.getTranslationNode().getText();
+
                     // removing annotations while iterating will throw a ConcurrentModificationException
                     LinkedList duplicates = new LinkedList();
                     for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
                         AnnotationNode node = (AnnotationNode) i.next();
-                        if (node != selection &&
-                            kanji.equals( node.getKanjiText()) &&
+                        if (kanji.equals( node.getKanjiText()) &&
                             reading.equals( node.getReadingNode().getText()) &&
                             translation.equals( node.getTranslationNode().getText()))
                             duplicates.add( node);
                     }
                     for ( Iterator i=duplicates.iterator(); i.hasNext(); )
                         ((AnnotationNode) i.next()).removeAnnotation();
-                    // force docpane to be re-layouted. Unfortunately I have not found a better
-                    // way to do this.
-                    doc.getStyleSheet().addRule( AnnotationTags.ANNOTATION.getId() + " { }");
+
+                    // select the following annotation node (or previous if it was the last)
+                    if (index >= model.getChildCount( model.getRoot()))
+                        index--;
+                    if (index >= 0) {
+                        TreeNode[] path = new TreeNode[2];
+                        path[0] = (TreeNode) model.getRoot();
+                        path[1] = (TreeNode) model.getChild( model.getRoot(), index);
+                        setSelectionPath( new TreePath( path));
+                    }
+                    else {
+                        updateActions( null);
+                    }
                 }
             };
         JGlossFrame.initAction( removeDuplicatesAction, "annotationeditor.menu.removeduplicates");
