@@ -44,7 +44,7 @@ public class JGlossWriter extends HTMLWriter {
      * Current version of JGloss. Will be written to the generator meta-tag
      * of the generated file.
      */
-    public static int JGLOSS_VERSION = 100;
+    public static int JGLOSS_VERSION = 101;
     
     /**
      * Major version of the JGloss file format. The major version is changed if a
@@ -83,6 +83,10 @@ public class JGlossWriter extends HTMLWriter {
      * Flag if the content meta tag already exists in the document.
      */
     protected boolean contentTypeTagExists;
+    /**
+     * Flag if the document has a title tag.
+     */
+    protected boolean titleTagExists;
 
     /**
      * Creates a new writer for a JGloss document which outputs to the given writer.
@@ -93,20 +97,23 @@ public class JGlossWriter extends HTMLWriter {
      * @param doc The document to write.
      */
     public JGlossWriter( Writer out, String encoding, JGlossDocument doc) {
+
         super( out, doc);
         this.encoding = encoding;
         this.doc = doc;
 
+        // Search the HEAD element for existing META and TITLE elements. These elements are nested
+        // in a IMPLIED element which is a child of the HEAD element.
         generatorTagExists = false;
-        // search for existing meta tag
+        contentTypeTagExists = false;
+        titleTagExists = false;
         Element e = doc.getDefaultRootElement();
-        // search the "body" element
         int i = 0;
         while (i < e.getElementCount()) {
             Element ec = e.getElement( i);
             if (ec.getName().equalsIgnoreCase( HTML.Tag.HEAD.toString()) || 
                 ec.getName().equalsIgnoreCase( HTML.Tag.IMPLIED.toString())) {
-                // poor man's recursion: iterate over children of ec
+                // Go down in tree: iterate over children of ec
                 e = ec;
                 i = 0;
                 continue;
@@ -124,6 +131,9 @@ public class JGlossWriter extends HTMLWriter {
                     contentTypeTagExists = true;
                 }
             }
+            else if (ec.getAttributes().containsAttribute
+                     ( StyleConstants.NameAttribute, HTML.Tag.TITLE))
+                titleTagExists = true;
 
             i++;
         }
@@ -244,10 +254,21 @@ public class JGlossWriter extends HTMLWriter {
      * for annotation elements.
      */
     protected void endTag( Element elem) throws IOException {
-        if (elem.getName().equals( HTML.Tag.HEAD.toString()) && !generatorTagExists) {
-            String generator = "<meta name=\"generator\" content=\"" + getFileVersionString() +
-                "\">\n";
-            nonEscapedOutput( generator.toCharArray(), 0, generator.length());
+        if (elem.getName().equals( HTML.Tag.HEAD.toString())) {
+            if (!titleTagExists) {
+                String title = "<title>" + doc.getTitle() + "</title>\n";
+                nonEscapedOutput( title.toCharArray(), 0, title.length());
+            }
+            if (!generatorTagExists) {
+                String generator = "<meta name=\"generator\" content=\"" + getFileVersionString() +
+                    "\">\n";
+                nonEscapedOutput( generator.toCharArray(), 0, generator.length());
+            }
+            if (!contentTypeTagExists) {
+                String contentType = "<meta name=\"content-type\" content=\"text/html; charset=" +
+                    getCharacterEncoding() + "\">\n";
+                nonEscapedOutput( contentType.toCharArray(), 0, contentType.length());
+            }
         }
 
         if (elem.getAttributes()

@@ -883,7 +883,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
         StyleDialog.getComponent().addStyleSheet( doc.getStyleSheet(), Collections.EMPTY_MAP);
 
         documentName = title;
-        setTitle( title + ":" + JGloss.messages.getString( "main.title"));
 
         final StopableReader stin = new StopableReader( in);
         // run import in own thread so we can monitor progress
@@ -931,6 +930,14 @@ public class JGlossFrame extends JFrame implements ActionListener {
             closeDocument();
             return;
         }
+
+        updateTitle();
+        // get notified of title changes
+        doc.addPropertyChangeListener( new PropertyChangeListener() {
+                public void propertyChange( PropertyChangeEvent e) {
+                    markChanged();
+                }
+            });
 
         docpane.setEditorKit( kit);
         docpane.setStyledDocument( doc);
@@ -1596,6 +1603,13 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 }
             }
         }        
+    }
+
+    /**
+     * Update the document window title.
+     */
+    protected void updateTitle() {
+        setTitle( documentName + ":" + JGloss.messages.getString( "main.title"));
     }
 
     /**

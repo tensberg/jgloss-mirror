@@ -162,12 +162,15 @@ editor.menu.paste.mk=E
 editor.menu.find=Suchen...
 editor.menu.find.mk=S
 editor.menu.findagain=Weitersuchen
-editor.menu.find.mk=r
+editor.menu.find.mk=W
 editor.menu.addannotation=Auswahl annotieren...
 editor.menu.addannotation.mk=u
-editor.addannotation.text=Bitte geben sie das Wort ein das für\ndie neue Annotation in den Wörterbüchern\nnachgesehen wird:
-editor.addannotation.title=Auswahl annotieren
+editor.menu.doctitle=Dokumenttitel...
+editor.menu.doctitle.mk=D
 
+editor.dialog.addannotation.title=Auswahl annotieren
+editor.dialog.doctitle.title=Dokumenttitel
+editor.dialog.doctitle=Titel des Dokumentes:
 editor.dialog.find=Suchen nach:
 editor.dialog.find.title=Suchen
 editor.dialog.find.notfound=Der Text "{0}" wurde nicht im Dokument gefunden.
@@ -276,6 +279,7 @@ export.latex.header=\
 % Benutzen sie platex um die Datei zu verarbeiten.\n\
 % Beachten sie das die Datei ruby-annotation.sty, die JGloss beiliegt,\n\
 % installiert sein muss.\n\n
+export.latex.vocabulary=\ -- Vokabelliste
 
 about.frame.title=Über JGloss
 about.text=Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.

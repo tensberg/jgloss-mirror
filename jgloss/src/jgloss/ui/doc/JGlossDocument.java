@@ -26,6 +26,7 @@ package jgloss.ui.doc;
 import jgloss.*;
 import jgloss.dictionary.*;
 
+import java.beans.*;
 import java.util.*;
 
 import javax.swing.text.*;
@@ -105,6 +106,10 @@ public class JGlossDocument extends HTMLDocument {
      * <code>-1</code> if unknown.
      */
     private int fileFormatMinorVersion;
+    /**
+     * Manages the property change listeners, which are notified of document title changes.
+     */
+    private PropertyChangeSupport listeners;
 
     /**
      * Stores a newline character as a char array. Used by the <CODE>JGlossReader</CODE>.
@@ -674,6 +679,8 @@ public class JGlossDocument extends HTMLDocument {
             fileFormatMajorVersion = -1;
             fileFormatMinorVersion = -1;
         }
+
+        listeners = new PropertyChangeSupport( this);
     }
 
     /**
@@ -876,5 +883,38 @@ public class JGlossDocument extends HTMLDocument {
      */
     public int getFileFormatMinorVersion() {
         return fileFormatMinorVersion;
+    }
+
+    /**
+     * Adds a listener which will be notified of changes to the document title.
+     */
+    public void addPropertyChangeListener( PropertyChangeListener listener) {
+        listeners.addPropertyChangeListener( listener);
+    }
+
+    /**
+     * Removes a previously added document change listener.
+     */
+    public void removePropertyChangeListener( PropertyChangeListener listener) {
+        listeners.removePropertyChangeListener( listener);
+    }
+
+    /**
+     * Sets the title of the document. This modifies the <CODE>DocumentTitle</CODE> property
+     * of the Document object. This also fires a property change event.
+     */
+    public void setTitle( String title) {
+        String oldTitle = getTitle();
+        if (oldTitle!=null && !oldTitle.equals( title) || oldTitle==null && title!=null) {
+            putProperty( Document.TitleProperty, title);
+            listeners.firePropertyChange( Document.TitleProperty, oldTitle, title);
+        }
+    }
+
+    /**
+     * Returns the title of the document. This is the <CODE>DocumentTitle</CODE> property.
+     */
+    public String getTitle() {
+        return (String) getProperty( Document.TitleProperty);
     }
 } // class JGlossDocument

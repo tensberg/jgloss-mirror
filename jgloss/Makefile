@@ -40,7 +40,7 @@ ifndef NATIVE2ASCII
   NATIVE2ASCII := native2ascii
 endif
 
-RELEASE := 1.0
+RELEASE := 1.0.1
 DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www

@@ -24,7 +24,7 @@
 package jgloss.ui;
 
 import jgloss.*;
-import jgloss.ui.doc.JGlossEditorKit;
+import jgloss.ui.doc.*;
 import jgloss.ui.annotation.*;
 
 import java.awt.*;
@@ -136,7 +136,7 @@ public class JGlossEditor extends JTextPane {
 
         public WordLookupDialog() {
             super( (Frame) SwingUtilities.getWindowAncestor( JGlossEditor.this),
-                   JGloss.messages.getString( "editor.addannotation.title"), true);
+                   JGloss.messages.getString( "editor.dialog.addannotation.title"), true);
             Action annotateAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
                         accepted = true;
@@ -232,6 +232,10 @@ public class JGlossEditor extends JTextPane {
      * Action which annotates the current selection.
      */
     private Action addAnnotationAction;
+    /**
+     * Displays the document title and lets the user change it.
+     */
+    private Action documentTitleAction;
     /**
      * Searches a string in the document.
      */
@@ -421,6 +425,21 @@ public class JGlossEditor extends JTextPane {
                 };
             addAnnotationAction.setEnabled( false);
             UIUtilities.initAction( addAnnotationAction, "editor.menu.addannotation");
+            documentTitleAction = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        Object result = JOptionPane.showInputDialog
+                            ( SwingUtilities.getRoot( JGlossEditor.this), 
+                              JGloss.messages.getString( "editor.dialog.doctitle"),
+                              JGloss.messages.getString( "editor.dialog.doctitle.title"),
+                              JOptionPane.PLAIN_MESSAGE, null, null, 
+                              ((JGlossDocument) getDocument()).getTitle());
+                        if (result != null) {
+                            ((JGlossDocument) getDocument()).setTitle( result.toString());
+                        }
+                    }
+                };
+            documentTitleAction.setEnabled( false);
+            UIUtilities.initAction( documentTitleAction, "editor.menu.doctitle");
             findAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
                         Object result = JOptionPane.showInputDialog
@@ -443,6 +462,7 @@ public class JGlossEditor extends JTextPane {
                         }
                     }
                 };
+            findAction.setEnabled( false);
             UIUtilities.initAction( findAction, "editor.menu.find");
             findAgainAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
@@ -464,6 +484,7 @@ public class JGlossEditor extends JTextPane {
             editMenu.add( UIUtilities.createMenuItem( findAction));
             editMenu.add( UIUtilities.createMenuItem( findAgainAction));
             editMenu.add( UIUtilities.createMenuItem( addAnnotationAction));
+            editMenu.add( UIUtilities.createMenuItem( documentTitleAction));
 
             addCaretListener( new CaretListener() {
                     public void caretUpdate( CaretEvent e) {
@@ -630,6 +651,15 @@ public class JGlossEditor extends JTextPane {
     public void setEditorKit( JGlossEditorKit kit) {
         super.setEditorKit( kit);
         xcvManager.updateActions( this);
+    }
+
+    /**
+     * Sets the document to edit. Calling this method enables the find and document title actions.
+     */
+    public void setStyledDocument( StyledDocument doc) {
+        super.setStyledDocument( doc);
+        findAction.setEnabled( true);
+        documentTitleAction.setEnabled( true);
     }
 
     /**

@@ -195,13 +195,16 @@ public class LaTeXExporter {
         lengths.append( "\\addtolength{\\tw}{-1.0\\ww}\n");
         lengths.append( "\\addtolength{\\tw}{-1.0\\rw}\n");
         
+        if (doc.getTitle() != null) {
+            out.write( "\\pagestyle{myheadings}\n\\markright{" + escape( doc.getTitle()) + "}\n");
+        }
+
         if (translationsOnPage) {
             out.write( lengths.toString());
             out.write( "\\addtolength{\\tw}{-20pt}\n"); // I'm not sure where the 20pt come from
             // define footnote command for annotations
             out.write( "\\newcommand{\\fn}[3]{\\footnotetext{\\makebox[\\ww][l]{#1}" + 
                        " \\makebox[\\rw][l]{#2} \\parbox[t]{\\tw}{#3}}}\n\n");
-
         }
 
         out.write( outtext.toString());
@@ -209,6 +212,10 @@ public class LaTeXExporter {
         if (!translationsOnPage && translations.length() > 0) {
             // append translation list to the end of the document
             out.write( "\n\n\\newpage\n\\small\n");
+            if (doc.getTitle() != null) {
+                out.write( "\\markright{" + escape( doc.getTitle()) + 
+                           JGloss.messages.getString( "export.latex.vocabulary") + "}\n");
+            }
             out.write( lengths.toString());
             out.write( "\\addtolength{\\tw}{-4pt}\n"); // I'm not sure where the 4pt come from
             // define footnote command for annotations
