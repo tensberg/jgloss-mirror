@@ -257,9 +257,9 @@ public class JGlossDocument extends HTMLDocument {
                     }
                     
                     String word = new String( data, ta.getStart(), talen);
+                    String reading = null; // reading (in dictionary form)
                     String dictionaryWord = null; // null means same as word
                     String dictionaryReading = null; // null means same as reading
-                    String reading = null;
                     String translation = null;
                     if (ta instanceof Reading && !(ta instanceof Translation)) {
                         // get reading from annotations
@@ -273,7 +273,7 @@ public class JGlossDocument extends HTMLDocument {
                             reading = r.getWord();
                         if (!r.getWord().equals( word)) {
                             dictionaryWord = r.getWord();
-                            dictionaryReading= r.getReading();
+                            dictionaryReading = r.getReading();
                         }
 
                         // try to find matching translation
@@ -328,7 +328,10 @@ public class JGlossDocument extends HTMLDocument {
 
                     handleStartTag( AnnotationTags.WORD, a, pos);
 
-                    if (reading == null) {
+                    // The "reading" variable is set to the dictionary form of the
+                    // reading of the word, even if word itself is a hiragana string.
+                    // Hiragana words should not be annotated
+                    if (reading==null || !StringTools.containsKanji( word)) {
                         // There has to always be at least one reading.
                         // Insert word with a single reading/base pair with an empty reading.
                         handleStartTag( AnnotationTags.READING_BASETEXT, a, pos);
@@ -343,7 +346,9 @@ public class JGlossDocument extends HTMLDocument {
                         handleEndTag( AnnotationTags.READING_BASETEXT, pos);
                     }
                     else {
-                        // wr already contains the word/reading pairs
+                        // The "reading" variable is set to the dictionary form of the
+                        // reading of the word. The inflected form of the reading is
+                        // implicitly derived by the splitWordReading method.
                         String base = dictionaryWord;
                         if (base == null)
                             base = word;

@@ -75,7 +75,8 @@
     </sect1>
     <sect1><title>License</title>
       <para>
-        &JGloss; is licensed under the terms of the GNU General Public License.
+        &JGloss; is licensed under the terms of the 
+        <ulink url="http://www.gnu.org/licenses/licenses.html#TOCGPL">GNU General Public License</ulink>.
         It comes with ABSOLUTELY NO WARRANTY. This is free software, and you are
         welcome to redistribute it under certain conditions. Read the 
         license for details.
@@ -112,7 +113,9 @@
                 <ulink url="http://ftp.cc.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil">
                   Monash Nihongo FTP Archive</ulink>. Each dictionary also needs an index file.
                 &JGloss; can use the <acronym>XJDX</acronym> index files used by <abbrev>e. g.</abbrev>
-                <application>XJDIC</application> or <application>GJiten</application>, or
+                <ulink url="http://www.csse.monash.edu.au/~jwb/xjdic/"><application>XJDIC</application>
+                 </ulink> or <ulink url="http://gjiten.sourceforge.net/">
+                  <application>GJiten</application></ulink>, or
                 index files in its own format <acronym>JJDX</acronym>. 
                 If no index file is found, it will be created automatically.
               </para>
@@ -392,8 +395,8 @@
             to manipulate the annotations in the document.
             The left part shows the annotated document
             (see <xref linkend="sect.docview">). An <emphasis>annotated word</emphasis> is
-            highlighted in light red, a <emphasis>reading annotation</emphasis> in light green
-            and a <emphasis>translation annotation</emphasis> in light blue. The currently
+            highlighted in red, a <emphasis>reading annotation</emphasis> in green
+            and a <emphasis>translation annotation</emphasis> in blue. The currently
             selected annotation is highlighted in deep red.
           </para>
         </blockquote>
@@ -459,9 +462,9 @@
         Select <guimenuitem>HTML</guimenuitem> from the <guisubmenu>Export</guisubmenu>
         entry in the <guimenu>File</guimenu> menu. In the file chooser you can select which type of
         annotations will be written. Select a file name and save the HTML file. If you are using
-        the <application>Internet Explorer 5.5</application>, which already more or less supports the
+        the <application>Internet Explorer 5.5</application>, which already (more or less) supports the
         <citetitle>Ruby Annotation</citetitle> XHTML specification, the ruby in the document will be
-        rendered above the annotated word. Otherwise, it will be inserted after the annotated word.
+        rendered above the annotated word.
       </para>
     </sect1>
 
@@ -469,15 +472,15 @@
       <para>
         The left part of the window shows the annotated document. Annotated words will have a colored
         background. You can change the colors or switch them off in the 
-        <link linkend="sect.prefs.general">Preferences dialog</link> and toggle the display
+        <link linkend="sect.prefs.general">preferences dialog</link> and toggle the display
         of reading and translation annotations in the <link linkend="sect.menu.view">View menu</link>.
         If you left-click on an annotated word, a popup window will show all dictionary entries
         for this word. A right-click will select this word in the annotation editor and pop up
         a context menu with options for this annotation (see 
-        <xref linkend="sect.menu.annotation">). To add an annotation, select some text
+        <xref linkend="sect.menu.annotation">). To look up the selection in the dictionaries,
+        select <guimenuitem>Word Lookup</guimenuitem>. To add an annotation, select some text
         and use <guimenuitem>Annotate Selection</guimenuitem> in the <guimenu>Edit</guimenu> menu
-        (see <xref linkend="sect.menu.edit">). To look up the selection in the dictionaries,
-        select <guimenuitem>Word Lookup</guimenuitem>.
+        (see <xref linkend="sect.menu.edit">).
       </para>
     </sect1>
 
@@ -498,11 +501,14 @@
         the chosen item, see <xref linkend="sect.menu.annotation">.
       </para>
       <para>
-        The first item under the annotated word is the current reading. To edit the reading,
+        Each annotated word has one or more readings. If a word has no kanji characters,
+        the reading will span the whole word. Otherwise, a reading annotation is added
+        to every kanji substring of the word. The annotation editor shows the reading,
+        or list of readings. To edit a reading,
         select the item and hit <keycap>space</keycap>, or click it twice and wait a moment.
         When you are done with editing, press <keycap>return</keycap>, and the document view
         will be updated with the new reading.
-        The second item shows the current translation. It is edited in the same way as the
+        The second item shows the current translation. It is edited in the same way as a
         reading.
       </para>
       <para>
@@ -515,8 +521,8 @@
       </para>
       <para>
         Some text documents you can find on the net are already annotated with readings 
-        by placing the reading in brackets after a word. These readings will be recognized 
-        during importing and used used as reading
+        by placing the reading in brackets after a word. These readings can be recognized by the
+        text parser during importing and used used as reading
         annotation. They are shown in the <guimenuitem>Reading from document</guimenuitem> items.
         Selecting one and hitting <keycap>space</keycap> will make it the reading of the
         annotation. If you are using a dictionary which provides readings but no translations,
@@ -592,39 +598,23 @@
         Selecting <guimenuitem>Import</guimenuitem> will show the 
         <guilabel>Import File</guilabel> dialog. In the text field you can enter
         an HTTP URL or the file name of a local document. The document should be plain text.
-        There is some support for importing <acronym>HTML</acronym> documents, but it will work
-        only for simple layouts. If you hit the <guibutton>Choose File</guibutton>
+        There is some support for importing <acronym>HTML</acronym> documents, but it will only work
+        for simple layouts. If you hit the <guibutton>Choose File</guibutton>
         button, a file chooser dialog will pop up and let you select a local file.
         The character encoding of the file can be selected in the 
         <guilabel>Character encoding ...</guilabel> popup menu. You can usually
         leave it on the <guilabel>&lt;auto&gt;</guilabel> setting, which will make &JGloss;
         auto-detect the encoding of the file. If the auto-detection fails for a file, you can
-        select the encoding manually. If a text document already contains annotations with the
-        reading of kanji words, the import parser will use these readings for the automatically
-        generated annotations. The readings must appear after a kanji word, enclosed in brackets
-        which you can select in the <guilabel>Brackets ...</guilabel> popup menu. If the document
-        does not contain annotations, you can ignore the settings. Hitting the 
-        <guibutton>Import</guibutton> button will import the selected file.
+        select the encoding manually. You can choose the text parser for the automatic annotation in
+        the <guilabel>Text Parser</guilabel> part of the dialog (see <xref linkend="sect.parser">). 
+        Hitting the <guibutton>Import</guibutton> button will import the selected file.
       </para>
       <para>
-        The import process will automatically generate annotations for the file by looking up
-        words in the user-selected dictionaries. A simple heuristic decides what is looked up:
-        for a sequence of katakana characters, the whole sequence is treated as one word and
-        looked up. For a sequence of kanji characters followed by hiragana characters, the
-        algorithm first looks for possible inflected forms in the hiragana string and will
-        try to find words that consist of the kanji word and the dictionary form of the inflected
-        forms that appear in the hiragana string. If no match is found, only the kanji part
-        is looked up. If still no match is found in any of the dictionaries, prefixes of the
-        kanji word will be tried and if this leads to a match the process will be repeated with
-        the remainder. A consequence of this is that hiragana words will never be annotated
-        automatically even if they are in the dictionaries. You can add annotations to them
-        manually later.
-      </para>
-      <para>
-        If there was a reading annotation in the document for the annotated word, this reading
+        If there is a reading annotation for a annotated word, this reading
         will be used for the reading annotation, and the first translation found with this reading
         will be used for the translation annotation. Otherwise, the first reading and translation
-        found in a dictionary will be used for the annotation. You can change this later.
+        found in a dictionary will be used for the annotation. You can change the annotations later
+        manually.
       </para>
       <note>
         <para>
@@ -655,36 +645,24 @@
           If you export the document in HTML format, the document can viewed in any web browser
           that supports display of Japanese characters. The markup defined in the
           <citetitle>Ruby Annotation</citetitle> specification is used to embed the annotations,
-          so browsers which support it can place the annotations above/below the annotated words.
-          On browsers which don't support it, the annotations will be rendered after the annotated
-          word.
+          browsers which support it will render the annotations above/below the annotated words.
         </para>
         <para>
-          If you select the <guilabel>Interactive HTML</guilabel> option, Javascript
-          will be used in the generated document to interactively show and hide the annotations
-          on browsers which support it. Annotations will initially be hidden. When the user
-          clicks on an annotated word, the annotation is shown. On browsers which don't support
-          the necessary Javascript functions, the annotations will always be shown.
+          If the <guilabel>backwards compatible</guilabel> switch is not selected, the generated
+          HTML will use all options of the <citetitle>Ruby Annotation</citetitle> to embed
+          both readings and translations. The generated document will render correctly only on
+          browsers which fully support the specification (I don't know of a browser which currently
+          does). Otherwise, the subset of the specification which the Internet Explorer 5.5
+          understands will be used for reading annotations. Translations are shown using JavaScript
+          in a floating window and the status bar of the browser when the user moves the mouse
+          over an annotated word. In the Mozilla and other browsers
+          which don't support ruby annotations, but support the neccessary JavaScript functions, reading
+          annotations will be shown in a floating window and the status bar. In other browsers, the
+          reading annotations will be shown in the document after the annotated word. The translations
+          are not available.
         </para>
         <para>
-          With the <guilabel>Backwards compatible</guilabel> option, you can control the form
-          of generated HTML. Usually, the annotations are put in brackets to distinguish
-          them from the normal flow of text. On browsers which support 
-          ruby annotations, this is not only unnecessary but would
-          look wrong. If <guilabel>Backwards compatible</guilabel> is selected, the generated
-          HTML will use brackets, and a Javascript will remove the brackets from the
-          annotations if they are not needed when the document is loaded in the browser.
-          The documents will be usable in all browsers, even if they don't support
-          ruby annotations and Javascript. If it is unchecked, the generated document will not
-          have brackets around annotations. The brackets will be added by Javascript when the
-          document is loaded on browsers not supporting ruby annotations. This means less
-          work for modern browsers but will generate documents that don't work as well with
-          older browsers or browsers with Javascript disabled. As an added bonus, try importing
-          the HTML document in <application>Word 2000</application>. <application>Word 2000</application>
-          understands ruby annotations and will use them in the imported document.
-        </para>
-        <para>
-          With the <guilabel>write "hidden" annotations</guilabel> you can control how to
+          With the <guilabel>write "hidden" annotations</guilabel> switch you can control how to
           treat annotations which are marked as <link linkend="sect.menu.annotation">
             <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
           the annotations for hidden words will not be written to the generated document.
@@ -710,8 +688,7 @@
           The LaTeX export function will generate a text document in LaTeX format. It
           can be processed with <application>platex</application>. <application>platex</application>
           is an extension to TeX for typesetting Japanese documents. It is bundled with
-          TeTex.
-          The generated document uses the ruby macro for reading annotations. You can find it
+          TeTex. The generated document uses the ruby macro for reading annotations. You can find it
           in the <filename>latex-ruby</filename> folder of &JGloss;
         </para>
         <para>
@@ -793,6 +770,73 @@
       </para>
     </sect1>
 
+
+    <sect1 id="sect.parser"><title>Text Parser selection</title>
+      <para>
+        JGloss can use two different parsers for the automatic annotation of Japanese text, the
+        Kanji parser and the ChaSen parser. Select the parser by clicking the appropriate radio
+        button. The ChaSen parser will only be available if the chasen executable program is set in
+        the <guilabel>General</guilabel> part of the <link linkend="sect.prefs.general">Preferences
+          dialog</link>.
+      </para>
+      <para>
+        If the <guilabel>annotate first occurrence</guilabel> option is selected, each word in a
+        document is only annotated the first time it appears. This decreases the RAM usage and
+        the time it takes to display the document. Some documents you can find on the internet
+        already have reading annotations added to kanji words in the form of some hiragana
+        enclosed in brackets after the kanji word. The kanji parser will generate
+        reading annotation entries for these words. You can select the brackets used in the document
+        for reading annotations with the <guilabel>Brackets used...</guilabel> box. If the document
+        contains no reading annotations, you can ignore this setting. The ChaSen parser does
+        not support reading annotations in the document.
+      </para>
+      <sect2><title>The Kanji parser</title>
+        <para>
+          The Kanji parser is built into JGloss. A simple heuristic is used for choosing words to annotate:
+          For a sequence of katakana characters, the whole sequence is treated as one word and
+          looked up. For a sequence of kanji characters followed by hiragana characters, the
+          algorithm first looks for possible inflected forms in the hiragana string and will
+          try to find words that consist of the kanji word and the dictionary form of the inflected
+          forms that appear in the hiragana string. If no match is found, only the kanji part
+          is looked up. If still no match is found in any of the dictionaries, prefixes of the
+          kanji word will be tried and if this leads to a match the process will be repeated with
+          the remainder. A consequence of this is that hiragana words will never be annotated
+          automatically even if they are in the dictionaries.
+        </para>
+      </sect2>
+      <sect2><title>The ChaSen parser</title>
+        <para>
+          The ChaSen parser uses the ChaSen morphological analysis program to decompose Japanese
+          text in words and to derive the base form of inflected words.
+          It is slower than the Kanji parser, but will annotate hiragana words as
+          well as kanji and katakana words. It also does a better job of deinflecting verbs and
+          adjectives. You can download ChaSen
+          from <ulink url="http://chasen.aist-nara.ac.jp/">http://chasen.aist-nara.ac.jp/</ulink>.
+          After installation, you have to set the path to the chasen executable in the 
+          <link linkend="sect.prefs.general">preferences dialog</link>. It is usually
+          <filename>/usr/local/bin/chasen</filename> under Unix or 
+          <filename>c:\Program Files\chasen21\chasen.exe</filename> under Windows.
+        </para>
+        <para>
+          The ChaSen program is used to generate a list of words with their reading and base form for
+          the parsed text. The words will be looked up in the dictionaries, and if an entry is
+          found, an annotation will be generated. If no dictionary entry is found and the word
+          is not inflected, kanji substrings will be tried. A reading annotation with the reading
+          output by ChaSen is also added. Since the ChaSen program uses its own dictionaries to detect
+          words, it might not recognize words which are found in the dictionaries used by JGloss
+          but not in the ChaSen dictionaries.
+        </para>
+        <note>
+          <para>
+            On Windows systems, an empty console window is visible while ChaSen is running, unless
+            JGloss is started from the command line. Under Windows 98, the ChaSen program does not
+            correctly terminate. You will have to close the ChaSen window manually after the text
+            is parsed.
+          </para>
+        </note>
+      </sect2>
+    </sect1>
+
     <sect1 id="sect.preferences"><title>The Preferences Dialog</title>
       <para>
         The preferences dialog contains four panels, one with general preferences,
@@ -806,7 +850,14 @@
         <para>
           You can select the window opened on startup with the 
           <guilabel>Open empty JGloss document</guilabel> and 
-          <guilabel>Open Word Lookup dialog</guilabel> radio buttons.
+          <guilabel>Open Word Lookup dialog</guilabel> radio buttons. The text parser used when
+          importing the clipboard content can be selected in the 
+          <guilabel>Import Clipboard Parser</guilabel> section of the dialog. See 
+          <xref linkend="sect.parser"> for details. You can set the location of the
+          ChaSen parser program in the <guilabel>ChaSen executable</guilabel> text field.
+          If the program can not be found, the ChaSen parser will not be available.
+        </para>
+        <para>
           If you select the <guilabel>Enable direct editing</guilabel> checkbox, you can
           edit the text in the document view like you would in a text editor. Unfortunately
           this function does not work very well and you should save the document before enabling
@@ -974,11 +1025,12 @@
           <varlistentry><term>Annotate Selection</term>
             <listitem>
               <para>
-                This will let you add an annotation to the currently selected text. A
-                dialog will pop up where you can edit the word for the dictionary lookup,
-                <abbrev>e. g.</abbrev> change a verb to the dictionary form. This word
-                will then be looked up in the dictionaries and an annotation will be added
-                with the result of the lookup.
+                This will let you add an annotation to the currently selected text.
+                The <link linkend="sect.wordlookup">Word Lookup dialog</link> will be opened
+                and show the selected word. You can edit the word and search it in the dictionaries.
+                If you hit the <guibutton>Annotate</guibutton> button, the word in the document
+                will be annotated with the current search result. Hit
+                <guibutton>Cancel</guibutton> to not annotate the word.
               </para>
               <note>
                 <para>
@@ -995,7 +1047,9 @@
             <listitem>
               <para>
                 Selecting this item will show the word lookup dialog (see 
-                <xref linkend="sect.wordlookup">).
+                <xref linkend="sect.wordlookup">). If some text is selected in the current
+                document, this text will be automatically searched using the current dialog 
+                settings.
               </para>
             </listitem>
           </varlistentry>
@@ -1200,6 +1254,12 @@
           <ulink url="http://ftp.cc.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil">EDICT 
             and KANJIDIC dictionaries
           </ulink>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The <ulink url="http://chasen.aist-nara.ac.jp/">ChaSen</ulink> morphological analysis
+          tool.
         </para>
       </listitem>
       <listitem>

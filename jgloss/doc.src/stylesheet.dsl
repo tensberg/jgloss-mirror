@@ -43,7 +43,10 @@
    (normalize "copyright")
    (normalize "publisher")))
 
+
 <![%print;[
+
+(define (toc-depth nd) 3)
 
 (define %footnote-ulinks%
   ;; Generate footnotes for ULinks?
@@ -59,8 +62,8 @@
 
 (define %html-ext% ".html")
 (define %root-filename% "index")
-;;(define nochunks #t)
-;;(define rootchunk #t)
+(define nochunks #t)
+(define rootchunk #t)
 
 (define (toc-depth nd) 2)
 

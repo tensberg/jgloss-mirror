@@ -31,33 +31,6 @@ import java.util.*;
  * @author Michael Koch
  */
 public class StringTools {
-    public static void main( String[] args) {
-        System.out.println( "\u6f22\u5b57");
-        splitWordReading( "\u6f22\u5b57", "\u304b\u3093\u3058");
-        System.out.println( "\u601d\u3046");
-        splitWordReading( "\u601d\u3046", "\u304a\u3082\u3046");
-        System.out.println( "\u601d\u3044\u51fa");
-        splitWordReading( "\u601d\u3044\u51fa", "\u304a\u3082\u3044\u3067");
-        System.out.println( "\u601d\u3044\u51fa\u3059");
-        splitWordReading( "\u601d\u3044\u51fa\u3059", "\u304a\u3082\u3044\u3060\u3059");
-        System.out.println( "\u3044\u3044\u52a0\u6e1b");
-        splitWordReading( "\u3044\u3044\u52a0\u6e1b", "\u3044\u3044\u304b\u3052\u3093");
-
-        System.out.println( "\u75db\u3044");
-        splitWordReading( "\u75db\u3044", "\u75db\u3044", "\u3044\u305f\u3044");
-        System.out.println( "\u75db\u304f");
-        splitWordReading( "\u75db\u304f", "\u75db\u3044", "\u3044\u305f\u3044");
-    }
-    
-    private static void print( String[][] s) {
-        for ( int i=0; i<s.length; i++) {
-            System.out.print( s[i][0]);
-            if (s[i].length > 1)
-                System.out.print( "(" + s[i][1] + ")");
-            System.out.println();
-        }
-    }
-
     /**
      * Returns the unicode block of a character. The test is optimized to work faster than
      * <CODE>Character.UnicodeBlock.of</CODE> for Japanese characters, but will work slower
@@ -129,22 +102,51 @@ public class StringTools {
         return out.toString();
     }
 
+    /**
+     * Test if a string contains any kanji characters. The test is done using the 
+     * {@link isKanji(char) isKanji} method.
+     */
+    public static boolean containsKanji( String word) {
+        for ( int i=0; i<word.length(); i++) {
+            if (isKanji( word.charAt( i)))
+                return true;
+        }
+
+        return false;
+    }
+
     public static String[][] splitWordReading( String word, String reading) {
         return splitWordReading( word, word, reading);
     }
 
+    /**
+     * Split a kanji/kana compound word in kanji and kana parts. Readings are added to the kanji
+     * substrings. To decide which reading each kanji substring has, hiragana substrings in the
+     * kanji/kana words are searched in the reading string, and the remaining parts are interpreted
+     * as reading of the kanji substrings.
+     *
+     * @param inflectedWord Inflected form of the kanji/kana word. Everything after the last kanji
+     *        character is treated as inflected form and added to the output array as last element.
+     * @param baseWord Dictionary form of the kanji/kana word.
+     * @param baseReading Reading (in hiragana) of the word in base form.
+     * @return Array with the word split in kanji/kana substrings. For every kanji substring, a
+     *         kanji/reading string pair is contained in the array. For every kana substring,
+     *         a single string is contained.
+     */
     public static String[][] splitWordReading( String inflectedWord, String baseWord, String baseReading) {
-        System.out.println( "splitting " + inflectedWord + "/" + baseWord + "/" + baseReading);
+        System.err.println( "splitting " + inflectedWord + "/" + baseWord + "/" + baseReading);
         List result = new ArrayList( baseWord.length()/2);
         int hStart = 0; // hiragana start
-        int hEnd;
+        int hEnd; // hiragana end
         int kStart = 0; // kanji start
         int kStartReading = 0; // kanji start in reading string
         int hStartReading = 0; // hiragana start in reading
         do {
+            // search start of hiragana substring
             while (hStart<baseWord.length() && !isHiragana( baseWord.charAt( hStart)))
                 hStart++;
             hEnd = hStart + 1;
+            // search end of hiragana substring
             while (hEnd<baseWord.length() && isHiragana( baseWord.charAt( hEnd)))
                 hEnd++;
 
@@ -201,7 +203,18 @@ public class StringTools {
 
         String[][] out = new String[result.size()][];
         out = (String[][]) result.toArray( out);
+
         print( out);
+        
         return out;
+    }
+
+    private static void print( String[][] s) {
+        for ( int i=0; i<s.length; i++) {
+            System.err.print( s[i][0]);
+            if (s[i].length > 1)
+                System.err.print( "(" + s[i][1] + ")");
+            System.err.println();
+        }
     }
 } // class StringTools
