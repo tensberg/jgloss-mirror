@@ -110,6 +110,7 @@ public class Preferences {
         "export.latex.writehidden";    
 
     public static final String EXCLUSIONS_FILE = "exclusions.file";
+    public static final String USERDICTIONARY_FILE = "userdictionary.file";
 
     /**
      * Path to the user preferences file.

@@ -56,9 +56,17 @@ public class Dictionaries extends Box {
      * from the list displayed to the user if he has not yet applied changes.
      */
     private DefaultListModel dictionariesOrig;
+    /**
+     * An EDICT editable by the user.
+     */
+    private UserDictionary userDictionary;
+    /**
+     * Implementation used to create the user dictionary.
+     */
+    private UserDictionary.Implementation userDictImplementation;
 
     /**
-     * Wrapper for a dictionary and its descriptor. Used as elements in the list model
+     * Wrapper for a dictionary and its descriptor. Used as elements in the list model.
      */
     private class DictionaryWrapper {
         /**
@@ -108,6 +116,14 @@ public class Dictionaries extends Box {
         }
 
         return out;
+    }
+
+    /**
+     * Returns the user dictionary. If the user dictionary creation failed <CODE>null</CODE>
+     * will be returned.
+     */
+    public static UserDictionary getUserDictionary() {
+        return getComponent().userDictionary;
     }
 
     /**
@@ -188,7 +204,11 @@ public class Dictionaries extends Box {
                             down.setEnabled( true);
                         else
                             down.setEnabled( false);
-                        remove.setEnabled( true);
+                        if (((DictionaryWrapper) dictionaries.getSelectedValue()).dictionary !=
+                            userDictionary)
+                            remove.setEnabled( true);
+                        else
+                            remove.setEnabled( false);
                     }
                 }
             });
@@ -197,6 +217,11 @@ public class Dictionaries extends Box {
         add( scroller);
         add( Box.createHorizontalStrut( 5));
         add( p);
+
+        userDictImplementation = new UserDictionary.Implementation
+            ( System.getProperty( "user.home") + File.separator +
+              JGloss.prefs.getString( Preferences.USERDICTIONARY_FILE));
+        DictionaryFactory.registerImplementation( UserDictionary.class, userDictImplementation);
     }
 
     /**
@@ -310,8 +335,18 @@ public class Dictionaries extends Box {
                 String[] fs = p.getPaths( Preferences.DICTIONARIES);
                 for ( int i=0; i<fs.length; i++) {
                     Dictionary d = loadDictionary( fs[i]);
-                    if (d != null)
+                    if (d != null) {
                         dictionariesOrig.addElement( new DictionaryWrapper( fs[i], d));
+                        if (d instanceof UserDictionary)
+                            userDictionary = (UserDictionary) d;
+                    }
+                }
+                if (userDictionary == null) {
+                    userDictionary = (UserDictionary) 
+                        loadDictionary( userDictImplementation.getDescriptor());
+                    if (userDictionary != null)
+                        dictionariesOrig.insertElementAt( new DictionaryWrapper
+                            ( userDictImplementation.getDescriptor(), userDictionary), 0);
                 }
             }
             

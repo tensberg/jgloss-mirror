@@ -216,6 +216,7 @@ annotationeditor.menu.show=Show Annotation
 annotationeditor.menu.remove=Remove Annotation
 annotationeditor.menu.removeduplicates=Remove Anno. & Duplicates
 annotationeditor.menu.addtoexclusions=Add to Exclusions
+annotationeditor.menu.addtodictionary=Add to Dictionary
 annotationeditor.menu.add=Add Annotation
 annotationeditor.menu.hideduplicates=Hide all Duplicates
 annotationeditor.menu.unhide=Show all Annotations
@@ -230,6 +231,7 @@ annotationeditor.action.meta.ak=released SPACE
 annotationeditor.action.remove.ak=R
 annotationeditor.action.removeduplicates.ak=D
 annotationeditor.action.addtoexclusions.ak=E
+annotationeditor.action.addtodictionary.ak=U
 annotationeditor.action.hide.ak=H
 
 export.encodings=Encoding:
@@ -261,3 +263,6 @@ encodings.default=<auto>
 pasteimport.title=JGloss Import
 pasteimport.description=Text pasted in this area will be imported\nin a new JGloss document.
 pasteimport.standby=Please wait while the document is opened.
+
+userdictionary.name=user dictionary
+userdictionary.instance.name=User dictionary (editable EDICT)
