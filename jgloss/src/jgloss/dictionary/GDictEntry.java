@@ -54,6 +54,8 @@ public class GDictEntry extends DefaultDictionaryEntry {
 
         public String getReading() { return reading; }
         public List getTranslations() { return translations; }
+
+        public String toString() { return DefaultDictionaryEntry.toString( this); }
     } // class DictionaryEntryWrapper
 
     /**
@@ -63,21 +65,51 @@ public class GDictEntry extends DefaultDictionaryEntry {
      */
     protected String[][] words;
     /**
-     * Part of speech of this entry.
-     */
-    protected String partOfSpeech;
-    /**
      * Marks where distinct ranges of meaning end in the translation array. If there is only
      * one range of meaning for all translations, <code>rangesOfMeaning</code> has length 0,
      * otherwise the <code>rangesOfMeaning[i]<code> is the first index of the i+2-th range of meaning
      * int the <code>translations</code> array
      */
     protected int[] rangesOfMeaning;
+    /**
+     * Part of speech of this entry.
+     */
+    protected String partOfSpeech;
     protected String comment;
     protected String reference;
 
-    public GDictEntry() {
-        super( null, null, null, null);
+    /**
+     * Creates a new dictionary entry.
+     *
+     * @param wordlist List of lists which each hold a word with alternative spellings.
+     * @param reading The reading of the words. May be <code>null</code>.
+     * @param translations List of translations.
+     * @param rangesOfMeaning Indexes in the translation list for the start of new ranges of meaning
+     *        for translations. The beginning index of the second range of meaning is stored in
+     *        <code>rangesOfMeaning[0]</code>. If there is only one range of meaning, <code>null</code>
+     *        may be passed.
+     * @param partOfSpeech Part of speech of this entry. May be <code>null</code>.
+     * @param comment An explanation of the entry. May be <code>null</code>.
+     * @param reference A reference to other entries. May be <code>null</code>.
+     * @param dictionary Dictionary which contains this entry.
+     */
+    public GDictEntry( List wordlist, String reading, List translations, int[] rangesOfMeaning,
+                       String partOfSpeech, String comment, String reference, 
+                       Dictionary dictionary) {
+        super( null, reading, translations, dictionary);
+        words = new String[wordlist.size()][];
+        int c = 0;
+        for ( Iterator i=wordlist.iterator(); i.hasNext(); ) {
+            List alternatives = (List) i.next();
+            words[c++] = (String[]) alternatives.toArray( new String[alternatives.size()]);
+        }
+        if (rangesOfMeaning == null)
+            this.rangesOfMeaning = new int[0];
+        else
+            this.rangesOfMeaning = rangesOfMeaning;
+        this.partOfSpeech = partOfSpeech;
+        this.comment = comment;
+        this.reference = reference;
     }
 
     /**
@@ -180,7 +212,7 @@ public class GDictEntry extends DefaultDictionaryEntry {
         out.append( ' ');
         for ( int i=0; i<getRangesOfMeaningCount(); i++) {
             if (getRangesOfMeaningCount() > 1) {
-                out.append( '[');
+                out.append( "[");
                 out.append( i+1);
                 out.append( "] ");
             }

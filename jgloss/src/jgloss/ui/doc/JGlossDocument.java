@@ -412,7 +412,12 @@ public class JGlossDocument extends HTMLDocument {
                         DictionaryEntry de = tr.getDictionaryEntry();
                         reading = de.getReading(); // dictionary form of reading, real reading for
                                                    // inflected verbs will be derived further down
-                        translation = (String) de.getTranslations().get( 0);
+                        try {
+                            translation = (String) de.getTranslations().get( 0);
+                        } catch (IndexOutOfBoundsException ex) {
+                            ex.printStackTrace();
+                            System.err.println( de.toString());
+                        }
                         if (!de.getWord().equals( word)) {
                             dictionaryWord = de.getWord();
                             dictionaryReading = de.getReading();

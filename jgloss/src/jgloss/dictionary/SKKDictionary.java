@@ -240,7 +240,7 @@ public class SKKDictionary implements Dictionary {
      * @see Dictionary
      * @see WordReadingPair
      */
-    public List search( String expression, short mode) throws SearchException {
+    public List search( String expression, short searchmode, short resultmode) throws SearchException {
         List result = new LinkedList();
 
         Object o = entries.get( expression);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -73,45 +73,6 @@ public abstract class TextAnnotationCodec {
      * Remembers all dictionary names so far and the NullDictionaries created for them.
      */
     private static Map dictionaries = new HashMap();
-
-    /**
-     * A dummy dictionary which is only stores the dictionary name. Instances of this
-     * class are used when reconstructing the dictionary from an annotation encoded as string.
-     *
-     * @author Michael Koch
-     */
-    private static class NullDictionary implements jgloss.dictionary.Dictionary {
-        /**
-         * Name of the dictionary.
-         */
-        private String name;
-
-        /**
-         * Construct a new dummy dictionary with the given name.
-         *
-         * @param name The name of this dictionary.
-         */
-        public NullDictionary( String name) {
-            this.name = name;
-        }
-
-        /**
-         * Does a dictionary search. Since this is a dummy dictionary, it will always return the
-         * empty list.
-         */
-        public java.util.List search( String expression, short mode) throws SearchException {
-            return java.util.Collections.EMPTY_LIST;
-        }
-
-        /**
-         * Returns the name of the dictionary.
-         *
-         * @return The name of the dictionary.
-         */
-        public String getName() { return name; }
-
-        public void dispose() {}
-    }
 
     /**
      * Used to store annotation types unknown to the JGloss application. This is used to

@@ -512,7 +512,7 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
         }
 
         // if we get here, it was not in the cache
-        result = d.search( word, Dictionary.SEARCH_EXACT_MATCHES);
+        result = d.search( word, Dictionary.SEARCH_EXACT_MATCHES, Dictionary.RESULT_DICTIONARY_ENTRIES);
         if (lookupCache != null) {
             if (result.size() > 0)
                 lookupCache.put( key, result);

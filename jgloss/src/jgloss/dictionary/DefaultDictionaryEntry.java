@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -59,17 +59,31 @@ public class DefaultDictionaryEntry implements DictionaryEntry {
      * @param word The Japanese word of this entry.
      * @param reading The reading of this word. May be <CODE>null</CODE> if this word contains no
      *                kanji.
+     * @param translation List of translations for this entry. The list is not copied but used as is.
+     * @param dictionary Dictionary which contains this entry.
+     */
+    public DefaultDictionaryEntry( String word, String reading, List translations, 
+                                   Dictionary dictionary) {
+        this.word = word;
+        this.reading = reading;
+        this.translations = translations;
+        this.dictionary = dictionary;
+    }
+
+    /**
+     * Creates a new dictionary entry.
+     *
+     * @param word The Japanese word of this entry.
+     * @param reading The reading of this word. May be <CODE>null</CODE> if this word contains no
+     *                kanji.
      * @param translation Array of translations for this entry.
      * @param dictionary Dictionary which contains this entry.
      */
     public DefaultDictionaryEntry( String word, String reading, String[] translations, 
                                    Dictionary dictionary) {
-        this.word = word;
-        this.reading = reading;
-        this.translations = new ArrayList( translations.length);
+        this( word, reading, new ArrayList( translations.length), dictionary);
         for ( int i=0; i<translations.length; i++)
             this.translations.add( translations[i]);
-        this.dictionary = dictionary;
     }
 
     /**
@@ -100,26 +114,28 @@ public class DefaultDictionaryEntry implements DictionaryEntry {
     public Dictionary getDictionary() { return dictionary; }
 
     /**
-     * Returns a string representation of this entry.
-     *
-     * @return A string representation of this entry.
+     * Returns a string representation of a dictionary entry.
      */
-    public String toString() {
+    public static String toString( DictionaryEntry entry) {
         StringBuffer out = new StringBuffer( 128);
-        out.append( word);
-        if (reading != null) {
+        out.append( entry.getWord());
+        if (entry.getReading() != null) {
             out.append( " \uff08");
-            out.append( reading);
+            out.append( entry.getReading());
             out.append( '\uff09');
         }
         out.append( ' ');
-        for ( Iterator i=translations.iterator(); i.hasNext(); ) {
+        for ( Iterator i=entry.getTranslations().iterator(); i.hasNext(); ) {
             out.append( i.next().toString());
             if (i.hasNext())
                 out.append( "; ");
         }
 
         return out.toString();
+    }
+
+    public String toString() {
+        return toString( this);
     }
 
     /**

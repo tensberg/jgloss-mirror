@@ -48,7 +48,7 @@ public class EDict implements Dictionary {
             s.add( line);
         }
         System.err.println( "Lines read: " + s.size());
-        List l = e.search( "year", SEARCH_ANY_MATCHES);
+        List l = e.search( "year", SEARCH_ANY_MATCHES, RESULT_DICTIONARY_ENTRIES);
         System.err.println( "Matches found: " + l.size());
         for ( Iterator i=l.iterator(); i.hasNext(); ) {
             String next = i.next().toString();
@@ -247,7 +247,7 @@ public class EDict implements Dictionary {
      * @see Dictionary
      * @see DictionaryEntry
      */
-    public List search( String expression, short mode) throws SearchException {
+    public List search( String expression, short searchmode, short resultmode) throws SearchException {
         List result = new LinkedList();
 
         // do a binary search through the index file
@@ -272,8 +272,8 @@ public class EDict implements Dictionary {
                     int start = index[match];
 
                     // test if entry matches search mode
-                    if (mode == SEARCH_EXACT_MATCHES ||
-                        mode == SEARCH_STARTS_WITH) {
+                    if (searchmode == SEARCH_EXACT_MATCHES ||
+                        searchmode == SEARCH_STARTS_WITH) {
                         // test if preceeding character marks beginning of word entry
                         if (start > 0) {
                             switch (dictionary[start-1]) {
@@ -287,8 +287,8 @@ public class EDict implements Dictionary {
                             }
                         }
                     }
-                    if (mode == SEARCH_EXACT_MATCHES ||
-                        mode == SEARCH_ENDS_WITH) {
+                    if (searchmode == SEARCH_EXACT_MATCHES ||
+                        searchmode == SEARCH_ENDS_WITH) {
                         // test if preceeding character marks beginning of word entry
                         if (start+expr_euc.length < dictionaryLength) { 
                             switch (dictionary[start+expr_euc.length]) {

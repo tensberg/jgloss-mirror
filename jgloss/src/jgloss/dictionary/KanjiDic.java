@@ -454,26 +454,18 @@ public class KanjiDic implements Dictionary {
      * Searches for an entry matching expression. Currently only exact match searches are
      * fully supported, the other search modes will return a superset of exact match search,
      * but not all matches which should be returned.
-     *
-     * @return A list of dictionary entries or word-reading pairs.
-     *         If no match is found, the empty list will be returned.
-     *         For entries with translations, <CODE>DictionaryEntries</CODE> will be created,
-     *         otherwise <CODE>WordReadingPairs</CODE> will be used.
-     * @see Dictionary
-     * @see DictionaryEntry
-     * @see WordReadingPair
      */
-    public List search( String expression, short mode) {
-        List result = new LinkedList();
+    public List search( String expression, short searchmode, short resultmode) {
+        List result = new ArrayList( 10);
 
         Object o = entries.get( expression);
         if (o != null) {
             if (o instanceof List) // list of entries
                 for ( Iterator i=((List) o).iterator(); i.hasNext(); ) {
-                    constructResult( expression, result, (String) i.next(), mode);
+                    constructResult( expression, result, (String) i.next(), searchmode, resultmode);
                 }
             else { // single entry
-                constructResult( expression, result, (String) o, mode);
+                constructResult( expression, result, (String) o, searchmode, resultmode);
             }
         }
 
@@ -487,9 +479,10 @@ public class KanjiDic implements Dictionary {
      * @param expression The expression which is looked up.
      * @param r List of results to which the created objects are added.
      * @param e The entry for which the objects will be created.
-     * @param mode The search mode.
+     * @param searchmode The search mode.
      */
-    protected void constructResult( String expression, List r, String entry, short mode) {
+    protected void constructResult( String expression, List r, String entry, short searchmode,
+                                    short resultmode) {
         Entry e = new Entry( entry);
         final String kanji = new String( new char[] { e.getKanji() });
         boolean kanjiMatches = kanji.equals( expression);
@@ -516,7 +509,7 @@ public class KanjiDic implements Dictionary {
                     if (!(kanjiMatches || translationMatches))
                         readingMatches = expression.equals( de.getReading()) ||
                             expression.equals( de.getWord());
-                    if ((kanjiMatches && (mode==SEARCH_STARTS_WITH || mode==SEARCH_ANY_MATCHES ||
+                    if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
                                           de.getWord().equals( kanji))) || 
                         translationMatches || readingMatches)
                         r.add( de);
@@ -532,7 +525,7 @@ public class KanjiDic implements Dictionary {
                     if (!kanjiMatches)
                         readingMatches = expression.equals( wrp.getReading()) ||
                             expression.equals( wrp.getWord());
-                    if ((kanjiMatches && (mode==SEARCH_STARTS_WITH || mode==SEARCH_ANY_MATCHES ||
+                    if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
                                           wrp.getWord().equals( kanji))) ||
                         readingMatches)
                         r.add( wrp);
@@ -549,7 +542,7 @@ public class KanjiDic implements Dictionary {
                 if (!kanjiMatches)
                     readingMatches = expression.equals( de.getReading()) ||
                         expression.equals( de.getWord());
-                if ((kanjiMatches && (mode==SEARCH_STARTS_WITH || mode==SEARCH_ANY_MATCHES ||
+                if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
                                       de.getWord().equals( kanji))) || readingMatches)
                     r.add( de);
             }
@@ -562,7 +555,7 @@ public class KanjiDic implements Dictionary {
             if (!kanjiMatches)
                 readingMatches = expression.equals( de.getReading()) ||
                     expression.equals( de.getWord());
-            if ((kanjiMatches && (mode==SEARCH_STARTS_WITH || mode==SEARCH_ANY_MATCHES ||
+            if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
                                   de.getWord().equals( kanji))) || readingMatches)
                 r.add( de);
         }

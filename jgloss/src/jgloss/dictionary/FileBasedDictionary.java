@@ -282,7 +282,7 @@ public abstract class FileBasedDictionary implements Dictionary {
      */
     public abstract String getEncoding();
 
-    public List search( String expression, short mode) throws SearchException {
+    public List search( String expression, short searchmode, short resultmode) throws SearchException {
         List result = new ArrayList( 10);
 
         // do a binary search through the index file
@@ -307,14 +307,14 @@ public abstract class FileBasedDictionary implements Dictionary {
                     int start = index.get( match);
 
                     // test if entry matches search mode
-                    if (mode == SEARCH_EXACT_MATCHES ||
-                        mode == SEARCH_STARTS_WITH) {
+                    if (searchmode == SEARCH_EXACT_MATCHES ||
+                        searchmode == SEARCH_STARTS_WITH) {
                         // test if preceeding character marks beginning of word entry
                         if (start>0 && !isEntryStart( start))
                             continue;
                     }
-                    if (mode == SEARCH_EXACT_MATCHES ||
-                        mode == SEARCH_ENDS_WITH) {
+                    if (searchmode == SEARCH_EXACT_MATCHES ||
+                        searchmode == SEARCH_ENDS_WITH) {
                         // test if following character marks end of word entry
                         if (start+exprBytes.length+1<dicchannel.size() &&
                             !isEntryEnd( start+exprBytes.length))
@@ -358,7 +358,8 @@ public abstract class FileBasedDictionary implements Dictionary {
                         entrybuf.get( chars);
                         entry = new String( chars, getEncoding());
                     }
-                    parseEntry( result, entry);
+                    parseEntry( result, entry, start, index.get( match), expression, exprBytes,
+                                searchmode, resultmode);
                 }
             }
         } catch (IOException ex) {
@@ -395,9 +396,24 @@ public abstract class FileBasedDictionary implements Dictionary {
 
     /**
      * Create <CODE>DictionaryEntries</CODE> from the entry string and add them to the
-     * result list.
+     * result list. The parsing may create more than one dictionary entry. The method is
+     * passed information about what was matched and where in the dictionary the match was
+     * found so it can decide which entries to add.
+     *
+     * @param result List to which new dictionary entries should be added.
+     * @param entry String from the dictionary file from which the dictionary entries should be
+     *              created.
+     * @param entrystart Position in the dictionary of the first byte of the entry.
+     * @param where Position in the dictionary where the expression was found.
+     * @param expression The expression searched.
+     * @param expBytes Byte array containing the expression encoded using the dictionary's character
+     *                 encoding.
+     * @param searchmode The search mode.
+     * @param resultmode Determines the wanted type of results.
      */
-    protected abstract void parseEntry( List result, String entry);
+    protected abstract void parseEntry( List result, String entry, int entrystart, int where,
+                                        String expression, byte[] exprBytes, short searchmode,
+                                        short resultmode);
 
     /**
      * Returns the index of an index entry which matches a word. If there is more than one match,
@@ -707,12 +723,12 @@ public abstract class FileBasedDictionary implements Dictionary {
      */
     protected int compare( byte[] str, int off) {
         ByteConverterState state = newByteConverterState();
-        dictionary.position( off);
+
         for ( int i=0; i<str.length; i++) {
             int b1 = convertByteInChar( byteToUnsignedByte( str[i]), false, state);
             int b2;
             try {
-                b2 = convertByteInChar( byteToUnsignedByte( dictionary.get()), true, state);
+                b2 = convertByteInChar( byteToUnsignedByte( dictionary.get( off+i)), true, state);
             } catch (BufferUnderflowException ex) {
                 // end of dictionary file, dictionary string is prefix of str
                 return 1;

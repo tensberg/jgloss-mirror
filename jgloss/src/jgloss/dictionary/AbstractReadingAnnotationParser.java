@@ -36,14 +36,9 @@ public abstract class AbstractReadingAnnotationParser extends AbstractParser
      * Dummy dictionary which is used for Readings constructed from reading anntoations found in
      * the document. This is used to return a descriptive name for the dictionary.
      */
-    public static Dictionary DOCUMENT_DICTIONARY = new Dictionary() {
-            public final String DOCUMENT_DICTIONARY_NAME = 
-                ResourceBundle.getBundle( "resources/messages-dictionary")
-                .getString( "parser.dictionary.document");
-            public String getName() { return DOCUMENT_DICTIONARY_NAME; }
-            public List search( String expression, short mode) { return null; }
-            public void dispose() {}
-        };
+    public static Dictionary DOCUMENT_DICTIONARY = new NullDictionary
+        ( ResourceBundle.getBundle( "resources/messages-dictionary")
+          .getString( "parser.dictionary.document"));
 
     /**
      * Character which signals the beginning of a reading annotation for a kanji word.

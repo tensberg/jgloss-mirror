@@ -316,8 +316,9 @@ public class EditableEDict extends EDict {
      * @see Dictionary
      * @see DictionaryEntry
      */
-    public synchronized List search( String expression, short mode) throws SearchException {
-        return super.search( expression, mode);
+    public synchronized List search( String expression, short searchmode, short resultmode)
+        throws SearchException {
+        return super.search( expression, searchmode, resultmode);
     }
 
     /**

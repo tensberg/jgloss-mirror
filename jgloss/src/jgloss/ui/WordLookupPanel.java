@@ -86,25 +86,15 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
      */
     protected int resultLimit;
 
-    /**
-     * List holding the result of the last dictionary lookup.
-     */
-    protected java.util.List lastResult = Collections.EMPTY_LIST;
-    protected boolean keepLastResult;
-
     protected XCVManager xcvManager;
 
     protected Dimension preferredSize;
 
     /**
      * Creates a new word lookup panel.
-     *
-     * @param keepLastResult Flag if the user's last search result should be remembered for retrieval
-     *                       using {@link #getLastResult() getLastResult}.
      */
-    public WordLookupPanel( boolean keepLastResult) {
+    public WordLookupPanel() {
         this.resultLimit = JGloss.prefs.getInt( Preferences.WORDLOOKUP_RESULTLIMIT, 500);
-        this.keepLastResult = keepLastResult;
 
         setLayout( new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -379,15 +369,31 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
     }
 
     /**
-     * Looks up the current selection.
+     * Looks up the current selection using the search parameters set in the dialog.
+     *
+     * @param resultmode Determines the object types in the result list.
+     * @return List of dictionary lookup results.
      */
-    protected void search() {
+    public List searchSelection( short resultmode) {
+        return searchSelection( resultmode, false);
+    }
+
+    /**
+     * Looks up the current selection using the search parameters set in the dialog.
+     *
+     * @param resultmode Determines the object types in the result list.
+     * @param markDictionaries If <code>true</code> and more than one dictionary is searched,
+     *        the name of each searched dictionary will be inserted in the list prior to the
+     *        search results for that dictionary.
+     * @return List of dictionary lookup results.
+     */
+    protected List searchSelection( short resultmode, boolean markDictionaries) {
         if (expression.getSelectedItem() == null)
-            return;
+            return Collections.EMPTY_LIST;
 
         String ex = expression.getSelectedItem().toString();
         if (ex.length() == 0)
-            return;
+            return Collections.EMPTY_LIST;
 
         short mode;
         if (exact.isSelected())
@@ -418,25 +424,31 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             }
         }
         
-        java.util.List result = new ArrayList( 500);
+        java.util.List result = new ArrayList( 50);
         if (allDictionaries.isSelected()) {
             Dictionary[] d = Dictionaries.getDictionaries( true);
             for ( int i=0; i<d.length; i++) {
-                result.add( d[i].getName()); // mark beginning of next dictionary in results
-                lookupAll( d[i], ex, conjugations, hiragana, mode, result);
+                if (markDictionaries)
+                    result.add( d[i].getName()); // mark beginning of next dictionary in results
+                lookupAll( d[i], ex, conjugations, hiragana, mode, resultmode, result, markDictionaries);
             }
         }
         else {
             lookupAll( (Dictionary) dictionaryChoice.getSelectedItem(),
-                       ex, conjugations, hiragana, mode, result);
+                       ex, conjugations, hiragana, mode, resultmode, result, markDictionaries);
         }
         
+        return result;
+    }
+
+    protected void search() {
+        List result = searchSelection( Dictionary.RESULT_NATIVE, true);
+        String ex = expression.getSelectedItem().toString();
+
         // generate result text
         StringBuffer resultText = new StringBuffer( result.size()*30);
         boolean useHTML = (result.size() < resultLimit);
         int results = 0; // number of result entries without dictionary names
-        if (keepLastResult)
-            lastResult = new ArrayList( result.size());
         for ( Iterator i=result.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (o instanceof String) { // dictionary name
@@ -464,8 +476,6 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             }
             else { // dictionary entry
                 results++;
-                if (keepLastResult)
-                    lastResult.add( o);
                 WordReadingPair wrp = (WordReadingPair) o;
                 if (useHTML) {
                     StringBuffer match = new StringBuffer( wrp.toString());
@@ -575,20 +585,24 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
      *                 matches the dictionary form will be used.
      * @param mode Search mode.
      * @param result List of dictionary entries matching the search expression.
+     * @param addConjugations If <code>true</code>, the conjugation used to derive the search result will
+     *                        be inserted in the list of results.
      * @return Number of entries found.
      */
     protected int lookupAll( Dictionary dic, String expression, Conjugation[] conjugations, 
-                              String hiragana, short mode, java.util.List result) {
+                             String hiragana, short mode, short resultmode, java.util.List result,
+                             boolean addConjugations) {
         int results; // number of entry lines found
         
         if (conjugations == null)
-            results = lookupWord( dic, expression, null, mode, result);
+            results = lookupWord( dic, expression, null, mode, resultmode, result);
         else {
-            results = lookupWord( dic, expression + hiragana, null, mode, result);
+            results = lookupWord( dic, expression + hiragana, null, mode, resultmode, result);
             for ( int i=0; i<conjugations.length; i++) {
                 if (!conjugations[i].getDictionaryForm().equals( hiragana))
                     results += lookupWord( dic, expression + conjugations[i].getDictionaryForm(),
-                                           conjugations[i], mode, result);
+                                           addConjugations ? conjugations[i] : null, mode, 
+                                           resultmode, result);
             }
         }
 
@@ -606,9 +620,9 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
      * @return Number of entries found.
      */
     protected int lookupWord( Dictionary dic, String expression, Conjugation conjugation,
-                               short mode, java.util.List result) {
+                              short searchmode, short resultmode, java.util.List result) {
         try {
-            java.util.List entries = dic.search( expression, mode);
+            java.util.List entries = dic.search( expression, searchmode, resultmode);
             if (entries.size() > 0) {
                 if (conjugation != null)
                     result.add( conjugation);
@@ -644,14 +658,6 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
      * Returns the manager of the cut/copy/paste actions of this dialog.
      */
     public XCVManager getXCVManager() { return xcvManager; }
-
-    /**
-     * Returns the dictionary entries found in the last search. If there was no search,
-     * the empty list will be returned.
-     */
-    public java.util.List getLastResult() {
-        return lastResult;
-    }
 
     public Dimension getPreferredSize() {
         if (preferredSize == null)

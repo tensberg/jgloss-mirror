@@ -50,11 +50,7 @@ public class ChasenParser extends AbstractParser {
     /**
      * Dummy dictionary which is used for Readings returned by chasen.
      */
-    public static Dictionary DOCUMENT_DICTIONARY = new Dictionary() {
-            public String getName() { return PARSER_NAME; }
-            public List search( String expression, short mode) { return null; }
-            public void dispose() {}
-        };
+    public static Dictionary DOCUMENT_DICTIONARY = new NullDictionary( PARSER_NAME);
 
     /**
      * Implementation of WordReadingPair which returns the <CODE>DOCUMENT_DICTIONARY</CODE> as
@@ -492,7 +488,8 @@ public class ChasenParser extends AbstractParser {
         if (result == null) {
             result = new ArrayList( dictionaries.length*2);
             for ( int i=0; i<dictionaries.length; i++) {
-                result.addAll( dictionaries[i].search( word, Dictionary.SEARCH_EXACT_MATCHES));
+                result.addAll( dictionaries[i].search( word, Dictionary.SEARCH_EXACT_MATCHES,
+                                                       Dictionary.RESULT_DICTIONARY_ENTRIES));
             }
             if (lookupCache != null) {
                 if (result.size() > 0)

@@ -151,7 +151,7 @@ public class JGlossEditor extends JTextPane {
                     }
                 };
             UIUtilities.initAction( cancelAction, "button.cancel");
-            wordlookup = new WordLookupPanel( true);
+            wordlookup = new WordLookupPanel();
 
             getContentPane().setLayout( new BorderLayout());
             getContentPane().add( wordlookup, BorderLayout.CENTER);
@@ -183,7 +183,7 @@ public class JGlossEditor extends JTextPane {
             WordLookupDialog.this.show();
             WordLookupDialog.this.dispose(); // works around a bug in the Java/KDE window manager interaction
             if (accepted)
-                return wordlookup.getLastResult();
+                return wordlookup.searchSelection( jgloss.dictionary.Dictionary.RESULT_DICTIONARY_ENTRIES);
             else
                 return null;
         }

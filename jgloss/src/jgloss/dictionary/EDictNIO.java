@@ -48,7 +48,7 @@ public class EDictNIO extends FileBasedDictionary {
         String line;
         while ((line = in.readLine()) != null) {
             List l = new java.util.ArrayList( 1);
-            dict.parseEntry( l, line);
+            dict.parseEntry( l, line, 0, 0, null, null, (short) 0, (short) 0);
             DictionaryEntry e = (DictionaryEntry) l.get( 0);
             StringBuffer entry = new StringBuffer( 128);
             entry.append( e.getWord());
@@ -114,10 +114,10 @@ public class EDictNIO extends FileBasedDictionary {
     private final static void test( String word, Dictionary d1, Dictionary d2, short mode) 
         throws SearchException {
         long t = System.currentTimeMillis();
-        List r1 = d1.search( word, mode);
+        List r1 = d1.search( word, mode, RESULT_DICTIONARY_ENTRIES);
         t1 += System.currentTimeMillis() - t;
         t = System.currentTimeMillis();
-        List r2 = d2.search( word, mode);
+        List r2 = d2.search( word, mode, RESULT_DICTIONARY_ENTRIES);
         t2 += System.currentTimeMillis() - t;
         //System.err.println( "Results: " + r1.size() + "/" + r2.size());
         java.util.Set s1 = new java.util.HashSet( r1.size()*2+1);
@@ -238,7 +238,8 @@ public class EDictNIO extends FileBasedDictionary {
      * <CODE>word [reading] /translation 1/translation2/...</CODE> with the reading
      * being optional.
      */
-    protected void parseEntry( List result, String entry) {
+    protected void parseEntry( List result, String entry, int entrystart, int where, String expression,
+                               byte[] exprBytes, short searchmode, short resultmode) {
         int j, k;
         // word:
         String word;

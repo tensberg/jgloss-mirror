@@ -47,6 +47,15 @@ public interface Dictionary {
      * Return all matches where the search string is a substring of the match.
      */
     short SEARCH_ANY_MATCHES = 3;
+    /**
+     * Results must be {@link WordReadingPair WordReadingPair} or 
+     * {@link DictionaryEntry DictionaryEntry} instances.
+     */
+    short RESULT_DICTIONARY_ENTRIES = 0;
+    /**
+     * Results can be in a format specified by the dictionary.
+     */
+    short RESULT_NATIVE = 1;
 
     /**
      * Returns a short descriptive name of the dictionary. For dictionaries based
@@ -60,17 +69,23 @@ public interface Dictionary {
      * Searches for entries in the dictionary.
      *
      * @param expression The string to search for.
-     * @param mode The search mode. One of <CODE>SEARCH_EXACT_MATCHES, SEARCH_STARTS_WITH,
-     *             SEARCH_ENDS_WITH</CODE> or <CODE>SEARCH_ANY_MATCHES</CODE>.
+     * @param searchmode Determines how the expression must match an entry.
+     *              One of {@link SEARCH_EXACT_MATCHES SEARCH_EXACT_MATCHES},
+     *              {@link SEARCH_STARTS_WITH SEARCH_STARTS_WITH},
+     *              {@link SEARCH_ENDS_WITH SEARCH_ENDS_WITH} or 
+     *              {@link SEARCH_ANY_MATCHES SEARCH_ANY_MATCHES}. Not every dictionary may support
+     *              all match modes.
+     * @param resultmode Determines the type of objects in the results list. One of
+     *             {@link RESULT_DICTIONARY_ENTRIES RESULT_DICTIONARY_ENTRIES} or
+     *             {@link RESULT_NATIVE RESULT_NATIVE}.
      * @return A list of dictionary entries which match the expression given the search modes.
-     *         Items in the list are instances of <CODE>WordReadingPair</CODE> or 
-     *         <CODE>DictionaryEntry</CODE> (note that <CODE>DictionaryEntry</CODE> implements
-     *         <CODE>WordReadingPair</CODE>). If no match is found, the empty list will be returned.
+     *         The type of objects in the list is determined by the result mode.
+     *         If no match is found, the empty list will be returned.
      * @exception SearchException if there was an error during the search.
      * @see DictionaryEntry
      * @see WordReadingPair
      */
-    List search( String expression, short mode) throws SearchException;
+    List search( String expression, short searchmode, short resultmode) throws SearchException;
 
     /**
      * Called when the dictionary is no longer needed. This gives the dictionary the

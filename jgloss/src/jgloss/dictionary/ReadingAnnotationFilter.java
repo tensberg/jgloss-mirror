@@ -49,14 +49,9 @@ public class ReadingAnnotationFilter {
      * Dummy dictionary which is used for Readings constructed from reading anntoations found in
      * the document. This is used to return a descriptive name for the dictionary.
      */
-    public static final Dictionary DOCUMENT_DICTIONARY = new Dictionary() {
-            public final String DOCUMENT_DICTIONARY_NAME = 
-                ResourceBundle.getBundle( "resources/messages-dictionary")
-                .getString( "parser.dictionary.document");
-            public String getName() { return DOCUMENT_DICTIONARY_NAME; }
-            public List search( String expression, short mode) { return null; }
-            public void dispose() {}
-        };
+    public static final Dictionary DOCUMENT_DICTIONARY = new NullDictionary
+        ( ResourceBundle.getBundle( "resources/messages-dictionary")
+          .getString( "parser.dictionary.document"));
 
     /**
      * Creates a reading annotation filter for a text which uses the specified characters as

@@ -80,7 +80,7 @@ public class WordLookup extends JFrame {
     public WordLookup() {
         super( JGloss.messages.getString( "wordlookup.title"));
 
-        wordlookup = new WordLookupPanel( false);
+        wordlookup = new WordLookupPanel();
         getContentPane().setLayout( new GridLayout( 1, 1));
         getContentPane().add( wordlookup);
 
