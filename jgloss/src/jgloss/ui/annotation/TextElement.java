@@ -50,15 +50,17 @@ class TextElement {
      */
     public void setText( String _text) {
         text = _text;
-        if (text==null || text.length()==0)
-            // a minimal text must always be set so that the element will not be deleted
-            text = JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER;
 
         try {
             int start = element.getStartOffset();
             int end = element.getEndOffset();
             Document doc = element.getDocument();
-            doc.insertString( end, text, element.getAttributes());
+
+            // a minimal text must always be set so that the element will not be deleted
+            String insert = (text==null || text.length()==0) ? 
+                JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER : text;
+            doc.insertString( end, insert, element.getAttributes());
+
             doc.remove( start, end-start);
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -26,88 +26,92 @@ package jgloss.ui;
 import jgloss.JGloss;
 import jgloss.JGlossApp;
 import jgloss.Preferences;
+import jgloss.parser.Parser;
+import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.export.ExportMenu;
-import jgloss.ui.xml.JGlossDocument;
-import jgloss.ui.xml.JGlossDocumentBuilder;
+import jgloss.ui.html.AnnotationTags;
 import jgloss.ui.html.JGlossEditor;
 import jgloss.ui.html.JGlossEditorKit;
 import jgloss.ui.html.JGlossHTMLDoc;
-import jgloss.ui.html.AnnotationTags;
-import jgloss.parser.Parser;
-import jgloss.parser.ReadingAnnotationFilter;
+import jgloss.ui.xml.JGlossDocument;
+import jgloss.ui.xml.JGlossDocumentBuilder;
 import jgloss.util.CharacterEncodingDetector;
 
-import java.awt.EventQueue;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.JobAttributes;
 import java.awt.PageAttributes;
 import java.awt.PrintJob;
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.Graphics;
-import java.awt.GridLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.DataFlavor;
-import java.beans.PropertyChangeListener;
+import java.awt.event.ComponentListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.util.LinkedList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.MalformedURLException;
-import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 
-import javax.swing.Action;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.WindowConstants;
-import javax.swing.JOptionPane;
-import javax.swing.ProgressMonitor;
 import javax.swing.JViewport;
-import javax.swing.JFileChooser;
-import javax.swing.text.Element;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.View;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.ProgressMonitor;
+import javax.swing.WindowConstants;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.View;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -122,7 +126,7 @@ import org.xml.sax.SAXException;
  * @author Michael Koch
  */
 public class JGlossFrame extends JPanel implements ActionListener, ListSelectionListener,
-                                                   HyperlinkListener {
+                                                   HyperlinkListener, CaretListener {
     /**
      * Collection of publically available actions.
      */
@@ -306,10 +310,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
     /**
      * Open recent menu used for JGloss documents. The instance is shared between instances of
-     * <CODE>JGlossFrame</CODE> and <CODE>WordLookup</CODE>.
+     * <CODE>JGlossFrame</CODE> and {@link LookupFrame LookupFrame}.
      */
     public final static OpenRecentMenu OPEN_RECENT = new OpenRecentMenu( 8);
 
+    /**
+     * Data model of this frame.
+     */
     private JGlossFrameModel model;
 
     /**
@@ -352,6 +359,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     private Transformer jglossWriterTransformer;
 
     /**
+     * Manager for the cut/copy/past actions;
+     */
+    private XCVManager xcvManager;
+
+    /**
      * Saves the document.
      */
     private Action saveAction;
@@ -367,6 +379,19 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * Closes this JGlossFrame.
      */
     private Action closeAction;
+    /**
+     * Action which annotates the current selection.
+     */
+    private Action addAnnotationAction;
+    /**
+     * Displays the document title and lets the user change it.
+     */
+    private Action documentTitleAction;
+    /**
+     * Brings the word lookup frame to the foreground and searches the current selection.
+     */
+    private Action wordLookupAction;
+
     /**
      * Open recent menu for this instance of <CODE>JGlossFrame</CODE>.
      */
@@ -428,12 +453,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * by using import or open actions.
      */
     public JGlossFrame() {
-        model = new JGlossFrameModel();
-
-        setLayout( new GridLayout( 1, 1));
-
         jglossFrames.add( this);
 
+        model = new JGlossFrameModel();
+
+        // set up the frame
         /* The JGlossFrame does not directly inherit from
          * JFrame, because memory profiling has shown that the JFrame objects are not correctly garbage
          * collected as expected (at least in JDK1.3). To keep the state associated with the JFrame objects
@@ -441,20 +465,72 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
          * See also JGlossFrame.dispose().
          */
         frame = new JFrame( JGloss.messages.getString( "main.title"));
+        frame.getContentPane().setBackground( Color.white);
+        frame.getContentPane().setLayout( new GridLayout( 1, 1));
+        frame.setLocation( JGloss.prefs.getInt( Preferences.FRAME_X, 0),
+                           JGloss.prefs.getInt( Preferences.FRAME_Y, 0));
+        frame.setSize( JGloss.prefs.getInt( Preferences.FRAME_WIDTH, frame.getPreferredSize().width),
+                       JGloss.prefs.getInt( Preferences.FRAME_HEIGHT, frame.getPreferredSize().height));
         
-        // set up the frame
-        annotationEditor = new AnnotationEditorPanel();
+        componentListener = new ComponentAdapter() {
+                public void componentMoved( ComponentEvent e) {
+                    JGloss.prefs.set( Preferences.FRAME_X, frame.getX());
+                    JGloss.prefs.set( Preferences.FRAME_Y, frame.getY());
+                }
+                public void componentResized( ComponentEvent e) {
+                    JGloss.prefs.set( Preferences.FRAME_WIDTH, frame.getWidth());
+                    JGloss.prefs.set( Preferences.FRAME_HEIGHT, frame.getHeight());
+                }
+            };
+        frame.addComponentListener( componentListener);
+        windowListener = new WindowAdapter() {
+                public void windowClosing( WindowEvent e) {
+                    synchronized (this) {
+                        if (deferWindowClosing) {
+                            // Another thread is currently executing loadDocument.
+                            // Defer the closing of the window until the frame object is in a safe state.
+                            // The loadDocument method is responsible for closing the window.
+                            deferWindowClosing = false;
+                        }
+                        else {
+                            if (askCloseDocument())
+                                closeDocument();
+                        }
+                    }
+                }
+            };
+        frame.addWindowListener( windowListener);
+        frame.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        // set up actions and menu
+        xcvManager = new XCVManager();
+        
+        Actions action = initActions();
+        frame.addWindowListener( actions.importClipboardListener);
+
+        // annotation list must be created before initMenuBar is called
         annotationList = new AnnotationList();
         annotationList.addListSelectionListener( this);
+
+        frame.setJMenuBar( initMenuBar( actions));
+
+        // set up the content of this component
+        setBackground( Color.white);
+        setLayout( new GridLayout( 1, 1));
+
+        annotationEditor = new AnnotationEditorPanel();
         docpane = new JGlossEditor( annotationList);
+        docpane.addCaretListener( this);
+        xcvManager.addManagedComponent( docpane);
         hyperlinker = new LookupResultList.Hyperlinker
             ( true, true, true, true, true);
-        lookupPanel = new SimpleLookup( null, hyperlinker);
+        lookupPanel = new SimpleLookup( new Component[] { new JButton( addAnnotationAction) },
+                                        hyperlinker);
         lookupPanel.addHyperlinkListener( this);
 
         JScrollPane annotationEditorScroller = 
             new JScrollPane( annotationEditor,
-                             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                              JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane annotationListScroller = 
             new JScrollPane( annotationList,
@@ -487,45 +563,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         splitPanes = new JSplitPane[] { split1, split2, split3 };
 
-        setBackground( Color.white);
-        frame.getContentPane().setBackground( Color.white);
-        frame.getContentPane().setLayout( new GridLayout( 1, 1));
+        // show the created frame
+        frame.show();
+    }
 
-        frame.setLocation( JGloss.prefs.getInt( Preferences.FRAME_X, 0),
-                           JGloss.prefs.getInt( Preferences.FRAME_Y, 0));
-        frame.setSize( JGloss.prefs.getInt( Preferences.FRAME_WIDTH, frame.getPreferredSize().width),
-                       JGloss.prefs.getInt( Preferences.FRAME_HEIGHT, frame.getPreferredSize().height));
-
-        componentListener = new ComponentAdapter() {
-                public void componentMoved( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.FRAME_X, frame.getX());
-                    JGloss.prefs.set( Preferences.FRAME_Y, frame.getY());
-                }
-                public void componentResized( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.FRAME_WIDTH, frame.getWidth());
-                    JGloss.prefs.set( Preferences.FRAME_HEIGHT, frame.getHeight());
-                }
-            };
-        frame.addComponentListener( componentListener);
-        windowListener = new WindowAdapter() {
-                public void windowClosing( WindowEvent e) {
-                    synchronized (this) {
-                        if (deferWindowClosing) {
-                            // Another thread is currently executing loadDocument.
-                            // Defer the closing of the window until the frame object is in a safe state.
-                            // The loadDocument method is responsible for closing the window.
-                            deferWindowClosing = false;
-                        }
-                        else {
-                            if (askCloseDocument())
-                                closeDocument();
-                        }
-                    }
-                }
-            };
-        frame.addWindowListener( windowListener);
-        frame.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
-
+    private Actions initActions() {
         saveAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     if (model.getDocumentPath() == null)
@@ -536,6 +578,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             };
         saveAction.setEnabled( false);
         UIUtilities.initAction( saveAction, "main.menu.save"); 
+
         saveAsAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     saveDocumentAs();
@@ -543,6 +586,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             };
         saveAsAction.setEnabled( false);
         UIUtilities.initAction( saveAsAction, "main.menu.saveAs");
+
         printAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doPrint();
@@ -550,6 +594,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             };
         printAction.setEnabled( false);
         UIUtilities.initAction( printAction, "main.menu.print"); 
+
         closeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     if (askCloseDocument()) {
@@ -558,14 +603,59 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 }
             };
         UIUtilities.initAction( closeAction, "main.menu.close");
-        
-        Actions actions = new Actions( this);
 
+        addAnnotationAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                }
+            };
+        addAnnotationAction.setEnabled( false);
+        UIUtilities.initAction( addAnnotationAction, "main.menu.addannotation");
+
+        documentTitleAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    String title = model.getHTMLDocument().getTitle();
+                    if (title == null)
+                        title = "";
+                    Object result = JOptionPane.showInputDialog
+                        ( frame, 
+                          JGloss.messages.getString( "main.dialog.doctitle"),
+                          JGloss.messages.getString( "main.dialog.doctitle.title"),
+                          JOptionPane.PLAIN_MESSAGE, null, null, 
+                          title);
+                    if (result != null) {
+                        model.getHTMLDocument().setTitle( result.toString());
+                    }
+                }
+            };
+        documentTitleAction.setEnabled( false);
+        UIUtilities.initAction( documentTitleAction, "main.menu.doctitle");
+
+        wordLookupAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    JGlossApp.getLookupFrame().setVisible( true);
+                    String selection = docpane.getSelectedText();
+                    if (selection == null || selection.length() == 0) {
+                        Annotation anno = (Annotation) annotationList.getSelectedValue();
+                        if (anno != null)
+                            selection = anno.getDictionaryForm();
+                    }
+                    if (selection!=null && selection.length()>0)
+                        JGlossApp.getLookupFrame().search( selection);
+                }
+            };
+        UIUtilities.initAction( wordLookupAction, "main.menu.wordlookup");
+        
+        return new Actions( this);
+    }
+
+    private JMenuBar initMenuBar( Actions actions) {
         // set up the menu bar
         JMenuBar bar = new JMenuBar();
+
         JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.file"));
         menu.add( UIUtilities.createMenuItem( actions.importDocument));
         menu.add( UIUtilities.createMenuItem( actions.importClipboard));
+        menu.addMenuListener( actions.importClipboardListener);
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( actions.open));
         openRecentMenu = OPEN_RECENT.createMenu( actions.openRecentListener);
@@ -582,26 +672,16 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         menu.add( UIUtilities.createMenuItem( closeAction));
         bar.add( menu);
 
-        frame.addWindowListener( actions.importClipboardListener);
-        menu.addMenuListener( actions.importClipboardListener);
+        menu = new JMenu( JGloss.messages.getString( "main.menu.edit"));
+        menu.add( UIUtilities.createMenuItem( xcvManager.getCutAction()));
+        menu.add( UIUtilities.createMenuItem( xcvManager.getCopyAction()));
+        menu.add( UIUtilities.createMenuItem( xcvManager.getPasteAction()));
+        menu.addMenuListener( xcvManager.getEditMenuListener());
 
-        menu = docpane.getEditMenu();
         menu.addSeparator();
-        Action wordLookupAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    JGlossApp.getLookupFrame().setVisible( true);
-                    String selection = docpane.getSelectedText();
-                    if (selection == null || selection.length() == 0) {
-                        Annotation anno = (Annotation) annotationList.getSelectedValue();
-                        if (anno != null)
-                            selection = anno.getDictionaryForm();
-                    }
-                    if (selection!=null && selection.length()>0)
-                        JGlossApp.getLookupFrame().search( selection);
-                }
-            };
-        UIUtilities.initAction( wordLookupAction, "main.menu.wordlookup");
         menu.add( UIUtilities.createMenuItem( wordLookupAction));
+        menu.add( UIUtilities.createMenuItem( addAnnotationAction));
+        menu.add( UIUtilities.createMenuItem( documentTitleAction));
         menu.addSeparator();
         preferencesItem = UIUtilities.createMenuItem( PreferencesFrame.showAction);
         menu.add( preferencesItem);
@@ -641,10 +721,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         aboutItem = UIUtilities.createMenuItem( AboutFrame.showAction);
         menu.add( aboutItem);
         bar.add( menu);
-        
-        frame.setJMenuBar( bar);
 
-        frame.show();
+        return bar;
     }
 
     public JGlossFrameModel getModel() { return model; }
@@ -1040,6 +1118,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
                     docpane.setEditorKit( kit);
+                    xcvManager.updateActions( docpane);
                     docpane.setStyledDocument( htmlDoc);
                     AnnotationListModel annoModel = 
                         new AnnotationListModel( htmlDoc.getAnnotationElements());
@@ -1243,10 +1322,54 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         
         if (protocol.equals( LookupResultList.Hyperlinker.WORD_PROTOCOL))
             anno.setDictionaryForm( text);
-        else if (protocol.equals( LookupResultList.Hyperlinker.READING_PROTOCOL))
+        else if (protocol.equals( LookupResultList.Hyperlinker.READING_PROTOCOL)) {
             anno.setDictionaryFormReading( text);
+            anno.setReading( text);
+        }
         else if (protocol.equals( LookupResultList.Hyperlinker.TRANSLATION_PROTOCOL))
             anno.setTranslation( text);
+    }
+
+    public void valueChanged( ListSelectionEvent e) {
+        if (e.getFirstIndex() >= 0) {
+            Annotation anno = (Annotation) annotationList.getSelectedValue();
+            if (anno != null) {
+                docpane.highlightText( anno.getStartOffset(),
+                                       anno.getEndOffset());
+                annotationEditor.setAnnotation( anno);
+                lookupPanel.search( anno.getDictionaryForm());
+            }
+            else {
+                docpane.removeHighlight();
+                annotationEditor.setAnnotation( null);
+            }
+        }
+        // else: content of currently selected annotation changed; ignore
+    }
+
+    /**
+     * Reacts to text selection in the annotated document by searching the selected text in
+     * the lookup panel.
+     */
+    public void caretUpdate( CaretEvent e) {
+        if (e.getDot() == e.getMark())
+            return; // no selection
+
+        int from;
+        int to;
+        if (e.getDot() < e.getMark()) {
+            from = e.getDot();
+            to = e.getMark();
+        }
+        else {
+            from = e.getMark();
+            to = e.getDot();
+        }
+            
+        String selection = model.getHTMLDocument()
+            .getUnannotatedText(from,to);
+        if (selection.length() > 0)
+            lookupPanel.search( selection);
     }
 
     /**
@@ -1451,23 +1574,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         frame.setTitle( model.getDocumentName() + ":" + JGloss.messages.getString( "main.title"));
     }
 
-    public void valueChanged( ListSelectionEvent e) {
-        if (e.getFirstIndex() >= 0) {
-            Annotation anno = (Annotation) annotationList.getSelectedValue();
-            if (anno != null) {
-                docpane.highlightText( anno.getStartOffset(),
-                                       anno.getEndOffset());
-                annotationEditor.setAnnotation( anno);
-                lookupPanel.search( anno.getDictionaryForm());
-            }
-            else {
-                docpane.removeHighlight();
-                annotationEditor.setAnnotation( null);
-            }
-        }
-        // else: content of currently selected annotation changed; ignore
-    }
-
     /**
      * Dispose resources associated with the JGloss document.
      */
@@ -1503,6 +1609,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         splitPanes = null;
         exportMenu.setContext( null);
         exportMenu = null;
+        docpane.removeCaretListener( this);
         docpane = null;
         docpaneScroller = null;
         kit = null;

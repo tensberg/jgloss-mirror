@@ -25,6 +25,14 @@ package jgloss.ui.annotation;
 
 import java.util.EventObject;
 
+/**
+ * Event which is triggered if the annotation list or the state of an annotation has 
+ * changed in some way.
+ *
+ * @author Michael Koch
+ * @see AnnotationListener
+ * @see AnnotationListModel
+ */
 public class AnnotationEvent extends EventObject {
     protected Annotation annotation;
     protected int index;
@@ -41,7 +49,17 @@ public class AnnotationEvent extends EventObject {
         readingIndex = _readingIndex;
     }
 
+    /**
+     * Returns the annotation which has changed.
+     */
     public Annotation getAnnotation() { return annotation; }
+    /**
+     * Returns the index of the changed annotation in the annotation model.
+     */
     public int getIndex() { return index; }
+    /**
+     * Index of the reading which changed, if this is a <code>readingChanged</code> event.
+     * May be <code>-1</code> if several or all readings changed.
+     */
     public int getReadingIndex() { return readingIndex; }
 } // class AnnotationEvent

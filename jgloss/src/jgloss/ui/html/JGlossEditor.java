@@ -28,6 +28,7 @@ import jgloss.Preferences;
 import jgloss.ui.UIUtilities;
 import jgloss.ui.XCVManager;
 import jgloss.ui.AnnotationList;
+import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.xml.JGlossDocument;
 
 import java.awt.*;
@@ -85,7 +86,7 @@ public class JGlossEditor extends JTextPane {
                             synchronized (this) {
                                 int p = viewToModel( pos);
                                 if (tooltips) {
-                                    showToolTip( "FIXME!", pos);
+                                    showToolTip( "FIXME", pos);
                                 }
                                 updated = false;
                             }
@@ -157,14 +158,6 @@ public class JGlossEditor extends JTextPane {
     private JTextArea tooltip;
 
     /**
-     * Action which annotates the current selection.
-     */
-    private Action addAnnotationAction;
-    /**
-     * Displays the document title and lets the user change it.
-     */
-    private Action documentTitleAction;
-    /**
      * Searches a string in the document.
      */
     private Action findAction;
@@ -181,14 +174,6 @@ public class JGlossEditor extends JTextPane {
      */
     private int lastFindPosition;
 
-    /**
-     * The menu which contains actions specific to document editing.
-     */
-    private JMenu editMenu;
-    /**
-     * Manager for the cut/copy/past actions;
-     */
-    private XCVManager xcvManager;
     /**
      * Update the tooltip font in response to default ui changes.
      */
@@ -225,13 +210,6 @@ public class JGlossEditor extends JTextPane {
                                            }
                                        });
         setKeymap( map);
-
-        xcvManager = new XCVManager( this);
-        editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
-        editMenu.add( UIUtilities.createMenuItem( xcvManager.getCutAction()));
-        editMenu.add( UIUtilities.createMenuItem( xcvManager.getCopyAction()));
-        editMenu.add( UIUtilities.createMenuItem( xcvManager.getPasteAction()));
-        editMenu.addMenuListener( xcvManager.getEditMenuListener());
 
         mouseFollower = new MouseFollowerThread();
         mouseFollower.start();
@@ -278,8 +256,8 @@ public class JGlossEditor extends JTextPane {
                         if ((e.getModifiers() & selectButtonMask) != 0) {
                             int pos = viewToModel( e.getPoint());
                             int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex
-                                ( pos);
-                            if (annoIndex != -1) {
+                                ( pos, AnnotationListModel.BIAS_NONE);
+                            if (annoIndex >= 0) {
                                 annotationList.setSelectedIndex( annoIndex);
                             }
                         }
@@ -320,44 +298,6 @@ public class JGlossEditor extends JTextPane {
             };
         UIManager.getDefaults().addPropertyChangeListener( fontChangeListener);
 
-        addAnnotationAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    /*AnnotationNode node = ((AnnotationModel) annotationEditor.getModel()).addAnnotation
-                        (getSelectionStart(), getSelectionEnd(),
-                         lookupTranslator,
-                         (JGlossEditorKit) getStyledEditorKit());
-                    if (node != null) {
-                        // select first reading and translation (if any)
-                        node.selectFirstAnnotation();
-                            
-                        // select annotation node
-                        annotationEditor.selectNode( node);
-                        annotationEditor.expandAll( node);
-                        annotationEditor.makeVisible( node);
-                        annotationEditor.requestFocus();
-                        }*/
-                }
-            };
-        addAnnotationAction.setEnabled( false);
-        UIUtilities.initAction( addAnnotationAction, "editor.menu.addannotation");
-        documentTitleAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    String title = htmlDoc.getTitle();
-                    if (title == null)
-                        title = "";
-                    Object result = JOptionPane.showInputDialog
-                        ( SwingUtilities.getRoot( JGlossEditor.this), 
-                          JGloss.messages.getString( "editor.dialog.doctitle"),
-                          JGloss.messages.getString( "editor.dialog.doctitle.title"),
-                          JOptionPane.PLAIN_MESSAGE, null, null, 
-                          title);
-                    if (result != null) {
-                        htmlDoc.setTitle( result.toString());
-                    }
-                }
-            };
-        documentTitleAction.setEnabled( false);
-        UIUtilities.initAction( documentTitleAction, "editor.menu.doctitle");
         findAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     Object result = JOptionPane.showInputDialog
@@ -397,19 +337,6 @@ public class JGlossEditor extends JTextPane {
             };
         UIUtilities.initAction( findAgainAction, "editor.menu.findagain");
         findAgainAction.setEnabled( false); // will be enabled after first find
-
-        editMenu.addSeparator();
-        editMenu.add( UIUtilities.createMenuItem( findAction));
-        editMenu.add( UIUtilities.createMenuItem( findAgainAction));
-        editMenu.add( UIUtilities.createMenuItem( addAnnotationAction));
-        editMenu.add( UIUtilities.createMenuItem( documentTitleAction));
-
-        addCaretListener( new CaretListener() {
-                public void caretUpdate( CaretEvent e) {
-                    boolean hasSelection = e.getDot() != e.getMark();
-                    addAnnotationAction.setEnabled( hasSelection);
-                }
-            });
     }
 
     /**
@@ -544,37 +471,12 @@ public class JGlossEditor extends JTextPane {
     }
 
     /**
-     * Returns the editor menu with actions specific to document editing. It can be
-     * integrated in the application menu bar. Since it is unique, it cannot be used
-     * in more than one menu bar.
-     *
-     * @return The editor menu with actions specific to document editing.
-     */
-    public JMenu getEditMenu() {
-        return editMenu;
-    }
-
-    /**
-     * Sets the editor kit used to manipulate the document.
-     *
-     * @param kit The document to display.
-     */
-    public void setEditorKit( JGlossEditorKit kit) {
-        super.setEditorKit( kit);
-        xcvManager.updateActions( this);
-    }
-
-    /**
      * Sets the document to edit. Calling this method enables the find and document title actions.
      */
     public void setStyledDocument( StyledDocument _doc) {
         super.setStyledDocument( _doc);
         htmlDoc = (JGlossHTMLDoc) _doc;
-        findAction.setEnabled( true);
-        documentTitleAction.setEnabled( true);
     }
-
-    public XCVManager getXCVManager() { return xcvManager; }
 
     /**
      * Search for some text in the document. If the text is found as part of an annotation, the
@@ -608,7 +510,6 @@ public class JGlossEditor extends JTextPane {
         }
         where += from; // start offset must be taken into account
 
-        //annotationEditor.selectAnnotation( where); // does nothing if where is not in annotation
         requestFocus(); // selection will only be visible if editor has the focus
         // select found text
         setCaretPosition( where);

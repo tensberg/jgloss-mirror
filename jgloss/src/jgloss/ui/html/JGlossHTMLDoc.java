@@ -46,9 +46,14 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.dom.DOMSource;
 
 /**
- * Extends the <CODE>HTMLDocument</CODE> class to deal with documents which contain
- * annotations. It in particular contains methods to manipulate the attributes of the
- * annotation elements and controls the document loading process.
+ * Extends the HTML document class to handle JGloss document annotations. 
+ * Each JGloss html document is linked to a {@link jgloss.ui.xml.JGlossDocument JGloss XML document}.
+ * The JGloss HTML document is generated from the JGloss XML document via a XSLT style sheet.
+ * If the HTML document is changed, the XML document is marked as invalid and is re-generated
+ * from the HTML document via class {@link HTMLToSAXParserAdapter HTMLToSAXParserAdapter}.
+ * The HTML document is used whenever the document content or structure needs to be changed.
+ * The XML document is used when an external well-defined representation is needed, such as
+ * when saving or exporting the document.
  *
  * @author Michael Koch
  */
@@ -252,6 +257,11 @@ public class JGlossHTMLDoc extends HTMLDocument {
         setParser( _htmlparser);
     }
 
+    /**
+     * Set the JGloss XML document to which this HTML document corresponds. The HTML document
+     * will be generated from the XML document when the method is called. Changes to the
+     * HTML document will be propagated to the XML document.
+     */
     public void setJGlossDocument( JGlossDocument _baseDoc) {
         baseDoc = _baseDoc;
 
@@ -388,7 +398,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
 
     /**
      * Sets the title of the document. This modifies the <CODE>DocumentTitle</CODE> property
-     * of the Document object. This also fires a property change event.
+     * of the Document object. Calling this method fires a property change event.
      */
     public void setTitle( String title) {
         String oldTitle = getTitle();
@@ -399,9 +409,83 @@ public class JGlossHTMLDoc extends HTMLDocument {
     }
 
     /**
-     * Returns the title of the document. This is the <CODE>DocumentTitle</CODE> property.
+     * Returns the title of the document. It is stored in the <CODE>DocumentTitle</CODE> property.
      */
     public String getTitle() {
         return (String) getProperty( Document.TitleProperty);
     }
+
+    /**
+     * Currently not implemented, don't use.
+     */
+    public String getUnannotatedText( int start, int end) {
+        return new UnannotatedTextFetcher().getText(start, end).toString();
+    }
+
+    /**
+     * Fetch a span of text from the document, leaving out text with is part of an annotation.
+     * This is a class-based implementation of a recursive algorithm which traverses the document
+     * tree.
+     */
+    private class UnannotatedTextFetcher {
+        private int start;
+        private int end;
+        private StringBuffer text;
+        private Segment textSegment;
+
+        UnannotatedTextFetcher() {
+            textSegment = new Segment();
+            textSegment.setPartialReturn(true);
+        }
+
+        /**
+         * Returns the unannotated text between the given start and end offsets.
+         */
+        public StringBuffer getText( int _start, int _end) {
+            System.err.println( _start + "/" + _end);
+            start = _start;
+            end = _end;
+            text = new StringBuffer(end - start);
+
+            JGlossHTMLDoc.this.readLock();
+            addUnannotatedText( getDefaultRootElement());
+            JGlossHTMLDoc.this.readUnlock();
+
+            return text;
+        }
+
+        private void addUnannotatedText(Element elem) {
+            if (elem.getStartOffset() > end || elem.getEndOffset() < start)
+                return;
+            
+            if (elem.getName().equals(HTML.Tag.CONTENT.toString())) {
+                // element spanning some text, add if the text is not part of an annotation
+                AttributeSet as = elem.getAttributes();
+                if (!as.isDefined( AnnotationTags.READING) &&
+                    !as.isDefined( AnnotationTags.TRANSLATION)) {
+                    // copy the part of the element text which intersects with the requested
+                    // text span to the string buffer
+                    int offset = Math.max(start,elem.getStartOffset());
+                    int length = Math.min(end,elem.getEndOffset())-offset;
+                    try {
+                        // partial return is activated for the text segment, so we have
+                        // to iterate until all segment fragments are copied
+                        while (length > 0) {
+                            JGlossHTMLDoc.this.getText(offset,length,textSegment);
+                            text.append(textSegment.array,textSegment.offset,textSegment.count);
+                            offset += textSegment.count;
+                            length -= textSegment.count;
+                        }
+                    } catch (BadLocationException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            else {
+                // recurse over children, which will have content nodes as descendants
+                for ( int i=0; i<elem.getElementCount(); i++)
+                    addUnannotatedText( elem.getElement( i));
+            }
+        }
+    } // class UnannotatedTextFetcher
 } // class JGlossDocument

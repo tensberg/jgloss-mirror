@@ -111,8 +111,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
           menu.addSeparator();*/
         bar.add( menu);
 
-        final JMenu editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
-        XCVManager xcv = new XCVManager( config.getSearchExpressionField());
+        final JMenu editMenu = new JMenu( JGloss.messages.getString( "main.menu.edit"));
+        XCVManager xcv = new XCVManager();
+        xcv.addManagedComponent( config.getSearchExpressionField());
         xcv.addManagedComponent( config.getDistanceField());
 
         editMenu.add( xcv.getCutAction());

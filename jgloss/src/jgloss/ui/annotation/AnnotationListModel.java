@@ -30,6 +30,10 @@ import java.util.Iterator;
 import javax.swing.text.Element;
 
 public class AnnotationListModel {
+    public static final int BIAS_NONE = 0;
+    public static final int BIAS_LEFT = 1;
+    public static final int BIAS_RIGHT = 2;
+
     private List annotations;
     private List annotationListeners = new ArrayList( 5);
     private int searchindex;
@@ -50,7 +54,19 @@ public class AnnotationListModel {
         return annotations.indexOf( anno);
     }
 
-    public int findAnnotationIndex( int pos) {
+    /**
+     * Find the index of the annotation at a given position in the document.
+     *
+     * @param pos Position in the JGloss html document.
+     * @param bias Controls what will be returned if the position is not in an annotation.
+     *        <code>BIAS_NONE</code> will return -2, <code>BIAS_LEFT</code> will return the
+     *        index of the annotation left of the position (<code>-1</code> if the position is
+     *        left of the first annotation) and <code>BIAS_RIGHT</code> will return the
+     *        index of the annotation right of the position 
+     *        ({@link #getAnnotationCount() getAnnotationCount} if the position is
+     *        right of the last annotation).
+     */
+    public int findAnnotationIndex( int pos, int bias) {
         // the finishing index of the previous search is remebered. This will make the
         // search faster if the method is called for close locations. Since this method
         // is often called after mouse movement events, this is likely to be the case.
@@ -58,30 +74,47 @@ public class AnnotationListModel {
             searchindex = annotations.size() / 2;
 
         // do a binary search
-        Annotation out;
+        Annotation anno;
         boolean found = false;
         int min = 0;
         int max = annotations.size()-1;
         do {
-            out = (Annotation) annotations.get( searchindex);
-            if (pos < out.getStartOffset()) {
-                if (searchindex == min) // no annotation for this position
-                    return -1;
-                else if (((Annotation) annotations.get( searchindex-1))
-                         .getEndOffset()-1 < pos)
-                    // pos is between two annotation elements
-                    return -1;
+            anno = (Annotation) annotations.get( searchindex);
+            if (pos < anno.getStartOffset()) {
+                if (searchindex == min || // no annotation for this position
+                    ((Annotation) annotations.get( searchindex-1))
+                    .getEndOffset()-1 < pos) { // pos is between two annotation elements
+                    switch (bias) {
+                    case BIAS_NONE:
+                        return -2;
+                    case BIAS_LEFT:
+                        return searchindex-1;
+                    case BIAS_RIGHT:
+                        return searchindex;
+                    default:
+                        throw new IllegalArgumentException( "bias invalid");
+                    }
+                }
                 else {
                     max = searchindex - 1;
                     searchindex = min + (searchindex-min) / 2;
                 }
             }
-            else if (pos > out.getEndOffset()-1) {
-                if (searchindex == max) // no annotation for this position
-                    return -1;
-                else if (((Annotation) annotations.get( searchindex+1))
-                         .getStartOffset() > pos)
-                    return -1;
+            else if (pos > anno.getEndOffset()-1) {
+                if (searchindex == max || // no annotation for this position
+                    ((Annotation) annotations.get( searchindex+1))
+                    .getStartOffset() > pos) {
+                    switch (bias) {
+                    case BIAS_NONE:
+                        return -2;
+                    case BIAS_LEFT:
+                        return searchindex;
+                    case BIAS_RIGHT:
+                        return searchindex+1;
+                    default:
+                        throw new IllegalArgumentException( "bias invalid");
+                    }
+                }
                 else {
                     min = searchindex + 1;
                     searchindex = searchindex + (max-searchindex)/2 + 1;
@@ -124,7 +157,7 @@ public class AnnotationListModel {
         AnnotationEvent event = new AnnotationEvent( this, anno, index);
         List listeners = new ArrayList( annotationListeners);
         for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((AnnotationListener) i.next()).annotationInserted( event);
+            ((AnnotationListener) i.next()).annotationRemoved( event);
         }
     }
 
@@ -132,7 +165,7 @@ public class AnnotationListModel {
         AnnotationEvent event = new AnnotationEvent( this, anno, indexOf( anno));
         List listeners = new ArrayList( annotationListeners);
         for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((AnnotationListener) i.next()).annotationInserted( event);
+            ((AnnotationListener) i.next()).annotationChanged( event);
         }
     }
 
@@ -140,7 +173,7 @@ public class AnnotationListModel {
         AnnotationEvent event = new AnnotationEvent( this, anno, indexOf( anno), readingIndex);
         List listeners = new ArrayList( annotationListeners);
         for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((AnnotationListener) i.next()).annotationInserted( event);
+            ((AnnotationListener) i.next()).readingChanged( event);
         }
     }
 } // class AnnotationListModel

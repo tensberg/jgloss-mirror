@@ -44,6 +44,15 @@ import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
+/**
+ * Insert reading/translation annotations into a document. Instances of this class
+ * are used to annotate documents when they are imported into JGloss. Text inside of
+ * &lt;p&gt; tags is analyzed and the appropriate JGlossDocument annotation tags are inserted.
+ * The document structure, including the newly created tags, is passed on to the parent
+ * document handler for further processing.
+ *
+ * @author Michael Koch
+ */
 class AnnotationGenerator extends DefaultHandler {
     private DefaultHandler parent;
     private ReadingAnnotationFilter readingFilter;
@@ -106,6 +115,10 @@ class AnnotationGenerator extends DefaultHandler {
             inP = false;
     }
 
+    /**
+     * Handle character strings in the document. The string is parsed and annotations are
+     * inserted.
+     */
     public void characters( char[] c, int start, int length) throws SAXException {
         if (!(inP && annotateText)) {
             parent.characters( c, start, length);

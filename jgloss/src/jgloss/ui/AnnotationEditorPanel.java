@@ -81,13 +81,14 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
         c2.anchor = GridBagConstraints.NORTHWEST;
         c2.gridx = 0;
         c2.fill = GridBagConstraints.NONE;
-        add( new JLabel( JGloss.messages.getString( "annotationeditor.translation")), c2);
         GridBagConstraints c3 = new GridBagConstraints();
         c3.anchor = GridBagConstraints.NORTHWEST;
         c3.gridx = 1;
         c3.fill = GridBagConstraints.HORIZONTAL;
         c3.weightx = 1;
-        add( translation, c3);
+
+        add( new JLabel( JGloss.messages.getString( "annotationeditor.grammaticaltype")), c2);
+        add( grammaticalType, c3);
         
         add( new JLabel( JGloss.messages.getString( "annotationeditor.dictionaryform")), c);
         GridBagConstraints c4 = (GridBagConstraints) c2.clone();
@@ -99,8 +100,8 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
              c4);
         add( dictionaryFormReading, c3);
 
-        add( new JLabel( JGloss.messages.getString( "annotationeditor.grammaticaltype")), c2);
-        add( grammaticalType, c3);
+        add( new JLabel( JGloss.messages.getString( "annotationeditor.translation")), c2);
+        add( translation, c3);
 
         add( readingEditor, c);
 
@@ -186,6 +187,7 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
 
     public void annotationInserted( AnnotationEvent ae) {}
     public void annotationRemoved( AnnotationEvent ae) {}
+
     public void annotationChanged( AnnotationEvent ae) {
         if (ae.getAnnotation() == annotation) {
             updateDisplay();

@@ -25,6 +25,7 @@ package jgloss.ui.annotation;
 
 import jgloss.ui.xml.JGlossDocument;
 import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.util.StringTools;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -125,6 +126,39 @@ public class Annotation {
         owner.fireAnnotationChanged( this);
     }
 
+    public void setReading( String _reading) {
+        if (readings.length == 0) // no reading; TODO: create reading?
+            return;
+        else {
+            try {
+                String[][] wordReading = StringTools.splitWordReading( getDictionaryForm(), _reading);
+                int targetReading = 0;
+                for ( int i=0; i<wordReading.length; i++) {
+                    if (wordReading[i].length == 2) { // word substring with a reading
+                        if (targetReading < readings.length)
+                            readings[targetReading++].setText( wordReading[i][1]);
+                        else
+                            // More reading substrings in wordReading than there are readings
+                            // in the annotated text. Add the additional readings to the last
+                            // reading element.
+                            readings[targetReading-1].setText
+                                ( readings[targetReading-1].getText() + wordReading[i][1]);
+                    }
+                }
+                // If there were less readings in wordReading than there are in the annotated
+                // element, set the remaining reading elements to the empty string.
+                while (targetReading < readings.length)
+                    readings[targetReading++].setText( "");
+
+                updateAnnotatedTextReading();
+                owner.fireReadingChanged( this, -1);
+            } catch (StringIndexOutOfBoundsException ex) {
+                System.err.println( "Warning: Unparseable Word/Reading");
+                setReading( 0, _reading);
+            }
+        }
+    }
+
     public void setReading( int index, String _reading) {
         readings[index].setText( _reading);
         updateAnnotatedTextReading();
@@ -169,11 +203,16 @@ public class Annotation {
         Element word = anno.getElement( 0);
         for ( int i=0; i<word.getElementCount(); i++) {
             Element child = word.getElement( i);
-            if (child.getElementCount() > 0)
-                // rb element, get bt child
+            if (child.getElementCount() > 0) {
+                // rb element, get re child
                 child = child.getElement( 0);
-            // else: child is bt
-            reading.append( getText( child));
+                String text = getText( child);
+                if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER))
+                    text = "";
+                reading.append( text);
+            }
+            else // child is bt
+                reading.append( getText( child));
         }
         annotatedTextReading = reading.toString();
     }

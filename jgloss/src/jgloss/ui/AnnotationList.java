@@ -410,7 +410,7 @@ public class AnnotationList extends JList implements MouseListener {
         Rectangle screen = invoker.getGraphicsConfiguration().getBounds();
         // If the menu has not been shown yet, the size will be 0, even if validate()
         // and pack() were called.
-        if (size.width == 0 && size.height == 0) {
+        /*if (size.width == 0 && size.height == 0) {
             // move the menu off-screen
             pmenu.setLocation( screen.x + screen.width + 1, 0);
             pmenu.setVisible( true);
@@ -422,7 +422,7 @@ public class AnnotationList extends JList implements MouseListener {
         if (x + size.width > screen.x + screen.width)
             x = screen.x + screen.width - size.width;
         if (y + size.height > screen.y + screen.height)
-            y = screen.y + screen.height - size.height;
+        y = screen.y + screen.height - size.height;*/
 
         pmenu.show( invoker, x - sc.x, y - sc.y);
     }

@@ -25,9 +25,22 @@ package jgloss.ui.annotation;
 
 import java.util.EventListener;
 
+/**
+ * Listens to changes of annotations in the annotation list model.
+ *
+ * @author Michael Koch
+ * @see AnnotationListModel
+ */
 public interface AnnotationListener extends EventListener {
     void annotationInserted( AnnotationEvent ae);
     void annotationRemoved( AnnotationEvent ae);
+    /**
+     * Triggered if the state of an annotation has changed in some way.
+     * This does not include changes to the reading.
+     */
     void annotationChanged( AnnotationEvent ae);
+    /**
+     * Triggered if a reading of an annotation has changed.
+     */
     void readingChanged( AnnotationEvent ae);
 } // interface AnnotationListener

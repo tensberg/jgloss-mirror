@@ -90,12 +90,7 @@ public class XCVManager {
 
     private FocusListener setActiveActionListener;
 
-    public XCVManager( JComboBox source) {
-        this( (JTextComponent) source.getEditor().getEditorComponent());
-    }
-
-    public XCVManager( JTextComponent source) {
-        this.activeSource = source;
+    public XCVManager() {
         sourceActions = new HashMap( 5);
 
         cutAction = new AbstractAction() {
@@ -104,23 +99,22 @@ public class XCVManager {
                 }
             };
         cutAction.setEnabled( false);
-        UIUtilities.initAction( cutAction, "editor.menu.cut");
+        UIUtilities.initAction( cutAction, "xcv.menu.cut");
         copyAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     delegateeCopyAction.actionPerformed( e);
                 }
             };
         copyAction.setEnabled( false);
-        UIUtilities.initAction( copyAction, "editor.menu.copy");
+        UIUtilities.initAction( copyAction, "xcv.menu.copy");
         pasteAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     delegateePasteAction.actionPerformed( e);
                 }
             };
         pasteAction.setEnabled( false);
-        UIUtilities.initAction( pasteAction, "editor.menu.paste");
+        UIUtilities.initAction( pasteAction, "xcv.menu.paste");
 
-        updateActions( activeSource);
         editMenuListener = new MenuListener() {
                 public void menuSelected( MenuEvent e) {
                     updateActionState();
@@ -129,12 +123,16 @@ public class XCVManager {
                 public void menuCanceled( MenuEvent e) {}
             };
 
-        setActiveActionListener = new FocusAdapter() {
+        setActiveActionListener = new FocusListener() {
                 public void focusGained( FocusEvent e) {
                     setActiveSource( (JTextComponent) e.getSource());
                 }
+
+                public void focusLost( FocusEvent e) {
+                    if (!e.isTemporary())
+                        setActiveSource( null);
+                }
             };
-        source.addFocusListener( setActiveActionListener);
     }
 
     public Action getCutAction() { return cutAction; }
@@ -201,19 +199,26 @@ public class XCVManager {
 
     /**
      * Sets the currently active text field and updates the delegatee actions accordingly.
+     *
+     * @param source The new active source; or <code>null</code> if there is no active source.
      */
     protected synchronized void setActiveSource( JTextComponent source) {
         activeSource = source;
-        Action[] actions = (Action[]) sourceActions.get( source);
-        delegateeCutAction = actions[0];
-        delegateeCopyAction = actions[1];
-        delegateePasteAction = actions[2];
+        if (activeSource != null) {
+            Action[] actions = (Action[]) sourceActions.get( source);
+            delegateeCutAction = actions[0];
+            delegateeCopyAction = actions[1];
+            delegateePasteAction = actions[2];
+        }
 
         updateActionState();
     }
 
     public synchronized void updateActionState() {
-        boolean hasSelection = activeSource.getSelectionStart() != activeSource.getSelectionEnd();
+        boolean isEnabled = activeSource != null;
+        
+        boolean hasSelection = isEnabled &&
+            activeSource.getSelectionStart()!=activeSource.getSelectionEnd();
         cutAction.setEnabled( hasSelection && 
                               delegateeCutAction != null &&
                               delegateeCutAction.isEnabled() &&
@@ -221,13 +226,15 @@ public class XCVManager {
         copyAction.setEnabled( hasSelection &&
                                delegateeCopyAction != null &&
                                delegateeCopyAction.isEnabled());
-        Transferable t = java.awt.Toolkit.getDefaultToolkit().
-            getSystemClipboard().getContents( null);
+        Transferable t = null;
+        if (isEnabled) 
+            java.awt.Toolkit.getDefaultToolkit().
+                getSystemClipboard().getContents( null);
         boolean hasContent = (t != null &&
                               (t.isDataFlavorSupported( DataFlavor.getTextPlainUnicodeFlavor()) ||
                                t.isDataFlavorSupported( DataFlavor.stringFlavor)));
         
-        pasteAction.setEnabled( hasContent &&
+        pasteAction.setEnabled( isEnabled && hasContent &&
                                 delegateePasteAction != null &&
                                 delegateePasteAction.isEnabled() &&
                                 activeSource.isEditable());

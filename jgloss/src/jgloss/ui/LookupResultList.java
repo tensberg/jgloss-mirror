@@ -300,6 +300,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     private void startLookup() {
         marker.setMarkedText( searchExpression);
         hyperlinker.clearReferences();
+        previousDictionaryName = null;
         previousDictionaryHasMatch = true;
         dictionaryEntries = 0;
         entriesInTextBuffer = 0;
