@@ -28,8 +28,8 @@ error.no_message=(no message)
 error.loadPreferences=An error occured while loading the preferences:
 error.storePreferences=An error occured while saving the preferences:
 error.dictionary.title=Error opening dictionary
-error.dictionary.filenotfound=The dictionary {0} could not be opened.\nCheck if the dictionary and the index file (".xjdx")\n are readable.
-error.dictionary.ioerror=An error occured while loading\the dictionary {0}.
+error.dictionary.filenotfound=The dictionary {0} could not be opened.\nCheck if the dictionary file {1}\nexists and is readable.
+error.dictionary.ioerror=An error occured while loading\nthe dictionary {0}.
 error.import.title=Error while importing file
 error.import.exception=An error occured while importing {0}:\n{1}.
 error.export.title=Error while exporting file
@@ -57,6 +57,12 @@ splashscreen.loadingPreferences=loading preferences
 splashscreen.initPreferences=loading dictionaries
 splashscreen.initMain=creating application window
 
+main.usage=Usage: jgloss.JGloss [options] file ...\n\
+Options:\n\
+\  -h, --help, /?  Print this message\n\
+\  -i, --createindex Create an index file for the dictionary files\n\
+\                    given on the command line
+main.unknownoption=Unknown option {0}
 main.title=JGloss
 
 main.menu.file=File
@@ -233,3 +239,9 @@ vconj.21=adj., negative
 vconj.22=adj., negative, past
 vconj.23=adj., past
 vconj.24=plain verb or adjective
+
+edict.buildindex=Building index for dictionary {0}.\nThis can take some time.
+edict.load=Loading dictionary {0}.
+edict.writejjdx=Writing JJDX index for dictionary {0}.
+edict.warning.jjdxversion=WARNING: the version number of the JJDX index for {0} is higher than the version supported by this version of JGloss.
+edict.error.writejjdx=Error while writing the JJDX file: {0}: {1}
