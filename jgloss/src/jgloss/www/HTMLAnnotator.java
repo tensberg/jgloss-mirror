@@ -29,6 +29,11 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+/**
+ * Look up words in a Japanese HTML page and add a tag with the dictionary entries.
+ * A CSS Style Sheet and JavaScript fragment will be added which displays the entries
+ * when the mouse is over a word.
+ */
 public class HTMLAnnotator {
     /**
      * Path to the script fragment resource which will be embedded in the
@@ -39,12 +44,25 @@ public class HTMLAnnotator {
     private Parser parser;
     private String script;
 
-    public HTMLAnnotator( Parser parser) throws IOException {
-        this.parser = parser;
+    // used by addAnnotationText
+    private String lastdictionary;
+    private String lastword;
+    private String lasttranslation;
 
+    /**
+     * Constructs an annotator which uses the given parser and the default 
+     * Style Sheet/JavaScript fragment.
+     *
+     * @param parser Parser used for parsing text in the page.
+     * @exception IOException if the default script could not be read.
+     */
+    public HTMLAnnotator( Parser parser) throws IOException {
+        this( parser, null);
+
+        // read the default script
         Reader resource = new InputStreamReader
             ( HTMLAnnotator.class.getResourceAsStream( HTMLAnnotator.SCRIPT_RESOURCE), "UTF-8");
-        char[] buf = new char[512];
+        char[] buf = new char[4096];
         StringBuffer scriptbuf = new StringBuffer();
         int r;
         while ((r=resource.read( buf)) != -1) {
@@ -54,6 +72,22 @@ public class HTMLAnnotator {
         script = scriptbuf.toString();
     }
 
+    /**
+     * Constructs an annotator which uses the given parser and Style Sheet/JavaScript.
+     *
+     * @param parser Parser used for parsing text in the page.
+     * @param script Text which will be embedded in the resulting page, either directly before
+     *               the &lt;/head&gt; tag, or if none is encountered before the &lt;body&gt; tag.
+     */
+    public HTMLAnnotator( Parser parser, String script) {
+        this.parser = parser;
+        this.script = script;
+    }
+
+    /**
+     * Reads an HTML document from <CODE>in</CODE>, annotates Japanese words with dictionary lookup results
+     * and writes the resulting HTML page to <CODE>out</CODE>. 
+     */
     public void annotate( Reader in, Writer out, URLRewriter rewriter) throws IOException {
         in = new BufferedReader( in);
         
@@ -135,7 +169,8 @@ public class HTMLAnnotator {
                     if (inBody) {
                         annotateText( out, text);
                     }
-                    out.write( text.toString());
+                    else
+                        out.write( text.toString());
                     text.delete( 0, text.length());
                     if (c=='<') {
                         inTag = true;
@@ -153,127 +188,125 @@ public class HTMLAnnotator {
         out.write( text.toString());
     }
 
-    protected StringBuffer annotateText( Writer out, StringBuffer text) throws IOException {
+    /**
+     * Annotates the text with dictionary lookup results and writes it to <CODE>out</CODE>
+     */
+    protected void annotateText( Writer out, StringBuffer text) throws IOException {
         if (text.length() == 0)
-            return text;
+            return;
 
         char[] chars = new char[text.length()];
         text.getChars( 0, text.length(), chars, 0);
 
         try {
             List annotations = parser.parse( chars);
-            
-            // The annotations will have to be added last to first, because changing text
-            // changes the start offsets returned by the parser.
-            // All annotations with a start offset in [start,start+length[ of the first
-            // annotation seen will form the text for one annotated word.
-            List annotext = new LinkedList();
-            List wordannos = new ArrayList( 10);
-            int start = -1;
-            int length = 0;
-            // compile the annotation texts for annotated words
+            StringBuffer anno = new StringBuffer( 200);
+            int start = 0; // index of first character of annotated word
+            int end = 0; // index of first character after annotated word
+
             for ( Iterator i=annotations.iterator(); i.hasNext(); ) {
                 Parser.TextAnnotation a = (Parser.TextAnnotation) i.next();
-                if (a.getStart()>=start+length) {
-                    // new annotated word
-                    String anno = getAnnotationText( wordannos);
-                    if (anno.length() > 0) {
-                        annotext.add( new Integer( start));
-                        annotext.add( new Integer( length));
-                        annotext.add( anno);
-                    }
-                    wordannos.clear();
-                    start = a.getStart();
-                    length = a.getLength();
-                }
-                wordannos.add( a);
-            }
-            // add the remaining annotations
-            String anno = getAnnotationText( wordannos);
-            if (anno.length() > 0) {
-                annotext.add( new Integer( start));
-                annotext.add( new Integer( length));
-                annotext.add( anno);
-            }
-            
-            // insert the annotation text
-            for ( ListIterator i=annotext.listIterator( annotext.size()); i.hasPrevious(); ) {
-                anno = (String) i.previous();
-                length = ((Integer) i.previous()).intValue();
-                start = ((Integer) i.previous()).intValue();
-                
-                text.insert( start+length, "</span>");
-                text.insert( start, "<span class=\"an\" onMouseOver=\"sp(this,&quot;" + anno +
-                             "&quot;)\" onMouseOut=\"hp(this)\">");
-            }
-        } catch (SearchException ex) {}
+                if (a.getStart() >= end) {
+                    // new annotated word; write the previous annotated word
+                    if (a.getStart() > end) // write unannotated text
+                        out.write( text.substring( end, a.getStart()));
 
-        return text;
+                    if (anno.length() > 0) { // == 0 for first annotation in list
+                        out.write( "<span class=\"an\" onMouseOver=\"sp(this,&quot;");
+                        out.write( anno.toString());
+                        out.write( "&quot;)\" onMouseOut=\"hp(this)\">");
+                        out.write( text.substring( start, end));
+                        out.write( "</span>");
+                        anno.delete( 0, anno.length());
+                    }
+                        
+                    start = a.getStart();
+                    end = start + a.getLength();
+                    lastdictionary = "";
+                    lastword = "";
+                    lasttranslation = "";
+                }
+                addAnnotationText( anno, a);
+            }
+            // write the last annotation
+            if (anno.length() > 0) { // == 0 for first annotation in list
+                out.write( "<span class=\"an\" onMouseOver=\"sp(this,&quot;");
+                out.write( anno.toString());
+                out.write( "&quot;)\" onMouseOut=\"hp(this)\">");
+                out.write( text.substring( start, end));
+                out.write( "</span>");
+            }
+            // write the remaining text
+            if (end < text.length())
+                out.write( text.substring( end));
+
+        } catch (SearchException ex) {
+            out.write( "<!-- JGloss parser error: " + ex.getMessage() + " -->)");
+        }
     }
 
-    protected String getAnnotationText( List annotations) {
-        StringBuffer text = new StringBuffer();
-        String lastdictionary = "";
-        String lastword = "";
-        String lasttranslation = "";
-
-        for ( Iterator i=annotations.iterator(); i.hasNext(); ) {
-            Parser.TextAnnotation a = (Parser.TextAnnotation) i.next();
-
-            String dictionary = null;
-            if (a instanceof Reading)
-                dictionary = ((Reading) a).getWordReadingPair().getDictionary().getName();
-            else if (a instanceof Translation)
-                dictionary = ((Translation) a).getDictionaryEntry().getDictionary().getName();
-            if (!dictionary.equals( lastdictionary)) {
-                text.append( dictionary + ":\\n");
-                lastdictionary = dictionary;
-                lastword = "";
-                lasttranslation = "";
-            }
-
-            String translation = "";
-            if (a instanceof Translation) {
-                StringBuffer t = new StringBuffer();
-                String[] translations = ((Translation) a).getDictionaryEntry().getTranslations();
-                for ( int j=0; j<translations.length; j++) {
-                    t.append( "    ");
-                    t.append( translations[j]);
-                    t.append( "\\n");
-                }
-                translation = t.toString();
-            }
-
-            if (a instanceof AbstractAnnotation) {
-                AbstractAnnotation aa = (AbstractAnnotation) a;
-                String word = aa.getWord();
-                String reading = aa.getReading();
-                if (word.equals( lastword) && translation.equals( lasttranslation)) {
-                    // merge two word entries if reading and translation are equal
-                    // insert new reading
-                    int pos = text.length() - lasttranslation.length() - 3;
-                    if (reading != null) {
-                        if (text.charAt( pos) != ']')
-                                // last word had no reading
-                                text.insert( pos, " []");
-                        else {
-                            text.insert( pos, '\u3001');
-                            pos++;
-                        }
-                        text.insert( pos, reading);
-                    }
-                }
-                else {
-                    text.append( "  " + word);
-                    if (reading != null)
-                        text.append( " [" + reading + "]");
-                    text.append( "\\n" + translation);
-                    lastword = word;
-                    lasttranslation = translation;
-                }
-            }
+    /**
+     * Appends the text for an annotation.
+     *
+     * @param intext Text to which the annotation is appended.
+     * @param a The annotation to append.
+     */
+    protected StringBuffer addAnnotationText( StringBuffer text, Parser.TextAnnotation a) {
+        String dictionary = null;
+        if (a instanceof Reading)
+            dictionary = ((Reading) a).getWordReadingPair().getDictionary().getName();
+        else if (a instanceof Translation)
+            dictionary = ((Translation) a).getDictionaryEntry().getDictionary().getName();
+        if (!dictionary.equals( lastdictionary)) {
+            text.append( dictionary + ":\\n");
+            lastdictionary = dictionary;
+            lastword = "";
+            lasttranslation = "";
         }
 
+        String translation = "";
+        if (a instanceof Translation) {
+            StringBuffer t = new StringBuffer();
+            String[] translations = ((Translation) a).getDictionaryEntry().getTranslations();
+            for ( int j=0; j<translations.length; j++) {
+                t.append( "    ");
+                t.append( translations[j]);
+                t.append( "\\n");
+            }
+            translation = t.toString();
+        }
+        
+        if (a instanceof AbstractAnnotation) {
+            AbstractAnnotation aa = (AbstractAnnotation) a;
+            String word = aa.getWord();
+            String reading = aa.getReading();
+            if (word.equals( lastword) && translation.equals( lasttranslation)) {
+                // merge two word entries if reading and translation are equal
+                // insert new reading
+                int pos = text.length() - lasttranslation.length() - 3;
+                if (pos < 0)
+                    System.out.println( text + "\n" + lasttranslation);
+                if (reading != null) {
+                    if (text.charAt( pos) != ']')
+                        // last word had no reading
+                        text.insert( pos, " []");
+                    else {
+                        text.insert( pos, '\u3001');
+                        pos++;
+                    }
+                    text.insert( pos, reading);
+                }
+            }
+            else {
+                text.append( "  " + word);
+                if (reading != null)
+                    text.append( " [" + reading + "]");
+                text.append( "\\n" + translation);
+                lastword = word;
+                lasttranslation = translation;
+            }
+        }
+    
         // escape special characters
         for ( int i=text.length()-1; i>=0; i--) {
             switch (text.charAt( i)) {
@@ -286,7 +319,7 @@ public class HTMLAnnotator {
             }
         }
 
-        return text.toString();
+        return text;
     }
 
     protected String getTagName( StringBuffer text) {
@@ -300,7 +333,7 @@ public class HTMLAnnotator {
     protected StringBuffer rewriteURL( String name, StringBuffer tag, URLRewriter rewriter) {
         String target = null;
         
-        if (name.equals( "a"))
+        if (name.equals( "a") || name.equals( "area"))
             target = "href";
         else if (name.equals( "img"))
             target = "src";
