@@ -1,0 +1,41 @@
+% Encoding: EUC-JP
+% This is a EUC-JP encoded Japanese LaTeX document generated
+% by JGloss from %document-filename% on %generation-time%.
+% Use platex to process this file.
+% Note that the file ruby-annotation.sty which comes with JGloss
+% must be installed.
+%
+% template-author: Michael Koch <tensberg@gmx.net>
+% The template file may be freely redistributed unmodified
+% or modified.
+% $Id$
+
+\documentclass[%font-size%pt]{jarticle}
+\usepackage[overlap,CJK]{ruby-annotation}
+\usepackage{pslatex}
+\renewcommand{\thefootnote}{}
+
+\begin{document}
+
+\pagestyle{myheadings}
+\markright{%document-title%}
+\newlength{\ww}
+\settowidth{\ww}{%longest-word%--}
+\newlength{\rw}
+\settowidth{\rw}{%longest-reading%--}
+
+\newlength{\tw}
+\setlength{\tw}{\textwidth}
+\addtolength{\tw}{-1.0\ww}
+\addtolength{\tw}{-1.0\rw}
+% I don't know where the -20pt come from, but they have to be there for
+% the layout to work.
+\addtolength{\tw}{-20pt}
+\newcommand{\fn}[3]{\footnotetext{\makebox[\ww][l]{#1} \makebox[\rw][l]{#2} \parbox[t]{\tw}{#3}}}
+
+%begin text
+%ruby \\ruby{%word%}{%reading%}
+%translation \\fn{%dictionary-word%}{%dictionary-reading%}{%translation%}
+%end text
+
+\end{document}

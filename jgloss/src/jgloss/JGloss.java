@@ -456,14 +456,15 @@ public class JGloss {
      * @see JavaPreferences
      */
     private static Preferences initPreferences() {
+        Preferences prefs = null;
         try {
             // Test for availability of JDK1.4 prefs API
             // We have to use instantiation via Class.forName, because otherwise the Java VM
             // dies while JGloss is initialized on Java 1.3 because the java.util.prefs classes
             // can't be found
-            Preferences prefs = (Preferences) Class.forName( "jgloss.JavaPreferences").newInstance();
+            prefs = (Preferences) Class.forName( "jgloss.JavaPreferences").newInstance();
             // copy old settings if needed
-            if (!prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, true) &&
+            if (!prefs.getBoolean( Preferences.PREFERENCES_MIGRATED, false) &&
                 new File( PropertiesPreferences.PREFS_FILE).exists()) {
                 PropertiesPreferences prop = new PropertiesPreferences();
                 prop.copyPreferences( prefs);
@@ -484,6 +485,23 @@ public class JGloss {
         } catch (InstantiationException ex3) {
             ex3.printStackTrace();
         }
-        return new PropertiesPreferences(); // use properties-based prefs
+
+        if (prefs == null) // JavaPreferences not available
+            prefs = new PropertiesPreferences(); // use properties-based prefs
+
+        // migrate export.encoding, which was used in JGloss 1.0.3 and earlier
+        String encoding = prefs.getString( "export.encoding");
+        if (encoding == null) // encoding wasn't set, use old default value
+            encoding = "SHIFT_JIS";
+        if (prefs.getString( Preferences.EXPORT_PLAINTEXT_ENCODING).length() == 0)
+            prefs.set( Preferences.EXPORT_PLAINTEXT_ENCODING, encoding);
+        if (prefs.getString( Preferences.EXPORT_HTML_ENCODING).length() == 0)
+            prefs.set( Preferences.EXPORT_HTML_ENCODING, encoding);
+        if (prefs.getString( Preferences.EXPORT_ANNOTATIONLIST_ENCODING).length() == 0)
+            prefs.set( Preferences.EXPORT_ANNOTATIONLIST_ENCODING, encoding);
+        if (prefs.getString( Preferences.EXPORT_EXCLUSIONS_ENCODING).length() == 0)
+            prefs.set( Preferences.EXPORT_EXCLUSIONS_ENCODING, encoding);
+
+        return prefs;
     }
 } // class JGloss

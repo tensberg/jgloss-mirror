@@ -92,6 +92,7 @@ button.overwrite=Overwrite
 button.choose=Choose...
 button.select=Select
 button.annotate=Annotate
+button.add=Add...
 
 jgloss.title=JGloss
 jgloss.version=Version 1.0.4
@@ -357,6 +358,11 @@ annotationeditor.action.addtodictionary.ak=U
 annotationeditor.action.hide.ak=H
 
 export.encodings=Encoding:
+export.templates=Template:
+export.template.unmatchedbegin=No matching end marker for {0} in export template, line {1,number}.
+export.template.patternredefined=Redefined pattern in export template, line {0,number}.
+export.template.unknownline=Unrecognized line {0,number} in export template.
+export.choosetemplate=Choose a template
 export.annotationlist.title=Export annotation list
 export.annotationlist.header=\# annotation list for {0}\n\# Encoding: {1}\n
 export.writereading=Write readings
@@ -367,14 +373,12 @@ export.html.title=Export HTML
 export.html.interactive=Interactive HTML
 export.html.backwardscompatible=Backwards Compatible
 export.latex.title=Export LaTeX
-export.latex.translationsonpage=Place translation on same page as word
-export.latex.header=\
-% This is a EUC-JP encoded Japanese LaTeX document generated\n\
-% by JGloss from {0} on {1,date,medium}, {1,time,short}.\n\
-% Use platex to process this file.\n\
-% Note that the file ruby-annotation.sty which comes with JGloss\n\
-% must be installed.\n\n
-export.latex.vocabulary=\ --- Vocabulary List
+export.latex.fontsize=Font Size:
+export.latex.fontsize_pt=pt
+
+# List of templates stored in jgloss.jar and accessible as resource
+# The format of the list is "path:description:path:description:..."
+export.latex.templates=/data/templates/platex-top.tex:platex - translations on page:/data/templates/platex-list.tex:platex - translations at end:/data/templates/platex-ruby.tex:platex - no translations
 
 about.frame.title=About JGloss
 about.title=JGloss 1.0.4

@@ -45,7 +45,6 @@ DISTNAME := jgloss-$(RELEASE)
 
 PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotation jgloss.www
 
-DATA := vconj HTMLExporter HTMLAnnotator COPYING
 DATA_WWW := HTMLAnnotator vconj
 
 ICONS := jgloss.png html.png tex.png txt.png chasen.png
@@ -138,7 +137,8 @@ setup:
 	mkdir -p resources/icons
 	cp $(addprefix src/resources/icons/, $(ICONS)) resources/icons
 	mkdir -p data
-	cp $(addprefix src/data/, $(DATA)) data
+	cp -r src/data/* data
+	-cd data && find -depth -name "CVS" -exec rm -r \{\} \;
 
 setup_www:
 	mkdir -p data

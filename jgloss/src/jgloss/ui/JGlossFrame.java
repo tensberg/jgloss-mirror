@@ -26,6 +26,7 @@ package jgloss.ui;
 import jgloss.*;
 import jgloss.ui.doc.*;
 import jgloss.ui.annotation.*;
+import jgloss.ui.export.*;
 import jgloss.dictionary.*;
 
 import java.awt.*;
@@ -1427,76 +1428,24 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Exports the document as plain text to a user-specified file.
      */
     private void doExportPlainText() {
-        JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
-        f.setDialogTitle( JGloss.messages.getString( "export.plaintext.title"));
-        f.setFileHidingEnabled( true);
-        f.setFileView( CustomFileView.getFileView());                            
+        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
+                                                     JGloss.messages.getString( "export.plaintext.title"));
 
-        // setup the encoding chooser
-        JPanel p = new JPanel();
-        p.setLayout( new GridLayout( 1, 1));
-        Box b2 = Box.createVerticalBox();
-        Box b = Box.createHorizontalBox();
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( new JLabel( JGloss.messages.getString( "export.encodings")));
-        b.add( Box.createHorizontalStrut( 3));
-        JComboBox encodings = new JComboBox( JGloss.prefs.getList( Preferences.ENCODINGS, ','));
-        encodings.setSelectedItem( JGloss.prefs.getString( Preferences.EXPORT_ENCODING));
-        encodings.setEditable( true);
-        b.add( encodings);
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-        b2.add( Box.createVerticalStrut( 3));
-
-        b = Box.createHorizontalBox();
-        JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
-        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_PLAINTEXT_WRITEREADING, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeReading, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        b = Box.createHorizontalBox();
-        JCheckBox writeTranslations = 
-            new JCheckBox( JGloss.messages.getString( "export.writetranslations"));        
-        writeTranslations.setSelected( JGloss.prefs.getBoolean
-                                       ( Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeTranslations, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        b = Box.createHorizontalBox();
-        JCheckBox writeHidden = 
-            new JCheckBox( JGloss.messages.getString( "export.writehidden"));        
-        writeHidden.setSelected( JGloss.prefs.getBoolean
-                                 ( Preferences.EXPORT_PLAINTEXT_WRITEHIDDEN, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeHidden, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        p.add( UIUtilities.createSpaceEater( b2, false));
-        f.setAccessory( p);
+        f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_PLAINTEXT_ENCODING);
+        f.addElement( ExportFileChooser.WRITE_READING, Preferences.EXPORT_PLAINTEXT_WRITEREADING);
+        f.addElement( ExportFileChooser.WRITE_TRANSLATIONS, Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS);
+        f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_PLAINTEXT_WRITEHIDDEN);
 
         int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
-            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             Writer out = null;
             try {
                 out = new BufferedWriter( new OutputStreamWriter
                     ( new FileOutputStream( f.getSelectedFile()),
-                      (String) encodings.getSelectedItem()));
-                JGloss.prefs.set( Preferences.EXPORT_ENCODING, (String) encodings.getSelectedItem());
-                JGloss.prefs.set( Preferences.EXPORT_PLAINTEXT_WRITEREADING,
-                                  writeReading.isSelected());
-                JGloss.prefs.set( Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS,
-                                  writeTranslations.isSelected());
-                JGloss.prefs.set( Preferences.EXPORT_PLAINTEXT_WRITEHIDDEN,
-                                  writeHidden.isSelected());
+                      f.getEncoding()));
                 PlainTextExporter.export( doc, (AnnotationModel) annotationEditor.getModel(),
-                                          out, writeReading.isSelected(), writeTranslations.isSelected(),
-                                          writeHidden.isSelected());
+                                          out, f.getWriteReading(), f.getWriteTranslations(),
+                                          f.getWriteHidden());
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
@@ -1520,84 +1469,24 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Exports the document as plain text to a user-specified file.
      */
     private void doExportLaTeX() {
-        JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
-        f.setDialogTitle( JGloss.messages.getString( "export.latex.title"));
-        f.setFileHidingEnabled( true);
-        f.setFileView( CustomFileView.getFileView());
-        f.setFileFilter( new ExtensionFileFilter( "tex", 
-                                                  JGloss.messages.getString
-                                                  ( "filefilter.description.latex")));
+        LaTeXExportFileChooser f = new LaTeXExportFileChooser( JGloss.getCurrentDir());
 
-        // setup the encoding chooser
-        JPanel p = new JPanel();
-        p.setLayout( new GridLayout( 1, 1));
-        Box b2 = Box.createVerticalBox();
-        Box b = Box.createHorizontalBox();
-        JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
-        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_LATEX_WRITEREADING, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeReading, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        b = Box.createHorizontalBox();
-        final JCheckBox writeTranslations = 
-            new JCheckBox( JGloss.messages.getString( "export.writetranslations"));        
-        writeTranslations.setSelected( JGloss.prefs.getBoolean
-                                       ( Preferences.EXPORT_LATEX_WRITETRANSLATIONS, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeTranslations, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        b = Box.createHorizontalBox();
-        final JCheckBox translationsOnPage = 
-            new JCheckBox( JGloss.messages.getString( "export.latex.translationsonpage"));        
-        translationsOnPage.setSelected( JGloss.prefs.getBoolean
-                                        ( Preferences.EXPORT_LATEX_TRANSLATIONSONPAGE, true));
-        translationsOnPage.setEnabled( writeTranslations.isSelected());
-        b.add( Box.createHorizontalStrut( 24));
-        b.add( UIUtilities.createSpaceEater( translationsOnPage, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-        writeTranslations.addItemListener
-            ( new ItemListener() {
-                    public void itemStateChanged( ItemEvent e) {
-                        translationsOnPage.setEnabled( writeTranslations.isSelected());
-                    }
-                });
-
-        b = Box.createHorizontalBox();
-        JCheckBox writeHidden = 
-            new JCheckBox( JGloss.messages.getString( "export.writehidden"));        
-        writeHidden.setSelected( JGloss.prefs.getBoolean
-                                 ( Preferences.EXPORT_LATEX_WRITEHIDDEN, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeHidden, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        p.add( UIUtilities.createSpaceEater( b2, false));
-        f.setAccessory( p);
+        f.addTemplateChooser( Preferences.EXPORT_LATEX_TEMPLATE, Preferences.EXPORT_LATEX_USERTEMPLATES);
+        f.addFontSizeChooser( Preferences.EXPORT_LATEX_FONTSIZE);
+        f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_LATEX_WRITEHIDDEN);
 
         int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
-            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
+            InputStreamReader template = null;
             Writer out = null;
             try {
+                template = f.getTemplate();
                 out = new BufferedWriter( new OutputStreamWriter
-                    ( new FileOutputStream( f.getSelectedFile()), "EUC_JP"));
-                JGloss.prefs.set( Preferences.EXPORT_LATEX_WRITEREADING,
-                                  writeReading.isSelected());
-                JGloss.prefs.set( Preferences.EXPORT_LATEX_WRITETRANSLATIONS,
-                                  writeTranslations.isSelected());
-                JGloss.prefs.set( Preferences.EXPORT_LATEX_TRANSLATIONSONPAGE,
-                                  translationsOnPage.isSelected());
-                JGloss.prefs.set( Preferences.EXPORT_LATEX_WRITEHIDDEN,
-                                  writeHidden.isSelected());
-                LaTeXExporter.export( doc, documentName, (AnnotationModel) annotationEditor.getModel(),
-                                      out, writeReading.isSelected(), writeTranslations.isSelected(),
-                                      translationsOnPage.isSelected(), writeHidden.isSelected());
+                    ( new FileOutputStream( f.getSelectedFile()), template.getEncoding()));
+                new LaTeXExporter().export
+                    ( f.getTemplate(), doc, documentName, f.getFontSize(), 
+                      (AnnotationModel) annotationEditor.getModel(),
+                      out, f.getWriteHidden());
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
@@ -1608,11 +1497,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
                       JGloss.messages.getString( "error.export.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             } finally {
+                if (template != null) try {
+                    template.close();
+                } catch (IOException ex) { ex.printStackTrace(); }
                 if (out != null) try {
                     out.close();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                } catch (IOException ex) { ex.printStackTrace(); }
             }
         }        
     }
@@ -1621,75 +1511,25 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Exports the document as HTML to a user-specified file.
      */
     private void doExportHTML() {
-        JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
-        f.setDialogTitle( JGloss.messages.getString( "export.html.title"));
-        f.setFileHidingEnabled( true);
-        f.setFileFilter( new ExtensionFileFilter
-            ( "html", JGloss.messages.getString( "filefilter.description.html")));
-        f.setFileView( CustomFileView.getFileView());
+        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
+                                                     JGloss.messages.getString( "export.html.title"));
 
-        // setup the encoding chooser
-        JPanel p = new JPanel();
-        p.setLayout( new GridLayout( 1, 1));
-        Box b2 = Box.createVerticalBox();
-        Box b = Box.createHorizontalBox();
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( new JLabel( JGloss.messages.getString( "export.encodings")));
-        b.add( Box.createHorizontalStrut( 3));
-        Vector v = new Vector( 5);
-        JComboBox encodings = new JComboBox( JGloss.prefs.getList( Preferences.ENCODINGS, ','));
-        encodings.setSelectedItem( JGloss.prefs.getString( Preferences.EXPORT_ENCODING));
-        encodings.setEditable( true);
-        b.add( encodings);
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-        b2.add( Box.createVerticalStrut( 3));
-
-        b = Box.createHorizontalBox();
+        f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_HTML_ENCODING);
+        f.addElement( ExportFileChooser.WRITE_READING, Preferences.EXPORT_HTML_WRITEREADING);
+        f.addElement( ExportFileChooser.WRITE_TRANSLATIONS, 
+                      Preferences.EXPORT_HTML_WRITETRANSLATIONS);
         JCheckBox backwardsCompatible = 
             new JCheckBox( JGloss.messages.getString( "export.html.backwardscompatible"));        
         backwardsCompatible.setSelected( JGloss.prefs.getBoolean
                                          ( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( backwardsCompatible, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
+        f.addCustomElement( backwardsCompatible);
+        f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_HTML_WRITEHIDDEN);
 
-        b = Box.createHorizontalBox();
-        JCheckBox writeReading = new JCheckBox( JGloss.messages.getString( "export.writereading"));
-        writeReading.setSelected( JGloss.prefs.getBoolean( Preferences.EXPORT_HTML_WRITEREADING, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeReading, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-        b2.add( Box.createVerticalStrut( 3));
-
-        b = Box.createHorizontalBox();
-        JCheckBox writeTranslations = 
-            new JCheckBox( JGloss.messages.getString( "export.writetranslations"));        
-        writeTranslations.setSelected( JGloss.prefs.getBoolean
-                                       ( Preferences.EXPORT_HTML_WRITETRANSLATIONS, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeTranslations, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        b = Box.createHorizontalBox();
-        JCheckBox writeHidden = 
-            new JCheckBox( JGloss.messages.getString( "export.writehidden"));        
-        writeHidden.setSelected( JGloss.prefs.getBoolean
-                                 ( Preferences.EXPORT_HTML_WRITEHIDDEN, false));
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( UIUtilities.createSpaceEater( writeHidden, true));
-        b.add( Box.createHorizontalStrut( 3));
-        b2.add( b);
-
-        p.add( UIUtilities.createSpaceEater( b2, false));
-        f.setAccessory( p);
+        f.setFileFilter( new ExtensionFileFilter
+            ( "html", JGloss.messages.getString( "filefilter.description.html")));
 
         int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
-            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             Writer out = null;
 
             // The document is modified during export. Save the original changed state.
@@ -1697,20 +1537,13 @@ public class JGlossFrame extends JFrame implements ActionListener {
             try {
                 out = new BufferedWriter( new OutputStreamWriter
                     ( new FileOutputStream( f.getSelectedFile()),
-                      (String) encodings.getSelectedItem()));
-                JGloss.prefs.set( Preferences.EXPORT_ENCODING, (String) encodings.getSelectedItem());
-                JGloss.prefs.set( Preferences.EXPORT_HTML_WRITEREADING,
-                                  writeReading.isSelected());
-                JGloss.prefs.set( Preferences.EXPORT_HTML_WRITETRANSLATIONS,
-                                  writeTranslations.isSelected());
+                      (String) f.getEncoding()));
                 JGloss.prefs.set( Preferences.EXPORT_HTML_BACKWARDSCOMPATIBLE,
                                   backwardsCompatible.isSelected());
-                JGloss.prefs.set( Preferences.EXPORT_HTML_WRITEHIDDEN,
-                                  writeHidden.isSelected());
-                new HTMLExporter( out, (String) encodings.getSelectedItem(), doc,
-                                  writeReading.isSelected(), writeTranslations.isSelected(),
+                new HTMLExporter( out, f.getEncoding(), doc,
+                                  f.getWriteReading(), f.getWriteTranslations(),
                                   backwardsCompatible.isSelected(),
-                                  writeHidden.isSelected()).write();
+                                  f.getWriteHidden()).write();
                 // restore document changed state
                 if (originalDocumentChanged == false) {
                     documentChanged = false;
@@ -1739,39 +1572,22 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Exports the annotation list to a user-specified file.
      */
     private void doExportAnnotationList() {
-        JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
-        f.setDialogTitle( JGloss.messages.getString( "export.annotationlist.title"));
-        f.setFileHidingEnabled( true);
-        f.setFileView( CustomFileView.getFileView());
+        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
+                                                     JGloss.messages.getString
+                                                     ( "export.annotationlist.title"));
 
-        // setup the encoding chooser
-        JPanel p = new JPanel();
-        p.setLayout( new GridLayout( 1, 1));
-        Box b = Box.createHorizontalBox();
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( new JLabel( JGloss.messages.getString( "export.encodings")));
-        b.add( Box.createHorizontalStrut( 3));
-        Vector v = new Vector( 5);
-        JComboBox encodings = new JComboBox( JGloss.prefs.getList( Preferences.ENCODINGS, ','));
-        encodings.setSelectedItem( JGloss.prefs.getString( Preferences.EXPORT_ENCODING));
-        encodings.setEditable( true);
-        b.add( encodings);
-        b.add( Box.createHorizontalStrut( 3));
-        p.add( UIUtilities.createSpaceEater( b, false));
-        f.setAccessory( p);
+        f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_ANNOTATIONLIST_ENCODING);
 
         int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
-            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             Writer out = null;
             try {
                 out = new BufferedWriter( new OutputStreamWriter
                     ( new FileOutputStream( f.getSelectedFile()),
-                      (String) encodings.getSelectedItem()));
-                JGloss.prefs.set( Preferences.EXPORT_ENCODING, (String) encodings.getSelectedItem());
+                      f.getEncoding()));
                 out.write( JGloss.messages.getString( "export.annotationlist.header",
                                                       new Object[] 
-                    { documentName, (String) encodings.getSelectedItem() }));
+                    { documentName, f.getEncoding() }));
                 // do not output duplicate annotations:
                 Set seenAnnotations = new TreeSet();
                 for ( Iterator i=((AnnotationModel) annotationEditor.getModel()).getAnnotationNodes();

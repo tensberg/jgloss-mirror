@@ -111,12 +111,14 @@ public abstract class Preferences {
     public static final String IMPORTCLIPBOARD_FIRSTOCCURRENCE = "importclipboard.firstoccurrence";
     public static final String IMPORTCLIPBOARD_READINGBRACKETS = "importclipboard.readingbrackets";
 
-    public static final String EXPORT_ENCODING = "export.encoding";
+    public static final String EXPORT_PLAINTEXT_ENCODING = "export.plaintext.encoding";
     public static final String EXPORT_PLAINTEXT_WRITEREADING = "export.plaintext.writereading";
     public static final String EXPORT_PLAINTEXT_WRITETRANSLATIONS = 
         "export.plaintext.writetranslations";
     public static final String EXPORT_PLAINTEXT_WRITEHIDDEN = 
         "export.plaintext.writehidden";    
+
+    public static final String EXPORT_HTML_ENCODING = "export.html.encoding";
     public static final String EXPORT_HTML_WRITEREADING = "export.html.writereading";
     public static final String EXPORT_HTML_WRITETRANSLATIONS = 
         "export.html.writetranslations";
@@ -125,18 +127,16 @@ public abstract class Preferences {
     public static final String EXPORT_HTML_WRITEHIDDEN = 
         "export.html.writehidden";
 
-    public static final String EXPORT_LATEX_PREAMBLE = "export.latex.preamble";
-    public static final String EXPORT_LATEX_DOCUMENTCLASS = "export.latex.documentclass";
-    public static final String EXPORT_LATEX_DOCUMENTCLASS_OPTIONS =
-        "export.latex.documentclass.options";
-    public static final String EXPORT_LATEX_RUBY_OPTIONS =
-        "export.latex.ruby.options";
-    public static final String EXPORT_LATEX_WRITEREADING = "export.latex.writereading";
-    public static final String EXPORT_LATEX_WRITETRANSLATIONS = 
-        "export.latex.writetranslations";
-    public static final String EXPORT_LATEX_TRANSLATIONSONPAGE = "export.latex.translationsonpage";
     public static final String EXPORT_LATEX_WRITEHIDDEN = 
         "export.latex.writehidden";    
+    public static final String EXPORT_LATEX_TEMPLATE = "export.latex.template";    
+    public static final String EXPORT_LATEX_USERTEMPLATES = "export.latex.usertemplates";
+    public static final String EXPORT_LATEX_FONTSIZES = "export.latex.fontsizes";
+    public static final String EXPORT_LATEX_FONTSIZE = "export.latex.fontsize";
+
+    public static final String EXPORT_ANNOTATIONLIST_ENCODING = "export.annotationlist.encoding";
+
+    public static final String EXPORT_EXCLUSIONS_ENCODING = "export.exclusions.encoding";
 
     public static final String EXCLUSIONS_FILE = "exclusions.file";
     public static final String EXCLUSIONS_ENCODING = "exclusions.encoding";

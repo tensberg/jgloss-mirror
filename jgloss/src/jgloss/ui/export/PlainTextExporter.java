@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.ui;
+package jgloss.ui.export;
 
 import jgloss.ui.doc.*;
 import jgloss.ui.annotation.*;

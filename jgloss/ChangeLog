@@ -1,4 +1,5 @@
-1.0.4: (2002/04/04)
+1.0.4: (2002/04/05)
+	- Added template-based LaTeX-export.
 	- Font and font size of word lookup result is now configurable.
 	- Added auto-configure option to style settings.
 	- Fixed reading generation for mixed Katakana-Kanji words.

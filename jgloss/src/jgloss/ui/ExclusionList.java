@@ -24,6 +24,7 @@
 package jgloss.ui;
 
 import jgloss.*;
+import jgloss.ui.export.ExportFileChooser;
 import jgloss.dictionary.*;
 
 import java.io.*;
@@ -314,36 +315,16 @@ public class ExclusionList extends JPanel {
      * Displays a file chooser and writes the contents of the JList to the selected file.
      */
     private void exportList() {
-        JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
-        f.setDialogTitle( JGloss.messages.getString( "exclusions.export.title"));
-        f.setFileHidingEnabled( true);
-        f.setFileView( CustomFileView.getFileView());
-
-        // setup the encoding chooser
-        JPanel p = new JPanel();
-        p.setLayout( new GridLayout( 1, 1));
-        Box b = Box.createHorizontalBox();
-        b.add( Box.createHorizontalStrut( 3));
-        b.add( new JLabel( JGloss.messages.getString( "export.encodings")));
-        b.add( Box.createHorizontalStrut( 3));
-        Vector v = new Vector( 5);
-        JComboBox encodings = new JComboBox( JGloss.prefs.getList( Preferences.ENCODINGS, ','));
-        encodings.setSelectedItem( JGloss.prefs.getString( Preferences.EXPORT_ENCODING));
-        encodings.setEditable( true);
-        b.add( encodings);
-        b.add( Box.createHorizontalStrut( 3));
-        p.add( UIUtilities.createSpaceEater( b, false));
-        f.setAccessory( p);
+        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(), "exclusions.export.title");
+        f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_EXCLUSIONS_ENCODING);
 
         int r = f.showSaveDialog( SwingUtilities.getRoot( box));
         if (r == JFileChooser.APPROVE_OPTION) {
-            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             BufferedWriter out = null;
             try {
                 out = new BufferedWriter( new OutputStreamWriter
                     ( new FileOutputStream( f.getSelectedFile()),
-                      (String) encodings.getSelectedItem()));
-                JGloss.prefs.set( Preferences.EXPORT_ENCODING, (String) encodings.getSelectedItem());
+                      f.getEncoding()));
                 DefaultListModel m = (DefaultListModel) exclusionList.getModel();
                 for ( int i=0; i<m.size(); i++) {
                     String word = m.get( i).toString();

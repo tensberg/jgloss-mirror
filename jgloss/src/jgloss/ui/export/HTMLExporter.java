@@ -21,8 +21,10 @@
  *
  */
 
-package jgloss.ui.doc;
+package jgloss.ui.export;
 
+import jgloss.ui.*;
+import jgloss.ui.doc.*;
 import jgloss.dictionary.*;
 
 import java.io.*;
