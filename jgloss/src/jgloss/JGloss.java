@@ -264,19 +264,20 @@ public class JGloss {
                         }
                     });
             }
-            else {
-                if (args.length == 0) {
-                    if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP))
-                        WordLookup.getFrame().show();
-                    else
-                        new JGlossFrame();
-                }
+            
+            if (args.length==0 || pasteFrameActive) {
+                if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP))
+                    WordLookup.getFrame().show();
                 else
-                    for ( int i=0; i<args.length; i++) {
-                        JGlossFrame f = new JGlossFrame();
-                        f.loadDocument( args[i]);
-                    }
+                    new JGlossFrame();
             }
+            else {
+                for ( int i=0; i<args.length; i++) {
+                    JGlossFrame f = new JGlossFrame();
+                    f.loadDocument( args[i]);
+                }
+            }
+
             splash.close();
         } catch (NoClassDefFoundError ex) {
             displayError( messages.getString( "error.noclassdef"), ex, true);

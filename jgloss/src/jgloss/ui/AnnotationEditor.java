@@ -443,7 +443,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                             break;
                         }
                     }
-                    if (!isHiragana || selection.getDictionaryFormNode().getReading()==null)
+                    if (!isHiragana || selection.getDictionaryFormNode().getReading().length()==0)
                         ExclusionList.addWord( selection.getDictionaryFormNode().getWord());
                     else
                         ExclusionList.addWord( selection.getDictionaryFormNode().getReading());
