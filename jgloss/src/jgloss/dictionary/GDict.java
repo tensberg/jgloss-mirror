@@ -101,7 +101,7 @@ public class GDict extends FileBasedDictionary {
      * pattern is matched.
      */
     protected static final Pattern ALTERNATIVES_PATTERN = Pattern.compile
-        ( "((?:[^(]+?|(?:\\(.*?(?:\\)|(?:\\||$))))+?)(?:;\\s|$)");
+        ( "((?:[^(]+?|(?:\\(.*?(?:\\)|(?:\\||$))))+?)(\\s\\[\\d+\\])?(?:;\\s|$)");
     protected static Matcher ALTERNATIVES_MATCHER = ALTERNATIVES_PATTERN.matcher( "");
     /**
      * Matches translation ranges of meaning. Group 1 contains the number of the range written in 
@@ -141,6 +141,11 @@ public class GDict extends FileBasedDictionary {
                 byte b2 = dictionary.get( offset-2);
                 return (b2 == ';' || b2 == ']');
             }
+            if (b=='(' && 
+                (dictionary.get( offset)&0xf0)==0xe0)
+                // ( followed by a 3-byte encoded character is assumed to be an alternative
+                // spelling in the word field
+                return true;
             return false;
         } catch (IndexOutOfBoundsException ex) {
             return true;
