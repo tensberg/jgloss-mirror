@@ -40,11 +40,21 @@
         <param-name>allowed_protocols</param-name>
         <param-value>http:ftp</param-value>
         <description>
-            List of protocols which are allowed in the URLs which the user specifies. Be careful
+            List of protocols which are allowed in the URLs used to access remote locations. Be careful
             with what you allow. If you allow "file", the user can access all files on the webserver
             to which the servlet has read access. If the user
             specifies a protocol which is not allowed by this configuration parameter, the
-            servlet will send an error page. The separator character is a ':'.
+            servlet will send a 403 "Forbidden" error. The separator character is a ':'.
+        </description>
+      </init-param>
+
+      <init-param>
+        <param-name>secure_allowed_protocols</param-name>
+        <param-value>http:https:ftp</param-value>
+        <description>
+            This is the same as allowed_protocols, except this list will be used if the client is
+            connected to the servlet through a secure protocol (e. g. https). If you do not set
+            this parameter, secure access is not allowed.
         </description>
       </init-param>
 
