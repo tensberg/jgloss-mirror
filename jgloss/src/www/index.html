@@ -9,11 +9,29 @@
 -->
 <head>
 <title>JGloss-WWW</title>
-<script language="JavaScript" src="converturl.js" type="text/javascript"></script>
-</head>
-<body>
 
-<div id="content">
+<style type="text/css">
+<!--
+body { margin: 0px; }
+
+td.toc { width: 14%; font-size: 80%; }
+div.toc { position: fixed; padding: 5px; }
+td.content { width: 86%; }
+
+//-->
+</style>
+
+</head>
+
+<body bgcolor="white" text="black">
+
+<table>
+<tr>
+
+<!-- table of contents -->
+<td valign="top" class="toc" bgcolor="azure">
+
+<div class="toc">
 <a href="#title">JGloss-WWW</a><br>
 <a href="#urlformat">URL format</a><br>
 <a href="#form2">URL-Converter</a><br>
@@ -23,8 +41,11 @@
 <a href="#security">Security/Privacy considerations</a><br>
 <a href="#whyservlet">Why a servlet?</a><br>
 </div>
+</td>
 
-<div style="margin-top: 15px;">
+<!-- content -->
+<td valign="top" class="content">
+
 <a name="title"><h2>JGloss-WWW</h2></a>
 <p>
 JGloss-WWW is a Java servlet which proxies web content. Words in a Japanese HTML document
@@ -298,8 +319,12 @@ I don't think this is possible with the current plugin APIs.
 
 <hr>
 (C) 2001 <a href="mailto:tensberg@gmx.net">Michael Koch &lt;tensberg@gmx.net&gt;</a>;
-    last updated: $date$<br>
+    last updated: $Date$<br>
     Any part of this document may be freely copied, modified and redistributed.
-</div>
+</td>
+
+</tr>
+</table>
+
 </body>
 </html>

@@ -62,7 +62,7 @@
 
 (define %html-ext% ".html")
 (define %root-filename% "index")
-(define nochunks #t)
+;;(define nochunks #t)
 (define rootchunk #t)
 
 (define (toc-depth nd) 2)
