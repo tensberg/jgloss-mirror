@@ -1,39 +1,305 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
 <!-- (c) 2001 Michael Koch (tensberg@gmx.net)
- Example html start page for use with the jgloss.www.JGlossServlet.
+ Documentation/example html start page for use with the jgloss.www.JGlossServlet
+
+ Any part of this document may be freely copied, modified and redistributed.
 
  $Id$ 
 -->
 <head>
 <title>JGloss-WWW</title>
-
 <script language="JavaScript" src="converturl.js" type="text/javascript"></script>
 </head>
 <body>
-<h2>JGloss-WWW</h2>
+
+<div id="content">
+<a href="#title">JGloss-WWW</a><br>
+<a href="#urlformat">URL format</a><br>
+<a href="#form2">URL-Converter</a><br>
+<a href="#cookieforwarding">Cookie forwarding</a><br>
+<a href="#formdataforwarding">Form data forwarding</a><br>
+<a href="#rewriting">The rewriting process</a><br>
+<a href="#security">Security/Privacy considerations</a><br>
+<a href="#whyservlet">Why a servlet?</a><br>
+</div>
+
+<div style="margin-top: 15px;">
+<a name="title"><h2>JGloss-WWW</h2></a>
 <p>
-Example page for using the JGloss-WWW servlet to rewrite Japanese web pages. The servlet
-will read a Japanese HTML page from the URL you enter, look up the words in the text
-and display the results via JavaScript when you move the mouse over a word.
+JGloss-WWW is a Java servlet which proxies web content. Words in a Japanese HTML document
+are annotated on the fly with their readings and translations. These annotations are
+shown as pop-ups when the user moves the mouse over a word using JavaScript (currently
+only Mozilla is supported).
+</p><p>
+To use the servlet you will need a servlet container (application implementing the
+servlet API specification), for example <a href="http://jakarta.apache.org/">Tomcat</a>.
+You can build the servlet by typing "make jgloss-www" in the root directory
+of the <a href="http://sourceforge.net/project/showfiles.php?group_id=29259">JGloss source code
+</a>. All necessary
+files will be copied to the folder "jgloss-www". The servlet is configured by editing the
+file "web.xml" in the WEB-INF subdirectory. The following form shows how you can call the
+servlet. This assumes that the the servlet is registered with the servlet container under
+the name "jgloss-www" at the same location as this page.
 </p>
 
-<h3>Enter a URL</h3>
+<a name="form1"><h3>Enter a URL</h3></a>
 <form action="jgloss-www" method="get">
 URL: <input type="text" name="jgurl" size="80"> <input type="submit" value="Go!"><br><br>
 <input type="checkbox" name="jgforwardcookies" value="true">forward cookies<br>
 <input type="checkbox" name="jgforwardforms" value="true">forward form data<br>
 </form>
 
-<h3>URL-Converter</h3>
+<a name="urlformat"><h4>URL format</h4>
+<p>
+The CGI query parameters will be converted by the servlet to a URL of the form
+"<code>path to servlet/flags/base url</code>". There are two flags: 
+<code>forward cookies</code> and <code>forward form data</code>. A "1" means that the
+feature is enabled, a "0" disables it. The base URL points to the document on the
+remote server which should be forwarded and possibly rewritten by JGloss-WWW. The URL is escaped by
+replacing all special characters with a '_' followed by the hexadecimal character
+code. (The standard '%' escaping mechanism is not used because the URL may or may not
+be unescaped by the servlet container before it is passed to the servlet).
+</p><p>
+Instead of using CGI query parameters, the generated URL can be used directly to access
+the remote document through JGloss-WWW. The following form does the URL encoding/decoding
+via JavaScript. The JavaScript source is <a href="converturl.js">here</a>.
+</p>
+
+<a name="form2"><h3>URL-Converter</h3></a>
 <form name="urlconverter" onSubmit="return false">
 JGloss-WWW URL: <br><input type="text" name="jglossurl" size="80">
           <input type="button" value="Convert" onClick="jglossToBase()"> <br>
 Base URL: <br><input type="text" name="baseurl" size="80">
           <input type="button" value="Convert" 
-                 onClick="baseToJGloss( &quot;jgloss-www&quot;)"> <br>
-<input type="checkbox" name="forwardcookies">Forward cookies<br>
-<input type="checkbox" name="forwardformdata">Forward form data<br>
+                 onClick="baseToJGloss()"> <br>
+<input type="checkbox" name="forwardcookies">forward cookies<br>
+<input type="checkbox" name="forwardformdata">forward form data<br>
 </form>
+
+<a name="cookieforwarding"><h4>Cookie forwarding</h4></a>
+<p>
+JGloss-WWW can forward cookies from client to remote server and back. This feature has
+to be enabled globally on the JGloss-WWW server by setting the initialization parameters
+in web.xml, and can be disabled/enabled on a per-connection basis by 
+setting the <code>forward cookies</code> flag.
+</p><p>
+For cookie forwarding to work, 
+the cookie has to be encapsulated when sent to the user. When the remote server
+wants to set a cookie, the domain, path and portlist attributes of the cookie are
+added to the cookie name in the form <code>domain|path|portlist|original name</code>,
+and are changed to the JGloss-WWW server specific values. Since on the client side all
+cookies set while browsing through JGloss-WWW originate from the JGloss-WWW server, the
+usual client mechanism of filtering cookies based on the original domain is not possible.
+The servlet does however implement the basic rejection criteria described in RFC2965.
+</p><p>
+When the client makes a request through JGloss-WWW, it will send all cookies it received
+earlier back to the servlet.
+The servlet will reconstruct the original domain/path/portlist from the cookie name
+and only forward the cookies which match the remote URL as described in RFC2965 (with some
+relaxations for Netscape-style cookies to stay compatible). Note that since all encapsulated
+cookies originate from the JGloss-WWW server, the client will always send all cookies set
+while browsing through JGloss-WWW. This could become a problem if the user
+is on a slow connection and many cookies are set. This happens even if cookie forwarding
+is disabled for a connection if cookies have been set during previous sessions.
+</p><p>
+Disabling cookie forwarding has basically the same effect as disabling cookies in the client
+browser. Cookies will not be sent to the remote server, and sites which require cookies will
+not work properly.
+</p><p>
+The cookie forwarding mechanism will not work with cookies set by a JavaScript in the HTML
+page transmitted to the client.
+</p>
+
+<a name="formdataforwarding"><h4>Form data forwarding</h4></a>
+<p>
+Form data from both GET and POST forms can be forwarded by the JGloss-WWW servlet. This
+feature has to be enabled globally on the JGloss-WWW server by setting the initialization
+parameters in web.xml, and can be disabled/enabled on a per-connection basis by setting
+the <code>forward form data</code> flag. 
+</p><p>
+If the feature is disabled, forms will not be
+changed when the HTML page is rewritten. Therefore when the user submits the form, the
+client web browser will contact the originating server directly and the data and response
+will not pass through the JGloss-WWW server. This also means that the resulting page will
+not be annotated, and cookies will not be encapsulated which means that re-opening the page
+through the servlet might not lead to the expected results.
+</p><p>
+Data passed in the query part of the URL will be appended to the remote URL before opening
+the connection. If POST is used, the body of the client request will be copied
+verbatim to the remote server connection.
+</p>
+
+<a name="rewriting"><h4>The rewriting process</h4></a>
+<p>
+What follows is an (incomplete) description of how the servlet processes a request. 
+</p><p>
+The flags and remote URL are decoded and tested against the configuration parameters. If the remote
+URL is malformed or the protocol is not allowed by the configuration, an error is sent. If
+form data forwarding is enabled, query parameters present in the request URL
+will be added to the remote URL. If cookie forwarding is enabled, the cookies will be added before
+connecting to the remote URL. All applicable request headers will be forwarded to the remote URL
+connection.
+</p><p>
+When the connection to the remote URL is established, form data uploaded by a POST request will
+be copied to the remote connection if enabled. If the response from the remote server is a
+redirect directive, the redirect will be followed, establishing a new connection. If the
+remote server wants to set cookies and cookie forwarding is enabled, the cookies will be
+added to the servlet response. If rewriting is enabled for the content type of the response 
+sent by the remote server, the response document will be rewritten before sending it to
+the client. Otherwise, the response is tunneled (copied unchanged) to the client.
+All applicable response headers will be forwarded to the reply.
+</p><p>
+Rewriting an HTML document involves both annotating Japanese text with translations and
+changing any links in the document. For the text annotation, a JavaScript fragment is added
+to the header of the document, and a <code>&lt;span&gt;</code> element containing the
+annotation text and a JavaScript call which shows it is added to each annotated word.
+URL rewriting currently supports links in the <code>&lt;a&gt;</code>, <code>&lt;area&gt;</code>,
+<code>&lt;img&gt;</code> and <code>&lt;form&gt;</code> tags. Relative URLs will be made
+absolute using the remote URL. For <code>&lt;a&gt;</code> and <code>&lt;area&gt;</code>
+the URL will be changed to point to the JGloss-WWW servlet,
+if the protocol of the URL is allowed by the servlet configuration. For
+<code>&lt;form&gt;</code> tags, this will only be done if form data forwarding is enabled,
+otherwise the <CODE>action</CODE> link will point to the original location and a submit
+of the form will open a direct connection from the client to the remote server.
+</p>
+
+<a name="security"><h4>Security/Privacy considerations</h4></a>
+<p>
+This section describes the security and privacy implications of using the JGloss-WWW servlet.
+I tried to cover all aspects, but don't claim completeness. The main consequence
+for a user is that he should NEVER use JGloss-WWW when security/privacy
+relevant data could be transmitted, unless he fully trusts the JGloss-WWW server operator;
+and an administrator of a JGloss-WWW server should carefully consider what features of the
+servlet he enables.
+</p>
+<h5>Secure connections</h5>
+<p>
+The JGloss-WWW servlet supports secure connections between both client and servlet, and
+servlet and remote server. For a secure client/servlet connection, the servlet container
+has to be configured to allow secure connections. For a secure servlet/remote server connection,
+a protocol handler for https URL connections has to be installed in the Java Runtime.
+The Sun implementation of the Java Secure Sockets Extension (JSSE) contains such a protocol
+handler.
+</p><p>
+What is important for the servlet user to know is that the servlet ALWAYS has access to ALL DATA
+passed through the servlet between the client and the remote server, even if a secure 
+connection is used. Unlike proxies which tunnel SSL connections, the servlet will 
+always decrypt data it receives. This is necessary because otherwise HTML pages transferred 
+over a secure connection could not be rewritten.
+</p><p>
+If secure connections are enabled, there are four modes of data transfer between 
+client-servlet/servlet-remote server. If the connection is insecure/insecure, the usual
+security rules apply: don't transmit any sensitive data. 
+</p><p>
+A secure/insecure connection will
+make it (hopefully) impossible to intercept and read the transferred data between client 
+and servlet, but the servlet/remote server connection is not secure. If a user browses
+insecure pages this way he should not enter any security-sensitive data. The problem with
+this is that the client browser will show that the connection to the displayed page is secure
+when in fact only the connection to the servlet is secure. The JGloss-WWW 
+administrator should consider disabling secure access to the servlet if he wants to avoid
+misunderstandings. 
+</p><p>
+A secure/secure
+connection should make it impossible to intercept and read the transferred data between 
+client, servlet and remote server. The servlet will still have full access to all transferred
+data, so users should not transmit sensitive data unless they fully trust the JGloss-WWW server
+operator. The encryption algorithms and key lengths used between client and servlet, and servlet
+and remote server may be different, and the user has no method of looking up this information.
+To avoid misleading the user on the level of security used on connections, the JGloss-WWW server
+administrator should consider disabling secure connections by configuring the servlet accordingly.
+</p><p>
+When using a insecure/secure connection, data transferred between client and servlet can be
+intercepted and read. While the client browser shows that the connection is not secure, the
+displayed page might say that the connection is secure, because the remote server only saw
+the secure connection to the servlet. This may mislead the user on the level of security and
+therefore the JGloss-WWW administrator should not enable secure protocols if 
+the connection to the servlet is insecure.
+</p><p>
+Establishing a secure connection requires a trusted public key certificate from the remote server.
+A client usually comes with a chain of root certificates which will be used to verify server
+certificates. If a certificate cannot be verified the client usually rejects the connection or
+asks the user if the connection should be established nevertheless. If a https URL connection
+handler has been installed on the JGloss-WWW server to establish secure connections to remote
+servers, the root certificate chain of the JGloss-WWW server usually differs from the one at the
+client. This means that the servlet may accept connections which the client would reject, and
+that a connection may be rejected by the servlet even if the client would accept the connection.
+There is currently no way to avoid this problem.
+</p>
+<h5>Cookies and form data</h5>
+<p>
+Regardless of the cookie forwarding configuration, a cookie sent from the server will always
+be seen by the servlet, and all cookies forwarded by JGloss-WWW to a client will always
+be transmitted back to the servlet (unless the user deletes them through a browser interface).
+Therefore, disabling cookie forwarding does not increase security, but privacy
+might be enhanced because remote sites can not track the user through cookies (this is the
+same as disabling cookies in the browser). Cookies are per definition not secure and should
+not contain sensitive information, unless transmitted over a secure connection. The "secure"
+flag of a cookie signals the browser that the cookie should only be sent over a secure
+connection. The <code>enable_secure-to-insecure_cookie_forwarding</code> initialization 
+parameter of the servlet controls if cookies without the "secure" flag should be forwarded 
+from a secure to an insecure connection. Since this is the expected behavior, it should
+usually be enabled. "secure" cookies will never be forwarded over an insecure connection.
+</p><p>
+If form data forwarding is enabled, the <code>action</code> attributes of forms will
+be changed to point to the JGloss-WWW servlet. As a result, the servlet will see all
+data entered in the form. If a user wants to prevent this, he should disable form data
+forwarding. The browser will then connect directly to the remote server when the form
+is submitted. This will of course prevent the annotation of the resulting page.
+The <code>enable_secure-to-insecure_form_data_forwarding</code> initialization 
+parameter of the servlet controls if data will be forwarded if the client-servlet
+connection is secure but the servlet-remote server connection isn't. If this is disabled,
+accidental transfer of sensitive data over an insecure connection is prevented, but
+non-sensitive data can not be transferred either. This does effectively prevent
+all forms pointing to insecure locations from working.
+</p><p>
+Since the target of a form is usually not shown in the browser, there is no easy way to
+see if form data in a page will be forwarded through JGloss-WWW or not. There is also
+no obvious way to disable form data forwarding if it was initially disabled. Currently
+the only way is to change the form forwarding flag in the URL 
+(see <a href="#urlformat">URL format</a>) and reload the page.
+</p>
+<h5>Installation/Implementation</h5>
+<p>
+The implementation is currently experimental and has undergone only minimal testing. This
+means that there is no guarantee that the servlet will really behave in the way documented
+here. The servlet may be vulnerable against attacks by crackers. It will open
+network connections specified by an URL entered by an untrusted user, and these connections
+will have the access privileges given to the servlet by the servlet container. Care should
+be taken when configuring these privileges that only access to public resources is granted.
+To aid debugging, the servlet currently logs a lot of data which can be considered privacy/security
+relevant, including remote URLs and cookies.
+</p>
+
+<a name="whyservlet"><h4>Why is it implemented as a servlet?</h4></a>
+<p>
+JGloss-WWW is implemented as servlet, but it functions as a rewriting proxy. So why is it
+not implemented as a proxy in the first place? A proxy would be more transparent to the user,
+and there would be no need to change URLs, and do cookie and form data forwarding.
+</p><p>
+The main reason for the servlet implementation is that the servlet API makes it easy to
+receive and respond to http connections. On the other hand, in order to implement a rewriting proxy one 
+would have to implement a proxy first (or take an existing proxy and modify it), which I
+considered to be more work. A proxy would also not be able to rewrite encrypted content,
+since it simply tunnels it (which of course increases security). For the user, switching
+between rewritten and direct transfer would involve changing the proxy settings of the
+browser every time, while the servlet implementation only requires the input of a special URL.
+And finally, I wanted to do this as an exercise in servlet programming.
+</p><p>
+It should be relatively easy to plug JGloss in an already existing proxy (if you have access to
+the source, and it is written in Java). An instance of <code>jgloss.www.HTMLAnnotator</code>
+would be used to annotate all documents sent from the proxy to the client which have a content
+type of "text/html" and a Japanese character encoding. Another thing I'd also like to see is
+JGloss-like functionality implemented in a web browser. The document would be intercepted
+after it is received by the browser, but before it is presented to the user. Unfortunately
+I don't think this is possible with the current plugin APIs.
+</p>
+
+<hr>
+(C) 2001 <a href="mailto:tensberg@gmx.net">Michael Koch &lt;tensberg@gmx.net&gt;</a>;
+    last updated: $date$<br>
+    Any part of this document may be freely copied, modified and redistributed.
+</div>
 </body>
 </html>
