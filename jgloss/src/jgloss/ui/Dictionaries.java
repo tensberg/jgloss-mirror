@@ -129,7 +129,7 @@ public class Dictionaries extends Box {
                 }
             };
         up.setEnabled( false);
-        JGlossFrame.initAction( up, "prefs.button.up");
+        JGlossFrame.initAction( up, "dictionaries.button.up");
         final Action down = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
@@ -140,14 +140,14 @@ public class Dictionaries extends Box {
                 }
             };
         down.setEnabled( false);
-        JGlossFrame.initAction( down, "prefs.button.down");
+        JGlossFrame.initAction( down, "dictionaries.button.down");
         final Action add = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     addDictionary();
                 }
             };
         add.setEnabled( true);
-        JGlossFrame.initAction( add, "prefs.button.add");
+        JGlossFrame.initAction( add, "dictionaries.button.add");
         final Action remove = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
@@ -163,7 +163,7 @@ public class Dictionaries extends Box {
                 }
             };
         remove.setEnabled( false);
-        JGlossFrame.initAction( remove, "prefs.button.remove");
+        JGlossFrame.initAction( remove, "dictionaries.button.remove");
         JPanel p = new JPanel( new GridLayout( 0, 1));
         p.add( new JButton( add));
         p.add( new JButton( remove));
