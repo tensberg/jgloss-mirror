@@ -41,6 +41,8 @@
 22	adj., negative, past
 23	adj., past
 24	plain verb or adjective
+25	adj., i->ku
+26	adj., i->na
 #
 #  and these are the conjugations/inflections, and their dictionary forms
 #	(please note that these are scanned from the top, so the order is
@@ -73,7 +75,12 @@ $   this line flags the start of them
 る	る	24
 れる	れる	24
 りる	りる	24
+るい	るい	24
+さい	さい	24
 # conjugated forms
+るく	るい	25
+さな	さい	26
+#
 た	る	5
 て	る	4
 かない	く	0
