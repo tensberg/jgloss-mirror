@@ -570,16 +570,31 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 }
             };
         JGlossFrame.initAction( metaAction, "annotationeditor.action.meta");
+
+        // Add the key bindings for the actions to the annotation editor.
+        // Since the metaAction uses a "released SPACE" and a "SPACE" action is also defined,
+        // the "SPACE" action has to be overridden. Since the "SPACE" action is not defined
+        // in the JTree's input map but in one of the parents and I don't want to mess the
+        // Keybindings up too much, I add a dummy binding for "SPACE" which does nothing.
+        // A "released SPACE" has to be used because otherwise a space character is added when
+        // text editing is started.
         InputMap im = getInputMap();
+        KeyStroke[] strokes = im.allKeys();
+        KeyStroke metaStroke = (KeyStroke) metaAction.getValue( Action.ACCELERATOR_KEY);
+        for ( int i=0; i<strokes.length; i++) {
+            if (strokes[i].getKeyCode() == metaStroke.getKeyCode())
+                im.put( strokes[i], "dummy");
+        }
         ActionMap am = getActionMap();
+        am.put( "dummy", new AbstractAction() { public void actionPerformed( ActionEvent e) {} });
+
         im.put( (KeyStroke) nextAnnotationAction.getValue( Action.ACCELERATOR_KEY),
                 nextAnnotationAction.getValue( Action.NAME));
         am.put( nextAnnotationAction.getValue( Action.NAME), nextAnnotationAction);
         im.put( (KeyStroke) previousAnnotationAction.getValue( Action.ACCELERATOR_KEY),
                 previousAnnotationAction.getValue( Action.NAME));
         am.put( previousAnnotationAction.getValue( Action.NAME), previousAnnotationAction);
-        im.put( (KeyStroke) metaAction.getValue( Action.ACCELERATOR_KEY),
-                metaAction.getValue( Action.NAME));
+        im.put( metaStroke, metaAction.getValue( Action.NAME));
         am.put( metaAction.getValue( Action.NAME), metaAction);
         im.put( KeyStroke.getKeyStroke( JGloss.messages.getString( "annotationeditor.action.remove.ak")),
                 removeAction.getValue( Action.NAME));
