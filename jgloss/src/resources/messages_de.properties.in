@@ -23,8 +23,18 @@
 # $Id$
 #
 error.no_message=(keine Information)
-error.loadPreferences=Beim Laden der Voreinstellungen ist ein Fehler aufgetreten:
-error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufgetreten:
+error.initialization.title=Fehler
+error.initialization={0}{1}\n\nDie Java-exception war\n{2}: {3}.
+error.initialization.fatal=JGloss kann nicht gestartet werden.\n\n
+error.initialization.generic=Beim Initialisieren ist ein Fehler aufgetreten.
+error.noclassdef=\
+Eine Java-Klasse wurde nicht gefunden. Dies bedeutet das entweder\n\
+ihre Java-Version nicht mit Java 2 Version 1.3 kompatibel ist\n\
+oder das die JGloss JAR Datei fehlerhaft ist.\n\
+Sie können eine kompatible Java-Version von\n\
+http://java.sun.com/j2se/1.3/jre/ herunterladen.
+error.loadPreferences=Beim Laden der Voreinstellungen ist ein Fehler aufgetreten.
+error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufgetreten.
 error.dictionary.title=Fehler beim Öffnen des Wörterbuchs
 error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei {1}\n existiert und lesbar ist.
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.
