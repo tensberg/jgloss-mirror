@@ -30,7 +30,6 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.nio.charset.*;
 import java.util.*;
-import java.text.MessageFormat;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -485,7 +484,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * buffer. The method converts the byte buffer data to a string and invokes
      * {@link #parseEntry(String) parseEntry}.
      */
-    protected DictionaryEntry createEntryFrom( ByteBuffer entry) 
+    protected DictionaryEntry createEntryFrom( ByteBuffer entry, int startOffset) 
         throws SearchException {
         
         String entrystring;
@@ -506,7 +505,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             }
         }
         
-        return parseEntry( entrystring);
+        return parseEntry( entrystring, startOffset);
     }
     
     /**
@@ -643,9 +642,10 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Create a {@link DictionaryEntry DictionaryEntry} object from the entry string from the dictionary.
      *
      * @param entry Entry string as found in the dictionary.
+     * @param startOffset Start offset of the entry in the dictionary file.
      * @exception SearchException if the dictionary entry is malformed.
      */
-    protected abstract DictionaryEntry parseEntry( String entry) throws SearchException;
+    protected abstract DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException;
     
     public void dispose() {
         try {
@@ -936,7 +936,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                 }
                     
                 try {
-                    nextEntry = createEntryFrom( entry);
+                    nextEntry = createEntryFrom( entry, entryOffsets[0]);
                     seenEntries.add( entryOffsets[0]); // start offset of entry
                 } catch (SearchException ex) {
                     ex.printStackTrace();

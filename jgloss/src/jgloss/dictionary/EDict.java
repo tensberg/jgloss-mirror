@@ -252,7 +252,7 @@ public class EDict extends FileBasedDictionary {
      * <CODE>word [reading] /translation 1/translation 2/...</CODE> with the reading
      * being optional.
      */
-    protected DictionaryEntry parseEntry( String entry) throws SearchException {
+    protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
         //System.err.println( entry);
         ENTRY_MATCHER.reset( entry);
         if (!ENTRY_MATCHER.matches())
@@ -380,7 +380,8 @@ public class EDict extends FileBasedDictionary {
             start = end+1;
         } while (start < translations.length());
 
-        return new SingleWordEntry( word, reading, rom, generalA, wordA, translationA, roma, this);
+        return new SingleWordEntry( startOffset, word, reading, rom, generalA, wordA, translationA,
+                                    roma, this);
     }
     
     public String toString() {

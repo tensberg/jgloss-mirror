@@ -65,6 +65,13 @@ public class Attributes implements Attribute {
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
+    public static final Attribute REFERENCE = new Attributes
+        ( NAMES.getString( "att.reference.name"),
+          NAMES.getString( "att.reference.desc"),
+          true, true, ReferenceAttributeValue.class, 
+          new DictionaryEntry.AttributeGroup[] 
+            { DictionaryEntry.AttributeGroup.GENERAL });
+
     public static final Attribute SYNONYM = new Attributes
         ( NAMES.getString( "att.synonym.name"),
           NAMES.getString( "att.synonym.desc"),

@@ -32,17 +32,29 @@ import java.util.List;
 abstract class BaseEntry implements DictionaryEntry {
     protected String reading;
     protected String[][] translations;
-    protected Dictionary dictionary;
     protected AttributeSet generalA;
     protected AttributeSet wordA;
     protected AttributeSet translationA;
     protected AttributeSet[] translationRomA;
+
+    protected Dictionary dictionary;
+    /**
+     * Unique marker of this dictionary entry relative to other dictionary entries in
+     * this dictionary. Used for fast equality test. Every dictionary entry object which
+     * is created from the same dictionary entry in a dictionary instance must have the
+     * same <code>entryMarker</code>, and for dictionary entry objects created from different
+     * dictionary entries the marker must always be different. The marker usually is the
+     * position where the entry is found in the dictionary, since this is unique.
+     */
+    protected int entryMarker;
+
     protected DefaultAttributeSet emptySet = new DefaultAttributeSet( null);
 
-    public BaseEntry( String _reading, List _translations,
+    public BaseEntry( int _entryMarker, String _reading, List _translations,
                       AttributeSet _generalA, AttributeSet _wordA,
                       AttributeSet _translationA,
                       List _translationRomA, Dictionary _dictionary) {
+        entryMarker = _entryMarker;
         reading = _reading;
         translations = new String[_translations.size()][];
         int rom = 0;
@@ -160,4 +172,9 @@ abstract class BaseEntry implements DictionaryEntry {
 
     public Dictionary getDictionary() { return dictionary; }
 
+    public boolean equals( Object o) {
+        return (o instanceof BaseEntry &&
+                ((BaseEntry) o).dictionary == dictionary &&
+                ((BaseEntry) o).entryMarker == entryMarker);
+    }
 } // class BaseEntry

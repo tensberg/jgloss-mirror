@@ -29,10 +29,12 @@ import jgloss.dictionary.attribute.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.charset.CharacterCodingException;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Implementation for dictionaries in WadokuJT.txt format. 
@@ -67,12 +69,32 @@ public class WaDokuJT extends FileBasedDictionary {
         d.dispose();
     }
 
+    protected static final ResourceBundle NAMES = ResourceBundle.getBundle
+        ( "resources/messages-dictionary");
+
+    public static final Attribute MAIN_ENTRY = new Attributes
+        ( NAMES.getString( "wadoku.att.main_entry.name"),
+          NAMES.getString( "wadoku.att.main_entry.desc"),
+          false, false, null,
+          new DictionaryEntry.AttributeGroup[] 
+            { DictionaryEntry.AttributeGroup.GENERAL });
+
+    public static final Attribute MAIN_ENTRY_REF = new Attributes
+        ( NAMES.getString( "wadoku.att.main_entry_ref.name"),
+          NAMES.getString( "wadoku.att.main_entry_ref.desc"),
+          false, false, null,
+          new DictionaryEntry.AttributeGroup[] 
+            { DictionaryEntry.AttributeGroup.GENERAL });
+
     /**
      * Name of the dictionary format.
      */
     public static final String FORMAT_NAME = "WadokuJT";
 
-    protected final static AttributeMapper mapper = initMapper();
+    protected static final AttributeMapper mapper = initMapper();
+
+    protected static final SearchFieldSelection MATCH_WORD_FIELD =
+        new SearchFieldSelection( true, false, false, true, false);
 
     private static AttributeMapper initMapper() {
         try {
@@ -94,7 +116,7 @@ public class WaDokuJT extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-    public final static DictionaryFactory.Implementation implementation = 
+    public static final DictionaryFactory.Implementation implementation = 
         initImplementation();
 
     /**
@@ -158,6 +180,10 @@ public class WaDokuJT extends FileBasedDictionary {
     protected final Pattern CATEGORY_PATTERN = Pattern.compile
         ( "(.+?)(?:[,;]\\s?|\\z)");
     protected final Matcher CATEGORY_MATCHER = CATEGORY_PATTERN.matcher( "");
+
+    protected final Pattern REFERENCE_PATTERN = Pattern.compile
+        ( "(\u21d2|\u2192|\u21d4)\\s(\\S+)(?:\\s\\(.*?\\))(?:;\\s|\\z)");
+    protected final Matcher REFERENCE_MATCHER = REFERENCE_PATTERN.matcher( "");
 
     public WaDokuJT( File dicfile) throws IOException {
         super( dicfile);
@@ -298,7 +324,7 @@ public class WaDokuJT extends FileBasedDictionary {
         }
     }
 
-    protected DictionaryEntry parseEntry( String entry) throws SearchException {
+    protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
         try {
             DictionaryEntry out = null; 
             List wordlist = new ArrayList( 10);
@@ -351,9 +377,9 @@ public class WaDokuJT extends FileBasedDictionary {
                 }
                 
                 // split translations
-                TRANSLATIONS_MATCHER.reset( translations);
-                while (TRANSLATIONS_MATCHER.find()) {
-                    String crm = TRANSLATIONS_MATCHER.group( 2);
+                Matcher translationsMatcher = TRANSLATIONS_PATTERN.matcher( translations);
+                while (translationsMatcher.find()) {
+                    String crm = translationsMatcher.group( 2);
                     // handle categories (marked at beginning of translation enclosed in {})
                     if (crm.charAt( 0) == '{') {
                         int endb = crm.indexOf( '}');
@@ -361,7 +387,7 @@ public class WaDokuJT extends FileBasedDictionary {
                         // they are written before the first ROM marker, or if there are no ROM
                         // markers. In both cases, group(1) is null. If allTranslations is
                         // false, attributes apply only to the current ROM.
-                        boolean allTranslations = TRANSLATIONS_MATCHER.group( 1) == null;
+                        boolean allTranslations = translationsMatcher.group( 1) == null;
                         // attribute strings unrecognized by mapping
                         StringBuffer unrecognized = null;
                         // attributes of this rom, create only if needed
@@ -444,12 +470,49 @@ public class WaDokuJT extends FileBasedDictionary {
                 }
             }
 
+            start = end+1;
+            end = entry.indexOf( '|', start);
+            if (end > start+1) {
+                String comment = entry.substring( start, end);
+                REFERENCE_MATCHER.reset( comment);
+                while (REFERENCE_MATCHER.find()) {
+                    char tc = REFERENCE_MATCHER.group( 1).charAt( 0);
+                    Attribute type;
+                    if (tc == '\u2192')
+                        type = Attributes.REFERENCE;
+                    else if (tc == '\u21d2')
+                        type = Attributes.SYNONYM;
+                    else
+                        type = Attributes.ANTONYM;
+                    generalA.addAttribute( type, new SearchReference
+                                           ( REFERENCE_MATCHER.group( 2), this,
+                                             ExpressionSearchModes.EXACT,
+                                             new Object[] { REFERENCE_MATCHER.group( 2),
+                                                            MATCH_WORD_FIELD }));
+                }
+            }
+
+            String mainEntry = entry.substring( end+1);
+            if (mainEntry.startsWith( "HE")) {
+                generalA.addAttribute( MAIN_ENTRY, null);
+                if (mainEntry.length() == 2)
+                    mainEntry = "";
+                else // cut off "HE; " part of mainEntry
+                    mainEntry = mainEntry.substring( 4);
+            }
+            if (mainEntry.length() > 0) {
+                // reference to main entry
+                generalA.addAttribute( MAIN_ENTRY_REF, new SearchReference
+                                       ( mainEntry, this, ExpressionSearchModes.EXACT, new Object[] 
+                                           { mainEntry, MATCH_WORD_FIELD }));
+            }
+
             if (wordlist.size() == 1) {
-                out = new SingleWordEntry( (String) wordlist.get( 0), reading, rom, generalA,
-                                           wordA, translationA, romA, this);
+                out = new SingleWordEntry( startOffset, (String) wordlist.get( 0), reading, rom,
+                                           generalA, wordA, translationA, romA, this);
             }
             else {
-                out = new MultiWordEntry( wordlist, reading, rom, generalA,
+                out = new MultiWordEntry( startOffset, wordlist, reading, rom, generalA,
                                           wordA, wordsA, translationA, romA, this);
             }
 

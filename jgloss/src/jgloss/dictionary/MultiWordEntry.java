@@ -33,11 +33,11 @@ public class MultiWordEntry extends BaseEntry {
     protected String[] words;
     protected AttributeSet[] wordsA;
 
-    public MultiWordEntry( List _words, String _reading, List _translations,
-                        AttributeSet _generalA, AttributeSet _wordA, List _wordsA,
-                        AttributeSet _translationA,
-                        List _translationRomA, Dictionary _dictionary) {
-        super( _reading, _translations,
+    public MultiWordEntry( int _entryMarker, List _words, String _reading, List _translations,
+                           AttributeSet _generalA, AttributeSet _wordA, List _wordsA,
+                           AttributeSet _translationA,
+                           List _translationRomA, Dictionary _dictionary) {
+        super( _entryMarker, _reading, _translations,
                _generalA, _wordA,
                _translationA, _translationRomA, _dictionary);
         words = new String[_words.size()];

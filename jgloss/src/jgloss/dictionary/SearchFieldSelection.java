@@ -41,6 +41,16 @@ public class SearchFieldSelection {
      */
     public SearchFieldSelection() {}
 
+    public SearchFieldSelection( boolean _wordSelected, boolean _readingSelected, 
+                                 boolean _translationSelected, 
+                                 boolean _matchField, boolean _matchWord) {
+        wordSelected = _wordSelected;
+        readingSelected = _readingSelected;
+        translationSelected = _translationSelected;
+        matchField = _matchField;
+        matchWord = _matchWord;
+    }
+
     /**
      * Toggle the selection value of a field.
      */
