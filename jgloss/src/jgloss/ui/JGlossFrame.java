@@ -391,18 +391,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
         split = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT,
                                 docpaneScroller,
                                 annotationEditorScroller);
-        split.setDividerLocation( 0.8d);
-        split.setResizeWeight( 0.8d);
+        double position = JGloss.prefs.getDouble
+            ( Preferences.VIEW_DIVIDERLOCATION, 0.7d);
+        split.setDividerLocation( position);
+        split.setResizeWeight( position);
         split.setOneTouchExpandable( true);
-        split.addPropertyChangeListener( new PropertyChangeListener() {
-                public void propertyChange( PropertyChangeEvent e) {
-                    if (split.DIVIDER_LOCATION_PROPERTY.equals( e.getPropertyName())) {
-                        JGloss.prefs.set( Preferences.VIEW_ANNOTATIONEDITORHIDDEN,
-                                          ((Integer) e.getNewValue()).intValue() >=
-                                          split.getMaximumDividerLocation());
-                    }
-                }
-            });
 
         getContentPane().setBackground( Color.white);
 
@@ -914,15 +907,23 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 for ( int i=0; i<history.length; i+=2) try {
                     if (history[i].equals( documentPath)) {
                         int index = Integer.parseInt( history[i+1]);
-                        AnnotationNode annotation = (AnnotationNode) annotationEditor.getModel()
+                        final AnnotationNode annotation = (AnnotationNode) annotationEditor.getModel()
                             .getChild( annotationEditor.getModel().getRoot(), index);
-                        annotationEditor.makeVisible( annotation);
-                        annotationEditor.selectNode( annotation);
+                        Runnable worker = new Runnable() {
+                                public void run() {
+                                    annotationEditor.makeVisible( annotation);
+                                    annotationEditor.selectNode( annotation);
+                                }
+                            };
+                        if (EventQueue.isDispatchThread())
+                            worker.run();
+                        else
+                            EventQueue.invokeLater( worker);
+                        break;
                     }
                 } catch (ArrayIndexOutOfBoundsException ex) {
                 } catch (NumberFormatException ex2) {
                 } catch (NullPointerException ex3) {}
-            
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1025,9 +1026,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
         Runnable worker = new Runnable() {
                 public void run() {
-                    // Parser must be set to non-strict mode when a document is edited.
-                    // (This constructor is only called during document editing, not when a document
-                    //  is loaded)
+                    // Parser must be set to non-strict mode for editing to work.
                     doc.setStrictParsing( false);
 
                     docpane.setEditorKit( kit);
@@ -1036,9 +1035,15 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     
                     getContentPane().removeAll();
                     getContentPane().add( split);
-                    getContentPane().validate();
+                    validate();
                     if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN))
                         split.setDividerLocation( 1.0f);
+                    else {
+                        double position = JGloss.prefs.getDouble
+                            ( Preferences.VIEW_DIVIDERLOCATION, 0.7d);
+                        split.setDividerLocation( position);
+                        split.setResizeWeight( position);
+                    }
 
                     doc.setAddAnnotations( false);
                     exportMenu.setEnabled( true);
@@ -1054,6 +1059,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
                     docpane.followMouse( showAnnotationItem.isSelected(), false);
 
+                    // mark document as changed if some editing occurs
                     doc.addDocumentListener( new DocumentListener() {
                             public void insertUpdate(DocumentEvent e) {
                                 markChanged();
@@ -1062,7 +1068,26 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                 markChanged();
                             }
                             public void changedUpdate(DocumentEvent e) {
-                                markChanged();
+                                // triggered by style changes, don't react to this
+                            }
+                        });
+
+                    // save splitpane location settings in the preferences
+                    split.addPropertyChangeListener( new PropertyChangeListener() {
+                            public void propertyChange( PropertyChangeEvent e) {
+                                if (split.DIVIDER_LOCATION_PROPERTY.equals( e.getPropertyName())) {
+                                    int newPosition = ((Integer) e.getNewValue()).intValue();
+                                    if (newPosition >= split.getMaximumDividerLocation())
+                                        JGloss.prefs.set( Preferences.VIEW_ANNOTATIONEDITORHIDDEN,
+                                                          true);
+                                    else {
+                                        JGloss.prefs.set( Preferences.VIEW_ANNOTATIONEDITORHIDDEN,
+                                                          false);
+                                        JGloss.prefs.set( Preferences.VIEW_DIVIDERLOCATION,
+                                                          ((double) newPosition)/
+                                                          split.getWidth());
+                                    }
+                                }
                             }
                         });
                 }

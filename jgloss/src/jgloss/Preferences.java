@@ -84,6 +84,7 @@ public class Preferences {
     public static final String VIEW_SHOWTRANSLATION = "view.showtranslation";
     public static final String VIEW_SHOWANNOTATION = "view.showannotation";
     public static final String VIEW_ANNOTATIONEDITORHIDDEN = "view.annotationeditorhidden";
+    public static final String VIEW_DIVIDERLOCATION = "view.dividerlocation";
 
     public static final String EDITOR_ENABLEEDITINGCHECKBOX = "editor.enableeditingcheckbox";
     public static final String EDITOR_ENABLEEDITING = "editor.enableediting";
@@ -223,6 +224,35 @@ public class Preferences {
      */
     public synchronized void set( String key, int value) {
         set( key, Integer.toString( value));
+    }
+
+    /**
+     * Returns the preference for the given key as a double. If the preference is not a
+     * valid double number, the value given to the method will be used.
+     *
+     * @param key Key to the preference.
+     * @param d Default value, if the preference is not parseable as double.
+     * @return The corresponding preference value.
+     */
+    public synchronized double getDouble( String key, double d) {
+        double out = d;
+        try {
+            out = Double.parseDouble( getString( key));
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
+
+        return out;
+    }
+
+    /**
+     * Sets the new preference value to a double.
+     *
+     * @param key Key to the preference.
+     * @param value The new value.
+     */
+    public synchronized void set( String key, double value) {
+        set( key, Double.toString( value));
     }
 
     /**

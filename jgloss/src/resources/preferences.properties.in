@@ -69,6 +69,7 @@ view.showreading=true
 view.showtranslation=true
 view.showannotation=false
 view.annotationeditorhidden=false
+view.dividerlocation=0.7
 
 editor.enableeditingcheckbox=false
 editor.enableediting=false
