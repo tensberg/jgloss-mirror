@@ -24,54 +24,100 @@
 
 -->
 
+<!--
+  An export descriptor XML file describes an export format used by JGloss.
+  JGloss builds the export menu from the export descriptor files. If the user
+  selects an export menu item, JGloss reads the export descriptor file and builds
+  a dialog in which the user can select the output file and the specified parameters.
+
+  The creation of the export file itself is done by applying an XSLT file to the JGloss
+  document (represented as XML). The XML tree provided to the XSLT file has the following
+  form:
+  - Root of the tree is a <jgloss-export> element
+  - For every parameter defined in the export descriptor (see below), an element is created as child
+    of /jgloss-export/parameters/, with the name as defined in the export descriptor and the
+    value selected by the user.
+  - The JGloss document has the same form as the JGloss save file format. The original root node <jgloss>
+    is the second child of <jgloss-export>.
+-->
+
+<!-- root element -->
 <!ELEMENT export (description,parameters?,localized-strings?,(template|templates))>
 
+<!-- description contains standard elements which all export formats share -->
 <!ELEMENT description (menuitem,title,file-extension?)>
+
+<!-- menuitem selects the name of the exporter in the JGloss menu -->
 <!ELEMENT menuitem EMPTY>
-<!ATTLIST menuitem key CDATA #REQUIRED>
+<!ATTLIST menuitem key CDATA #REQUIRED> <!-- key name in the JGloss resource file -->
+
+<!-- Title of the export dialog -->
 <!ELEMENT title EMPTY>
-<!ATTLIST title key CDATA #REQUIRED>
+<!ATTLIST title key CDATA #REQUIRED> <!-- key name in the JGloss resource file -->
+
+<!-- File extension of the created file -->
 <!ELEMENT file-extension (#PCDATA)>
 <!ATTLIST file-extension description-key CDATA #REQUIRED>
 
-<!ELEMENT parameters (encoding|boolean|string|combobox|docname|datetime)+>
-<!ELEMENT docname (#PCDATA)>
-<!ATTLIST docname name CDATA #REQUIRED>
-<!ELEMENT datetime (#PCDATA)>
-<!ATTLIST datetime name CDATA #REQUIRED>
+<!-- Parameters for the XSLT file.
+     UI elements are added to the export dialog. The values entered will be bound
+     to elements in the XML tree which is used as input to the export XSLT file.
 
+     Attributes of the parameters: 
+       label-key - Key in the JGloss resource file
+       prefs-key - Name of the Preferences key to which the selection is stored
+       name      - Name of the element in the jgloss-export tree
+ -->
+<!ELEMENT parameters (encoding|boolean|string|list|docname|datetime)+>
+
+<!-- Name of the JGloss document. No UI element is created for this. -->
+<!ELEMENT docname EMPTY>
+<!ATTLIST docname name CDATA #REQUIRED> <!-- Name of the element in the jgloss-export tree -->
+
+<!-- Current date and time as string -->
+<!ELEMENT datetime EMPTY>
+<!ATTLIST datetime name CDATA #REQUIRED> <!-- Name of the element in the jgloss-export tree -->
+
+<!-- Character encoding used for the file created by the export.
+     The encodings are predefined in JGloss. The text contained in the element
+     determines the default encoding.
+-->
 <!ELEMENT encoding (#PCDATA)>
 <!ATTLIST encoding label-key CDATA #REQUIRED
                    prefs-key CDATA #REQUIRED
                    name CDATA #REQUIRED>
+<!-- Boolean selection of a feature. Creates a checkbox. -->
 <!ELEMENT boolean (#PCDATA)>
 <!ATTLIST boolean label-key CDATA #REQUIRED
                   prefs-key CDATA #REQUIRED
                   name CDATA #REQUIRED>
+
+<!-- Asks the user for text input. -->
 <!ELEMENT string (#PCDATA)>
 <!ATTLIST string label-key CDATA #REQUIRED
                  prefs-key CDATA #REQUIRED
                  name CDATA #REQUIRED>
-<!ELEMENT combobox (comboitem)+>
-<!ATTLIST combobox label-key CDATA #REQUIRED
+<!-- Lets the user select one of several choices. Creates a combo box. 
+     Attribute: editable - true: the user can enter his own text.      -->
+<!ELEMENT list (listitem)+>
+<!ATTLIST list label-key CDATA #REQUIRED
                    prefs-key CDATA #REQUIRED
                    name CDATA #REQUIRED
                    editable (true|false) "false">
-<!ELEMENT comboitem ((label|label-key)?,value)>
+<!-- Each listitem is one of the choices of the list -->
+<!ELEMENT listitem ((label|label-key)?,value)>
 <!ELEMENT label (#PCDATA)>
 <!ELEMENT label-key (#PCDATA)>
 <!ELEMENT value (#PCDATA)>
 
-<!ELEMENT localized-strings (localized-string)+>
-<!ELEMENT localized-string EMPTY>
-<!ATTLIST localized-string key CDATA #REQUIRED
-                           name CDATA #REQUIRED>
+<!-- Reference to the export template XSLT file -->
+<!ELEMENT template ((label|label-key)?,source)>
+<!ELEMENT source (#PCDATA)> <!-- path to the XSLT file, relative to the export descriptor -->
 
+<!-- Collection of two or more different templates -->
 <!ELEMENT templates (template,template+)>
 <!ATTLIST templates name CDATA "template-name"
                     label-key CDATA #REQUIRED
                     prefs-key CDATA #REQUIRED
                     editable (true|false) "false">
 
-<!ELEMENT template ((label|label-key)?,source)>
-<!ELEMENT source (#PCDATA)>

@@ -39,7 +39,7 @@ class DateTimeParameter extends AbstractParameter {
         super( elem);
     }
 
-    public String getValue( JGlossFrameModel source, URL systemId) {
+    public Object getValue( JGlossFrameModel source, URL systemId) {
         return DATETIME_FORMAT.format( new Date( System.currentTimeMillis()));
     }
 } // class DateTimeParameter

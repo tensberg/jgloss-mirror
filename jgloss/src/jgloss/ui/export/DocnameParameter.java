@@ -34,7 +34,7 @@ class DocnameParameter extends AbstractParameter {
         super( elem);
     }
 
-    public String getValue( JGlossFrameModel source, URL systemId) {
+    public Object getValue( JGlossFrameModel source, URL systemId) {
         return source.getDocumentName();
     }
 } // class DocnameParameter

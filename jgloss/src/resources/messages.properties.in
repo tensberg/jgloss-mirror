@@ -31,9 +31,9 @@ error.initialization.fatal=JGloss cannot be started.\n\n
 error.initialization.generic=An error occurred during initialization.
 error.noclassdef=\
 A Java class was not found. This means that either your Java installation\n\
-is not compatible with Java 2 Version 1.3 or that the JGloss JAR file is broken.\n\
+is not compatible with Java 2 Version 1.4 or that the JGloss JAR file is broken.\n\
 You can download a compatible Java version from\n\
-http://java.sun.com/j2se/1.3/jre/.
+http://java.sun.com/j2se/1.4/.
 error.loadPreferences=An error occurred while loading the preferences.
 error.storePreferences=An error occurred while saving the preferences.
 error.dictionary.title=Error opening dictionary
@@ -102,10 +102,10 @@ button.add=Add...
 button.add.mk=A
 
 jgloss.title=JGloss
-jgloss.version=Version 2
+jgloss.version=Version 2 alpha 0
 
 jdictionary.title=JDictionary
-jdictionary.version=Version 2
+jdictionary.version=Version 2 alpha 0
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>

@@ -35,15 +35,15 @@
 
   <parameters>
     <docname name="docname" />
-    <datetime name="creation-date" />
+    <datetime name="generation-time" />
 
-    <combobox name="fontsize"
+    <list name="fontsize"
       label-key="export.latex.fontsize"
       prefs-key="export.latex.fontsize">
-      <comboitem><value>10</value></comboitem>
-      <comboitem><value>11</value></comboitem>
-      <comboitem><value>12</value></comboitem>
-    </combobox>
+      <listitem><value>10</value></listitem>
+      <listitem><value>11</value></listitem>
+      <listitem><value>12</value></listitem>
+    </list>
 
   </parameters>
   

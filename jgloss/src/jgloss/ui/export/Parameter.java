@@ -29,5 +29,5 @@ import java.net.URL;
 
 interface Parameter {
     String getName();
-    String getValue( JGlossFrameModel source, URL systemId);
+    Object getValue( JGlossFrameModel source, URL systemId);
 } // class Parameter

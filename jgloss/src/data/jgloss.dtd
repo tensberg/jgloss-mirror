@@ -24,15 +24,29 @@
 
 -->
 
+<!-- DTD of the JGloss file format -->
+
+<!-- root element, structured in head and body similar to HTML -->
 <!ELEMENT jgloss (head,body)>
 
+<!-- head contains meta information about the document -->
 <!ELEMENT head (generator?,title)>
 <!ELEMENT generator (#PCDATA)>
 <!ELEMENT title (#PCDATA)>
 
+<!-- The body consists of several paragraphs of annotated text -->
 <!ELEMENT body (p)+>
+
+<!-- paragraph element -->
 <!ELEMENT p (#PCDATA | anno)*>
 
+<!-- text annotated with readings and a translation
+     Attributes:
+     tr     - translation of the base text of the annotation element
+     base   - base text in dictionary form, equals annotated text if empty
+     basere - reading of the base text of the dictionary form, equals annotated text if empty
+     type   - grammatical form of the annotated text
+ -->
 <!ELEMENT anno (#PCDATA | rbase)*>
 <!ATTLIST anno tr CDATA #IMPLIED
                base  CDATA #IMPLIED
@@ -40,6 +54,11 @@
                type  CDATA #IMPLIED
 >
 
+<!-- text fragment annotated with its reading
+     Attributes:
+     re    - reading of the #PCDATA text
+     docre - reading annotation imported from the original document
+ -->
 <!ELEMENT rbase (#PCDATA)>
 <!ATTLIST rbase re CDATA ""
                 docre CDATA #IMPLIED

@@ -53,11 +53,11 @@ class EncodingParameter extends UIParameter {
 
     public Component getComponent() { return box; }
 
-    public String getValue( JGlossFrameModel source, URL systemId) {
+    public Object getValue( JGlossFrameModel source, URL systemId) {
         return getValue();
     }
 
-    public String getValue() {
+    public Object getValue() {
         return encodings.getSelectedItem().toString();
     }
 

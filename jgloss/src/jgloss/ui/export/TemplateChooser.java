@@ -25,7 +25,7 @@ package jgloss.ui.export;
 
 import org.w3c.dom.Element;
 
-class TemplateChooser extends ComboBoxParameter {
+class TemplateChooser extends ListParameter {
     TemplateChooser( Element elem) {
         super( elem);
     }

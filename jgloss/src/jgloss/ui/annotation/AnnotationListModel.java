@@ -69,7 +69,7 @@ public class AnnotationListModel {
      *        right of the last annotation).
      */
     public int findAnnotationIndex( int pos, int bias) {
-        // the finishing index of the previous search is remebered. This will make the
+        // the finishing index of the previous search is remembered. This will make the
         // search faster if the method is called for close locations. Since this method
         // is often called after mouse movement events, this is likely to be the case.
         if (searchindex<0 || searchindex>=annotations.size())
@@ -169,8 +169,40 @@ public class AnnotationListModel {
                     }
                 });
         try {
-            Annotation annotation = (Annotation) annotations.remove(annoOffset);
-            fireAnnotationRemoved(annotation, annoOffset);
+            // Since the annotation element has already been removed from the document,
+            // the invariant that each Element in the annotation list has a distinct start offset
+            // does not hold and binary search returns one of the elements.
+            // Find the removed element among all elements with same
+            // start offset.
+            int annoOffsetStore = annoOffset;
+
+            // search backward
+            while (annoOffset >= 0 &&
+                   annoElement != ((Annotation) annotations.get(annoOffset)).getAnnotationElement() &&
+                   annoElement.getStartOffset() == 
+                   ((Annotation) annotations.get(annoOffset)).getAnnotationElement().getStartOffset())
+                annoOffset--;
+            
+            // if not found, search forward
+            if (annoOffset < 0 ||
+                annoElement != ((Annotation) annotations.get(annoOffset)).getAnnotationElement()) {
+                annoOffset = annoOffsetStore;
+
+                while (annoOffset < annotations.size() &&
+                       annoElement != ((Annotation) annotations.get(annoOffset)).getAnnotationElement() &&
+                       annoElement.getStartOffset() == 
+                       ((Annotation) annotations.get(annoOffset)).getAnnotationElement().getStartOffset())
+                    annoOffset++;
+            }
+
+            if (annoOffset < annotations.size() &&
+                ((Annotation) annotations.get(annoOffset)).getAnnotationElement()==annoElement) {
+                Annotation annotation = (Annotation) annotations.remove(annoOffset);
+                fireAnnotationRemoved(annotation, annoOffset);
+            }
+            else {
+                System.err.println( "WARNING: assertion failed, removed annotation element not found");
+            }
         } catch (IndexOutOfBoundsException ex) {
             // element was not found, programming error
             ex.printStackTrace();

@@ -43,8 +43,8 @@ class BooleanParameter extends UIParameter {
 
     public Component getComponent() { return box; }
 
-    public String getValue( JGlossFrameModel source, URL systemId) {
-        return String.valueOf( box.isSelected()); 
+    public Object getValue( JGlossFrameModel source, URL systemId) {
+        return Boolean.valueOf( box.isSelected()); 
     }
 
     public void loadFromPrefs() {

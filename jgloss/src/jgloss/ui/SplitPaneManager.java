@@ -30,6 +30,11 @@ import java.beans.PropertyChangeEvent;
 
 import javax.swing.JSplitPane;
 
+/**
+ * Makes the state of split panes persistent by storing their divider locations in the preferences.
+ *
+ * @author Michael Koch
+ */
 class SplitPaneManager implements PropertyChangeListener {
     private static final String PREFS_KEY = "splitpane.";
     private static final String PREFS_KEY_LOCATION = ".location";
@@ -69,11 +74,15 @@ class SplitPaneManager implements PropertyChangeListener {
             if (newValue <= splitPane.getMinimumDividerLocation())
                 newValue = 0;
             else if (newValue >= splitPane.getMaximumDividerLocation())
-                newValue = splitPane.getWidth();
-
-            JGloss.prefs.set( prefsKey,
-                              ((double) newValue)/
-                              splitPane.getWidth());
+                newValue = splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT ?
+                    splitPane.getWidth() : splitPane.getHeight();
+            
+            double newLocation = ((double) newValue)/
+                (splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT ?
+                 splitPane.getWidth() : splitPane.getHeight());
+                              
+            System.err.println(newLocation);
+            JGloss.prefs.set(prefsKey, newLocation);
         }
     }
 } // class SplitPaneManager

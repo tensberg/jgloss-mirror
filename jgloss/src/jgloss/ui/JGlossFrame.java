@@ -37,6 +37,7 @@ import jgloss.ui.html.JGlossEditor;
 import jgloss.ui.html.JGlossEditorKit;
 import jgloss.ui.html.JGlossHTMLDoc;
 import jgloss.ui.html.AnnotationListSynchronizer;
+import jgloss.ui.html.SelectedAnnotationHighlighter;
 import jgloss.ui.xml.JGlossDocument;
 import jgloss.ui.xml.JGlossDocumentBuilder;
 import jgloss.util.CharacterEncodingDetector;
@@ -533,6 +534,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         annotationEditor = new AnnotationEditorPanel();
         docpane = new JGlossEditor( annotationList);
         docpane.addCaretListener( this);
+        new SelectedAnnotationHighlighter(annotationList, docpane);
         xcvManager.addManagedComponent( docpane);
         hyperlinker = new LookupResultList.Hyperlinker
             ( true, true, true, true, true);
@@ -1369,23 +1371,16 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
     /**
      * React to changes to the selection of the annotation list by selecting the annotation
-     * in the docpane and annotation editor.
+     * in the annotation editor and lookup panel.
      */
     public void valueChanged( ListSelectionEvent e) {
         if (e.getFirstIndex() >= 0) {
             Annotation anno = (Annotation) annotationList.getSelectedValue();
             if (anno != null) {
-                docpane.highlightText( anno.getStartOffset(),
-                                       anno.getEndOffset());
-                // Move the caret to the beginning of the annotation. While the caret
-                // is not visible, this has the side effect of clearing a text selection
-                // the user has made, which is what is wanted.
-                docpane.setCaretPosition(anno.getStartOffset());
                 annotationEditor.setAnnotation( anno);
                 lookupPanel.search( anno.getDictionaryForm());
             }
             else {
-                docpane.removeHighlight();
                 annotationEditor.setAnnotation( null);
             }
         }

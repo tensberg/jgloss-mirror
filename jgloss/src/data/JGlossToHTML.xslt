@@ -24,6 +24,11 @@
 
 -->
 
+<!-- 
+  Transforms a JGloss XML document to a modified HTML document readable by
+  JGlossHTMLDoc/JGlossEditorKit.
+ -->
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:output method="html" indent="no" encoding="UTF-8" />

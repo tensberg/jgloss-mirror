@@ -128,7 +128,6 @@ dist-binary-jdictionary: jdictionary doc
 	mkdir -p dist/$(JDICTIONARY_DISTNAME)
 	cp -r $(JDICTIONARY_BINARY_ZIP) dist/$(JDICTIONARY_DISTNAME)
 	-cd dist/$(JDICTIONARY_DISTNAME) && find -depth -name "CVS" -exec rm -r \{\} \;
-	cd dist/$(JDICTIONARY_DISTNAME) && rm -r $(filter-out $(JDICTIONARY_BINARY_ZIP), $(JDICTIONARY_BINARY_DIST))
 	cd dist && zip -q -r $(JDICTIONARY_DISTNAME).zip $(JDICTIONARY_DISTNAME)
 	cd dist && tar -czf $(JDICTIONARY_DISTNAME).tgz $(JDICTIONARY_DISTNAME)
 	rm -r dist/$(JDICTIONARY_DISTNAME)

@@ -39,7 +39,7 @@ import javax.swing.JComboBox;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-class ComboBoxParameter extends UIParameter {
+class ListParameter extends UIParameter {
     protected static class Value {
         private String label;
         private String value;
@@ -57,7 +57,7 @@ class ComboBoxParameter extends UIParameter {
     private Box box;
     protected JComboBox combobox;
 
-    ComboBoxParameter( Element elem) {
+    ListParameter( Element elem) {
         super( elem);
 
         box = Box.createHorizontalBox();
@@ -70,7 +70,7 @@ class ComboBoxParameter extends UIParameter {
 
     public Component getComponent() { return box; }
 
-    public String getValue( JGlossFrameModel source, URL systemId) { 
+    public Object getValue( JGlossFrameModel source, URL systemId) { 
         return getValue();
     }
     
@@ -111,4 +111,4 @@ class ComboBoxParameter extends UIParameter {
 
         return out;
     }
-} // class ComboBoxParameter
+} // class ListParameter

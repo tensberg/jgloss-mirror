@@ -14,15 +14,12 @@
   
   <xsl:output method="text" encoding="UTF-8" />
 
-  <xsl:variable name="writetr" 
-    select="/jgloss-export/parameters/writetranslations='true'" />
-  <xsl:variable name="writere" 
-    select="/jgloss-export/parameters/writereadings='true'" />
-  <xsl:variable name="voclist" 
-    select="/jgloss-export/parameters/voclist='true'" />
+  <xsl:param name="writetr" />
+  <xsl:param name="writere" />
+  <xsl:param name="voclist" />
 
   <xsl:template match="/">
-    <xsl:apply-templates select="jgloss-export/jgloss" />
+    <xsl:apply-templates select="jgloss/body" />
   </xsl:template>
 
   <xsl:template match="jgloss">
@@ -36,10 +33,6 @@ Vocabulary List
       </xsl:text>
       <xsl:apply-templates select=".//anno" mode="voclist" />
     </xsl:if>
-  </xsl:template>
-
-  <xsl:template match="generator">
-    <meta name="generator" value="{.}" />
   </xsl:template>
 
   <xsl:template match="anno">

@@ -353,6 +353,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
         ((JGlossEditorKit.JGlossParserWrapper) getParser()).setStrict( strict);
     }
 
+    /**
+     * Returns a list of all annotation elements.
+     */
     public List getAnnotationElements() {
         List out = new ArrayList( 10);
         readLock();
@@ -436,7 +439,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
      */
     public Element getAnnotationElement(int offset) {
         Element anno = getDefaultRootElement();
-        while (!anno.isLeaf() && 
+        while (!anno.isLeaf() &&
                !anno.getAttributes().getAttribute(StyleConstants.NameAttribute)
                .equals(AnnotationTags.ANNOTATION)) {
             anno = anno.getElement(anno.getElementIndex(offset));
@@ -494,7 +497,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
             if (sae != null) {
                 insertAfterEnd( sae, "&nbsp;");
             }
-            Element eae = getAnnotationElement(endp.getOffset()+1);
+            // The same for an annotation in front.
+            Element eae = getAnnotationElement(endp.getOffset());
             if (eae != null) {
                 insertBeforeStart( eae, "&nbsp;");
                 // the nbsp is inserted before endp, move endp to the left of the nbsp

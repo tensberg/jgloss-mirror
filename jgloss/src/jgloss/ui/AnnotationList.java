@@ -386,7 +386,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 
         // select the next annotation (or previous, if this was the last annotation)
         selection = Math.min(selection, getModel().getSize()-1);
-        if (selection > 0)
+        if (selection >= 0)
             setSelectedIndex(selection);
     }
 

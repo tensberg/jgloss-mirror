@@ -42,7 +42,7 @@ abstract class UIParameter extends AbstractParameter {
     public abstract void loadFromPrefs();
 
     public void saveToPrefs() {
-        JGloss.prefs.set( prefsKey, getValue( null, null));
+        JGloss.prefs.set( prefsKey, String.valueOf(getValue( null, null)));
     }
 
     protected void initFromElement( Element elem) {

@@ -13,15 +13,13 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   
   <xsl:output method="html" indent="no" encoding="UTF-8" />
-  <!-- if indent is set to "yes", Internet Explorer does not render the annotation correctly -->
+  <!-- if indent is set to "yes", Internet Explorer does not render the annotations correctly -->
 
-  <xsl:variable name="writetr" 
-    select="/jgloss-export/parameters/writetranslations='true'" />
-  <xsl:variable name="writere" 
-    select="/jgloss-export/parameters/writereadings='true'" />
+  <xsl:param name="writetr" />
+  <xsl:param name="writere" />
 
   <xsl:template match="/">
-    <xsl:apply-templates select="jgloss-export/jgloss" />
+    <xsl:apply-templates select="jgloss" />
   </xsl:template>
 
   <xsl:template match="jgloss">

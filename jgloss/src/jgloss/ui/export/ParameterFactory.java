@@ -30,7 +30,7 @@ class ParameterFactory {
         String ENCODING = "encoding";
         String STRING = "string";
         String BOOLEAN = "boolean";
-        String COMBOBOX = "combobox";
+        String LIST = "list";
         String DOCNAME = "docname";
         String DATETIME = "datetime";
     }
@@ -49,8 +49,8 @@ class ParameterFactory {
             return new StringParameter( elem);
         else if (name.equals( Elements.BOOLEAN))
             return new BooleanParameter( elem);
-        else if (name.equals( Elements.COMBOBOX))
-            return new ComboBoxParameter( elem);
+        else if (name.equals( Elements.LIST))
+            return new ListParameter( elem);
         else
             throw new IllegalArgumentException( elem.getTagName());
     }

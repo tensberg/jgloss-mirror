@@ -24,6 +24,7 @@
 package jgloss.ui;
 
 import jgloss.JGloss;
+import jgloss.Preferences;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.DictionaryEntryField;
@@ -32,6 +33,7 @@ import jgloss.dictionary.attribute.ReferenceAttributeValue;
 
 import java.lang.ref.WeakReference;
 
+import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.EventQueue;
@@ -142,7 +144,9 @@ class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
         list = new LookupResultList( 100, SimpleLookup.class.getResource( STYLE_SHEET), false,
                                      hyperlinker);
         list.addHyperlinkListener( this);
-        new HyperlinkKeyNavigator(list.getFancyResultPane().getSelectionColor())
+        new HyperlinkKeyNavigator(new Color
+                                  (Math.max(0, JGloss.prefs.getInt
+                                            (Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))))
             .setTargetEditor(list.getFancyResultPane());
 
         this.add( list, BorderLayout.CENTER);

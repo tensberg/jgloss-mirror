@@ -173,20 +173,12 @@ class Exporter {
                     ( new SAXSource( getSelectedTemplate()));
 
                 if (encoding != null)
-                    transformer.setOutputProperty( OutputKeys.ENCODING, encoding.getValue());
+                    transformer.setOutputProperty( OutputKeys.ENCODING, 
+                                                   String.valueOf(encoding.getValue()));
+                
+                setParameters(source,transformer);
 
-                Element parametersElement = createParametersElement( source, doc);
-                Element jglossElement = doc.getDocumentElement();
-                Element root = doc.createElement( Elements.JGLOSS_EXPORT);
-                doc.replaceChild( root, jglossElement);
-                root.appendChild( parametersElement);
-                root.appendChild( jglossElement);
-
-                try {
-                    transformer.transform( new DOMSource( doc), new StreamResult( out));
-                } finally {
-                    doc.replaceChild( jglossElement, root);
-                }
+                transformer.transform( new DOMSource( doc), new StreamResult( out));
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
@@ -267,15 +259,11 @@ class Exporter {
         return new InputSource( source);
     }
 
-    private Element createParametersElement( JGlossFrameModel source, Document doc) {
-        Element param = doc.createElement( Elements.PARAMETERS);
+    private void setParameters(JGlossFrameModel source,Transformer transformer) {
         for ( Iterator i=parameters.iterator(); i.hasNext(); ) {
             Parameter p = (Parameter) i.next();
-            Element pe = doc.createElement( p.getName());
-            pe.appendChild( doc.createTextNode( p.getValue( source, systemId)));
-            param.appendChild( pe);
+            transformer.setParameter(p.getName(), p.getValue( source, systemId));
         }
-        return param;
     }
 
     private void initFileChooser() {
