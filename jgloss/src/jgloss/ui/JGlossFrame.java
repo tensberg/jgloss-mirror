@@ -1434,6 +1434,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
         if (r == JFileChooser.APPROVE_OPTION) {
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             Writer out = null;
+
+            // The document is modified during export. Save the original changed state.
+            boolean originalDocumentChanged = documentChanged;
             try {
                 out = new BufferedWriter( new OutputStreamWriter
                     ( new FileOutputStream( f.getSelectedFile()),
@@ -1451,6 +1454,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                   writeReading.isSelected(), writeTranslations.isSelected(),
                                   backwardsCompatible.isSelected(),
                                   writeHidden.isSelected()).write();
+                // restore document changed state
+                if (originalDocumentChanged == false) {
+                    documentChanged = false;
+                    saveAction.setEnabled( false);
+                }   
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog

@@ -98,6 +98,8 @@ startup.wordlookup=false
 wordlookup.searchtype=0
 wordlookup.deinflection=true
 wordlookup.alldictionaries=true
+# Limit for the number of results the word lookup panel will show.
+wordlookup.resultlimit=1000
 
 chasen.location=/usr/local/bin/chasen
 

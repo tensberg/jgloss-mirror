@@ -66,19 +66,36 @@ public class WordLookupPanel extends JPanel {
      */
     protected JComboBox expression;
     /**
+     * Text field used to display the result as plain text. This text field is used when there
+     * are more than {@link #resultLimit resultLimit} results.
+     */
+    JTextArea resultPlain;
+    /**
+     * Text field used to display the result as HTML text. This text field is used when there
+     * are less than {@link #resultLimit resultLimit} results.
+     */
+    JTextPane resultFancy;
+    /**
      * Text pane which displays the lookup result.
      */
-    protected JTextPane result;
     protected JScrollPane resultScroller;
+    /**
+     * Limit of entry lines up to which HTML formatting of the result will be used.
+     */
+    protected int resultLimit;
 
     /**
      * List holding the result of the last dictionary lookup.
      */
     protected java.util.List lastResult = Collections.EMPTY_LIST;
+    protected boolean keepLastResult;
 
     protected XCVManager xcvManager;
 
-    public WordLookupPanel() {
+    public WordLookupPanel( boolean keepLastResult) {
+        this.resultLimit = JGloss.prefs.getInt( Preferences.WORDLOOKUP_RESULTLIMIT, 500);
+        this.keepLastResult = keepLastResult;
+
         setLayout( new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -214,7 +231,9 @@ public class WordLookupPanel extends JPanel {
             };
         clearAction.setEnabled( true);
         UIUtilities.initAction( clearAction, "wordlookup.clear");
-        p.add( new JButton( clearAction), c2);
+        JButton clear = new JButton( clearAction);
+        p.add( clear, c2);
+        clear.setNextFocusableComponent( exact);
 
         add( p, c);
 
@@ -222,15 +241,34 @@ public class WordLookupPanel extends JPanel {
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
         
+        // set up the result panes.
+        resultFancy = new JTextPane();
+        resultFancy.setContentType( "text/html");
+        resultFancy.setEditable( false);
+        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule( STYLE);
+        resultFancy.getKeymap().addActionForKeyStroke
+            ( KeyStroke.getKeyStroke( "pressed TAB"),
+              new AbstractAction() {
+                      public void actionPerformed( ActionEvent e) {
+                          transferFocus();
+                      }
+                  });
+
+        resultPlain = new JTextArea();
+        resultPlain.setEditable( false);
+        resultPlain.getKeymap().addActionForKeyStroke
+            ( KeyStroke.getKeyStroke( "pressed TAB"),
+              new AbstractAction() {
+                      public void actionPerformed( ActionEvent e) {
+                          transferFocus();
+                      }
+                  });
+
         p = new JPanel( new GridLayout( 1, 1));
         p.setBorder( BorderFactory.createCompoundBorder
                      ( BorderFactory.createTitledBorder( JGloss.messages.getString( "wordlookup.result")),
                        BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
-        result = new JTextPane();
-        result.setEditable( false);
-        result.setContentType( "text/html");
-        ((HTMLEditorKit) result.getEditorKit()).getStyleSheet().addRule( STYLE);
-        resultScroller = new JScrollPane( result, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        resultScroller = new JScrollPane( resultPlain, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         p.add( resultScroller);
         add( p, c);
@@ -244,7 +282,8 @@ public class WordLookupPanel extends JPanel {
             });
 
         xcvManager = new XCVManager( expression);
-        xcvManager.addManagedComponent( result);
+        xcvManager.addManagedComponent( resultFancy);
+        xcvManager.addManagedComponent( resultPlain);
     }
 
     /**
@@ -294,8 +333,6 @@ public class WordLookupPanel extends JPanel {
         String ex = expression.getSelectedItem().toString();
         if (ex.length() == 0)
             return;
-        StringBuffer result = new StringBuffer();
-        lastResult = new ArrayList( 10);
 
         short mode;
         if (exact.isSelected())
@@ -323,14 +360,12 @@ public class WordLookupPanel extends JPanel {
                 }
             }
         }
-            
+        
+        java.util.List result = new ArrayList( 500);
         if (allDictionaries.isSelected()) {
             Dictionary[] d = Dictionaries.getDictionaries();
             for ( int i=0; i<d.length; i++) {
-                result.append( JGloss.messages.getString( "wordlookup.matches"));
-                result.append( "<font color=\"green\">");
-                result.append( d[i].getName());
-                result.append( "</font>:<br>\n");
+                result.add( d[i].getName()); // mark beginning of next dictionary in results
                 lookupAll( d[i], ex, conjugations, hiragana, mode, result);
             }
         }
@@ -338,29 +373,135 @@ public class WordLookupPanel extends JPanel {
             lookupAll( (Dictionary) dictionaryChoice.getSelectedItem(),
                        ex, conjugations, hiragana, mode, result);
         }
-            
-        if (result.length() == 0) {
-            result.append( JGloss.messages.getString( "wordlookup.nomatches",
-                                                      new Object[] { expression.getSelectedItem() }));
+        
+        // generate result text
+        StringBuffer resultText = new StringBuffer( result.size()*30);
+        boolean useHTML = (result.size() < resultLimit);
+        int results = 0; // number of result entries without dictionary names
+        if (keepLastResult)
+            lastResult = new ArrayList( result.size());
+        for ( Iterator i=result.iterator(); i.hasNext(); ) {
+            Object o = i.next();
+            if (o instanceof String) { // dictionary name
+                resultText.append( JGloss.messages.getString( "wordlookup.matches"));
+                if (useHTML)
+                    resultText.append( "<font color=\"green\">");
+                resultText.append( (String) o);
+                if (useHTML)
+                    resultText.append( "</font>:<br>");
+                else
+                    resultText.append( ':');
+                resultText.append( '\n');
+            }
+            else if (o instanceof Conjugation) {
+                Conjugation conjugation = (Conjugation) o;
+                if (useHTML)
+                    resultText.append( "<i>");
+                resultText.append( JGloss.messages.getString
+                                   ( "wordlookup.inflection", new String[] {
+                                       conjugation.getType(), conjugation.getDictionaryForm(),
+                                       conjugation.getConjugatedForm() }));
+                if (useHTML)
+                    resultText.append( "</i><br>");
+                resultText.append( '\n');
+            }
+            else { // dictionary entry
+                results++;
+                if (keepLastResult)
+                    lastResult.add( o);
+                StringBuffer match = new StringBuffer();
+                WordReadingPair wrp = (WordReadingPair) o;
+                if (useHTML) {
+                    match.append( wrp.getWord());
+                    if (wrp.getReading() != null && wrp.getReading().length()>0
+                        && !(wrp.getWord().equals( wrp.getReading()))) {
+                        match.append( " \uff08");
+                        match.append( wrp.getReading());
+                        match.append( '\uff09');
+                    }
+                    if (wrp instanceof DictionaryEntry) {
+                        match.append( ' ');
+                        String[] t = ((DictionaryEntry) wrp).getTranslations();
+                        match.append( t[0]);
+                        for ( int j=1; j<t.length; j++) {
+                            match.append( " / ");
+                            match.append( t[j]);
+                        }
+                    }
+
+                    // highlight the expression in the result
+                    String lcex = ex.toLowerCase();
+                    String lcmatch = match.toString().toLowerCase();
+                    int off = lcmatch.lastIndexOf( lcex);
+                    while (off != -1) {
+                        match.insert( off+ex.length(), "</font>");
+                        match.insert( off, "<font color=\"blue\">");
+                        off = lcmatch.lastIndexOf( lcex, off-1);
+                    }
+
+                    resultText.append( match);
+                    resultText.append( "<br>\n");
+                }
+                else {
+                    // add entry as plain text
+                    resultText.append( wrp.getWord() + " \uff08" + wrp.getReading());
+                    resultText.append( '\uff09');
+                    if (wrp instanceof DictionaryEntry) {
+                        resultText.append( ' ');
+                        String[] t = ((DictionaryEntry) wrp).getTranslations();
+                        resultText.append( t[0]);
+                        for ( int j=1; j<t.length; j++) {
+                            resultText.append( " / ");
+                            resultText.append( t[j]);
+                        }
+                    }
+                    resultText.append('\n');
+                }
+            }
         }
-        else
-            result.insert( 0, JGloss.messages.getString( "wordlookup.matchesfor",
-                                                         new Object[] { expression.getSelectedItem() })
-                           + "<br>\n");
 
-        result.insert( 0, "<html><head></head><body>");
-        result.append( "</body></html>");
+        if (results == 0) {
+            resultText = new StringBuffer( JGloss.messages.getString
+                                           ( "wordlookup.nomatches",
+                                             new Object[] { expression.getSelectedItem() }));
+        }
+        else {
+            resultText.insert( 0, '\n');
+            if (useHTML)
+                resultText.insert( 0, "<br>");
+            resultText.insert( 0, JGloss.messages.getString( "wordlookup.matchesfor",
+                                                             new Object[] 
+                { Integer.toString( results), expression.getSelectedItem() }));
+        }
 
-        // setting up the new doc this way is more complicated than simply using setText
-        // on the JTextPane, but avoids the scroll pane moving to the end of the generated document
-        Document doc = this.result.getEditorKit().createDefaultDocument();
-        try {
-            this.result.getEditorKit().read( new java.io.StringReader( result.toString()),
-                                             doc, 0);
-        } catch (Exception exc) {}
-        this.result.setDocument( doc);
+        // create new result display pane
+        if (useHTML) {
+            resultText.insert( 0, "<html><head></head><body>");
+            resultText.append( "</body></html>");
+            // setting up the new doc this way is more complicated than simply using setText
+            // on the JTextPane, but avoids the scroll pane moving to the end of the generated document
+            HTMLEditorKit kit = (HTMLEditorKit) resultFancy.getEditorKit();
+            Document doc = kit.createDefaultDocument();
+            try {
+                kit.read( new java.io.StringReader( resultText.toString()), doc, 0);
+            } catch (Exception exc) {}
+            resultFancy.setDocument( doc);
+            if (resultScroller.getViewport().getView() != resultFancy) {
+                resultScroller.setViewportView( resultFancy);
+                resultPlain.setText( ""); // clear to save memory
+            }
+        }
+        else {
+            resultPlain.setText( resultText.toString());
+            if (resultScroller.getViewport().getView() != resultPlain) {
+                resultScroller.setViewportView( resultPlain);
+                resultFancy.setDocument( ((HTMLEditorKit) resultFancy.getEditorKit())
+                                         .createDefaultDocument()); // clear to save memory
+                
+            }
+        }
         resultScroller.getViewport().setViewPosition( new Point( 0, 0));
-
+            
         // remember the current search string
         ex = expression.getSelectedItem().toString();
         expression.insertItemAt( ex, 0);
@@ -377,70 +518,60 @@ public class WordLookupPanel extends JPanel {
         expression.setSelectedItem( ex);
     }
 
-    protected void lookupAll( Dictionary dic, String expression, Conjugation[] conjugations, 
-                              String hiragana, short mode, StringBuffer result) {
+    /**
+     * Look up an expression with all possible conjugations in a dictionary.
+     *
+     * @param dic Dictionary in which to look up the expression.
+     * @param expression Expression to look up.
+     * @param conjugations List of conjugations which will be added to the expression. May be
+     *                     <CODE>null</CODE>.
+     * @param hiragana Inflection after the expression. Only conjugations where the hiragana inflection
+     *                 matches the dictionary form will be used.
+     * @param mode Search mode.
+     * @param result List of dictionary entries matching the search expression.
+     * @return Number of entries found.
+     */
+    protected int lookupAll( Dictionary dic, String expression, Conjugation[] conjugations, 
+                              String hiragana, short mode, java.util.List result) {
+        int results; // number of entry lines found
+        
         if (conjugations == null)
-            lookupWord( dic, expression, null, mode, result);
+            results = lookupWord( dic, expression, null, mode, result);
         else {
-            lookupWord( dic, expression + hiragana, null, mode, result);
+            results = lookupWord( dic, expression + hiragana, null, mode, result);
             for ( int i=0; i<conjugations.length; i++) {
                 if (!conjugations[i].getDictionaryForm().equals( hiragana))
-                    lookupWord( dic, expression + conjugations[i].getDictionaryForm(),
-                                conjugations[i], mode, result);
+                    results += lookupWord( dic, expression + conjugations[i].getDictionaryForm(),
+                                           conjugations[i], mode, result);
             }
         }
+
+        return results;
     }
     
-    protected void lookupWord( Dictionary dic, String expression, Conjugation conjugation,
-                               short mode, StringBuffer result) {
+    /**
+     * Look up an expression in a dictionary.
+     *
+     * @param dic Dictionary in which to look up the expression.
+     * @param expression Expression to look up.
+     * @param conjugation Conjugation to apply to the expression. May be <CODE>null</CODE>.
+     * @param mode Search mode.
+     * @param result List of dictionary entries matching the search expression.
+     * @return Number of entries found.
+     */
+    protected int lookupWord( Dictionary dic, String expression, Conjugation conjugation,
+                               short mode, java.util.List result) {
         try {
             java.util.List entries = dic.search( expression, mode);
             if (entries.size() > 0) {
-                lastResult.addAll( entries);
-                if (conjugation != null) {
-                    result.append( "<i>" + JGloss.messages.getString
-                                   ( "wordlookup.inflection", new String[] {
-                                       conjugation.getType(), conjugation.getDictionaryForm(),
-                                       conjugation.getConjugatedForm() }) +
-                                   "</i><br>");
-                }
-
-                for ( Iterator i=entries.iterator(); i.hasNext(); ) {
-                    StringBuffer match = new StringBuffer();
-                    WordReadingPair wrp = (WordReadingPair) i.next();
-                    match.append( wrp.getWord());
-                    if (wrp.getReading() != null && wrp.getReading().length()>0
-                        && !(wrp.getWord().equals( wrp.getReading()))) {
-                        match.append( " \uff08");
-                        match.append( wrp.getReading());
-                        match.append( '\uff09');
-                    }
-                    if (wrp instanceof DictionaryEntry) {
-                        match.append( " ");
-                        String[] t = ((DictionaryEntry) wrp).getTranslations();
-                        match.append( t[0]);
-                        for ( int j=1; j<t.length; j++) {
-                            match.append( " / ");
-                            match.append( t[j]);
-                        }
-                    }
-
-                    // highlight the expression in the result
-                    String lcex = expression.toLowerCase();
-                    String lcmatch = match.toString().toLowerCase();
-                    int off = lcmatch.lastIndexOf( lcex);
-                    while (off != -1) {
-                        match.insert( off+expression.length(), "</font>");
-                        match.insert( off, "<font color=\"blue\">");
-                        off = lcmatch.lastIndexOf( lcex, off-1);
-                    }
-
-                    result.append( match);
-                    result.append( "<br>\n");
-                }
+                if (conjugation != null)
+                    result.add( conjugation);
+                result.addAll( entries);
             }
+            return entries.size();
         } catch (SearchException ex) {
             ex.printStackTrace();
+            return 0;
         }
     }
 

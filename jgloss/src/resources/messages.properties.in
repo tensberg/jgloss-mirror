@@ -87,7 +87,7 @@ button.select=Select
 button.annotate=Annotate
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9.4
+jgloss.version=Version 0.9.5
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -342,6 +342,6 @@ wordlookup.clear=Clear
 wordlookup.result=Search result:
 wordlookup.nodictionary=<none available>
 wordlookup.matches=Matches in\ 
-wordlookup.matchesfor=Entries matching {0}:
+wordlookup.matchesfor=Found {0} entries matching {1}:
 wordlookup.nomatches=No matching entries found for {0}
 wordlookup.inflection=Possible inflection: {0}, {1}->{2}

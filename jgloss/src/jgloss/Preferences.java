@@ -123,6 +123,7 @@ public class Preferences {
     public static final String WORDLOOKUP_SEARCHTYPE = "wordlookup.searchtype";
     public static final String WORDLOOKUP_DEINFLECTION = "wordlookup.deinflection";
     public static final String WORDLOOKUP_ALLDICTIONARIES = "wordlookup.alldictionaries";
+    public static final String WORDLOOKUP_RESULTLIMIT = "wordlookup.resultlimit";
 
     public static final String CHASEN_LOCATION = "chasen.location";
 

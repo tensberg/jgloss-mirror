@@ -151,7 +151,7 @@ public class JGlossEditor extends JTextPane {
                     }
                 };
             UIUtilities.initAction( cancelAction, "button.cancel");
-            wordlookup = new WordLookupPanel();
+            wordlookup = new WordLookupPanel( true);
 
             getContentPane().setLayout( new BorderLayout());
             getContentPane().add( wordlookup, BorderLayout.CENTER);
@@ -405,8 +405,8 @@ public class JGlossEditor extends JTextPane {
                               JOptionPane.PLAIN_MESSAGE);
                         if (text!=null && text.length()>0) {
                             try {
-                                lastFindText = text;
                                 int where = find( text, 0);
+                                lastFindText = text;
                                 if (where != -1) {
                                     lastFindPosition = where;
                                     findAgainAction.setEnabled( true);
@@ -423,8 +423,10 @@ public class JGlossEditor extends JTextPane {
                             if (where != -1)
                                 lastFindPosition = where;
                             else
-                                lastFindPosition = 0;
-                        } catch (BadLocationException ex) {}
+                                lastFindPosition = 0; // wrap search
+                        } catch (BadLocationException ex) {
+                            lastFindPosition = 0;
+                        }
                     }
                 };
             UIUtilities.initAction( findAgainAction, "editor.menu.findagain");

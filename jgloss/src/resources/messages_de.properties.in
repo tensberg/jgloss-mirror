@@ -85,9 +85,6 @@ button.choose=Auswählen...
 button.select=Auswählen
 button.annotate=Annotieren
 
-jgloss.title=JGloss
-jgloss.version=Version 0.9.4
-
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<Erstelle Anwendungsfenster>
 splashscreen.loadingPreferences=Lade Voreinstellungen
@@ -311,6 +308,6 @@ wordlookup.clear=Löschen
 wordlookup.result=Suchergebnis:
 wordlookup.nodictionary=<keine verfügbar>
 wordlookup.matches=Treffer in\ 
-wordlookup.matchesfor=Einträge für {0}:
+wordlookup.matchesfor={0} Einträge für {1} gefunden:
 wordlookup.nomatches=Keine Einträge für {0} gefunden
 wordlookup.inflection=Mögliche Inflektion: {0}, {1}->{2}

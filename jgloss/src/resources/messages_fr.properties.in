@@ -62,9 +62,6 @@ button.save=Sauver
 button.discard=Abandonner
 button.close=Fermer
 
-jgloss.title=JGloss
-jgloss.version=Version 0.9.4
-
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<création de la fenêtre d'application>
 splashscreen.loadingPreferences=chargement des préférences
