@@ -38,6 +38,19 @@ import java.text.MessageFormat;
  */
 public abstract class FileBasedDictionary implements Dictionary {
     /**
+     * Implementations of this carry state for the byte conversion in 
+     * {@link FileBasedDictionary#convertByteInChar(int,boolean,ByteConverterState) convertByteInChar}.
+     *
+     * @see #newByteConverterState()
+     */
+    protected static interface ByteConverterState {
+        /**
+         * Sets the state information to it's original setting.
+         */
+        void reset();
+    }
+
+    /**
      * Filename extension of a JJDX-format index. Will be added to the filename of the
      * dictionary.
      */
@@ -156,7 +169,7 @@ public abstract class FileBasedDictionary implements Dictionary {
                     if (indexbuf.getInt() == JJDX_LITTLE_ENDIAN)
                         order = ByteOrder.LITTLE_ENDIAN;
                 }
-                System.err.println( "using " + order);
+
                 // move to index start
                 indexbuf.position( offset);
                 indexbuf.order( order);
@@ -186,6 +199,7 @@ public abstract class FileBasedDictionary implements Dictionary {
             if (match != -1) {
                 int firstmatch = findMatch( exprBytes, match, true);
                 int lastmatch = findMatch( exprBytes, match, false);
+                //System.err.println( "all matches in EDictNIO: " + (lastmatch-firstmatch+1));
 
                 // Several index entries can point to the same entry line. For example
                 // if a word contains the same kanji twice, and words with this kanji are looked up,
@@ -217,10 +231,8 @@ public abstract class FileBasedDictionary implements Dictionary {
                         start--;
 
                     Integer starti = new Integer( start);
-                    if (seenEntries.contains( starti)) {
-                        match++;
+                    if (seenEntries.contains( starti))
                         continue;
-                    }
                     else
                         seenEntries.add( starti);
                     
@@ -388,6 +400,19 @@ public abstract class FileBasedDictionary implements Dictionary {
         indexbuf.putInt( 4*2, entries);
         indexchannel.truncate( INDEX_OFFSET + entries*4);
         indexchannel.force( true);
+        // map index to new size
+        index = indexchannel.map( FileChannel.MapMode.READ_WRITE, INDEX_OFFSET,
+                                  indexchannel.size()).order( ByteOrder.nativeOrder())
+            .asIntBuffer();
+    }
+
+    /**
+     * Returns the name of this dictionary. This is the filename of the dictionary file.
+     *
+     * @return The name of this dictionary.
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -416,7 +441,7 @@ public abstract class FileBasedDictionary implements Dictionary {
         int wantedlength = 2;
         while (dictionary.position() < end) {
             int position = dictionary.position();
-            int type = readNextCharacter(); // changes position
+            int type = readNextCharacter( inWord); // changes position
             if (inWord) {
                 if (type < 0) {
                     // end of word; add index entry the current word is long enough
@@ -463,11 +488,13 @@ public abstract class FileBasedDictionary implements Dictionary {
      * {@link #dictionary dictionary}. An arbitrary number of bytes may be skipped by the method
      * after the character is read in order to skip over non-indexable dictionary fields.
      *
+     * @param inWord <CODE>true</CODE> if the current character follows a character in a indexable
+     *               word. This can be used to change the meaning of characters depending on their position.
      * @return -1, if the character is not part of an indexable word; 0 if an index entry should
      *         be created immediately for the character position; n (&gt;0): add an index entry
      *         for the word containing this character if it has more than n characters.
      */
-    protected abstract int readNextCharacter();
+    protected abstract int readNextCharacter( boolean inWord);
 
     /**
      * Add a word entry to the index. This method will be called by 
@@ -480,10 +507,9 @@ public abstract class FileBasedDictionary implements Dictionary {
             index.put( offset);
         } catch (BufferOverflowException ex) {
             // increase file size
-            System.err.println( indexchannel);
             int position = index.position();
             index = indexchannel.map( FileChannel.MapMode.READ_WRITE, INDEX_OFFSET,
-                                      indexchannel.size()*2).order( ByteOrder.nativeOrder())
+                                         indexchannel.size()*2).order( ByteOrder.nativeOrder())
                 .asIntBuffer();
             index.position( position+1);
             index.put( offset);
@@ -548,13 +574,14 @@ public abstract class FileBasedDictionary implements Dictionary {
      * @return -1 if i1&lt;i2, 1 if i1&gt;i2, 0 for equality.
      */
     protected int compare( int i1, int i2) {
+        ByteConverterState state = newByteConverterState();
         int len1 = (int) dictionary.capacity() - i1;
         int len2 = (int) dictionary.capacity() - i2;
         // compare at most 30 bytes
         int length = Math.min( 30, Math.min( len1, len2));
         for ( int i=0; i<length; i++) {
-            int b1 = byteToUnsignedByte( dictionary.get( i1+i));
-            int b2 = byteToUnsignedByte( dictionary.get( i2+i));
+            int b1 = convertByteInChar( byteToUnsignedByte( dictionary.get( i1+i)), false, state);
+            int b2 = convertByteInChar( byteToUnsignedByte( dictionary.get( i2+i)), true, state);
             if (b1 < b2)
                 return -1;
             else if (b1 > b2)
@@ -581,12 +608,13 @@ public abstract class FileBasedDictionary implements Dictionary {
      *         or 0 if they are equal.
      */
     protected int compare( byte[] str, int off) {
+        ByteConverterState state = newByteConverterState();
         dictionary.position( off);
         for ( int i=0; i<str.length; i++) {
-            int b1 = byteToUnsignedByte( str[i]);
+            int b1 = convertByteInChar( byteToUnsignedByte( str[i]), false, state);
             int b2;
             try {
-                b2 = byteToUnsignedByte( dictionary.get());
+                b2 = convertByteInChar( byteToUnsignedByte( dictionary.get()), true, state);
             } catch (BufferUnderflowException ex) {
                 // end of dictionary file, dictionary string is prefix of str
                 return 1;
@@ -600,6 +628,25 @@ public abstract class FileBasedDictionary implements Dictionary {
     }
 
     /**
+     * Change a byte which is part of a multibyte encoded char in some way. This can be used
+     * for example to change uppercase ASCII characters to lowercase or katakana to hiragana.
+     * The method is called from {@link #compare(byte[],int) compare( str, off)} and
+     * {@link #compare(int,int) compare( i1, i2)}.
+     */
+    protected int convertByteInChar( int b, boolean last, ByteConverterState state) {
+        return b;
+    }
+
+    /**
+     * Creates a new state object for byte conversion. 
+     * If the derived class does not need state information, the method does not need to return
+     * anything.
+     */
+    protected ByteConverterState newByteConverterState() {
+        return null;
+    }
+
+    /**
      * Converts the byte value to an int with the value of the 8 bits
      * interpreted as an unsigned byte.
      *
@@ -608,14 +655,5 @@ public abstract class FileBasedDictionary implements Dictionary {
      */
     protected final static int byteToUnsignedByte( byte b) {
         return b & 0xff;
-    }
-
-    /**
-     * Returns the name of this dictionary. This is the filename of the dictionary file.
-     *
-     * @return The name of this dictionary.
-     */
-    public String getName() {
-        return name;
     }
 } // class FileBasedDictionary

@@ -38,12 +38,11 @@ import java.util.regex.*;
  */
 public class EDictNIO extends FileBasedDictionary {
     public static void main( String[] args) throws Exception {
-        EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
-        //EDict eo = new EDict( "/home/michael/japan/dictionaries/edict", true);
+        //EDictNIO en = new EDictNIO( new File( "/home/michael/japan/dictionaries/edict"), true);
+        EDictNIO en = new EDictNIO( new File( "/usr/share/edict/edict"), true);
         EDict eo = new EDict( "/usr/share/edict/edict", true);
-        //test( "end", en, eo, SEARCH_STARTS_WITH);
-
-
+        //test( "year", en, eo, SEARCH_ANY_MATCHES);
+        
         Matcher word = Pattern.compile( "^(\\S+)").matcher( "");
         Matcher reading = Pattern.compile( "\\[(.*?)\\]").matcher( "");
         Matcher translation = Pattern.compile( "/(.*?)/").matcher( "");
@@ -269,7 +268,7 @@ public class EDictNIO extends FileBasedDictionary {
         result.add( new DictionaryEntry( word, reading, translation, this));
     }
     
-    protected int readNextCharacter() {
+    protected int readNextCharacter( boolean inWord) {
         int c = byteToUnsignedByte( dictionary.get());
         if (c > 127) { // multibyte character in EUC-JP encoding
             // skip second byte
@@ -287,137 +286,73 @@ public class EDictNIO extends FileBasedDictionary {
             if (c>='a' && c<='z' ||
                 c>='A' && c<='Z' ||
                 c>='0' && c<='9' ||
-                c=='-' || c=='.')
+                (inWord && (c=='-' || c=='.')))
                 return 3; // word character
             else
                 return -1; // not in index word
         }
     }
 
-    /**
-     * Comparison which takes into account the EUC-JP encoding format and
-     * converts katakana to hiragana and uppercase characters to lowercase.
-     */
-    protected int compare( int i1, int i2) {
-        int len1 = (int) dictionary.capacity() - i1;
-        int len2 = (int) dictionary.capacity() - i2;
-        // compare at most 30 bytes
-        int length = Math.min( 30, Math.min( len1, len2));
+    protected static class EDictState implements ByteConverterState {
+        /**
+         * Multibyte char is 1 byte long.
+         */
+        public final static int ONE_BYTE = 1;
+        /**
+         * Multibyte char is 2 bytes long.
+         */
+        public final static int TWO_BYTES = 2;
+        /**
+         * Multibyte char is 3 bytes long.
+         */
+        public final static int THREE_BYTES = 3;
+        /**
+         * Byte in multibyte character
+         */
+        public int byteInChar;
+        /**
+         * Number of bytes in multibyte character
+         */
+        public int type;
 
-        int b = 1; // byte in multibyte character
-        final int ONE_BYTE = 1;
-        final int TWO_BYTES = 2;
-        final int THREE_BYTES = 3;
-        int type = ONE_BYTE;
-
-        for ( int i=0; i<length; i++) {
-            int c1 = byteToUnsignedByte( dictionary.get( i1+i));
-            int c2 = byteToUnsignedByte( dictionary.get( i2+i));
-
-            if (b == 1) { // first byte in possible multibyte character
-                // convert katakana to hiragana
-                if (c1 == 0xA5) {
-                    c1 = 0xA4;
-                }
-                if (c2 == 0xA5) {
-                    c2 = 0xA4;
-                }
-                // Determine number of bytes in multibyte char
-                // We only need to test the type of c1, because if c1 and c2 are different,
-                // the equality test ends.
-                if (c1 < 127) {
-                    type = ONE_BYTE; // single-byte ASCII
-                    // uppercase -> lowercase conversion
-                    if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
-                    if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
-                }
-                else {
-                    if (c1 == 0x8f) // JIS X 0212 3-Byte Kanji
-                        type = THREE_BYTES;
-                    else
-                        type = TWO_BYTES;
-                    b++;
-                }
-            }
-            else // second or third byte in multibyte char
-                if (b == type) // last byte in char, reset counter
-                    b = 1;
-                else 
-                    b++; // only reached for 3-byte char
-
-            if (c1 < c2)
-                return -1;
-            else if (c1 > c2)
-                return 1;
+        public EDictState() {
+            reset();
         }
-        // equal along the length
-        if (len1 < len2)
-            return -1;
-        else if (len1 > len2)
-            return 1;
-        else
-            return 0; // equality
+
+        public void reset() {
+            byteInChar = 1;
+            type = ONE_BYTE;
+        }
     }
 
-    /**
-     * Comparison which takes into account the EUC-JP encoding format and
-     * converts katakana to hiragana and uppercase characters to lowercase.
-     */
-    protected int compare( byte[] str, int off) {
-        int b = 1; // byte in multibyte character
-        final int ONE_BYTE = 1;
-        final int TWO_BYTES = 2;
-        final int THREE_BYTES = 3;
-        int type = ONE_BYTE;
-
-        dictionary.position( off);
-        for ( int i=0; i<str.length; i++) {
-            int c1 = byteToUnsignedByte( str[i]);
-            int c2;
-            try {
-                c2 = byteToUnsignedByte( dictionary.get());
-            } catch (BufferUnderflowException ex) {
-                // end of dictionary file, dictionary string is prefix of str
-                return 1;
+    protected int convertByteInChar( int c, boolean last, ByteConverterState bstate) {
+        EDictState state = (EDictState) bstate;
+        if (state.byteInChar == 1) { // first byte in multibyte character
+            if (c < 128) { // ASCII char
+                state.type = EDictState.ONE_BYTE;
+                // uppercase -> lowercase conversion
+                if ((c >= 'A') && (c <= 'Z')) c |= 0x20;
             }
-
-            if (b == 1) { // first byte in possible multibyte character
+            else {
                 // convert katakana to hiragana
-                if (c1 == 0xA5) {
-                    c1 = 0xA4;
-                }
-                if (c2 == 0xA5) {
-                    c2 = 0xA4;
-                }
-                // Determine number of bytes in multibyte char
-                // We only need to test the type of c1, because if c1 and c2 are different,
-                // the equality test ends.
-                if (c1 < 127) {
-                    type = ONE_BYTE; // single-byte ASCII
-                    // uppercase -> lowercase conversion
-                    if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
-                    if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
-                }
-                else {
-                    if (c1 == 0x8f) // JIS X 0212 3-Byte Kanji
-                        type = THREE_BYTES;
-                    else
-                        type = TWO_BYTES;
-                    b++;
-                }
+                if (c == 0xA5)
+                    c = 0xA4;
+                state.type = EDictState.TWO_BYTES;
+                if (c == 0x8f) // JIS X 0212 3-Byte Kanji
+                    state.type = EDictState.THREE_BYTES;
             }
-            else // second or third byte in multibyte char
-                if (b == type) // last byte in char, reset counter
-                    b = 1;
-                else
-                    b++;
-
-            if (c1 < c2)
-                return -1;
-            else if (c1 > c2)
-                return 1;
         }
-        return 0; // equality
+        if (last) {
+            state.byteInChar++;
+            if (state.byteInChar > state.type)
+                state.byteInChar = 1;
+        }
+
+        return c;
+    }
+
+    protected ByteConverterState newByteConverterState() {
+        return new EDictState();
     }
 
     public String toString() {

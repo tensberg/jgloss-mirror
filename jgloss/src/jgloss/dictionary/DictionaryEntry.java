@@ -98,15 +98,21 @@ public class DictionaryEntry implements WordReadingPair {
      * @return A string representation of this entry.
      */
     public String toString() {
-        String out = word + " [";
-        if (reading != null) 
-            out += reading;
-        out += "] ";
-        for ( int i=0; i<translation.length; i++)
-            out += "/" + translation[i];
-        out += "/";
+        StringBuffer out = new StringBuffer( 128);
+        out.append( word);
+        if (reading != null) {
+            out.append( " [");
+            out.append( reading);
+            out.append( ']');
+        }
+        out.append( ' ');
+        for ( int i=0; i<translation.length; i++) {
+            out.append( '/');
+            out.append( translation[i]);
+        }
+        out.append( '/');
 
-        return out;
+        return out.toString();
     }
 
     /**
