@@ -88,6 +88,10 @@ public class Parser {
      * Number of lookup results found in the cache but already garbage collected.
      */
     private int cacheGarbageCollected = 0;
+    /**
+     * Flag if 0x0a and 0x0d characters should be ignored in parsed text.
+     */
+    private boolean ignoreNewlines;
 
     /**
      * Describes an annotation for a specific position in the parsed text.
@@ -135,40 +139,40 @@ public class Parser {
 
     /**
      * Creates a new parser which will use the given dictionaries, use no reading annotation
-     * delimiters and will cache dictionary lookups.
+     * delimiters, will cache dictionary lookups and not ignore newlines.
      *
      * @param dictionaries The dictionaries used for word lookups.
      */
     public Parser( Dictionary[] dictionaries) {
-        this( dictionaries, null, '\0', '\0', true);
+        this( dictionaries, null, '\0', '\0', true, false);
     }
 
     /**
      * Creates a new parser which will use the given dictionaries, use no reading annotation
-     * delimiters and will cache dictionary lookups.
+     * delimiters and will cache dictionary lookups and not ignore newlines.
      *
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      */
     public Parser( Dictionary[] dictionaries, Set exclusions) {
-        this( dictionaries, exclusions, '\0', '\0', true);
+        this( dictionaries, exclusions, '\0', '\0', true, false);
     }
 
     /**
      * Creates a new parser which will use the given dictionaries and use no reading annotation
-     * delimiters.
+     * delimiters and not ignore newlines.
      *
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      * @param cacheLookups <CODE>true</CODE> if dictionary lookups should be cached.
      */
     public Parser( Dictionary[] dictionaries, Set exclusions, boolean cacheLookups) {
-        this( dictionaries, exclusions, '\0', '\0', cacheLookups);
+        this( dictionaries, exclusions, '\0', '\0', cacheLookups, false);
     }
 
     /**
      * Creates a parser which will use the given dictionaries and reading annotation delimiters.
-     * Dictionary lookup results will be cached.
+     * Dictionary lookup results will be cached and newlines will not be ignored.
      *
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
@@ -176,7 +180,7 @@ public class Parser {
      * @param readingEnd Character which signals the end of a reading annotation.
      */
     public Parser( Dictionary[] dictionaries, Set exclusions, char readingStart, char readingEnd) {
-        this( dictionaries, exclusions, readingStart, readingEnd, true);
+        this( dictionaries, exclusions, readingStart, readingEnd, true, false);
     }
 
     /**
@@ -196,15 +200,19 @@ public class Parser {
      * @param readingStart Character which signals the beginning of a reading annotation.
      * @param readingEnd Character which signals the end of a reading annotation.
      * @param cacheLookups <CODE>true</CODE> if dictionary lookups should be cached.
+     * @param ignoreNewlines If this is <CODE>true</CODE>, 0x0a and 0x0d characters in the parsed text
+     *                       will be ignored and the character immediately before and after the newline
+     *                       will be treated as if forming a single word.
      * @see Reading
      * @see SoftReference
      */
     public Parser( Dictionary[] dictionaries, Set exclusions, char readingStart, char readingEnd,
-                   boolean cacheLookups) {
+                   boolean cacheLookups, boolean ignoreNewlines) {
         this.dictionaries = dictionaries;
         this.exclusions = exclusions;
         this.readingStart = readingStart;
         this.readingEnd = readingEnd;
+        this.ignoreNewlines = ignoreNewlines;
 
         if (cacheLookups)
             lookupCache = new TreeMap();
@@ -275,6 +283,10 @@ public class Parser {
             if (Thread.currentThread().interrupted())
                 throw new ParsingInterruptedException();
             
+            if (ignoreNewlines && 
+                (text[i]==0x0a || text[i]==0x0d))
+                continue;
+
             ub = Character.UnicodeBlock.of( text[i]);
             switch (mode) {
             case OUTSIDE:
@@ -753,6 +765,18 @@ public class Parser {
      * Returns the character which signals the end of a reading annotation for a kanji word.
      */
     public char getReadingEnd() { return readingEnd; }
+
+    /**
+     * Test if the parser skips newlines in the imported text.
+     */
+    public boolean getIgnoreNewlines() { return ignoreNewlines; }
+
+    /**
+     * Set if the parser should skip newlines in the imported text.
+     */
+    public void setIgnoreNewlines( boolean ignoreNewlines) {
+        this.ignoreNewlines = ignoreNewlines;
+    }
 
     /**
      * Returns the number of dictionary lookups.
