@@ -1,4 +1,4 @@
-0.9.5: (2001/12/04)
+0.9.5: (2001/12/05)
 	- Improved handling of long result lists in word lookup dialog.
 	- Removed the dummy print menu item from the word lookup dialog.
 	- Fixed exception thrown if the document window is closed while
@@ -19,6 +19,8 @@
 	- Left-clicking an annotated word now selects the annotation. This
 	  behavior can be changed back in the preferences.
 	- Style changes in the preferences are only applied once.
+	- When annotating a word, the first reading and translation are now
+	  automatically selected.
 0.9.4: (2001/11/07)
 	- Improved handling of reading annotations in imported text;
 	  ChaSen parser can now be used with texts with reading annotations.

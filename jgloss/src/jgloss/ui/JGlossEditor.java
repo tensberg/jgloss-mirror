@@ -306,12 +306,14 @@ public class JGlossEditor extends JTextPane {
         // A JTextComponent normally does not do TAB focus traversal since TAB is a valid input
         // character. Because the JGlossEditor is not used for normal text input, I override
         // this behavior for convenience.
-        getKeymap().addActionForKeyStroke( KeyStroke.getKeyStroke( "pressed TAB"),
-                                           new AbstractAction() {
-                                                   public void actionPerformed( ActionEvent e) {
-                                                       transferFocus();
-                                                   }
-                                               });
+        Keymap map = addKeymap( "tab map", getKeymap());
+        map.addActionForKeyStroke( KeyStroke.getKeyStroke( "pressed TAB"),
+                                   new AbstractAction() {
+                                           public void actionPerformed( ActionEvent e) {
+                                               transferFocus();
+                                           }
+                                       });
+        setKeymap( map);
 
         xcvManager = new XCVManager( this);
         editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
@@ -367,8 +369,11 @@ public class JGlossEditor extends JTextPane {
 
                             if (!autoscroll && (e.getModifiers() & selectButtonMask)!=0) {
                                 int pos = viewToModel( e.getPoint());
-                                annotationEditor.makeVisible( pos);
-                                annotationEditor.selectAnnotation( pos);
+                                AnnotationNode annotation = annotationEditor.selectAnnotation( pos);
+                                if (annotation != null) {
+                                    annotationEditor.makeVisible( annotation);
+                                    annotationEditor.requestFocus();
+                                }
                             }
                             else if (!tooltips && (e.getModifiers() & tooltipButtonMask)!=0) {
                                 showToolTip( ((AnnotationModel) annotationEditor.getModel())
@@ -403,9 +408,14 @@ public class JGlossEditor extends JTextPane {
                              lookupTranslator,
                              (JGlossEditorKit) getStyledEditorKit());
                         if (node != null) {
+                            // select first reading and translation (if any)
+                            node.selectFirstAnnotation();
+                            
+                            // select annotation node
                             annotationEditor.selectNode( node);
                             annotationEditor.expandAll( node);
                             annotationEditor.makeVisible( node);
+                            annotationEditor.requestFocus();
                         }
                     }
                 };

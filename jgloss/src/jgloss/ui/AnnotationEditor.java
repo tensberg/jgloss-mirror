@@ -309,7 +309,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 public void actionPerformed( ActionEvent e) {
                     TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
                     String reading;
-                    Parser.TextAnnotation annotation;
+                    AbstractAnnotation annotation;
                     if (tn instanceof TranslationNode) {
                         annotation = ((TranslationNode) tn).getTranslation();
                         reading = ((TranslationNode) tn).getReading();
@@ -322,7 +322,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     while (!(tn instanceof AnnotationNode))
                         tn = tn.getParent();
 
-                    ((AnnotationNode) tn).setLinkedAnnotation( annotation);
+                    ((AnnotationNode) tn).setWordFrom( annotation);
                 }
             };
         UIUtilities.initAction( useReadingAction, "annotationeditor.menu.usereading");
@@ -968,9 +968,13 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * position, nothing will be done.
      *
      * @param pos A position in the document which contains the annotations.
+     * @return The annotation made visible, or <CODE>null</CODE> if there is no annotation at the position.
      */
-    public void makeVisible( int pos) {
-        makeVisible( model.findAnnotation( pos));
+    public AnnotationNode makeVisible( int pos) {
+        AnnotationNode annotation = model.findAnnotation( pos);
+        if (annotation != null)
+            makeVisible( annotation);
+        return annotation;
     }
 
     /**
@@ -1019,9 +1023,13 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * annotation exists at the specified position, nothing will be done.
      *
      * @param pos The position in the document for which the annotation should be selected.
+     * @return The selected annotation, or <CODE>null</CODE> if there is no annotation at the position.
      */
-    public void selectAnnotation( int pos) {
-        selectNode( model.findAnnotation( pos));
+    public AnnotationNode selectAnnotation( int pos) {
+        AnnotationNode annotation = model.findAnnotation( pos);
+        if (annotation != null)
+            selectNode( annotation);
+        return annotation;
     }
 
     /**

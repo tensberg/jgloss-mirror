@@ -120,19 +120,28 @@ public class ChasenParser extends AbstractParser {
             lookupCache = new HashMap( 5000);
     }
 
+    /**
+     * Sets the path to the default ChaSen executable. This executable will be used when the
+     * executable path is not passed in with the constructor.
+     */
     public static void setDefaultExecutable( String chasenExecutable) {
         defaultChasenExecutable = chasenExecutable;
     }
 
+    /**
+     * Returns the path to the default ChaSen executable.
+     */
     public static String getDefaultExecutable() {
         return defaultChasenExecutable;
     }
 
     /**
      * Test if the chasen program is available at the specified path. The test is done by
-     * calling the program with the "-V" (for version) option.
+     * calling the program with the "-V" (for version) option. If the path to the executable
+     * is the same as in the previous test, and this test was successfull, the test will not be
+     * repeated.
      *
-     * @param chasenExecutable Full path to the chasen binary.
+     * @param chasenExecutable Full path to the chasen executable.
      */
     public static boolean isChasenExecutable( String chasenExecutable) {
         // If the last call to isChasenExecutable was successful, the name of the
@@ -218,6 +227,10 @@ public class ChasenParser extends AbstractParser {
 
             String line;
             while (parsePosition<=text.length && (line=chasenOut.readLine())!=null) {
+                // test for outside interruption
+                if (Thread.currentThread().interrupted())
+                    throw new ParsingInterruptedException();
+
                 // chasen skips spaces, so we have to adjust parsePosition here
                 while (parsePosition<text.length && text[parsePosition]==' ')
                     parsePosition++;
@@ -379,7 +392,6 @@ public class ChasenParser extends AbstractParser {
                 }
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
             throw new SearchException( ex);
         }
         
@@ -427,7 +439,7 @@ public class ChasenParser extends AbstractParser {
             // terminate chasen process by writing EOT on its input stream
             try {
                 chasenIn.flush(); // should be empty
-                chasen.getOutputStream().close();
+                chasen.getOutputStream().close(); // this should terminate the executable
                 // read remaining input (should be empty)
                 byte[] buf = new byte[512];
                 while (chasen.getInputStream().available() > 0)
@@ -442,13 +454,20 @@ public class ChasenParser extends AbstractParser {
                                 System.err.println( "abnormal termination of chasen");
                                 chasen.destroy();
                             }
+                            chasen = null;
                         }
                     };
                 wait.start();
+
+                // clear lingering interruption flag just to be sure
+                Thread.currentThread().interrupted();
+
                 try {
                     // give chasen process 5 seconds to terminate normally
                     wait.join( 5000);
-                } catch (InterruptedException ex) {}
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
                 if (wait.isAlive()) {
                     System.err.println( "chasen did not terminate");
                     // something went wrong
@@ -457,7 +476,6 @@ public class ChasenParser extends AbstractParser {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            chasen = null;
         }
     }
 
@@ -518,8 +536,8 @@ public class ChasenParser extends AbstractParser {
 
     /**
      * Test which character encoding ChaSen uses for its input and output streams. On
-     * Linux this will probably be EUC-JP and on Windows Shift-JIS. The test is done by running
-     * chasen with the -lf option, which makes it list the conjugation forms, and check the encoding
+     * Linux this will probably be EUC-JP and Shift-JIS on Windows. The test is done by running
+     * chasen with the -lf option, which makes it list the conjugation forms, and checking the encoding
      * of the output. The test is only done the first time the method is called, the result is
      * cached and reused on further calls.
      *

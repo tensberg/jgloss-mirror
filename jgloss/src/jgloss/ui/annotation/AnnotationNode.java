@@ -34,22 +34,28 @@ import javax.swing.text.*;
 import javax.swing.tree.*;
 
 /**
- * An annotation node wraps an annotation element in a document. It has two
- * {@link ReadingTranslationNode ReadingTranslationNodes} as children, which allow
- * the edit of the current reading and translation annotation. It additionally has
+ * An annotation node wraps an annotation element in a document. It has a {@link WordNode WordNode}
+ * or {@link ReadingTextNode ReadingTextNode}, a {@link TranslationTextNode TranslationTextNode}
+ * and a {@link DictionaryFormNode DictionaryFormNode} as children.
+ * It additionally has
  * child nodes for the reading and translations found by the dictionary lookups during
  * parsing.
  *
  * @author Michael Koch
- * @see ReadingTranslationNode
- * @see ReadingAnnotationNode
- * @see DictionaryNode
  */
 public class AnnotationNode extends InnerNode {
+    /**
+     * Index of the first dictionary node child of this node.
+     */
+    private final static int DICTIONARY_NODE_OFFSET = 3;
+
     /**
      * The annotation element this node wraps.
      */
     private Element annotation;
+    /**
+     * Manages the readings of the annotated word.
+     */
     private WordNode word;
     /**
      * The child which displays the current translation annotation.
@@ -274,26 +280,62 @@ public class AnnotationNode extends InnerNode {
     }
 
     /**
-     * Sets the linked text annotation of the annotation element this node wraps.
-     * This is one of the text annotations in the list of annotations for this element.
-     * It is usually set to the annotation from which the current settings of the
-     * reading and translation annotations are taken. Setting the linked annotation
-     * will update the dictionary form child of the annotation node.
+     * Set the reading and dictionary form from the annotation.
      *
-     * @return The new linked annotation.
+     * @param annotation The annotation from which to take the word and reading.
      */
-    public void setLinkedAnnotation( Parser.TextAnnotation linkedAnnotation) {
-        if (linkedAnnotation instanceof AbstractAnnotation) {
-            AbstractAnnotation aa = (AbstractAnnotation) linkedAnnotation;
-            String word = aa.getWord();
-            String reading = aa.getReading();
-            if (reading == null ||
-                reading.equals( word))
-                reading = "";
-            dictionaryform.setWord( word);
-            dictionaryform.setReading( reading);
-            this.word.setReading( word, reading);
+    public void setWordFrom( AbstractAnnotation annotation) {
+        String newword = annotation.getWord();
+        String newreading = annotation.getReading();
+        if (newreading == null ||
+            newreading.equals( newword))
+            newreading = "";
+        dictionaryform.setWord( newword);
+        dictionaryform.setReading( newreading);
+
+        // only set the reading if the annotated word is not all hiragana
+        boolean isHiragana = true;
+        String annotatedWord = word.getWord();
+        for ( int i=0; i<annotatedWord.length(); i++) {
+            if (!StringTools.isHiragana( annotatedWord.charAt( i))) {
+                isHiragana = false;
+                break;
+            }
         }
+        if (!isHiragana)
+            word.setReading( newword, newreading);
+    }
+
+    /**
+     * Set the reading, translation and dictionary form to the first dictionary entry. Does nothing
+     * if no annotation exists.
+     */
+    public void selectFirstAnnotation() {
+        if (getChildCount() <= DICTIONARY_NODE_OFFSET) // no annotation
+            return;
+
+        // No child bounds checking is done because if the tree is constructed correctly,
+        // all child accesses should succeed.
+
+        TreeNode tn = getChildAt( DICTIONARY_NODE_OFFSET); // first dictionary node
+
+        TreeNode tnc = tn.getChildAt( 0);
+        if (tnc instanceof TranslationNode) {
+            setWordFrom( ((TranslationNode) tnc).getTranslation());
+            
+            // If there are several readings with identical translations, the
+            // TranslationLeafNodes are only attached to the last TranslationNode.
+            // Search this TranslationNode.
+            
+            int i = 1;
+            while (tnc.getChildCount() == 0)
+                tnc = (TranslationNode) tn.getChildAt( i++);
+            
+            tnc = tnc.getChildAt( 0); // first translationLeafNode
+            getTranslationNode().setText( ((TranslationLeafNode) tnc).getTranslation());
+        }
+        else if (tnc instanceof ReadingAnnotationNode)
+            setWordFrom( ((ReadingAnnotationNode) tnc).getReading());
     }
 
     /**
