@@ -43,6 +43,7 @@ public class JGlossServlet extends HttpServlet {
 
     private jgloss.dictionary.Dictionary[] dictionaries;
     private Parser parser;
+    private HTMLAnnotator annotator;
     private Set allowedProtocols;
 
     public JGlossServlet() {}
@@ -86,6 +87,11 @@ public class JGlossServlet extends HttpServlet {
         dictionaries = (jgloss.dictionary.Dictionary[]) diclist.toArray( dictionaries);
 
         parser = new Parser( dictionaries);
+        try {
+            annotator = new HTMLAnnotator( parser);
+        } catch (IOException ex) {
+            throw new ServletException( ex);
+        }
 
         // read allowed protocols
         allowedProtocols = new TreeSet();
@@ -186,7 +192,7 @@ public class JGlossServlet extends HttpServlet {
             ( connection.getInputStream(), connection.getContentEncoding());
         try {
             resp.setContentType( "text/html; charset=" + in.getEncoding());
-            new HTMLAnnotator( parser).annotate( in, resp.getWriter());
+            annotator.annotate( in, resp.getWriter());
         } finally {
             in.close();
         }

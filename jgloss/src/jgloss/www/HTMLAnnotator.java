@@ -30,10 +30,28 @@ import java.net.*;
 import java.util.*;
 
 public class HTMLAnnotator {
-    private Parser parser;
+    /**
+     * Path to the script fragment resource which will be embedded in the
+     * HEAD part of the HTML file.
+     */
+    private final static String SCRIPT_RESOURCE = "/data/HTMLAnnotator";
 
-    public HTMLAnnotator( Parser parser) {
+    private Parser parser;
+    private String script;
+
+    public HTMLAnnotator( Parser parser) throws IOException {
         this.parser = parser;
+
+        Reader resource = new InputStreamReader
+            ( HTMLAnnotator.class.getResourceAsStream( HTMLAnnotator.SCRIPT_RESOURCE), "UTF-8");
+        char[] buf = new char[512];
+        StringBuffer scriptbuf = new StringBuffer();
+        int r;
+        while ((r=resource.read( buf)) != -1) {
+            scriptbuf.append( buf, 0, r);
+        }
+        resource.close();
+        script = scriptbuf.toString();
     }
 
     public void annotate( Reader in, Writer out) throws IOException {
@@ -42,8 +60,10 @@ public class HTMLAnnotator {
         StringBuffer text = new StringBuffer();
         text.ensureCapacity( 4096);
 
+        boolean scriptWritten = false;
         boolean inBody = false;
         boolean inTag = false;
+        boolean inString = false;
         
         int i = in.read();
         while (i != -1) {
@@ -51,16 +71,38 @@ public class HTMLAnnotator {
             
             if (inTag) {
                 text.append( c);
-                if (c == '>') {
+                if (c=='>' && !inString) {
                     inTag = false;
+
+                    // handle special tags
+                    String tag = getTagName( text).toLowerCase();
+                    //out.write( "<!-- tag " + tag + " -->");
+                    if ((tag.equals( "/head") || 
+                        tag.equals( "body")) && !scriptWritten) {
+                        out.write( script);
+                        scriptWritten = true;
+                    }
+                    if (tag.equals( "body"))
+                        inBody = true;
+                    else if (tag.equals( "/html"))
+                        inBody = false;
+                    else if (tag.equals( "/body")) {
+                        inBody = false;
+                        out.write( "\n<div id=\"popup\" class=\"popup\">" + 
+                                   "<pre id=\"annotation\"> </pre></div>\n");
+                    }
+
                     out.write( text.toString());
                     text.delete( 0, text.length());
                 }
+                if (c == '"')
+                    inString = !inString;
             }
             else {
                 if (c=='<' || c=='\n') {
-                    if (inBody)
-                        annotate( text);
+                    if (inBody) {
+                        annotateText( out, text);
+                    }
                     out.write( text.toString());
                     text.delete( 0, text.length());
                     if (c=='<')
@@ -72,10 +114,15 @@ public class HTMLAnnotator {
             i = in.read();
         }
         // write remainder
+        if (inBody && !inTag)
+            annotateText( out, text);
         out.write( text.toString());
     }
 
-    protected StringBuffer annotate( StringBuffer text) {
+    protected StringBuffer annotateText( Writer out, StringBuffer text) throws IOException {
+        if (text.length() == 0)
+            return text;
+
         char[] chars = new char[text.length()];
         text.getChars( 0, text.length(), chars, 0);
 
@@ -116,14 +163,14 @@ public class HTMLAnnotator {
             }
             
             // insert the annotation text
-            for ( ListIterator i=wordannos.listIterator(); i.hasPrevious(); ) {
+            for ( ListIterator i=annotext.listIterator( annotext.size()); i.hasPrevious(); ) {
                 anno = (String) i.previous();
                 length = ((Integer) i.previous()).intValue();
                 start = ((Integer) i.previous()).intValue();
                 
-                text.insert( start+length, "</div>");
-                text.insert( start, "<div class=\"an\" onMouseOver=\"sp(this,&quot;" + anno +
-                             "&quot;)\" onMouseOut=\"hp()\">");
+                text.insert( start+length, "</span>");
+                text.insert( start, "<span class=\"an\" onMouseOver=\"sp(this,&quot;" + anno +
+                             "&quot;)\" onMouseOut=\"hp(this)\">");
             }
         } catch (SearchException ex) {}
 
@@ -149,7 +196,7 @@ public class HTMLAnnotator {
             StringBuffer text = (StringBuffer) dicmap.get( d);
             if (text == null) {
                 text = new StringBuffer( d);
-                text.append( ":\n");
+                text.append( ":\\n");
                 dicmap.put( d, text);
                 dictionaries.add( text);
             }
@@ -175,6 +222,7 @@ public class HTMLAnnotator {
             }
             if (a instanceof AbstractAnnotation) {
                 AbstractAnnotation aa = (AbstractAnnotation) a;
+                text.insert( insertAt, "\\n");
                 if (aa.getReading() != null && !aa.getReading().equals( aa.getWord()))
                     text.insert( insertAt, " [" + aa.getReading() + "]");
                 text.insert( insertAt, "  " + aa.getWord());
@@ -186,7 +234,7 @@ public class HTMLAnnotator {
             out.append( i.next().toString());
 
         // escape special characters
-        for ( int i=out.length(); i>=0; i--) {
+        for ( int i=out.length()-1; i>=0; i--) {
             switch (out.charAt( i)) {
             case '"':
                 out.replace( i, i+1, "\\&quot;");
@@ -198,5 +246,13 @@ public class HTMLAnnotator {
         }
 
         return out.toString();
+    }
+
+    protected String getTagName( StringBuffer text) {
+        int end = 2;
+        while (end<text.length()-1 && text.charAt( end)>0x20)
+            end++;
+        
+        return text.substring( 1, end);
     }
 } // class HTMLAnnotator
