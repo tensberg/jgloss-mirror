@@ -1,10 +1,15 @@
-1.0: (2001/07/01)
-        - Improved HTML import. Still not very usefull, though.
+1.0: (2001/07/04)
+	- Added support for KANJIDIC dictionaries.
+	- Added support for SKK word-reading dictionaries.
+	- Added word exclusion list for automatic annotation.
+	- Added command line option for dictionary format detection.
 	- Added index file format JJDX, which can be used instead of
 	  XJDX index files. JGloss will create the index if none is
 	  found.
 	- Added command line options for JJDX creation and opening
 	  JGloss files.
+	- Added command to remove duplicate annotations.
+        - Improved HTML import. Still not very useful, though.
 	- Speeded up initial display of documents. Unfortunately,
 	  it is still slow.
         - Hidden annotations are not expanded after a document
