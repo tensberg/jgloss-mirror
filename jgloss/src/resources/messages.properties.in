@@ -60,7 +60,7 @@ splashscreen.initMain=creating application window
 main.usage=Usage: jgloss.JGloss [options] file ...\n\
 Options:\n\
 \  -h, --help, /?  Print this message\n\
-\  -i, --createindex Create an index file for the dictionary files\n\
+\  -i, --createindex Create index files for the dictionary files\n\
 \                    given on the command line
 main.unknownoption=Unknown option {0}
 main.title=JGloss
@@ -244,4 +244,4 @@ edict.buildindex=Building index for dictionary {0}.\nThis can take some time.
 edict.load=Loading dictionary {0}.
 edict.writejjdx=Writing JJDX index for dictionary {0}.
 edict.warning.jjdxversion=WARNING: the version number of the JJDX index for {0} is higher than the version supported by this version of JGloss.
-edict.error.writejjdx=Error while writing the JJDX file: {0}: {1}
+edict.error.writejjdx=Error while writing the JJDX file: {0}, {1}
