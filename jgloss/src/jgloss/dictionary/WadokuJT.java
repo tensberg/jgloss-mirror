@@ -263,6 +263,19 @@ public class WadokuJT extends FileBasedDictionary {
         super( dicfile);
     }
 
+    protected void initSupportedAttributes() {
+        super.initSupportedAttributes();
+        
+        supportedAttributes.addAll( mapper.getAttributes());
+        supportedAttributes.add( Attributes.GAIRAIGO);
+        supportedAttributes.add( Attributes.EXPLANATION);
+        supportedAttributes.add( Attributes.SYNONYM);
+        supportedAttributes.add( Attributes.ANTONYM);
+        supportedAttributes.add( ALT_READING);
+        supportedAttributes.add( MAIN_ENTRY);
+        supportedAttributes.add( MAIN_ENTRY_REF);
+    }
+
     protected EncodedCharacterHandler createCharacterHandler() {
         return new UTF8CharacterHandler();
     }
@@ -528,7 +541,7 @@ public class WadokuJT extends FileBasedDictionary {
                 }
 
                 // handle categories (marked at beginning of translation enclosed in {})
-                if (crm.charAt( 0) == '{') {
+                if (crm.charAt( 0) == '{') try {
                     int endb = crm.indexOf( '}');
                     // Test if the attributes apply to all translations. This is the case if
                     // they are written before the first ROM marker, or if there are no ROM
@@ -551,7 +564,7 @@ public class WadokuJT extends FileBasedDictionary {
                                 else if (att.appliesTo
                                          ( DictionaryEntry.AttributeGroup.TRANSLATION))
                                     translationA.addAttribute( att, mapping.getValue());
-                                else // should not happen
+                                else // program error, should not happen
                                     throw new SearchException
                                         ( "wrong attribute type for " + cat);
                             }
@@ -567,7 +580,7 @@ public class WadokuJT extends FileBasedDictionary {
                                 else if (att.appliesTo
                                          ( DictionaryEntry.AttributeGroup.GENERAL))
                                     generalA.addAttribute( att, mapping.getValue());
-                                else // should not happen
+                                else // program error, should not happen
                                     throw new SearchException
                                         ( "wrong attribute type for " + cat);
                             }
@@ -600,6 +613,10 @@ public class WadokuJT extends FileBasedDictionary {
                         unrecognized.append( crm);
                         crm = unrecognized.toString();
                     }
+                } catch (StringIndexOutOfBoundsException ex) {
+                    System.err.println
+                        ( "WadokuJT warning: missing closing bracket in translation " + crm);
+                    // can be safely ignored
                 }
 
                 List crml = new ArrayList( 10);
@@ -665,7 +682,7 @@ public class WadokuJT extends FileBasedDictionary {
 
             return out;
         } catch (Exception ex) {
-            throw new SearchException( "WadokuJT WARNING: malformed dictionary entry \"" + entry + "\"");
+            throw new MalformedEntryException( this, entry, ex);
         }
     }
 

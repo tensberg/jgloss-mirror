@@ -313,7 +313,7 @@ public class LookupModel implements Cloneable {
             // clear old selection
             for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
                 StateWrapper wrapper = (StateWrapper) i.next();
-                if (wrapper.isEnabled()) {
+                if (wrapper.isSelected()) {
                     wrapper.setSelected( false);
                     break;
                 }
@@ -321,17 +321,19 @@ public class LookupModel implements Cloneable {
         }
 
         newDictionaryWrapper.setSelected( select);
-
-        // check if more than one dictionary is selected
-        boolean seenDictionary = false;
-        multiDictionarySelection = false;
-        for ( Iterator i=dictionaries.iterator(); i.hasNext() && !multiDictionarySelection; ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
-            if (wrapper.isSelected()) {
-                if (seenDictionary)
-                    multiDictionarySelection = true;
-                else
-                    seenDictionary = true;
+        
+        if (multiDictionaryMode) {
+            // check if more than one dictionary is selected
+            boolean seenDictionary = false;
+            multiDictionarySelection = false;
+            for ( Iterator i=dictionaries.iterator(); i.hasNext() && !multiDictionarySelection; ) {
+                StateWrapper wrapper = (StateWrapper) i.next();
+                if (wrapper.isSelected()) {
+                    if (seenDictionary)
+                        multiDictionarySelection = true;
+                    else
+                        seenDictionary = true;
+                }
             }
         }
 
@@ -585,12 +587,13 @@ public class LookupModel implements Cloneable {
         listeners.add( listener);
     }
 
-    public void removeLooupChangeListener( LookupChangeListener listener) {
+    public void removeLookupChangeListener( LookupChangeListener listener) {
         listeners.remove( listener);
     }
 
     protected void fireLookupChange( LookupChangeEvent event) {
-        for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
+        List tempListeners = new ArrayList( listeners);
+        for ( Iterator i=tempListeners.iterator(); i.hasNext(); ) {
             ((LookupChangeListener) i.next()).stateChanged( event);
         }
     }

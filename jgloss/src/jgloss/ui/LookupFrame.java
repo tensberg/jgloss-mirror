@@ -27,17 +27,27 @@ import jgloss.JGloss;
 import jgloss.Preferences;
 
 import jgloss.dictionary.*;
+import jgloss.dictionary.attribute.ReferenceAttributeValue;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
-public class LookupFrame extends JFrame implements ActionListener {
+public class LookupFrame extends JFrame implements ActionListener, HyperlinkListener {
     protected LookupConfigPanel config;
     protected LookupModel model;
     protected AsynchronousLookupEngine engine;
     protected LookupResultList list;
+
+    protected List history;
+    protected int historyPosition;
+    protected static final int MAX_HISTORY_SIZE = 20;
+    protected Action historyBackAction;
+    protected Action historyForwardAction;
     
     protected Dimension preferredSize;
 
@@ -45,19 +55,23 @@ public class LookupFrame extends JFrame implements ActionListener {
         super( JGloss.messages.getString( "wordlookup.title"));
 
         getContentPane().setLayout( new BorderLayout());
-
+        JPanel center = new JPanel();
+        center.setLayout( new BorderLayout());
+        getContentPane().add( center, BorderLayout.CENTER);
+        
         model = _model;
         config = new LookupConfigPanel( model, this);
         list = new LookupResultList();
         engine = new AsynchronousLookupEngine( list);
 
         config.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2));
-        getContentPane().add( config, BorderLayout.NORTH);
+        center.add( config, BorderLayout.NORTH);
 
         list.setBorder( BorderFactory.createCompoundBorder
                      ( BorderFactory.createTitledBorder( JGloss.messages.getString( "wordlookup.result")),
                        BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
-        getContentPane().add( list, BorderLayout.CENTER);
+        list.addHyperlinkListener( this);
+        center.add( list, BorderLayout.CENTER);
         getRootPane().setDefaultButton( config.getSearchButton());
 
         // create actions
@@ -137,10 +151,32 @@ public class LookupFrame extends JFrame implements ActionListener {
                     JGloss.prefs.set( Preferences.WORDLOOKUP_HEIGHT, getHeight());
                 }
             });
+
+        history = new ArrayList( MAX_HISTORY_SIZE);
+        historyBackAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    historyBack();
+                }
+            };
+        UIUtilities.initAction( historyBackAction, "wordlookup.history.back");
+        historyBackAction.setEnabled( false);
+        historyForwardAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    historyForward();
+                }
+            };
+        UIUtilities.initAction( historyForwardAction, "wordlookup.history.forward");
+        historyForwardAction.setEnabled( false);
+        JToolBar toolbar = new JToolBar();
+        toolbar.add( historyBackAction);
+        toolbar.add( historyForwardAction);
+        getContentPane().add( toolbar, BorderLayout.NORTH);
     }
 
     public void actionPerformed( ActionEvent event) {
-        engine.doLookup( (LookupModel) model.clone());
+        LookupModel clonedModel = (LookupModel) model.clone();
+        engine.doLookup( clonedModel);
+        addToHistory( clonedModel);
     }
 
     public void dispose() {
@@ -153,5 +189,81 @@ public class LookupFrame extends JFrame implements ActionListener {
             return super.getPreferredSize();
         else
             return preferredSize;
+    }
+
+    protected void historyBack() {
+        historyPosition--;
+        Object o = history.get( historyPosition);
+
+        if (o instanceof LookupModel) {
+            history.set( historyPosition, model.clone());
+        }
+
+        if (historyPosition == 0)
+            historyBackAction.setEnabled( false);
+        historyForwardAction.setEnabled( true);
+        showHistoryItem( o);
+    }
+
+    protected void historyForward() {
+        Object o = history.get( historyPosition);
+        historyPosition++;
+
+        if (o instanceof LookupModel) {
+            history.set( historyPosition-1, model.clone());
+        }
+
+        if (historyPosition == history.size())
+            historyForwardAction.setEnabled( false);
+        historyBackAction.setEnabled( true);
+        showHistoryItem( o);
+    }
+
+    protected void addToHistory( Object o) {
+        history.add( historyPosition, o);
+        historyPosition++;
+        if (history.size() > MAX_HISTORY_SIZE) {
+            if (historyPosition*2>MAX_HISTORY_SIZE) {
+                history.remove( 0);
+                historyPosition--;
+            }
+            else
+                history.remove( history.size()-1);
+        }
+        historyBackAction.setEnabled( true);
+    }
+
+    protected void showHistoryItem( Object o) {
+        if (o instanceof LookupModel) {
+            model = (LookupModel) o;
+            config.setModel( model);
+            engine.doLookup( (LookupModel) model.clone());
+        }
+        else {
+            ((LookupResultCache) o).replay( list);
+        }
+    }
+
+    public void hyperlinkUpdate( HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            int colon = e.getDescription().indexOf( ':');
+            String protocol = e.getDescription().substring( 0, colon);
+            String refKey = e.getDescription().substring( colon+1);
+            followReference( protocol, refKey);
+        }
+    }
+
+    protected void followReference( String type, String refKey) {
+        ReferenceAttributeValue ref = list.getReference( refKey);
+        if (ref != null) try {
+            LookupResultCache cache = new LookupResultCache
+                ( JGloss.messages.getString( "wordlookup.reference." + type, 
+                                             new Object[] { ref.getReferenceTitle() }),
+                      ref.getReferencedEntries());
+            cache.replay( list);
+            addToHistory( cache);
+        } catch (SearchException ex) {
+            ex.printStackTrace();
+        }
     }
 } // class LookupFrame

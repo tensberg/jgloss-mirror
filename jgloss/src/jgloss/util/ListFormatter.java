@@ -33,9 +33,9 @@ package jgloss.util;
 public class ListFormatter {
     public static final char ITEMNO_MARKER = 'n';
 
-    private StringBuffer buf;
-    private int length;
-    private int itemNo;
+    protected StringBuffer buffer;
+    protected int length;
+    protected int itemNo;
 
     private String emptyList;
     private String[] singleListBefore;
@@ -43,6 +43,15 @@ public class ListFormatter {
     private String[] multiListBefore;
     private String[] multiListBetween;
     private String[] multiListAfter;
+
+    public ListFormatter( ListFormatter _formatter) {
+        emptyList = _formatter.emptyList;
+        singleListBefore = _formatter.singleListBefore;
+        singleListAfter = _formatter.singleListAfter;
+        multiListBefore = _formatter.multiListBefore;
+        multiListBetween = _formatter.multiListBetween;
+        multiListAfter = _formatter.multiListAfter;
+    }
 
     public ListFormatter( String _listBetween) {
         this( "", _listBetween, "");
@@ -76,29 +85,17 @@ public class ListFormatter {
             return new String[] { in.substring( 0, i), in.substring( i+1) };
     }
 
-    public ListFormatter newList( StringBuffer _buf, int _length) {
-        buf = _buf;
+    public ListFormatter newList( StringBuffer _buffer, int _length) {
+        buffer = _buffer;
         itemNo = 0;
         length = _length;
         return this;
     }
 
-    public ListFormatter addItem( String item) {
+    public ListFormatter addItem( Object item) {
         appendText( length==1 ? singleListBefore : 
                     (itemNo==0 ? multiListBefore : multiListBetween), itemNo);
-        buf.append( item);
-        if (itemNo == length)
-            appendText( length==1 ? singleListAfter :
-                        multiListAfter, itemNo);
-        itemNo++;
-
-        return this;
-    }
-
-    public ListFormatter addItem( StringBuffer item) {
-        appendText( length==1 ? singleListBefore : 
-                    (itemNo==0 ? multiListBefore : multiListBetween), itemNo);
-        buf.append( item);
+        doAppendItem( item);
         if (itemNo == length-1)
             appendText( length==1 ? singleListAfter :
                         multiListAfter, itemNo);
@@ -107,21 +104,32 @@ public class ListFormatter {
         return this;
     }
 
+    protected void doAppendItem( Object item) {
+        if (item instanceof String) {
+            buffer.append( (String) item);
+        }
+        else if (item instanceof StringBuffer) {
+            buffer.append( (StringBuffer) item);
+        }
+        else
+            buffer.append( String.valueOf( item));
+    }
+
     private void appendText( String[] text, int itemNo) {
-        buf.append( text[0]);
+        buffer.append( text[0]);
         if (text.length > 1) {
-            buf.append( itemNo+1);
-            buf.append( text[1]);
+            buffer.append( itemNo+1);
+            buffer.append( text[1]);
         }
     }
 
     public StringBuffer endList() {
         if (length == 0)
-            buf.append( emptyList);
+            buffer.append( emptyList);
 
-        return buf;
+        return buffer;
     }
 
-    public StringBuffer getBuffer() { return buf; }
+    public StringBuffer getBuffer() { return buffer; }
 } // class ListFormatter
 

@@ -40,13 +40,15 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
     protected Indexable dictionary;
     protected ByteBuffer tempIndex;
     protected IntBuffer tempIndexInt;
+    protected int type;
 
     /**
      * Random number generator. Used for randomized quicksort in index creation.
      */
     protected static Random random = new Random();
 
-    public BinarySearchIndexBuilder() {
+    public BinarySearchIndexBuilder( int _type) {
+        type = _type;
     }
     
     public void startBuildIndex( IndexContainer _container, Indexable _dictionary) throws IndexException {
@@ -105,7 +107,7 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
 
                 // copy index data from temp file to index container
                 try {
-                    indexContainer.createIndex( BinarySearchIndex.TYPE, tempIndex);
+                    indexContainer.createIndex( type, tempIndex);
                 } catch (IndexOutOfBoundsException ex) {
                     throw new IndexException( ex);
                 }

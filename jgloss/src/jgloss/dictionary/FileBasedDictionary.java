@@ -23,6 +23,7 @@
 
 package jgloss.dictionary;
 
+import jgloss.dictionary.attribute.Attribute;
 import jgloss.util.*;
 
 import java.io.*;
@@ -209,6 +210,11 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * {@link #initSearchModes() initSearchModes}.
      */
     protected Map supportedSearchModes;
+    /**
+     * Set of attributes supported by this dictionary implementation. Initialized in
+     * {@link #initSupportedAttributes() initSupportedAttributes}.
+     */
+    protected Set supportedAttributes;
     
     /**
      * Initializes the dictionary. The dictionary file is opened and mapped into memory.
@@ -237,9 +243,10 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         dictionary = dicchannel.map( FileChannel.MapMode.READ_ONLY, 0, dictionarySize);
         dictionaryDuplicate = dictionary.duplicate();
 
-        binarySearchIndex = new BinarySearchIndex();
+        binarySearchIndex = new BinarySearchIndex( BinarySearchIndex.TYPE);
 
         initSearchModes();
+        initSupportedAttributes();
     }
 
     /**
@@ -261,8 +268,21 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         supportedSearchModes.put( ExpressionSearchModes.ANY, fields);
     }
 
+    /**
+     * Initialize the set of supported attributes. Since entry parsing, and thus attribute
+     * usage is entirely the responsibility of derived classes, this method only creates
+     * an empty set. Derived classes should add their supported attributes.
+     */
+    protected void initSupportedAttributes() {
+        supportedAttributes = new HashSet( 11);
+    }
+
     public boolean supports( SearchMode mode, boolean fully) {
         return supportedSearchModes.containsKey( mode);
+    }
+
+    public boolean supports( Attribute attribute) {
+        return supportedAttributes.contains( attribute);
     }
     
     public SearchFieldSelection getSupportedFields( SearchMode mode) {
@@ -306,7 +326,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         try {
             indexContainer = new FileIndexContainer( indexFile, true);
             if (!indexContainer.hasIndex( binarySearchIndex.getType())) {
-                IndexBuilder builder = new BinarySearchIndexBuilder();
+                IndexBuilder builder = new BinarySearchIndexBuilder( binarySearchIndex.getType());
                 builder.startBuildIndex( indexContainer, this);
                 boolean commit = false;
                 try {
@@ -462,9 +482,6 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             // end of dictionary->end of entry
         }
 
-        /*try {
-            System.err.println( new String( entrybuf, 0, entrylength, "EUC-JP"));
-            } catch (UnsupportedEncodingException ex) {}*/
         ByteBuffer out = ByteBuffer.wrap( entrybuf, 0, entrylength);
         out.position( matchstart-start);
 
@@ -781,7 +798,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * @param character The last character read from the buffer, or 0 at the first invocation. The
      *                  character format is dependent on 
      *                  {@link EncodedCharacterHandler#readCharacter(ByteBuffer) readCharacter}
-     *                  and not neccessary unicode.
+     *                  and not neccessaryly unicode.
      * @param field The current field.
      * @return The type of the field the method moved to.
      */
@@ -879,6 +896,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         protected EntrySet seenEntries = new EntrySet();
         protected int[] entryOffsets = new int[2];
         protected DictionaryEntry nextEntry = null;
+        protected SearchException deferredException = null;
 
         public ExpressionSearchIterator( SearchMode _searchmode, SearchFieldSelection _fields,
                                          int _expressionLength,
@@ -890,12 +908,28 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             generateNextEntry();
         }
 
-        public boolean hasNext() throws SearchException { return nextEntry != null; }
+        public boolean hasNext() { return nextEntry!=null || deferredException!=null; }
         public DictionaryEntry next() throws SearchException, NoSuchElementException {
             if (!hasNext())
                 throw new NoSuchElementException();
+            if (deferredException != null) {
+                SearchException out = deferredException;
+                deferredException = null;
+
+                if (out instanceof MalformedEntryException) // perhaps the next entry will work
+                    generateNextEntry();
+
+                throw out;
+            }
+
             DictionaryEntry current = nextEntry;
-            generateNextEntry(); // changes nextEntry
+            try {
+                generateNextEntry(); // changes nextEntry
+            } catch (SearchException ex) {
+                // the current entry is valid, so defer throwing this exception to the next
+                // call to next
+                deferredException = ex;
+            }
             return current;
         }
         public void remove() throws UnsupportedOperationException {

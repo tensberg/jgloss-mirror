@@ -103,11 +103,11 @@ vpath %.html doc/html
         compile-jgloss compile-jdictionary doc gen-javadoc\
         jgloss jdictionary jgloss-www resources
 
-jgloss: compile-jgloss $(RESOURCES) setup
-	$(JAR) cfm jgloss.jar MANIFEST.MF $(JGLOSS_BINARY_JAR)
-
 jdictionary: compile-jdictionary $(RESOURCES) setup
 	$(JAR) cfm jdictionary.jar MANIFEST.MF.jdictionary $(JDICTIONARY_BINARY_JAR)
+
+jgloss: compile-jgloss $(RESOURCES) setup
+	$(JAR) cfm jgloss.jar MANIFEST.MF $(JGLOSS_BINARY_JAR)
 
 im: compile-im
 	mkdir -p META-INF/services

@@ -25,6 +25,8 @@
 
 dictionary.load=Loading dictionary {0}.
 
+exception.malformedentry.message=Malformed entry in dictionary {0}: "{1}"
+
 edict.error.writedictionary=Error while writing the dicionary file: {0}, {1}
 edict.editable.name=EDICT (editable)
 
@@ -93,6 +95,3 @@ wadoku.att.main_entry_ref.desc=reference to main entry
 
 wadoku.att.alt_reading.name=altr
 wadoku.att.alt_reading.desc=reference to alternative reading
-
-gairaigo.je.name=Japanese-English
-gairaigo.ainu.name=Ainu

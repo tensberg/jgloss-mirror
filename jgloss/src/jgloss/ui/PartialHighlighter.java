@@ -46,7 +46,7 @@ public class PartialHighlighter implements Highlighter {
         FontMetrics fm = g.getFontMetrics();
 
         Color normal = g.getColor();
-        Color highlight = Color.red;
+        Color highlight = Color.blue;
   
         int x = 0;
         int y = fm.getAscent();

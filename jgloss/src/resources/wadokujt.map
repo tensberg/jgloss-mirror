@@ -17,6 +17,7 @@ Persönlichk.    CATEGORY        Category        pers
 Pharm.          CATEGORY        Category        pharm
 Psych.          CATEGORY        Category        psych
 Rel.            CATEGORY        Category        rel
+Sprachw.        CATEGORY        Category        phil
 
 五      PART_OF_SPEECH PartOfSpeech  v5         #5st. Verb
 他      PART_OF_SPEECH PartOfSpeech  vt         #trans.

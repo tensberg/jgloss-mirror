@@ -49,4 +49,11 @@ public class SearchException extends Exception {
     public SearchException( Throwable rootCause) {
         super( rootCause);
     }
+
+    /**
+     * Constructs a SearchException which wraps another exception.
+     */
+    public SearchException( String message, Throwable rootCause) {
+        super( message, rootCause);
+    }
 } // class SearchException

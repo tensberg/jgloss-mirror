@@ -204,3 +204,6 @@ cat.med.l=medical term
 
 cat.pharm.s=pharm
 cat.pharm.l=pharmaceutical term
+
+cat.phil.s=phil
+cat.phil.l=philology

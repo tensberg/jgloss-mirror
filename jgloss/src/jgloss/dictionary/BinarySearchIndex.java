@@ -49,18 +49,27 @@ public class BinarySearchIndex implements Index {
     protected final BinarySearchIterator EMPTY_MATCH = new BinarySearchIterator( 0, -1);
 
     /**
-     * Return type for {@link #getType() getType}.
+     * Default type of this index.
      */
     public static final int TYPE = 0x42695365; // BiSe in ASCII
 
     private IntBuffer index = null;
+    private int type;
 
+    public BinarySearchIndex() {
+        this( TYPE);
+    }
+
+    public BinarySearchIndex( int _type) {
+        type = _type;
+    }
+    
     public int getType() {
-        return TYPE;
+        return type;
     }
 
     public void setContainer( IndexContainer container) throws IndexException {
-        index = container.getIndexData( TYPE).asIntBuffer();
+        index = container.getIndexData( type).asIntBuffer();
     }
 
     public Index.Iterator getEntryPositions( Indexable dictionary, ByteBuffer expression,

@@ -21,16 +21,30 @@
  *
  */
 
-package jgloss.dictionary;
-
-import java.util.NoSuchElementException;
+package jgloss.dictionary.attribute;
 
 /**
- * Iterator over the results of a dictionary search.
- *
- * @author Michael Koch
+ * Attribute formatter which only prints the name of the attribute, not its values.
  */
-public interface ResultIterator {
-    boolean hasNext();
-    DictionaryEntry next() throws SearchException, NoSuchElementException;
-} // class ResultIterator
+public class AttributeNameFormatter implements AttributeFormatter {
+    private String before;
+    private String after;
+
+    public AttributeNameFormatter() {
+        this( null, null);
+    }
+    
+    public AttributeNameFormatter( String _before, String _after) {
+        before = _before;
+        after = _after;
+    }
+
+    public StringBuffer format( Attribute att, ValueList val, StringBuffer buf) {
+        if (before != null)
+            buf.append( before);
+        buf.append( att.getName());
+        if (after != null)
+            buf.append( after);
+        return buf;
+    }
+} // class AttributeNameFormatter

@@ -110,6 +110,7 @@ public class DefaultAttributeSet implements AttributeSet {
 
     protected AttributeSet parent = null;
     protected Map attributes = null;
+
     public DefaultAttributeSet() {
     }
 

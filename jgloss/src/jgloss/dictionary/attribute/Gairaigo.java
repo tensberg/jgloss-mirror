@@ -47,16 +47,7 @@ public class Gairaigo implements AttributeValue {
 
     public String getLanguageCode() { return code; }
 
-    public String getLanguageName() {
-        if (code.equals( JAPANESE_ENGLISH))
-            return MESSAGES.getString( "gairaigo.je.name");
-        else if (code.equals( AINU))
-            return MESSAGES.getString( "gairaigo.ai.name");
-        else
-            return new Locale( code).getDisplayLanguage();
-    }
-
     public String getOriginalWord() { return originalWord; }
 
-    public String toString() { return code + "/" + getLanguageName(); }
+    public String toString() { return code + ":\"" + getOriginalWord() + "\""; }
 } // class Gairaigo

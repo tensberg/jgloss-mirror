@@ -31,10 +31,6 @@ import java.util.*;
  * @author Michael Koch
  */
 public class StringTools {
-    public static void main( String[] args) throws Exception {
-        print( splitWordReading( args[0], StringTools.toHiragana( args[1])));
-    }
-
     /**
      * Returns the unicode block of a character. The test is optimized to work faster than
      * <CODE>Character.UnicodeBlock.of</CODE> for Japanese characters, but will work slower

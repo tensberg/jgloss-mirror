@@ -27,6 +27,8 @@ import jgloss.dictionary.*;
 import jgloss.dictionary.attribute.*;
 import jgloss.util.ListFormatter;
 
+import java.util.Map;
+
 // TODO: make formats configurable
 
 /**
@@ -35,56 +37,75 @@ import jgloss.util.ListFormatter;
  * @author Michael Koch
  */
 class DictionaryEntryFormat {
+    public static final String PROTOCOL_SYN = "syn";
 
     private static final ListFormatter word = new ListFormatter( " ", "; ", "");
-    private static final ListFormatter reading = new ListFormatter( " [", ": ", "]");
+    private static final ListFormatter reading = new ListFormatter( " [", "; ", "]");
     private static final ListFormatter rom = new ListFormatter( "", " ", ".", " (n) ", ". (n) ", ".");
     private static final ListFormatter crm = new ListFormatter( "", "; ", "");
     private static final ListFormatter syn = new ListFormatter( "", "/", "");
 
-    private static final DictionaryEntryFormatter formatter = new DictionaryEntryFormatter();
-    private static final DictionaryEntryFormatter htmlFormatter = new DictionaryEntryFormatter();
+    public static ListFormatter getWordFormatter() { return new ListFormatter( word); }
+    public static ListFormatter getReadingFormatter() { return new ListFormatter( reading); }
+    public static ListFormatter getTranslationRomFormatter() { return new ListFormatter( rom); }
+    public static ListFormatter getTranslationCrmFormatter() { return new ListFormatter( crm); }
+    public static ListFormatter getTranslationSynonymFormatter() { return new ListFormatter(  syn); }
 
-    static {
-        formatter.addWordFormat( word);
-        formatter.addReadingFormat( reading);
-        formatter.addTranslationFormat( rom, crm, syn);
+    public static DictionaryEntryFormatter createFormatter() {
+        DictionaryEntryFormatter out = new DictionaryEntryFormatter();
 
-        htmlFormatter.addWordFormat( word);
-        htmlFormatter.addReadingFormat( reading);
-        htmlFormatter.addTranslationFormat( rom, crm, syn);
+        out.addWordFormat( new ListFormatter( word));
+        out.addReadingFormat( new ListFormatter( reading));
+        out.addTranslationFormat( new ListFormatter( rom), new ListFormatter( crm),
+                                  new ListFormatter( syn));
 
+        addAttributeFormats( out);
+
+        return out;
+    }
+
+    public static DictionaryEntryFormatter createHTMLFormatter( MarkerListFormatter.Group group,
+                                                                Map references) {
+        DictionaryEntryFormatter out = new DictionaryEntryFormatter();
+
+        out.addWordFormat( new MarkerListFormatter( group, word));
+        out.addReadingFormat( new MarkerListFormatter( group, reading));
+        out.addTranslationFormat( new MarkerListFormatter( group, rom), 
+                                  new MarkerListFormatter( group, crm),
+                                  new MarkerListFormatter( group, syn));
+
+        addAttributeFormats( out);
+
+        out.addAttributeFormat( Attributes.SYNONYM,
+                                new HTMLReferenceAttributeFormatter
+                                ( PROTOCOL_SYN, " \u21d2", "", new ListFormatter( ","),
+                                  references), false);
+        
+        return out;
+    }
+
+    private static void addAttributeFormats( DictionaryEntryFormatter out) {
+        ListFormatter commaList = new ListFormatter( ",");
+        ListFormatter commaBracketList = new ListFormatter( " (", ",", ")");
         AttributeFormatter listFormat = new DefaultAttributeFormatter
-            ( " (", ")", "", false, new ListFormatter( ","));
+            ( " (", ")", "", false, commaList);
         AttributeFormatter informationFormat = new InformationAttributeFormatter
-            ( " (", ")", "", false, new ListFormatter( ","));
-        formatter.addAttributeFormat( Attributes.PART_OF_SPEECH,
-                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3,
-                                      listFormat);
-        htmlFormatter.addAttributeFormat( Attributes.PART_OF_SPEECH,
-                                          DictionaryEntryFormatter.Position.BEFORE_FIELD3,
-                                          listFormat);
-        formatter.addAttributeFormat( Attributes.EXAMPLE,
-                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3,
-                                      new DefaultAttributeFormatter( " {", "}", "", true, null));
-        htmlFormatter.addAttributeFormat( Attributes.EXAMPLE,
-                                          DictionaryEntryFormatter.Position.BEFORE_FIELD3,
-                                          new DefaultAttributeFormatter( " {", "}", "", true, null));
-        formatter.addAttributeFormat( Attributes.EXPLANATION, informationFormat, false);
-        htmlFormatter.addAttributeFormat( Attributes.EXPLANATION, informationFormat, false);
-    }
+            ( " (", ")", "", false, commaList);
+        AttributeFormatter attName = new AttributeNameFormatter( " {", "}");
 
-    public static ListFormatter getWordFormatter() { return word; }
-    public static ListFormatter getReadingFormatter() { return reading; }
-    public static ListFormatter getTranslationRomFormatter() { return rom; }
-    public static ListFormatter getTranslationCrmFormatter() { return crm; }
-    public static ListFormatter getTranslationSynFormatter() { return syn; }
-
-    public static DictionaryEntryFormatter getFormatter() {
-        return formatter;
-    }
-
-    public static DictionaryEntryFormatter getHTMLFormatter() {
-        return htmlFormatter;
+        out.addAttributeFormat( Attributes.PART_OF_SPEECH,
+                                DictionaryEntryFormatter.Position.BEFORE_FIELD3,
+                                listFormat);
+        out.addAttributeFormat( Attributes.ABBREVIATION,
+                                DictionaryEntryFormatter.Position.BEFORE_FIELD3,
+                                attName);
+        out.addAttributeFormat( Attributes.EXAMPLE,
+                                DictionaryEntryFormatter.Position.BEFORE_FIELD3,
+                                attName);
+        out.addAttributeFormat( Attributes.CATEGORY,
+                                DictionaryEntryFormatter.Position.BEFORE_FIELD3,
+                                listFormat);
+        out.addAttributeFormat( Attributes.GAIRAIGO, new GairaigoFormatter( commaBracketList), false);
+        out.addAttributeFormat( Attributes.EXPLANATION, informationFormat, false);
     }
 } // class DictionaryEntryFormat

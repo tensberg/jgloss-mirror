@@ -204,6 +204,13 @@ main.menu.about.tt=Show a dialog with information about JGloss
 main.dialog.close.title=Save changes
 main.dialog.close.message=Save changes to {0}?
 
+filter.mainentry.name=Main entries only
+filter.mainentry.desc=Show only entries marked as main entries (WadokuJT)
+filter.example.name=Examples only
+filter.example.desc=Show only entries marked as example
+filter.priority.name=Priority entries only
+filter.priority.desc=Show only priority entries (EDICT)
+
 editor.menu.edit=Edit
 editor.menu.cut=Cut
 editor.menu.cut.ak=control X
@@ -266,6 +273,7 @@ general.chasen.chooser.title=Choose ChaSen executable
 general.parserselector=Import Clipboard Parser
 
 style.title=Style
+style.fontsize_pt=pt
 style.autodetect=Auto-Configure Fonts
 style.autodetect.title=Font Auto-Configuration
 style.autodetect.progress.description=Testing all available fonts.
@@ -284,7 +292,7 @@ changed. Japanese text might not be displayed correctly.
 style.general=Japanese User Interface Font
 style.general.default=Use Java default font
 style.general.custom=Use this font:
-style.wordlookup=Word Lookup Results
+style.wordlookup=Search Results
 style.text=Text
 style.reading=Readings
 style.translation=Translations
@@ -478,8 +486,7 @@ wordlookup.matchmode.field=Match whole field
 wordlookup.matchmode.word=Match words
 wordlookup.filter=Filter Results
 wordlookup.status.searching=Searching... ({0,number,integer} matching {0,choice,0#entries|1#entry|1<entries} so far)
-wordlookup.status.matches=Found {0,choice,0#no entry|1#1 entry|1<{0} entries} using search mode {1}
-
+wordlookup.status.matches=Found {0,choice,0#no entry|1#1 entry|1<{0} entries}.
 wordlookup.nodictionary=<none available>
 wordlookup.matches=Matches in {0}:
 wordlookup.nomatches_dictionary=(no matching entries)
@@ -488,6 +495,11 @@ wordlookup.exception=(the dictionary has signalled an error: {1}, {0})
 wordlookup.inflection=Possible inflection: {0}, {1}->{2}
 wordlookup.clipboard=Clipboard
 wordlookup.clipboard.search=automatically search clipboard content
+wordlookup.history.forward=Forward
+wordlookup.history.forward.tt=switch to next lookup result
+wordlookup.history.back=Back
+wordlookup.history.back.tt=switch to previous lookup result
+wordlookup.reference.syn=synonym
 
 # default location of the chasen binary for different platforms
 chasen.location.unix=/usr/local/bin/chasen

@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.dictionary.attribute.Attribute;
+
 import java.util.Iterator;
 
 /**
@@ -61,11 +63,19 @@ public interface Dictionary {
      * mode is not supported, calling
      * {@link #search(SearchMode,Object[]) search) with this search mode will throw an exception.
      *
-     * @param SearchMode The search mode to test.
+     * @param searchmode The search mode to test.
      * @param fully If <code>true</code>, test if the search mode is fully supported, if 
      *        <code>false</code>, test if it is partially supported.
      */
     boolean supports( SearchMode searchmode, boolean fully);
+
+    /**
+     * Test if the dictionary supports an attribute, that is, entries in this dictionary may
+     * have the attribute set.
+     *
+     * @param attribute The attribute to test.
+     */
+    boolean supports( Attribute attribute);
 
     /**
      * Return the search fields for which a search of the given mode is supported for

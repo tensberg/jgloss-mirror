@@ -147,6 +147,13 @@ public class EDict extends FileBasedDictionary {
         super( dicfile);
     }
     
+    protected void initSupportedAttributes() {
+        super.initSupportedAttributes();
+        
+        supportedAttributes.addAll( mapper.getAttributes());
+        supportedAttributes.add( Attributes.PRIORITY);
+    }
+
     protected EncodedCharacterHandler createCharacterHandler() {
         return new EUCJPCharacterHandler();
     }
@@ -256,7 +263,7 @@ public class EDict extends FileBasedDictionary {
         //System.err.println( entry);
         ENTRY_MATCHER.reset( entry);
         if (!ENTRY_MATCHER.matches())
-            throw new SearchException( "EDICT: malformed dictionary entry " + entry);
+            throw new MalformedEntryException( this, entry);
 
         String word = ENTRY_MATCHER.group( 1);
         String reading = ENTRY_MATCHER.group( 2);

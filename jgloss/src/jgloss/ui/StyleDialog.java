@@ -247,6 +247,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
         loadPreferences();
     }
 
+    /**
+     * Let subclasses add additional user interface controls.
+     */
     protected void insertAdditionalControls( String[] allFonts) {}
 
     /**

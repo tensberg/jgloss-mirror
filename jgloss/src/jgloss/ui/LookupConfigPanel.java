@@ -60,7 +60,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     protected JTextField distance;
 
     protected boolean enableActionEvents = false;
-    protected boolean enableStateChangeEvents = false;
+    protected boolean enableSelectionEvents = false;
 
     protected JButton search;
     protected ActionListener searchAction;
@@ -92,10 +92,6 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
     public LookupConfigPanel( LookupModel _model, ActionListener _searchAction) {
         setLayout( new GridBagLayout());
-
-        model = _model;
-        model.addLookupChangeListener( this);
-        model.setMultiDictionarySelectionMode( false);
 
         // search mode setup
         SearchMode[] _searchModes = _model.getSearchModes();
@@ -208,11 +204,10 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
                                      ( JGloss.messages.getString
                                        ( "wordlookup.dictionaryselection")),
                                      BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
-        updateDictionaryChoice();
 
         // filter selection setup
         JPanel filterPanel = new JPanel( new GridLayout( 0, 1));
-        LookupResultFilter[] _filters = model.getFilters();
+        LookupResultFilter[] _filters = _model.getFilters();
         filters = new JCheckBox[_filters.length];
         for ( int i=0; i<_filters.length; i++) {
             JCheckBox box = new JCheckBox( _filters[i].getName());
@@ -243,7 +238,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         c3.fill = GridBagConstraints.NONE;
         c3.weightx = 0;
 
-        expression = new AutoSearchComboBox( model, 50);
+        expression = new AutoSearchComboBox( _model, 50);
         JLabel expressionDescription = 
             new JLabel( JGloss.messages.getString( "wordlookup.enterexpression"));
         expressionDescription.setDisplayedMnemonic
@@ -270,18 +265,6 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
             inputPanel.add( search, c3);
             searchAction = _searchAction;
         }
-
-        // set selected and enabled status from model
-        updateSearchModeSelection();
-        updateSearchModeAvailability();
-        updateSearchFieldSelection();
-        updateSearchFieldAvailability();
-        updateFilterSelection();
-        updateFilterAvailability();
-        updateDictionarySelection();
-        updateDictionaryAvailability();
-        updateInputSelection();
-        updateInputAvailability();
 
         // layout the panel
         c = new GridBagConstraints();
@@ -324,8 +307,10 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
                 }
             });
 
+        setModel( _model);
+
         enableActionEvents = true;
-        enableStateChangeEvents = true;
+        enableSelectionEvents = true;
     }
 
     public JButton getSearchButton() { return search; }
@@ -335,8 +320,6 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
      * been changed in the preferences window.
      */
     protected void updateDictionaryChoice() {
-        Object o = dictionaryChoice.getSelectedItem();
-        boolean seenSelectedItem = false;
         Dictionary[] d = model.getDictionaries();
         dictionaryChoice.removeAllItems();
         if (d.length == 0) {
@@ -347,26 +330,40 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
             dictionaryChoice.setEnabled( true);
             for ( int i=0; i<d.length; i++) {
                 dictionaryChoice.addItem( d[i]);
-                if (d[i].equals( o)) {
-                    dictionaryChoice.setSelectedIndex( i);
-                    seenSelectedItem = true;
-                }
-            }
-        }
-
-
-        if (!seenSelectedItem) {
-            for ( int i=0; i<d.length; i++) {
-                if (model.isDictionaryEnabled( i)) {
-                    model.selectDictionary( i, true);
-                    dictionaryChoice.setSelectedIndex( i);
-                    break;
-                }
             }
         }
     }
 
     public LookupModel getModel() { return model; }
+
+    public void setModel( LookupModel _model) {
+        if (model == _model)
+            return;
+
+        if (model != null)
+            model.removeLookupChangeListener( this);
+
+        model = _model;
+        model.setMultiDictionarySelectionMode( false);
+        expression.setLookupModel( model);
+
+        // set selected and enabled status from model
+        enableActionEvents = false;
+        updateSearchModeAvailability();
+        updateSearchModeSelection();
+        updateSearchFieldAvailability();
+        updateSearchFieldSelection();
+        updateFilterAvailability();
+        updateFilterSelection();
+        updateDictionaryChoice();
+        updateDictionaryAvailability();
+        updateDictionarySelection();
+        updateInputAvailability();
+        updateInputSelection();
+        enableActionEvents = true;
+
+        model.addLookupChangeListener( this);
+    }
 
     protected void updateSearchFieldSelection() {
         SearchFieldSelection sf = model.getSearchFields();
@@ -440,9 +437,6 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     }
 
     public void stateChanged( LookupChangeEvent event) {
-        if (!enableStateChangeEvents)
-            return;
-
         enableActionEvents = false;
 
         if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_AVAILABILITY))
@@ -455,21 +449,25 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
             updateFilterAvailability();
         if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY))
             updateInputAvailability();
-        if (event.hasChanged( LookupChangeEvent.DICTIONARY_LIST_CHANGED))
+        if (event.hasChanged( LookupChangeEvent.DICTIONARY_LIST_CHANGED)) {
             updateDictionaryChoice();
+            updateDictionarySelection();
+        }
 
-        if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_SELECTION))
-            updateSearchModeSelection();
-        if (event.hasChanged( LookupChangeEvent.DICTIONARY_SELECTION))
-            updateDictionarySelection();
-        if (event.hasChanged( LookupChangeEvent.MULTI_DICTIONARY_MODE))
-            updateDictionarySelection();
-        if (event.hasChanged( LookupChangeEvent.FILTER_SELECTION))
-            updateFilterSelection();
-        if (event.hasChanged( LookupChangeEvent.SEARCH_FIELDS_SELECTION))
-            updateSearchFieldSelection();
-        if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS))
-            updateInputSelection();
+        if (enableSelectionEvents) {
+            if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_SELECTION))
+                updateSearchModeSelection();
+            if (event.hasChanged( LookupChangeEvent.DICTIONARY_SELECTION))
+                updateDictionarySelection();
+            if (event.hasChanged( LookupChangeEvent.MULTI_DICTIONARY_MODE))
+                updateDictionarySelection();
+            if (event.hasChanged( LookupChangeEvent.FILTER_SELECTION))
+                updateFilterSelection();
+            if (event.hasChanged( LookupChangeEvent.SEARCH_FIELDS_SELECTION))
+                updateSearchFieldSelection();
+            if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS))
+                updateInputSelection();
+        }
 
         enableActionEvents = true;
     }
@@ -489,14 +487,13 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
         // ignore state changes in the model triggered through
         // the action
-        enableStateChangeEvents = false;
+        enableSelectionEvents = false;
 
         if (action.getSource() == search) {
             model.setSearchExpression( expression.getSelectedItem().toString());
             try {
                 model.setDistance( Integer.parseInt( distance.getText()));
             } catch (NumberFormatException ex) {}
-            enableStateChangeEvents = true; // action may want to change state
             searchAction.actionPerformed( action);
             return;
         }
@@ -542,6 +539,6 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
                 model.selectDictionary( dictionaryChoice.getSelectedIndex(), true);
         }
 
-        enableStateChangeEvents = true;
+        enableSelectionEvents = true;
     }
 } // class LookupConfigPanel

@@ -26,18 +26,23 @@ package jgloss.ui;
 import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.dictionary.*;
+import jgloss.dictionary.attribute.ReferenceAttributeValue;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
 import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
 
-public class LookupResultList extends JPanel implements LookupResultHandler {
+public class LookupResultList extends JPanel implements LookupResultHandler,
+                                                        MarkerListFormatter.Group {
     protected final static String STYLE = "body { color: black; background-color: white; }\n";
 
     /**
@@ -49,7 +54,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
     protected int fancyLimit;
 
-    protected LookupModel model;
+    protected DictionaryEntryFormatter htmlFormatter;
+    protected DictionaryEntryFormatter plainFormatter;
+    
     protected boolean multipleDictionaries;
     protected List resultBuffer;
     protected StringBuffer resultTextBuffer = new StringBuffer( 8192);
@@ -57,6 +64,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected int dictionaryEntries;
     protected boolean previousDictionaryHasMatch;
     protected JLabel status;
+    protected String searchExpression;
+    protected Map references;
 
     protected final static int BUFFER_LIMIT = 1000;
 
@@ -116,6 +125,18 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         this.add( resultScroller, BorderLayout.CENTER);
         status = new JLabel();
         this.add( status, BorderLayout.SOUTH);
+
+        references = new HashMap( fancyLimit*4+1);
+        htmlFormatter = DictionaryEntryFormat.createHTMLFormatter( this, references);
+        plainFormatter = DictionaryEntryFormat.createFormatter();
+    }
+
+    public ReferenceAttributeValue getReference( String key) {
+        return (ReferenceAttributeValue) references.get( key);
+    }
+
+    public void addHyperlinkListener( HyperlinkListener listener) {
+        resultFancy.addHyperlinkListener( listener);
     }
 
     public void addToXCVManager( XCVManager manager) {
@@ -123,9 +144,20 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         manager.addManagedComponent( resultPlain);
     }
 
-    public void startLookup( LookupModel _model) {
-        model = _model;
+    public void startLookup( String description) {
+        searchExpression = null;
+        multipleDictionaries = true;
+        startLookup();
+    }
+
+    public void startLookup( LookupModel model) {
         multipleDictionaries = model.getSelectedDictionaries().size() > 1;
+        searchExpression = model.isSearchExpressionEnabled() ? model.getSearchExpression() : null;
+        startLookup();
+    }
+
+    private void startLookup() {
+        references.clear();
         previousDictionaryHasMatch = true;
         dictionaryEntries = 0;
         entriesInTextBuffer = 0;
@@ -206,11 +238,11 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected void format( DictionaryEntry de, boolean fancy) {
         previousDictionaryHasMatch = true;
         if (fancy) {
-            DictionaryEntryFormat.getHTMLFormatter().format( de, resultTextBuffer);
+            htmlFormatter.format( de, resultTextBuffer);
             resultTextBuffer.append( "<br>");
         }
         else
-            DictionaryEntryFormat.getFormatter().format( de, resultTextBuffer);
+            plainFormatter.format( de, resultTextBuffer);
 
         resultTextBuffer.append( '\n');
         dictionaryEntries++;
@@ -251,9 +283,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         else
             flushTextBuffer();
         updateStatusText( JGloss.messages.getString( "wordlookup.status.matches",
-                                                     new Object[] { new Integer( dictionaryEntries),
-                                                                    model.getSelectedSearchMode().
-                                                                    getName() }));
+                                                     new Object[] { new Integer( dictionaryEntries) }));
     }
 
     protected void flushBuffer( final boolean fancy) {
@@ -284,7 +314,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                     if (fancy) {
                         HTMLDocument doc = (HTMLDocument) resultFancy.getEditorKit()
                             .createDefaultDocument();
-                        doc.setTokenThreshold( 150);
+                        //doc.setTokenThreshold( 150);
                         resultFancy.setDocument( doc);
 
                         if (resultScroller.getViewport().getView() != resultFancy) {
@@ -331,5 +361,17 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             updater.run();
         else 
             EventQueue.invokeLater( updater);
+    }
+
+    public String getMarkedText() {
+        return searchExpression;
+    }
+
+    public String getMarkBefore() {
+        return "<font color=\"blue\">";
+    }
+
+    public String getMarkAfter() {
+        return "</font>";
     }
 } // class LookupResultList

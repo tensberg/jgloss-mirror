@@ -23,6 +23,10 @@
 
 package jgloss.dictionary;
 
+import jgloss.dictionary.attribute.*;
+import jgloss.util.NullIterator;
+import jgloss.util.StringTools;
+
 import java.io.*;
 import java.util.*;
 import java.text.MessageFormat;
@@ -170,8 +174,8 @@ public class KanjiDic implements Dictionary {
          * Creates a new entry with the given values.
          */
         protected Entry( char kanji, String[] readings, String[] nanoriReadings,
-                      String radicalname, String[] translations, byte strokecount,
-                      short bnum, short cnum, short frequency) {
+                         String radicalname, String[] translations, byte strokecount,
+                         short bnum, short cnum, short frequency) {
             this.kanji = kanji;
             this.readings = readings;
             this.nanoriReadings = nanoriReadings;
@@ -217,7 +221,7 @@ public class KanjiDic implements Dictionary {
                         switch (c) {
                         case '-': // reading (for kanji used as suffix)
                                 // radicalname never starts with -
-                            currentl.add( dicline.substring( from, to));
+                            readingsl.add( dicline.substring( from, to));
                             break;
                             
                         case '{': // translation, enclosed in {}
@@ -260,13 +264,13 @@ public class KanjiDic implements Dictionary {
                                 // all other entry types are currently not used
                             }
                         } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
                             System.err.println( "WARNING: malformed dictionary entry " + dicline);
                         }
                     }
                     else {
-                        if (currentl != null)
+                        if (currentl != null) {
                             currentl.add( dicline.substring( from, to));
+                        }
                         else
                             radicalname = dicline.substring( from, to);
                     }
@@ -345,8 +349,6 @@ public class KanjiDic implements Dictionary {
         this.dicfile = dicfile;
         File dic = new File( dicfile);
         name = dic.getName();
-        System.err.println( MessageFormat.format( messages.getString( "dictionary.load"),
-                                                  new String[] { name }));
 
         BufferedReader in = new BufferedReader( new InputStreamReader
             ( new BufferedInputStream( new FileInputStream( dic)), "EUC-JP"));
@@ -469,30 +471,30 @@ public class KanjiDic implements Dictionary {
      * fully supported, the other search modes will return a superset of exact match search,
      * but not all matches which should be returned.
      */
-    public Iterator search( SearchMode mode, Object[] parameters) throws SearchException {
+    public ResultIterator search( SearchMode mode, Object[] parameters) throws SearchException {
         if (mode instanceof ExpressionSearchModes)
-            return searchExpression( mode, (String) parameters[0], 
+            return searchExpression( (ExpressionSearchModes) mode, (String) parameters[0], 
                                      (SearchFieldSelection) parameters[1]);
         else
             throw new UnsupportedSearchModeException( mode);
     }
 
-    public Iterator searchExpression( SearchMode mode, String expression, 
-                                      SearchFieldSelection fields) {
-        List result = new ArrayList( 10);
-
+    public ResultIterator searchExpression( ExpressionSearchModes mode, String expression, 
+                                            SearchFieldSelection fields) {
         Object o = entries.get( expression);
+        Iterator i;
         if (o != null) {
+
             if (o instanceof List) // list of entries
-                for ( Iterator i=((List) o).iterator(); i.hasNext(); ) {
-                    constructResult( expression, result, (String) i.next(), searchmode, resultmode);
-                }
+                i = ((List) o).iterator();
             else { // single entry
-                constructResult( expression, result, (String) o, searchmode, resultmode);
+                i = Collections.singletonList( o).iterator();
             }
         }
+        else
+            i = NullIterator.INSTANCE;
 
-        return result;
+        return new EntryListIterator( i, mode, expression, fields);
     }
 
     public boolean supports( SearchMode searchmode, boolean fully) {
@@ -504,152 +506,10 @@ public class KanjiDic implements Dictionary {
             return false;
     }
 
+    public boolean supports( Attribute att) { return false; }
+
     public SearchFieldSelection getSupportedFields( SearchMode searchmode) {
         return new SearchFieldSelection( true, true, true, true, false);
-    }
-
-    /**
-     * Creates the DictionaryEntry/WordReadingPair objects for the entry and adds them to
-     * the list of results. The entry is checked against the search mode.
-     *
-     * @param expression The expression which is looked up.
-     * @param result List of results to which the created objects are added.
-     * @param entry The entry for which the objects will be created.
-     * @param searchmode The search mode.
-     */
-    protected void constructResult( String expression, List result, String entry, short searchmode,
-                                    short resultmode) {
-        Entry e = new Entry( entry, true);
-        final String kanji = new String( new char[] { e.getKanji() });
-        boolean kanjiMatches = kanji.equals( expression);
-        
-        if (e.getTranslations() != null) { // create DictionaryEntries
-            String[] translations = e.getTranslations();
-            boolean translationMatches = false;
-            if (!kanjiMatches) {
-                for ( int i=0; i<translations.length; i++) {
-                    if (translations[i].equals( expression)) {
-                        translationMatches = true;
-                        break;
-                    }
-                }
-            }
-            
-            // the construction of the dictionary entry can change the kanji part by adding
-            // okurigana, so we have to re-test the match for exact matches.
-            if (e.getReadings() != null) { // may be null if there are only nanori readings
-                String[] readings = e.getReadings();
-                for ( int i=0; i<readings.length; i++) {
-                    DictionaryEntry de = createDictionaryEntry( kanji, readings[i], translations);
-                    boolean readingMatches = false;
-                    if (!(kanjiMatches || translationMatches))
-                        readingMatches = expression.equals( de.getReading()) ||
-                            expression.equals( de.getWord());
-                    if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || 
-                                          searchmode==SEARCH_ANY_MATCHES ||
-                                          de.getWord().equals( kanji))) || 
-                        translationMatches || readingMatches)
-                        addResult( result, de, resultmode);
-                }
-            }
-        }
-        else { // create WordReadingPairs
-            if (e.getReadings() != null) { // may be null if there are only nanori readings
-                String[] readings = e.getReadings();
-                for ( int i=0; i<readings.length; i++) {
-                    WordReadingPair wrp = createWordReadingPair( kanji, readings[i]);
-                    boolean readingMatches = false;
-                    if (!kanjiMatches)
-                        readingMatches = expression.equals( wrp.getReading()) ||
-                            expression.equals( wrp.getWord());
-                    if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || 
-                                          searchmode==SEARCH_ANY_MATCHES ||
-                                          wrp.getWord().equals( kanji))) ||
-                        readingMatches)
-                        addResult( result, wrp, resultmode);
-                }
-            }
-        }
-
-        if (e.getNanoriReadings() != null) {
-            String[] readings = e.getNanoriReadings();
-            String[] nanori = new String[] { messages.getString( "kanjidic.nanori") };
-            for ( int i=0; i<readings.length; i++) {
-                DictionaryEntry de = createDictionaryEntry( kanji, readings[i], nanori);
-                boolean readingMatches = false;
-                if (!kanjiMatches)
-                    readingMatches = expression.equals( de.getReading()) ||
-                        expression.equals( de.getWord());
-                if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
-                                      de.getWord().equals( kanji))) || readingMatches)
-                    addResult( result, de, resultmode);
-            }
-        }
-        if (e.getRadicalName() != null) {
-            DictionaryEntry de = createDictionaryEntry( kanji, e.getRadicalName(),
-                                                        new String[] { messages.getString
-                                                        ( "kanjidic.radicalname") });
-            boolean readingMatches = false;
-            if (!kanjiMatches)
-                readingMatches = expression.equals( de.getReading()) ||
-                    expression.equals( de.getWord());
-            if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
-                                  de.getWord().equals( kanji))) || readingMatches)
-                addResult( result, de, resultmode);
-        }
-    }
-
-    /**
-     * Creates a dictionary entry. If the reading has an okurigana part (separated by a '.'),
-     * the word will be kanji+okurigana and the dot in the reading will be removed.
-     *
-     * @param kanji The kanji of the entry.
-     * @param reading The reading of the entry.
-     * @param translations The translations of the entry.
-     */
-    protected DictionaryEntry createDictionaryEntry( String kanji, String reading,
-                                                     String[] translations) {
-        int dot = reading.indexOf( '.');
-        if (dot == -1)
-            return new DefaultDictionaryEntry( kanji, reading, translations, this);
-        else
-            return new DefaultDictionaryEntry( kanji + reading.substring( dot+1),
-                                               reading.substring( 0, dot) + reading.substring( dot+1),
-                                               translations, this);
-    }
-
-    /**
-     * Creates a word-reading pair. If the reading has an okurigana part (separated by a '.'),
-     * the word will be kanji+okurigana and the dot in the reading will be removed.
-     *
-     * @param kanji The kanji of the entry.
-     * @param reading The reading of the entry.
-     */
-    protected WordReadingPair createWordReadingPair( String kanji, String reading) {
-        final String k;
-        final String r;
-        int dot = reading.indexOf( '.');
-        if (dot == -1) {
-            k = kanji;
-            r = reading;
-        }
-        else {
-            k = kanji + reading.substring( dot+1);
-            r = reading.substring( 0, dot) + reading.substring( dot+1);
-        }
-        return new WordReadingPair() {
-                public String getWord() { return k; }
-                public String getReading() { return r; }
-                public Dictionary getDictionary() { return KanjiDic.this; }
-                public String toString() { return DefaultDictionaryEntry.toString( this); }
-            };
-    }
-
-    /**
-     * Add a dictionary entry to the list of results in a form determined by the result mode.
-     */
-    protected void addResult( List result, WordReadingPair entry, short resultmode) {
-        result.add( entry);
     }
     
     /**
@@ -688,4 +548,152 @@ public class KanjiDic implements Dictionary {
             return false;
         }
     }
+
+    protected class EntryListIterator implements ResultIterator {
+        protected Iterator entries;
+        
+        protected ExpressionSearchModes searchmode;
+        protected String expression;
+        protected SearchFieldSelection searchfields;
+
+        protected LinkedList entryCache = new LinkedList();
+
+        protected List readings = new ArrayList( 10);
+        protected List readingsOkuri = new ArrayList( 10);
+
+        protected char[] singleChar = new char[1];
+
+        public EntryListIterator( Iterator _entries, ExpressionSearchModes _searchmode,
+                                  String _expression, SearchFieldSelection _searchfields) {
+            entries = _entries;
+            searchmode = _searchmode;
+            expression = StringTools.toHiragana( _expression.toLowerCase());;
+            searchfields = _searchfields;
+            fillEntryCache();
+        }
+
+        public boolean hasNext() { return !entryCache.isEmpty(); }
+
+        public DictionaryEntry next() throws NoSuchElementException {
+            if (!hasNext())
+                throw new NoSuchElementException();
+
+            DictionaryEntry out = (DictionaryEntry) entryCache.removeFirst();
+
+            if (entryCache.isEmpty())
+                fillEntryCache();
+
+            return out;
+        }
+
+        /**
+         * Generate dictionary entries from a matching kanji entry and add it to the
+         * cache of dictionary entries.
+         */
+        protected void fillEntryCache() {
+            // currently nanori readings are not used either for matching or in
+            // dictionary entry creation
+
+            while (entryCache.isEmpty()) {
+                if (!entries.hasNext())
+                    return; // no next entry
+
+                KanjiDic.Entry entry = new KanjiDic.Entry( (String) entries.next(), false);
+                
+                fillReadingsList( entry.getReadings());
+
+                singleChar[0] = entry.getKanji();
+                String kanji = new String( singleChar);
+                // test if kanji matches
+                if (searchfields.isSelected( DictionaryEntryField.WORD)) {
+                    if (expression.equals( kanji)) {
+                        entryCache.add( new MultiReadingEntry( kanji, readings,
+                                                               entry.getTranslations(), KanjiDic.this)); 
+                    }
+                }
+
+                // test if any of the non-okurigana readings match
+                if (searchfields.isSelected( DictionaryEntryField.READING)) {
+                    for ( Iterator i=readings.iterator(); i.hasNext(); ) {
+                        String reading = (String) i.next();
+                        String readingN = StringTools.toHiragana( reading.toLowerCase());
+                        if (expressionMatches( readingN)) {
+                            entryCache.add( new MultiReadingEntry( kanji, readings,
+                                                                   entry.getTranslations(),
+                                                                   KanjiDic.this));
+                            break;
+                        }
+                    }
+                }
+
+                // test readings with okurigana
+                if (searchfields.isSelected( DictionaryEntryField.WORD) ||
+                    searchfields.isSelected( DictionaryEntryField.READING)) {
+                    for ( Iterator i=readingsOkuri.iterator(); i.hasNext(); ) {
+                        String[] reading = (String[]) i.next();
+                        String wordokuri = kanji + reading[1];
+                        if (searchfields.isSelected( DictionaryEntryField.WORD) &&
+                            expressionMatches( wordokuri) ||
+                            searchfields.isSelected( DictionaryEntryField.READING) &&
+                            expressionMatches( reading[2])) {
+                            entryCache.add( new MultiReadingEntry( wordokuri, reading[2],
+                                                                   entry.getTranslations(), 
+                                                                   KanjiDic.this));
+                            // a translation match could generate another entry for this
+                            // okurigana reading, so remove it here (it is no longer needed)
+                            i.remove();
+                        }
+                    }
+                }
+
+                // test translations
+                if (searchfields.isSelected( DictionaryEntryField.TRANSLATION)) {
+                    String[] translations = entry.getTranslations();
+                    if (translations != null) {
+                        for ( int i=0; i<translations.length; i++) {
+                            if (expressionMatches( StringTools.toHiragana
+                                                   ( translations[i].toLowerCase()))) {
+                                entryCache.add( new MultiReadingEntry( kanji, readings, translations,
+                                                                       KanjiDic.this));
+                                for ( Iterator j=readingsOkuri.iterator(); j.hasNext(); ) {
+                                    String[] reading = (String[]) j.next();
+                                    entryCache.add( new MultiReadingEntry
+                                                    ( kanji + reading[1], reading[2],
+                                                      translations, KanjiDic.this));
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        protected boolean expressionMatches( String word) {
+            return searchmode==ExpressionSearchModes.EXACT &&
+                word.equals( expression) ||
+                searchmode==ExpressionSearchModes.PREFIX &&
+                word.startsWith( expression) ||
+                searchmode==ExpressionSearchModes.SUFFIX &&
+                word.endsWith( expression) ||
+                searchmode==ExpressionSearchModes.ANY &&
+                word.indexOf( expression)!=-1;
+        }
+
+        protected void fillReadingsList( String[] allReadings) {
+            readings.clear();
+            readingsOkuri.clear();
+            for ( int i=0; i<allReadings.length; i++) {
+                int dot;
+                if ((dot=allReadings[i].indexOf( '.')) == -1) {
+                    readings.add( allReadings[i]);
+                }
+                else {
+                    String pre = allReadings[i].substring( 0, dot);
+                    String post = allReadings[i].substring( dot+1);
+                    readingsOkuri.add( new String[] { pre, post, pre+post });
+                }
+            }
+        }
+    } // class EntryListIterator
 } // class KanjiDic

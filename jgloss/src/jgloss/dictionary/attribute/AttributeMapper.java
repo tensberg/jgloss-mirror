@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.util.regex.*;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 
 /**
  * Mapping from strings used in dictionaries to mark attributes or attribute values to
@@ -55,13 +58,15 @@ public class AttributeMapper {
     }
 
     protected Map mappings;
-
+    protected Set allAttributes;
+    
     /**
      * Initializes a new mapping from dictionary-specific id's to attribute/value objects by
      * reading the configuration from a reader.
      */
     public AttributeMapper( LineNumberReader mapping) throws IOException {
-        mappings = new HashMap( 51);
+        mappings = new HashMap( 61);
+        allAttributes = new HashSet( 61);
 
         String line;
 
@@ -130,6 +135,7 @@ public class AttributeMapper {
                     }
 
                     mappings.put( id, new Mapping( attribute, attValue));
+                    allAttributes.add( attribute);
                 }
                 else
                     throw new IOException( "Invalid line " + mapping.getLineNumber());
@@ -144,4 +150,6 @@ public class AttributeMapper {
     public Mapping getMapping( String id) {
         return (Mapping) mappings.get( id);
     }
+
+    public Set getAttributes() { return Collections.unmodifiableSet( allAttributes); }
 } // class AttributeMapper

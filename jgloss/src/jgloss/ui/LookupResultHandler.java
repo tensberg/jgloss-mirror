@@ -28,6 +28,8 @@ import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.SearchException;
 
 public interface LookupResultHandler {
+    void startLookup( String description);
+
     void startLookup( LookupModel model);
 
     void dictionary( Dictionary d);

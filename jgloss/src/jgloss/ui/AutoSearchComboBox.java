@@ -29,7 +29,8 @@ import jgloss.util.ListFormatter;
 import jgloss.util.StringTools;
 import jgloss.dictionary.*;
 
-import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.*;
 
 import javax.swing.*;
@@ -53,10 +54,11 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     protected DictionaryEntryFormatter currentFormatter;
 
     protected int limit;
-    protected Vector items;
+    protected List items;
     protected String searchText;
     protected StringBuffer tempBuffer = new StringBuffer( 1024);
 
+    private boolean dontConfigureEditor;
 
     private Highlighter matchHighlighter = new MatchHighlighter();
     private Highlighter partialHighlighter = new PartialHighlighter();
@@ -159,6 +161,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         model = _model;
         limit = _limit;
         engine = new AsynchronousLookupEngine( this, limit);
+        setModel( new ReplaceableItemsComboBoxModel());
         ((JTextComponent) getEditor().getEditorComponent()).getDocument().addDocumentListener( this);
         setRenderer( cellRenderer);
         setPrototypeDisplayValue( PROTOTYPE);
@@ -168,22 +171,31 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         wordReadingTranslation.addReadingFormat( DictionaryEntryFormat.getReadingFormatter());
         wordReadingTranslation.addTranslationFormat( DictionaryEntryFormat.getTranslationRomFormatter(),
                                                      DictionaryEntryFormat.getTranslationCrmFormatter(),
-                                                     DictionaryEntryFormat.getTranslationSynFormatter());
+                                                     DictionaryEntryFormat
+                                                     .getTranslationSynonymFormatter());
         readingWordTranslation = new DictionaryEntryFormatter();
         readingWordTranslation.addReadingFormat( DictionaryEntryFormat.getReadingFormatter());
         readingWordTranslation.addWordFormat( DictionaryEntryFormat.getWordFormatter());
         readingWordTranslation.addTranslationFormat( DictionaryEntryFormat.getTranslationRomFormatter(),
                                                      DictionaryEntryFormat.getTranslationCrmFormatter(),
-                                                     DictionaryEntryFormat.getTranslationSynFormatter());
+                                                     DictionaryEntryFormat
+                                                     .getTranslationSynonymFormatter());
         translationWordReading = new DictionaryEntryFormatter();
         translationWordReading.addTranslationFormat( DictionaryEntryFormat.getTranslationRomFormatter(),
                                                      DictionaryEntryFormat.getTranslationCrmFormatter(),
-                                                     DictionaryEntryFormat.getTranslationSynFormatter());
+                                                     DictionaryEntryFormat
+                                                     .getTranslationSynonymFormatter());
         translationWordReading.addWordFormat( DictionaryEntryFormat.getWordFormatter());
         translationWordReading.addReadingFormat( DictionaryEntryFormat.getReadingFormatter());
  
         setEditable( true);
     }
+
+    public void setLookupModel( LookupModel _model) {
+        model = _model;
+    }
+
+    public LookupModel getLookupModel() { return model; }
 
     protected void doLookup() {
         synchronized (this) {
@@ -210,8 +222,16 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         engine.doLookup( tempModel);
     }
 
+    public void startLookup( String description) {
+        startLookup();
+    }
+
     public void startLookup( LookupModel model) {
-        items = new Vector( limit + 20);
+        startLookup();
+    }
+
+    protected void startLookup() {
+        items = new ArrayList( limit + 20);
     }
 
     public void dictionary( Dictionary d) {
@@ -237,19 +257,22 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     }
 
     public void endLookup() {
-        final ComboBoxModel newModel = new DefaultComboBoxModel( items);
+        final List newItems = items;
         items = null;
+
         Runnable updater = new Runnable() {
                 public void run() {
-                    JTextComponent c = (JTextComponent) getEditor().getEditorComponent();
-                    int caret = c.getCaretPosition();
-                    newModel.setSelectedItem
-                        ( c.getText());
-                    setModel( newModel);
-                    c.setCaretPosition( caret);
+                    // Changing the combo box model has the side effect of calling
+                    // configureEditor. This messes up the editor text and is unneccessary
+                    // anyway, so switch it off.
+                    dontConfigureEditor = true;
+                    ((ReplaceableItemsComboBoxModel) getModel()).replaceItems( newItems);
+                    dontConfigureEditor = false;
+                    items = null;
                     AutoSearchComboBox.this.showPopup();
                 }
             };
+
         if (EventQueue.isDispatchThread()) {
             updater.run();
         }
@@ -273,11 +296,22 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     public void setSelectedItem( Object o) {
         /* Implement some intelligent dictionary entry selection later.
            Completely disable selection for now.
+
           if (o!=null && o instanceof Object[]) {
             Object[] data = (Object[]) o;
             if (data[0] == DictionaryEntry.class)
                 super.setSelectedItem( data[1]);
                 }*/
+    }
+
+    public void configureEditor( ComboBoxEditor editor, Object anObject) {
+        // Changing the combo box model in endLookup has the side effect of calling
+        // configureEditor. Since this messes up the editor text and is unneccessary
+        // anyway, it can be switched off by setting dontConfigureEditor
+        if (dontConfigureEditor)
+            return;
+
+        super.configureEditor( editor, anObject);
     }
 
     protected void finalize() {

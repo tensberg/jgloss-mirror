@@ -24,6 +24,7 @@
 package jgloss;
 
 import jgloss.dictionary.*;
+import jgloss.dictionary.attribute.*;
 import jgloss.parser.*;
 import jgloss.util.CharacterEncodingDetector;
 import jgloss.ui.*;
@@ -143,7 +144,7 @@ public abstract class JGloss {
     protected static void registerDictionaries() {
         DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
         DictionaryFactory.registerImplementation( WadokuJT.class, WadokuJT.implementation);
-        //DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
+        DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
         //DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
     }
 
@@ -318,7 +319,18 @@ public abstract class JGloss {
                                DistanceSearchModes.NEAR,
                                DistanceSearchModes.RADIUS }),
               Arrays.asList( Dictionaries.getDictionaries( false)),
-              Arrays.asList( new Object[] { new AttributeResultFilter() }));
+              Arrays.asList( new Object[] 
+                  { 
+                      new AttributeResultFilter( messages.getString( "filter.mainentry.name"),
+                                                 messages.getString( "filter.mainentry.desc"),
+                                                 WadokuJT.MAIN_ENTRY, true), 
+                      new AttributeResultFilter( messages.getString( "filter.example.name"),
+                                                 messages.getString( "filter.example.desc"),
+                                                 Attributes.EXAMPLE, true),
+                      new AttributeResultFilter( messages.getString( "filter.priority.name"),
+                                                 messages.getString( "filter.priority.desc"),
+                                                 Attributes.PRIORITY, true)
+                  }));
         Dictionaries.addDictionaryListChangeListener
             ( new Dictionaries.DictionaryListChangeListener() {
                     public void dictionaryListChanged() {

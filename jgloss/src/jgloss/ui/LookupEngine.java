@@ -27,6 +27,11 @@ import jgloss.dictionary.*;
 
 import java.util.Iterator;
 
+/**
+ * Perform a dictionary lookup. The lookup configuration is taken from a {@link LookupModel LookupModel}.
+ *
+ * @author Michael Koch
+ */
 public class LookupEngine {
     protected LookupResultHandler handler;
     protected int dictionaryEntryLimit;
@@ -80,8 +85,9 @@ public class LookupEngine {
                                DictionaryEntry de = results.next();
                                dictionaryEntries++;
                                for ( int f=0; f<filters.length; f++) {
-                                   if (!filters[f].accept( de))
+                                   if (!filters[f].accept( de)) {
                                        continue results;
+                                   }
                                }
                                handler.dictionaryEntry( de);
                            } catch (SearchException ex) {
