@@ -49,11 +49,117 @@ import javax.swing.text.html.*;
  *
  * @author Michael Koch
  */
-public class JGlossFrame implements ActionListener {
+public class JGlossFrame extends JFrame implements ActionListener {
     /**
-     * The frame which contains all user interaction widgets.
+     * Collection of publically available actions.
      */
-    private JFrame frame;
+    public static class Actions {
+        /**
+         * Imports a document into an empty JGlossFrame.
+         */
+        public final Action importDocument;
+        /**
+         * Imports the clipboard content into an empty JGlossFrame.
+         */
+        public final Action importClipboard;
+        /**
+         * Menu listener which will update the state of the import clipboard
+         * action when the menu is selected.
+         */
+        public final MenuListener importClipboardListener;
+        /**
+         * Opens a document created by JGloss in an empty JGlossFrame.
+         */
+        public final Action open;
+
+        /**
+         * Creates a new instance of the actions which will invoke the methods
+         * on the specified target. If the target is <CODE>null</CODE>, a new JGlossFrame
+         * will be created on each invocation.
+         */
+        private Actions( final JGlossFrame target) {
+            importDocument = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        new Thread( "JGloss import") {
+                                public void run() {
+                                    ImportDialog d = new ImportDialog( target);
+                                    if (d.doDialog()) {
+                                        JGlossFrame which;
+                                        if (target==null || target.documentLoaded)
+                                            which = new JGlossFrame();
+                                        else
+                                            which = target;
+                                        
+                                        which.importDocument( d.getSelection(), d.getReadingStart(), 
+                                                              d.getReadingEnd(), d.getEncoding());
+                                        which.documentChanged = true;
+                                    }
+                                }
+                            }.start();
+                    }
+                };
+            importDocument.setEnabled( true);
+            initAction( importDocument, "main.menu.import"); 
+            importClipboard = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        new Thread( "JGloss import") {
+                                public void run() {
+                                    if (target == null)
+                                        new JGlossFrame().doImportClipboard();
+                                    else
+                                        target.doImportClipboard();
+                                }
+                            }.start();
+                    }
+                };
+            importClipboard.setEnabled( false);
+            initAction( importClipboard, "main.menu.importclipboard"); 
+            open = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        new Thread( "JGloss open") {
+                                public void run() {
+                                    JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
+                                    f.addChoosableFileFilter( jglossFileFilter);
+                                    f.setFileHidingEnabled( true);
+                                    int r = f.showOpenDialog( target);
+                                    if (r == JFileChooser.APPROVE_OPTION) {
+                                        JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
+                                        JGlossFrame which = target==null ||
+                                            target.documentLoaded ? new JGlossFrame() : target;
+                                        which.loadDocument( f.getSelectedFile().getAbsolutePath());
+                                    }
+                                }
+                            }.start();
+                        }
+                };
+            open.setEnabled( true);
+            initAction( open, "main.menu.open"); 
+            
+            importClipboardListener = new MenuListener() {
+                    public void menuSelected( MenuEvent e) {
+                        Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard()
+                            .getContents( null);
+                        if (t != null &&
+                            (t.isDataFlavorSupported( DataFlavor.getTextPlainUnicodeFlavor()) ||
+                             t.isDataFlavorSupported( DataFlavor.stringFlavor))) {
+                            importClipboard.setEnabled( true);
+                        }
+                        else
+                            importClipboard.setEnabled( false);
+                    }
+                    public void menuDeselected( MenuEvent e) {}
+                    public void menuCanceled( MenuEvent e) {}
+                };
+        }
+    }
+
+    /**
+     * Static instance of the actions which can be used by other classes. If an action
+     * is invoked, a new <CODE>JGlossFrame</CODE> will be created as the target of the
+     * action.
+     */
+    public final static Actions actions = new Actions( null);
+
     /**
      * Scrollpane which wraps the document editor.
      */
@@ -103,18 +209,6 @@ public class JGlossFrame implements ActionListener {
     private boolean documentChanged = false;
 
     /**
-     * Imports a document into an empty JGlossFrame.
-     */
-    private Action importAction;
-    /**
-     * Imports the clipboard content into an empty JGlossFrame.
-     */
-    private Action importClipboardAction;
-    /**
-     * Opens a document created by JGloss in an empty JGlossFrame.
-     */
-    private Action openAction;
-    /**
      * Saves the document.
      */
     private Action saveAction;
@@ -130,14 +224,6 @@ public class JGlossFrame implements ActionListener {
      * Closes this JGlossFrame.
      */
     private Action closeAction;
-    /**
-     * Displays the preferences dialog.
-     */
-    private Action preferencesAction;
-    /**
-     * Displays the about dialog.
-     */
-    private Action aboutAction;
     /**
      * Submenu containing the export actions.
      */
@@ -197,26 +283,18 @@ public class JGlossFrame implements ActionListener {
      * A file filter which will accept JGloss documents.
      */
     public static final javax.swing.filechooser.FileFilter jglossFileFilter = 
-        new javax.swing.filechooser.FileFilter() {
-            public boolean accept( File f) {
-                return f.isDirectory() ||
-                    f.getName().toLowerCase().endsWith( ".jgloss");
-            }
-
-            public String getDescription() { 
-                return JGloss.messages.getString( "filefilter.jgloss.description");
-            }
-        };
+        new ExtensionFileFilter( "jgloss", 
+                                 JGloss.messages.getString( "filefilter.jgloss.description"));
 
     /**
      * Creates a new JGlossFrame which does not contain a document. The user can add a document
      * by using import or open actions.
      */
     public JGlossFrame() {
+        super( JGloss.messages.getString( "main.title"));
         framecount++;
 
         // set up the frame
-        frame = new JFrame( JGloss.messages.getString( "main.title"));
         annotationEditor = new AnnotationEditor();
         annotationEditorScroller = new JScrollPane( annotationEditor,
                                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -241,26 +319,26 @@ public class JGlossFrame implements ActionListener {
                 }
             });
 
-        frame.getContentPane().setBackground( Color.white);
+        getContentPane().setBackground( Color.white);
 
-        frame.setLocation( JGloss.prefs.getInt( Preferences.FRAME_X, 0),
-                           JGloss.prefs.getInt( Preferences.FRAME_Y, 0));
-        frame.setSize( JGloss.prefs.getInt( Preferences.FRAME_WIDTH, frame.getPreferredSize().width),
-                       JGloss.prefs.getInt( Preferences.FRAME_HEIGHT, frame.getPreferredSize().height));
-        frame.addComponentListener( new ComponentAdapter() {
+        setLocation( JGloss.prefs.getInt( Preferences.FRAME_X, 0),
+                     JGloss.prefs.getInt( Preferences.FRAME_Y, 0));
+        setSize( JGloss.prefs.getInt( Preferences.FRAME_WIDTH, getPreferredSize().width),
+                 JGloss.prefs.getInt( Preferences.FRAME_HEIGHT, getPreferredSize().height));
+        addComponentListener( new ComponentAdapter() {
                 public void componentMoved( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.FRAME_X, frame.getX());
-                    JGloss.prefs.set( Preferences.FRAME_Y, frame.getY());
+                    JGloss.prefs.set( Preferences.FRAME_X, getX());
+                    JGloss.prefs.set( Preferences.FRAME_Y, getY());
                 }
                 public void componentResized( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.FRAME_WIDTH, frame.getWidth());
-                    JGloss.prefs.set( Preferences.FRAME_HEIGHT, frame.getHeight());
+                    JGloss.prefs.set( Preferences.FRAME_WIDTH, getWidth());
+                    JGloss.prefs.set( Preferences.FRAME_HEIGHT, getHeight());
                 }
             });
-        frame.addWindowListener( new WindowAdapter() {
+        addWindowListener( new WindowAdapter() {
                 public void windowClosing( WindowEvent e) {
                     if (askCloseDocument())
-                        frame.dispose();
+                        dispose();
                 }
 
                 public void windowClosed( WindowEvent e) {
@@ -270,7 +348,7 @@ public class JGlossFrame implements ActionListener {
                     }
                 }
             });
-        frame.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
 
         JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {
                 public void propertyChange( PropertyChangeEvent e) {
@@ -278,35 +356,7 @@ public class JGlossFrame implements ActionListener {
                         docpane.setEditable( "true".equals( e.getNewValue()));
                 }
             });
-
-        // set up the menu bar
-        JMenuBar bar = new JMenuBar();
-
-        importAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    new Thread( "JGloss import") {
-                            public void run() {
-                                doImport();
-                            }
-                        }.start();
-                }
-            };
-        importAction.setEnabled( true);
-        initAction( importAction, "main.menu.import"); 
-        importClipboardAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    doImportClipboard();
-                }
-            };
-        importClipboardAction.setEnabled( false);
-        initAction( importClipboardAction, "main.menu.importclipboard"); 
-        openAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    openDocument();
-                }
-            };
-        openAction.setEnabled( true);
-        initAction( openAction, "main.menu.open"); 
+        
         saveAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     if (documentPath == null)
@@ -362,18 +412,22 @@ public class JGlossFrame implements ActionListener {
         closeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     if (askCloseDocument()) {
-                        frame.hide();
-                        frame.dispose();
+                        hide();
+                        dispose();
                     }
                 }
             };
         initAction( closeAction, "main.menu.close");
+        
+        Actions actions = new Actions( this);
 
+        // set up the menu bar
+        JMenuBar bar = new JMenuBar();
         JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.file"));
-        menu.add( createMenuItem( importAction));
-        menu.add( createMenuItem( importClipboardAction));
+        menu.add( createMenuItem( actions.importDocument));
+        menu.add( createMenuItem( actions.importClipboard));
         menu.addSeparator();
-        menu.add( createMenuItem( openAction));
+        menu.add( createMenuItem( actions.open));
         menu.add( createMenuItem( saveAction));
         menu.add( createMenuItem( saveAsAction));
         exportMenu = new JMenu( JGloss.messages.getString( "main.menu.export"));
@@ -390,32 +444,22 @@ public class JGlossFrame implements ActionListener {
         menu.add( createMenuItem( closeAction));
         bar.add( menu);
 
-        menu.addMenuListener( new MenuListener() {
-                public void menuSelected( MenuEvent e) {
-                    Transferable t = frame.getToolkit().getSystemClipboard().getContents( this);
-                    if (t != null &&
-                        (t.isDataFlavorSupported( DataFlavor.getTextPlainUnicodeFlavor()) ||
-                        t.isDataFlavorSupported( DataFlavor.stringFlavor))) {
-                        importClipboardAction.setEnabled( true);
-                    }
-                    else
-                        importClipboardAction.setEnabled( false);
-                }
-                public void menuDeselected( MenuEvent e) {}
-                public void menuCanceled( MenuEvent e) {}
-            });
-
-        preferencesAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    PreferencesFrame.getFrame().show();
-                }
-            };
-        preferencesAction.setEnabled( true);
-        initAction( preferencesAction, "main.menu.preferences");
+        menu.addMenuListener( actions.importClipboardListener);
 
         menu = docpane.getEditMenu();
         menu.addSeparator();
-        menu.add( createMenuItem( preferencesAction));
+        Action wordLookupAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    WordLookup.showAction.actionPerformed( e);
+                    String selection = docpane.getSelectedText();
+                    if (selection != null && selection.length() > 0)
+                        WordLookup.getFrame().search( selection);
+                }
+            };
+        initAction( wordLookupAction, "main.menu.wordlookup");
+        menu.add( createMenuItem( wordLookupAction));
+        menu.addSeparator();
+        menu.add( createMenuItem( PreferencesFrame.showAction));
         bar.add( menu);
 
         compactViewItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.compactview"));
@@ -450,19 +494,13 @@ public class JGlossFrame implements ActionListener {
 
         bar.add( annotationEditor.getMenu());
 
-        aboutAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    AboutFrame.getFrame().show();
-                }
-            };
-        initAction( aboutAction, "main.menu.about");
         menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
-        menu.add( createMenuItem( aboutAction));
+        menu.add( createMenuItem( AboutFrame.showAction));
         bar.add( menu);
 
-        frame.setJMenuBar( bar);
+        setJMenuBar( bar);
 
-        frame.show();
+        show();
     }
 
     /**
@@ -533,12 +571,14 @@ public class JGlossFrame implements ActionListener {
      *                   <CODE>false</CODE> to make it grow vertical.
      * @return The newly created space eater component.
      */
-    public static Component createSpaceEater( Component c, boolean horizontal) {
+    public static JPanel createSpaceEater( Component c, boolean horizontal) {
         JPanel se = new JPanel( new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = horizontal ? GridBagConstraints.VERTICAL : GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         se.add( c, gbc);
         
@@ -570,8 +610,8 @@ public class JGlossFrame implements ActionListener {
     private boolean askCloseDocument() {
         if (documentChanged) {
             int r = JOptionPane.showOptionDialog
-                ( frame, JGloss.messages.getString( "main.dialog.close.message",
-                                                    new Object[] { documentName }),
+                ( this, JGloss.messages.getString( "main.dialog.close.message",
+                                                   new Object[] { documentName }),
                   JGloss.messages.getString( "main.dialog.close.title"),
                   JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                   new Object[] { JGloss.messages.getString( "button.save"),
@@ -601,28 +641,10 @@ public class JGlossFrame implements ActionListener {
     }
 
     /**
-     * Runs the import dialog and opens the document the user selected.
-     *
-     * @see ImportDialog
-     */
-    private void doImport() {
-        ImportDialog d = new ImportDialog( frame);
-        if (d.doDialog()) {
-            JGlossFrame which = this;
-            if (documentLoaded)
-                which = new JGlossFrame();
-
-            which.importDocument( d.getSelection(), d.getReadingStart(), 
-                                  d.getReadingEnd(), d.getEncoding());
-            which.documentChanged = true;
-        }
-    }
-
-    /**
      * Imports the content of the clipboard, if it contains plain text.
      */
     private void doImportClipboard() {
-        Transferable t = frame.getToolkit().getSystemClipboard().getContents( this);
+        Transferable t = getToolkit().getSystemClipboard().getContents( this);
         DataFlavor plain = DataFlavor.getTextPlainUnicodeFlavor();
 
         if (t != null) {
@@ -655,7 +677,7 @@ public class JGlossFrame implements ActionListener {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
-                    ( frame, JGloss.messages.getString
+                    ( this, JGloss.messages.getString
                       ( "error.import.exception", new Object[] 
                           { "import.clipboard", ex.getClass().getName(),
                             ex.getLocalizedMessage() }),
@@ -735,7 +757,7 @@ public class JGlossFrame implements ActionListener {
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
-                ( frame, JGloss.messages.getString
+                ( this, JGloss.messages.getString
                   ( "error.import.exception", new Object[] 
                       { path, ex.getClass().getName(),
                         ex.getLocalizedMessage() }),
@@ -768,7 +790,7 @@ public class JGlossFrame implements ActionListener {
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
-                ( frame, JGloss.messages.getString
+                ( this, JGloss.messages.getString
                   ( "error.import.exception", new Object[] 
                       { path, ex.getClass().getName(),
                         ex.getLocalizedMessage() }),
@@ -786,13 +808,14 @@ public class JGlossFrame implements ActionListener {
         try {
             File f = new File( path);
             Reader in = new InputStreamReader( new FileInputStream( f), "UTF-8");
-            loadDocument( in, path, f.getName(), 
+            documentPath = f.getAbsolutePath();
+            loadDocument( in, documentPath, f.getName(), 
                           new Parser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()), false,
                           CharacterEncodingDetector.guessLength( (int) f.length(), "UTF-8"));
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
-                ( frame, JGloss.messages.getString
+                ( this, JGloss.messages.getString
                   ( "error.load.exception", new Object[] 
                       { path, ex.getClass().getName(), ex.getLocalizedMessage() }),
                   JGloss.messages.getString( "error.load.title"),
@@ -825,7 +848,7 @@ public class JGlossFrame implements ActionListener {
         StyleDialog.getComponent().addStyleSheet( doc.getStyleSheet(), getAdditionalStyles());
             
         documentName = title;
-        frame.setTitle( title + ":" + JGloss.messages.getString( "main.title"));
+        setTitle( title + ":" + JGloss.messages.getString( "main.title"));
 
         final StopableReader stin = new StopableReader( in);
         // run import in own thread so we can monitor progress
@@ -839,9 +862,9 @@ public class JGlossFrame implements ActionListener {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         JOptionPane.showConfirmDialog
-                            ( frame, JGloss.messages.getString
+                            ( JGlossFrame.this, JGloss.messages.getString
                               ( "error.import.exception", new Object[] 
-                                  { tpath, ex.getLocalizedMessage() }),
+                                  { tpath, ex.getClass().getName(), ex.getLocalizedMessage() }),
                               JGloss.messages.getString( "error.import.title"),
                               JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
                     }
@@ -850,8 +873,8 @@ public class JGlossFrame implements ActionListener {
         t.start();
 
         ProgressMonitor pm = new ProgressMonitor
-            ( frame, JGloss.messages.getString( "load.progress", 
-                                                new Object[] { path }),
+            ( this, JGloss.messages.getString( "load.progress", 
+                                               new Object[] { path }),
               null, 0, length);
         while (t.isAlive()) {
             try {
@@ -872,9 +895,9 @@ public class JGlossFrame implements ActionListener {
         annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
         annotationEditor.expandNonHidden();
 
-        frame.getContentPane().removeAll();
-        frame.getContentPane().add( split);
-        frame.getContentPane().validate();
+        getContentPane().removeAll();
+        getContentPane().add( split);
+        getContentPane().validate();
         if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN))
             split.setDividerLocation( 1.0f);
 
@@ -965,8 +988,8 @@ public class JGlossFrame implements ActionListener {
             JobAttributes ja = new JobAttributes();
             PageAttributes pa = new PageAttributes();
             pa.setOrigin( PageAttributes.OriginType.PRINTABLE);
-            PrintJob job = frame.getToolkit().getPrintJob
-                ( frame, documentName, ja, pa);
+            PrintJob job = getToolkit().getPrintJob
+                ( this, documentName, ja, pa);
 
             if (job != null) {
                 // do the printing
@@ -1102,7 +1125,7 @@ public class JGlossFrame implements ActionListener {
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
-                ( frame, JGloss.messages.getString
+                ( this, JGloss.messages.getString
                   ( "error.save.exception", new Object[] 
                       { documentPath, ex.getClass().getName(), ex.getLocalizedMessage() }),
                   JGloss.messages.getString( "error.save.title"),
@@ -1120,33 +1143,16 @@ public class JGlossFrame implements ActionListener {
             path = JGloss.getCurrentDir();
         else
             path = new File( documentPath).getPath();
-        JFileChooser f = new JFileChooser( path);
+        JFileChooser f = new SaveFileChooser( path);
         f.setFileHidingEnabled( true);
         f.addChoosableFileFilter( jglossFileFilter);
-        int r = f.showSaveDialog( frame);
+        int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
             documentPath =  f.getSelectedFile().getAbsolutePath();
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-            frame.setTitle( f.getSelectedFile().getName() + 
-                            ":" + JGloss.messages.getString( "main.title"));
+            setTitle( f.getSelectedFile().getName() + 
+                      ":" + JGloss.messages.getString( "main.title"));
             saveDocument();
-        }
-    }
-
-    /**
-     * Runs a file chooser dialog, and if the user accepts opens the selected JGloss document,
-     * either in a new JGlossFrame, or in this if it is currently unused.
-     */
-    private void openDocument() {
-        JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
-        f.addChoosableFileFilter( jglossFileFilter);
-        f.setFileHidingEnabled( true);
-        int r = f.showOpenDialog( frame);
-        if (r == JFileChooser.APPROVE_OPTION) {
-            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-            JGlossFrame which = documentLoaded ? new JGlossFrame() : this;
-            which.documentPath = f.getSelectedFile().getAbsolutePath();
-            which.loadDocument( f.getSelectedFile().getAbsolutePath());
         }
     }
 
@@ -1165,7 +1171,7 @@ public class JGlossFrame implements ActionListener {
      * Exports the document as plain text to a user-specified file.
      */
     private void doExportPlainText() {
-        JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
+        JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
         f.setDialogTitle( JGloss.messages.getString( "export.plaintext.title"));
         f.setFileHidingEnabled( true);
 
@@ -1217,7 +1223,7 @@ public class JGlossFrame implements ActionListener {
         p.add( createSpaceEater( b2, false));
         f.setAccessory( p);
 
-        int r = f.showSaveDialog( frame);
+        int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             Writer out = null;
@@ -1238,7 +1244,7 @@ public class JGlossFrame implements ActionListener {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
-                    ( frame, JGloss.messages.getString
+                    ( this, JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
                           { documentPath, ex.getClass().getName(),
                             ex.getLocalizedMessage() }),
@@ -1258,19 +1264,12 @@ public class JGlossFrame implements ActionListener {
      * Exports the document as plain text to a user-specified file.
      */
     private void doExportLaTeX() {
-        JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
+        JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
         f.setDialogTitle( JGloss.messages.getString( "export.latex.title"));
         f.setFileHidingEnabled( true);
-        f.setFileFilter( new javax.swing.filechooser.FileFilter() {
-                public boolean accept( File file) {
-                    return file.isDirectory() ||
-                        file.getName().toLowerCase().endsWith( ".tex");
-                }  
-                public String getDescription() { 
-                    return JGloss.messages.getString( "filefilter.latex.description");
-                }
-            });
-
+        f.setFileFilter( new ExtensionFileFilter( "tex", 
+                                                  JGloss.messages.getString
+                                                  ( "filefilter.latex.description")));
 
         // setup the encoding chooser
         JPanel p = new JPanel();
@@ -1320,7 +1319,7 @@ public class JGlossFrame implements ActionListener {
         p.add( createSpaceEater( b2, false));
         f.setAccessory( p);
 
-        int r = f.showSaveDialog( frame);
+        int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             Writer out = null;
@@ -1341,7 +1340,7 @@ public class JGlossFrame implements ActionListener {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
-                    ( frame, JGloss.messages.getString
+                    ( this, JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
                           { documentPath, ex.getClass().getName(),
                             ex.getLocalizedMessage() }),
@@ -1361,18 +1360,11 @@ public class JGlossFrame implements ActionListener {
      * Exports the document as HTML to a user-specified file.
      */
     private void doExportHTML() {
-        JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
+        JFileChooser f = new SaveFileChooser( JGloss.getCurrentDir());
         f.setDialogTitle( JGloss.messages.getString( "export.html.title"));
         f.setFileHidingEnabled( true);
-        f.setFileFilter( new javax.swing.filechooser.FileFilter() {
-                public boolean accept( File file) {
-                    return file.isDirectory() ||
-                        file.getName().toLowerCase().endsWith( ".html");
-                }  
-                public String getDescription() { 
-                    return JGloss.messages.getString( "filefilter.html.description");
-                }
-            });
+        f.setFileFilter( new ExtensionFileFilter
+            ( "html", JGloss.messages.getString( "filefilter.html.description")));
 
         // setup the encoding chooser
         JPanel p = new JPanel();
@@ -1443,7 +1435,7 @@ public class JGlossFrame implements ActionListener {
         p.add( createSpaceEater( b2, false));
         f.setAccessory( p);
 
-        int r = f.showSaveDialog( frame);
+        int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             Writer out = null;
@@ -1469,7 +1461,7 @@ public class JGlossFrame implements ActionListener {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
-                    ( frame, JGloss.messages.getString
+                    ( this, JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
                           { documentPath, ex.getClass().getName(),
                             ex.getLocalizedMessage() }),
@@ -1494,7 +1486,7 @@ public class JGlossFrame implements ActionListener {
             path = JGloss.getCurrentDir();
         else
             path = new File( documentPath).getPath();
-        JFileChooser f = new JFileChooser( path);
+        JFileChooser f = new SaveFileChooser( path);
         f.setDialogTitle( JGloss.messages.getString( "export.annotationlist.title"));
         f.setFileHidingEnabled( true);
 
@@ -1514,7 +1506,7 @@ public class JGlossFrame implements ActionListener {
         p.add( createSpaceEater( b, false));
         f.setAccessory( p);
 
-        int r = f.showSaveDialog( frame);
+        int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             Writer out = null;
@@ -1552,7 +1544,7 @@ public class JGlossFrame implements ActionListener {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
-                    ( frame, JGloss.messages.getString
+                    ( this, JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
                           { documentPath, ex.getClass().getName(),
                             ex.getLocalizedMessage() }),

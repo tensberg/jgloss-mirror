@@ -1,4 +1,5 @@
-0.9.2: (2001/08/03)
+0.9.2: (2001/08/10)
+	- Added dialog for looking up words in the dictionaries.
         - Added a JGloss servlet. The servlet proxies web pages and
 	  annotates them with Japanese translations.
 	- Extreme speedup of EDICT lookups. The old entry match test was
@@ -15,6 +16,7 @@
 	- Added dictionary form node to annotation editor. This allows
 	  greater control over what will be written in LaTeX and
 	  annotation list exports.
+	- Added equalize annotations function.
 	- HTML export: files now show reading and translation in popup
 	  windows in browsers which support the neccessary JavaScript
 	  functions, and in the status bar.
@@ -24,6 +26,10 @@
 	  now happens in the background. This decreases the perceived
 	  startup time.
 	- Popup menus will be positioned to always fit on the screen.
+	- A dialog will ask for confirmation before existing files are
+	  overwritten.
+	- An extension will automatically be added to file names if no
+	  extension is given by the user.
 0.9.1: (2001/07/13)
 	- Added support for KANJIDIC dictionaries.
 	- Added support for SKK word-reading dictionaries.

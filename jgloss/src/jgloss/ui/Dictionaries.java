@@ -109,13 +109,20 @@ public class Dictionaries extends Box {
      * @return Array of currently active dictionaries.
      */
     public static Dictionary[] getDictionaries() {
-        ListModel m = getComponent().dictionariesOrig;
-        Dictionary[] out = new Dictionary[m.getSize()];
-        for ( int i=0; i<m.getSize(); i++) {
-            out[i] = ((DictionaryWrapper) m.getElementAt( i)).dictionary;
+        synchronized (getComponent()) {
+            // this method might be called early in the initialziation process, so make sure
+            // that the preferences are initialized
+            if (getComponent().dictionariesOrig == null)
+                getComponent().loadPreferences();
+            
+            ListModel m = getComponent().dictionariesOrig;
+            Dictionary[] out = new Dictionary[m.getSize()];
+            for ( int i=0; i<m.getSize(); i++) {
+                out[i] = ((DictionaryWrapper) m.getElementAt( i)).dictionary;
+            }
+            
+            return out;
         }
-
-        return out;
     }
 
     /**
@@ -303,9 +310,13 @@ public class Dictionaries extends Box {
         Preferences p = JGloss.prefs;
         synchronized (p) {
             ListModel m = dictionaries.getModel();
-            String paths = "";
+            // keep the original list of dictionaries in case the user cancels the dialog
+            dictionariesOrig = new DefaultListModel();
+            for ( int i=0; i<m.getSize(); i++)
+                dictionariesOrig.addElement( m.getElementAt( i));
 
             // construct a string which consists of the paths to the dictionary files
+            String paths = "";
             if (m.getSize() > 0) {
                 paths = ((DictionaryWrapper) m.getElementAt( 0)).descriptor;
                 for ( int i=1; i<m.getSize(); i++) {
@@ -314,18 +325,13 @@ public class Dictionaries extends Box {
                 }
             }
             p.set( Preferences.DICTIONARIES, paths);
-
-            // keep the original list of dictionaries in case the user cancels the dialog
-            dictionariesOrig = new DefaultListModel();
-            for ( int i=0; i<m.getSize(); i++)
-                dictionariesOrig.addElement( m.getElementAt( i));
         }
     }
 
     /**
      * Initializes the list of displayed dictionaries from the preferences setting.
      */
-    public void loadPreferences() {
+    public synchronized void loadPreferences() {
         Preferences p = JGloss.prefs;
         synchronized (p) {
             // since creating the dictionaries from a file takes a long time, they are

@@ -90,7 +90,7 @@ public class EDict implements Dictionary {
     /**
      * Random number generator. Used for randomized quicksort in index creation.
      */
-    protected Random random;
+    protected static Random random = new Random();
 
     /**
      * Object describing this implementation of the <CODE>Dictionary</CODE> interface. The
@@ -159,7 +159,6 @@ public class EDict implements Dictionary {
      */
     public EDict( String dicfile, boolean createindex) throws IOException {
         this.dicfile = dicfile;
-        random = new Random();
 
         File df = new File( dicfile);
         name = df.getName();
@@ -734,7 +733,7 @@ public class EDict implements Dictionary {
      * the comparison and returning equality at word boundaries, the method will compare at
      * most 20 bytes starting from the index positions. This increases the chance of
      * inequality even if the indexed words would compare equal. It is done this way because quicksort
-     * behaves very badly if there are many equalities.
+     * behaves lousy if there are many equalities.
      *
      * @param i1 Index in the dictionary to the first string.
      * @param i2 Index in the dictionary to the second string.
@@ -798,6 +797,10 @@ public class EDict implements Dictionary {
         return (c1-c2) > 0 ? 1 : -1;
     }
 
+    /**
+     * Sorts a part of the index array using randomized quicksort. Call this with
+     * (0, indexLenght-1) to sort the whole index.
+     */
     protected void quicksortIndex( int left, int right) {
         if (left >= right)
             return;

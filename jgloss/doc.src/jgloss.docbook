@@ -35,7 +35,7 @@
   </bookinfo>
 
   <chapter><title>Introduction</title>
-    <sect1><title>What it is</title>
+    <sect1><title>About JGloss</title>
       <para>
         &JGloss; is an application for adding reading and translation annotations
         to words in a Japanese text document. This can be done automatically and
@@ -70,12 +70,13 @@
         <ulink url="ftp://ftp.cc.monash.edu.au/pub/nihongo/www-jdict.ps.gz">ideas from the WWWJDIC</ulink>.
         The character encoding detection uses code from Yasuhiro Tonooka's 
         <application>kcc</application> (Kanji Code Converter) program.
-        The French localization is written by Alexandre Beraud.
+        The French localization is contributed by Alexandre Beraud.
       </para>
     </sect1>
     <sect1><title>License</title>
       <para>
-        &JGloss; is licensed under the terms of the GNU General Public License.
+        &JGloss; is licensed under the terms of the 
+        <ulink url="http://www.gnu.org/gpl.html">GNU General Public License</ulink>.
         It comes with ABSOLUTELY NO WARRANTY. This is free software, and you are
         welcome to redistribute it under certain conditions. Read the 
         license for details.
@@ -114,7 +115,7 @@
                 &JGloss; can use the <acronym>XJDX</acronym> index files used by <abbrev>e. g.</abbrev>
                 <application>XJDIC</application> or <application>GJiten</application>, or
                 index files in its own format <acronym>JJDX</acronym>. 
-                If no index file is found, it will automatically be created.
+                If no index file is found, it will be created automatically.
               </para>
             </listitem>
           </varlistentry>
@@ -138,7 +139,7 @@
             <listitem>
               <para>
                 The SKK dictionaries provide a mapping from readings to words (no translations).
-                They are usually used for Japanese input methods, but &JGloss; uses them
+                They are usually used for Japanese input methods, but &JGloss; can use them
                 to look up readings for kanji words.
               </para>
             </listitem>
@@ -153,7 +154,7 @@
         double-clicking the <filename>jgloss.jar</filename> file should start the application.
         To start &JGloss; from a shell, change to the directory which contains the 
         <acronym>JAR</acronym> file and enter <userinput>java -jar jgloss.jar</userinput>.
-        JGloss has some command line options, which can be added to the command line:
+        JGloss has some command line options:
         <userinput>java -jar jgloss.jar [option] file ...</userinput>.
         <variablelist id="sect.options"><title>Options</title>
           <varlistentry>
@@ -172,7 +173,7 @@
             <listitem>
               <para>
                 Creates JJDX index files for the dictionary files given on the command
-                line. The index files will be written to the local
+                line. The index files will be saved in the current
                 directory. &JGloss; tries to create a JJDX index file for a dictionary file
                 automatically when none is found. If this fails, for example because a normal
                 user has no write permissions for the dictionary directory, you can log in
@@ -197,7 +198,7 @@
               <para>
                 Instead of opening an empty JGloss document window, a window will be opened
                 in which you can paste text. The text will be imported in a new JGloss document.
-                This is mainly useful with the X select-and-paste approach to copying text,
+                This is mainly useful with the X11 select-and-paste approach to copying text,
                 which does not work with the <guimenuitem>Import Clipboard</guimenuitem> function.
                 Note that in order to copy Japanese characters from 
                 <application>Netscape Navigator/Communicator</application>
@@ -215,7 +216,7 @@
         If Japanese is set as your computer system's default language, &JGloss; should work without
         any further setup. If not, you should at least have a Japanese font installed.
         A Japanese input method, while not required, should also be installed.
-        If you are using Sun's <application>Java Runtime Environment</application>, make sure
+        If you are using Sun's <application>Java Runtime Environment</application> for Windows, make sure
         that you have the international version installed (the smaller version comes only with
         English locale settings).
       </para>
@@ -252,6 +253,22 @@
         to use one of the methods mentioned above to get Java to use Japanese fonts. I had no luck
         so far in getting the JRE to use the input method under <application>Windows 98</application>.
       </para>
+      <sect2><title>Java and X11 fonts</title>
+        <para>
+          The <filename>font.properties.ja</filename> file of the Linux version of Java is configured for
+          fonts contained in the Japanese distribution of Red Hat 6.1 (and the international
+          7.x with Japanese support installed). It seems that these fonts (wadalab-gothic.ttf
+          and watanabe-mincho.ttf) are not contained in most other Linux distributions. To make things
+          worse, Java only seems to accept TrueType fonts and not the Japanese bitmap fonts commonly
+          installed with X11. This means that you will either have to install the mentioned
+          TrueType fonts or edit the properties file to use a different already installed
+          Japanese TrueType font.
+        </para>
+        <para>
+          I won't go in the details of installing a Japanese TrueType font under X11. If you would
+          volunteer to write that part, please contact me.
+        </para>
+      </sect2>
     </sect1>
 
     <sect1><title>Do It Yourself</title>
@@ -285,11 +302,12 @@
           <varlistentry><term><command>jgloss-www</command></term>
             <listitem>
               <para>
-                Builds the JGloss-WWW servlet. The components will be placed in the
+                Builds the (experimental) JGloss-WWW servlet. The components will be placed in the
                 <filename>jgloss-www</filename> directory. This is an experimental servlet
                 which rewrites Japanese web pages. Words in the page are looked up and
                 annotated with the dictionary entries. JavaScript is used to display the
-                result in the browser.
+                result in the browser. You can find documentation for the servlet in
+                <filename>src/www/index.html</filename>.
               </para>
             </listitem>
           </varlistentry>
@@ -365,7 +383,8 @@
         The left part of the window shows the annotated document. An annotated word is shown
         in light red, with the reading annotation above and the translation annotation below the
         word. The right part of the window contains the annotation editor. For every annotated word,
-        it will display the word and below it the current reading and translation annotation, and
+        it will display the word and below it the current reading and translation annotation, 
+        the dictionary form of the entry, and
         all readings and translations found in the dictionary. You can use the annotation editor
         to change the reading and translation of a word, either by selecting one of the listed
         entries, or by selecting the current reading/translation item and entering the new text.
@@ -437,7 +456,8 @@
         a context menu with options for this annotation (see 
         <xref linkend="sect.menu.annotation">). To add an annotation, select some text
         and use <guimenuitem>Annotate Selection</guimenuitem> in the <guimenu>Edit</guimenu> menu
-        (see <xref linkend="sect.menu.edit">).
+        (see <xref linkend="sect.menu.edit">). To look up the selection in the dictionaries,
+        select <guimenuitem>Word Lookup</guimenuitem>.
       </para>
     </sect1>
 
@@ -464,6 +484,14 @@
         will be updated with the new reading.
         The second item shows the current translation. It is edited in the same way as the
         reading.
+      </para>
+      <para>
+        The dictionary form entry shows the dictionary form of the annotated word. This form
+        will be used for the user dictionary entry, the annotation list and the LaTeX export
+        format. The dictionary form will be set when you select the reading from one of the
+        dictionary entries. To edit it manually, hit <keycap>space</keycap> when the
+        dictionary entry node is selected. This will show the word and reading parts of the
+        entry, which you can edit like the translation nodes.
       </para>
       <para>
         Some text documents you can find on the net are already annotated with readings 
@@ -514,6 +542,15 @@
             <row>
               <entry><keycap>e</keycap></entry>
               <entry>Add annotated word to exclusion list</entry>
+            </row>
+            <row>
+              <entry><keycap>u</keycap></entry>
+              <entry>Add annotated word to the user dictionary</entry>
+            </row>
+            <row>
+              <entry><keycap>a</keycap></entry>
+              <entry>Use the reading and translation of the annotated word for all identical words
+                in the document</entry>
             </row>
             <row>
               <entry><keycap>h</keycap></entry>
@@ -654,12 +691,12 @@
           can be processed with <application>platex</application>. <application>platex</application>
           is an extension to TeX for typesetting Japanese documents. It is bundled with
           TeTex.
-        </para>
-        <para>
           The generated document uses the ruby macro for reading annotations. You can find it
           in the <filename>latex-ruby</filename> folder of &JGloss;
         </para>
         <para>
+          The generated document contains footnotes for every annotated word. The footnote
+          will show the dictionary form of the word and the selected translation.
           With the <guilabel>write "hidden" annotations</guilabel> you can control how to
           treat annotations which are marked as <link linkend="sect.menu.annotation">
             <emphasis>hidden</emphasis></link> in the annotation editor. If it is unchecked,
@@ -670,7 +707,8 @@
       <sect2><title>Annotation List</title>
         <para>
           The annotation list export function will write a text file listing all annotations
-          in the document. Annotations will only be written once, duplicate entries will be
+          in the document. The dictionary form and the selected translation of the annotated 
+          word is used. Annotations will only be written once, duplicate entries will be
           skipped. You can use the generated text as a basis for a vocabulary list, but
           the file will need some editing.
         </para>

@@ -60,6 +60,7 @@ button.import=Importieren
 button.save=Speichern
 button.discard=Verwerfen
 button.close=Schließen
+button.overwrite=Überschreiben
 
 jgloss.title=JGloss
 jgloss.version=Version 0.9.2
@@ -72,16 +73,24 @@ splashscreen.initMain=Erstelle Anwendungsfenster
 
 main.usage=Benutzung: jgloss.JGloss [Option] Datei ...\n\
 Optionen:\n\
-\  -h, --help, /?  Zeigt diese Nachricht\n\
-\  -i, --createindex Erzeugt Indexdateien für die in der Kommandozeile\n\
-\                    angegebenen Wörterbuchdateien\n\
-\  -f, --format      Gibt das Wörterbuchformat für die in der Kommandozeile\n\
-\                    angegebenen Dateien aus\n\
-\  -p, --pastewindow Öffnet anstatt einem JGloss-Dokument ein Fenster in\n\
-\                    das Text kopiert werden kann, der dann importiert wird
+\  -h, --help, /?     Zeigt diese Nachricht\n\
+\  -i, --createindex  Erzeugt Indexdateien für die in der Kommandozeile\n\
+\                     angegebenen Wörterbuchdateien\n\
+\  -f, --format       Gibt das Wörterbuchformat für die in der Kommandozeile\n\
+\                     angegebenen Dateien aus\n\
+\  -a, --annotatehtml Annotiert eine HTML-Datei mit Wörterbucheinträgen für\n\
+\                     japanische Wörter. Die Annotationen werden im Browser\n\
+\                     mit Hilfe von JavaScript dargestellt.\n\
+\                     Parameterformat: -a [in [out]]\n\
+\                     Falls in und out ausgelassen werden oder zu '-'\n\
+\                     gesetzt werden wird die Standard-Ein/Ausgabe\n\
+\                     benutzt.\n\
+\  -p, --pastewindow  Öffnet anstatt einem JGloss-Dokument ein Fenster in\n\
+\                     das Text kopiert werden kann, der dann importiert wird.
 main.unknownoption=Unbekannte Option {0}
 main.format=Das Format von {0} scheint {1} zu sein.
-main.format.unrecognized=Das Format von {0} ist nicht bekannt.
+main.format.unrecognized=Das Format von {0} wurde nicht erkannt.
+main.annotatehtml.files=Die Ein- und Ausgabedatei müssen verschieden sein.
 main.title=JGloss
 
 main.menu.file=Datei
@@ -107,6 +116,7 @@ main.menu.print=Drucken...
 main.menu.print.mk=D
 main.menu.close=Schließen
 main.menu.close.mk=S
+main.menu.wordlookup=Wörterbuch
 main.menu.preferences=Voreinstellungen
 main.menu.preferences.mk=V
 main.menu.view=Ansicht
@@ -144,7 +154,13 @@ dictionaries.button.down=Eintrag nach unten
 dictionaries.button.add=Wörterbuch hinzufügen...
 dictionaries.button.remove=Eintrag entfernen
 
-style.title=Allgemein
+general.title=Allgemein
+general.startup=Beim Start
+general.startup.jglossframe=Öffne leeres JGloss-Dokument
+general.startup.wordlookup=Öffne Wörterbuch-Dialog
+general.editor.enableediting=Direktes Editieren ermöglichen (fehlerhaft)
+
+style.title=Darstellung
 style.text=Text
 style.reading=Lesung
 style.translation=Übersetzung
@@ -154,7 +170,6 @@ style.text.usecolor=Hintergrundfarbe:
 style.text.colorchooser.title=Hintergrundfarbe auswählen
 style.highlight.color=Auswahlfarbe für Annotationen:
 style.highlight.colorchooser.title=Auswahlfarbe für Annotationen
-style.editor.enableediting=Direktes Editieren ermöglichen (fehlerhaft)
 
 exclusions.title=Ausschlüsse
 exclusions.button.add=Wort hinzufügen...
@@ -179,6 +194,10 @@ print.title=Dokument drucken
 
 annotationeditor.reading=Lesung:\ 
 annotationeditor.translation=Übersetzung:\ 
+annotationeditor.dictionaryform=Wörterbuchform:\ 
+annotationeditor.dictionaryform.none=(keine)
+annotationeditor.dictionaryform.word=Wort:\ 
+annotationeditor.dictionaryform.reading=Lesung:\ 
 annotationeditor.readingannotation=Lesung aus {0}: {1}
 annotationeditor.menu.title=Annotation
 annotationeditor.menu.usereading=Diese Lesung benutzen
@@ -187,7 +206,9 @@ annotationeditor.menu.hide=Annotation ausblenden
 annotationeditor.menu.show=Annotation einblenden
 annotationeditor.menu.remove=Annotation entfernen
 annotationeditor.menu.removeduplicates=Entferne Anno. & Duplikate
+annotationeditor.menu.equalize=Für Alle benutzen
 annotationeditor.menu.addtoexclusions=Zu Ausschlüssen hinzufügen
+annotationeditor.menu.addtodictionary=Zu Wörterbuch hinzufügen
 annotationeditor.menu.add=Annotation hinzufügen
 annotationeditor.menu.hideduplicates=Alle Duplikate ausblenden
 annotationeditor.menu.unhide=Alle Annotationen einblenden
@@ -216,11 +237,38 @@ about.license.title=GNU General Public License
 
 preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
 
-filefilter.description=JGloss Dokumente (*.jgloss)
+filefilter.jgloss.description=JGloss Dokumente (*.jgloss)
 filefilter.html.description=HTML Dokumente (*.html)
 filefilter.latex.description=LaTeX Dokumente (*.tex)
+
+filechooser.overwrite.title=Datei überschreiben?
+filechooser.overwrite=Die ausgewählte Datei {0} existiert\nbereits. Überschreiben?
 
 encodings.default=<auto>
 
 pasteimport.title=JGloss Import
 pasteimport.description=Text, der in dieses Fenster kopiert wird, wird in \nein neues JGloss-Dokument importiert.
+pasteimport.standby=Bitte warten sie während das Dokument geöffnet wird.
+
+userdictionary.name=Benutzerwörterbuch
+userdictionary.instance.name=Benutzerwörterbuch (editierbares EDICT)
+
+wordlookup.title=JGloss Wörterbuch
+wordlookup.searchoptions=Suchoptionen
+wordlookup.choice.exact=Exakte Übereinstimmung
+wordlookup.choice.startswith=Beginnt mit Wort
+wordlookup.choice.endswith=Endet mit Wort
+wordlookup.choice.any=Beliebige Übereinstimmung
+wordlookup.choice.verbdeinflection=Benutze De-Inflektion
+wordlookup.dictionaryselection=Wörterbuch-Auswahl
+wordlookup.choice.dictionary=Suche in Wörterbuch
+wordlookup.choice.alldictionaries=Suche in allen Wörterbüchern
+wordlookup.enterexpression=Suchwort:
+wordlookup.search=Suchen
+wordlookup.clear=Löschen
+wordlookup.result=Suchergebnis:
+wordlookup.nodictionary=<keine verfügbar>
+wordlookup.matches=Treffer in\ 
+wordlookup.matchesfor=Einträge für {0}:
+wordlookup.nomatches=Keine Einträge für {0} gefunden
+wordlookup.inflection=Mögliche Inflektion: {0}, {1}->{2}

@@ -112,6 +112,12 @@ public class Preferences {
     public static final String EXCLUSIONS_FILE = "exclusions.file";
     public static final String USERDICTIONARY_FILE = "userdictionary.file";
 
+    public static final String STARTUP_WORDLOOKUP = "startup.wordlookup";
+
+    public static final String WORDLOOKUP_SEARCHTYPE = "wordlookup.searchtype";
+    public static final String WORDLOOKUP_DEINFLECTION = "wordlookup.deinflection";
+    public static final String WORDLOOKUP_ALLDICTIONARIES = "wordlookup.alldictionaries";
+    
     /**
      * Path to the user preferences file.
      */

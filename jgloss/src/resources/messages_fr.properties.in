@@ -45,13 +45,13 @@ error.exclusions.save=Une arreur a eu lieu lors de l''écriture de la\nliste d''e
 error.exclusions.load.title=Erreur à la lecture de la liste d'exclusion
 error.exclusions.load=Une erreur a eu lieu à la lecture de la\nliste d''exclusion dans {0}.\nL''exclusion Java était {1}, {2}.
 error.import.title=Erreur lors de l'import du fichier
-error.import.exception=Une erreur a eu lieu durant l''import de {0}:\n{1}.
+error.import.exception=Une erreur a eu lieu durant l''import de {0}.\nL''exclusion Java était {1}, {2}.
 error.export.title=Erreur lors de l'export du fichier
-error.export.exception=Une erreur a eu lieu durant l''export de:\n{0}.
+error.export.exception=Une erreur a eu lieu durant l''export.\nL''exclusion Java était {1}, {2}.
 error.load.title=Erreur de chargement de fichier
-error.load.exception=Une erreur a eu lieu durant le chargement de {0}:\n{1}.
+error.load.exception=Une erreur a eu lieu durant le chargement de {0}.\nL''exclusion Java était {1}, {2}.
 error.save.title=Erreur de sauvegarde de gichier
-error.save.exception=Une erreur a eu lieu durant la sauvegarde de {0}:\n{1}.
+error.save.exception=Une erreur a eu lieu durant la sauvegarde de {0}.\nL''exclusion Java était {1}, {2}.
 error.save.unknownannotation=Abandon du type d''annotation inconnu {0}
 
 button.ok=OK
@@ -73,14 +73,20 @@ splashscreen.initMain=création de la fenêtre d'application
 
 main.usage=Utilisation: jgloss.JGloss [option] fichier ...\n\
 Options:\n\
-\  -h, --help, /?    Affiche ce message\n\
-\  -i, --createindex Crée des fichiers index pour le dictionnaire\n\
-\                    donné en ligne de commande\n\
-\  -f, --format      Imprime le format de dictionnaire des fichiers\n\
-\                    donnés en ligne de commande\n\
+\  -h, --help, /?     Affiche ce message\n\
+\  -i, --createindex  Crée des fichiers index pour le dictionnaire\n\
+\                     donné en ligne de commande\n\
+\  -f, --format       Imprime le format de dictionnaire des fichiers\n\
+\                     donnés en ligne de commande\n\
+\  -a, --annotatehtml Annotate a HTML file with dictionary entries\n\
+\                     for Japanese words. JavaScript will be used\n\
+\                     to display the results in a browser.\n\
+\                     parameter format: -a [in [out]]\n\
+\                     If in or out are left out or are set to '-'\n\
+\                     stdin/stdout will be used.\n\
 \  -p, --pastewindow Instead of opening a JGloss document, shows\n\
 \                    a window in which you can paste text which\n\
-\                    will be imported
+\                    will be imported.
 main.unknownoption=Option inconnue {0}
 main.format=Le format de {0} semble être {1}.
 main.format.unrecognized={0} n''est pas un format de dictionnaire connu.
@@ -88,16 +94,13 @@ main.title=JGloss
 
 main.menu.file=Fichier
 main.menu.import=Importer...
-main.menu.import.ak=control I
 main.menu.import.mk=I
 main.menu.import.tt=Créer un nouveau document en important un fichier
 main.menu.importclipboard=Importer Clipboard
 main.menu.open=Ouvrir...
-main.menu.open.ak=control O
 main.menu.open.mk=O
 main.menu.open.tt=Ouvrir un document JGloss
 main.menu.save=Sauver
-main.menu.save.ak=control S
 main.menu.save.mk=S
 main.menu.save.tt=Sauver le document
 main.menu.saveAs=Sauver en tant que...
@@ -106,18 +109,16 @@ main.menu.saveAs.tt=Sauver le document sous un nouveau nom
 main.menu.export=Exporter
 main.menu.export.mk=E
 main.menu.export.plaintext=Text Plein...
-main.menu.export.plaintext.mk=P
+main.menu.export.plaintext.mk=T
 main.menu.export.latex=LaTeX...
 main.menu.export.plaintext.mk=L
 main.menu.export.html=HTML...
 main.menu.export.html.mk=H
 main.menu.export.annotationlist=Liste d'Annotations...
-main.menu.export.annotationlist.mk=A
+main.menu.export.annotationlist.mk=L
 main.menu.print=Imprimer...
-main.menu.print.ak=control P
 main.menu.print.mk=P
 main.menu.close=Fermer
-main.menu.close.ak=control W
 main.menu.close.mk=C
 main.menu.close.tt=Fermer le Document
 main.menu.preferences=Préférences
@@ -137,16 +138,12 @@ main.dialog.close.message=Sauver les changements dans {0}?
 
 editor.menu.edit=Editer
 editor.menu.cut=Couper
-editor.menu.cut.ak=control X
 editor.menu.cut.mk=C
 editor.menu.copy=Copier
-editor.menu.copy.ak=control C
 editor.menu.copy.mk=O
 editor.menu.paste=Coller
-editor.menu.paste.ak=control V
 editor.menu.paste.mk=P
 editor.menu.addannotation=Annoter la Sélection...
-editor.menu.addannotation.ak=control D
 editor.menu.addannotation.mk=A
 editor.menu.addannotation.tt=Ajoute une annotation à la sélection actuelle
 editor.addannotation.text=SVP entrez le mot à chercher dans\nles dictionnaires pour la nouvelle annotation:
@@ -162,7 +159,9 @@ dictionaries.button.down=Descendre la sélection
 dictionaries.button.add=Ajouter un fichier de dictionnaire...
 dictionaries.button.remove=Enlever la sélection
 
-style.title=Général
+general.title=Général
+general.editor.enableediting=Autoriser l'édition directe (buggué)
+
 style.text=Texte
 style.reading=Lecture
 style.translation=Traduction
@@ -172,7 +171,6 @@ style.text.usecolor=fixer la couleur de fond:
 style.text.colorchooser.title=Choisir la couleur de fond
 style.highlight.color=Couleur de surlignage pour les annotations:
 style.highlight.colorchooser.title=Surlignage d'annotations
-style.editor.enableediting=Autoriser l'édition directe (buggué)
 
 exclusions.title=Exclusions
 exclusions.button.add=Ajouter un mot...

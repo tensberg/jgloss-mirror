@@ -39,6 +39,20 @@ import javax.swing.*;
  */
 public class AboutFrame extends JFrame {
     /**
+     * Action which displays the about dialog.
+     */
+    public final static Action showAction;
+
+    static {
+        showAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    getFrame().show();
+                }
+            };
+        JGlossFrame.initAction( showAction, "main.menu.about");
+    }
+
+    /**
      * The application-wide instance used to display the about information.
      */
     private static JFrame dialog;

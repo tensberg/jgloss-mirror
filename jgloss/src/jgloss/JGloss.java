@@ -112,7 +112,7 @@ public class JGloss {
     /**
      * Starts JGloss.
      *
-     * @param args Arguments to the application. Not used.
+     * @param args Arguments to the application.
      */
     public static void main( String args[]) {
         try {
@@ -178,9 +178,6 @@ public class JGloss {
                     String[] fs = prefs.getPaths( Preferences.DICTIONARIES);
                     Dictionary[] d = new Dictionary[fs.length];
                     try {
-                        for ( int i=0; i<fs.length; i++)
-                            d[i] = DictionaryFactory.createDictionary( fs[i]);
-                        
                         InputStreamReader in;
                         Writer out;
                         if (args.length == 1 || args[1].equals( "-"))
@@ -192,11 +189,20 @@ public class JGloss {
                         if (args.length < 3 || args[2].equals( "-"))
                             out = new BufferedWriter( new OutputStreamWriter
                                 ( System.out, in.getEncoding()));
-                        else
+                        else {
+                            if (!args[1].equals( "-") &&
+                                new File( args[1]).equals( new File( args[2]))) {
+                                System.err.println( messages.getString( "main.annotatehtml.files"));
+                                System.exit( 1);
+                            }
                             out = new BufferedWriter( new OutputStreamWriter
                                 ( new FileOutputStream( args[2]), in.getEncoding()));
+                        }
+
+
+                        for ( int i=0; i<fs.length; i++)
+                            d[i] = DictionaryFactory.createDictionary( fs[i]);                        
                         Parser p = new Parser( d);
-                        //p.setIgnoreNewlines( true);
                         new HTMLAnnotator( p).annotate( in, out, new URLRewriter() {
                                 public String rewrite( String url) { return url; }
                                 public String rewrite( String url, String tag) { return url; }
@@ -210,7 +216,8 @@ public class JGloss {
 
                     System.exit( 0);
                 }
-                else if (args[0].startsWith( "-") || args[0].startsWith( "/")) {
+                else if (args[0].startsWith( "-") || 
+                         File.separatorChar != '/' && args[0].startsWith( "/")) {
                     System.err.println( messages.getString( "main.unknownoption",
                                                             new String[] { args[0] }));
                     System.err.println( messages.getString( "main.usage"));
@@ -238,6 +245,7 @@ public class JGloss {
                         } catch (IllegalArgumentException ex) {}
 
                         PreferencesFrame.getFrame();
+                        WordLookup.getFrame();
                     }
                 }.start();
             splash.setInfo( messages.getString( "splashscreen.initMain"));
@@ -251,8 +259,12 @@ public class JGloss {
                     });
             }
             else {
-                if (args.length == 0)
-                    new JGlossFrame();
+                if (args.length == 0) {
+                    if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP))
+                        WordLookup.getFrame().show();
+                    else
+                        new JGlossFrame();
+                }
                 else
                     for ( int i=0; i<args.length; i++) {
                         JGlossFrame f = new JGlossFrame();
@@ -284,7 +296,8 @@ public class JGloss {
      * @return <CODE>false</CODE>, if the application will not quit.
      */
     public static boolean exit() {
-        if (JGlossFrame.getFrameCount()>0 || pasteFrameActive)
+        if (JGlossFrame.getFrameCount()>0 || WordLookup.getFrame().isVisible() ||
+            pasteFrameActive)
             return false;
 
         // Instantiate a new Thread because the exit() method may have been called from

@@ -61,6 +61,7 @@ button.import=Import
 button.save=Save
 button.discard=Discard
 button.close=Close
+button.overwrite=Overwrite
 
 jgloss.title=JGloss
 jgloss.version=Version 0.9.2
@@ -90,6 +91,7 @@ Options:\n\
 main.unknownoption=Unknown option {0}
 main.format=The format of {0} seems to be {1}.
 main.format.unrecognized={0} is not a recognized dictionary format.
+main.annotatehtml.files=The input and output file must be different.
 main.title=JGloss
 
 main.menu.file=File
@@ -126,6 +128,9 @@ main.menu.close=Close
 main.menu.close.ak=control W
 main.menu.close.mk=C
 main.menu.close.tt=Close the document
+main.menu.wordlookup=Word Lookup
+main.menu.wordlookup.mk=W
+main.menu.wordlookup.ak=control L
 main.menu.preferences=Preferences
 main.menu.preferences.mk=P
 main.menu.view=View
@@ -168,7 +173,13 @@ dictionaries.button.down=Move entry down
 dictionaries.button.add=Add dictionary file...
 dictionaries.button.remove=Remove entry
 
-style.title=General
+general.title=General
+general.startup=On Startup
+general.startup.jglossframe=Open empty JGloss document
+general.startup.wordlookup=Open Word Lookup dialog
+general.editor.enableediting=Enable direct editing (buggy)
+
+style.title=Style
 style.text=Text
 style.reading=Reading
 style.translation=Translation
@@ -178,7 +189,6 @@ style.text.usecolor=set background color:
 style.text.colorchooser.title=Choose background color
 style.highlight.color=Highlight color for annotations:
 style.highlight.colorchooser.title=Annotation highlight
-style.editor.enableediting=Enable direct editing (buggy)
 
 exclusions.title=Exclusions
 exclusions.button.add=Add word...
@@ -215,6 +225,7 @@ annotationeditor.menu.hide=Hide Annotation
 annotationeditor.menu.show=Show Annotation
 annotationeditor.menu.remove=Remove Annotation
 annotationeditor.menu.removeduplicates=Remove Anno. & Duplicates
+annotationeditor.menu.equalize=Use for All
 annotationeditor.menu.addtoexclusions=Add to Exclusions
 annotationeditor.menu.addtodictionary=Add to Dictionary
 annotationeditor.menu.add=Add Annotation
@@ -230,6 +241,7 @@ annotationeditor.action.meta=Do something useful
 annotationeditor.action.meta.ak=released SPACE
 annotationeditor.action.remove.ak=R
 annotationeditor.action.removeduplicates.ak=D
+annotationeditor.action.equalize.ak=A
 annotationeditor.action.addtoexclusions.ak=E
 annotationeditor.action.addtodictionary.ak=U
 annotationeditor.action.hide.ak=H
@@ -258,6 +270,9 @@ filefilter.jgloss.description=JGloss documents (*.jgloss)
 filefilter.html.description=HTML documents (*.html)
 filefilter.latex.description=LaTeX documents (*.tex)
 
+filechooser.overwrite.title=Overwrite file?
+filechooser.overwrite=The selected file "{0}" already exists. Overwrite?
+
 encodings.default=<auto>
 
 pasteimport.title=JGloss Import
@@ -266,3 +281,23 @@ pasteimport.standby=Please wait while the document is opened.
 
 userdictionary.name=user dictionary
 userdictionary.instance.name=User dictionary (editable EDICT)
+
+wordlookup.title=JGloss Word Lookup
+wordlookup.searchoptions=Search Options
+wordlookup.choice.exact=Exact Matches
+wordlookup.choice.startswith=Starts With Expression
+wordlookup.choice.endswith=Ends With Expression
+wordlookup.choice.any=Any Match
+wordlookup.choice.verbdeinflection=Verb Deinflection
+wordlookup.dictionaryselection=Dictionary Selection
+wordlookup.choice.dictionary=Search Dictionary
+wordlookup.choice.alldictionaries=Search All Dictionaries
+wordlookup.enterexpression=Enter Expression:
+wordlookup.search=Search
+wordlookup.clear=Clear
+wordlookup.result=Search result:
+wordlookup.nodictionary=<none available>
+wordlookup.matches=Matches in\ 
+wordlookup.matchesfor=Entries matching {0}:
+wordlookup.nomatches=No matching entries found for {0}
+wordlookup.inflection=Possible inflection: {0}, {1}->{2}

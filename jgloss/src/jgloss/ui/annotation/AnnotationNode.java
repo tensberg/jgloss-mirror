@@ -51,9 +51,9 @@ public class AnnotationNode extends InnerNode {
      */
     private Element annotation;
     /**
-     * The document text contained in the kanji element.
+     * The document text contained in the word element.
      */
-    private String kanjiText;
+    private String wordText;
     /**
      * The child which displays the current reading annotation.
      */
@@ -85,17 +85,27 @@ public class AnnotationNode extends InnerNode {
         // Note that the child elements are guraranteed to exist by the way the element is constructed
         // in JGlossDocument.JGlossReader.
         this.annotation = annotation;
-        Element kanjiElement = annotation.getElement( 1);
+        Element wordElement = annotation.getElement( 1);
         try {
-            this.kanjiText = kanjiElement.getDocument().getText( kanjiElement.getStartOffset(),
-                                                                 kanjiElement.getEndOffset()-
-                                                                 kanjiElement.getStartOffset());
+            this.wordText = wordElement.getDocument().getText( wordElement.getStartOffset(),
+                                                                 wordElement.getEndOffset()-
+                                                                 wordElement.getStartOffset());
         } catch (BadLocationException ex) {
             ex.printStackTrace();
         }
         
-        reading = new ReadingTranslationNode( this, true);
-        translation = new ReadingTranslationNode( this, false);
+        reading = new ReadingTranslationNode( this, true) {
+                public void setText( String text) {
+                    super.setText( text);
+                    updateNodeText();
+                }
+            };
+        translation = new ReadingTranslationNode( this, false) {
+                public void setText( String text) {
+                    super.setText( text);
+                    updateNodeText();
+                }
+            };
         dictionaryform = new DictionaryFormNode( this);
         children.add( reading);
         children.add( translation);
@@ -188,11 +198,11 @@ public class AnnotationNode extends InnerNode {
     }
 
     /**
-     * Returns the text of the kanji part of this annotation.
+     * Returns the text of the word part of this annotation.
      *
-     * @return The text of the kanji part.
+     * @return The text of the word part.
      */
-    public String getKanjiText() { return kanjiText; }
+    public String getWordText() { return wordText; }
 
     /**
      * Returns the child node which manages the current reading annotation.
@@ -251,7 +261,6 @@ public class AnnotationNode extends InnerNode {
                     .addRule( AnnotationTags.ANNOTATION.getId() + " { }");
             }
             updateNodeText();
-            root.getModel().nodeChanged( this);
         }
     }
 
@@ -262,7 +271,7 @@ public class AnnotationNode extends InnerNode {
     public void removeAnnotation() {
         try {
             JGlossDocument doc = ((JGlossDocument) annotation.getDocument());
-            doc.setOuterHTML( annotation, kanjiText);
+            doc.setOuterHTML( annotation, wordText);
             // remove the newline which the stupid HTMLDocument.insertHTML insists on adding
             doc.remove( annotation.getEndOffset()-1, 1);
         } catch (Exception ex) {
@@ -297,15 +306,19 @@ public class AnnotationNode extends InnerNode {
      * have changed (for example after being hidden).
      */
     private void updateNodeText() {
-        nodeText = kanjiText + ":";
+        String newNodeText = wordText + ":";
         if (isHidden()) {
-            nodeText += JGloss.messages.getString( "annotationeditor.entry.hidden");
+            newNodeText += JGloss.messages.getString( "annotationeditor.entry.hidden");
             String reading = getReadingNode().getText();
-            if (reading!=null && reading.length()>0)
-                nodeText += " " + reading;
+            if (reading.length() > 0)
+                newNodeText += " " + reading;
             String translation = getTranslationNode().getText();
-            if (translation!=null && translation.length()>0)
-                nodeText += " " + translation;
+            if (translation.length() > 0)
+                newNodeText += " " + translation;
+        }
+        if (!newNodeText.equals( nodeText)) {
+            nodeText = newNodeText;
+            getRootNode().getModel().nodeChanged( this);
         }
     }
 } // class AnnotationNode

@@ -125,8 +125,6 @@ public class StyleDialog extends Box {
     private JButton translationColor;
     private JButton highlightColor;
 
-    private JCheckBox enableEditing;
-
     /**
      * The list of managed style sheets.
      */
@@ -346,15 +344,6 @@ public class StyleDialog extends Box {
         this.add( b);
 
         this.add( Box.createVerticalStrut( 2));
-        // enable editing
-        b = Box.createHorizontalBox();
-        b.add( Box.createHorizontalStrut( 3));
-        enableEditing = new JCheckBox( JGloss.messages.getString( "style.editor.enableediting"));
-        b.add( enableEditing);
-        b.add( Box.createHorizontalGlue());
-        this.add( b);
-
-        this.add( Box.createVerticalStrut( 2));
 
         loadPreferences();
     }
@@ -405,8 +394,6 @@ public class StyleDialog extends Box {
             ( Math.max( 0, JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff))));
         ((ColorIcon) highlightColor.getIcon()).setColor( new Color
             ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xffffff))));
-
-        enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING));
     }
 
     /**
@@ -459,8 +446,6 @@ public class StyleDialog extends Box {
         JGloss.prefs.set( Preferences.FONT_TRANSLATION_BGCOLOR, color.getRGB() & 0xffffff);
         color = ((ColorIcon) highlightColor.getIcon()).getColor();
         JGloss.prefs.set( Preferences.ANNOTATION_HIGHLIGHT_COLOR, color.getRGB() & 0xffffff);
-
-        JGloss.prefs.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
     }
 
     /**

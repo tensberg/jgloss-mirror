@@ -29,6 +29,8 @@ edict.buildindex=Erzeuge Index für Wörterbuch {0}.\nDies kann einige Zeit dauern
 edict.writejjdx=Schreibe JJDX Index für Wörterbuch {0}.
 edict.warning.jjdxversion=WARNUNG: Die Version der JJDX Indexdatei für {0} ist größer als die von dieser Version\von JGloss unterstützte.
 edict.error.writejjdx=Fehler beim Schreiben der JJDX Indexdatei: {0}, {1}
+edict.error.writedictionary=Fehler beim Schreiben der Wörterbuchdatei: {0}, {1}
+edict.editable.name=EDICT (editierbar)
 
 kanjidic.nanori=(nanori, Namenslesung)
 kanjidic.radicalname=(Name des Radikals)

@@ -270,7 +270,8 @@ public abstract class TextAnnotationCodec {
             j = code.indexOf( FIELD_SEPARATOR, i);
             final String reading = code.substring( i, j);
             final jgloss.dictionary.Dictionary d = getDictionary
-                ( JGloss.messages.getString( "parser.dictionary.document"));
+                ( ResourceBundle.getBundle( "resources/messages-dictionary")
+                  .getString( "parser.dictionary.document"));
             return new Reading( start, length, 
                                 new WordReadingPair() {
                                         public String getWord() { return reading; }

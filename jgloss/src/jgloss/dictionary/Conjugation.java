@@ -181,7 +181,8 @@ public class Conjugation {
      */
     public String getDictionaryForm() { return dictionaryForm; }
     /**
-     * Returns a description of the grammatical type of this conjugation.
+     * Returns a description of the grammatical type of this conjugation. The desciption
+     * is localized using the default locale.
      *
      * @return a description.
      */
@@ -218,7 +219,13 @@ public class Conjugation {
                     int i = line.indexOf( '\t');
                     if (i != -1) {
                         String label = line.substring( 0, i).trim();
-                        labels.put( label, messages.getString( RESOURCE_PREFIX + label));
+                        try {
+                            labels.put( label, messages.getString( RESOURCE_PREFIX + label));
+                        } catch (MissingResourceException ex) {
+                            System.err.println( "vconj: missing resource for description " + 
+                                                RESOURCE_PREFIX + label);
+                            labels.put( label, line.substring( i+1).trim());
+                        }
                     }
                 }
                 else { // read conjugations

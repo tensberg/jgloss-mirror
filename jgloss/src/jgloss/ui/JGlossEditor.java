@@ -157,40 +157,17 @@ public class JGlossEditor extends JTextPane {
     private JTextArea tooltip;
 
     /**
-     * Action which cuts out the selected part of the document. Delegates to the HTMLDocuments
-     * cut action.
-     */
-    private Action cutAction;
-    /**
-     * Action which copies the selected part of the document. Delegates to the HTMLDocuments
-     * copy action.
-     */
-    private Action copyAction;
-    /**
-     * Action which pastes the clipboard content. Delegates to the HTMLDocuments
-     * paste action.
-     */
-    private Action pasteAction;
-    /**
      * Action which annotates the current selection.
      */
     private Action addAnnotationAction;
     /**
-     * Cut action of the HTMLDocument.
-     */
-    private Action delegateeCutAction;
-    /**
-     * Copy action of the HTMLDocument.
-     */
-    private Action delegateeCopyAction;
-    /**
-     * Paste action of the HTMLDocument.
-     */
-    private Action delegateePasteAction;
-    /**
      * The menu which contains actions specific to document editing.
      */
     private JMenu editMenu;
+    /**
+     * Manager for the cut/copy/past actions;
+     */
+    private XCVManager xcvManager;
 
     /**
      * Displays a dialog which allows the user to enter the word to look up.
@@ -236,31 +213,12 @@ public class JGlossEditor extends JTextPane {
         super();
         setAutoscrolls( true);
 
-        cutAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    delegateeCutAction.actionPerformed( e);
-                }
-            };
-        cutAction.setEnabled( false);
-        JGlossFrame.initAction( cutAction, "editor.menu.cut");
-        copyAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    delegateeCopyAction.actionPerformed( e);
-                }
-            };
-        copyAction.setEnabled( false);
-        JGlossFrame.initAction( copyAction, "editor.menu.copy");
-        pasteAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    delegateePasteAction.actionPerformed( e);
-                }
-            };
-        pasteAction.setEnabled( false);
-        JGlossFrame.initAction( pasteAction, "editor.menu.paste");
+        xcvManager = new XCVManager( this);
         editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
-        editMenu.add( JGlossFrame.createMenuItem( cutAction));
-        editMenu.add( JGlossFrame.createMenuItem( copyAction));
-        editMenu.add( JGlossFrame.createMenuItem( pasteAction));
+        editMenu.add( JGlossFrame.createMenuItem( xcvManager.getCutAction()));
+        editMenu.add( JGlossFrame.createMenuItem( xcvManager.getCopyAction()));
+        editMenu.add( JGlossFrame.createMenuItem( xcvManager.getPasteAction()));
+        editMenu.addMenuListener( xcvManager.getEditMenuListener());
 
         if (source != null) {
             annotationEditor = source;
@@ -318,7 +276,7 @@ public class JGlossEditor extends JTextPane {
             tooltip.setForeground( tt.getForeground());
             tooltip.setFont( tt.getFont());
 
-            addAnnotationAction =  new AbstractAction() {
+            addAnnotationAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
                         AnnotationNode node = ((AnnotationModel) annotationEditor.getModel()).addAnnotation
                             (getSelectionStart(), getSelectionEnd(),
@@ -338,14 +296,10 @@ public class JGlossEditor extends JTextPane {
             addCaretListener( new CaretListener() {
                     public void caretUpdate( CaretEvent e) {
                         boolean hasSelection = e.getDot() != e.getMark();
-                        cutAction.setEnabled( hasSelection && isEditable());
-                        copyAction.setEnabled( hasSelection);
                         addAnnotationAction.setEnabled( hasSelection);
                     }
                 });
         }
-
-        updateDelegateeActions();
     }
 
     /**
@@ -494,25 +448,6 @@ public class JGlossEditor extends JTextPane {
      */
     public void setEditorKit( JGlossEditorKit kit) {
         super.setEditorKit( kit);
-        updateDelegateeActions();
-    }
-
-    /**
-     * Initializes the delegatee cut/copy/paste actions by looking them up from
-     * <CODE>DefaultEditorKit</CODE>.
-     *
-     * @see javax.swing.text.DefaultEditorKit
-     */
-    private void updateDelegateeActions() {
-        Action[] actions = getActions();
-        for ( int i=0; i<actions.length; i++) {
-            String name = (String) actions[i].getValue( Action.NAME);
-            if (name.equals( DefaultEditorKit.cutAction))
-                delegateeCutAction = actions[i];
-            else if (name.equals( DefaultEditorKit.copyAction))
-                delegateeCopyAction = actions[i];
-            else if (name.equals( DefaultEditorKit.pasteAction))
-                delegateePasteAction = actions[i];
-        }
+        xcvManager.updateActions();
     }
 } // class JEditorPane

@@ -85,6 +85,12 @@ export.latex.ruby.options=overlap,CJK
 exclusions.file=.jgloss-exclusions
 userdictionary.file=.jgloss-userdictionary
 
+startup.wordlookup=false
+
+wordlookup.searchtype=0
+wordlookup.deinflection=true
+wordlookup.alldictionaries=true
+
 # Name of the DTD the javax.swing.text.html.parser.ParserDelegator uses. Found in the
 # Swing source code. There is no way to inquire this programatically. 
 dtd.default=html32

@@ -46,6 +46,20 @@ import javax.swing.event.*;
  */
 public class PreferencesFrame {
     /**
+     * Action which displays the preferences dialog.
+     */
+    public final static Action showAction;
+
+    static {
+        showAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    getFrame().show();
+                }
+            };
+        JGlossFrame.initAction( showAction, "main.menu.preferences");
+    }
+
+    /**
      * The application-wide single instance.
      */
     private static PreferencesFrame prefs;
@@ -127,6 +141,7 @@ public class PreferencesFrame {
 
         JTabbedPane tab = new JTabbedPane();
         tab.setBorder( BorderFactory.createEmptyBorder( 0, 0, 10, 0));
+        tab.addTab( JGloss.messages.getString( "general.title"), GeneralDialog.getComponent());
         tab.addTab( JGloss.messages.getString( "style.title"), StyleDialog.getComponent());
         tab.addTab( JGloss.messages.getString( "dictionaries.title"), Dictionaries.getComponent());
         tab.addTab( JGloss.messages.getString( "exclusions.title"), ExclusionList.getComponent());
@@ -147,6 +162,7 @@ public class PreferencesFrame {
      */
     public void savePreferences() {
         Dictionaries.getComponent().savePreferences();
+        GeneralDialog.getComponent().savePreferences();
         StyleDialog.getComponent().savePreferences();
         ExclusionList.getComponent().savePreferences();
     }
@@ -156,6 +172,7 @@ public class PreferencesFrame {
      */
     public void loadPreferences() {
         Dictionaries.getComponent().loadPreferences();
+        GeneralDialog.getComponent().loadPreferences();
         StyleDialog.getComponent().loadPreferences();
         ExclusionList.getComponent().loadPreferences();
     }
@@ -165,6 +182,7 @@ public class PreferencesFrame {
      */
     public void applyPreferences() {
         Dictionaries.getComponent().applyPreferences();
+        GeneralDialog.getComponent().applyPreferences();
         StyleDialog.getComponent().applyPreferences();
         ExclusionList.getComponent().applyPreferences();
     }
