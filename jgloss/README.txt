@@ -22,7 +22,7 @@ executing "make doc", or you can read the documentation source
 
 JGloss 1.0.3 fixed some bugs in the EDICT implementation. To improve dictionary
 lookup accuracy, you should delete any old .jjdx index files created by
-previous versions of JGloss.
+versions of JGloss before 1.0.3.
 
 Known problems:
   - When the ChaSen parser is used with JRE 1.3 on Windows 98/ME/XP, a window
@@ -39,7 +39,7 @@ Known problems:
   - On Linux force-quitting JGloss by typing Control-C or using kill -HUP
     sometimes doesn't work.
   - The custom user interface font chosen in the style dialog is applied
-    thorough the application only after JGloss is restarted.
+    throughout the application only after JGloss is restarted.
   - Pasting text in the text field of the input dialog does not work with non-
     Japanese Windows. Use Import Clipboard instead.
   - Import Clipboard does not work in MacOS X, unless the system language is

@@ -72,7 +72,8 @@
         The character encoding detection uses code from Yasuhiro Tonooka's 
         <application>kcc</application> (Kanji Code Converter).
         The French localization is contributed by Alexandre Beraud.
-        Heinrich Künsting helped with the LaTeX export function.
+        Heinrich Künsting helped with the LaTeX export template design and wrote the LaTeX-CJK list
+        template.
         Some of the file chooser icons are taken from 
         <ulink url="http://artists.kde.org">the KDE project</ulink>.
       </para>

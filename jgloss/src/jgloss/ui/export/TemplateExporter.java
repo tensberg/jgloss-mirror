@@ -739,7 +739,7 @@ public abstract class TemplateExporter {
                     line = line.substring( 1);
                 line = line.trim();
                 if (line.length() == 0)
-                    description.append( "\n\n");
+                    description.append( "\n");
                 else {
                     description.append( line);
                     description.append( ' ');

@@ -1,20 +1,22 @@
 %encoding: EUC-JP
-%short-description: LaTeX-CJK - transl. at end - hyperlinks
+%short-description: LaTeX-CJK - Uebers. am Ende - Hyperlinks
 %description
-% Generate a latex/pdflatex input file which uses the CJK and hyperref
-% macro packages. Translations are put in a list after the main text.
-% Hyperlinks between text paragraphs and
-% vocabulary paragraphs are inserted, and paragraphs are bookmarked.
+% Generiert eine Latex/PDFLatex-Quelldatei, die das CJK- und
+% Hyperref-Makro-Package benutzt. Uebersetzungen werden in einer Liste dem Text
+% angefuegt. Hyperlinks zwischen Textabsaetzen und Vokabel-Absaetzen 
+% werden eingefuegt, und fuer Absaetze werden Lesezeichen generiert.
 %
-% Run latex twice on the document to get the bookmarks right.
+% Fuehren sie Latex zweimal aus, damit die Lesezeichen korrekt generiert
+% werden. 
 %end description
-% This is a EUC-JP encoded Japanese LaTeX document generated
-% by JGloss from %document-filename% on %generation-time%.
-% The CJK macro package must be installed to process this file.
+% Dies ist ein EUC-JP-kodiertes japanisches LaTeX-Dokument, generiert
+% von JGloss aus %document-filename% am %generation-time%.
+% Das CJK Makro-Package muss installiert sein, um diese Datei zu
+% verarbeiten.
 %
 % template-author: Heinrich Kuensting <heinrich.kuensting@gmx.net>
-% The template file may be freely redistributed unmodified
-% or modified.
+% Die Template-Datei kann ohne Einschraenkungen unmodifiziert
+% oder modifiziert weitergegeben werden.
 % $Id$
 
 \newif\ifpdf
@@ -31,7 +33,7 @@
    \usepackage[pdftex]{graphicx}
    \usepackage[pdfpagemode={UseOutlines},        %FullScreen, None
                pdftitle={%document-title%},
-               %pdfauthor={Your name here},
+               %pdfauthor={Ihr Name hier},
                pdfsubject={Annotated Japanese Document},
                pdfkeywords={JGloss, PDF, PDFLatex, Japan, Japanese},
                pdfstartview={FitBH},
@@ -55,7 +57,7 @@
 
 \renewcommand{\thefootnote}{}
 \newcommand{\fn}[3]{\noindent \makebox[\ww][l]{#1} \makebox[\rw][l]{#2} \parbox[t]{\tw}{#3}}
-\newcommand{\para}[1]{\noindent \textbf{Paragraph #1}}
+\newcommand{\para}[1]{\noindent \textbf{Absatz #1}}
 
 \begin{document}
 \begin{CJK*}[dnp]{JIS}{min}
@@ -68,14 +70,14 @@
 \markright{%document-title%}
     
 %document-text
-%paragraph-start: \\hypertarget{text_para %paragraph-number%}{}\n\\pdfbookmark[1]{Text paragraph %paragraph-number%}{text_para %paragraph-number%}\n\\noindent\\hyperlink{voc_para %paragraph-number%}{\\tiny$\\diamondsuit$}\n
+%paragraph-start: \\hypertarget{text_para %paragraph-number%}{}\n\\pdfbookmark[1]{Absatz %paragraph-number%}{text_para %paragraph-number%}\n\\noindent\\hyperlink{voc_para %paragraph-number%}{\\tiny$\\diamondsuit$}\n
 %reading: \\ruby{%word%}{%reading%}
 %paragraph-end: \n\n\\bigskip\n\n
 %end document-text
 
 \newpage
 \small
-\markright{%document-title% --- Vocabulary List}
+\markright{%document-title% --- Vokabelliste}
 \newlength{\ww}
 \settowidth{\ww}{%longest-word%--}
 \newlength{\rw}
@@ -87,11 +89,11 @@
 \addtolength{\tw}{-1.0\rw}
 \addtolength{\tw}{-5pt}
 
-\hypertarget{Vocabulary}{}
-\pdfbookmark[1]{Vocabulary}{Vocabulary}
+\hypertarget{Vokabeln}{}
+\pdfbookmark[1]{Vokabeln}{Vokabeln}
 
 %annotation-list
-%paragraph-start: \\hypertarget{voc_para %paragraph-number%}{\\para{%paragraph-number%}}\n\\pdfbookmark[2]{Vocabulary %paragraph-number%}{voc_para %paragraph-number%}\n\\noindent\\hyperlink{text_para %paragraph-number%}{\\tiny$\\diamondsuit$}\n\n
+%paragraph-start: \\hypertarget{voc_para %paragraph-number%}{\\para{%paragraph-number%}}\n\\pdfbookmark[2]{Vokabeln %paragraph-number%}{voc_para %paragraph-number%}\n\\noindent\\hyperlink{text_para %paragraph-number%}{\\tiny$\\diamondsuit$}\n\n
 %paragraph-end: \n\\bigskip\n\n
 %translation: \\fn{%word%}{%reading%}{%translation%}\n
 %end annotation-list

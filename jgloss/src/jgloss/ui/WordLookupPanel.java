@@ -546,6 +546,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         }
         else {
             resultPlain.setText( resultText.toString());
+            resultPlain.setCaretPosition( 0);
             if (resultScroller.getViewport().getView() != resultPlain) {
                 resultScroller.setViewportView( resultPlain);
                 resultFancy.setDocument( ((HTMLEditorKit) resultFancy.getEditorKit())

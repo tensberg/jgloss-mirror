@@ -297,6 +297,7 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
         if (description==null || description.length()==0)
             description = JGloss.messages.getString( "export.template.nodescription");
         templateDescription.setText( description);
+        templateDescription.setCaretPosition( 0);
     }
 
     /**

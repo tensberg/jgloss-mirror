@@ -1,4 +1,4 @@
-1.0.4: (2002/04/23)
+1.0.4: (2002/05/06)
 	- Added template-based LaTeX-export.
 	- For long translations, a shorter translation entry is
 	  automatically added (mainly noticeable with GDICT).
@@ -10,6 +10,7 @@
 	  creation.
 	- Fixed font autodetection under J2SE 1.4.
 	- Fixed LaTeX export under J2SE 1.3.
+	- Fixed large result list in word lookup scrolls to end bug.
 1.0.3: (2002/03/17)
 	- Added support for GDICT dictionaries (J2SE 1.4 required).
 	- Reimplementation of EDICT using the NIO API (J2SE 1.4 required).

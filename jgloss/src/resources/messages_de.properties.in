@@ -342,6 +342,7 @@ export.templates=Format:
 export.template.unmatchedbegin=Kein Ende-Marker für {0} in Export-Format gefunden, Zeile {1,number}.
 export.template.patternredefined=Pattern erneut definiert in Export-Format, Zeile {0,number}.
 export.template.unknownline=Die Zeile {0,number} ist an dieser Stelle nicht im Export-Format erlaubt.
+export.template.nodescription=Keine Beschreibung verfügbar.
 export.choosetemplate=Wählen sie eine Vorlage
 export.annotationlist.title=Annotationsliste exportieren
 export.annotationlist.header=\# Annotationsliste fuer {0}\n\# Zeichensatz: {1}\n
@@ -354,6 +355,14 @@ export.html.interactive=Interaktives HTML
 export.html.backwardscompatible=Abwärtskompatibel
 export.latex.title=LaTeX exportieren
 export.latex.fontsize=Fontgröße:
+
+export.latex.templates=\
+/data/templates/platex-top_de.tex.tmpl:\
+/data/templates/platex-list_de.tex.tmpl:\
+/data/templates/platex-ruby_de.tex.tmpl:\
+/data/templates/latexcjk-top_de.tex.tmpl:\
+/data/templates/latexcjk-list_de.tex.tmpl:\
+/data/templates/latexcjk-ruby_de.tex.tmpl
 
 about.frame.title=Über JGloss
 about.text=\

@@ -142,6 +142,7 @@ public class AboutFrame extends JFrame {
             license = new JFrame( JGloss.messages.getString( "about.license.title"));
             JTextArea ta = new JTextArea( gpl.toString());
             ta.setEditable( false);
+            ta.setCaretPosition( 0);
             ta.setFont( new Font( "Monospaced", Font.PLAIN, 11));
             JScrollPane p = new JScrollPane( ta, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                              JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);

@@ -1,18 +1,18 @@
 %encoding: EUC-JP
-%short-description: pLaTeX - translations at end
+%short-description: pLaTeX - Uebers. am Ende
 %description
-% Generate a platex input file. Translations are put in
-% a list after the main text.
+% Generiert eine Platex-Quelldatei. Uebersetzungen werden
+% in einer Liste dem Text angefuegt.
 %end description
-% This is a EUC-JP encoded Japanese LaTeX document generated
-% by JGloss from %document-filename% on %generation-time%.
-% Use platex to process this file.
-% Note that the file ruby-annotation.sty which comes with JGloss
-% must be installed.
+% Dies ist ein EUC-JP-kodiertes japanisches LaTeX-Dokument, generiert
+% von JGloss aus %document-filename% am %generation-time%.
+% Benutzen Sie platex, um die Datei zu verarbeiten.
+% Beachten Sie, dass die Datei ruby-annotation.sty, die JGloss
+% beiliegt, installiert sein muss.
 %
 % template-author: Michael Koch <tensberg@gmx.net>
-% The template file may be freely redistributed unmodified
-% or modified.
+% Die Template-Datei kann ohne Einschraenkungen unmodifiziert
+% oder modifiziert weitergegeben werden.
 % $Id$
 
 \documentclass[%font-size%pt]{jarticle}
@@ -32,7 +32,7 @@
 
 \newpage
 \small
-\markright{%document-title% --- Vocabulary List}
+\markright{%document-title% --- Vokabelliste}
 \newlength{\ww}
 \settowidth{\ww}{%longest-word%--}
 \newlength{\rw}
@@ -44,7 +44,7 @@
 \addtolength{\tw}{-1.0\rw}
 \addtolength{\tw}{-5pt}
 \newcommand{\fn}[3]{\noindent \makebox[\ww][l]{#1} \makebox[\rw][l]{#2} \parbox[t]{\tw}{#3}}
-\newcommand{\para}[1]{\noindent \textbf{Paragraph #1}}
+\newcommand{\para}[1]{\noindent \textbf{Absatz #1}}
 
 %annotation-list
 %paragraph-start: \\para{%paragraph-number%}\n\n
