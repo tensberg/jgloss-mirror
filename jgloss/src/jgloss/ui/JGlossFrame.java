@@ -260,8 +260,9 @@ public class JGlossFrame implements ActionListener {
 
                 public void windowClosed( WindowEvent e) {
                     framecount--;
-                    if (framecount == 0)
+                    if (framecount == 0) {
                         JGloss.exit();
+                    }
                 }
             });
         frame.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -829,6 +830,12 @@ public class JGlossFrame implements ActionListener {
         annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
         annotationEditor.expandNonHidden();
 
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add( split);
+        frame.getContentPane().validate();
+        if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN))
+            split.setDividerLocation( 1.0f);
+
         doc.setAddAnnotations( false);
         exportMenu.setEnabled( true);
         exportPlainTextAction.setEnabled( true);
@@ -843,12 +850,6 @@ public class JGlossFrame implements ActionListener {
 
         docpane.followMouse( showAnnotationItem.isSelected(),
                              editorFollowsMouseItem.isSelected());
-
-        frame.getContentPane().removeAll();
-        frame.getContentPane().add( split);
-        frame.getContentPane().validate();
-        if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN))
-            split.setDividerLocation( 1.0f);
 
         documentLoaded = true;
 
