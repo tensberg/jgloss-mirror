@@ -23,8 +23,6 @@
 
 package jgloss.dictionary;
 
-import jgloss.JGloss;
-
 import java.lang.ref.SoftReference;
 import java.util.*;
 
@@ -35,6 +33,12 @@ import java.util.*;
  * @author Michael Koch
  */
 public class Parser {
+    /**
+     * Localizable message resource.
+     */
+    private final static ResourceBundle messages = 
+        ResourceBundle.getBundle( "resources/messages-dictionary");
+
     /**
      * Thrown if the parsing thread is interrupted by calling its <CODE>interrupt</CODE>
      * method.
@@ -124,7 +128,7 @@ public class Parser {
      * the document. This is used to return a useful name for the dictionary.
      */
     private static final Dictionary documentDictionary = new Dictionary()  {
-            public String getName() { return JGloss.messages.getString( "parser.dictionary.document"); }
+            public String getName() { return messages.getString( "parser.dictionary.document"); }
             public List search( String expression, short mode) { return null; }
             public void dispose() {}
         };
@@ -252,7 +256,7 @@ public class Parser {
      */
     public List parse( char[] text) throws SearchException {
         List out = new ArrayList( text.length/3);
-
+        
         final byte OUTSIDE = 0;
         final byte IN_KATAKANA = 1;
         final byte IN_KANJI = 2;
@@ -265,11 +269,12 @@ public class Parser {
         StringBuffer reading = new StringBuffer();
         StringBuffer inflection = new StringBuffer();
         Character.UnicodeBlock ub;
+        boolean compverb = false;
         for ( int i=0; i<text.length; i++) {
             parsePosition = i; // tell the world where we are in parsing (see getParsePosition())
             if (Thread.currentThread().interrupted())
                 throw new ParsingInterruptedException();
-
+            
             ub = Character.UnicodeBlock.of( text[i]);
             switch (mode) {
             case OUTSIDE:
@@ -300,16 +305,27 @@ public class Parser {
                     }
                 }
                 break;
-
+                
             case END_READING: // previous character ended reading block, treat as if kanji ended
             case IN_KANJI: // currently in Kanji compound
                 if (ub != Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS &&
                     text[i] != '\u3005') { // '\u3005' is the repeat mark
                     // end of current word, look for possible inflection and enter new mode
-                    if (ub == Character.UnicodeBlock.HIRAGANA) { 
-                        // catch possible verb/adjective inflections
-                        mode = IN_INFLECTION;
-                        inflection = new StringBuffer().append( text[i]);
+                    if (ub == Character.UnicodeBlock.HIRAGANA) {
+                        // catch possible composite verb
+                        if (!compverb && mode!=END_READING && word.length()==1 && i<text.length-3 &&
+                            Character.UnicodeBlock.of( text[i+1]) == 
+                            Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS &&
+                            Character.UnicodeBlock.of( text[i+2]) == 
+                            Character.UnicodeBlock.HIRAGANA) {
+                            compverb = true;
+                            // add hiragana char to word
+                        }
+                        else {
+                            // catch possible verb/adjective inflections
+                            mode = IN_INFLECTION;
+                            inflection = new StringBuffer().append( text[i]);
+                        }
                     }
                     else if (text[i]==readingStart && readingStart!='\0') {
                         mode = IN_READING;
@@ -327,12 +343,31 @@ public class Parser {
                     }
                 }
                 break;
-
+                
             case IN_INFLECTION: // currently in possible inflection
                 if (ub != Character.UnicodeBlock.HIRAGANA) {
-                    out.addAll( findTranslations( wordStart, word.toString(), 
-                                                  reading.toString(), inflection.toString(), true, true,
-                                                  true));
+                    // the tests for the setting of the compverb flag guarantee that the
+                    // lookup of a compverb will always happen IN_INFLECTION, and that reading is empty
+                    if (compverb) {
+                        List result = findTranslations( wordStart, word.toString(), null,
+                                                        inflection.toString(), false, false, true);
+                        if (result.size() == 0) {
+                            // try first part of compverb
+                            result = findTranslations( wordStart, word.substring( 0, 1), null,
+                                                       word.substring( 1, 2), false, false, true);
+                            out.addAll( result);
+                            // try last part
+                            result = findTranslations( wordStart+2, word.substring( 2, 3), null,
+                                                       word.substring( 3), false, false, true);
+                        }
+                        out.addAll( result);
+                        compverb = false;
+                    }
+                    else {
+                        out.addAll( findTranslations( wordStart, word.toString(), 
+                                                      reading.toString(), inflection.toString(), true, true,
+                                                      true));
+                    }
                     if (ub == Character.UnicodeBlock.KATAKANA)
                         mode = IN_KATAKANA;
                     else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
@@ -346,7 +381,7 @@ public class Parser {
                 else
                     inflection.append( text[i]);
                 break;
-
+                
             case IN_READING: // currently in reading annotation
                 if (text[i]=='\n' || (i==text.length-1 && text[i] != readingEnd)) {
                     // Don't allow readings to span multiple lines to avoid runaways when
@@ -365,19 +400,37 @@ public class Parser {
                 else
                     mode = END_READING;
             }
-
+            
             if (mode==IN_KANJI || mode==IN_KATAKANA) {
                 word.append( text[i]);
             }
         }
-
+        
         // look up last word in buffer
         if (mode==IN_KATAKANA || mode==IN_KANJI || mode==END_READING)
             out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), true, true,
                                           true));
-        else if (mode == IN_INFLECTION)
-            out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), 
-                                          inflection.toString(), true, true, true));
+        else if (mode == IN_INFLECTION) {
+            if (compverb) {
+                List result = findTranslations( wordStart, word.toString(), null,
+                                                inflection.toString(), false, false, true);
+                if (result.size() == 0) {
+                    // try first part of compverb
+                    result = findTranslations( wordStart, word.substring( 0, 1), null,
+                                               word.substring( 1, 2), false, false, true);
+                    out.addAll( result);
+                    // try last part
+                    result = findTranslations( wordStart+2, word.substring( 2, 3), null,
+                                               word.substring( 3), false, false, true);
+                }
+                out.addAll( result);
+                compverb = false;
+            }
+            else {
+                out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), 
+                                              inflection.toString(), true, true, true));
+            }
+        }
 
         return out;
     }
@@ -586,39 +639,25 @@ public class Parser {
                 int[] lengths = new int[dictionaries.length];
                 int maxlength = 0;
 
-                for ( int i=0; i<dictionaries.length; i++) {
-                    List r = search( dictionaries[i], word.substring( 0, 1), 
-                                     Dictionary.SEARCH_STARTS_WITH);
-                    entries[i] = new LinkedList();
-                    for ( Iterator j=r.iterator(); j.hasNext(); ) {
-                        WordReadingPair wrp = (WordReadingPair) j.next();
-                        String wrpword = wrp.getWord();
-                        if (wrpword.length()>=lengths[i] &&
-                            wrpword.length()<word.length()) {
-                            if (word.startsWith( wrpword)) {
-                                // it is important to remember the length of the word
-                                // even if it is in the exclusion list
-                                if (wrpword.length()>lengths[i]) {
-                                    // we have a new longest match for this dictionary
-                                    // throw previous matches away
-                                    lengths[i] = wrpword.length();
-                                    maxlength = Math.max( wrpword.length(), maxlength);
-                                    entries[i].clear();
-                                }
-                                
-                                if (!(useExclusions && exclusions!=null &&
-                                      exclusions.contains( wrpword)))
-                                    entries[i].add( wrp);
-                            }
+                for ( int i=word.length()-1; i>0; i--) {
+                    String subword = word.substring( 0, i);
+                    for ( int j=0; j<entries.length; j++) {
+                        entries[j] = search( dictionaries[j], subword, Dictionary.SEARCH_EXACT_MATCHES);
+                        if (entries[j].size() > 0) {
+                            maxlength = i;
+                            match = true;
                         }
                     }
+                    if (match)
+                        break;
                 }
 
-                if (maxlength > 0) { // match found
+                if (match) { // match found
                     for ( int i=0; i<dictionaries.length; i++) {
-                        if (entries[i]!=null && lengths[i]==maxlength) {
-                            for ( Iterator j=entries[i].iterator(); j.hasNext(); ) {
-                                WordReadingPair wrp = (WordReadingPair) j.next();
+                        for ( Iterator j=entries[i].iterator(); j.hasNext(); ) {
+                            WordReadingPair wrp = (WordReadingPair) j.next();
+                            if (!(useExclusions && exclusions!=null &&
+                                  exclusions.contains( wrp.getWord()))) {
                                 if (wrp instanceof DictionaryEntry) {
                                     translations.add( new Translation( wordStart, maxlength,
                                                                        (DictionaryEntry) wrp));
@@ -629,13 +668,15 @@ public class Parser {
                             }
                         }
                     }
+                }
+                else
+                    maxlength = 1; // skip first char and lookup remainder
                     
-                    // continue search with suffix of word
-                    if (trySuffixes) {
-                        word = word.substring( maxlength);
-                        wordStart += maxlength;
-                        stop = false;
-                    }
+                // continue search with suffix of word
+                if (trySuffixes) {
+                    word = word.substring( maxlength);
+                    wordStart += maxlength;
+                    stop = false;
                 }
             }
         }
