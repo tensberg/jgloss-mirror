@@ -326,8 +326,8 @@ public class JGlossWriter extends HTMLWriter {
      *         the JGloss file format.
      */
     public static String getFileVersionString() {
-        return "JGloss " + (JGLOSS_VERSION/100) + "." + (JGLOSS_VERSION%100) + 
-            "; file format version " +
+        return "JGloss " + (JGLOSS_VERSION/100) + "." + (JGLOSS_VERSION/10%10) +
+            + (JGLOSS_VERSION%100) + "; file format version " +
             FILE_FORMAT_MAJOR_VERSION + "." + FILE_FORMAT_MINOR_VERSION;
     }
 
