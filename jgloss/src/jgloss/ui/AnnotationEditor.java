@@ -152,6 +152,14 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      */
     private Action removeAction;
     /**
+     * Action which removes all duplicates of the currently selected annotation.
+     */
+    private Action removeDuplicatesAction;
+    /**
+     * Action which adds the word of the selected annotation to the list of excluded words.
+     */
+    private Action addToExclusionsAction;
+    /**
      * Action which will hide all annotations which are a duplicate of a previous annotation.
      */
     private Action hideDuplicatesAction;
@@ -316,9 +324,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
                     while (!(tn instanceof AnnotationNode))
                         tn = tn.getParent();
-                    AnnotationNode krn = (AnnotationNode) tn;
-                    int index = model.getIndexOfChild( model.getRoot(), krn);
-                    krn.removeAnnotation();
+                    AnnotationNode selection = (AnnotationNode) tn;
+                    int index = model.getIndexOfChild( model.getRoot(), selection);
+                    selection.removeAnnotation();
                     // select the following annotation node (or previous if it was the last)
                     if (index >= model.getChildCount( model.getRoot()))
                         index--;
@@ -332,6 +340,52 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             };
         JGlossFrame.initAction( removeAction, "annotationeditor.menu.remove");
         removeAction.setEnabled( false);
+        // Removes all annotations which are a duplicate of the currently selected annotation.
+        // A duplicate has the same kanji, reading and translation.
+        removeDuplicatesAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
+                    while (!(tn instanceof AnnotationNode))
+                        tn = tn.getParent();
+                    AnnotationNode selection = (AnnotationNode) tn;
+                    String kanji = selection.getKanjiText();
+                    String reading = selection.getReadingNode().getText();
+                    String translation = selection.getTranslationNode().getText();
+                    // removing annotations while iterating will throw a ConcurrentModificationException
+                    LinkedList duplicates = new LinkedList();
+                    for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
+                        AnnotationNode node = (AnnotationNode) i.next();
+                        if (node != selection &&
+                            kanji.equals( node.getKanjiText()) &&
+                            reading.equals( node.getReadingNode().getText()) &&
+                            translation.equals( node.getTranslationNode().getText()))
+                            duplicates.add( node);
+                    }
+                    for ( Iterator i=duplicates.iterator(); i.hasNext(); )
+                        ((AnnotationNode) i.next()).removeAnnotation();
+                    // force docpane to be re-layouted. Unfortunately I have not found a better
+                    // way to do this.
+                    doc.getStyleSheet().addRule( AnnotationTags.ANNOTATION.getId() + " { }");
+                }
+            };
+        JGlossFrame.initAction( removeDuplicatesAction, "annotationeditor.menu.removeduplicates");
+        removeDuplicatesAction.setEnabled( false);
+        // add the word of the selected annotation to the list of excluded words
+        addToExclusionsAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
+                    while (!(tn instanceof AnnotationNode))
+                        tn = tn.getParent();
+                    AnnotationNode selection = (AnnotationNode) tn;
+                    String word = selection.getKanjiText();
+                    Parser.TextAnnotation link = selection.getLinkedAnnotation();
+                    if (link!=null && link instanceof AbstractAnnotation)
+                        word = ((AbstractAnnotation) link).getWord();
+                    ExclusionList.addWord( word);
+                }
+            };
+        JGlossFrame.initAction( addToExclusionsAction, "annotationeditor.menu.addtoexclusions");
+        addToExclusionsAction.setEnabled( false);
         // Hide all annotations which are a duplicate of a previous annotation.
         // A duplicate has the same kanji, reading and translation.
         hideDuplicatesAction = new AbstractAction() {
@@ -377,19 +431,21 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         menu = new JMenu( JGloss.messages.getString( "annotationeditor.menu.title"));
         pmenu = new JPopupMenu();
         menu.add( JGlossFrame.createMenuItem( useReadingAction));
-        //pmenu.add( useReadingAction);
         menu.add( JGlossFrame.createMenuItem( useTranslationAction));
-        //pmenu.add( useTranslationAction);
+
+        menu.addSeparator();
         menu.add( JGlossFrame.createMenuItem( hideAction));
         pmenu.add( hideAction);
         menu.add( JGlossFrame.createMenuItem( removeAction));
         pmenu.add( removeAction);
+        menu.add( JGlossFrame.createMenuItem( removeDuplicatesAction));
+        pmenu.add( removeDuplicatesAction);
+        menu.add( JGlossFrame.createMenuItem( addToExclusionsAction));
+        pmenu.add( addToExclusionsAction);
+        
         menu.addSeparator();
-        //pmenu.addSeparator();
         menu.add( JGlossFrame.createMenuItem( hideDuplicatesAction));
-        //pmenu.add( hideDuplicatesAction); // this is not a context-sensitive action
         menu.add( JGlossFrame.createMenuItem( unhideAction));
-        //pmenu.add( unhideAction);
 
         addMouseListener( this);
 
@@ -404,7 +460,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                         while (!(annotation instanceof AnnotationNode))
                             annotation = annotation.getParent();
                         int index = model.getIndexOfChild( model.getRoot(), annotation);
-                        if (index < model.getChildCount( model.getRoot()))
+                        if (index < model.getChildCount( model.getRoot())-1)
                             annotation = (TreeNode) model.getChild( model.getRoot(), index+1);
                         else // last annotation, no new selection
                             annotation = null;
@@ -506,6 +562,14 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         im.put( KeyStroke.getKeyStroke( JGloss.messages.getString( "annotationeditor.action.remove.ak")),
                 removeAction.getValue( Action.NAME));
         am.put( removeAction.getValue( Action.NAME), removeAction);
+        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
+                                        ( "annotationeditor.action.removeduplicates.ak")),
+                removeDuplicatesAction.getValue( Action.NAME));
+        am.put( removeDuplicatesAction.getValue( Action.NAME), removeDuplicatesAction);
+        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
+                                        ( "annotationeditor.action.addtoexclusions.ak")),
+                addToExclusionsAction.getValue( Action.NAME));
+        am.put( addToExclusionsAction.getValue( Action.NAME), addToExclusionsAction);
         im.put( KeyStroke.getKeyStroke( JGloss.messages.getString( "annotationeditor.action.hide.ak")),
                 hideAction.getValue( Action.NAME));
         am.put( hideAction.getValue( Action.NAME), hideAction);
@@ -664,6 +728,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             useTranslationAction.setEnabled( false);
             hideAction.setEnabled( false);
             removeAction.setEnabled( false);
+            removeDuplicatesAction.setEnabled( false);
+            addToExclusionsAction.setEnabled( false);
         }
         else {
             useReadingAction.setEnabled(tn instanceof ReadingAnnotationNode ||
@@ -671,6 +737,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             useTranslationAction.setEnabled(tn instanceof TranslationLeafNode);
             hideAction.setEnabled( true);
             removeAction.setEnabled( true);
+            removeDuplicatesAction.setEnabled( true);
+            addToExclusionsAction.setEnabled( true);
 
             updateHideAction( tn);
         }
