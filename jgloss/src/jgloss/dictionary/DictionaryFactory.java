@@ -37,6 +37,9 @@ import java.util.*;
  * @see DictionaryFactory.Implementation
  */
 public abstract class DictionaryFactory {
+    /**
+     * Base class for other <CODE>DictionaryFactory</CODE> exceptions.
+     */
     public static class Exception extends java.lang.Exception {
         public Exception() {}
         public Exception( String message) {
@@ -123,7 +126,7 @@ public abstract class DictionaryFactory {
             float cc = ic.isInstance( descriptor);
             if (cc > conf) {
                 imp = ic;
-                cc = conf;
+                conf = cc;
             }
         }
 
