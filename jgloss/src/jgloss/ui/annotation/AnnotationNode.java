@@ -62,7 +62,11 @@ public class AnnotationNode extends InnerNode {
      * The child which displays the current translation annotation.
      */
     private ReadingTranslationNode translation;
-
+    /**
+     * Child which displays the dictionary form of the anntated word.
+     */
+    private DictionaryFormNode dictionaryform;
+    
     /**
      * The text which this node displays in the tree.
      */
@@ -82,11 +86,20 @@ public class AnnotationNode extends InnerNode {
         // in JGlossDocument.JGlossReader.
         this.annotation = annotation;
         Element kanjiElement = annotation.getElement( 1);
+        try {
+            this.kanjiText = kanjiElement.getDocument().getText( kanjiElement.getStartOffset(),
+                                                                 kanjiElement.getEndOffset()-
+                                                                 kanjiElement.getStartOffset());
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
         
         reading = new ReadingTranslationNode( this, true);
         translation = new ReadingTranslationNode( this, false);
+        dictionaryform = new DictionaryFormNode( this);
         children.add( reading);
         children.add( translation);
+        children.add( dictionaryform);
 
         List annotations = (java.util.List) annotation.getAttributes().getAttribute
             ( JGlossDocument.TEXT_ANNOTATION);
@@ -132,13 +145,6 @@ public class AnnotationNode extends InnerNode {
                 }
                 // else: unhandled annotation type, ignore
             }
-        }
-        try {
-            this.kanjiText = kanjiElement.getDocument().getText( kanjiElement.getStartOffset(),
-                                                                 kanjiElement.getEndOffset()-
-                                                                 kanjiElement.getStartOffset());
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
         }
 
         updateNodeText();
@@ -202,6 +208,11 @@ public class AnnotationNode extends InnerNode {
     public ReadingTranslationNode getTranslationNode() { return translation; }
 
     /**
+     * Returns the node which displays the dictionary form of the annotated word.
+     */
+    public DictionaryFormNode getDictionaryFormNode() { return dictionaryform; }
+
+    /**
      * Returns <CODE>true</CODE> if the annotation is hidden (not displayed in the
      * document).
      *
@@ -260,36 +271,25 @@ public class AnnotationNode extends InnerNode {
     }
 
     /**
-     * Returns the linked text annotation of the annotation element this node wraps.
-     * This is one of the text annotations in the list of annotations for this element.
-     * It is usually set to the annotation from which the current settings of the
-     * reading and translation annotations are taken.
-     *
-     * @return The linked annotation, or <CODE>null</CODE> if there is no linked annotation.
-     */
-    public Parser.TextAnnotation getLinkedAnnotation() {
-        return (Parser.TextAnnotation) annotation.getAttributes().getAttribute
-            (JGlossDocument.LINKED_ANNOTATION);
-    }
-
-    /**
      * Sets the linked text annotation of the annotation element this node wraps.
      * This is one of the text annotations in the list of annotations for this element.
      * It is usually set to the annotation from which the current settings of the
-     * reading and translation annotations are taken.
+     * reading and translation annotations are taken. Setting the linked annotation
+     * will update the dictionary form child of the annotation node.
      *
      * @return The new linked annotation.
      */
     public void setLinkedAnnotation( Parser.TextAnnotation linkedAnnotation) {
-        ((JGlossDocument) annotation.getDocument()).setLinkedAnnotation( annotation,
-                                                                         linkedAnnotation);
-    }
-
-    /**
-     * Removes the linked text annotation from this annotation.
-     */
-    public void removeLinkedAnnotation() {
-        ((JGlossDocument) annotation.getDocument()).setLinkedAnnotation( annotation, null);
+        if (linkedAnnotation instanceof AbstractAnnotation) {
+            AbstractAnnotation aa = (AbstractAnnotation) linkedAnnotation;
+            String word = aa.getWord();
+            String reading = aa.getReading();
+            if (reading == null ||
+                reading.equals( word))
+                reading = "";
+            dictionaryform.setWord( word);
+            dictionaryform.setReading( reading);
+        }
     }
 
     /**
@@ -301,12 +301,10 @@ public class AnnotationNode extends InnerNode {
         if (isHidden()) {
             nodeText += JGloss.messages.getString( "annotationeditor.entry.hidden");
             String reading = getReadingNode().getText();
-            if (reading!=null && reading.length()>0 && 
-                (reading.length()>1 || reading.charAt( 0)!=' '))
+            if (reading!=null && reading.length()>0)
                 nodeText += " " + reading;
             String translation = getTranslationNode().getText();
-            if (translation!=null && translation.length()>0 && 
-                (translation.length()>1 || translation.charAt( 0)!=' '))
+            if (translation!=null && translation.length()>0)
                 nodeText += " " + translation;
         }
     }
