@@ -53,7 +53,7 @@ import jgloss.util.DefaultListFormatter;
  * WadokuJT is a Japanese-German dictionary directed by Ulrich Apel 
  * (see <a href="http://www.wadoku.org">http://www.wadoku.org</a>).
  * The WadokuJT.txt file form of the dictionary is maintained by Hans-Joerg Bibiko and available
- * from <a href="http://www.bibiko.com/dlde.htm">http://www.bibiko.com/dlde.htm</a>.
+ * from <a href="http://www.bibiko.de/dlde.htm">http://www.bibiko.de/dlde.htm</a>.
  *
  * @author Michael Koch
  */

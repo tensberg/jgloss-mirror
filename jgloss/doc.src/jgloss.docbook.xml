@@ -127,12 +127,12 @@
           </varlistentry>
 
           <varlistentry>
-            <term><ulink url="http://www.bibiko.com/dlde.htm">WadokuJT</ulink></term>
+            <term><ulink url="http://www.bibiko.de/dlde.htm">WadokuJT</ulink></term>
             <listitem>
               <para>
                 The WadokuJiten is an extensive Japanese-German dictionary. 
                 To use it, download the file <filename>WadokuJT.zip</filename> from
-                <ulink url="http://www.bibiko.com/dlen.htm">this page</ulink>, unzip it
+                <ulink url="http://www.bibiko.de/dlen.htm">this page</ulink>, unzip it
                 and add the resulting file <filename>WadokuJT.txt</filename> to the list of
                 dictionaries used by &JGloss; in the dictionary dialog.
               </para>
