@@ -27,6 +27,7 @@ import jgloss.*;
 
 import java.io.*;
 import java.awt.*;
+import java.util.*;
 
 import javax.swing.event.*;
 import javax.swing.text.*;
@@ -187,7 +188,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 if (parser.getLookups() > 15) {
                     // print some statistics 
                     System.out.println( "time: " + (System.currentTimeMillis()-t)/1000f);
-                    System.out.println( "lookups: " + parser.getLookups());
+                    System.out.println( "dictionary lookups: " + parser.getLookups());
                     System.out.println( "cache hits: " + parser.getCacheHits());
                     System.out.println( "cache gc: " + parser.getGarbageCollected());
                     parser.clearCache();
@@ -594,7 +595,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
     }
 
     /**
-     * Initializes and returns the DTD used for parsing JGloss documents.
+     * Initializes and returns the DTD used for parsing JGloss documents. This is
+     * a modified 3.2 DTD which allows annotation elements anywhere #pcdata is allowed.
      *
      * @return The DTD for parsing JGloss documents.
      */
@@ -604,45 +606,95 @@ public class JGlossEditorKit extends HTMLEditorKit {
         // The two alternatives are creating a completely new DTD or hacking the existing one,
         // which I am doing here.
 
-        if (dtd == null) {
+        if (dtd == null) try {
             // make sure that the default DTD is initialized:
             new ParserDelegator();
-            try {
-                // As of JDK1.3, the name of the default DTD of the ParserDelegator is hardcoded
-                // in the source, and there is no way for other program to inquire it,
-                // so I put it in the preferences to make it easily changeable
-                dtd = DTD.getDTD( JGloss.prefs.getString( Preferences.DTD_DEFAULT));
-                // redefine <p> to allow anything as child
-                AttributeList al = dtd.getElement( "p").getAttributes();
-                dtd.defineElement( "p", DTD.ANY, false, true, null, null, null, al);
 
-                // add custom tags
-                al = new AttributeList( JGlossDocument.HIDDEN_ATTRIBUTE, DTD.CDATA, 
-                                        0, null, null, null);
-                al = new AttributeList( JGlossDocument.LINKED_ANNOTATION, DTD.CDATA, 0, null, null, al);
-                al = new AttributeList( JGlossDocument.TEXT_ANNOTATION, DTD.CDATA, 0, null, null, al);
+            // As of JDK1.3, the name of the default DTD of the ParserDelegator is hardcoded
+            // in the source, and there is no way for other program to inquire it,
+            // so I put it in the preferences to make it easily changeable.
+            dtd = DTD.getDTD( JGloss.prefs.getString( Preferences.DTD_DEFAULT));
+            
+            // add custom elements
+            // #pcdata*
+            ContentModel pcdata = new ContentModel( '*', 
+                                                    new ContentModel( dtd.pcdata),
+                                                    null);
+            javax.swing.text.html.parser.Element reading = 
+                dtd.defineElement( AnnotationTags.READING.getId(),
+                                   DTD.MODEL, false, false, pcdata, null, null, null);
+            javax.swing.text.html.parser.Element kanji = 
+                dtd.defineElement( AnnotationTags.KANJI.getId(),
+                                   DTD.MODEL, false, false, pcdata, null, null, null);
+            javax.swing.text.html.parser.Element translation = 
+                dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
+                                   DTD.MODEL, false, false, pcdata, null, null, null);
+            
+            AttributeList al = new AttributeList( JGlossDocument.HIDDEN_ATTRIBUTE, DTD.CDATA, 
+                                                  0, null, null, null);
+            al = new AttributeList( JGlossDocument.LINKED_ANNOTATION, DTD.CDATA, 0, null, null, al);
+            al = new AttributeList( JGlossDocument.TEXT_ANNOTATION, DTD.CDATA, 0, null, null, al);
+            
+            // The content model of <anno> should really be (reading & kanji & translation),
+            // but character level attributes created by a <font> or <a href> tag can be embedded
+            // in an annotation element when the document is written by the HTMLWriter,
+            // so we have to use DTD.ANY.
+            dtd.defineElement( AnnotationTags.ANNOTATION.getId(),
+                               DTD.ANY, false, false, null, null, null, al);
 
-                javax.swing.text.html.parser.Element reading = 
-                    dtd.defineElement( AnnotationTags.READING.getId(),
-                                       DTD.CDATA, false, false, null, null, null, null);
-                javax.swing.text.html.parser.Element kanji = 
-                    dtd.defineElement( AnnotationTags.KANJI.getId(),
-                                       DTD.CDATA, false, false, null, null, null, null);
-                javax.swing.text.html.parser.Element translation = 
-                    dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
-                                       DTD.CDATA, false, false, null, null, null, null);
+            javax.swing.text.html.parser.Element annotation = dtd.getElement
+                ( AnnotationTags.ANNOTATION.getId());
 
-                // (reading & kanji & translation)
-                ContentModel cm = new ContentModel( '&', new ContentModel
-                    ( 0, reading, new ContentModel( 0, kanji, new ContentModel
-                        ( translation))));
-                dtd.defineElement( AnnotationTags.ANNOTATION.getId(),
-                                   DTD.MODEL, false, false, cm, null, null, al);
-            } catch (java.io.IOException ex) {
-                ex.printStackTrace();
+            // (anno | reading | kanji | translation | #pcdata*)
+            ContentModel annotationmodel = new ContentModel( '|', new ContentModel
+                ( 0, annotation,
+                  new ContentModel( 0, reading, new ContentModel
+                      ( 0, kanji, new ContentModel
+                          ( 0, translation, new ContentModel( '*',
+                                                              new ContentModel( dtd.pcdata), null))))));
+            // allow an annotation element or any of its subelements anywhere the DTD allows #pcdata
+            for ( Iterator i=dtd.elements.iterator(); i.hasNext(); ) {
+                javax.swing.text.html.parser.Element e =
+                    (javax.swing.text.html.parser.Element) i.next();
+                if (e!=annotation && e!=reading && e!=kanji && e!=translation) {
+                    updateContentModel( dtd, e.getContent(), annotationmodel);
+                }
             }
+        } catch (java.io.IOException ex) {
+            ex.printStackTrace();
         }
 
         return dtd;
+    }
+
+    /**
+     * Change a content model by replacing all occurrences of #pcdata with a new model.
+     * This is used to insert the annotation element model wherever #pcdata is allowed in the
+     * DTD.
+     *
+     * @param dtd The DTD to which the content model belongs.
+     * @param cm The content model which will be changed.
+     * @param annotationmodel The model which will replace any occurrences of #pcdata.
+     * @param return <CODE>true</CODE> if the content model was changed.
+     */
+    private static boolean updateContentModel( DTD dtd, ContentModel cm, 
+                                               ContentModel annotationmodel) {
+        if (cm == null)
+            return false;
+
+        boolean changed = false;
+        do {
+            if (cm.content instanceof ContentModel) {
+                ContentModel cm2 = (ContentModel) cm.content;
+                if (cm2.type==0 && cm2.content==dtd.pcdata) {
+                    cm.content = annotationmodel;
+                    changed = true;
+                }
+                else
+                    changed |= updateContentModel( dtd, (ContentModel) cm.content, annotationmodel);
+            }
+            cm = cm.next;
+        } while (cm != null);
+        return changed;
     }
 } // class JGlossEditorKit
