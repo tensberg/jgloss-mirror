@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT jgloss (head,body)>
+
+<!ELEMENT head (generator?,title)>
+<!ELEMENT generator (#PCDATA)>
+<!ELEMENT title (#PCDATA)>
+
+<!ELEMENT body (p)+>
+<!ELEMENT p (#PCDATA | anno)*>
+
+<!ELEMENT anno (#PCDATA | rbase)*>
+<!ATTLIST anno tr CDATA #IMPLIED
+               base  CDATA #IMPLIED
+               basere CDATA #IMPLIED
+               type  CDATA #IMPLIED
+>
+
+<!ELEMENT rbase (#PCDATA)>
+<!ATTLIST rbase re CDATA ""
+                docre CDATA #IMPLIED
+>

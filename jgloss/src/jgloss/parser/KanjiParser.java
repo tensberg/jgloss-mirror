@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -23,10 +23,7 @@
 
 package jgloss.parser;
 
-import jgloss.dictionary.Dictionary;
-import jgloss.dictionary.SearchException;
-import jgloss.dictionary.WordReadingPair;
-import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.*;
 
 import jgloss.util.StringTools;
 
@@ -51,13 +48,14 @@ import java.io.*;
  * character is the reading annotation start delimiter,  all following characters until the
  * reading annotation end delimiter are treated as reading for the word. 
  * Hiragana characters directly following the word or the reading annotation will be used as possible
- * verb/adjective inflections. The <CODE>findTranslation</CODE> method will then be called
- * with this word/reading/hiragana tuple and the result added to the annotation list.
+ * verb/adjective inflections. The <CODE>createAnnotations</CODE> method will then be called
+ * with this word/reading/hiragana tuple.
  * </P>
  *
  * @author Michael Koch
  */
-public class KanjiParser extends AbstractReadingAnnotationParser {
+public class KanjiParser extends AbstractParser {
+    private Dictionary[] dictionaries;
     /**
      * Cache which stores previously looked-up words.
      */
@@ -70,9 +68,11 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
      * Number of lookup results taken from the cache.
      */
     private int cacheHits = 0;
+    private Object[] searchParameters;
+    private StringBuffer searchKey;
 
     private final static String PARSER_NAME = 
-        ResourceBundle.getBundle( "resources/messages-dictionary")
+        ResourceBundle.getBundle( "resources/messages-parser")
         .getString( "parser.kanji.name");
 
     /**
@@ -82,31 +82,25 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      */
-    public KanjiParser( Dictionary[] dictionaries, Set exclusions) {
-        this( dictionaries, exclusions, '\0', '\0', true, false, false);
+    public KanjiParser( Dictionary[] dictionaries, Set exclusions, boolean firstOccurrenceOnly) {
+        this( dictionaries, exclusions, true, false, firstOccurrenceOnly);
     }
 
     /**
-     * Creates a new parser which will use the given dictionaries.<BR>
-     * The characters
-     * <CODE>readingStart</CODE> and <CODE>readingEnd</CODE> will be used to delimit
-     * reading annotations for kanji words. That is, if after a kanji word <CODE>readingStart</CODE>
-     * is encountered, the text to <CODE>readingEnd</CODE> will be used to create a
-     * <CODE>Reading</CODE> annotation for the kanji word.<BR>
+     * Creates a new parser which will use the given dictionaries.
      * 
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
-     * @param readingStart Character which signals the beginning of a reading annotation.
-     * @param readingEnd Character which signals the end of a reading annotation.
      * @param cacheLookups <CODE>true</CODE> if dictionary lookups should be cached.
      * @param ignoreNewlines If this is <CODE>true</CODE>, 0x0a and 0x0d characters in the parsed text
      *                       will be ignored and the character immediately before and after the newline
      *                       will be treated as if forming a single word.
      * @see Reading
      */
-    public KanjiParser( Dictionary[] dictionaries, Set exclusions, char readingStart, char readingEnd,
+    public KanjiParser( Dictionary[] dictionaries, Set exclusions,
                         boolean cacheLookups, boolean ignoreNewlines, boolean firstOccurrenceOnly) {
-        super( dictionaries, exclusions, ignoreNewlines, firstOccurrenceOnly, readingStart, readingEnd);
+        super( exclusions, ignoreNewlines, firstOccurrenceOnly);
+        this.dictionaries = dictionaries;
         if (cacheLookups)
             lookupCache = new HashMap( 5000);
     }
@@ -119,23 +113,21 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
      *         list will be returned.
      * @exception SearchException If an error occurrs during a dictionary lookup.
      */
-    public List parse( char[] text) throws SearchException {
-        List out = new ArrayList( text.length/3);
+    public List parse( char[] text, int start, int length) throws SearchException {
+        int end = start + length;
+        List out = new ArrayList( length/3);
         
         final byte OUTSIDE = 0;
         final byte IN_KATAKANA = 1;
         final byte IN_KANJI = 2;
         final byte IN_INFLECTION = 3;
-        final byte IN_READING = 4;
-        final byte END_READING = 5; // reading end delimiter was encoutered
         int mode = OUTSIDE;
         int wordStart = 0;
         StringBuffer word = new StringBuffer();
-        StringBuffer reading = new StringBuffer();
         StringBuffer inflection = new StringBuffer();
         Character.UnicodeBlock ub;
         boolean compverb = false;
-        for ( int i=0; i<text.length; i++) {
+        for ( int i=start; i<end; i++) {
             parsePosition = i; // tell the world where we are in parsing (see getParsePosition())
             if (Thread.currentThread().interrupted())
                 throw new ParsingInterruptedException();
@@ -158,33 +150,26 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
                 
             case IN_KATAKANA: // currently in Katakana word
                 if (ub != Character.UnicodeBlock.KATAKANA) {
-                    if (readingStart!='\0' && text[i]==readingStart) {
-                        mode = IN_READING;
-                    }
-                    else {
-                        out.addAll( findTranslations( wordStart, word.toString(),
-                                                      reading.toString(), true, true));
-                        if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
-                            mode = IN_KANJI;
-                        else
-                            mode = OUTSIDE;
-                        word = new StringBuffer();
-                        reading = new StringBuffer();
-                        wordStart = i;
-                    }
+                    createAnnotations( wordStart, word.toString(),
+                                       true, true, out);
+                    if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
+                        mode = IN_KANJI;
+                    else
+                        mode = OUTSIDE;
+                    word.setLength( 0);
+                    wordStart = i;
                 }
                 break;
-                
-            case END_READING: // previous character ended reading block, treat as if kanji ended
+
             case IN_KANJI: // currently in Kanji compound
                 if (ub != Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS &&
                     text[i] != '\u3005') { // '\u3005' is the kanji repeat mark
                     // end of current word, look for possible inflection and enter new mode
                     if (ub == Character.UnicodeBlock.HIRAGANA) {
                         // catch possible composite verb
-                        if (!compverb && mode!=END_READING && word.length()==1 && i<text.length-1 &&
+                        if (!compverb && word.length()==1 && i<end-1 &&
                             StringTools.isKanji( text[i+1]) &&
-                            (i == text.length-2 ||
+                            (i == end-2 ||
                              StringTools.isHiragana( text[i+2]))) {
                             compverb = true;
                             // add hiragana char to word
@@ -195,18 +180,14 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
                             inflection = new StringBuffer().append( text[i]);
                         }
                     }
-                    else if (text[i]==readingStart && readingStart!='\0') {
-                        mode = IN_READING;
-                    }
                     else {
-                        out.addAll( findTranslations( wordStart, word.toString(),
-                                                      reading.toString(), true, true));
+                        createAnnotations( wordStart, word.toString(),
+                                           true, true, out);
                         if (ub == Character.UnicodeBlock.KATAKANA)
                             mode = IN_KATAKANA;
                         else
                             mode = OUTSIDE;
-                        word = new StringBuffer();
-                        reading = new StringBuffer();
+                        word.setLength( 0);
                         wordStart = i;
                     }
                 }
@@ -214,17 +195,16 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
                 
             case IN_INFLECTION: // currently in possible inflection
                 if (ub != Character.UnicodeBlock.HIRAGANA) {
-                    List result = findTranslations( wordStart, word.toString(), reading.toString(),
-                                                    inflection.toString(), !compverb, !compverb);
+                    boolean result = createAnnotations( wordStart, word.toString(),
+                                                        inflection.toString(), !compverb, !compverb, out);
                     // the tests for the setting of the compverb flag guarantee that the
                     // lookup of a compverb will always happen IN_INFLECTION, and that reading is empty
                     if (compverb) {
                         compverb = false;
-                        if (result.size() == 0) {
+                        if (!result) {
                             // try first part of compverb
-                            result = findTranslations( wordStart, word.substring( 0, 1), null,
-                                                       word.substring( 1, 2), false, false);
-                            out.addAll( result);
+                            createAnnotations( wordStart, word.substring( 0, 1),
+                                               word.substring( 1, 2), false, false, out);
                             // reparse last part, which may be the start of a new compverb
                             mode = OUTSIDE;
                             word = new StringBuffer();
@@ -233,7 +213,6 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
                             continue;
                         }
                     }
-                    out.addAll( result);
 
                     if (ub == Character.UnicodeBlock.KATAKANA)
                         mode = IN_KATAKANA;
@@ -242,30 +221,11 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
                     else
                         mode = OUTSIDE;
                     wordStart = i;
-                    word = new StringBuffer();
-                    reading = new StringBuffer();
+                    word.setLength( 0);
                 }
                 else
                     inflection.append( text[i]);
                 break;
-                
-            case IN_READING: // currently in reading annotation
-                if (text[i]=='\n' || (i==text.length-1 && text[i] != readingEnd)) {
-                    // Don't allow readings to span multiple lines to avoid runaways when
-                    // this is not really a reading. Ignore the text in the "reading" string buffer. 
-                    out.addAll( findTranslations( wordStart, word.toString(), null, true, true));
-                    // "unread" the string that is not really a reading and try to parse the
-                    // content of it
-                    i -= reading.length();
-                    word = new StringBuffer();
-                    reading = new StringBuffer();
-                    mode = OUTSIDE;
-                } 
-                else if (text[i] != readingEnd) {
-                    reading.append( text[i]);
-                }
-                else
-                    mode = END_READING;
             }
             
             if (mode==IN_KANJI || mode==IN_KATAKANA) {
@@ -274,50 +234,29 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
         }
         
         // look up last word in buffer
-        if (mode==IN_KATAKANA || mode==IN_KANJI || mode==END_READING)
-            out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), true, true));
+        if (mode==IN_KATAKANA || mode==IN_KANJI)
+            createAnnotations( wordStart, word.toString(), true, true, out);
         else if (mode == IN_INFLECTION) {
-            List result = findTranslations( wordStart, word.toString(), reading.toString(),
-                                            inflection.toString(), !compverb, !compverb);
+            boolean result = createAnnotations( wordStart, word.toString(),
+                                                inflection.toString(), !compverb, !compverb, out);
             if (compverb) {
-                if (result.size() == 0) {
+                if (!result) {
                     // try first part of compverb
-                    result = findTranslations( wordStart, word.substring( 0, 1), null,
-                                               word.substring( 1, 2), false, false);
-                    out.addAll( result);
+                    createAnnotations( wordStart, word.substring( 0, 1),
+                                       word.substring( 1, 2), false, false, out);
                     // try last part
-                    result = findTranslations( wordStart+2, word.substring( 2, 3), null,
-                                               inflection.toString(), false, false);
+                    createAnnotations( wordStart+2, word.substring( 2, 3),
+                                       inflection.toString(), false, false, out);
                 }
             }
-            out.addAll( result);
         }
 
         return out;
     }
 
-    /**
-     * Finds all translations for a word. This is equivalent to calling 
-     * <CODE>findTranslations</CODE> with inflection set to <CODE>null</CODE>
-     *
-     * @param wordStart Offset of the search word in the text containing word. 
-     * @param word The word to look up.
-     * @param reading A reading annotation for the word. May be <CODE>null</CODE>. If not <CODE>null</CODE>,
-     *             a <CODE>Reading</CODE> object will be created for the reading and made the first entry
-     *             of the returned list.
-     * @param inflection String of hiragana characters which might contain a verb/adjective inflection.
-     *                   May be <CODE>null</CODE>.
-     * @param tryPrefixes If no exact match is found, try prefixes of the word.
-     * @param trySuffixes If <CODE>tryPrefixes</CODE> is <CODE>true</CODE> and a prefix is found,
-     *                    repeat the search with the remaining suffix of <CODE>word</CODE>
-     * @return A list of reading and translation annotations for the search word.
-     * @exception SearchException If a dictionary lookup failed.
-     * @see Reading
-     * @see Translation
-     */
-    private List findTranslations( int wordStart, String word, String reading,
-                                   boolean tryPrefixes, boolean trySuffixes) throws SearchException {
-        return findTranslations( wordStart, word, reading, null, tryPrefixes, trySuffixes);
+    private boolean createAnnotations( int wordStart, String word, boolean tryPrefixes, 
+                                       boolean trySuffixes, List out) throws SearchException {
+        return createAnnotations( wordStart, word, null, tryPrefixes, trySuffixes, out);
     }
 
     /**
@@ -341,32 +280,22 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
      *
      * @param wordStart Offset of the search word in the text containing word. 
      * @param word The word to look up.
-     * @param reading A reading annotation for the word. May be <CODE>null</CODE>. If not <CODE>null</CODE>,
-     *             a <CODE>Reading</CODE> object will be created for the reading and made the first entry
-     *             of the returned list.
      * @param inflection String of hiragana characters which might contain a verb/adjective inflection.
      *                   May be <CODE>null</CODE>.
      * @param tryPrefixes If no exact match is found, try prefixes of the word.
      * @param trySuffixes If <CODE>tryPrefixes</CODE> is <CODE>true</CODE> and a prefix is found,
      *                    repeat the search with the remaining suffix of <CODE>word</CODE>.
-     * @return A list of reading and translation annotations for the search word.
+     * @return <code>true</code> if at least one annotation was generated or part of the word
+     *         matched the exclusion list.
      * @exception SearchException If a dictionary lookup failed.
      * @see Reading
      * @see Translation
      * @see Conjugation
      */
-    private List findTranslations( int wordStart, String word, final String reading,
-                                   String inflection, boolean tryPrefixes,
-                                   boolean trySuffixes) throws SearchException {
-        List translations = new ArrayList( 6);
-        if (reading!=null && reading.length()>0) {
-            final String fword = word;
-            translations.add( new Reading( wordStart, word.length(), new WordReadingPair() {
-                    public String getWord() { return fword; }
-                    public String getReading() { return reading; }
-                    public Dictionary getDictionary() { return DOCUMENT_DICTIONARY; }
-                }));
-        }
+    private boolean createAnnotations( int wordStart, String word,
+                                       String inflection, boolean tryPrefixes,
+                                       boolean trySuffixes, List annotations) throws SearchException {
+        boolean result = false;
 
         Conjugation[] conjugations = null;
         if (inflection != null)
@@ -377,162 +306,128 @@ public class KanjiParser extends AbstractReadingAnnotationParser {
             //System.out.println( "Looking up " + word + ":" + reading + ":" + inflection);
             stop = true;
 
-            boolean match = false;
             // try to find exact match with conjugation
             if (conjugations != null) {
                 for ( int i=0; i<conjugations.length; i++) {
                     if (ignoreWord( word + conjugations[i].getDictionaryForm())) {
-                        match = true;
-                        break;
+                        return true;
                     }
                 }
                 
-                if (!match) { // no exclusion found
-                    for ( int j=0; j<dictionaries.length; j++) {
-                        for ( int i=0; i<conjugations.length; i++) {
-                            List t = search( dictionaries[j], word + conjugations[i].getDictionaryForm());
-                            if (t.size() > 0) {
-                                match = true;
-                                if (firstOccurrenceOnly)
-                                    annotatedWords.add( word + conjugations[i].getDictionaryForm());
-                                for ( Iterator k=t.iterator(); k.hasNext(); ) {
-                                    WordReadingPair wrp = (WordReadingPair) k.next();
-                                    if (wrp instanceof DictionaryEntry) {
-                                        translations.add( new Translation
-                                            ( wordStart, word.length() + conjugations[i]
-                                              .getConjugatedForm().length(),
-                                              (DictionaryEntry) wrp, conjugations[i]));
-                                    }
-                                    else {
-                                        translations.add( new Reading
-                                            ( wordStart, word.length() + conjugations[i]
-                                              .getConjugatedForm().length(),
-                                              wrp, conjugations[i]));
-                                    }
-                                }
-                                break; // don't search for shorter entries
-                            }
+                for ( int j=0; j<dictionaries.length; j++) {
+                    for ( int i=0; i<conjugations.length; i++) {
+                        String dictionaryWord = word +
+                            conjugations[i].getDictionaryForm();
+                        if (hasMatch( dictionaries[j], dictionaryWord)) {
+                            String conjugatedForm = word +
+                                conjugations[i].getConjugatedForm();
+                            annotations.add( new TextAnnotation
+                                             ( wordStart, word.length() + 
+                                               conjugations[i].getConjugatedForm().length(),
+                                               null, dictionaryWord, null, conjugations[i].getType()));
+                            if (firstOccurrenceOnly)
+                                annotatedWords.add( dictionaryWord);
+                            return true;
                         }
                     }
                 }
             }
             
-            if (!match) {
-                // try to find exact match without conjugation
-                if (ignoreWord( word)) {
-                    match = true;
-                }
-                else {
-                    for ( int i=0; i<dictionaries.length; i++) {
-                        List t = search( dictionaries[i], word);
-                        if (t.size() > 0) {
-                            match = true;
-                            if (firstOccurrenceOnly)
-                                annotatedWords.add( word);
-                            for ( Iterator k=t.iterator(); k.hasNext(); ) {
-                                WordReadingPair wrp = (WordReadingPair) k.next();
-                                if (wrp instanceof DictionaryEntry) {
-                                    translations.add( new Translation( wordStart, word.length(),
-                                                                       (DictionaryEntry) wrp));
-                                }
-                                else {
-                                    translations.add( new Reading( wordStart, word.length(), wrp));
-                                }
-                            }
-                        }
+            // try to find exact match without conjugation
+            if (ignoreWord( word)) {
+                return true;
+            }
+            else {
+                for ( int i=0; i<dictionaries.length; i++) {
+                    if (hasMatch( dictionaries[i], word)) {
+                        annotations.add( new TextAnnotation
+                                         ( wordStart, word.length(), word));
+                        if (firstOccurrenceOnly)
+                            annotatedWords.add( word);
+                        return true;
                     }
                 }
             }
 
-            if (!match && tryPrefixes && StringTools.isKanji( word.charAt( 0)) &&
+            // Still no luck? If this is a kanji compound, try prefixes of the word.
+            if (tryPrefixes && StringTools.isKanji( word.charAt( 0)) &&
                 word.length()>1) {
-                // Still no luck? If this is a kanji compound, try prefixes of the word.
                 List[] entries = new List[dictionaries.length]; // stores lookup results of prefix
-                int maxlength = 0; // length of the prefix
+                int matchlength; // length of the prefix
                 boolean ignore = false;
                 String subword = null;
+                boolean match = false;
 
-                for ( int i=word.length()-1; i>0; i--) {
-                    subword = word.substring( 0, i);
-                    ignore = ignoreWord( subword);
-                    if (!ignore) {
-                        for ( int j=0; j<entries.length; j++) {
-                            entries[j] = search( dictionaries[j], subword);
-                            if (entries[j].size() > 0) {
-                                match = true;
-                            }
-                        }
-                    }
-                    // end search after prefix of maximal length is found in a dictionary, but not before
-                    // this prefix is looked up in all dictionaries.
-                    if (ignore || match) {
-                        maxlength = i;
+                for ( matchlength=word.length()-1; matchlength>0; matchlength--) {
+                    subword = word.substring( 0, matchlength);
+                    if (ignoreWord( subword))
                         break;
+
+                    for ( int j=0; j<entries.length; j++) {
+                        if (hasMatch( dictionaries[j], subword))
+                            break;
                     }
                 }
 
-                if (match) { // match found
-                    if (firstOccurrenceOnly)
-                        annotatedWords.add( subword);
-                    for ( int i=0; i<dictionaries.length; i++) {
-                        for ( Iterator j=entries[i].iterator(); j.hasNext(); ) {
-                            WordReadingPair wrp = (WordReadingPair) j.next();
-                            if (wrp instanceof DictionaryEntry) {
-                                translations.add( new Translation( wordStart, maxlength,
-                                                                   (DictionaryEntry) wrp));
-                            }
-                            else {
-                                translations.add( new Reading( wordStart, maxlength, wrp));
-                            }
-                        }
+                if (matchlength > 0) { // match found
+                    if (!ignoreWord( subword)) {
+                        if (firstOccurrenceOnly)
+                            annotatedWords.add( subword);
+                        annotations.add( new TextAnnotation
+                                         ( wordStart, matchlength, subword));
                     }
+                    result = true;
                 }
-                else if (!ignore)
-                    maxlength = 1; // skip first char and look up remainder
+                else
+                    matchlength = 1; // skip first char and look up remainder
                     
                 // continue search with suffix of word
                 if (trySuffixes) {
-                    word = word.substring( maxlength);
-                    wordStart += maxlength;
+                    word = word.substring( matchlength);
+                    wordStart += matchlength;
                     stop = false;
                 }
             }
         }
 
-        return translations;
+        return result;
     }
 
     /**
-     * Look up an entry in a dictionary. If a cache is used, it will be looked up there first, and
-     * search results will be stored in the cache.
-     *
-     * @param d Dictionary to use for the lookup.
-     * @param word Word to look up.
-     * @param mode One of the valid search modes defined in <CODE>Dictionary</CODE>.
-     * @return The result of the lookup.
-     * @exception SearchException if the lookup fails.
-     * @see Dictionary
+     * Test if the word can be found in the dictionary using exact match search.
      */
-    private List search( Dictionary d, String word) throws SearchException {
+    private boolean hasMatch( Dictionary d, String word) throws SearchException {
         lookups++;
-        String key = word + ":" + d.getName();
+        if (searchKey == null)
+            searchKey = new StringBuffer( 128);
+        searchKey.setLength( 0);
+        searchKey.append( word);
+        searchKey.append( ':');
+        searchKey.append( d.getName());
+        String key = searchKey.toString();
         //System.out.println( "searching " + key);
-        List result;
 
         if (lookupCache!=null &&
             lookupCache.containsKey( key)) {
-            result = (List) lookupCache.get( key);
+            boolean result = ((Boolean) lookupCache.get( key)).booleanValue();
             cacheHits++;
             return result;
         }
 
         // if we get here, it was not in the cache
-        result = d.search( word, Dictionary.SEARCH_EXACT_MATCHES, Dictionary.RESULT_DICTIONARY_ENTRIES);
+        if (searchParameters == null) {
+            searchParameters = new Object[2];
+            searchParameters[1] = new SearchFieldSelection( true, true, false, true, false);
+        }
+
+        searchParameters[0] = word;
+        boolean result = false;
+        try {
+            result = d.search( ExpressionSearchModes.EXACT, searchParameters).hasNext();
+        } catch (UnsupportedSearchModeException ex) {}
+
         if (lookupCache != null) {
-            if (result.size() > 0)
-                lookupCache.put( key, result);
-            else
-                lookupCache.put( key, java.util.Collections.EMPTY_LIST);
+            lookupCache.put( key, Boolean.valueOf( result));
         }
 
         return result;

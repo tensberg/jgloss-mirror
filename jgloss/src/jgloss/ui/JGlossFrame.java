@@ -23,27 +23,93 @@
 
 package jgloss.ui;
 
-import jgloss.*;
-import jgloss.ui.doc.*;
-import jgloss.ui.annotation.*;
-import jgloss.ui.export.*;
-import jgloss.dictionary.*;
-import jgloss.parser.*;
+import jgloss.JGloss;
+import jgloss.JGlossApp;
+import jgloss.Preferences;
+import jgloss.ui.annotation.Annotation;
+import jgloss.ui.annotation.AnnotationListModel;
+import jgloss.ui.xml.JGlossDocument;
+import jgloss.ui.xml.JGlossDocumentBuilder;
+import jgloss.ui.html.JGlossEditor;
+import jgloss.ui.html.JGlossEditorKit;
+import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.ui.html.AnnotationTags;
+import jgloss.parser.Parser;
+import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.util.CharacterEncodingDetector;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.datatransfer.*;
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.awt.EventQueue;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.JobAttributes;
+import java.awt.PageAttributes;
+import java.awt.PrintJob;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.DataFlavor;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.util.LinkedList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.MalformedURLException;
+import java.lang.reflect.InvocationTargetException;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.text.html.*;
+import javax.swing.Action;
+import javax.swing.AbstractAction;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.WindowConstants;
+import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
+import javax.swing.JViewport;
+import javax.swing.JFileChooser;
+import javax.swing.text.View;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Frame which contains everything needed to edit a single JGloss document.
@@ -52,7 +118,7 @@ import javax.swing.text.html.*;
  *
  * @author Michael Koch
  */
-public class JGlossFrame extends JPanel implements ActionListener {
+public class JGlossFrame extends JPanel implements ActionListener, ListSelectionListener {
     /**
      * Collection of publically available actions.
      */
@@ -111,11 +177,11 @@ public class JGlossFrame extends JPanel implements ActionListener {
                                         else
                                             which.importString
                                                 ( d.getSelection(), d.isDetectParagraphs(), 
+                                                  JGloss.messages.getString( "import.textarea"),
+                                                  JGloss.messages.getString( "import.textarea"),
                                                   d.createParser( Dictionaries.getDictionaries( true),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
-                                                  JGloss.messages.getString( "import.textarea"),
-                                                  JGloss.messages.getString( "import.textarea"),
                                                   false);
                                         which.documentChanged = true;
                                     }
@@ -255,33 +321,29 @@ public class JGlossFrame extends JPanel implements ActionListener {
      */
     private ComponentListener componentListener;
     /**
-     * Scrollpane which wraps the document editor.
+     * The JGloss annotated document this frame edits.
      */
-    private JScrollPane docpaneScroller;
+    private JGlossDocument doc;
     /**
      * The document editor.
      */
     private JGlossEditor docpane;
     /**
+     * Scrollpane which contains the document editor.
+     */
+    private JScrollPane docpaneScroller;
+    /**
      * Editor kit used in the creation of the document.
      */
     private JGlossEditorKit kit;
     /**
-     * The JGloss annotated document this frame edits.
+     * The HTML document rendering the edited JGloss document;
      */
-    private JGlossDocument doc;
-    /**
-     * Scrollpane which wraps the annotation editor.
-     */
-    private JScrollPane annotationEditorScroller;
-    /**
-     * The editor used to edit annotations.
-     */
-    private AnnotationEditor annotationEditor;
-    /**
-     * The split pane containing the document and annotation editor.
-     */
-    private JSplitPane split;
+    private JGlossHTMLDoc htmlDoc;
+    private AnnotationList annotationList;
+    private AnnotationListModel annotationListModel;
+    private AnnotationEditorPanel annotationEditor;
+    private SimpleLookup lookupPanel;
 
     /**
      * The name of the document. For files this is the file name.
@@ -306,6 +368,8 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * the <CODE>loadDocument</CODE> method is executing.
      */
     private boolean deferWindowClosing = false;
+
+    private Transformer jglossWriterTransformer;
 
     /**
      * Saves the document.
@@ -343,10 +407,6 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * Exports the document as HTML.
      */
     private Action exportHTMLAction;
-    /**
-     * Exports the document as XML.
-     */
-    private Action exportXMLAction;
     /**
      * Exports the annotations to a file.
      */
@@ -404,23 +464,34 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * by using import or open actions.
      */
     public JGlossFrame() {
+        setLayout( new GridLayout( 1, 1));
+
         jglossFrames.add( this);
 
-        /* The JGlossFrame does not (any longer) directly inherit from
+        /* The JGlossFrame does not directly inherit from
          * JFrame, because memory profiling has shown that the JFrame objects are not correctly garbage
          * collected as expected (at least in JDK1.3). To keep the state associated with the JFrame objects
          * to a minimum, they are kept separate from the JGlossFrame state.
          * See also JGlossFrame.dispose().
          */
         frame = new JFrame( JGloss.messages.getString( "main.title"));
-         
+        
         // set up the frame
-        annotationEditor = new AnnotationEditor();
-        annotationEditorScroller = new JScrollPane( annotationEditor,
-                                                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        docpane = new JGlossEditor( annotationEditor);
-        docpane.setEditable( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
+        annotationEditor = new AnnotationEditorPanel();
+        annotationList = new AnnotationList();
+        annotationList.addListSelectionListener( this);
+        docpane = new JGlossEditor( annotationList);
+        lookupPanel = new SimpleLookup( null);
+        
+        JScrollPane annotationEditorScroller = 
+            new JScrollPane( annotationEditor,
+                             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane annotationListScroller = 
+            new JScrollPane( annotationList,
+                             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
         JLabel rendering = new JLabel( JGloss.messages.getString( "main.renderingdocument"),
                                        JLabel.CENTER);
         rendering.setBackground( Color.white);
@@ -429,19 +500,26 @@ public class JGlossFrame extends JPanel implements ActionListener {
         docpaneScroller = new JScrollPane( rendering,
                                            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        docpane.setNextFocusableComponent( annotationEditor);
-        annotationEditor.setNextFocusableComponent( docpane);
-        split = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT,
-                                docpaneScroller,
-                                annotationEditorScroller);
-        double position = JGloss.prefs.getDouble
-            ( Preferences.VIEW_DIVIDERLOCATION, 0.7d);
-        split.setDividerLocation( position);
-        split.setResizeWeight( position);
-        split.setOneTouchExpandable( true);
+
+        JSplitPane split1 = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT,
+                                            docpaneScroller,
+                                            annotationListScroller);
+        split1.setOneTouchExpandable( true);
+
+        JSplitPane split2 = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT,
+                                            annotationEditorScroller,
+                                            lookupPanel);
+        split2.setOneTouchExpandable( true);
+
+        JSplitPane split3 = new JSplitPane( JSplitPane.VERTICAL_SPLIT,
+                                            split1, split2);
+        split3.setOneTouchExpandable( true);
+
+        this.add( split3);
 
         setBackground( Color.white);
         frame.getContentPane().setBackground( Color.white);
+        frame.getContentPane().setLayout( new GridLayout( 1, 1));
 
         frame.setLocation( JGloss.prefs.getInt( Preferences.FRAME_X, 0),
                            JGloss.prefs.getInt( Preferences.FRAME_Y, 0));
@@ -478,14 +556,6 @@ public class JGlossFrame extends JPanel implements ActionListener {
         frame.addWindowListener( windowListener);
         frame.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
 
-        prefsListener = new PropertyChangeListener() {
-                public void propertyChange( PropertyChangeEvent e) {
-                    if (e.getPropertyName().equals( Preferences.EDITOR_ENABLEEDITING))
-                        docpane.setEditable( "true".equals( e.getNewValue()));
-                }
-            };
-        JGloss.prefs.addPropertyChangeListener( prefsListener);
-        
         saveAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     if (documentPath == null)
@@ -524,13 +594,6 @@ public class JGlossFrame extends JPanel implements ActionListener {
             };
         exportHTMLAction.setEnabled( false);
         UIUtilities.initAction( exportHTMLAction, "main.menu.export.html"); 
-        exportXMLAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    doExportXML();
-                }
-            };
-        exportXMLAction.setEnabled( false);
-        UIUtilities.initAction( exportXMLAction, "main.menu.export.xml"); 
         exportAnnotationListAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     doExportAnnotationList();
@@ -575,7 +638,6 @@ public class JGlossFrame extends JPanel implements ActionListener {
         exportMenu.add( UIUtilities.createMenuItem( exportPlainTextAction));
         exportMenu.add( UIUtilities.createMenuItem( exportLaTeXAction));
         exportMenu.add( UIUtilities.createMenuItem( exportAnnotationListAction));
-        exportMenu.add( UIUtilities.createMenuItem( exportXMLAction));
         menu.add( exportMenu);
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( printAction));
@@ -590,10 +652,15 @@ public class JGlossFrame extends JPanel implements ActionListener {
         menu.addSeparator();
         Action wordLookupAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    WordLookup.showAction.actionPerformed( e);
+                    JGlossApp.getLookupFrame().setVisible( true);
                     String selection = docpane.getSelectedText();
-                    if (selection != null && selection.length() > 0)
-                        WordLookup.getFrame().search( selection);
+                    if (selection == null || selection.length() == 0) {
+                        Annotation anno = (Annotation) annotationList.getSelectedValue();
+                        if (anno != null)
+                            selection = anno.getDictionaryForm();
+                    }
+                    if (selection!=null && selection.length()>0)
+                        JGlossApp.getLookupFrame().search( selection);
                 }
             };
         UIUtilities.initAction( wordLookupAction, "main.menu.wordlookup");
@@ -631,7 +698,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
         menu.add( showAnnotationItem);
         bar.add( menu);
 
-        bar.add( annotationEditor.getMenu());
+        bar.add( annotationList.getMenu());
         
         menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
         aboutItem = UIUtilities.createMenuItem( AboutFrame.showAction);
@@ -640,7 +707,6 @@ public class JGlossFrame extends JPanel implements ActionListener {
         
         frame.setJMenuBar( bar);
 
-        frame.getContentPane().add( this);
         frame.show();
     }
 
@@ -653,7 +719,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * @return <CODE>true</CODE>, if the document can be closed.
      */
     private boolean askCloseDocument() {
-        if (documentChanged) {
+        if (documentLoaded && documentChanged) {
             int r = JOptionPane.showOptionDialog
                 ( this, JGloss.messages.getString( "main.dialog.close.message",
                                                    new Object[] { documentName }),
@@ -682,7 +748,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
             }                                   
         }
 
-        return !documentChanged;
+        return !(documentLoaded && documentChanged);
     }
 
     /**
@@ -691,8 +757,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
     private void closeDocument() {
         // save the currently selected node in the preferences
         if (documentPath != null) {
-            int index = ((javax.swing.tree.DefaultTreeModel) annotationEditor.getModel()).getIndexOfChild
-                ( annotationEditor.getModel().getRoot(), annotationEditor.getLastSelectedAnnotation());
+            int index = annotationList.getSelectedIndex();
             if (index != -1) {
                 StringBuffer history = new StringBuffer();
                 String[] oldHistory = JGloss.prefs.getList( Preferences.HISTORY_SELECTION, 
@@ -766,22 +831,22 @@ public class JGlossFrame extends JPanel implements ActionListener {
                 if (documentLoaded)
                     which = new JGlossFrame();
                 
-                which.loadDocument
-                    ( new HTMLifyReader( in, JGloss.prefs.getBoolean
-                                         ( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true)),
+                which.importFromReader
+                    ( in, JGloss.prefs.getBoolean
+                      ( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true),
                       JGloss.messages.getString( "import.clipboard"),
                       JGloss.messages.getString( "import.clipboard"),
-                      GeneralDialog.getComponent().createImportClipboardParser
+                      GeneralDialog.getInstance().createReadingAnnotationFilter(),
+                      GeneralDialog.getInstance().createImportClipboardParser
                       ( Dictionaries.getDictionaries( true), ExclusionList.getExclusions()),
-                      GeneralDialog.getComponent().createReadingAnnotationFilter(),
-                      true, len);
+                      len);
                 which.documentChanged = true;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showConfirmDialog
                     ( this, JGloss.messages.getString
                       ( "error.import.exception", new Object[] 
-                          { "import.clipboard", ex.getClass().getName(),
+                          { JGloss.messages.getString( "import.clipboard"), ex.getClass().getName(),
                             ex.getLocalizedMessage() }),
                       JGloss.messages.getString( "error.import.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -792,9 +857,9 @@ public class JGlossFrame extends JPanel implements ActionListener {
     /**
      * Sets up everything neccessary to import a file and loads it. If <CODE>filename</CODE> is
      * a URL, it will create a reader which reads from the location the document points to. If it
-     * is a path to a local file, it will create a reader which reads from it. In both cases, 
-     * if the document is not already in HTML format, it will be 
-     * converted to HTML. The method will then call <CODE>loadDocument</CODE> with the newly created reader.
+     * is a path to a local file, it will create a reader which reads from it. 
+     * The method will then call <CODE>loadDocument</CODE> with the newly 
+     * created reader.
      *
      * @param path URL or path of the file to import.
      * @param detectParagraphs Flag if the {@link HTMLifyReader HTMLifyReader} should detect paragraphs.
@@ -846,16 +911,8 @@ public class JGlossFrame extends JPanel implements ActionListener {
                 }
             }
 
-            if (!contenttype.startsWith( "text/html"))
-                in = new HTMLifyReader( in);
-
-            loadDocument( in, path, title, parser, filter, true,
-                          CharacterEncodingDetector.guessLength( contentlength, encoding));
-            if (contenttype.startsWith( "text/html")) {
-                JOptionPane.showMessageDialog( this, JGloss.messages.getString( "error.import.htmlwarning"),
-                                               JGloss.messages.getString( "error.import.htmlwarning.title"),
-                                               JOptionPane.INFORMATION_MESSAGE);
-            }
+            importFromReader( in, detectParagraphs, path, title, filter, parser,
+                              CharacterEncodingDetector.guessLength( contentlength, encoding));
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
@@ -876,7 +933,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * The method can only be applied on a <CODE>JGlossFrame</CODE> with no open document.
      *
      * @param text The text which will be imported.
-     * @param detectParagraphs Flag if the {@link HTMLifyReader HTMLifyReader} should detect paragraphs.
+     * @param detectParagraphs Flag if paragraph detection should be done.
      * @param title Title of the newly created document.
      * @param path Path to the document.
      * @param setPath If <CODE>true</CODE>, the {@link #documentPath documentPath} variable will
@@ -884,13 +941,12 @@ public class JGlossFrame extends JPanel implements ActionListener {
      *        which the newly created document should be written. If <CODE>false</CODE>,
      *        <CODE>path</CODE> will only be used in informational messages to the user during import.
      */
-    public void importString( String text, boolean detectParagraphs, Parser parser, 
-                              ReadingAnnotationFilter filter, String title,
-                              String path, boolean setPath) {
+    public void importString( String text, boolean detectParagraphs, String path, String title,
+                              Parser parser, ReadingAnnotationFilter filter, 
+                              boolean setPath) {
         try {
-            loadDocument
-                ( new HTMLifyReader( new StringReader( text), detectParagraphs), path, title,
-                  parser, filter, true, text.length());
+            importFromReader( new StringReader( text), detectParagraphs, path, title, filter, parser,
+                              text.length());
             documentChanged = true;
             if (setPath)
                 this.documentPath = path;
@@ -913,11 +969,8 @@ public class JGlossFrame extends JPanel implements ActionListener {
      */
     public void loadDocument( File f) {
         try {
-            Reader in = new InputStreamReader( new FileInputStream( f), "UTF-8");
             documentPath = f.getAbsolutePath();
-            loadDocument( in, documentPath, f.getName(), 
-                          null, null, false,
-                          CharacterEncodingDetector.guessLength( (int) f.length(), "UTF-8"));
+            loadDocument( new FileInputStream( f), f.getName());
 
             synchronized (this) { // prevent closing of document while post-processing
                 if (doc == null) {
@@ -925,40 +978,6 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     return;
                 }
 
-                // test the file version of the loaded document
-                String formatWarning = null;
-                if (doc.getJGlossVersion() != -1) {
-                    if (doc.getFileFormatMajorVersion() > JGlossWriter.FILE_FORMAT_MAJOR_VERSION)
-                        formatWarning = JGloss.messages.getString
-                            ( "warning.load.version.larger.major",
-                              new Object[] { new Integer( doc.getJGlossVersion()/100),
-                                             new Integer( doc.getJGlossVersion()%100) });
-                    else if (doc.getFileFormatMajorVersion() == JGlossWriter.FILE_FORMAT_MAJOR_VERSION &&
-                             doc.getFileFormatMinorVersion() > JGlossWriter.FILE_FORMAT_MINOR_VERSION)
-                        formatWarning = JGloss.messages.getString
-                            ( "warning.load.version.larger.minor",
-                              new Object[] { new Integer( doc.getJGlossVersion()/100),
-                                             new Integer( doc.getJGlossVersion()%100) });
-                    else if (doc.getFileFormatMajorVersion() < JGlossWriter.FILE_FORMAT_MAJOR_VERSION ||
-                             doc.getFileFormatMajorVersion() == JGlossWriter.FILE_FORMAT_MAJOR_VERSION &&
-                             doc.getFileFormatMinorVersion() < JGlossWriter.FILE_FORMAT_MINOR_VERSION)
-                        formatWarning = JGloss.messages.getString
-                            ( "warning.load.version.smaller");
-                    // else format == current format
-                }
-                else
-                    formatWarning = JGloss.messages.getString( "warning.load.notjgloss");
-                
-                if (formatWarning != null) {
-                    JOptionPane.showConfirmDialog
-                        ( this, formatWarning,
-                          JGloss.messages.getString( "warning.load.title"),
-                          JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
-                    // force a save as since the document format has changed
-                    documentPath = null;
-                    documentChanged = true;
-                    saveAction.setEnabled( true); // will behave like save as
-                }
                 OPEN_RECENT.addDocument( f);
 
                 // re-select the selection at the time the document was closed
@@ -966,13 +985,10 @@ public class JGlossFrame extends JPanel implements ActionListener {
                                                          File.pathSeparatorChar);
                 for ( int i=0; i<history.length; i+=2) try {
                     if (history[i].equals( documentPath)) {
-                        int index = Integer.parseInt( history[i+1]);
-                        final AnnotationNode annotation = (AnnotationNode) annotationEditor.getModel()
-                            .getChild( annotationEditor.getModel().getRoot(), index);
+                        final int index = Integer.parseInt( history[i+1]);
                         Runnable worker = new Runnable() {
                                 public void run() {
-                                    annotationEditor.makeVisible( annotation);
-                                    annotationEditor.selectNode( annotation);
+                                    annotationList.setSelectedIndex( index);
                                 }
                             };
                         if (EventQueue.isDispatchThread())
@@ -981,9 +997,8 @@ public class JGlossFrame extends JPanel implements ActionListener {
                             EventQueue.invokeLater( worker);
                         break;
                     }
-                } catch (ArrayIndexOutOfBoundsException ex) {
-                } catch (NumberFormatException ex2) {
-                } catch (NullPointerException ex3) {}
+                } catch (NumberFormatException ex) {
+                } catch (NullPointerException ex2) {}
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -996,39 +1011,27 @@ public class JGlossFrame extends JPanel implements ActionListener {
         }
     }
 
-    /**
-     * Loads a document into this JGlossFrame. This will completely set up the frame for editing.
-     * This can be used to either open a JGloss document or to import some Japanese text, depending
-     * of the setting of <CODE>addAnnotations</CODE>. The document must be in JGloss or HTML format.
-     *
-     * @param in The reader from which to load the document.
-     * @param path The location of the document which was used to create the reader.
-     * @param title Title of the file. This will normally be the filename component of the path.
-     * @param parser The parser to use to annotate Japanese text.
-     * @param filter Filter for fetching the reading annotations from a parsed document.
-     * @param addAnnotations <CODE>true</CODE> if annotations should be added while loading the
-     *                       document.
-     * @param length Approximate length in characters of the document to load. This will only be used
-     *               for the progress bar.
-     */
-    private void loadDocument( Reader in, String path, String title, Parser parser, 
-                               ReadingAnnotationFilter filter,
-                               boolean addAnnotations, int length) 
-        throws IOException {
+    private void loadDocument( InputStream in, String title) throws IOException, SAXException {
         // Prevent the windowClosing event from directly closing the window.
         // If a windowClosing event is registered while the loadDocument method is executing,
         // the deferWindowClosing flag will be cleared.
         deferWindowClosing = true;
         documentLoaded = true;
 
-        kit = new JGlossEditorKit( parser, filter, addAnnotations, compactViewItem.isSelected(),
-                                   showReadingItem.isSelected(),
-                                   showTranslationItem.isSelected());
-        doc = (JGlossDocument) kit.createDefaultDocument();
-        StyleDialog.getComponent().addStyleSheet( doc.getStyleSheet(), Collections.EMPTY_MAP);
+        doc = new JGlossDocument( new InputSource( in));
+        setupFrame( title);
+    }
 
-        documentName = title;
-
+    private void importFromReader( Reader in, boolean detectParagraphs,
+                                   String path, String title, 
+                                   ReadingAnnotationFilter filter, Parser parser, int length) 
+        throws IOException {
+        // Prevent the windowClosing event from directly closing the window.
+        // If a windowClosing event is registered while the loadDocument method is executing,
+        // the deferWindowClosing flag will be cleared.
+        deferWindowClosing = true;
+        documentLoaded = true;
+        
         final StopableReader stin = new StopableReader( in);
 
         final ProgressMonitor pm = new ProgressMonitor
@@ -1039,7 +1042,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
         javax.swing.Timer progressUpdater = new javax.swing.Timer( 1000, new ActionListener() {
                 public void actionPerformed( ActionEvent e) {
                     // this handler is called from the event dispatch thread
-                    pm.setProgress( ((JGlossDocument) doc).getParsePosition());
+                    pm.setProgress( stin.getCharCount());
                     if (pm.isCanceled() || // cancel button of progress bar pressed
                         !deferWindowClosing) { // close button of document frame pressed
                         stin.stop();
@@ -1050,7 +1053,8 @@ public class JGlossFrame extends JPanel implements ActionListener {
         progressUpdater.start();
 
         try {
-            kit.read( stin, doc, 0);
+            doc = new JGlossDocumentBuilder().build( stin, detectParagraphs, filter,
+                                                     parser, Dictionaries.getDictionaries( true));
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
@@ -1065,15 +1069,34 @@ public class JGlossFrame extends JPanel implements ActionListener {
         in.close();
         pm.close();
 
+        if (doc == null) {
+            deferWindowClosing = false;
+            documentLoaded = false;
+        }
+        else {
+            setupFrame( title);
+        }
+    }
+
+    private void setupFrame( String title) throws IOException {
         if (!deferWindowClosing) {
             // close button of document frame pressed while document was loading
             closeDocument();
             return;
         }
 
+        kit = new JGlossEditorKit( compactViewItem.isSelected(),
+                                   showReadingItem.isSelected(),
+                                   showTranslationItem.isSelected());
+        htmlDoc = (JGlossHTMLDoc) kit.createDefaultDocument();
+        DocumentStyleDialog.getDocumentStyleDialog()
+            .addStyleSheet( htmlDoc.getStyleSheet(), Collections.EMPTY_MAP);
+        htmlDoc.setJGlossDocument( doc);
+
+        documentName = title;
         updateTitle();
         // get notified of title changes
-        doc.addPropertyChangeListener( new PropertyChangeListener() {
+        htmlDoc.addPropertyChangeListener( new PropertyChangeListener() {
                 public void propertyChange( PropertyChangeEvent e) {
                     markChanged();
                 }
@@ -1085,20 +1108,13 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
                     docpane.setEditorKit( kit);
-                    docpane.setStyledDocument( doc);
-                    annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
-                    
+                    docpane.setStyledDocument( htmlDoc);
+                    annotationListModel = new AnnotationListModel( htmlDoc.getAnnotationElements());
+                    annotationList.setAnnotationListModel( annotationListModel);
+
                     frame.getContentPane().removeAll();
-                    frame.getContentPane().add( split);
+                    frame.getContentPane().add( JGlossFrame.this);
                     frame.validate();
-                    if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN, false))
-                        split.setDividerLocation( 1.0f);
-                    else {
-                        double position = JGloss.prefs.getDouble
-                            ( Preferences.VIEW_DIVIDERLOCATION, 0.7d);
-                        split.setDividerLocation( position);
-                        split.setResizeWeight( position);
-                    }
                     
                     // Layout document view in the background while still allowing user interaction
                     // in other windows. Since Swing is single-threaded, this is somewhat complicated:
@@ -1147,17 +1163,16 @@ public class JGlossFrame extends JPanel implements ActionListener {
                                                     annotationEditor!=null) {
                                                     docpaneScroller.setViewport( port);
                                                     frame.validate();
-                                                    docpane.followMouse( showAnnotationItem.isSelected(),
-                                                                         false);
+                                                    docpane.followMouse( showAnnotationItem.isSelected());
                                                     // scroll to selected annotation
-                                                    AnnotationNode current = annotationEditor
+                                                    /*AnnotationNode current = annotationEditor
                                                         .getSelectedAnnotation();
                                                     if (current != null) {
                                                         docpane.makeVisible( current.getAnnotationElement().
                                                                              getStartOffset(),
                                                                              current.getAnnotationElement().
                                                                              getEndOffset());
-                                                    }
+                                                                             }*/
                                                     setCursor( currentCursor);
                                                 }
                                             }
@@ -1175,14 +1190,12 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     EventQueue.invokeLater( rendererStart);
 
                     // Parser must be set to non-strict mode for editing to work.
-                    doc.setStrictParsing( false);
+                    htmlDoc.setStrictParsing( false);
 
-                    doc.setAddAnnotations( false);
                     exportMenu.setEnabled( true);
                     exportPlainTextAction.setEnabled( true);
                     exportLaTeXAction.setEnabled( true);
                     exportHTMLAction.setEnabled( true);
-                    exportXMLAction.setEnabled( true);
                     exportAnnotationListAction.setEnabled( true);
                     printAction.setEnabled( true);
                     if (documentPath == null) 
@@ -1191,7 +1204,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     saveAsAction.setEnabled( true);
 
                     // mark document as changed if some editing occurs
-                    doc.addDocumentListener( new DocumentListener() {
+                    /*doc.addDocumentListener( new DocumentListener() {
                             public void insertUpdate(DocumentEvent e) {
                                 markChanged();
                             }
@@ -1201,10 +1214,10 @@ public class JGlossFrame extends JPanel implements ActionListener {
                             public void changedUpdate(DocumentEvent e) {
                                 // triggered by style changes, don't react to this
                             }
-                        });
+                            });*/
 
                     // save splitpane location settings in the preferences
-                    split.addPropertyChangeListener( new PropertyChangeListener() {
+                    /*split.addPropertyChangeListener( new PropertyChangeListener() {
                             public void propertyChange( PropertyChangeEvent e) {
                                 if (split.DIVIDER_LOCATION_PROPERTY.equals( e.getPropertyName())) {
                                     int newPosition = ((Integer) e.getNewValue()).intValue();
@@ -1220,7 +1233,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
                                     }
                                 }
                             }
-                        });
+                            });*/
                 }
             };
         if (EventQueue.isDispatchThread()) {
@@ -1232,13 +1245,13 @@ public class JGlossFrame extends JPanel implements ActionListener {
             } catch (InterruptedException ex) {
                 // What? Should not happen.
                 ex.printStackTrace();
-            } catch (java.lang.reflect.InvocationTargetException ex) {
-                if (ex.getTargetException() instanceof IOException)
-                    throw (IOException) ex.getTargetException();
-                else if (ex.getTargetException() instanceof RuntimeException)
-                    throw (RuntimeException) ex.getTargetException();
+            } catch (InvocationTargetException ex2) {
+                if (ex2.getCause() instanceof IOException)
+                    throw (IOException) ex2.getCause();
+                else if (ex2.getCause() instanceof RuntimeException)
+                    throw (RuntimeException) ex2.getCause();
                 else // should not happen
-                    ex.printStackTrace();
+                    ex2.printStackTrace();
             }
         }
 
@@ -1260,23 +1273,23 @@ public class JGlossFrame extends JPanel implements ActionListener {
                 JGloss.prefs.set( Preferences.VIEW_COMPACTVIEW, compactViewItem.isSelected());
                 kit.setCompactView( compactViewItem.isSelected());
                 // force docpane to be re-layouted.
-                doc.getStyleSheet().addRule( AnnotationTags.ANNOTATION.getId() + " {}");
+                htmlDoc.getStyleSheet().addRule( AnnotationTags.ANNOTATION.getId() + " {}");
             }
             else if (e.getSource()==showReadingItem) {
                 JGloss.prefs.set( Preferences.VIEW_SHOWREADING, showReadingItem.isSelected());
                 kit.showReading( showReadingItem.isSelected());
                 // force docpane to be re-layouted.
-                doc.getStyleSheet().addRule( AnnotationTags.READING.getId() + " {}");
+                htmlDoc.getStyleSheet().addRule( AnnotationTags.READING.getId() + " {}");
             }
             else if (e.getSource()==showTranslationItem) {
                 JGloss.prefs.set( Preferences.VIEW_SHOWTRANSLATION, showTranslationItem.isSelected());
                 kit.showTranslation( showTranslationItem.isSelected());
                 // force docpane to be re-layouted.
-                doc.getStyleSheet().addRule( AnnotationTags.TRANSLATION.getId() + " {}");
+                htmlDoc.getStyleSheet().addRule( AnnotationTags.TRANSLATION.getId() + " {}");
             }
             else if (e.getSource()==showAnnotationItem) {
                 JGloss.prefs.set( Preferences.VIEW_SHOWANNOTATION, showAnnotationItem.isSelected());
-                docpane.followMouse( showAnnotationItem.isSelected(), false);
+                docpane.followMouse( showAnnotationItem.isSelected());
             }
         }
     }
@@ -1419,9 +1432,12 @@ public class JGlossFrame extends JPanel implements ActionListener {
      */
     private boolean saveDocument() {
         try {
-            Writer out = new OutputStreamWriter( new FileOutputStream( documentPath), "UTF-8");
-            JGlossWriter w = new JGlossWriter( out, "UTF-8", doc);
-            w.write();
+            OutputStream out = new BufferedOutputStream( new FileOutputStream( documentPath));
+            if (jglossWriterTransformer == null)
+                jglossWriterTransformer = TransformerFactory.newInstance().
+                    newTransformer();
+            jglossWriterTransformer.transform( new DOMSource( doc.getDOMDocument()),
+                                               new StreamResult( out));
             out.close();
             documentChanged = false;
             saveAction.setEnabled( false);
@@ -1479,12 +1495,13 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * Exports the document as plain text to a user-specified file.
      */
     private void doExportPlainText() {
-        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
+        /*ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
                                                      JGloss.messages.getString( "export.plaintext.title"));
 
         f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_PLAINTEXT_ENCODING);
         f.addElement( ExportFileChooser.WRITE_READING, Preferences.EXPORT_PLAINTEXT_WRITEREADING);
-        f.addElement( ExportFileChooser.WRITE_TRANSLATIONS, Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS);
+        f.addElement( ExportFileChooser.WRITE_TRANSLATIONS, 
+                      Preferences.EXPORT_PLAINTEXT_WRITETRANSLATIONS);
         f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_PLAINTEXT_WRITEHIDDEN);
 
         int r = f.showSaveDialog( this);
@@ -1513,14 +1530,14 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     ex.printStackTrace();
                 }
             }
-        }        
+            }  */      
     }
 
     /**
      * Exports the document as plain text to a user-specified file.
      */
     private void doExportLaTeX() {
-        LaTeXExportFileChooser f = new LaTeXExportFileChooser( JGloss.getCurrentDir());
+        /*LaTeXExportFileChooser f = new LaTeXExportFileChooser( JGloss.getCurrentDir());
 
         f.addElement( ExportFileChooser.WRITE_HIDDEN, Preferences.EXPORT_LATEX_WRITEHIDDEN);
 
@@ -1561,14 +1578,14 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     out.close();
                 } catch (IOException ex) { ex.printStackTrace(); }
             }
-        }        
+            }   */     
     }
 
     /**
      * Exports the document as HTML to a user-specified file.
      */
     private void doExportHTML() {
-        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
+        /*ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
                                                      JGloss.messages.getString( "export.html.title"));
 
         f.addElement( ExportFileChooser.ENCODING_CHOOSER, Preferences.EXPORT_HTML_ENCODING);
@@ -1622,58 +1639,14 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     ex.printStackTrace();
                 }
             }
-        }        
-    }
-
-    /**
-     * Exports the document as XML to a user-specified file.
-     */
-    private void doExportXML() {
-        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
-                                                     JGloss.messages.getString( "export.xml.title"));
-
-        f.setFileFilter( new ExtensionFileFilter
-            ( "xml", JGloss.messages.getString( "filefilter.description.xml")));
-
-        int r = f.showSaveDialog( this);
-        if (r == JFileChooser.APPROVE_OPTION) {
-            Writer out = null;
-
-            // The document is modified during export. Save the original changed state.
-            boolean originalDocumentChanged = documentChanged;
-            try {
-                out = new BufferedWriter( new OutputStreamWriter
-                    ( new FileOutputStream( f.getSelectedFile()), XMLExporter.ENCODING_UTF8));
-                new XMLExporter( out, doc).write();
-                // restore document changed state
-                if (originalDocumentChanged == false) {
-                    documentChanged = false;
-                    saveAction.setEnabled( false);
-                }   
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showConfirmDialog
-                    ( this, JGloss.messages.getString
-                      ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getClass().getName(),
-                            ex.getLocalizedMessage() }),
-                      JGloss.messages.getString( "error.export.title"),
-                      JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            } finally {
-                if (out != null) try {
-                    out.close();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }        
+            } */       
     }
 
     /**
      * Exports the annotation list to a user-specified file.
      */
     private void doExportAnnotationList() {
-        ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
+        /*ExportFileChooser f = new ExportFileChooser( JGloss.getCurrentDir(),
                                                      JGloss.messages.getString
                                                      ( "export.annotationlist.title"));
 
@@ -1728,7 +1701,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     ex.printStackTrace();
                 }
             }
-        }        
+            } */       
     }
 
     /**
@@ -1736,6 +1709,20 @@ public class JGlossFrame extends JPanel implements ActionListener {
      */
     protected void updateTitle() {
         frame.setTitle( documentName + ":" + JGloss.messages.getString( "main.title"));
+    }
+
+    public void valueChanged( ListSelectionEvent e) {
+        Annotation anno = (Annotation) annotationList.getSelectedValue();
+        if (anno != null) {
+            docpane.highlightText( anno.getStartOffset(),
+                                   anno.getEndOffset());
+            annotationEditor.setAnnotation( anno);
+            lookupPanel.search( anno.getDictionaryForm());
+        }
+        else {
+            docpane.removeHighlight();
+            annotationEditor.setAnnotation( null);
+        }
     }
 
     /**
@@ -1746,9 +1733,8 @@ public class JGlossFrame extends JPanel implements ActionListener {
 
         JGloss.prefs.removePropertyChangeListener( prefsListener);
         if (doc != null)
-            StyleDialog.getComponent().removeStyleSheet( doc.getStyleSheet());
+            DocumentStyleDialog.getDocumentStyleDialog().removeStyleSheet( htmlDoc.getStyleSheet());
         docpane.dispose();
-        annotationEditor.dispose();
         OPEN_RECENT.removeMenu( openRecentMenu);
 
         // remove references from static action to menu item
@@ -1770,11 +1756,13 @@ public class JGlossFrame extends JPanel implements ActionListener {
         // not garbage collected until a new frame is created. To ensure that the objects referenced
         // from the JGlossFrame are freed, set references to null
         docpane = null;
+        docpaneScroller = null;
         doc = null;
         kit = null;
+        htmlDoc = null;
+        annotationListModel = null;
+        annotationList.removeListSelectionListener( this);
+        annotationList = null;
         annotationEditor = null;
-        split = null;
-        docpaneScroller = null;
-        annotationEditorScroller = null;
     }
 } // class JGlossFrame

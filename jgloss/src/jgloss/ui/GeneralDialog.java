@@ -29,7 +29,6 @@ import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.parser.Chasen;
 import jgloss.parser.ChasenParser;
-import jgloss.ui.doc.*;
 
 import java.util.*;
 import java.awt.*;
@@ -162,13 +161,13 @@ public class GeneralDialog extends Box implements PreferencesPanel {
             all.add( Box.createVerticalStrut( 2));
         }
 
-        this.add( UIUtilities.createSpaceEater( all, false));
+        this.add( UIUtilities.createFlexiblePanel( all, false));
 
         loadPreferences();
         applyPreferences();
     }
 
-    public String getTitle() { JGloss.messages.getString( "general.title"); }
+    public String getTitle() { return JGloss.messages.getString( "general.title"); }
     public Component getComponent() { return this; }
 
     /**

@@ -59,14 +59,11 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     protected StringBuffer tempBuffer = new StringBuffer( 1024);
 
     private boolean dontConfigureEditor;
+    private boolean dontDoLookup;
 
     private Highlighter matchHighlighter = new MatchHighlighter();
     private Highlighter partialHighlighter = new PartialHighlighter();
     private Highlighter highlighter = partialHighlighter;
-
-    protected final static String PROTOTYPE = 
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-
 
     public class DefinitionRenderer extends JLabel  
         implements ListCellRenderer {
@@ -164,7 +161,6 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         setModel( new ReplaceableItemsComboBoxModel());
         ((JTextComponent) getEditor().getEditorComponent()).getDocument().addDocumentListener( this);
         setRenderer( cellRenderer);
-        setPrototypeDisplayValue( PROTOTYPE);
 
         wordReadingTranslation = new DictionaryEntryFormatter();
         wordReadingTranslation.addWordFormat( DictionaryEntryFormat.getWordFormatter());
@@ -198,6 +194,9 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     public LookupModel getLookupModel() { return model; }
 
     protected void doLookup() {
+        if (dontDoLookup)
+            return;
+
         synchronized (this) {
             String nextSearchText = ((JTextComponent) getEditor().getEditorComponent()).getText();
             if (nextSearchText.equals( searchText) || nextSearchText.length()==0)
@@ -243,10 +242,6 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     public void dictionaryEntry( DictionaryEntry de) {
         tempBuffer.setLength( 0);
         currentFormatter.format( de, tempBuffer);
-        if (tempBuffer.length() > PROTOTYPE.length()) {
-            tempBuffer.setLength( PROTOTYPE.length()-3);
-            tempBuffer.append( "...");
-        }
         items.add( new Object[] { DictionaryEntry.class, tempBuffer.toString() });
     }
 
@@ -294,6 +289,11 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     }
 
     public void setSelectedItem( Object o) {
+        if (o instanceof String) {
+            dontDoLookup = true;
+            super.setSelectedItem( o);
+            dontDoLookup = false;
+        }
         /* Implement some intelligent dictionary entry selection later.
            Completely disable selection for now.
 

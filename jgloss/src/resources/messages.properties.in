@@ -48,12 +48,6 @@ error.exclusions.load.title=Error reading exclusion list
 error.exclusions.load=An error occurred while reading the\nexclusion list from {0}.\nThe Java exception was {1}, {2}.
 error.import.title=Error while importing file
 error.import.exception=An error occurred while importing {0}.\nThe Java exception was {1}, {2}.
-error.import.htmlwarning=\
-The imported document is HTML-formatted. JGloss can only render simple\n\
-HTML files; if the document is displayed incorrectly, open the original file\n\
-file in a web browser, copy the text to the clipboard and open it in JGloss\n\
-by selecting the "Import Clipboard" menu item.
-error.import.htmlwarning.title=HTML Information
 error.export.title=Error while exporting file
 error.export.exception=An error occurred while exporting.\nThe Java exception was {0}, {1}.
 error.load.title=Error while loading file
@@ -336,14 +330,14 @@ parserselector.detectparagraphs.mk=G
 
 print.title=Print document
 
-annotationeditor.reading=Reading:\ 
-annotationeditor.reading.kanji={0}:\ 
 annotationeditor.readings=Readings:
+annotationeditor.reading.base={0}:\ 
 annotationeditor.translation=Translation:\ 
 annotationeditor.dictionaryform=Dictionary Form:\ 
 annotationeditor.dictionaryform.none=(none)
 annotationeditor.dictionaryform.word=Word:\ 
 annotationeditor.dictionaryform.reading=Reading:\ 
+annotationeditor.grammaticaltype=Gramm. type:\ 
 annotationeditor.readingannotation=Reading from {0}: {1}
 annotationeditor.menu.title=Annotation
 annotationeditor.menu.usereading=Use this Reading
@@ -415,11 +409,14 @@ export.latex.templates=\
 /data/templates/latexcjk-list.tex.tmpl:\
 /data/templates/latexcjk-ruby.tex.tmpl
 
-about.frame.title=About JGloss
-about.title=JGloss 1.0.6
-about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+jgloss.about.frame.title=About JGloss
+jgloss.about.title=JGloss 1.1 alpha
+jgloss.about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
+jdictionary.about.frame.title=About JDictionary
+jdictionary.about.title=JDictionary 1.1 alpha
+jdictionary.about.text=A front-end for Japanese dictionaries.\n\nCopyright (c) 2002 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 
 preferences.header=This file contains the preferences for the application JGloss.
 preferences.header.obsolete=\

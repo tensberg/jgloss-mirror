@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -21,10 +21,6 @@
  */
 
 package jgloss.parser;
-
-import jgloss.dictionary.WordReadingPair;
-import jgloss.dictionary.Dictionary;
-import jgloss.dictionary.NullDictionary;
 
 import jgloss.util.StringTools;
 
@@ -52,20 +48,13 @@ public class ReadingAnnotationFilter {
     protected char kanjiSeparator;
 
     /**
-     * Dummy dictionary which is used for Readings constructed from reading anntoations found in
-     * the document. This is used to return a descriptive name for the dictionary.
-     */
-    public static final Dictionary DOCUMENT_DICTIONARY = new NullDictionary
-        ( ResourceBundle.getBundle( "resources/messages-dictionary")
-          .getString( "parser.dictionary.document"));
-
-    /**
      * Creates a reading annotation filter for a text which uses the specified characters as
      * delimiters.
      *
      * @param readingStart Character at the beginning of a reading annotation.
      * @param readingEnd Character at the end of a reading annotation.
-     * @param kanjiSeparator Character used to separate two adjacent kanji substrings.
+     * @param kanjiSeparator Character used to separate two adjacent kanji substrings with
+     *                       separate readings.
      */
     public ReadingAnnotationFilter( char readingStart, char readingEnd, char kanjiSeparator) {
         this.readingStart = readingStart;
@@ -75,40 +64,36 @@ public class ReadingAnnotationFilter {
 
     /**
      * Filter the reading annotations from a text array. The text without the annotation fragments
-     * is returned in a new array, the original text array is not modified. A {@link Reading Reading}
-     * annotation object is generated for every reading in the text.
+     * is returned in a new array, the original text array is not modified. A 
+     * {@link ReadingAnnotation ReadingAnnotation} is generated for every reading in the text.
      *
      * @param text Text to filter.
      * @param readings List of reading annotations from the text, with start offsets in the returned array.
      * @return Text without the reading annotations.
      */
-    public char[] filter( char[] text, List readings) {
-        char[] outtext = new char[text.length];
+    public char[] filter( char[] text, int start, int length, List readings) {
+        char[] outtext = new char[length];
         int outtextIndex = 0; // current position in outtext
         int kanjiStart = -1; // start index of current kanji substring in text, or -1
         int kanjiOutStart = -1; // start index of current kanji substring in outtext
         int annotationStart = -1; // start index of current reading in text
         boolean inReading = false;
         
-        for ( int textIndex = 0; textIndex<text.length; textIndex++) {
+        for ( int textIndex = start; textIndex<start+length; textIndex++) {
             if (inReading) {
                 if (text[textIndex] == readingEnd) {
                     // valid reading annotation
-                    final String word = new String( text, kanjiStart,
-                                                    annotationStart-kanjiStart);
                     final String reading = new String( text, annotationStart+1,
                                                        textIndex-annotationStart-1);
                     if (kanjiStart>0 && text[kanjiStart-1]==kanjiSeparator) {
                         // remove kanji separator char from outtext
-                        System.arraycopy( outtext, kanjiOutStart, outtext, kanjiOutStart-1, word.length());
+                        System.arraycopy( outtext, kanjiOutStart, outtext, kanjiOutStart-1, 
+                                          annotationStart-kanjiStart);
                         outtextIndex--;
                         kanjiOutStart--;
                     }
-                    readings.add( new Reading( kanjiOutStart, word.length(), new WordReadingPair() {
-                            public String getWord() { return word; }
-                            public String getReading() { return reading; }
-                            public Dictionary getDictionary() { return DOCUMENT_DICTIONARY; }
-                        }));
+                    readings.add( new ReadingAnnotation( kanjiOutStart, annotationStart-kanjiStart,
+                                                         reading));
 
                     
                     inReading = false;
@@ -151,15 +136,19 @@ public class ReadingAnnotationFilter {
     /**
      * Sets the character which signals the beginning of a reading annotation for a kanji word.
      */
-    public void setReadingStart( char readingStart) {
-        this.readingStart = readingStart;
+    public void setReadingStart( char _readingStart) {
+        readingStart = _readingStart;
     }
 
     /**
      * Sets the character which signals the end of a reading annotation for a kanji word.
      */
-    public void setReadingEnd( char readingEnd) {
-        this.readingEnd = readingEnd;
+    public void setReadingEnd( char _readingEnd) {
+        readingEnd = _readingEnd;
+    }
+
+    public void setKanjiSeparator( char _kanjiSeparator) {
+        kanjiSeparator = _kanjiSeparator;
     }
 
     /**
@@ -170,5 +159,5 @@ public class ReadingAnnotationFilter {
      * Returns the character which signals the end of a reading annotation for a kanji word.
      */
     public char getReadingEnd() { return readingEnd; }
-
+    public char getKanjiSeparator() { return kanjiSeparator; }
 } // class ReadingAnnotationFilter

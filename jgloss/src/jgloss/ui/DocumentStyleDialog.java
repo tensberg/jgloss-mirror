@@ -25,7 +25,8 @@ package jgloss.ui;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
-import jgloss.ui.doc.AnnotationTags;
+import jgloss.ui.html.AnnotationTags;
+import jgloss.ui.html.JGlossEditor;
 
 import java.util.*;
 import java.awt.*;

@@ -66,6 +66,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected JLabel status;
     protected String searchExpression;
     protected Map references;
+    protected int entryCount;
 
     protected final static int BUFFER_LIMIT = 500;
 
@@ -150,6 +151,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         manager.addManagedComponent( resultPlain);
     }
 
+    public int getEntryCount() { return entryCount; }
+
     public void startLookup( String description) {
         searchExpression = null;
         multipleDictionaries = true;
@@ -168,6 +171,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         dictionaryEntries = 0;
         entriesInTextBuffer = 0;
         resultBuffer = new ArrayList( fancyLimit);
+        entryCount = 0;
     }
 
     public void dictionary( Dictionary d) {
@@ -179,6 +183,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         if (!addToResultBuffer( de))
             formatNow( de);
 
+        entryCount++;
     }
 
     public void exception( SearchException ex) {

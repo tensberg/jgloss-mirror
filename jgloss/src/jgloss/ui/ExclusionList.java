@@ -91,7 +91,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      * Adds a single word to the exclusion list.
      */
     public static void addWord( String word) {
-        getComponent().add( word);
+        getInstance().add( word);
     }
 
     /**
@@ -197,7 +197,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         changed = false;
     }
 
-    public String getTitle() { JGloss.messages.getString( "exclusions.title"); }
+    public String getTitle() { return JGloss.messages.getString( "exclusions.title"); }
     public Component getComponent() { return this; }
 
     /**

@@ -342,7 +342,7 @@ public class AnnotationModel extends DefaultTreeModel {
             Element eae = null;
             if (ann != null) {
                 eae = ann.getAnnotationElement();
-                doc.insertBeforeStart( eae, "&nbsp");
+                doc.insertBeforeStart( eae, "&nbsp;");
                 start = startp.getOffset()-1;
                 startp = doc.createPosition( start);
                 end = endp.getOffset()-1;

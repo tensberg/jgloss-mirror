@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -23,7 +23,7 @@
 
 package jgloss.ui;
 
-import jgloss.*;
+import jgloss.JGloss;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -55,35 +55,41 @@ public class AboutFrame extends JFrame {
     /**
      * The application-wide instance used to display the about information.
      */
-    private static JFrame dialog;
+    private static AboutFrame dialog;
     /**
      * The application-wide instance used to display the GNU GPL.
      */
     private static JFrame license;
 
-    /**
-     * Returns the application-wide unique instance of the about dialog.
-     *
-     * @return The about dialog.
-     */
-    public static JFrame getFrame() {
-        if (dialog == null)
-            dialog = new AboutFrame();
-        return dialog;
+    public static void createFrame( String prefix) {
+        synchronized (AboutFrame.class) {
+            dialog = new AboutFrame( prefix);
+            AboutFrame.class.notifyAll();
+        }
+    }
+
+    public static AboutFrame getFrame() {
+        synchronized (AboutFrame.class) {
+            if (dialog == null) try {
+                // wait until frame is created
+                AboutFrame.class.wait();
+            } catch (InterruptedException ex) {}
+            return dialog;
+        }
     }
 
     /**
      * Creates the about dialog.
      */
-    private AboutFrame() {
+    private AboutFrame( String prefix) {
         super();
-        setTitle( JGloss.messages.getString( "about.frame.title"));
+        setTitle( JGloss.messages.getString( prefix + ".about.frame.title"));
         
-        JLabel label = new JLabel( JGloss.messages.getString( "about.title"));
+        JLabel label = new JLabel( JGloss.messages.getString( prefix + ".about.title"));
         label.setHorizontalAlignment( SwingConstants.CENTER);
         label.setFont( new Font( "SansSerif", Font.BOLD, label.getFont().getSize()+3));
         label.setForeground( Color.black);
-        JTextArea area = new JTextArea( JGloss.messages.getString( "about.text"));
+        JTextArea area = new JTextArea( JGloss.messages.getString( prefix + ".about.text"));
         area.setEditable( false);
         area.setOpaque( false);
 

@@ -222,11 +222,11 @@ public class StringTools {
             // search start of hiragana substring
             // use isKana instead of isHiragana to correctly handle katakana dash, which is not
             // converted by isHiragana
-            while (hStart<baseWord.length() && !isKana( baseWordH.charAt( hStart)))
+            while (hStart<baseWord.length() && needsReading( baseWordH, hStart))
                 hStart++;
             hEnd = hStart + 1;
             // search end of hiragana substring
-            while (hEnd<baseWord.length() && isKana( baseWordH.charAt( hEnd)))
+            while (hEnd<baseWord.length() && !needsReading( baseWordH, hEnd))
                 hEnd++;
 
             String kanji = inflectedWord.substring( kStart, hStart);
@@ -286,6 +286,19 @@ public class StringTools {
         //print( out);
         
         return out;
+    }
+
+    /**
+     * Test if a character needs a reading annotation.
+     */
+    private static boolean needsReading( String text, int pos) {
+        char c = text.charAt( pos);
+        return !isKana( c) ||
+            // handle special case with infix katakana 'ke', which is read as 'ka' or 'ga'
+            // when used as counter or in place names, as in ikkagetsu or Sakuragaoka
+            (c=='\u30f6' || c=='\u30b1') && 
+            pos>0 && isKanji( text.charAt( pos-1)) && 
+            pos+1<text.length() && isKanji( text.charAt( pos+1));
     }
 
     /**

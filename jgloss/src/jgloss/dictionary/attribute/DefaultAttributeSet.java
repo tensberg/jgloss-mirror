@@ -179,7 +179,7 @@ public class DefaultAttributeSet implements AttributeSet {
 
     public void addAttribute( Attribute key, AttributeValue value) {
         if (attributes == null)
-            attributes = new HashMap( 11);
+            attributes = new HashMap();
         Object v = attributes.get( key);
 
         if (v == null)

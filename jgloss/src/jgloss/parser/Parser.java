@@ -35,42 +35,17 @@ import java.util.*;
  */
 public interface Parser {
     /**
-     * Describes an annotation for a specific position in the parsed text.
-     * Results returned by the parser are instances of this.
-     *
-     * @author Michael Koch
-     */
-    interface TextAnnotation {
-        /**
-         * Returns the start offset of this annotation in the parsed text. 
-         *
-         * @return The start offset.
-         */
-        int getStart();
-        /**
-         * Returns the length of the annotated text.
-         *
-         * @return The length of the annotated text.
-         */
-        int getLength();
-    }
-
-    /**
      * Parses the text, returning a list with annotations for words in the text.
      *
      * @param text The text to parse.
-     * @return A list with annotations for the text. If no annotations were created, the empty
+     * @return A list of {@link TextAnnotation text annotations}. If no annotations were created, the empty
      *         list will be returned.
      * @exception SearchException If an error occurrs during a dictionary lookup.
      */
-    List parse( char[] text) throws SearchException;
+    List parse( char[] text, int start, int length) throws SearchException;
 
     /**
-     * Returns the position in the text the parser is currently parsing. This is not threadsafe.
-     * If more than one thread is using this Parser object, the result of this method is
-     * undetermined.
-     *
-     * @return The position in the text the parser is currently parsing.
+     * Returns the position in the text the parser is currently parsing.
      */
     int getParsePosition();
 
@@ -89,7 +64,7 @@ public interface Parser {
     void setIgnoreNewlines( boolean ignoreNewlines);
 
     /**
-     * Test if the parser skips newlines in the imported text.
+     * Return if the parser skips newlines in the imported text.
      */
     boolean getIgnoreNewlines();
 
@@ -101,7 +76,7 @@ public interface Parser {
     void setAnnotateFirstOccurrenceOnly( boolean firstOccurrence);
 
     /**
-     * Test if only the first occurrence of a word should be annotated.
+     * Return if only the first occurrence of a word should be annotated.
      */
     boolean getAnnotateFirstOccurrenceOnly();
 

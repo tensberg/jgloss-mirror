@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -21,19 +21,20 @@
  *
  */
 
-package jgloss.ui;
+package jgloss.ui.xml;
 
 import java.util.*;
 import java.io.*;
 
 /**
- * Reads a plain text file from a reader and formats it as simple HTML. Every line in the
- * input file will be enclosed in <CODE>&lt;P&gt;</CODE> tags. HTML-specific special characters will
+ * Reads a plain text file from a reader and formats it as a JGloss XML file without annotations.
+ * Every line in the
+ * input file will be enclosed in <CODE>&lt;P&gt;</CODE> tags. XML-specific special characters will
  * be replaced by named entities.
  *
  * @author Michael Koch
  */
-public class HTMLifyReader extends FilterReader {
+class JGlossifyReader extends FilterReader {
     /**
      * Buffer for the line currently being read.
      */
@@ -70,10 +71,16 @@ public class HTMLifyReader extends FilterReader {
      */
     private boolean detectParagraphs;
 
+    private final static String HEADER =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+        "<!DOCTYPE jgloss PUBLIC \"" + JGlossDocument.DTD_PUBLIC + "\" \"" +
+        JGlossDocument.DTD_SYSTEM + "\">\n" +
+        "<jgloss>\n<head>\n";
+
     private final static char[] NO_PARAGRAPH_START;
     private final static char[] NO_PARAGRAPH_END;
 
-    private final static char[] END_HTML = "</body>\n</html>\n".toCharArray();
+    private final static char[] END_HTML = "</body>\n</jgloss>\n".toCharArray();
     private final static char[] START_PARAGRAPH = "<p>".toCharArray();
     private final static char[] END_PARAGRAPH = "</p>\n".toCharArray();
     private final static char[] EMPTY_PARAGRAPH = "<p></p>\n".toCharArray();
@@ -89,7 +96,7 @@ public class HTMLifyReader extends FilterReader {
         // it is probably used to format the indention at the beginning of a paragraph.
         // Unfortunately, the layout algorithm uses the space as a opportunity for breaking
         // an overlong line. To prevent this I approximate it with two non-breakable spaces.
-        funnyChars.put( new Character( '\u3000'), "&nbsp;&nbsp;".toCharArray());
+        funnyChars.put( new Character( '\u3000'), "&#160;&#160;".toCharArray());
 
         ResourceBundle strings = ResourceBundle.getBundle( "resources/jgloss-ui-HTMLifyReader");
         NO_PARAGRAPH_START = strings.getString( "no_paragraph_start").toCharArray();
@@ -104,7 +111,7 @@ public class HTMLifyReader extends FilterReader {
      *
      * @exception IOException if an error occurrs when accessing the underlying reader.
      */
-    public HTMLifyReader( Reader in) throws IOException {
+    public JGlossifyReader( Reader in) throws IOException {
         this( in, null, true);
     }
     
@@ -114,7 +121,7 @@ public class HTMLifyReader extends FilterReader {
      * @param in The reader from which to read the plain text file.
      * @exception IOException if an error occurrs when accessing the underlying reader.
      */
-    public HTMLifyReader( Reader in, boolean detectParagraphs) throws IOException {
+    public JGlossifyReader( Reader in, boolean detectParagraphs) throws IOException {
         this( in, null, detectParagraphs);
     }
 
@@ -128,25 +135,21 @@ public class HTMLifyReader extends FilterReader {
      *        determine between line breaks and paragraph breaks in the document read from the reader.
      * @exception IOException if an error occurrs when accessing the underlying reader.
      */
-    public HTMLifyReader( Reader in, String title, boolean detectParagraphs) throws IOException {
+    public JGlossifyReader( Reader in, String title, boolean detectParagraphs) throws IOException {
         super( new PushbackReader( in));
 
         this.detectParagraphs = detectParagraphs;
 
         StringBuffer lineBuf = new StringBuffer( 128);
 
-        lineBuf.append( "<HTML>\n<HEAD>\n");
+        lineBuf.append( HEADER);
+        lineBuf.append( "<title>");
         if (title != null) {
-            lineBuf.append( "<TITLE>");
             lineBuf.append( replaceFunnyChars( title));
-            lineBuf.append( "</TITLE>\n");
         }
+        lineBuf.append( "</title>\n");
 
-        // Make sure that the document has a header for the character encoding.
-        // It will be replaced with the correct encoding when the document is written.
-        lineBuf.append( "<META http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" >\n");
-
-        lineBuf.append( "</HEAD>\n<BODY>\n");
+        lineBuf.append( "</head>\n<body>\n");
 
         line = lineBuf.toString().toCharArray();
     }
@@ -159,7 +162,7 @@ public class HTMLifyReader extends FilterReader {
          */
 
         if (position >= line.length) {
-            if (eof == true) {
+            if (eof) {
                 // eof at underlying reader and all additional HTML already returned
                 return -1;
             }
@@ -229,19 +232,22 @@ public class HTMLifyReader extends FilterReader {
     }
 
     public int read( char[] buf, int off, int len) throws IOException {
+        if (eof)
+            return -1;
+
         for ( int i=0; i<len; i++) {
             int c = read();
             if (c == -1) // end of stream
                 return i;
 
-            buf[i] = (char) c;
+            buf[off+i] = (char) c;
         }
 
         return len;
     }
 
     public boolean ready() throws IOException {
-        return (position<line.length || super.ready());
+        return (!eof && (position<line.length || super.ready()));
     }
 
     /**
@@ -342,4 +348,4 @@ public class HTMLifyReader extends FilterReader {
         }
     }
 
-} // class HTMLifyReader
+} // class JGlossifyReader

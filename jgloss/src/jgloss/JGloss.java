@@ -357,7 +357,7 @@ public abstract class JGloss {
         }
     }
 
-    protected LookupFrame createLookupFrame() {
+    protected LookupModel createLookupModel() {
         mainLookupModel = new LookupModel
             ( Arrays.asList
               ( new Object[] { ExpressionSearchModes.EXACT,
@@ -388,9 +388,7 @@ public abstract class JGloss {
                 });
         mainLookupModel.loadFromPreferences( prefs, "wordlookup");
 
-        LookupFrame f = new LookupFrame( mainLookupModel);
-        f.setSize( f.getPreferredSize());
-        return f;
+        return mainLookupModel;
     }
 
     protected void shutdownHook() {
@@ -405,6 +403,7 @@ public abstract class JGloss {
     protected void backgroundCreateDialogs() {
         PreferencesFrame.createFrame
             ( getPreferencesPanels());
+        AboutFrame.createFrame( getApplicationName());
     }
     
     /**

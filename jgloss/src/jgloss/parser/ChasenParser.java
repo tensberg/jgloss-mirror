@@ -22,11 +22,7 @@
 
 package jgloss.parser;
 
-import jgloss.dictionary.Dictionary;
-import jgloss.dictionary.WordReadingPair;
 import jgloss.dictionary.SearchException;
-import jgloss.dictionary.NullDictionary;
-import jgloss.dictionary.DictionaryEntry;
 
 import jgloss.util.*;
 
@@ -49,40 +45,13 @@ import java.io.*;
  * @author Michael Koch
  */
 public class ChasenParser extends AbstractParser {
-    private final static ResourceBundle messages =
-        ResourceBundle.getBundle( "resources/messages-dictionary");
-
     private final static String PARSER_NAME = 
-        messages.getString( "parser.chasen.name");
+        ResourceBundle.getBundle( "resources/messages-parser").getString( "parser.chasen.name");
 
     /**
      * Command line parameter passed to chasen. Detemines the output format.
      */
-    private final static String CHASEN_ARGS = "-F %m\\t%H\\t%Tn\\t%Fn\\t%?T/%M/n/\\t%Y1\\n";
-
-    /**
-     * Dummy dictionary which is used for Readings returned by chasen.
-     */
-    public static Dictionary DOCUMENT_DICTIONARY = new NullDictionary( PARSER_NAME);
-
-    /**
-     * Implementation of WordReadingPair which returns the <CODE>DOCUMENT_DICTIONARY</CODE> as
-     * dictionary.
-     */
-    private static class ChasenWordReading implements WordReadingPair {
-        private String word;
-        private String reading;
-        public ChasenWordReading( String word, String reading) {
-            this.word = word;
-            if (reading!=null && reading.equals( word))
-                reading = null; // allowed per definition of WordReadingPair
-            this.reading = reading;
-        }
-
-        public String getWord() { return word; }
-        public String getReading() { return reading; }
-        public Dictionary getDictionary() { return DOCUMENT_DICTIONARY; }
-    } // class ChasenWordReading
+    private final static String CHASEN_ARGS = "-F %m\\t%H\\t%Tn\\t%Fn\\t%M\\t%Y1\\t%y1\\n";
     
     /**
      * Chasen instance used to parse text.
@@ -97,41 +66,28 @@ public class ChasenParser extends AbstractParser {
      */
     private Map lookupCache;
 
-    public ChasenParser( Dictionary[] dictionaries, Set exclusions) {
-        this( null, dictionaries, exclusions, true, false);
+    public ChasenParser( Set exclusions) {
+        this( null, exclusions, true);
     }
 
-    public ChasenParser( Dictionary[] dictionaries, Set exclusions, boolean cacheLookups) {
-        this( null, dictionaries, exclusions, cacheLookups, false);
+    public ChasenParser( Set exclusions, boolean firstOccurrenceOnly) {
+        this( null, exclusions, firstOccurrenceOnly);
     }
 
-    public ChasenParser( String chasenExecutable, Dictionary[] dictionaries, Set exclusions) {
-        this( chasenExecutable, dictionaries, exclusions, true, false);
-    }
-
-    public ChasenParser( String chasenExecutable, Dictionary[] dictionaries, Set exclusions,
-                         boolean cacheLookups, boolean firstOccurrenceOnly) {
-        super( dictionaries, exclusions, false, firstOccurrenceOnly);
+    public ChasenParser( String chasenExecutable, Set exclusions,
+                         boolean firstOccurrenceOnly) {
+        super( exclusions, false, firstOccurrenceOnly);
         this.chasenExecutable = chasenExecutable;
-        if (cacheLookups)
-            lookupCache = new HashMap( 5000);
     }
 
     public String getName() { return PARSER_NAME; }
 
     public Locale getLanguage() { return Locale.JAPANESE; }
 
-    /**
-     * Parses the text, returning a list with annotations for words in the text.
-     *
-     * @param text The text to parse.
-     * @return A list with annotations for the text. If no annotations were created, the empty
-     *         list will be returned.
-     * @exception SearchException If an error occurrs during a dictionary lookup.
-     */
-    public synchronized List parse( char[] text) throws SearchException {
-        parsePosition = 0;
-        List annotations = new ArrayList( text.length/3);
+    public List parse( char[] text, int start, int length) throws SearchException {
+        parsePosition = start;
+        int end = start + length;
+        List annotations = new ArrayList( length/3);
 
         try {
             if (chasen == null) {
@@ -142,8 +98,8 @@ public class ChasenParser extends AbstractParser {
                     chasen = new Chasen( CHASEN_ARGS, '\t');
             }
 
-            Chasen.Result result = chasen.parse( text);
-            while (parsePosition<=text.length && result.hasNext()) {
+            Chasen.Result result = chasen.parse( text, start, length);
+            while (parsePosition<=end && result.hasNext()) {
                 // test for outside interruption
                 if (Thread.currentThread().interrupted()) {
                     result.discard();
@@ -151,7 +107,7 @@ public class ChasenParser extends AbstractParser {
                 }
                 
                 // chasen skips spaces, so we have to adjust parsePosition here
-                while (parsePosition<text.length && text[parsePosition]==' ')
+                while (parsePosition<end && text[parsePosition]==' ')
                     parsePosition++;
                 
                 Object resultLine = result.next();
@@ -168,134 +124,26 @@ public class ChasenParser extends AbstractParser {
                         continue;
                     }
                     String partOfSpeech = (String) resultList.get( 1);
+                    if (!annotate( partOfSpeech)) {
+                        parsePosition += surfaceInflected.length();
+                        continue;
+                    }
                     String inflectionType = (String) resultList.get( 2);
                     String inflectedForm = (String) resultList.get( 3);
                     String surfaceBase = (String) resultList.get( 4);
-                    String readingBase = (String) resultList.get( 5);
-                    
-                    if (partOfSpeech.equals( "\u540d\u8a5e") || // meishi (noun)
-                        partOfSpeech.equals( "\u5f62\u5bb9\u52d5\u8a5e") || // keiyoudoushi (adjectival noun)
-                        partOfSpeech.equals( "\u9023\u4f53\u8a5e") || // rentaishi (pre-noun adjectival)
-                        partOfSpeech.equals( "\u526f\u8a5e") || // fukushi (adverb)
-                        partOfSpeech.equals( "\u63a5\u7d9a\u8a5e") // sezzokushi (conjunction)
-                        ) {
-                        // Search the surface form in all dictionaries. surfaceInflected and
-                        // surfaceBase are identical. If no match is found,
-                        // kanji substrings of the word will be tried.
-                        int from = 0;
-                        int to = surfaceInflected.length();
-                        do {
-                            String word = surfaceInflected.substring( from, to);
-                            if (ignoreWord( word)) {
-                                // continue search with remaining suffix
-                                // (loop will terminate if this was remainder of word)
-                                from = to;
-                                // only try kanji suffixes
-                                while (from<surfaceInflected.length() &&
-                                       !StringTools.isKanji
-                                       ( surfaceInflected.charAt( from)))
-                                    from++;
-                                to = surfaceInflected.length();
-                                readingBase = null;
-                                continue;
-                            }
+                    String readingBase = StringTools.toHiragana( (String) resultList.get( 5));
+                    String readingInflected = StringTools.toHiragana( (String) resultList.get( 6));
 
-                            List translations = search( word);
-                            if (translations.size() != 0) {
-                                if (firstOccurrenceOnly)
-                                    annotatedWords.add( word);
-                                if (readingBase != null) {
-                                    readingBase = StringTools.toHiragana( readingBase);
-                                    if (!readingBase.equals( word)) {
-                                        // don't add reading for hiragana
-                                        annotations.add( new Reading
-                                            ( parsePosition + from, to-from,
-                                              new ChasenWordReading( word, readingBase)));
-                                    }
-                                }
-                                                                      
-                                for ( Iterator i=translations.iterator(); i.hasNext(); ) {
-                                    WordReadingPair wrp = (WordReadingPair) i.next();
-                                    if (wrp instanceof DictionaryEntry) {
-                                        annotations.add( new Translation
-                                            ( parsePosition + from, 
-                                              to - from,
-                                              (DictionaryEntry) wrp));
-                                    }
-                                    else {
-                                        annotations.add( new Reading( parsePosition + from,
-                                                                      to - from, wrp));
-                                    }
-                                }
-                                // continue search with remaining suffix
-                                // (loop will terminate if this was remainder of word)
-                                from = to;
-                                // only try kanji suffixes
-                                while (from<surfaceInflected.length() &&
-                                       !StringTools.isKanji
-                                       ( surfaceInflected.charAt( from)))
-                                    from++;
-                                to = surfaceInflected.length();
-                                // There is no way to determine how much of the reading belongs
-                                // to the annotated substring, so readingBase becomes invalid
-                                readingBase = null;
-                            }
-                            else {
-                                readingBase = null; // invalid for substrings
-                                // no match found, try shorter prefix
-                                do {
-                                    to = to - 1;
-                                } while (to>from &&
-                                         // only try kanji prefixes
-                                         !StringTools.isKanji
-                                         ( surfaceInflected.charAt( to-1)));
-                                if (to == from) {
-                                    // no match found for prefix, try next suffix
-                                    do {
-                                        from++;
-                                    } while (from<surfaceInflected.length() &&
-                                             // only try kanji suffixes
-                                             !StringTools.isKanji
-                                             ( surfaceInflected.charAt( from)));
-                                    to = surfaceInflected.length();
-                                }
-                            }
-                        } while (from<to && from<surfaceInflected.length());
-                    }
-                    else if (partOfSpeech.equals( "\u52d5\u8a5e") ||  // doushi (verb)
-                             partOfSpeech.equals( "\u5f62\u5bb9\u8a5e") // keiyoushi ("true" adjective)
-                             ) {
-                        if (ignoreWord( surfaceBase)) {
-                            parsePosition += surfaceInflected.length();
-                            continue;
-                        }
-
-                        List translations = search( surfaceBase);
-                        if (translations.size() > 0) {
-                            if (firstOccurrenceOnly)
-                                annotatedWords.add( surfaceBase);
-                            Conjugation c = getConjugation( surfaceInflected, surfaceBase,
-                                                            partOfSpeech + "\u3001" + inflectedForm);
-                            readingBase = StringTools.toHiragana( readingBase);
-                            if (!readingBase.equals( surfaceBase)) {
-                                // don't add reading for hiragana
-                                annotations.add( new Reading
-                                    ( parsePosition, surfaceInflected.length(),
-                                      new ChasenWordReading( surfaceBase, readingBase), c));
-                            }
-                            for ( Iterator i=translations.iterator(); i.hasNext(); ) {
-                                WordReadingPair wrp = (WordReadingPair) i.next();
-                                if (wrp instanceof DictionaryEntry) {
-                                    annotations.add( new Translation
-                                        ( parsePosition, surfaceInflected.length(),
-                                          (DictionaryEntry) wrp, c));
-                                }
-                                else {
-                                    annotations.add( new Reading( parsePosition, 
-                                                                  surfaceInflected.length(), wrp, c));
-                                }
-                            }                               
-                        }
+                    if (!ignoreWord( surfaceBase)) {
+                        annotations.add
+                            ( new TextAnnotation( parsePosition, surfaceInflected.length(),
+                                                  readingInflected, surfaceBase, readingBase,
+                                                  constructGrammaticalType( partOfSpeech,
+                                                                            inflectionType,
+                                                                            inflectedForm)));
+                        
+                        if (firstOccurrenceOnly)
+                            annotatedWords.add( surfaceBase);
                     }
 
                     parsePosition += surfaceInflected.length();
@@ -309,6 +157,39 @@ public class ChasenParser extends AbstractParser {
     }
 
     /**
+     * Test if annotations should be generated for a particular part of speech.
+     */
+    protected boolean annotate( String partOfSpeech) {
+        return partOfSpeech.equals( "\u540d\u8a5e") || // meishi (noun)
+            partOfSpeech.equals( "\u5f62\u5bb9\u52d5\u8a5e") || // keiyoudoushi (adjectival noun)
+            partOfSpeech.equals( "\u9023\u4f53\u8a5e") || // rentaishi (pre-noun adjectival)
+            partOfSpeech.equals( "\u526f\u8a5e") || // fukushi (adverb)
+            partOfSpeech.equals( "\u63a5\u7d9a\u8a5e") || // sezzokushi (conjunction)
+            partOfSpeech.equals( "\u52d5\u8a5e") ||  // doushi (verb)
+            partOfSpeech.equals( "\u5f62\u5bb9\u8a5e"); // keiyoushi ("true" adjective)
+    }
+
+    protected String constructGrammaticalType( String partOfSpeech, String inflectionType,
+                                               String inflectedForm) {
+        boolean noInflectionType = "n".equals( inflectionType);
+        boolean noInflectedForm = "n".equals( inflectedForm);
+        if (noInflectionType && noInflectedForm)
+            return partOfSpeech;
+
+        StringBuffer out = new StringBuffer( partOfSpeech);
+        if (!noInflectionType) {
+            out.append( '\u3001');
+            out.append( inflectionType);
+        }
+        if (!noInflectedForm) {
+            out.append( '\u3001');
+            out.append( inflectedForm);
+        }
+        
+        return out.toString();
+    }                                          
+
+    /**
      * Ends the chasen application and clears the lookup cache.
      */
     public void reset() {
@@ -319,55 +200,6 @@ public class ChasenParser extends AbstractParser {
             lookupCache.clear();
 
         super.reset();
-    }
-
-    /**
-     * Look up an entry in a dictionary. If a cache is used, it will be looked up there first, and
-     * search results will be stored in the cache.
-     */
-    private List search( String word) throws SearchException {
-        List result = null;
-
-        if (lookupCache != null)
-            result = (List) lookupCache.get( word);
-
-        if (result == null) {
-            result = new ArrayList( dictionaries.length*2);
-            for ( int i=0; i<dictionaries.length; i++) {
-                result.addAll( dictionaries[i].search( word, Dictionary.SEARCH_EXACT_MATCHES,
-                                                       Dictionary.RESULT_DICTIONARY_ENTRIES));
-            }
-            if (lookupCache != null) {
-                if (result.size() > 0)
-                    lookupCache.put( word, result);
-                else {
-                    lookupCache.put( word, java.util.Collections.EMPTY_LIST);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Build a conjugation object encapsulating the information generated by ChaSen.
-     */
-    private Conjugation getConjugation( String inflected, String base, String type) {
-        // search last kanji in inflected form, everything after it is inflection
-        int i = inflected.length();
-        while (i>0 && !StringTools.isKanji( inflected.charAt( i-1))) {
-            i--;
-        }
-        if (i == 0) {
-            // Annotated hiragana word. Use point of divergence as inflection start.
-            while (i<inflected.length() && i<base.length() &&
-                   inflected.charAt( i)==base.charAt( i))
-                i++;
-        }
-        inflected = inflected.substring( i);
-        base = base.substring( i);
-        
-        return Conjugation.getConjugation( inflected, base, type);
     }
 
     /**

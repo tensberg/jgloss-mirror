@@ -93,14 +93,6 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
             };
         printAction.setEnabled( false);
         UIUtilities.initAction( printAction, "main.menu.print"); */
-        Action closeAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    hide();
-                    if (JGloss.exit())
-                        dispose();
-                }
-            };
-        UIUtilities.initAction( closeAction, "main.menu.close");
 
         setDefaultCloseOperation( DO_NOTHING_ON_CLOSE);
         addWindowListener( new WindowAdapter() {
@@ -114,18 +106,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         // setup menu bar
         JMenuBar bar = new JMenuBar();
         JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.file"));
-        //menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importDocument));
-        //menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importClipboard));
-        //addWindowListener( JGlossFrame.actions.importClipboardListener);
-        //menu.addMenuListener( JGlossFrame.actions.importClipboardListener);
-        //menu.addSeparator();
-        //menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.open));
-        //openRecent = JGlossFrame.OPEN_RECENT.createMenu( JGlossFrame.actions.openRecentListener);
-        //menu.add( openRecent);
-        //menu.addSeparator();
+        createFileMenuItems( menu);
         /*menu.add( UIUtilities.createMenuItem( printAction));
           menu.addSeparator();*/
-        menu.add( UIUtilities.createMenuItem( closeAction));
         bar.add( menu);
 
         final JMenu editMenu = new JMenu( JGloss.messages.getString( "editor.menu.edit"));
@@ -195,6 +178,28 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         toolbar.add( historyForwardAction);
         toolbar.add( legendAction);
         getContentPane().add( toolbar, BorderLayout.NORTH);
+
+        setSize( getPreferredSize());
+    }
+
+    public void search( String text) {
+        if (text == null || text.length()==0)
+            return;
+
+        model.setSearchExpression( text);
+        actionPerformed( null);
+    }
+
+    protected void createFileMenuItems( JMenu menu) {
+        Action closeAction = new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    hide();
+                    if (JGloss.exit())
+                        dispose();
+                }
+            };
+        UIUtilities.initAction( closeAction, "main.menu.close");
+        menu.add( UIUtilities.createMenuItem( closeAction));
     }
 
     public void actionPerformed( ActionEvent event) {

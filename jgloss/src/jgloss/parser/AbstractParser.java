@@ -23,8 +23,6 @@
 
 package jgloss.parser;
 
-import jgloss.dictionary.Dictionary;
-
 import java.util.Set;
 import java.util.HashSet;
 
@@ -34,10 +32,6 @@ import java.util.HashSet;
  * @author Michael Koch
  */
 public abstract class AbstractParser implements Parser {
-    /**
-     * Array of dictionaries used to look up words.
-     */
-    protected Dictionary[] dictionaries;
     /**
      * Offset in the array of chars currently parsed.
      */
@@ -62,9 +56,8 @@ public abstract class AbstractParser implements Parser {
      */
     protected boolean firstOccurrenceOnly;
 
-    public AbstractParser( Dictionary[] dictionaries, Set exclusions, boolean ignoreNewlines,
+    public AbstractParser( Set exclusions, boolean ignoreNewlines,
                            boolean firstOccurrenceOnly) {
-        this.dictionaries = dictionaries;
         this.exclusions = exclusions;
         this.ignoreNewlines = ignoreNewlines;
         this.firstOccurrenceOnly = firstOccurrenceOnly;

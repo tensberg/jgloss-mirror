@@ -39,7 +39,7 @@ public class JDictionaryApp extends JGloss {
     protected String getApplicationName() { return "jdictionary"; }
 
     protected void showMainWindow( String[] args) throws Exception {
-        createLookupFrame().show();
+        new LookupFrame( createLookupModel()).show();
     }
 
     protected PreferencesPanel[] getPreferencesPanels() {

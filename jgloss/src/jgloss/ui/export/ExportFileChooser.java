@@ -106,7 +106,7 @@ public class ExportFileChooser extends SaveFileChooser {
         if (accessory == null)
             createAccessory();
 
-        accessory.add( UIUtilities.createSpaceEater( element, true));
+        accessory.add( UIUtilities.createFlexiblePanel( element, true));
         accessory.add( Box.createVerticalStrut( 3));
     }
 
@@ -117,7 +117,7 @@ public class ExportFileChooser extends SaveFileChooser {
         if (accessory != null) {
             JPanel container = new JPanel( new GridLayout( 1, 1));
             container.setBorder( BorderFactory.createEmptyBorder( 3, 3, 3, 3));
-            container.add( UIUtilities.createSpaceEater( accessory, false));
+            container.add( UIUtilities.createFlexiblePanel( accessory, false));
             setAccessory( container);
         }
 

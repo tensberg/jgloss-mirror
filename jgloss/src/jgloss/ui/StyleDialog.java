@@ -24,7 +24,6 @@
 package jgloss.ui;
 
 import jgloss.*;
-import jgloss.ui.doc.*;
 
 import java.util.*;
 import java.awt.*;

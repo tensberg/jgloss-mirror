@@ -37,6 +37,7 @@ public class StopableReader extends FilterReader {
      * <CODE>true</CODE> if <CODE>stop</CODE> was called.
      */
     private boolean stopped = false;
+    private int charsRead = 0;
 
     /**
      * Constructs a new StopableReader which will read from the passed in stream.
@@ -57,8 +58,12 @@ public class StopableReader extends FilterReader {
     public int read() throws IOException {
         if (stopped)
             return -1;
-        else
-            return super.read();
+        else {
+            int c = super.read();
+            if (c != -1)
+                charsRead++;
+            return c;
+        }
     }
 
     /**
@@ -74,8 +79,12 @@ public class StopableReader extends FilterReader {
     public int read( char[] cbuf, int off, int len) throws IOException {
         if (stopped)
             return -1;
-        else
-            return super.read( cbuf, off, len);
+        else {
+            int count = super.read( cbuf, off, len);
+            if (count != -1)
+                charsRead += count;
+            return count;
+        }
     }
 
     /**
@@ -84,4 +93,6 @@ public class StopableReader extends FilterReader {
     public void stop() {
         stopped = true;
     }
+
+    public int getCharCount() { return charsRead; }
 } // class StopableReader

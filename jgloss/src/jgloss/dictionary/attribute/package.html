@@ -1,0 +1,49 @@
+<HTML>
+<HEAD>
+<!--
+ Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
+ 
+ This file is part of JGloss.
+ 
+ JGloss is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ JGloss is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with JGloss; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+ $Id$
+-->
+<TITLE>jgloss.dictionary.attribute package description</TITLE>
+</HEAD>
+<BODY>
+Dictionary attribute classes. 
+<p>
+Besides the word, reading and translation fields,
+{@linkplain jgloss.dictionary.DictionaryEntry dictionary entries}
+have attributes which contain additional information. For each attribute
+type there is a unique instance of the {@link jgloss.dictionary.attribute.Attribute Attribute} interface
+which marks the attribute. The {@link jgloss.dictionary.attribute.Attributes Attributes class} is the
+default implementation of the interface and contains a collection of standard
+attributes as static members. Dictionary implementations may define their
+own attributes in addition to the standard ones.
+</p><p>
+An attribute may have one or more values, which are instances of
+{@link jgloss.dictionary.attribute.AttributeValue AttributeValue}. Several standard value classes
+are defined which are used by the standard attributes. Attribute values
+for one attribute are stored in a {@link jgloss.dictionary.attribute.ValueList ValueList}.
+Attributes for one category of a dictionary entry and their values are collected
+in a {@link jgloss.dictionary.attribute.AttributeSet AttributeSet}.
+</p><p>
+To create a string representation of attributes and their values, instances
+of {@link jgloss.dictionary.attribute.AttributeFormatter AttributeFormatter} are used.
+</p>
+</BODY>
+</HTML>

@@ -42,7 +42,7 @@ public class Chasen {
         System.exit( 0);
 
         Chasen c = new Chasen( "/usr/local/bin/chasen", "", '\t');
-        Result r = c.parse( args[0].toCharArray());
+        Result r = c.parse( args[0].toCharArray(), 0, args[0].length());
         while (r.hasNext()) {
             System.err.println( r.next());
         }
@@ -103,7 +103,7 @@ public class Chasen {
         /**
          * Returns the next result line returned by the chasen process. The object is either
          * {@link #EOS EOS}, {@link #EOP EOP}, or a <code>List</code> of <code>Strings</code>
-         * with the result fields. The list is reused across multiple calls to <code>next</code>,
+         * with the result fields. The list is reused across multiple calls to <code>next</code>;
          * if you want to keep the results, copy the list.
          *
          * @exception NoSuchElementException if there is no next result line.
@@ -236,8 +236,7 @@ public class Chasen {
     }
 
     /**
-     * Test if the chasen program is available at the specified path. The test is done by
-     * calling the program with the "-V" (for version) option. If the path to the executable
+     * Test if the chasen program is available at the specified path. If the path to the executable
      * is the same as in the previous test, and this test was successfull, the test will not be
      * repeated.
      *
@@ -250,6 +249,8 @@ public class Chasen {
             lastChasenExecutable.equals( chasenExecutable))
             return true;
 
+        // The test is done by
+        // calling the program with the "-V" (for version) option.
         try {
             Process p = Runtime.getRuntime().exec( chasenExecutable + " -V");
 
@@ -339,7 +340,7 @@ public class Chasen {
      * @return Result iterator.
      * @exception IOException if communication with the chasen process failed.
      */
-    public Chasen.Result parse( char[] text) throws IOException {
+    public Chasen.Result parse( char[] text, int start, int length) throws IOException {
         if (result == null)
             result = new Result();
 
@@ -351,7 +352,7 @@ public class Chasen {
         // all data is parsed, the EOS we expect to see are counted.
         int expectedEOS = 0;
 
-        for ( int i=0; i<text.length; i++) {
+        for ( int i=start; i<start+length; i++) {
             // replace Dos or Mac line ends with unix line ends to make sure EOS is
             // treated correctly
             if (text[i] == 0x0d)
@@ -361,7 +362,7 @@ public class Chasen {
                 expectedEOS++;
         }
 
-        chasenIn.write( text);
+        chasenIn.write( text, start, length);
         chasenIn.write( (char) 0x0a); // chasen will start parsing when end of line is encountered
         expectedEOS++; // for the previous 0x0a
         chasenIn.flush();
@@ -402,16 +403,20 @@ public class Chasen {
 
     /**
      * Test which character encoding ChaSen uses for its input and output streams. On
-     * Linux this will probably be EUC-JP and Shift-JIS on Windows. The test is done by running
-     * chasen with the -lf option, which makes it list the conjugation forms, and checking the encoding
-     * of the output. The test is only done the first time the method is called, the result is
+     * Linux this will probably be EUC-JP and Shift-JIS on Windows. 
+     * The test is only done the first time the method is called, the result is
      * cached and reused on further calls.
      *
      * @return Canonical name of the encoding, or <CODE>null</CODE> if the test failed.
      */
     protected String getChasenPlatformEncoding( String chasenExecutable) {
         if (platformEncoding != null)
+            // return cached result
             return platformEncoding;
+
+        // The test is done by running
+        // chasen with the -lf option, which makes it list the conjugation forms,
+        // and checking the encoding of the output.
 
         try {
             Process chasen = Runtime.getRuntime().exec( chasenExecutable + " -lf");

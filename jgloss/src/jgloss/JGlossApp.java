@@ -23,7 +23,20 @@
 
 package jgloss;
 
-import jgloss.ui.*;
+import jgloss.parser.Chasen;
+import jgloss.parser.ChasenParser;
+import jgloss.parser.KanjiParser;
+import jgloss.ui.PreferencesPanel;
+import jgloss.ui.GeneralDialog;
+import jgloss.ui.DocumentStyleDialog;
+import jgloss.ui.ParserSelector;
+import jgloss.ui.LookupFrame;
+import jgloss.ui.Dictionaries;
+import jgloss.ui.ExclusionList;
+import jgloss.ui.JGlossFrame;
+import jgloss.ui.JGlossLookupFrame;
+
+import java.io.File;
 
 /**
  * Base class for launching the full application, including the word lookup and document parser
@@ -32,6 +45,10 @@ import jgloss.ui.*;
  * @author Michael Koch
  */
 public class JGlossApp extends JGloss {
+    public static final int CURRENT_VERSION = 1100;
+
+    private static LookupFrame lookupFrame;
+
     /**
      * Starts JGloss.
      *
@@ -41,15 +58,22 @@ public class JGlossApp extends JGloss {
         new JGlossApp().init( args);
     }
 
+    public static synchronized LookupFrame getLookupFrame() {
+        if (lookupFrame == null)
+            lookupFrame = new JGlossLookupFrame( application.createLookupModel());
+
+        return lookupFrame;
+    }
+
     protected String getApplicationName() { return "jgloss"; }
 
     protected void registerDictionaries() {
         super.registerDictionaries();
 
         // register text parsers
-        ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null).getName());
+        ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null, true).getName());
         ParserSelector.registerParser( ChasenParser.class, 
-                                       new ChasenParser( null, null, null, false, false).getName());
+                                       new ChasenParser( null, false).getName());
 
         // set default location of the chasen executable if this is the first start of JGloss
         String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
@@ -63,7 +87,7 @@ public class JGlossApp extends JGloss {
 
     protected PreferencesPanel[] getPreferencesPanels() {
         return new PreferencesPanel[] { GeneralDialog.getInstance(),
-                                        DocumentStyleDialog.getDocumentStyle(),
+                                        DocumentStyleDialog.getDocumentStyleDialog(),
                                         Dictionaries.getInstance(),
                                         ExclusionList.getInstance() };
     }
@@ -71,7 +95,7 @@ public class JGlossApp extends JGloss {
     protected void showMainWindow( String[] args) throws Exception {
         if (args.length == 0) {
             if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-                WordLookup.getFrame().show();
+                getLookupFrame().show();
             else
                 new JGlossFrame();
         }
@@ -83,6 +107,11 @@ public class JGlossApp extends JGloss {
         }   
     }
 
+    protected void backgroundCreateDialogs() {
+        getLookupFrame();
+        super.backgroundCreateDialogs();
+    }
+
     /**
      * Exits JGloss. Before the application quits, the preferences will be saved.
      * This method will be called when the last JGloss frame is closed. The method may return
@@ -92,7 +121,7 @@ public class JGlossApp extends JGloss {
      * @return <CODE>false</CODE>, if the application will not quit.
      */
     protected boolean doExit() {
-        if (JGlossFrame.getFrameCount()>0 || WordLookup.getFrame().isVisible())
+        if (JGlossFrame.getFrameCount()>0 || getLookupFrame().isVisible())
             return false;
 
         /*

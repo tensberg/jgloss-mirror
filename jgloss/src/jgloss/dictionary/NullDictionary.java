@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import jgloss.dictionary.attribute.Attribute;
+
 import java.util.List;
 import java.util.Collections;
 

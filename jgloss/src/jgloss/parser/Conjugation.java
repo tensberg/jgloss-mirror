@@ -49,7 +49,7 @@ public class Conjugation {
      * Localizable message resource.
      */
     private final static ResourceBundle messages = 
-        ResourceBundle.getBundle( "resources/messages-dictionary");
+        ResourceBundle.getBundle( "resources/messages-parser");
 
     /**
      * Ending of the conjugated verb/adjective.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -42,127 +42,7 @@ import javax.swing.tree.*;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicTreeUI;
 
-/**
- * Editor for annotations in a document. For each annotation the editor will show all
- * reading annotation and translations which were found during parsing. The user can select
- * which reading and which translation should be used, or edit a new value by hand.
- *
- * @author Michael Koch
- */
-public class AnnotationEditor extends JTree implements TreeSelectionListener, MouseListener {
-    /**
-     * Variant of the default tree cell editor which returns an increased preferred width
-     * for {@link jgloss.ui.annotation.EditableTextNode editable text nodes}. This is neccessary
-     * because otherwise readings and translations won't display if the text length is increased.
-     */
-    private class AnnotationTreeCellRenderer extends DefaultTreeCellRenderer {
-        /**
-         * This is set to <CODE>true</CODE> for editable text nodes to signal a change
-         * of the preferred width.
-         */
-        boolean modifyWidth;
-
-        public AnnotationTreeCellRenderer() {
-            super();
-            modifyWidth = false;
-        }
-
-        public Dimension getPreferredSize() {
-            Dimension preferred = super.getPreferredSize();
-            if (modifyWidth && preferred!=null)
-                preferred.width += 60;
-            return preferred;
-        }
-
-        public Component getTreeCellRendererComponent(JTree tree, Object value,
-                                                      boolean sel,
-                                                      boolean expanded,
-                                                      boolean leaf, int row,
-                                                      boolean hasFocus) {
-            modifyWidth = (value instanceof EditableTextNode);
-            return super.getTreeCellRendererComponent( tree, value, sel, expanded, leaf, row, hasFocus);
-        }
-    } // class AnnotationTreeCellRenderer
-
-    /**
-     * Editor for the reading or translation for a specific annotation. The editor consist of a
-     * static label which describes the type of entry and an editable component for the
-     * actual entry.
-     *
-     * @author Michael Koch
-     */
-    private class AnnotationTreeCellEditor extends DefaultTreeCellEditor {
-        private Box box;
-        private JLabel label;
-
-        /**
-         * Creates a new editor with its look taken from the component returned by the
-         * specified renderer.
-         *
-         * @param renderer The tree cell renderer on which the look for the editor should be based.
-         */
-        public AnnotationTreeCellEditor( DefaultTreeCellRenderer renderer) {
-            super( AnnotationEditor.this, renderer);
-        }
-
-        /**
-         * Prevent editing nodes other than EditableTextNodes.
-         */
-        public boolean isCellEditable( EventObject event) {
-            if (event != null &&
-                event.getSource() == AnnotationEditor.this &&
-                event instanceof MouseEvent) {
-                TreePath path = tree.getPathForLocation( ((MouseEvent)event).getX(),
-                                                         ((MouseEvent)event).getY());
-                if (path != null && 
-                    !(path.getLastPathComponent() instanceof EditableTextNode))
-                    return false;
-            }
-
-            return super.isCellEditable( event);
-        }
-
-        /**
-         * Creates a container in which the editing component will be placed. Additionally the
-         * descriptive label will be placed in the container.
-         *
-         * @return The newly created container.
-         */
-        protected Container createContainer() {
-            Container c = super.createContainer();
-            box = Box.createHorizontalBox();
-            label = new JLabel();
-            return c;
-        }
-
-        public Component getTreeCellEditorComponent( JTree tree, Object value,
-                                                     boolean isSelected,
-                                                     boolean expanded, boolean leaf, int row) {
-            Container c = (Container) super.getTreeCellEditorComponent( tree, value, isSelected, expanded,
-                                                                        leaf, row);
-
-            if (value instanceof EditableTextNode) {
-                EditableTextNode node = (EditableTextNode) value;
-                label.setFont( c.getFont());
-                label.setForeground( c.getForeground());
-                label.setText( node.getDescription());
-                String text = node.getText();
-                
-                JTextField textfield = ((JTextField) editingComponent);
-                textfield.setText( text);
-                textfield.setColumns( text.length() + 5); // leave space for editing
-                
-                box.removeAll();
-                box.add( label);
-                box.add( editingComponent); // editingComponent was reset by superclass
-                editingComponent = box; // will be added to container by superclass
-                prepareForEditing();
-            }
-            
-            return c;
-        }
-    }
-
+public class AnnotationEditor extends JPanel implements MouseListener {
     /**
      * Delegator for key events which only forwards <CODE>keyPressed</CODE> and <CODE>keyReleased</CODE>
      * events. In Swing 1.4, the <CODE>BasicTreeUI</CODE> key listener adds first letter navigation, 
@@ -219,39 +99,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         return null;
     }
 
-    /**
-     * The model which this JTree displays. Kept here as member variable to prevent the constant
-     * typecasting.
-     */
-    private AnnotationModel model;
-    /**
-     * JGlossEditor which displays the document containing the annotations managed by this 
-     * AnnotationEditor.
-     */
-    private JGlossEditor docpane;
-    /**
-     * The EditorKit which created the document.
-     */
-    private JGlossEditorKit kit;
-    /**
-     * The document which is displayed by <CODE>docpane</CODE> and contains the annotations
-     * managed by this AnnotationEditor.
-     */
     private JGlossDocument doc;
+    private JGlossEditor docpane;
 
-    /**
-     * Action which sets the reading of the selected annotation to the currently selected reading.
-     */
-    private Action useReadingAction;
-    /**
-     * Action which sets the translation of the selected annotation to the currently selected
-     * translation.
-     */
-    private Action useTranslationAction;
-    /**
-     * Action which hides the currently selected annotation.
-     */
-    private Action hideAction;
     /**
      * Action which removes the currently selected annotation.
      */
@@ -273,14 +123,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      */
     private Action addToDictionaryAction;
     /**
-     * Action which will hide all annotations which are a duplicate of a previous annotation.
-     */
-    private Action hideDuplicatesAction;
-    /**
-     * Action which will un-hide all annotations.
-     */
-    private Action unhideAction;
-    /**
      * Action which will set the current reading/translation text to the empty string.
      */
     private Action clearTranslationAction;
@@ -294,157 +136,11 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      */
     private JPopupMenu pmenu;
     /**
-     * Flag if the use translation action is currently added to the popup menu.
-     */
-    private boolean pmenuTranslationAdded = false;
-    /**
-     * Flag if the use reading action is currently added to the popup menu.
-     */
-    private boolean pmenuReadingAdded = false;
-    /**
      * Change the component font in response to preferences changes.
      */
     private PropertyChangeListener fontChangeListener;
 
-    /**
-     * An Enumeration containing no elements.
-     */
-    private final static Enumeration EMPTY_ENUMERATION = new Vector(1).elements();
-
-    /**
-     * Flag if this is the first time the tree is expanded. This is used for optimizing the
-     * <CODE>getExpandedDescendants</CODE> method.
-     */
-    private boolean isInitialExpansion = true;
-    /**
-     * Flag if getExpandedDescendants should return an empty enumeration. This is used together
-     * with <CODE>isInitialExpansion</CODE> to speed up the initial expansion of the tree.
-     */
-    private boolean returnEmptyEnumeration = false;
-
-    /**
-     * Creates a new annotation editor. The editor is initially empty and not associated
-     * to a document containing annotations. Call {@link #setDocument(Element,JGlossEditor) setDocument}
-     * to set the document to edit. The constructor will create a new empty AnnotationModel.
-     */
     public AnnotationEditor() {
-        setLargeModel( true);
-        model = new AnnotationModel() {
-                public void valueForPathChanged( TreePath path, Object newValue) {
-                    ((EditableTextNode) path.getLastPathComponent()).setText( newValue.toString());
-                }
-            };
-        setModel( model);
-        ((DefaultTreeSelectionModel) getSelectionModel())
-            .setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION);
-        model.addTreeModelListener( new TreeModelListener() {
-                private void checkCollapseNode( TreePath tp) {
-                    // collapse an annotation node if it was hidden through a user action
-                    if (tp.getLastPathComponent() instanceof AnnotationNode) {
-                        if (((AnnotationNode) tp.getLastPathComponent()).isHidden()) {
-                            collapsePath( tp);
-                        }
-                        else {
-                            expandAll( tp);
-                        }
-                    }
-                }
-
-                public void treeNodesChanged( TreeModelEvent e) {
-                    TreePath tp = e.getTreePath();
-                    if (e.getChildren() == null) {
-                        checkCollapseNode( tp);
-                    }
-                    else {
-                        Object[] children = e.getChildren();
-                        for ( int i=0; i<children.length; i++)
-                            checkCollapseNode( tp.pathByAddingChild( children[i]));
-                    }
-                }
-
-                public void treeNodesInserted( TreeModelEvent e) {}
-                public void treeNodesRemoved( TreeModelEvent e) {}
-                public void treeStructureChanged( TreeModelEvent e) {}
-            });
-
-        // Prevent the tree cell renderer from drawing the collapse/uncollapse icons in the
-        // tree because they don't make much sense for this application.
-        // The DefaultTreeCellRenderer seems to accept null for a new value, but it is not
-        // documented, so I use an empty icon.
-        Icon nullIcon = new Icon() {
-                public int getIconWidth() { return 0; }
-                public int getIconHeight() { return 0; }
-                public void paintIcon( java.awt.Component c, java.awt.Graphics g, int x, int y) {}
-            };
-        DefaultTreeCellRenderer r = new AnnotationTreeCellRenderer();
-        r.setLeafIcon( nullIcon);
-        r.setOpenIcon( nullIcon);
-        r.setClosedIcon( nullIcon);
-        setCellRenderer( r);
-        setRowHeight( r.getPreferredSize().height);
-        if (this.getUI() instanceof BasicTreeUI) {
-            BasicTreeUI ui = (BasicTreeUI) this.getUI();
-            ui.setCollapsedIcon( nullIcon);
-            ui.setExpandedIcon( nullIcon);
-        }
-        this.setCellEditor( new AnnotationTreeCellEditor( r));
-        this.setEditable( true);
-
-        this.setRootVisible( false);
-        this.setShowsRootHandles( false);
-
-        addTreeSelectionListener( this);
-
-        // use currently selected reading for this annotation
-        useReadingAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
-                    AbstractAnnotation annotation;
-                    if (tn instanceof TranslationNode) {
-                        annotation = ((TranslationNode) tn).getTranslation();
-                    }
-                    else {
-                        annotation = ((ReadingAnnotationNode) tn).getReading();
-                    }
-
-                    while (!(tn instanceof AnnotationNode))
-                        tn = tn.getParent();
-
-                    ((AnnotationNode) tn).setWordFrom( annotation);
-                }
-            };
-        UIUtilities.initAction( useReadingAction, "annotationeditor.menu.usereading");
-        useReadingAction.setEnabled( false);
-        // use currently selected translation for this annotation
-        useTranslationAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
-                    String translation = ((TranslationLeafNode) tn).getTranslation();
-
-                    Parser.TextAnnotation annotation = ((TranslationNode) tn.getParent())
-                        .getTranslation();
-
-                    while (!(tn instanceof AnnotationNode))
-                        tn = tn.getParent();
-                    ((AnnotationNode) tn).getTranslationNode().setText( translation);
-                }
-            };
-        UIUtilities.initAction( useTranslationAction, "annotationeditor.menu.usetranslation");
-        useTranslationAction.setEnabled( false);
-        // hide/unhide currently selected annotation
-        hideAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
-                    while (!(tn instanceof AnnotationNode))
-                        tn = tn.getParent();
-                    AnnotationNode krn = (AnnotationNode) tn;
-                    krn.setHidden( !krn.isHidden());
-                    if (getSelectionPath()!=null)
-                        updateHideAction( (TreeNode) getSelectionPath().getLastPathComponent());
-                }
-            };
-        UIUtilities.initAction( hideAction, "annotationeditor.menu.hide");
-        hideAction.setEnabled( false);
         // remove the currently selected annotation
         removeAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
@@ -614,56 +310,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             };
         UIUtilities.initAction( addToDictionaryAction, "annotationeditor.menu.addtodictionary");
         addToDictionaryAction.setEnabled( false);
-        // Hide all annotations which are a duplicate of a previous annotation.
-        // A duplicate has the same kanji, reading and translation.
-        hideDuplicatesAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    // stores already seen annotations
-                    Set nodes = new HashSet();
-                    for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
-                        AnnotationNode node = (AnnotationNode) i.next();
-                        if (!node.isHidden()) {
-                            String key = node.getWordNode().getWord() + "%" +
-                                node.getWordNode().getReading() + "%" +
-                                node.getTranslationNode().getText();
-                            if (nodes.contains( key))
-                                node.setHidden( true, false);
-                            else
-                                nodes.add( key);
-                        }
-                    }
-                    // force docpane to be re-layouted. Unfortunately I have not found a better
-                    // way to do this.
-                    doc.getStyleSheet().addRule( AnnotationTags.ANNOTATION.getId() + " { }");
-                }
-            };
-        UIUtilities.initAction( hideDuplicatesAction, "annotationeditor.menu.hideduplicates");
-        hideDuplicatesAction.setEnabled( false);
-        // make all hidden annotations visible
-        unhideAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
-                        AnnotationNode node = (AnnotationNode) i.next();
-                        if (node.isHidden()) {
-                            node.setHidden( false, false);
-                        }
-                    }
-                    // force docpane to be re-layouted. Unfortunately I have not found a better
-                    // way to do this.
-                    doc.getStyleSheet().addRule( AnnotationTags.ANNOTATION.getId() + " { }");
-                }
-            };
-        UIUtilities.initAction( unhideAction, "annotationeditor.menu.unhide");
-        unhideAction.setEnabled( false);
 
         menu = new JMenu( JGloss.messages.getString( "annotationeditor.menu.title"));
         pmenu = new JPopupMenu();
-        menu.add( UIUtilities.createMenuItem( useReadingAction));
-        menu.add( UIUtilities.createMenuItem( useTranslationAction));
-
-        menu.addSeparator();
-        menu.add( UIUtilities.createMenuItem( hideAction));
-        pmenu.add( hideAction);
         menu.add( UIUtilities.createMenuItem( removeAction));
         pmenu.add( removeAction);
         menu.add( UIUtilities.createMenuItem( removeDuplicatesAction));
@@ -674,10 +323,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         pmenu.add( addToExclusionsAction);
         menu.add( UIUtilities.createMenuItem( addToDictionaryAction));
         pmenu.add( addToDictionaryAction);
-        
-        menu.addSeparator();
-        menu.add( UIUtilities.createMenuItem( hideDuplicatesAction));
-        menu.add( UIUtilities.createMenuItem( unhideAction));
 
         addMouseListener( this);
 
@@ -774,48 +419,11 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 }
             };
         UIUtilities.initAction( previousAnnotationAction, "annotationeditor.action.previous");
-        // do something useful, based on the currenty selected node
-        Action metaAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    TreePath tp = getSelectionPath();
-                    if (tp != null) {
-                        TreeNode node = (TreeNode) tp.getLastPathComponent();
-                        if (node instanceof AnnotationNode)
-                            hideAction.actionPerformed( e);
-                        else if (node instanceof ReadingAnnotationNode ||
-                                 node instanceof TranslationNode)
-                            useReadingAction.actionPerformed( e);
-                        else if (node instanceof TranslationLeafNode)
-                            useTranslationAction.actionPerformed( e);
-                        else if (node instanceof EditableTextNode)
-                            startEditingAtPath( tp);
-                        else if (node instanceof DictionaryFormNode) {
-                            if (isExpanded( tp))
-                                collapsePath( tp);
-                            else
-                                expandPath( tp);
-                        }
-                    }
-                }
-            };
-        UIUtilities.initAction( metaAction, "annotationeditor.action.meta");
 
         // Add the key bindings for the actions to the annotation editor.
-        // Since the metaAction uses a "released SPACE" and a "SPACE" action is also defined,
-        // the "SPACE" action has to be overridden. Since the "SPACE" action is not defined
-        // in the JTree's input map but in one of the parents and I don't want to mess up the
-        // keybindings too much, I add a dummy binding for "SPACE" which does nothing.
-        // A "released SPACE" has to be used because otherwise a space character is added when
-        // text editing is started.
         InputMap im = getInputMap();
         KeyStroke[] strokes = im.allKeys();
-        KeyStroke metaStroke = (KeyStroke) metaAction.getValue( Action.ACCELERATOR_KEY);
-        for ( int i=0; i<strokes.length; i++) {
-            if (strokes[i].getKeyCode() == metaStroke.getKeyCode())
-                im.put( strokes[i], "dummy");
-        }
         ActionMap am = getActionMap();
-        am.put( "dummy", new AbstractAction() { public void actionPerformed( ActionEvent e) {} });
 
         im.put( (KeyStroke) nextAnnotationAction.getValue( Action.ACCELERATOR_KEY),
                 nextAnnotationAction.getValue( Action.NAME));
@@ -823,8 +431,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         im.put( (KeyStroke) previousAnnotationAction.getValue( Action.ACCELERATOR_KEY),
                 previousAnnotationAction.getValue( Action.NAME));
         am.put( previousAnnotationAction.getValue( Action.NAME), previousAnnotationAction);
-        im.put( metaStroke, metaAction.getValue( Action.NAME));
-        am.put( metaAction.getValue( Action.NAME), metaAction);
 
         im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
                                         ( "annotationeditor.action.cleartranslation.ak")),
@@ -849,9 +455,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                                         ( "annotationeditor.action.addtodictionary.ak")),
                 addToDictionaryAction.getValue( Action.NAME));
         am.put( addToDictionaryAction.getValue( Action.NAME), addToDictionaryAction);
-        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString( "annotationeditor.action.hide.ak")),
-                hideAction.getValue( Action.NAME));
-        am.put( hideAction.getValue( Action.NAME), hideAction);
 
         // update display if user changed font
         fontChangeListener = new PropertyChangeListener() {
@@ -872,112 +475,20 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * @param rootElement Root element of the document containing annotations.
      * @param docpane The editor which displays the annotated document.
      */
-    public void setDocument( Element rootElement, JGlossEditor docpane) {
-        this.docpane = docpane;
-        this.kit = (JGlossEditorKit) docpane.getEditorKit();
-        this.doc = (JGlossDocument) docpane.getDocument();
-        hideDuplicatesAction.setEnabled( true);
-        unhideAction.setEnabled( true);
-        model.setDocument( doc);
+    public void setDocument( JGlossDocument _doc, JGlossEditor _docpane) {
+        doc = _doc;
+        docpane = _docpane;
     }
 
     /**
-     * Expands all paths in the tree so that all nodes are visible.
+     * The currently selected annotation.
      */
-    public synchronized void expandAll() {
-        if (isInitialExpansion)
-            returnEmptyEnumeration = true;
-
-        if (!((TreeNode) model.getRoot()).isLeaf())
-            expandAll( new TreePath( model.getRoot()));
-
-        if (isInitialExpansion) {
-            isInitialExpansion = false;
-            returnEmptyEnumeration = false;
-        }
-    }
-
-    /**
-     * Expands all descendants of all annotation nodes which are not hidden.
-     */
-    public synchronized void expandNonHidden() {
-        if (isInitialExpansion)
-            returnEmptyEnumeration = true;
-
-        for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
-            AnnotationNode a = (AnnotationNode) i.next();
-            if (!a.isHidden())
-                expandAll( a);
-        }
-
-        if (isInitialExpansion) {
-            isInitialExpansion = false;
-            returnEmptyEnumeration = false;
-        }
-    }
-
-    /**
-     * Expands all paths in the tree passing through a node.
-     *
-     * @param node Node which will be expanded.
-     */
-    public void expandAll( TreeNode node) {
-        LinkedList path = new LinkedList();
-        path.add( node);
-        TreeNode parent = node.getParent();
-        while (parent != null) {
-            path.addFirst( parent);
-            parent = parent.getParent();
-        }
-        expandAll( new TreePath( path.toArray()));
-    }
-
-    /**
-     * Expands all paths in the tree passing through the node which is last in the path.
-     * This method has one exception: DictionaryFormNodes will not be expanded.
-     *
-     * @param path Contains the path from root to the node inclusive.
-     */
-    private void expandAll( TreePath path) {
-        TreeNode child = null;
-        boolean hasExpandedChild = false;
-        for ( Enumeration e=((TreeNode) path.getLastPathComponent()).children(); e.hasMoreElements(); ) {
-            child = (TreeNode) e.nextElement();
-            if (!(child.isLeaf() || child instanceof DictionaryFormNode)) {
-                expandAll( path.pathByAddingChild( child));
-                hasExpandedChild = true;
-            }
-        }
-        if (!hasExpandedChild)
-            this.expandPath( path);
-    }
-
-    /**
-     * Returns an enumeration of expanded descendants. This is overridden to optimize
-     * the initial expansion of the tree from {@link #expandAll() expandAll} or
-     * {@link #expandNonHidden() expandNonHidden}. Profiling has shown that this method
-     * is slowing down the expansion extremely.
-     * If one of this methods is called for
-     * the first time, it will set {@link #returnEmptyEnumeration} to <CODE>true</CODE>,
-     * because it is known that no nodes are expanded at that time. This method will
-     * then return an empty enumeration. 
-     */
-    public Enumeration getExpandedDescendants( TreePath parent) {
-        if (returnEmptyEnumeration)
-            return EMPTY_ENUMERATION;
-        else
-            return super.getExpandedDescendants( parent);
-    }
-
-    /**
-     * The currently selected annotation node.
-     */
-    private AnnotationNode annotationSelection = null;
+    private Annotation annotationSelection = null;
     /**
      * The last selected annotation. This is equal to <CODE>annotationSelection</CODE>, unless no
      * annotation is selected.
      */
-    private AnnotationNode lastSelectedAnnotation;
+    private Annotation lastSelectedAnnotation;
 
     /**
      * Adapt the display to a new selection. In response to a node selected in the annotation
@@ -992,7 +503,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     public void valueChanged( TreeSelectionEvent e) {
         if (e.getNewLeadSelectionPath() != null) {
             if (e.getNewLeadSelectionPath() != e.getOldLeadSelectionPath()) {
-                TreeNode tn = (TreeNode) e.getNewLeadSelectionPath().getLastPathComponent();                
+                TreeNode tn = (TreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
                 updateActions( tn);
                 
                 TreeNode selection = tn;
@@ -1042,83 +553,23 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         }
     }
 
-    /**
-     * Update the state of the actions to adapt to the given tree node.
-     *
-     * @param tn The tree node to adapt the actions to.
-     */
-    private void updateActions( TreeNode tn) {
-        if (tn == null) {
-            useReadingAction.setEnabled( false);
-            useTranslationAction.setEnabled( false);
-            hideAction.setEnabled( false);
+    private void updateActions( Annotation anno) {
+        if (anno == null) {
             removeAction.setEnabled( false);
             removeDuplicatesAction.setEnabled( false);
             equalizeAnnotationsAction.setEnabled( false);
             addToExclusionsAction.setEnabled( false);
             addToDictionaryAction.setEnabled( false);
             clearTranslationAction.setEnabled( false);
-
-            // update context sensitive popup menu
-            if (pmenuReadingAdded || pmenuTranslationAdded) {
-                pmenu.remove( 0);
-                pmenu.remove( 0); // separator
-                pmenuReadingAdded = false;
-                pmenuTranslationAdded = false;
-            }
         }
         else {
-            useReadingAction.setEnabled(tn instanceof ReadingAnnotationNode ||
-                                        tn instanceof TranslationNode);
-            useTranslationAction.setEnabled(tn instanceof TranslationLeafNode);
-            hideAction.setEnabled( true);
             removeAction.setEnabled( true);
             removeDuplicatesAction.setEnabled( true);
             equalizeAnnotationsAction.setEnabled( true);
             addToExclusionsAction.setEnabled( true);
             addToDictionaryAction.setEnabled( Dictionaries.getUserDictionary() != null);
-            clearTranslationAction.setEnabled( tn instanceof ReadingTranslationNode ||
-                                               tn instanceof AnnotationNode);
-
-            updateHideAction( tn);
-
-            // update context sensitive popup menu
-            if (pmenuReadingAdded && !(tn instanceof ReadingAnnotationNode ||
-                                       tn instanceof TranslationNode) ||
-                pmenuTranslationAdded && !(tn instanceof TranslationLeafNode)) {
-                pmenu.remove( 0);
-                pmenu.remove( 0); // separator
-                pmenuReadingAdded = false;
-                pmenuTranslationAdded = false;
-            }
-
-            if (!pmenuReadingAdded && (tn instanceof ReadingAnnotationNode||
-                                       tn instanceof TranslationNode)) {
-                pmenu.insert( useReadingAction, 0);
-                pmenu.insert( new JPopupMenu.Separator(), 1);
-                pmenuReadingAdded = true;
-            }
-            else if (!pmenuTranslationAdded && tn instanceof TranslationLeafNode) {
-                pmenu.insert( useTranslationAction, 0);
-                pmenu.insert( new JPopupMenu.Separator(), 1);
-                pmenuTranslationAdded = true;
-            }
+            clearTranslationAction.setEnabled( true);
         }
-    }
-
-    /**
-     * Adapt the hide action to the given node.
-     *
-     * @param tn The node to adapt to.
-     */
-    private void updateHideAction( TreeNode tn) {
-        while (!(tn instanceof AnnotationNode)) {
-            tn = tn.getParent();
-        }
-        hideAction.putValue( Action.NAME,
-                             JGloss.messages.getString( ((AnnotationNode) tn).isHidden() ?
-                                                        "annotationeditor.menu.show" : 
-                                                        "annotationeditor.menu.hide"));
     }
 
     /**
@@ -1140,8 +591,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * @param pos A position in the document which contains the annotations.
      * @return The annotation made visible, or <CODE>null</CODE> if there is no annotation at the position.
      */
-    public AnnotationNode makeVisible( int pos) {
-        AnnotationNode annotation = model.findAnnotation( pos);
+    public Annotation makeVisible( int pos) {
+        Annotation annotation = model.findAnnotation( pos);
         if (annotation != null)
             makeVisible( annotation);
         return annotation;
@@ -1153,22 +604,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      *
      * @param node The annotation node which will be made visible.
      */
-    public void makeVisible( AnnotationNode node) {
+    public void makeVisible( Annotation node) {
         if (node != null) {
-            TreeNode[] path = new TreeNode[2];
-            path[0] = (TreeNode) model.getRoot();
-            path[1] = node;
-            TreePath tp = new TreePath( path);
-            
-            // make node first visible entry in scroller
-            Rectangle r = getPathBounds( tp);
-            Component parent = getParent(); // JViewPort
-            if (parent!=null && parent instanceof JViewport) {
-                JViewport port = (JViewport) parent;
-                port.setViewPosition( new Point
-                    ( 0, Math.max( 0, Math.min( r.y, port.getViewSize().height -
-                                                port.getSize().height))));
-            }
 
             // uncollapse split pane if neccessary
             if (parent!=null && !(parent instanceof JSplitPane))
@@ -1203,27 +640,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             clearSelection();
         }
         return annotation;
-    }
-
-    /**
-     * Makes the given tree node the new selection. This will not scroll the display to 
-     * the new selection.
-     *
-     * @param node The tree node.
-     */
-    public void selectNode( TreeNode node) {
-        if (node == null)
-            return;
-
-        LinkedList path = new LinkedList();
-        while (node != null) {
-            path.addFirst( node);
-            node = node.getParent();
-        }
-
-        TreeNode[] tp = new TreeNode[path.size()];
-        tp = (TreeNode[]) path.toArray( tp);
-        setSelectionPath( new TreePath( tp));
     }
 
     /**

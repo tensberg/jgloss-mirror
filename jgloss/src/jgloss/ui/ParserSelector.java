@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -50,8 +50,7 @@ public class ParserSelector extends JPanel {
     private static java.util.List parsers = new ArrayList( 10);
 
     /**
-     * Registers a parser class with the parser selector. The parser class must have a constructor
-     * of the form <CODE>(Dictionary[] dictionaries,Set exclusions)</CODE>. Instances of
+     * Registers a parser class with the parser selector. Instances of
      * <CODE>ParserSelector</CODE> created before a new parser is registered will not be updated.
      *
      * @param parserClass Class implementing the {@link jgloss.dictionary.Parser Parser} interface.
@@ -61,11 +60,9 @@ public class ParserSelector extends JPanel {
      * @exception NoSuchMethodException if the parser class has no constructor of the form 
      *            <CODE>(Dictionary[] dictionaries,Set exclusions)</CODE>.
      */
-    public static void registerParser( Class parserClass, String displayName) throws NoSuchMethodException {
+    public static void registerParser( Class parserClass, String displayName) {
         if (!Parser.class.isAssignableFrom( parserClass))
             throw new ClassCastException();
-        // test if the constructor is available
-        parserClass.getConstructor( new Class[] { jgloss.dictionary.Dictionary[].class, Set.class });
 
         parsers.add( parserClass);
         parsers.add( displayName);
@@ -159,7 +156,7 @@ public class ParserSelector extends JPanel {
             b.add( new JLabel( JGloss.messages.getString( "parserselector.readingbrackets")));
             b.add( Box.createHorizontalStrut( 3));
             b.add( readingBrackets);
-            JPanel p = UIUtilities.createSpaceEater( b, true);
+            JPanel p = UIUtilities.createFlexiblePanel( b, true);
             p.setBorder( BorderFactory.createEmptyBorder( 5, 2, 0, 2));
             this.add( p, c);
         }
@@ -175,22 +172,29 @@ public class ParserSelector extends JPanel {
      */
     public static Parser createParser( Class parserClass, jgloss.dictionary.Dictionary[] dictionaries,
                                        Set exclusions, boolean firstOccurrenceOnly) {
-        if (parserClass == null)
-            return null;
+        // Try different combination of constructor parameters. The array contains several
+        // parameter combinations with the parameters in "parameters[][0]" and the
+        // corresponding type classes in "parameters[][1]".
+        Object[][] parameters = 
+            new Object[][] { { dictionaries, exclusions }, { exclusions } };
+        Class[][] paramClasses =
+            new Class[][] { { jgloss.dictionary.Dictionary[].class, Set.class},
+                            { Set.class } };
 
-        try {
-            Constructor c = parserClass
-                .getConstructor( new Class[] { jgloss.dictionary.Dictionary[].class, Set.class });
-            Parser p = (Parser) c.newInstance( new Object[] { dictionaries, exclusions });
+        // loop over the sets of parameters until a matching constructor is found.
+        for ( int i=0; i<parameters.length; i++) try {
+            Constructor c = parserClass.getConstructor( paramClasses[i]);
+            Parser p = (Parser) c.newInstance( parameters[i]);
             p.setAnnotateFirstOccurrenceOnly( firstOccurrenceOnly);
-
             return p;
-        }
-        catch (Exception ex) {
+        } catch (NoSuchMethodException ex) {
+            // try to find a constructor with a different set of parameters
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        return null;
+        throw new IllegalArgumentException( "no suitable constructor in parser class " +
+                                            parserClass.getName());
     }
 
     /**

@@ -46,7 +46,8 @@ public class AsynchronousLookupEngine extends LookupEngine {
         public void run() {
             synchronized (THREAD_LOCK) {
                 while (!terminateThread) try {
-                    THREAD_LOCK.wait();
+                    if (model == null)
+                        THREAD_LOCK.wait();
 
                     if (terminateThread)
                         break;
@@ -57,13 +58,15 @@ public class AsynchronousLookupEngine extends LookupEngine {
                         Thread.interrupted();
                     }
                     doLookupSuper( model);
-                    if (runAfterLookup != null)
-                        runAfterLookup.run();
                     synchronized (LOOKUP_LOCK) {
                         inLookup = false;
+                        model = null;
                         // clear lingering interrupted flag
                         Thread.interrupted();
                     }
+
+                    if (runAfterLookup != null)
+                        runAfterLookup.run();
                 } catch (InterruptedException ex) {}
             }
         }
@@ -116,6 +119,11 @@ public class AsynchronousLookupEngine extends LookupEngine {
     /**
      * Initiate a new lookup, which will be performed in its own thread. The method will return
      * immediately. If another search is currently executing, it will be aborted.
+     *
+     * @param runAfterLookup if <code>!= null</code>, this runnable will be executed in the
+     *        lookup thread after the search is completed. If the search is interrupted,
+     *        the runnable will not be executed. It is possible to schedule a new lookup from
+     *        the runnable.
      */
     public void doLookup( LookupModel model, Runnable runAfterLookup) {
         searchThread.newSearch( model, runAfterLookup);
@@ -126,7 +134,9 @@ public class AsynchronousLookupEngine extends LookupEngine {
     }
     
     public void dispose() {
-        searchThread.dispose();
+        if (searchThread != null)
+            searchThread.dispose();
+        searchThread = null;
     }
 
     protected void finalize() {
