@@ -315,7 +315,7 @@ public class EDict implements Dictionary {
                     while (end<dictionaryLength && dictionary[end]!=0x0a)
                         end++;
 
-                    String entry = new String( dictionary, start, end-start, "EUC-JP");
+                    String entry = unescape( new String( dictionary, start, end-start, "EUC-JP"));
 
                     int j, k;
                     // word:
@@ -327,7 +327,7 @@ public class EDict implements Dictionary {
                         continue;
                     }
                     else {
-                        word = unescape( entry.substring( 0, i));
+                        word = entry.substring( 0, i);
                     }
                     // reading:
                     String reading = null;
@@ -340,7 +340,7 @@ public class EDict implements Dictionary {
                             continue;
                         }
                         else
-                            reading = unescape( entry.substring( i+1, j));
+                            reading = entry.substring( i+1, j);
                     } // else: no reading
 
                     // translations
@@ -352,7 +352,7 @@ public class EDict implements Dictionary {
                     }
                     ArrayList translations = new ArrayList( 10);
                     while ((k=entry.indexOf( '/', i+1)) != -1) {
-                        translations.add( unescape( entry.substring( i+1, k)));
+                        translations.add( entry.substring( i+1, k));
                         i = k;
                     }
                     translations.trimToSize();

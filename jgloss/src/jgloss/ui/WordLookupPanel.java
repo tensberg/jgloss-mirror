@@ -63,6 +63,14 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
 
     private boolean updateListEventScheduled = false;
 
+    /**
+     * Search type ID for best match search.
+     *
+     * @see jgloss.dictionary.Dictionary#SEARCH_EXACT_MATCHES
+     * @see jgloss.dictionary.Dictionary#SEARCH_STARTS_WITH
+     * @see jgloss.dictionary.Dictionary#SEARCH_ENDS_WITH
+     * @see jgloss.dictionary.Dictionary#SEARCH_ANY_MATCHES
+     */
     private final static int SEARCH_BEST_MATCH = 100;
 
     /**
@@ -237,7 +245,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         p.add( expressionDescription, c2);
         //BUG: JComboBox changed to JTextField to work around a bug in the JRE 1.4 Windows L&F where
         // the JComboBox would grab the focus again after losing it and thus preventing buttons
-        // from working immediately
+        // from working
         //expression = new JComboBox();
         //expression.setEditable( true);
         expression = new JTextField();
@@ -408,7 +416,8 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
     }
 
     /**
-     * Looks up the current selection using the search parameters set in the dialog.
+     * Looks up the current selection using the search parameters set in the dialog and return the
+     * list of matches.
      *
      * @param resultmode Determines the object types in the result list.
      * @return List of dictionary lookup results.
@@ -418,7 +427,8 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
     }
 
     /**
-     * Looks up the current selection using the search parameters set in the dialog.
+     * Looks up the current selection using the search parameters set in the dialog and return
+     * the list of matches.
      *
      * @param resultmode Determines the object types in the result list.
      * @param markDictionaries If <code>true</code> and more than one dictionary is searched,
@@ -537,6 +547,10 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         return result;
     }
 
+    /**
+     * Search the the text in the seach expression field using the current dialog settings
+     * and display the result.
+     */
     protected void search() {
         /*if (expression.getSelectedItem() == null)
             return; // empty expression string
@@ -559,7 +573,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         resultText.append( '\n');
         while (it.hasNext()) {
             Object o = it.next();
-            if (o instanceof String) { // dictionary name
+            if (o instanceof String) { // name of Dictionary object
                 resultText.append( JGloss.messages.getString( "wordlookup.matches"));
                 if (useHTML)
                     resultText.append( "<font color=\"green\">");
@@ -582,7 +596,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                     resultText.append( "</i><br>");
                 resultText.append( '\n');
             }
-            else { // dictionary entry
+            else { // dictionary entry or word/reading pair
                 WordReadingPair wrp = (WordReadingPair) o;
                 if (useHTML) {
                     StringBuffer match = new StringBuffer( wrp.toString());

@@ -491,11 +491,11 @@ public class KanjiDic implements Dictionary {
      * the list of results. The entry is checked against the search mode.
      *
      * @param expression The expression which is looked up.
-     * @param r List of results to which the created objects are added.
-     * @param e The entry for which the objects will be created.
+     * @param result List of results to which the created objects are added.
+     * @param entry The entry for which the objects will be created.
      * @param searchmode The search mode.
      */
-    protected void constructResult( String expression, List r, String entry, short searchmode,
+    protected void constructResult( String expression, List result, String entry, short searchmode,
                                     short resultmode) {
         Entry e = new Entry( entry, true);
         final String kanji = new String( new char[] { e.getKanji() });
@@ -515,7 +515,7 @@ public class KanjiDic implements Dictionary {
             
             // the construction of the dictionary entry can change the kanji part by adding
             // okurigana, so we have to re-test the match for exact matches.
-            if (e.getReadings() != null) {
+            if (e.getReadings() != null) { // may be null if there are only nanori readings
                 String[] readings = e.getReadings();
                 for ( int i=0; i<readings.length; i++) {
                     DictionaryEntry de = createDictionaryEntry( kanji, readings[i], translations);
@@ -523,15 +523,16 @@ public class KanjiDic implements Dictionary {
                     if (!(kanjiMatches || translationMatches))
                         readingMatches = expression.equals( de.getReading()) ||
                             expression.equals( de.getWord());
-                    if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
+                    if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || 
+                                          searchmode==SEARCH_ANY_MATCHES ||
                                           de.getWord().equals( kanji))) || 
                         translationMatches || readingMatches)
-                        r.add( de);
+                        addResult( result, de, resultmode);
                 }
             }
         }
         else { // create WordReadingPairs
-            if (e.getReadings() != null) {
+            if (e.getReadings() != null) { // may be null if there are only nanori readings
                 String[] readings = e.getReadings();
                 for ( int i=0; i<readings.length; i++) {
                     WordReadingPair wrp = createWordReadingPair( kanji, readings[i]);
@@ -539,10 +540,11 @@ public class KanjiDic implements Dictionary {
                     if (!kanjiMatches)
                         readingMatches = expression.equals( wrp.getReading()) ||
                             expression.equals( wrp.getWord());
-                    if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
+                    if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || 
+                                          searchmode==SEARCH_ANY_MATCHES ||
                                           wrp.getWord().equals( kanji))) ||
                         readingMatches)
-                        r.add( wrp);
+                        addResult( result, wrp, resultmode);
                 }
             }
         }
@@ -558,7 +560,7 @@ public class KanjiDic implements Dictionary {
                         expression.equals( de.getWord());
                 if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
                                       de.getWord().equals( kanji))) || readingMatches)
-                    r.add( de);
+                    addResult( result, de, resultmode);
             }
         }
         if (e.getRadicalName() != null) {
@@ -571,7 +573,7 @@ public class KanjiDic implements Dictionary {
                     expression.equals( de.getWord());
             if ((kanjiMatches && (searchmode==SEARCH_STARTS_WITH || searchmode==SEARCH_ANY_MATCHES ||
                                   de.getWord().equals( kanji))) || readingMatches)
-                r.add( de);
+                addResult( result, de, resultmode);
         }
     }
 
@@ -621,6 +623,13 @@ public class KanjiDic implements Dictionary {
             };
     }
 
+    /**
+     * Add a dictionary entry to the list of results in a form determined by the result mode.
+     */
+    protected void addResult( List result, WordReadingPair entry, short resultmode) {
+        result.add( entry);
+    }
+    
     /**
      * Returns the path to the dictionary file.
      *

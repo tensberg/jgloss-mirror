@@ -85,7 +85,7 @@ public class EDictNIO extends FileBasedDictionary {
 
     public String getEncoding() { return "EUC_JP"; }
 
-    protected boolean isEntryStart( int offset) {
+    protected boolean isWordStart( int offset) {
         try {
             byte b = dictionary.get( offset-1);
             return (b=='[' || b=='/' || b==10 || b==13);
@@ -94,7 +94,7 @@ public class EDictNIO extends FileBasedDictionary {
         }
     }
     
-    protected boolean isEntryEnd( int offset) {
+    protected boolean isWordEnd( int offset) {
         try {
             byte b = dictionary.get( offset);
             if (b==']' || b=='/' || b==10 || b==13)
@@ -118,25 +118,25 @@ public class EDictNIO extends FileBasedDictionary {
     protected void parseEntry( List result, String entry, int entrystart, int where, String expression,
                                ByteBuffer exprbuf, short searchmode, short resultmode) {
         int j, k;
-        // word:
-        String word;
         try {
+            entry = unescape( entry);
+
             int i = entry.indexOf( ' ');
-            word = unescape( entry.substring( 0, i));
+            String word = entry.substring( 0, i);
 
             // reading:
             String reading = null;
             i = entry.indexOf( '[');
             if (i != -1) {
                 j = entry.indexOf( ']', i+1);
-                reading = unescape( entry.substring( i+1, j));
+                reading = entry.substring( i+1, j);
             } // else: no reading
         
             // translations
             i = entry.indexOf( '/', i);
             ArrayList translations = new ArrayList( 10);
             while ((k=entry.indexOf( '/', i+1)) != -1) {
-                translations.add( unescape( entry.substring( i+1, k)));
+                translations.add( entry.substring( i+1, k));
                 i = k;
             }
             translations.trimToSize();

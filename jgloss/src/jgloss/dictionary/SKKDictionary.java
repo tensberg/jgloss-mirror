@@ -142,7 +142,7 @@ public class SKKDictionary implements Dictionary {
         /**
          * Returns a string representation of the word/reading pair.
          */
-        public String toString() { return word + " (" + reading + ")"; }
+        public String toString() { return word + " [" + reading + "]"; }
     } // class SKKWordReadingPair
 
     /**
@@ -243,7 +243,7 @@ public class SKKDictionary implements Dictionary {
      * @see WordReadingPair
      */
     public List search( String expression, short searchmode, short resultmode) throws SearchException {
-        List result = new LinkedList();
+        List result = new ArrayList( 20);
 
         Object o = entries.get( expression);
         if (o != null) {
@@ -255,7 +255,7 @@ public class SKKDictionary implements Dictionary {
                 }
             }
         }
-
+        
         return result;
     }
 

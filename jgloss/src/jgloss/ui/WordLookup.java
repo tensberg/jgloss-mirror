@@ -31,7 +31,6 @@ import java.awt.event.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.util.Iterator;
 import java.io.IOException;
 
 import javax.swing.*;
@@ -190,9 +189,9 @@ public class WordLookup extends JFrame {
 
         setJMenuBar( bar);
 
-        pack();
-
         wordlookup.getExpressionField().requestFocus();
+
+        pack();
     }
 
     /**

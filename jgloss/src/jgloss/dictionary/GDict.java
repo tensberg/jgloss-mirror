@@ -39,6 +39,16 @@ import java.util.regex.*;
  * @author Michael Koch
  */
 public class GDict extends FileBasedDictionary {
+    public static void main( String[] args) {
+        ALTERNATIVES_MATCHER.reset( "foo (baz$vad); bar");
+        System.err.println( "running alternative matcher");
+        while (ALTERNATIVES_MATCHER.find()) {
+            System.err.println( "alternative match \"" + ALTERNATIVES_MATCHER.group( 1) +"\" " +
+                                ALTERNATIVES_MATCHER.start() + "/" + ALTERNATIVES_MATCHER.end());
+        }
+        System.err.println( "end matcher");
+    }
+
     /**
      * Name of the dictionary format.
      */
@@ -100,10 +110,10 @@ public class GDict extends FileBasedDictionary {
      * pattern is matched.
      */
     protected static final Pattern ALTERNATIVES_PATTERN = Pattern.compile
-        ( "((?:[^(\\{]+?|" + // normal text
+        ( "((?:[^(\\{]|" + // normal text
           "(?:\\(.*?[)|$])|" + // text in (), ignore "; "
           "(?:\\{.*?[}|$]))+?)" + // text in {}, ignore "; "
-          "(\\s\\[\\w+\\])?" + // optional comment (ignored)
+          "(?:\\s\\[\\w+\\])?" + // optional comment (ignored)
           "(?:\\s\\{.+?\\})?" + // optional comment (ignored)
           "(?:;\\s|$)"); // separation marker
     protected static Matcher ALTERNATIVES_MATCHER = ALTERNATIVES_PATTERN.matcher( "");
@@ -136,7 +146,7 @@ public class GDict extends FileBasedDictionary {
 
     public String getEncoding() { return "UTF-8"; }
 
-    protected boolean isEntryStart( int offset) {
+    protected boolean isWordStart( int offset) {
         try {
             byte b = dictionary.get( offset-1);
             if (b==';' || b=='|' || b==10 || b==13)
@@ -156,7 +166,7 @@ public class GDict extends FileBasedDictionary {
         }
     }
 
-    protected boolean isEntryEnd( int offset) {
+    protected boolean isWordEnd( int offset) {
         try {
             byte b = dictionary.get( offset);
             if (b==';' || b=='|' || b==10 || b==13)

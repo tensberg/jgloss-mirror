@@ -403,14 +403,14 @@ public abstract class FileBasedDictionary implements Dictionary {
                     if (searchmode == SEARCH_EXACT_MATCHES ||
                         searchmode == SEARCH_STARTS_WITH) {
                         // test if preceeding character marks beginning of word entry
-                        if (start>0 && !isEntryStart( start))
+                        if (start>0 && !isWordStart( start))
                             continue;
                     }
                     if (searchmode == SEARCH_EXACT_MATCHES ||
                         searchmode == SEARCH_ENDS_WITH) {
                         // test if following character marks end of word entry
                         if (start+exprbuf.capacity()+1<dictionarySize &&
-                            !isEntryEnd( start+exprbuf.capacity()))
+                            !isWordEnd( start+exprbuf.capacity()))
                             continue;
                     }
 
@@ -495,7 +495,7 @@ public abstract class FileBasedDictionary implements Dictionary {
      *
      * @param offset Offset in the dictionary to the first byte of the entry. Guaranteed to be &gt;0 
      */
-    protected abstract boolean isEntryStart( int offset);
+    protected abstract boolean isWordStart( int offset);
 
     /**
      * Test if the character is the last character of an entry in the dictionary.
@@ -503,7 +503,7 @@ public abstract class FileBasedDictionary implements Dictionary {
      * @param offset Offset in the dictionary to the first byte after the entry.
      *               Guaranteed to be &lt; dictionary size-1.
      */
-    protected abstract boolean isEntryEnd( int offset);
+    protected abstract boolean isWordEnd( int offset);
 
     /**
      * Test if the byte is the separator mark for two entries. This implementation uses
