@@ -32,23 +32,11 @@ import java.util.List;
  * @author Michael Koch
  * @see Parser
  */
-public class Translation implements Parser.TextAnnotation {
-    /**
-     * Start offset of this annotation in the parsed text.
-     */
-    private int start;
-    /**
-     * Length of the annotated text.
-     */
-    private int length;
+public class Translation extends AbstractAnnotation {
     /**
      * Dictionary entry for the annotated text.
      */
     private DictionaryEntry dictionaryEntry;
-    /**
-     * Conjugation which was used for the word in the text.
-     */
-    private Conjugation conjugation;
 
     /**
      * Constructs a new Translation object for a word in the parsed text which has no
@@ -74,35 +62,17 @@ public class Translation implements Parser.TextAnnotation {
      *                    lookup. May be <CODE>null</CODE>
      */
     public Translation( int start, int length, DictionaryEntry dictionaryEntry, Conjugation conjugation) {
-        this.start = start;
-        this.length = length;
+        super( start, length, conjugation);
         this.dictionaryEntry = dictionaryEntry;
-        this.conjugation = conjugation;
     }
 
-    /**
-     * Returns the start offset of this annotation in the parsed text. 
-     *
-     * @return The start offset.
-     */
-    public int getStart() { return start; }
-    /**
-     * Returns the length of the annotated text.
-     *
-     * @return The length of the annotated text.
-     */
-    public int getLength() { return length; }
+    public String getWord() { return dictionaryEntry.getWord(); }
+    public String getReading() { return dictionaryEntry.getReading(); }
+
     /**
      * Returns the dictionary entry describing the annotated text.
      *
      * @return The dictionary entry describing the annotated text.
      */
     public DictionaryEntry getDictionaryEntry() { return dictionaryEntry; }
-    /**
-     * Returns the conjugation used to derive the dictionary form used for the
-     * dictionary lookup. May be <CODE>null</CODE> no conjugation was used.
-     *
-     * @return The conjugation used.
-     */
-    public Conjugation getConjugation() { return conjugation; }
 } // class Translation
