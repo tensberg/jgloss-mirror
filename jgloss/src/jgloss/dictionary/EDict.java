@@ -159,6 +159,7 @@ public class EDict implements Dictionary {
      */
     public EDict( String dicfile, boolean createindex) throws IOException {
         this.dicfile = dicfile;
+        random = new Random();
 
         File df = new File( dicfile);
         name = df.getName();
@@ -183,14 +184,15 @@ public class EDict implements Dictionary {
             loadJJDX( jindex);
             xjdxIndex = false;
         }
-        else if (xindex.canRead() && xindex.lastModified()>=df.lastModified()) {
+        else if (xindex.canRead()) {
+            // no test for file modification date because the user should have greater manual
+            // control over XJDX files since they are not created by JGloss
             loadXJDX( xindex);
             xjdxIndex = true;
         }
         else if (createindex) {
             buildIndex( true);
             try {
-                jindex.createNewFile();
                 saveJJDX( jindex);
             } catch (IOException ex) {
                 System.err.println( MessageFormat.format( messages.getString( "edict.error.writejjdx"),
@@ -198,8 +200,6 @@ public class EDict implements Dictionary {
                                                                          ex.getLocalizedMessage() }));
             }
         }
-
-        random = new Random();
     }
 
     /**
@@ -508,11 +508,11 @@ public class EDict implements Dictionary {
      * @exception IOException when the file cannot be written.
      */
     public void saveJJDX( File indexfile) throws IOException {
-        System.err.println( MessageFormat.format( messages.getString( "edict.writejjdx"),
-                                                  new String[] { getName() }));
-
         if (indexLength == 0)
             return;
+
+        System.err.println( MessageFormat.format( messages.getString( "edict.writejjdx"),
+                                                  new String[] { getName() }));
 
         DataOutputStream os = new DataOutputStream( new BufferedOutputStream
             ( new FileOutputStream( indexfile)));
@@ -538,7 +538,6 @@ public class EDict implements Dictionary {
             System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
                                                       new String[] { getName() }));
       
-        index = null; // delete old index if existant
         xjdxIndex = false;
 
         preBuildIndex();
@@ -550,7 +549,8 @@ public class EDict implements Dictionary {
      * First step in index creation.
      */
     protected void preBuildIndex() {
-        index = new int[50000];
+        if (index == null)
+            index = new int[50000];
         indexLength = 0;
     }
 
@@ -612,7 +612,7 @@ public class EDict implements Dictionary {
     protected void addIndexEntry( int offset) {
         if (indexLength == index.length) {
             // allocate more storage space
-            int[] tindex = new int[index.length*2];
+            int[] tindex = new int[Math.max( Math.min( index.length*2, 10), 500*1024)];
             System.arraycopy( index, 0, tindex, 0, index.length);
             index = tindex;
         }
@@ -620,8 +620,8 @@ public class EDict implements Dictionary {
     }
 
     /**
-     * Called as the last step in index file creation. This method will copy the
-     * <CODE>indexentries</CODE> set in the <CODE>index</CODE> array.
+     * Called as the last step in index file creation. This method will quicksort
+     * the index array.
      */
     protected void postBuildIndex() {
         quicksortIndex( 0, indexLength-1);
