@@ -58,8 +58,20 @@ public class ReadingAnnotationNode extends LeafNode {
         super( parent);
         this.reading = reading;
         readingText = reading.getReading();
+        if (reading.getConjugation() != null) {
+            // cut off inflection
+            readingText = readingText.substring( 0, readingText.length() - 
+                                                 reading.getConjugation().getDictionaryForm().length());
+        }
+
         description = JGloss.messages.getString( "annotationeditor.readingannotation",
-                                                 new Object[] { readingText });
+                                                 new Object[] {
+                                                     reading.getWordReadingPair()
+                                                     .getDictionary().getName(),
+                                                     readingText });
+        if (reading.getConjugation() != null) {
+            description += " (" + reading.getConjugation().getType() + ")";
+        }
     }
 
     /**
