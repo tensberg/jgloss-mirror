@@ -24,7 +24,7 @@
 package jgloss.dictionary;
 
 /**
- * Maps a reading to a japanese word. Instances of this class can be used for a
+ * Maps a reading to a Japanese word. Instances of this class can be used for a
  * dictionary which only contains word/reading entries. If a word has more than one
  * reading, use several instances of <CODE>WordReadingPair</CODE>.
  *
@@ -33,9 +33,9 @@ package jgloss.dictionary;
  */
 public interface WordReadingPair {
     /**
-     * Returns the japanese word.
+     * Returns the Japanese word.
      *
-     * @return The japanese word.
+     * @return The Japanese word.
      */
     String getWord();
     /**
