@@ -357,7 +357,7 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         else {
             for ( int i=0; i<d.length; i++) {
                 dictionaryChoice.addItem( d[i]);
-                if (d[i].equals( selected))
+                if (selected!=null && d[i].equals( selected))
                     index = i;
             }
             search.setEnabled( true);

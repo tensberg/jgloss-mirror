@@ -569,7 +569,7 @@ public class EDict implements Dictionary {
         for ( int i=start; i<end; i++) {
             int c = byteToUnsignedByte( dictionary[i]);
             if (inword) {
-                if (!(alphaoreuc( dictionary[i]) || c=='-' || c=='.' || (c>='0' && c<='9'))) {
+                if (!(alphaoreuc( dictionary[i]) || c=='-' || c=='.')) {
                     inword = false;
                     int len = i - entry;
                     // save all entries with length >= 3 or kanji/kana entries of length 2 (bytes).
