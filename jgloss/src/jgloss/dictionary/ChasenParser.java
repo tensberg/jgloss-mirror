@@ -37,7 +37,8 @@ import java.io.*;
 public class ChasenParser implements Parser {
     public static void main( String[] args) throws Exception {
         System.out.println( isChasenExecutable( getDefaultExecutable()));
-        Parser p = new ChasenParser( new Dictionary[] { new EDict( "/usr/share/edict/edict", true) }, null);
+        ChasenParser p = new ChasenParser
+            ( new Dictionary[] { new EDict( "/usr/share/edict/edict", true) }, null);
         StringWriter w = new StringWriter();
         BufferedReader r = new BufferedReader( new InputStreamReader
             ( new FileInputStream( "/home/michael/japan/karinodouji/kari.noannotations.txt"), "EUC-JP"));
@@ -185,7 +186,6 @@ public class ChasenParser implements Parser {
         parsePosition = 0;
         if (chasen == null)
             startChasen();
-        System.out.println( "parsing " + text);
 
         List annotations = new ArrayList( text.length/3);
         List translations = new ArrayList( 10);
@@ -195,21 +195,29 @@ public class ChasenParser implements Parser {
             for ( int i=0; i<text.length; i++) {
                 if (text[i] == 0x0d)
                     text[i] = 0x0a;
+                // chasen skips normal spaces
+                if (text[i] == ' ')
+                    text[i] = '\u3000'; // Japanese space
             }
             chasenIn.write( text);
-            chasenIn.write( (char) 0x0a); // chasen will start parsing at end of line
+            chasenIn.write( (char) 0x0a); // chasen will start parsing when end of line is encountered
             chasenIn.flush();
 
             String line;
-            while (parsePosition<text.length-1 && (line=chasenOut.readLine())!=null) {
+            while (parsePosition<=text.length && (line=chasenOut.readLine())!=null) {
                 System.out.println( line + " " + parsePosition + " " + text.length);
                 if (line.equals( "EOS")) { // end of line in input text
-                    parsePosition += 1;
+                    parsePosition++;
                 }
                 else {
                     int s;
                     int t = line.indexOf( '\t');
                     String surfaceInflected = line.substring( 0, t);
+                    // don't annotate romaji (may be interpreted as meishi by chasen)
+                    if (surfaceInflected.charAt( 0) < 256) {
+                        parsePosition += surfaceInflected.length();
+                        continue;
+                    }
                     s = t + 1;
                     t = line.indexOf( '\t', s);
                     String partOfSpeech = line.substring( s, t);
@@ -232,19 +240,19 @@ public class ChasenParser implements Parser {
                         int from = 0;
                         int to = surfaceInflected.length();
                         do {
-                            translations.clear();
                             translations = search( surfaceInflected.substring( from, to));
                             if (translations.size() != 0) {
                                 for ( Iterator i=translations.iterator(); i.hasNext(); ) {
                                     WordReadingPair wrp = (WordReadingPair) i.next();
                                     if (wrp instanceof DictionaryEntry) {
                                         annotations.add( new Translation
-                                            ( parsePosition + from, surfaceInflected.length(),
+                                            ( parsePosition + from, 
+                                              to - from,
                                               (DictionaryEntry) wrp));
                                     }
                                     else {
                                         annotations.add( new Reading( parsePosition + from,
-                                                                      surfaceInflected.length(), wrp));
+                                                                      to - from, wrp));
                                     }
                                 }
                                 // continue search with remaining suffix
@@ -343,7 +351,8 @@ public class ChasenParser implements Parser {
     protected void startChasen() throws SearchException {
         try {
             chasen = Runtime.getRuntime().exec( chasenExecutable +
-                                                " -F %m\\t%H\\t%Tn\\t%Fn\\t%?T/%M/n/\\n");
+                                                " -F %m\\t%H\\t%Tn\\t%Fn\\t%?T/%M/n/\\n",
+                                                new String[] { "LANG=ja", "LC_ALL=ja_JP" });
             chasenOut = new BufferedReader( new InputStreamReader( chasen.getInputStream(),
                                                                    "EUC-JP"));
             chasenIn = new BufferedWriter( new OutputStreamWriter( chasen.getOutputStream(),
@@ -369,18 +378,18 @@ public class ChasenParser implements Parser {
 
         if (lookupCache!=null &&
             lookupCache.containsKey( word)) {
-            return (List) lookupCache.get( word);
+            result = (List) lookupCache.get( word);
         }
-
-        // if we get here, it was not in the cache
-        result = new ArrayList( dictionaries.length*2);
-        for ( int i=0; i<dictionaries.length; i++)
-            result.addAll( dictionaries[i].search( word, Dictionary.SEARCH_EXACT_MATCHES));
-        if (lookupCache != null) {
-            if (result.size() > 0)
-                lookupCache.put( word, result);
-            else
-                lookupCache.put( word, Collections.EMPTY_LIST);
+        else {
+            result = new ArrayList( dictionaries.length*2);
+            for ( int i=0; i<dictionaries.length; i++)
+                result.addAll( dictionaries[i].search( word, Dictionary.SEARCH_EXACT_MATCHES));
+            if (lookupCache != null) {
+                if (result.size() > 0)
+                    lookupCache.put( word, result);
+                else
+                    lookupCache.put( word, Collections.EMPTY_LIST);
+            }
         }
 
         return result;

@@ -205,7 +205,7 @@ public class JGlossServlet extends HttpServlet {
         dictionaries = new jgloss.dictionary.Dictionary[diclist.size()];
         dictionaries = (jgloss.dictionary.Dictionary[]) diclist.toArray( dictionaries);
 
-        parser = new Parser( dictionaries);
+        parser = new KanjiParser( dictionaries);
         parser.setIgnoreNewlines( true);
         try {
             annotator = new HTMLAnnotator( parser);
@@ -251,7 +251,7 @@ public class JGlossServlet extends HttpServlet {
 
         // Set of all headers which are not forwarded in forwardRequestHeaders or
         // forwardResponseHeaders. All unknown headers must be forwarded as per rfc2616.
-        noForwardHeaders = new HashSet( 20);
+        noForwardHeaders = new HashSet( 50);
         // general header fields
         noForwardHeaders.add( "connection"); // the content of this field is currently not handled
         noForwardHeaders.add( "upgrade");
@@ -436,13 +436,13 @@ public class JGlossServlet extends HttpServlet {
 
         String protocol = url.getProtocol();
         if (!connectionAllowedProtocols.contains( protocol)) {
+            // note that due to a bug in tomcat 3.2.3 instead of the error string
+            // "<h1>SSL required to access this page</H1>" will be returned to the client
             resp.sendError( HttpServletResponse.SC_FORBIDDEN,
                             MessageFormat.format
                             ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
                               .getString( "error.protocolnotallowed"),
                               new Object[] { protocol } ));
-            // note that due to a bug in tomcat 3.2.3 instead of the error string
-            // "<h1>SSL required to access this page</H1>" will be returned to the client
             getServletContext().log( "protocol not allowed accessing " + url.toString());
             return;
         }

@@ -308,7 +308,11 @@ public class JGlossDocument extends HTMLDocument {
                     }
                     if (dictionaryReading!=null && dictionaryReading.equals( dictionaryWord))
                         dictionaryReading = null;
-                    if (reading == null) // there has to be at least 1 character for the layout to work
+                    if (reading == null) 
+                        // there has to be at least 1 character for the layout to work
+                        reading = " ";
+                    else if (reading.equals( new String( word)))
+                        // can happpen if hiragana is annotated
                         reading = " ";
                     if (translation == null)
                         translation = " ";
