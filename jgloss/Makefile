@@ -101,7 +101,7 @@ all: compile $(RESOURCES) setup doc gen-javadoc
 doc: jgloss.pdf index.html
 
 gen-javadoc:
-	-mkdir javadoc
+	mkdir -p javadoc
 	javadoc -d javadoc -private \
                 -classpath "src:$(CLASSPATH)" \
                 -sourcepath src \
@@ -118,19 +118,19 @@ compile:
 # Convert properties files in native charset to ascii.
 # The charset is given in the input file by a line of the form "# Encoding: SOME-ENCODING"
 %.properties: %.properties.in
-	-mkdir resources
+	mkdir -p resources
 	$(NATIVE2ASCII) -encoding $(shell sed -n -e "/^# *Encoding:/s/.*Encoding:\(.*\)/\1/p" $<) $< resources/$@
 	cp resources/$@ src/resources/$@
 
 %.pdf: %.docbook doc.src/stylesheet.dsl
-	-mkdir doc
+	mkdir -p doc
 	cp -r doc.src/img doc
 	docbook2pdf -o doc -d $(shell pwd)/doc.src/stylesheet.dsl $<
 	rm -r doc/img
 	rm doc/jgloss.out
 
 index.html: jgloss.docbook doc.src/stylesheet.dsl
-	-mkdir -p doc/html
+	mkdir -p doc/html
 	cp -r doc.src/img doc/html
 	docbook2html -o doc/html -d $(shell pwd)/doc.src/stylesheet.dsl $<
 
