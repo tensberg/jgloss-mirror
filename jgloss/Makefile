@@ -65,7 +65,9 @@ CLASSPATH := ./src:$(CLASSPATH)
 
 # List main class source file and all other class source files not referenced from main class
 # for compilation
-JGLOSS_SOURCES := src/jgloss/JGlossApp.java
+JGLOSS_SOURCES := src/jgloss/JGlossApp.java \
+                  src/jgloss/ui/export/XSLTExporter.java \
+                  src/jgloss/ui/export/LaTeXExporter.java
 JDICTIONARY_SOURCES := src/jgloss/JDictionaryApp.java
 IM_SOURCES := src/jgloss/ui/im/KanaInputMethodDescriptor.java
 WWW_SOURCES := src/jgloss/www/JGlossServlet.java

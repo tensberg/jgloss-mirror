@@ -33,9 +33,13 @@
     <file-extension description-key="filefilter.description.latex">tex</file-extension>
   </description>
 
+  <export-class>jgloss.ui.export.LaTeXExporter</export-class>
+
   <parameters>
     <docname name="document-filename" />
     <datetime name="generation-time" />
+    <longest-annotation name="longest-word" type="dictionary-word" />
+    <longest-annotation name="longest-reading" type="dictionary-reading" />
 
     <list name="font-size"
       label-key="export.latex.fontsize"

@@ -39,42 +39,72 @@ import javax.swing.*;
  */
 public class AboutFrame extends JFrame {
     /**
-     * Action which displays the about dialog.
-     */
-    public final static Action showAction;
-
-    static {
-        showAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    getFrame().show();
-                }
-            };
-        UIUtilities.initAction( showAction, "main.menu.about");
-    }
-
-    /**
      * The application-wide instance used to display the about information.
      */
     private static AboutFrame dialog;
+    private static final Object dialogLock = new Object();
+    /**
+     * Action which displays the about dialog. The action is initialized when calling
+     * {@link #createFrame(String) createFrame}.
+     */
+    private static Action showAction;
+    private static final Object showActionLock = new Object();
     /**
      * The application-wide instance used to display the GNU GPL.
      */
     private static JFrame license;
 
+    /**
+     * Creates the standard about frame instance and the {@link #showAction showAction}.
+     *
+     * @param prefix Prefix to the resource key strings. Used to differentiate between JGloss and
+     *       JDictionary about dialog.
+     */
     public static void createFrame( String prefix) {
-        synchronized (AboutFrame.class) {
+        synchronized (dialogLock) {
             dialog = new AboutFrame( prefix);
-            AboutFrame.class.notifyAll();
+            dialogLock.notifyAll();
         }
     }
 
+    public static void createShowAction( String prefix) {
+        synchronized (showActionLock) {
+            showAction = new AbstractAction() {
+                    public void actionPerformed( ActionEvent e) {
+                        getFrame().show();
+                    }
+                };
+            UIUtilities.initAction( showAction, prefix + ".main.menu.about");
+            
+            showActionLock.notifyAll();
+        }        
+    }
+
+    /**
+     * Returns the standard about frame instance. The method will block until the about frame
+     * instance is initialized by calling {@link #createFrame(String) createFrame]}.
+     */
     public static AboutFrame getFrame() {
-        synchronized (AboutFrame.class) {
+        synchronized (dialogLock) {
             if (dialog == null) try {
                 // wait until frame is created
-                AboutFrame.class.wait();
+                dialogLock.wait();
             } catch (InterruptedException ex) {}
             return dialog;
+        }
+    }
+
+    /**
+     * Returns the show action which shows the about dialog. The method will block until the 
+     * action is initialized by calling {@link #createFrame(String) createFrame]}.
+     */
+    public static Action getShowAction() {
+        synchronized (showActionLock) {
+            if (showAction == null) try {
+                // wait until frame is created
+                showActionLock.wait();
+            } catch (InterruptedException ex) {}
+            return showAction;
         }
     }
 

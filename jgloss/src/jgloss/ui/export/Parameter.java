@@ -44,4 +44,4 @@ interface Parameter {
      * <code>boolean</code>, wrap them in their object counterparts.
      */
     Object getValue( JGlossFrameModel source, URL systemId);
-} // class Parameter
+} // interface Parameter

@@ -21,23 +21,29 @@
  *
  */
 
-package jgloss.ui.export;
-
-import jgloss.ui.JGlossFrameModel;
-
-import java.awt.Component;
-
-import org.w3c.dom.Document;
+package jgloss.util;
 
 /**
- * An <code>Exporter</code> runs the export process when the user selects an export menu item.
+ * Escape a string for a specific text format.
  *
  * @author Michael Koch
  */
-interface Exporter {
+public interface Escaper {
     /**
-     * Shows the export file chooser and runs the export.
+     * Escape a single character, if neccessary.
+     *
+     * @return The escape sequence for the character, or <code>null</code> if no escaping is
+     *         neccessary.
      */
-    void export( ExportConfiguration configuration, 
-                 JGlossFrameModel source, Document doc, Component parent);
-} // interface Exporter
+    String escapeChar(char c);
+
+    /**
+     * Escape all special characters in a string.
+     */
+    String escape(String text);
+
+    /**
+     * Escape all special characters in a string buffer. The modification may be done in place.
+     */
+    StringBuffer escape(StringBuffer text);
+} // interface Escaper

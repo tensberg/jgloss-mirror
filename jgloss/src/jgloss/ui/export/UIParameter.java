@@ -76,7 +76,7 @@ abstract class UIParameter extends AbstractParameter {
      */
     protected void initFromElement( Element elem) {
         super.initFromElement( elem);
-        label = JGloss.messages.getString( elem.getAttribute( Exporter.Attributes.LABEL_KEY));
-        prefsKey = elem.getAttribute( Exporter.Attributes.PREFS_KEY);
+        label = JGloss.messages.getString( elem.getAttribute( ExportConfiguration.Attributes.LABEL_KEY));
+        prefsKey = elem.getAttribute( ExportConfiguration.Attributes.PREFS_KEY);
     }
 } // class UIParameter

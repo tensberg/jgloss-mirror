@@ -45,6 +45,10 @@ import org.w3c.dom.Node;
  * box.
  */
 class ListParameter extends UIParameter {
+    /**
+     * Item in the list combo box model. Each item in the combo box has a label which is displayed
+     * and a value which is returned when the item is selected.
+     */
     protected static class Value {
         private String label;
         private String value;
@@ -55,7 +59,9 @@ class ListParameter extends UIParameter {
         }
 
         public String getLabel() { return label; }
+        public void setLabel(String _label) { this.label = _label; }
         public String getValue() { return value; }
+        public void setValue(String _value) { this.value = _value; }
 
         public String toString() { return label; }
     } // class Value
@@ -69,8 +75,8 @@ class ListParameter extends UIParameter {
         box = Box.createHorizontalBox();
         box.add( new JLabel( label));
         box.add( Box.createHorizontalStrut( 3));
-        combobox = new JComboBox( getItems( elem));
-        combobox.setEditable( "true".equals( elem.getAttribute( Exporter.Attributes.EDITABLE)));
+        combobox = new JComboBox(getItems(elem));
+        combobox.setEditable( "true".equals( elem.getAttribute( ExportConfiguration.Attributes.EDITABLE)));
         box.add( combobox);
     }
 
@@ -111,7 +117,7 @@ class ListParameter extends UIParameter {
         }
     }
 
-    private Vector getItems( Element elem) {
+    protected Vector getItems( Element elem) {
         Vector out = new Vector();
         StringBuffer buf = new StringBuffer();
 
@@ -120,7 +126,7 @@ class ListParameter extends UIParameter {
             Node labelElem = item.getFirstChild();
             buf.setLength( 0);
             String label = XMLTools.getText( labelElem, buf).toString();
-            if (labelElem.getNodeName().equals( Exporter.Elements.LABEL_KEY))
+            if (labelElem.getNodeName().equals( ExportConfiguration.Elements.LABEL_KEY))
                 label = JGloss.messages.getString( label);
 
             String value = label;
@@ -129,6 +135,7 @@ class ListParameter extends UIParameter {
                 buf.setLength( 0);
                 value = XMLTools.getText( valueElem, buf).toString();
             }
+
             out.add( new Value( label, value));
 
             item = item.getNextSibling();

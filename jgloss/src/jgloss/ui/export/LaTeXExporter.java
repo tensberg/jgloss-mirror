@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002,2003 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -23,21 +23,23 @@
 
 package jgloss.ui.export;
 
-import jgloss.ui.JGlossFrameModel;
-
-import java.awt.Component;
+import jgloss.util.LaTeXEscaper;
+import jgloss.util.XMLTools;
 
 import org.w3c.dom.Document;
 
 /**
- * An <code>Exporter</code> runs the export process when the user selects an export menu item.
- *
- * @author Michael Koch
+ * Works like XSLT exporter, but applies a {@link jgloss.util.LaTeXEscaper} to the document first.
  */
-interface Exporter {
-    /**
-     * Shows the export file chooser and runs the export.
-     */
-    void export( ExportConfiguration configuration, 
-                 JGlossFrameModel source, Document doc, Component parent);
-} // interface Exporter
+class LaTeXExporter extends XSLTExporter {
+    LaTeXExporter() {}
+
+    protected Document applyFilter(ExportConfiguration configuration, Document doc) {
+        doc = (Document) doc.cloneNode(true);
+        boolean escapeUmlauts = configuration.getEncoding()==null ||
+            !configuration.getEncoding().toUpperCase().startsWith("UTF");
+        DOMTextEscaper escaper = new DOMTextEscaper(new LaTeXEscaper(escapeUmlauts));
+        escaper.escapeTextIn( doc);
+        return doc;
+    }
+} // class LaTeXExporter

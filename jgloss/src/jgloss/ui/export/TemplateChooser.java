@@ -23,6 +23,13 @@
 
 package jgloss.ui.export;
 
+import jgloss.ui.JGlossFrameModel;
+
+import java.net.URL;
+import java.net.MalformedURLException;
+
+import javax.swing.ComboBoxModel;
+
 import org.w3c.dom.Element;
 
 /**
@@ -33,5 +40,19 @@ import org.w3c.dom.Element;
 class TemplateChooser extends ListParameter {
     TemplateChooser( Element elem) {
         super( elem);
+    }
+
+    public Object getValue( JGlossFrameModel source, URL systemId) {
+        String value = getValue();
+
+        if (systemId != null) {
+            try {
+                value = new URL( systemId, value).toExternalForm();
+            } catch (MalformedURLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return value;
     }
 } // class TemplateChooser

@@ -47,7 +47,7 @@ abstract class AbstractParameter implements Parameter {
      * Initializes the name and default value from an XML element.
      */
     protected void initFromElement( Element elem) {
-        name = elem.getAttribute( Exporter.Attributes.NAME);
+        name = elem.getAttribute( ExportConfiguration.Attributes.NAME);
         defaultValue = XMLTools.getText( elem);
     }
 } // class UIParameter

@@ -15,8 +15,8 @@
   <xsl:output method="html" indent="no" encoding="UTF-8" />
   <!-- if indent is set to "yes", Internet Explorer does not render the annotations correctly -->
 
-  <xsl:param name="writetr" />
-  <xsl:param name="writere" />
+  <xsl:param name="writetranslations" />
+  <xsl:param name="writereadings" />
 
   <xsl:template match="/">
     <xsl:apply-templates select="jgloss" />
@@ -43,7 +43,7 @@
 
   <xsl:template match="anno">
     <xsl:choose>
-      <xsl:when test="$writetr and string-length(@tr)>0">
+      <xsl:when test="$writetranslations and string-length(@tr)>0">
         <span title="{@tr}">
           <xsl:apply-templates />
         </span>
@@ -56,9 +56,9 @@
 
   <xsl:template match="rbase">
     <xsl:choose>
-      <xsl:when test="$writere and string-length(@re)>0">
+      <xsl:when test="$writereadings and string-length(@re)>0">
         <ruby>
-          <xsl:if test="$writetr and string-length(../@tr)>0">
+          <xsl:if test="$writetranslations and string-length(../@tr)>0">
             <xsl:attribute name="title"><xsl:value-of select="../@tr" /></xsl:attribute>
           </xsl:if>
           <rb><xsl:value-of select="." /></rb>

@@ -102,10 +102,10 @@ button.add=Add...
 button.add.mk=A
 
 jgloss.title=JGloss
-jgloss.version=Version 2 alpha 0
+jgloss.version=Version 2 alpha 1
 
 jdictionary.title=JDictionary
-jdictionary.version=Version 2 alpha 0
+jdictionary.version=Version 2 alpha 1
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -177,9 +177,6 @@ main.menu.showtranslation.tt=Toggle the visibility of translation annotations
 main.menu.showannotation=Show Annotation Tooltips
 main.menu.showannotation.tt=If selected, shows the annotation tooltip if the mouse moves over an annotation
 main.menu.help=Help
-main.menu.about=About JGloss
-main.menu.about.mk=A
-main.menu.about.tt=Show a dialog with information about JGloss
 main.menu.addannotation=Annotate Selection...
 main.menu.addannotation.ak=control D
 main.menu.addannotation.mk=A
@@ -187,6 +184,14 @@ main.menu.addannotation.tt=Add an annotation to the current selection
 main.menu.doctitle=Document Title...
 main.menu.doctitle.mk=D
 main.menu.doctitle.tt=View and edit the title of the document
+
+jgloss.main.menu.about=About JGloss
+jgloss.main.menu.about.mk=A
+jgloss.main.menu.about.tt=Show a dialog with information about JGloss
+
+jdictionary.main.menu.about=About JDictionary
+jdictionary.main.menu.about.mk=A
+jdictionary.main.menu.about.tt=Show a dialog with information about JDictionary
 
 main.dialog.close.title=Save changes
 main.dialog.close.message=Save changes to {0}?
@@ -408,14 +413,14 @@ export.annotationlist.menu.mk=A
 export.annotationlist.menu.tt=Write the annotations to a text file
 export.annotationlist.title=Export annotation list
 
-jgloss.generator=JGloss 2 alpha 0
+jgloss.generator=JGloss 2 alpha 1
 jgloss.about.frame.title=About JGloss
-jgloss.about.title=JGloss 2 alpha 0
+jgloss.about.title=JGloss 2 alpha 1
 jgloss.about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001-2003 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
 jdictionary.about.frame.title=About JDictionary
-jdictionary.about.title=JDictionary 2 alpha 0
+jdictionary.about.title=JDictionary 2 alpha 1
 jdictionary.about.text=A front-end for Japanese dictionaries.\n\nCopyright (c) 2002,2003 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 
 preferences.header=This file contains the preferences for the application JGloss.

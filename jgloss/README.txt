@@ -1,4 +1,4 @@
-JGloss 2 Alpha 0
+JGloss 2 Alpha 1
 ================
 
 JGloss homepage: http://jgloss.sourceforge.net/
@@ -20,7 +20,7 @@ executable JAR file by typing "make jgloss", create the documentation by
 executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
-About Alpha 0
+About Alpha 1
 -------------
 This is a preview of the new JGloss version, mainly to show that I am still
 working on the program. It should give you an opportunity to try out the
@@ -32,7 +32,7 @@ which were in the previous JGloss versions but are not in this alpha
 version. They will eventually make their reappearance when I find the time
 to reimplement them.
 
-Some of the greater issues of JGloss 2 Alpha 0:
+Some of the greater issues of JGloss 2 Alpha 1:
 - The file format of the .jgloss files has incompatibly changed, opening
   older files is not (yet) possible
 - The handbook is out of date

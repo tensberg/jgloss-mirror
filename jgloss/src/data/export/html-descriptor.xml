@@ -33,6 +33,8 @@
     <file-extension description-key="filefilter.description.html">html</file-extension>
   </description>
 
+  <export-class>jgloss.ui.export.XSLTExporter</export-class>
+
   <parameters>
 
     <encoding name="encoding"

@@ -126,7 +126,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         bar.add( editMenu);           
 
         menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
-        menu.add( UIUtilities.createMenuItem( AboutFrame.showAction));
+        menu.add( UIUtilities.createMenuItem( AboutFrame.getShowAction()));
         bar.add( menu);
 
         setJMenuBar( bar);

@@ -32,6 +32,8 @@
     <title key="export.annotationlist.title" />
   </description>
 
+  <export-class>jgloss.ui.export.XSLTExporter</export-class>
+
   <parameters>
     
     <encoding name="encoding"

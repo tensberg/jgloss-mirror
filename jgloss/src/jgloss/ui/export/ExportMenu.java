@@ -26,6 +26,7 @@ package jgloss.ui.export;
 import jgloss.JGloss;
 import jgloss.util.StringTools;
 import jgloss.ui.JGlossFrameModel;
+import jgloss.ui.UIUtilities;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -50,16 +51,16 @@ import org.xml.sax.SAXException;
 public class ExportMenu extends JMenu implements ActionListener {
     private static List exporters = new ArrayList();
 
-    private static final String EXPORTER_CLIENT_PROPERTY = "exporter client property";
+    private static final String EXPORTCONFIG_CLIENT_PROPERTY = "export config client property";
     
     /**
-     * Register an exporter. The supplied input source must be initialized to an
+     * Register an export configuration. The supplied input source must be initialized to an
      * export descriptor XML document. For each registered exporter a menu item will be
      * created.
      */
-    public static synchronized void registerExporter( InputSource in) throws IOException,
-                                                                             SAXException {
-        exporters.add( new Exporter( in));
+    public static synchronized void registerExport( InputSource in) throws IOException,
+                                                                           SAXException {
+        exporters.add( new ExportConfiguration( in));
     }
 
     /**
@@ -70,8 +71,8 @@ public class ExportMenu extends JMenu implements ActionListener {
     public static synchronized void registerStandardExporters() {
         String[] resources = StringTools.split( JGloss.messages.getString( "exporters"), ':');
         for ( int i=0; i<resources.length; i++) try {
-            registerExporter( new InputSource( ExportMenu.class.getResource( resources[i])
-                                               .toExternalForm()));
+            registerExport( new InputSource( ExportMenu.class.getResource( resources[i])
+                                             .toExternalForm()));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -80,16 +81,16 @@ public class ExportMenu extends JMenu implements ActionListener {
     private JGlossFrameModel context;
 
     /**
-     * Creates a new export menu. For each registered exporter a menu item is created.
+     * Creates a new export menu. For each registered export configuration a menu item is created.
      */
     public ExportMenu() {
         super( JGloss.messages.getString( "main.menu.export"));
 
         for ( Iterator i=exporters.iterator(); i.hasNext(); ) {
-            Exporter exporter = (Exporter) i.next();
+            ExportConfiguration export = (ExportConfiguration) i.next();
             JMenuItem item = new JMenuItem();
-            exporter.initButton( item);
-            item.putClientProperty( EXPORTER_CLIENT_PROPERTY, exporter);
+            UIUtilities.initButton(item, export.getMenuKey());
+            item.putClientProperty( EXPORTCONFIG_CLIENT_PROPERTY, export);
             item.addActionListener( this);
             item.setEnabled( false);
             this.add( item);
@@ -115,8 +116,9 @@ public class ExportMenu extends JMenu implements ActionListener {
      */
     public void actionPerformed( ActionEvent a) {
         JMenuItem source = (JMenuItem) a.getSource();
-        Exporter exporter = (Exporter) source.getClientProperty( EXPORTER_CLIENT_PROPERTY);
-        exporter.export( context, context.getDocument().getDOMDocument(), 
-                         SwingUtilities.getRoot( this));
+        ExportConfiguration export = 
+            (ExportConfiguration) source.getClientProperty( EXPORTCONFIG_CLIENT_PROPERTY);
+        export.createExporter().export( export, context, context.getDocument().getDOMDocument(), 
+                                        SwingUtilities.getRoot( this));
     }
 } // class ExportMenu

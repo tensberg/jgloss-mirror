@@ -21,6 +21,8 @@ my $header = <<'END_HEADER';
   <xsl:param name="document-title" />
   <xsl:param name="generation-time" />
   <xsl:param name="font-size" />
+  <xsl:param name="longest-word" />
+  <xsl:param name="longest-reading" />
 
   <xsl:template match="/">
     <xsl:apply-templates select="jgloss/body" />
@@ -40,62 +42,7 @@ my $body_end = <<'END_BODY';
 END_BODY
 
 my $footer = <<'END_FOOTER';
-  <!-- Determine the longest dictionary word or dictionary reading of all anntotations in the
-       document. Since it is not possible in XSLT to reassign variables once created and thus store
-       the current longest word, the computation is done lisp-style by 
-       comparing the current longest word with the head of the annotation list (stored as a
-       node set) and then recursively calling the template with the new longest word and the tail
-       of the annotation list. When the node list becomes empty, the recursion terminates and
-       the longest word is created on the output tree.
-       This method is not very efficient, but I know of no better way short of implementing this
-       in Java (making the export code more complicated).
-   -->
-  <xsl:template name="longest-word">
-    <xsl:param name="longest-word" />
-    <xsl:param name="annos" />
-    <xsl:param name="mode" />
-
-    <xsl:choose>
-      <xsl:when test="count($annos)>0">
-
-        <xsl:variable name="word">
-          <!-- variables in the apply-templates mode attribute are not allowed -->
-          <xsl:if test="$mode='base'">
-            <xsl:apply-templates select="$annos[1]" mode="base" />
-          </xsl:if>
-          <xsl:if test="$mode='basere'">
-            <xsl:apply-templates select="$annos[1]" mode="basere" />
-          </xsl:if>
-        </xsl:variable>
-
-        <xsl:choose>
-          <xsl:when test="string-length($word)>string-length($longest-word)">
-            <xsl:call-template name="longest-word">
-              <xsl:with-param name="longest-word" select="$word" />
-              <xsl:with-param name="annos" select="$annos[position()>1]" />
-              <xsl:with-param name="mode" select="$mode" />
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="longest-word">
-              <xsl:with-param name="longest-word" select="$longest-word" />
-              <xsl:with-param name="annos" select="$annos[position()>1]" />
-              <xsl:with-param name="mode" select="$mode" />
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-
-      </xsl:when>
-      <xsl:otherwise>
-
-        <xsl:value-of select="$longest-word"/>
-
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- Determine the base reading of the word, which is stored in the attribute @basere, or is equal
-  to the reading of the annotation text if @basere is empty -->
+  <!-- Determine the base text of the word -->
   <xsl:template match="anno" mode="base">
     <xsl:choose>
       <xsl:when test="string-length(@base)>0">
@@ -155,22 +102,10 @@ $replacements{'font-size'} = <<'END';
 </xsl:text><xsl:value-of select="$font-size" /><xsl:text>
 END
 $replacements{'longest-word'} = <<'END';
-</xsl:text>
-<xsl:call-template name="longest-word">
-      <xsl:with-param name="longest-word" select="''" />
-      <xsl:with-param name="annos" select=".//anno" />
-      <xsl:with-param name="mode" select="'base'" />
-</xsl:call-template>
-<xsl:text>
+</xsl:text><xsl:value-of select="$longest-word" /><xsl:text>
 END
 $replacements{'longest-reading'} = <<'END';
-</xsl:text>
-<xsl:call-template name="longest-word">
-      <xsl:with-param name="longest-reading" select="''" />
-      <xsl:with-param name="annos" select=".//anno" />
-      <xsl:with-param name="mode" select="'basere'" />
-</xsl:call-template>
-<xsl:text>
+</xsl:text><xsl:value-of select="$longest-reading" /><xsl:text>
 END
 $replacements{'word'} = <<'END';
 </xsl:text><xsl:value-of select="." /><xsl:text>

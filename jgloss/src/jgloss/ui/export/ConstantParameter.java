@@ -25,19 +25,20 @@ package jgloss.ui.export;
 
 import jgloss.ui.JGlossFrameModel;
 
-import java.awt.Component;
-
-import org.w3c.dom.Document;
+import java.net.URL;
 
 /**
- * An <code>Exporter</code> runs the export process when the user selects an export menu item.
- *
- * @author Michael Koch
+ * Export parameter with a constant value.
  */
-interface Exporter {
-    /**
-     * Shows the export file chooser and runs the export.
-     */
-    void export( ExportConfiguration configuration, 
-                 JGlossFrameModel source, Document doc, Component parent);
-} // interface Exporter
+class ConstantParameter implements Parameter {
+    private String name;
+    private Object value;
+
+    ConstantParameter(String _name, String _value) {
+        this.name = _name;
+        this.value = _value;
+    }
+
+    public String getName() { return name; }
+    public Object getValue( JGlossFrameModel source, URL systemId) { return value; }
+} // class ConstantParameter

@@ -42,7 +42,7 @@
 -->
 
 <!-- root element -->
-<!ELEMENT export (description,parameters?,localized-strings?,(template|templates))>
+<!ELEMENT export (description,export-class,parameters?,localized-strings?,(template|templates))>
 
 <!-- description contains standard elements which all export formats share -->
 <!ELEMENT description (menuitem,title,file-extension?)>
@@ -59,6 +59,10 @@
 <!ELEMENT file-extension (#PCDATA)>
 <!ATTLIST file-extension description-key CDATA #REQUIRED>
 
+<!-- Fully qualified name of the class which does the export. 
+     Must implement interface jgloss.ui.export.Exporter -->
+<!ELEMENT export-class (#PCDATA)>
+
 <!-- Parameters for the XSLT file.
      UI elements are added to the export dialog. The values entered will be bound
      to elements in the XML tree which is used as input to the export XSLT file.
@@ -68,7 +72,7 @@
        prefs-key - Name of the Preferences key to which the selection is stored
        name      - Name of the element in the jgloss-export tree
  -->
-<!ELEMENT parameters (encoding|boolean|string|list|docname|datetime)+>
+<!ELEMENT parameters (encoding|boolean|string|list|docname|datetime|longest-annotation)+>
 
 <!-- Name of the JGloss document. No UI element is created for this. -->
 <!ELEMENT docname EMPTY>
@@ -97,6 +101,14 @@
 <!ATTLIST string label-key CDATA #REQUIRED
                  prefs-key CDATA #REQUIRED
                  name CDATA #REQUIRED>
+
+<!-- Determines the longest reading or translation annotation in the document.
+     The element may define a default value, which will be used if the longest annotation
+     in the document is shorter than the default. -->
+<!ELEMENT longest-annotation (#PCDATA)>
+<!ATTLIST longest-annotation name CDATA #REQUIRED
+                             type (word|reading|dictionary-word|dictionary-reading|translation) #REQUIRED>
+
 <!-- Lets the user select one of several choices. Creates a combo box. 
      Attribute: editable - true: the user can enter his own text.      -->
 <!ELEMENT list (listitem)+>
@@ -110,10 +122,6 @@
 <!ELEMENT label-key (#PCDATA)>
 <!ELEMENT value (#PCDATA)>
 
-<!-- Reference to the export template XSLT file -->
-<!ELEMENT template ((label|label-key)?,source)>
-<!ELEMENT source (#PCDATA)> <!-- path to the XSLT file, relative to the export descriptor -->
-
 <!-- Collection of templates. If the editable attribute is set to true, the user can choose
      his own template files in addition to the supplied ones. -->
 <!ELEMENT templates (template*)>
@@ -122,3 +130,6 @@
                     prefs-key CDATA #REQUIRED
                     editable (true|false) "false">
 
+<!-- Reference to one export template XSLT file -->
+<!ELEMENT template ((label|label-key)?,source)>
+<!ELEMENT source (#PCDATA)> <!-- path to the XSLT file, relative to the export descriptor -->

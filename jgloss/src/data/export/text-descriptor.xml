@@ -32,6 +32,8 @@
     <title key="export.text.title" />
   </description>
 
+  <export-class>jgloss.ui.export.XSLTExporter</export-class>
+
   <parameters>
 
     <encoding name="encoding"

@@ -752,7 +752,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         bar.add( annotationList.getMenu());
         
         menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
-        aboutItem = UIUtilities.createMenuItem( AboutFrame.showAction);
+        aboutItem = UIUtilities.createMenuItem( AboutFrame.getShowAction());
         menu.add( aboutItem);
         bar.add( menu);
 

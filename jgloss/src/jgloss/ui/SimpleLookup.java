@@ -103,7 +103,7 @@ class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
         model.selectAllDictionaries( true);
         model.selectSearchField( DictionaryEntryField.WORD, true);
         model.selectSearchField( DictionaryEntryField.READING, true);
-        model.selectSearchField( DictionaryEntryField.TRANSLATION, false);
+        model.selectSearchField( DictionaryEntryField.TRANSLATION, true);
         model.selectMatchMode( MatchMode.FIELD, true);
 
         setLayout( new BorderLayout());
