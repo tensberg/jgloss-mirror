@@ -1,8 +1,8 @@
 %encoding: EUC-JP
-%short-description: platex - translations on page
+%short-description: pLaTeX - translations on page
 %description
-% Generate a platex input file with translations placed on
-% the page where the word appears.
+% Generate a platex input file. Translations are put
+% in a footnote on the page where the word appears.
 %end description
 % This is a EUC-JP encoded Japanese LaTeX document generated
 % by JGloss from %document-filename% on %generation-time%.
@@ -29,9 +29,9 @@
 \setlength{\tw}{\textwidth}
 \addtolength{\tw}{-1.0\ww}
 \addtolength{\tw}{-1.0\rw}
-% I don't know where the -20pt come from, but they have to be there for
-% the layout to work.
-\addtolength{\tw}{-20pt}
+% I don't know where the -22pt come from, but if they are not subtracted,
+% latex complains about overful \hboxes
+\addtolength{\tw}{-22pt}
 
 \begin{document}
 

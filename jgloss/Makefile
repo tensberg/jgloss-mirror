@@ -69,14 +69,14 @@ ROOT_SOURCES := src/jgloss/JGloss.java src/jgloss/JavaPreferences.java src/jglos
 WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
-SOURCE_DIST := README.txt COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex-ruby
+SOURCE_DIST := README.txt COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex
 # files and directories that go into the binary distribution, either in the JGloss jar file
 # or in the zip file.
-BINARY_DIST := README.txt COPYING ChangeLog jgloss data resources doc latex-ruby
+BINARY_DIST := README.txt COPYING ChangeLog jgloss data resources doc latex
 # files that go into the binary distribution jar file
 BINARY_JAR := jgloss data resources
 # files that go into the binary distribution zip file
-BINARY_ZIP := jgloss.jar README.txt COPYING ChangeLog doc latex-ruby
+BINARY_ZIP := jgloss.jar README.txt COPYING ChangeLog doc latex
 
 #
 # end configuration
@@ -104,6 +104,7 @@ dist: dist-source dist-binary
 dist-binary: compile $(RESOURCES) setup doc
 	mkdir -p dist/$(DISTNAME)
 	cp -r $(BINARY_DIST) dist/$(DISTNAME)
+	cp -r data/templates dist/$(DISTNAME)/latex/
 	-cd dist/$(DISTNAME) && find -depth -name "CVS" -exec rm -r \{\} \;
 	cd dist/$(DISTNAME) && $(JAR) cfm jgloss.jar ../../MANIFEST.MF $(BINARY_JAR)
 	cd dist/$(DISTNAME) && rm -r $(filter-out $(BINARY_ZIP), $(BINARY_DIST))

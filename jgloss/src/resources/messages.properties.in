@@ -95,7 +95,7 @@ button.annotate=Annotate
 button.add=Add...
 
 jgloss.title=JGloss
-jgloss.version=Version 1.0.4pre2
+jgloss.version=Version 1.0.4pre3
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
@@ -382,14 +382,12 @@ export.latex.fontsize_pt=pt
 # List of templates stored in jgloss.jar and accessible as resource
 export.latex.templates=\
 /data/templates/platex-top.tex.tmpl:\
-/data/templates/platex-top-wide.tex.tmpl:\
 /data/templates/platex-list.tex.tmpl:\
-/data/templates/platex-list-wide.tex.tmpl:\
 /data/templates/platex-ruby.tex.tmpl:\
-/data/templates/platex-ruby-wide.tex.tmpl
+/data/templates/latexcjk-top.tex.tmpl
 
 about.frame.title=About JGloss
-about.title=JGloss 1.0.4pre2
+about.title=JGloss 1.0.4pre3
 about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
