@@ -57,6 +57,10 @@ public class JGlossServlet extends HttpServlet {
     /**
      * Initialization parameter name.
      */
+    public final static String SECURE_ALLOWED_PROTOCOLS = "secure_allowed_protocols";
+    /**
+     * Initialization parameter name.
+     */
     public final static String REWRITTEN_TYPES = "rewritten_types";
     /**
      * Initialization parameter name.
@@ -107,6 +111,11 @@ public class JGlossServlet extends HttpServlet {
      * Set of protocols allowed in remote urls.
      */
     private Set allowedProtocols;
+    /**
+     * Set of protocols allowed in remote urls used when the Client-Servlet connection is
+     * secure.
+     */
+    private Set secureAllowedProtocols;
     /**
      * List of MIME types which will be annotated.
      */
@@ -204,6 +213,32 @@ public class JGlossServlet extends HttpServlet {
                                           .getString( "error.noprotocols"),
                                           new Object[] { ALLOWED_PROTOCOLS}));
         allowedProtocols.addAll( split( p, ':'));
+        // write log entry
+        p = "";
+        for ( Iterator i=allowedProtocols.iterator(); i.hasNext(); ) {
+            if (p.length() > 0)
+                p += ", ";
+            p += (String) i.next();
+        }
+        if (p.length() == 0)
+            p = "none";
+        getServletContext().log( "allowed protocols: " + p);
+
+        // read secure allowed protocols
+        secureAllowedProtocols = new HashSet( 5);
+        p = config.getInitParameter( SECURE_ALLOWED_PROTOCOLS);
+        if (p != null)
+            secureAllowedProtocols.addAll( split( p, ':'));
+        // write log entry
+        p = "";
+        for ( Iterator i=secureAllowedProtocols.iterator(); i.hasNext(); ) {
+            if (p.length() > 0)
+                p += ", ";
+            p += (String) i.next();
+        }
+        if (p.length() == 0)
+            p = "none";
+        getServletContext().log( "secure allowed protocols: " + p);
 
         // Set of all headers which are forwarded in forwardRequestHeaders or
         // forwardResponseHeaders.
@@ -234,6 +269,16 @@ public class JGlossServlet extends HttpServlet {
             rewrittenContentTypes = new String[1];
             rewrittenContentTypes[0] = "text/html";
         }
+        // write log entry
+        p = "";
+        for ( int i=0; i<rewrittenContentTypes.length; i++) {
+            if (p.length() > 0)
+                p += ", ";
+            p += rewrittenContentTypes[i];
+        }
+        if (p.length() == 0)
+            p = "none";
+        getServletContext().log( "rewritten content types: " + p);
 
         p = config.getInitParameter( ENABLE_COOKIE_FORWARDING);
         enableCookieForwarding = "true".equals( p);
@@ -242,14 +287,14 @@ public class JGlossServlet extends HttpServlet {
         enableCookieSecureInsecureForwarding = "true".equals( p);
         getServletContext().log( "secure-to-insecure cookie forwarding " + 
                                  (enableCookieSecureInsecureForwarding ? "enabled" : "disabled"));
-        p = config.getInitParameter( ENABLE_SECURE_INSECURE_FORM_DATA_FORWARDING);
-        enableFormDataSecureInsecureForwarding = "true".equals( p);
-        getServletContext().log( "secure-to-insecure form data forwarding " + 
-                                 (enableFormDataSecureInsecureForwarding ? "enabled" : "disabled"));
         p = config.getInitParameter( ENABLE_FORM_DATA_FORWARDING);
         enableFormDataForwarding = "true".equals( p);
         getServletContext().log( "form data forwarding " + 
                                  (enableFormDataForwarding ? "enabled" : "disabled"));
+        p = config.getInitParameter( ENABLE_SECURE_INSECURE_FORM_DATA_FORWARDING);
+        enableFormDataSecureInsecureForwarding = "true".equals( p);
+        getServletContext().log( "secure-to-insecure form data forwarding " + 
+                                 (enableFormDataSecureInsecureForwarding ? "enabled" : "disabled"));
         try {
             responseBufferSize = Integer.parseInt( config.getInitParameter( RESPONSE_BUFFER_SIZE));
             getServletContext().log( "response buffer size set to " + responseBufferSize + " bytes");
@@ -298,11 +343,17 @@ public class JGlossServlet extends HttpServlet {
                 "true".equals( req.getParameter( ALLOW_FORM_DATA_FORWARDING));
             String target = new JGlossURLRewriter
                 ( req.getContextPath() + req.getServletPath(),
-                  new URL( HttpUtils.getRequestURL( req).toString()), allowedProtocols,
-                  allowCookieForwarding, allowFormDataForwarding).rewrite( urlstring);
+                  new URL( HttpUtils.getRequestURL( req).toString()), null,
+                  allowCookieForwarding, allowFormDataForwarding).rewrite( urlstring, true);
             resp.sendRedirect( target);
             return;
         }
+
+        Set connectionAllowedProtocols;
+        if (req.isSecure())
+            connectionAllowedProtocols = secureAllowedProtocols;
+        else
+            connectionAllowedProtocols = allowedProtocols;
 
         Object[] oa = JGlossURLRewriter.parseEncodedPath( pathinfo);
         // pathinfo includes the leading '/'
@@ -330,8 +381,14 @@ public class JGlossServlet extends HttpServlet {
 
         // prepend protocol if neccessary
         if (urlstring.indexOf( ':') == -1) {
-            if (allowedProtocols.contains( "http"))
-                urlstring = "http://" + urlstring;
+            if (req.isSecure()) {
+                if (secureAllowedProtocols.contains( "https"))
+                    urlstring = "https://" + urlstring;
+            }
+            else {
+                if (allowedProtocols.contains( "http"))
+                    urlstring = "http://" + urlstring;
+            }
         }
 
         URL url;
@@ -347,12 +404,15 @@ public class JGlossServlet extends HttpServlet {
         }
 
         String protocol = url.getProtocol();
-        if (!allowedProtocols.contains( protocol)) {
+        if (!connectionAllowedProtocols.contains( protocol)) {
             resp.sendError( HttpServletResponse.SC_FORBIDDEN,
                             MessageFormat.format
                             ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
                               .getString( "error.protocolnotallowed"),
                               new Object[] { protocol } ));
+            // note that due to a bug in tomcat 3.2.3 instead of the error string
+            // "<h1>SSL required to access this page</H1>" will be returned to the client
+            getServletContext().log( "protocol not allowed accessing " + url.toString());
             return;
         }
 
@@ -385,7 +445,7 @@ public class JGlossServlet extends HttpServlet {
         do {
             JGlossURLRewriter rewriter = new JGlossURLRewriter
                 ( req.getContextPath() + req.getServletPath(),
-                  url, allowedProtocols,
+                  url, connectionAllowedProtocols,
                   allowCookieForwarding, allowFormDataForwarding);
 
             URLConnection connection = url.openConnection();
@@ -441,7 +501,16 @@ public class JGlossServlet extends HttpServlet {
                     String location = connection.getHeaderField( "location");
                     if (location != null) try {
                         url = new URL( location);
-                        if (!redirects.contains( url) &&
+                        if (!connectionAllowedProtocols.contains( url.getProtocol())) {
+                            resp.sendError( HttpServletResponse.SC_FORBIDDEN,
+                                            MessageFormat.format
+                                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                                              .getString( "error.forwardprotocolnotallowed"),
+                                              new Object[] { url.toString(), url.getProtocol() } ));
+                            getServletContext().log( "forward protocol not allowed accessing " +
+                                                     url.toString());
+                        }
+                        else if (!redirects.contains( url) &&
                             // While rfc2616 does not set a limit on redirects, I want to
                             // avoid an endless number of redirects by a broken or malicious server.
                             redirects.size() < 30) {
@@ -455,6 +524,9 @@ public class JGlossServlet extends HttpServlet {
                         getServletContext().log( "malformed url " + location + "/" + ex.getMessage());
                     }
                 }
+                
+                if (!followingRedirect)
+                    resp.setStatus( response);
             }
 
             if (forwardCookies) {
@@ -466,7 +538,7 @@ public class JGlossServlet extends HttpServlet {
                     // Add the newly generated cookies to the next redirection.
                     // The new and old cookies have to be merged. For equality test a test
                     // on the cookie name is sufficient because the domain/path/port/name is
-                    // encoded in the name. This is the reason a Map is used for the merging.
+                    // encoded in the name.
                     if (cookies != null) {
                         for ( int i=0; i<cookies.length; i++)
                             newCookies.put( cookies[i].getName(), cookies[i]);
