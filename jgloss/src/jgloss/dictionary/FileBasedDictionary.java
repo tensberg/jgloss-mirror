@@ -166,7 +166,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 	            }
             } catch (IOException ex) {
             	confidence = ZERO_CONFIDENCE;
-            	reason = NAMES.getString("dictionary.reason.file");
+            	reason = NAMES.getString("dictionary.reason.read");
             	ex.printStackTrace();
             }
             

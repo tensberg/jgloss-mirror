@@ -54,6 +54,11 @@ import jgloss.dictionary.MatchMode;
 import jgloss.dictionary.SearchFieldSelection;
 import jgloss.dictionary.SearchMode;
 
+/**
+ * User configuration for dictionary lookups.
+ *
+ * @author Michael Koch
+ */
 public class LookupConfigPanel extends JPanel implements LookupChangeListener,
                                                          ActionListener {
     protected LookupModel model;
@@ -118,7 +123,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         SearchMode[] _searchModes = _model.getSearchModes();
         searchModes = new JRadioButton[_searchModes.length];
         ButtonGroup modesGroup = new ButtonGroup();
-        JPanel modesPanel = new JPanel( new GridLayout( 0, 1));
+        JPanel modesPanel = new JPanel( new GridLayout( 0, 2));
         for ( int i=0; i<_searchModes.length; i++) {
             SearchMode mode = _searchModes[i];
             JRadioButton button = new JRadioButton( mode.getName());
@@ -214,10 +219,22 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         UIUtilities.initButton( allDictionaries, "wordlookup.choice.alldictionaries");
         dictionaries.add( allDictionaries);
 
-        JPanel dictionaryPanel = new JPanel( new GridLayout( 0, 2));
-        dictionaryPanel.add( dictionary);
-        dictionaryPanel.add( dictionaryChoice);
-        dictionaryPanel.add( allDictionaries);
+        JPanel dictionaryPanel = new JPanel( new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.NONE;
+        c.gridx = GridBagConstraints.RELATIVE;
+        c.gridy = 0;
+        dictionaryPanel.add( dictionary, c);
+        c = (GridBagConstraints) c.clone();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        dictionaryPanel.add( dictionaryChoice, c);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 2;
+        c.fill = GridBagConstraints.BOTH;
+        dictionaryPanel.add( allDictionaries, c);
 
         dictionaryPanel = UIUtilities.createFlexiblePanel( dictionaryPanel, false);
         dictionaryPanel.setBorder( BorderFactory.createCompoundBorder
@@ -247,7 +264,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
         // input field setup
         JPanel inputPanel = new JPanel( new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
+        c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 5;
@@ -293,30 +310,20 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1;
         c.weighty = 1;
-        
-        c.gridx = 0;
+        c.gridx = GridBagConstraints.RELATIVE;
         c.gridy = 0;
-        c.gridheight = 2;
+        c.gridheight = 1;
         this.add( modesPanel, c);
-
-        c = (GridBagConstraints) c.clone();
-        c.gridx = 2;
-        c.gridy = GridBagConstraints.RELATIVE;
-        c.gridheight = filters.length > 0 ? 1 : 2;
         this.add( dictionaryPanel, c);
         if (filters.length > 0)
             this.add( filterPanel, c);
-
-        c = (GridBagConstraints) c.clone();
-        c.gridx = 1;
-        c.gridheight = 1;
         this.add( fieldsPanel, c);
         this.add( matchPanel, c);
         
         c = (GridBagConstraints) c.clone();
         c.gridy = 2;
         c.gridx = 0;
-        c.gridwidth = 3;
+        c.gridwidth = (filters.length == 0) ? 4 : 5;
         c.fill = GridBagConstraints.HORIZONTAL;
         this.add( inputPanel, c);
 

@@ -385,9 +385,9 @@ public abstract class JGloss {
         mainLookupModel = new LookupModel
             ( Arrays.asList
               ( new Object[] { ExpressionSearchModes.EXACT,
+                               ExpressionSearchModes.ANY,
                                ExpressionSearchModes.PREFIX,
                                ExpressionSearchModes.SUFFIX,
-                               ExpressionSearchModes.ANY,
                                DistanceSearchModes.NEAR,
                                DistanceSearchModes.RADIUS }),
               Arrays.asList( Dictionaries.getDictionaries( false)),

@@ -106,7 +106,7 @@ public class KanjiDic implements Dictionary {
                         }
                     } catch (IOException ex) {
                         ex.printStackTrace();
-                        reason = messages.getString("dictionary.reason.file");
+                        reason = messages.getString("dictionary.reason.read");
                     } catch (NumberFormatException ex) {}
                     
                     return new DictionaryFactory.TestResult(confidence, reason);

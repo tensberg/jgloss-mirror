@@ -40,6 +40,11 @@ import jgloss.dictionary.SearchParameters;
 import jgloss.dictionary.StandardSearchParameter;
 import jgloss.util.StringTools;
 
+/**
+ * Model for user configuration of dictionary lookups.
+ *
+ * @author Michael Koch
+ */
 public class LookupModel implements Cloneable {
     protected List searchModes;
 
