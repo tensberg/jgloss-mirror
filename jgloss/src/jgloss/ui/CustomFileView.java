@@ -83,42 +83,52 @@ public class CustomFileView extends FileView {
     }
 
     public String getTypeDescription( File f) {
-        if (f.isFile()) { // as opposed to a directory
-            String name = f.getName().toLowerCase();
-            if (name.endsWith( ".jgloss"))
-                return JGLOSS_DESCRIPTION;
-            if (name.endsWith( ".xml"))
-                return XML_DESCRIPTION;
-            if (name.endsWith( ".htm") || name.endsWith( ".html"))
-                return HTML_DESCRIPTION;
-            if (name.endsWith( ".tex"))
-                return TEX_DESCRIPTION;
-            if (name.endsWith( ".txt"))
-                return TEXT_DESCRIPTION;
-            if (name.endsWith( ".tmpl"))
-                return TEMPLATE_DESCRIPTION;
-        }
+        String name = f.getName().toLowerCase();
+        String desc = null;
+        if (name.endsWith( ".jgloss"))
+            desc = JGLOSS_DESCRIPTION;
+        else if (name.endsWith( ".xml"))
+            desc = XML_DESCRIPTION;
+        else if (name.endsWith( ".htm") || name.endsWith( ".html"))
+            desc = HTML_DESCRIPTION;
+        else if (name.endsWith( ".tex"))
+            desc = TEX_DESCRIPTION;
+        else if (name.endsWith( ".txt"))
+            desc = TEXT_DESCRIPTION;
+        else if (name.endsWith( ".tmpl"))
+            desc = TEMPLATE_DESCRIPTION;
         
+        // see getIcon() for discussion of f.isFile()
+        if (desc!=null && f.isFile())
+            return desc;
+
         return null; // let L&F file view determine the description
     }
 
     public Icon getIcon( File f) {
-        if (f.isFile()) { // as opposed to a directory
-            String name = f.getName().toLowerCase();
-            if (name.endsWith( ".jgloss"))
-                return JGLOSS_ICON;
-            if (name.endsWith( ".xml"))
-                return XML_ICON;
-            if (name.endsWith( ".htm") || name.endsWith( ".html"))
-                return HTML_ICON;
-            if (name.endsWith( ".tex"))
-                return TEX_ICON;
-            if (name.endsWith( ".txt"))
-                return TEXT_ICON;
-            if (name.endsWith( ".tmpl"))
-                return TEMPLATE_ICON;
-        }
+        String name = f.getName().toLowerCase();
+        Icon icon = null;
+        if (name.endsWith( ".jgloss"))
+            icon = JGLOSS_ICON;
+        else if (name.endsWith( ".xml"))
+            icon = XML_ICON;
+        else if (name.endsWith( ".htm") || name.endsWith( ".html"))
+            icon = HTML_ICON;
+        else if (name.endsWith( ".tex"))
+            icon = TEX_ICON;
+        else if (name.endsWith( ".txt"))
+            icon = TEXT_ICON;
+        else if (name.endsWith( ".tmpl"))
+            icon = TEMPLATE_ICON;
         
+        // bug #581152
+        // Only show icons for files, not directories. The f.isFile() test should be done first
+        // into the method, but it has the side effect of triggering warning dialogs for missing
+        // disks in drive a: when used with JRE1.3.1 and Windows, so only do the tests for filesystem
+        // items with known extensions.
+        if (icon!=null && f.isFile())
+            return icon;
+
         return null; // let L&F file view determine the icon
     }
 } // class CustomFileView

@@ -1,3 +1,6 @@
+1.0.6: (2002/07/15)
+	- Fixed access of A drive dialogs when using file dialogs with
+	  Windows and JRE 1.3.
 1.0.5: (2002/06/11)
 	- Improved paragraph detection on text import.
 	- Added XML export option.
