@@ -170,6 +170,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         public JGlossParser() {
             super( getDTD());
+
+            // Swing 1.4 changes how whitespace is coalesced in class 
+            // javax.swing.text.html.parser.Parser. The new behavior breaks reading of JGloss documents
+            // with tags containing only a single space character (e. g. <trans> </trans>). To switch
+            // back to the old behavior, the protected member strict must be changed to true.
+            strict = true;
         }
 
         /**
@@ -271,6 +277,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
      */
     public class AnnotationView extends BlockView {
         /**
+         * Last parent view which was a LogicalView. See {@link #setParent() setParent}.
+         */
+        private View logicalViewParent = null;
+
+        /**
          * Flag if the first child of the word of this annotation has a reading (is a READING_BASETEXT).
          */
         private boolean startsAnnotated;
@@ -284,6 +295,43 @@ public class JGlossEditorKit extends HTMLEditorKit {
             super( elem, View.Y_AXIS);
             startsAnnotated = elem.getElement( 0).getElement( 0).getAttributes()
                 .getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.READING_BASETEXT);
+        }
+
+        /**
+         * Fix setting of <CODE>null</CODE> parent with Swing 1.4. <CODE>AnnotationViews</CODE> 
+         * can be referenced
+         * from two parents at the same time: a <CODE>FlowView.LogicalView</CODE> and a 
+         * <CODE>ParagraphView.Row</CODE>. If the <CODE>AnnotationView</CODE> is removed from the
+         * <CODE>ParagraphView.Row</CODE> by calling <CODE>setParent(null)</CODE>, the 
+         * <CODE>LogicalView</CODE> has to be made parent again for the layout to work.
+         */
+        public void setParent( View parent) {
+            if (parent==null && logicalViewParent!=null) {
+                // Instead of removing the parent, test if the logical view should be made
+                // parent again.
+                if (getParent() == logicalViewParent) {
+                    // The annotationView is removed from the logical view parent
+                    logicalViewParent = null;
+                }
+                else {
+                    // Test if the AnnotationView is still a child of the logical view.
+                    for ( int i=0; i<logicalViewParent.getViewCount(); i++) {
+                        if (logicalViewParent.getView( i) == this) {
+                            // Still a child: reset parent view to logical view.
+                            parent = logicalViewParent;
+                        }
+                    }
+                }
+            }
+
+            if (parent != null) {
+                // Save logical view parent. Since the class FlowView.LogicalView is package-private,
+                // the test has to be done via class name check.
+                if (parent.getClass().getName().equals( "javax.swing.text.FlowView$LogicalView"))
+                    logicalViewParent = parent;
+            }
+
+            super.setParent( parent);
         }
 
         /**
@@ -303,6 +351,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * translation view is ignored and only the width of the word is returned.
          */
         public float getPreferredSpan( int axis) {
+            if (getParent() == null) {
+                System.err.println( "View invalid");
+                Thread.dumpStack();
+            }
+
             if (axis==View.X_AXIS && compactView)
                 // view 0 is the view for the WORD element
                 return getView( 0).getPreferredSpan( axis);
@@ -311,7 +364,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
         }
 
         /**
-         * Returns the maximum span of the view. Overridden to prevent it to grow beyond
+         * Returns the maximum span of the view. Overridden to prevent it growing beyond
          * the preferred span.
          */
         public float getMaximumSpan( int axis) {
@@ -415,7 +468,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @return <CODE>true</CODE> if the hidden attribute is set.
          */
         public boolean isAnnotationHidden() {
-            return ((AnnotationView) getParent().getParent()).isAnnotationHidden();
+            if (getParent() != null &&
+                getParent().getParent() != null)
+                return ((AnnotationView) getParent().getParent()).isAnnotationHidden();
+            else
+                return false;
         }
 
         /**
@@ -525,6 +582,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         public void paint( Graphics g, Shape allocation) {
             if (isHidden())
+                return;
+            if (getParent() == null)
                 return;
 
             if (allocation instanceof Rectangle) {

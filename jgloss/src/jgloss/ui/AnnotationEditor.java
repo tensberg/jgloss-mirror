@@ -91,7 +91,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     private class AnnotationTreeCellEditor extends DefaultTreeCellEditor {
         private Box box;
         private JLabel label;
-        private Component glue;
 
         /**
          * Creates a new editor with its look taken from the component returned by the
@@ -101,6 +100,23 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
          */
         public AnnotationTreeCellEditor( DefaultTreeCellRenderer renderer) {
             super( AnnotationEditor.this, renderer);
+        }
+
+        /**
+         * Prevent editing nodes other than EditableTextNodes.
+         */
+        public boolean isCellEditable( EventObject event) {
+            if (event != null &&
+                event.getSource() == AnnotationEditor.this &&
+                event instanceof MouseEvent) {
+                TreePath path = tree.getPathForLocation( ((MouseEvent)event).getX(),
+                                                         ((MouseEvent)event).getY());
+                if (path != null && 
+                    !(path.getLastPathComponent() instanceof EditableTextNode))
+                    return false;
+            }
+
+            return super.isCellEditable( event);
         }
 
         /**
@@ -122,14 +138,13 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             Container c = (Container) super.getTreeCellEditorComponent( tree, value, isSelected, expanded,
                                                                         leaf, row);
 
-            canEdit = canEdit && (value instanceof EditableTextNode);
-            if (canEdit) {
+            if (value instanceof EditableTextNode) {
                 EditableTextNode node = (EditableTextNode) value;
                 label.setFont( c.getFont());
                 label.setForeground( c.getForeground());
                 label.setText( node.getDescription());
                 String text = node.getText();
-
+                
                 JTextField textfield = ((JTextField) editingComponent);
                 textfield.setText( text);
                 textfield.setColumns( text.length() + 5); // leave space for editing
@@ -138,8 +153,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 box.add( label);
                 box.add( editingComponent); // editingComponent was reset by superclass
                 editingComponent = box; // will be added to container by superclass
+                prepareForEditing();
             }
-
+            
             return c;
         }
     }
@@ -320,15 +336,12 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         useReadingAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
-                    String reading;
                     AbstractAnnotation annotation;
                     if (tn instanceof TranslationNode) {
                         annotation = ((TranslationNode) tn).getTranslation();
-                        reading = ((TranslationNode) tn).getReading();
                     }
                     else {
                         annotation = ((ReadingAnnotationNode) tn).getReading();
-                        reading = ((ReadingAnnotationNode) tn).getReadingText();
                     }
 
                     while (!(tn instanceof AnnotationNode))

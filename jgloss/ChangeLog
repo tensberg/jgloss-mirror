@@ -1,3 +1,6 @@
+1.0.2: (2002/02/09)
+	- Fixes for JDK 1.4.
+	- Fixed all tree nodes are editable bug.
 1.0.1: (2002/01/22)
 	- Added user interface font selection to style preference panel.
 	- Font autodetection on first startup. JGloss tries to set

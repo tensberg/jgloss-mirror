@@ -93,7 +93,7 @@ button.select=Select
 button.annotate=Annotate
 
 jgloss.title=JGloss
-jgloss.version=Version 1.0.1
+jgloss.version=Version 1.0.2
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>

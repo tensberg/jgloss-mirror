@@ -98,7 +98,7 @@ public class ExclusionList extends JPanel {
     private ExclusionList() {
         setLayout( new GridBagLayout());
 
-        exclusions = new HashSet( 20);
+        exclusions = new HashSet( 101);
         // construct the dictionaries list editor
         exclusionList = new JList();
         exclusionList.setModel( new DefaultListModel());
@@ -264,7 +264,7 @@ public class ExclusionList extends JPanel {
             BufferedReader r = new BufferedReader( new InputStreamReader
                 ( new FileInputStream( filename), 
                   JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
-            Set newExclusions = new HashSet( 1000);
+            Set newExclusions = new HashSet( 1001);
             String line;
             while ((line=r.readLine()) != null) {
                 if (line.length() > 0)

@@ -244,7 +244,7 @@ public class JGlossServlet extends HttpServlet {
 
         // Set of all headers which are not forwarded in forwardRequestHeaders or
         // forwardResponseHeaders. All unknown headers must be forwarded as per rfc2616.
-        noForwardHeaders = new HashSet( 50);
+        noForwardHeaders = new HashSet( 51);
         // general header fields
         noForwardHeaders.add( "connection"); // the content of this field is currently not handled
         noForwardHeaders.add( "upgrade");

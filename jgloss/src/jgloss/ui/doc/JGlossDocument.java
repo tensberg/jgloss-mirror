@@ -199,7 +199,7 @@ public class JGlossDocument extends HTMLDocument {
          *        annotation elements instead of an AnnotationAction. This is needed because
          *        the canInsertTag, which is needed to correctly handle the case where only a
          *        fragment of the HTML document should be inserted, is private and thus cannot
-         *        be called from the AnnotationAction.
+         *        be called from the AnnotationActiendon.
          */
         private void addCustomTags( boolean blockCompatible) {
             if (blockCompatible)
@@ -615,9 +615,9 @@ public class JGlossDocument extends HTMLDocument {
          * @param errorMsg The error message.
          * @param pos Position at which the error occured.
          */
-        /*public void handleError( String errorMsg, int pos) {
+        public void handleError( String errorMsg, int pos) {
             System.err.println( errorMsg + " at " + pos);
-            }*/
+        }
 
         /**
          * Returns the current position in the loading document.

@@ -47,7 +47,8 @@ public class SaveFileChooser extends JFileChooser {
      */
     public File getSelectedFile() {
         File f = super.getSelectedFile();
-        if (getFileFilter() instanceof ExtensionFileFilter)
+        if (f != null && 
+            getFileFilter() instanceof ExtensionFileFilter)
             f = ((ExtensionFileFilter) getFileFilter()).addExtension( f);
 
         return f;

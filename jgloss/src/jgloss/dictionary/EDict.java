@@ -230,7 +230,7 @@ public class EDict implements Dictionary {
                 // if a word contains the same kanji twice, and words with this kanji are looked up,
                 // one index entry is found for the first occurrence and one for the second. To prevent
                 // adding the entry multiple times, entries are stored in a set.
-                Set seenEntries = new HashSet( 50);
+                Set seenEntries = new HashSet( 51);
 
                 // read all matching entries
                 for ( match=firstmatch; match<=lastmatch; match++) {

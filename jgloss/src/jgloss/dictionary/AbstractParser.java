@@ -66,7 +66,7 @@ public abstract class AbstractParser implements Parser {
         this.ignoreNewlines = ignoreNewlines;
         this.firstOccurrenceOnly = firstOccurrenceOnly;
         if (firstOccurrenceOnly)
-            annotatedWords = new HashSet( 100);
+            annotatedWords = new HashSet( 101);
     }
 
     /**
@@ -85,7 +85,7 @@ public abstract class AbstractParser implements Parser {
      */
     public void reset() {
         if (annotatedWords != null)
-            annotatedWords = new HashSet( 100);
+            annotatedWords = new HashSet( 101);
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class AbstractParser implements Parser {
         this.firstOccurrenceOnly = firstOccurrenceOnly;
         if (firstOccurrenceOnly) {
             if (annotatedWords==null)
-                annotatedWords = new HashSet( 100);
+                annotatedWords = new HashSet( 101);
         }
         else
             annotatedWords = null;
