@@ -81,12 +81,10 @@ public class AnnotationNode extends InnerNode {
         // Note that the child elements are guraranteed to exist by the way the element is constructed
         // in JGlossDocument.JGlossReader.
         this.annotation = annotation;
-        Element readingElement = annotation.getElement( 0);
         Element kanjiElement = annotation.getElement( 1);
-        Element translationElement = annotation.getElement( 2);
         
-        reading = new ReadingTranslationNode( this, readingElement, true);
-        translation = new ReadingTranslationNode( this, translationElement, false);
+        reading = new ReadingTranslationNode( this, true);
+        translation = new ReadingTranslationNode( this, false);
         children.add( reading);
         children.add( translation);
 

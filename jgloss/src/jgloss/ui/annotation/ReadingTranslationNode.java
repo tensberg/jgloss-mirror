@@ -37,10 +37,6 @@ import javax.swing.text.*;
  */
 public class ReadingTranslationNode extends LeafNode {
     /**
-     * The reading or translation element in the document which this node wraps.
-     */
-    private Element reading;
-    /**
      * The text contained in the reading or translation element.
      */
     private String readingText;
@@ -61,9 +57,10 @@ public class ReadingTranslationNode extends LeafNode {
      * @param isReading <CODE>true</CODE> if this is a reading, <CODE>false</CODE> if this is a
      *               translation annotation.
      */
-    public ReadingTranslationNode( InnerNode parent, Element reading, boolean isReading) {
+    public ReadingTranslationNode( InnerNode parent, boolean isReading) {
         super( parent);
-        this.reading = reading;
+        this.isReading = isReading; // must be set before calling getElement()
+        Element reading = getElement();
         try {
             this.readingText = reading.getDocument().getText( reading.getStartOffset(),
                                                               reading.getEndOffset()-
@@ -71,7 +68,6 @@ public class ReadingTranslationNode extends LeafNode {
         } catch (BadLocationException ex) {
             ex.printStackTrace();
         }
-        this.isReading = isReading;
 
         description = JGloss.messages.getString( isReading ? "annotationeditor.reading" :
                                                  "annotationeditor.translation");
@@ -119,6 +115,7 @@ public class ReadingTranslationNode extends LeafNode {
         readingText = text;
         getRootNode().getModel().nodeChanged( this);
         try {
+            Element reading = getElement();
             int start = reading.getStartOffset();
             int end = reading.getEndOffset();
             JGlossDocument doc = ((JGlossDocument) reading.getDocument());
@@ -127,5 +124,17 @@ public class ReadingTranslationNode extends LeafNode {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Returns the element which displays the reading/translation in the JGloss document.
+     * The element object may change if the annotations are manipulated, so you should not
+     * use it over longer intervals.
+     */
+    public Element getElement() {
+        if (isReading)
+            return ((AnnotationNode) parent).getAnnotationElement().getElement( 0);
+        else // translation
+            return ((AnnotationNode) parent).getAnnotationElement().getElement( 2);
     }
 } // class ReadingTranslationNode
