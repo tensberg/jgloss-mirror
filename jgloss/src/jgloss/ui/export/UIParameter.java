@@ -23,10 +23,9 @@
 
 package jgloss.ui.export;
 
-import jgloss.JGloss;
-import jgloss.util.XMLTools;
-
 import java.awt.Component;
+
+import jgloss.JGloss;
 
 import org.w3c.dom.Element;
 

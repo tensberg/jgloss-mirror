@@ -23,18 +23,32 @@
 
 package jgloss.ui;
 
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.html.StyleSheet;
+
 import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.ui.html.AnnotationTags;
 import jgloss.ui.html.JGlossEditor;
-
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.html.StyleSheet;
 
 /**
  * Style dialog which also manages JGloss document styles.

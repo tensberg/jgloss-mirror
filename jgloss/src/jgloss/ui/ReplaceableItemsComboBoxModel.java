@@ -23,10 +23,10 @@
 
 package jgloss.ui;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.RandomAccess;
 import java.util.Collections;
+import java.util.List;
+import java.util.RandomAccess;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;

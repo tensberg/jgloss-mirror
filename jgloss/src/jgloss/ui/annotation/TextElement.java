@@ -23,11 +23,11 @@
 
 package jgloss.ui.annotation;
 
-import jgloss.ui.html.JGlossHTMLDoc;
-
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.BadLocationException;
+
+import jgloss.ui.html.JGlossHTMLDoc;
 
 class TextElement {
     private Element element;

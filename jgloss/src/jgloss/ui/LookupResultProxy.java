@@ -23,11 +23,13 @@
 
 package jgloss.ui;
 
-import jgloss.dictionary.*;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.SearchException;
 
 /**
  * Lookup result handler which will forward the results to one or more other lookup result handler

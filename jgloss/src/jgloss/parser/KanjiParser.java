@@ -23,20 +23,20 @@
 
 package jgloss.parser;
 
-import jgloss.dictionary.*;
-
-import jgloss.util.StringTools;
-
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Set;
 
-import java.io.*;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.ExpressionSearchModes;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SearchFieldSelection;
+import jgloss.dictionary.UnsupportedSearchModeException;
+import jgloss.util.StringTools;
 
 /**
  * Parser implementation which annotates kanji words.
@@ -139,7 +139,7 @@ public class KanjiParser extends AbstractParser {
         boolean compverb = false;
         for ( int i=start; i<end; i++) {
             parsePosition = i; // tell the world where we are in parsing (see getParsePosition())
-            if (Thread.currentThread().interrupted())
+            if (Thread.interrupted())
                 throw new ParsingInterruptedException();
             
             if (ignoreNewlines && 

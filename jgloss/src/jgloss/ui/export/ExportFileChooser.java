@@ -23,26 +23,20 @@
 
 package jgloss.ui.export;
 
-import jgloss.JGloss;
-import jgloss.Preferences;
-
-import jgloss.ui.SaveFileChooser;
-import jgloss.ui.CustomFileView;
-import jgloss.ui.UIUtilities;
-
-import java.util.List;
-import java.util.Iterator;
-
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.util.Iterator;
+import java.util.List;
 
-import javax.swing.JFileChooser;
-import javax.swing.Box;
-import javax.swing.JPanel;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
+import jgloss.JGloss;
+import jgloss.ui.CustomFileView;
+import jgloss.ui.SaveFileChooser;
+import jgloss.ui.UIUtilities;
 
 /**
  * File chooser with user interface elements typical for file export.

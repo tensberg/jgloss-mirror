@@ -23,13 +23,13 @@
 
 package jgloss.dictionary.attribute;
 
-import jgloss.util.NullIterator;
-
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+
+import jgloss.util.NullIterator;
 
 public class DefaultAttributeSet implements AttributeSet {
     protected class MutableValueList implements ValueList {

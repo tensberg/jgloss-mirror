@@ -23,14 +23,16 @@
 
 package jgloss.ui.im;
 
-import java.awt.*;
-import java.awt.im.*;
-import java.awt.im.spi.*;
-import java.awt.font.*;
-import java.awt.event.*;
-
+import java.awt.AWTEvent;
+import java.awt.Rectangle;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.KeyEvent;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextHitInfo;
+import java.awt.im.InputMethodHighlight;
+import java.awt.im.spi.InputMethod;
+import java.awt.im.spi.InputMethodContext;
 import java.text.AttributedString;
-
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;

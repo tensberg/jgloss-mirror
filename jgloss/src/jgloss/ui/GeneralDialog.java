@@ -23,20 +23,35 @@
 
 package jgloss.ui;
 
-import jgloss.*;
-import jgloss.dictionary.*;
-import jgloss.parser.Parser;
-import jgloss.parser.ReadingAnnotationFilter;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Set;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.InputVerifier;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+import jgloss.JGloss;
+import jgloss.Preferences;
 import jgloss.parser.Chasen;
 import jgloss.parser.ChasenParser;
-
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.html.StyleSheet;
+import jgloss.parser.Parser;
+import jgloss.parser.ReadingAnnotationFilter;
 
 /**
  * Component which allows the user to edit general preferences. This will normally embedded

@@ -23,8 +23,8 @@
 
 package jgloss;
 
-import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 /**
  * Implementation of the application preferences which uses the Java 1.4 prefs API.

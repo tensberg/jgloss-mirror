@@ -23,11 +23,11 @@
 
 package jgloss.dictionary.attribute;
 
-import jgloss.util.ListFormatter;
-
-import java.util.ResourceBundle;
-import java.util.MissingResourceException;
 import java.text.MessageFormat;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
+import jgloss.util.ListFormatter;
 
 /**
  * Format word attribute values.

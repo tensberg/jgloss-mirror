@@ -23,15 +23,21 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.awt.datatransfer.*;
-import java.awt.event.*;
-import java.util.*;
-
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComboBox;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.JTextComponent;
 
 /**
  * Makes the Cut/Copy/Paste actions of a <CODE>JTextComponent</CODE> available for a menu.

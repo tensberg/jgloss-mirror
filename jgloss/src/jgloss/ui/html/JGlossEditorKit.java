@@ -23,24 +23,38 @@
 
 package jgloss.ui.html;
 
-import jgloss.JGloss;
-import jgloss.Preferences;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Iterator;
 
-import jgloss.ui.xml.JGlossDocument;
-
-import java.io.*;
-import java.awt.*;
-import java.util.*;
-
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.text.html.*;
-import javax.swing.text.html.parser.DocumentParser;
-import javax.swing.text.html.parser.DTD;
-import javax.swing.text.html.parser.ParserDelegator;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.Segment;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
+import javax.swing.text.html.BlockView;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.InlineView;
+import javax.swing.text.html.StyleSheet;
 import javax.swing.text.html.parser.AttributeList;
 import javax.swing.text.html.parser.ContentModel;
+import javax.swing.text.html.parser.DTD;
+import javax.swing.text.html.parser.DocumentParser;
+import javax.swing.text.html.parser.ParserDelegator;
 import javax.swing.text.html.parser.TagElement;
+
+import jgloss.JGloss;
+import jgloss.Preferences;
 
 /**
  * The <CODE>JGlossEditorKit</CODE> is an extension of the <CODE>HTMLEditorKit</CODE> 
@@ -927,7 +941,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
     }
 
     public void setStyleSheet(StyleSheet _jglossStyleSheet) {
-        jglossStyleSheet = jglossStyleSheet;
+        jglossStyleSheet = _jglossStyleSheet;
     }
 
     public StyleSheet getStyleSheet() {

@@ -23,8 +23,10 @@
 
 package jgloss;
 
-import jgloss.dictionary.*;
-import jgloss.ui.*;
+import jgloss.ui.Dictionaries;
+import jgloss.ui.LookupFrame;
+import jgloss.ui.PreferencesPanel;
+import jgloss.ui.StyleDialog;
 
 /**
  * Base class for launching the JDictionary application, which only includes the word lookup part.

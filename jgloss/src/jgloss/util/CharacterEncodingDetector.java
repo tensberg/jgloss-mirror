@@ -29,7 +29,12 @@
 
 package jgloss.util;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PushbackInputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Try to detect the character encoding of an input stream reading Japanese

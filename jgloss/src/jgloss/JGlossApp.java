@@ -23,21 +23,21 @@
 
 package jgloss;
 
+import java.io.File;
+
 import jgloss.parser.Chasen;
 import jgloss.parser.ChasenParser;
 import jgloss.parser.KanjiParser;
-import jgloss.ui.PreferencesPanel;
-import jgloss.ui.GeneralDialog;
-import jgloss.ui.DocumentStyleDialog;
-import jgloss.ui.ParserSelector;
-import jgloss.ui.LookupFrame;
 import jgloss.ui.Dictionaries;
+import jgloss.ui.DocumentStyleDialog;
 import jgloss.ui.ExclusionList;
+import jgloss.ui.GeneralDialog;
 import jgloss.ui.JGlossFrame;
 import jgloss.ui.JGlossLookupFrame;
+import jgloss.ui.LookupFrame;
+import jgloss.ui.ParserSelector;
+import jgloss.ui.PreferencesPanel;
 import jgloss.ui.export.ExportMenu;
-
-import java.io.File;
 
 /**
  * Base class for launching the full application, including the word lookup and document parser

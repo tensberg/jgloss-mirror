@@ -23,16 +23,16 @@
 
 package jgloss.ui.xml;
 
-import jgloss.ui.html.JGlossHTMLDoc;
-import jgloss.ui.html.HTMLToSAXParserAdapter;
-
 import java.io.IOException;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import jgloss.ui.html.HTMLToSAXParserAdapter;
+import jgloss.ui.html.JGlossHTMLDoc;
+
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

@@ -23,18 +23,33 @@
 
 package jgloss.www;
 
-import jgloss.dictionary.*;
-import jgloss.parser.*;
-import jgloss.util.CharacterEncodingDetector;
-
-import java.io.*;
-import java.util.*;
-import java.util.zip.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.text.MessageFormat;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jgloss.dictionary.DictionaryFactory;
+import jgloss.dictionary.EDict;
+import jgloss.dictionary.KanjiDic;
+import jgloss.parser.KanjiParser;
+import jgloss.parser.Parser;
+import jgloss.util.CharacterEncodingDetector;
 
 /**
  * Servlet which annotates an HTML page with the dictionary entries for

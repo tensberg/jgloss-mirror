@@ -23,28 +23,28 @@
 
 package jgloss.ui.export;
 
-import jgloss.JGloss;
-import jgloss.util.XMLTools;
-import jgloss.ui.ExtensionFileFilter;
-
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.filechooser.FileFilter;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactory;
+
+import jgloss.JGloss;
+import jgloss.ui.ExtensionFileFilter;
+import jgloss.util.XMLTools;
+
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.EntityResolver;
 
 /**
  * Reads an exporter configuration from an export descriptor XML file. The export is done

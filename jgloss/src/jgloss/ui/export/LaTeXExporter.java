@@ -24,7 +24,6 @@
 package jgloss.ui.export;
 
 import jgloss.util.LaTeXEscaper;
-import jgloss.util.XMLTools;
 
 import org.w3c.dom.Document;
 

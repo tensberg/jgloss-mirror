@@ -23,7 +23,9 @@
 
 package jgloss.dictionary;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * The dictionary factory is used to create instances of dictionaries based on a descriptor.

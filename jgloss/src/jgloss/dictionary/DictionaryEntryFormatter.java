@@ -23,10 +23,15 @@
 
 package jgloss.dictionary;
 
-import jgloss.util.ListFormatter;
-import jgloss.dictionary.attribute.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
+import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.AttributeFormatter;
+import jgloss.dictionary.attribute.AttributeSet;
+import jgloss.util.ListFormatter;
 
 /**
  * Format a dictionary entry as String. The class is designed to offer highly customizable

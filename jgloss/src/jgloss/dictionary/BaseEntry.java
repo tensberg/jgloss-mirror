@@ -23,12 +23,12 @@
 
 package jgloss.dictionary;
 
-import jgloss.dictionary.attribute.AttributeSet;
-import jgloss.dictionary.attribute.DefaultAttributeSet;
-
 import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.List;
+
+import jgloss.dictionary.attribute.AttributeSet;
+import jgloss.dictionary.attribute.DefaultAttributeSet;
 
 abstract class BaseEntry implements DictionaryEntry {
     protected String reading;

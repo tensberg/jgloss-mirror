@@ -23,19 +23,18 @@
 
 package jgloss.ui.export;
 
-import jgloss.JGloss;
-import jgloss.Preferences;
-import jgloss.util.XMLTools;
-import jgloss.ui.JGlossFrameModel;
-
-import java.util.Vector;
 import java.awt.Component;
 import java.net.URL;
+import java.util.Vector;
 
-import javax.swing.JLabel;
 import javax.swing.Box;
-import javax.swing.JComboBox;
 import javax.swing.ComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+
+import jgloss.JGloss;
+import jgloss.ui.JGlossFrameModel;
+import jgloss.util.XMLTools;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

@@ -24,12 +24,18 @@
 package jgloss.ui;
 
 import jgloss.JGloss;
-import jgloss.dictionary.*;
-import jgloss.dictionary.attribute.*;
-import jgloss.util.ListFormatter;
+import jgloss.dictionary.DictionaryEntryFormatter;
+import jgloss.dictionary.WadokuJT;
+import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.AttributeFormatter;
+import jgloss.dictionary.attribute.AttributeNameFormatter;
+import jgloss.dictionary.attribute.Attributes;
+import jgloss.dictionary.attribute.DefaultAttributeFormatter;
+import jgloss.dictionary.attribute.InformationAttributeFormatter;
+import jgloss.dictionary.attribute.ReferenceAttributeFormatter;
+import jgloss.dictionary.attribute.WordFormatter;
 import jgloss.util.DefaultListFormatter;
-
-import java.util.Map;
+import jgloss.util.ListFormatter;
 
 // TODO: make formats configurable by the user
 

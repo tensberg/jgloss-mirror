@@ -23,8 +23,8 @@
 
 package jgloss.dictionary;
 
-import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 
 /**

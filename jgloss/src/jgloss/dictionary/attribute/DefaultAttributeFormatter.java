@@ -23,8 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
-import jgloss.util.ListFormatter;
 import jgloss.util.DefaultListFormatter;
+import jgloss.util.ListFormatter;
 
 /**
  * Default formatter for attributes and their values.

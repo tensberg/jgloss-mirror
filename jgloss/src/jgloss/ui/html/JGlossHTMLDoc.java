@@ -23,27 +23,34 @@
 
 package jgloss.ui.html;
 
-import jgloss.ui.xml.JGlossDocument;
-import jgloss.dictionary.*;
-import jgloss.parser.*;
-import jgloss.util.StringTools;
-
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.text.*;
-import javax.swing.text.html.*;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.Position;
+import javax.swing.text.Segment;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+
+import jgloss.ui.xml.JGlossDocument;
+import jgloss.util.StringTools;
 
 /**
  * Extends the HTML document class to handle JGloss document annotations. 

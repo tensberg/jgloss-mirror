@@ -23,12 +23,10 @@
 
 package jgloss.ui.export;
 
-import jgloss.ui.JGlossFrameModel;
-
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 
-import javax.swing.ComboBoxModel;
+import jgloss.ui.JGlossFrameModel;
 
 import org.w3c.dom.Element;
 

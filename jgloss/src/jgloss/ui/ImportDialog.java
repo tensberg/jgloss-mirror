@@ -23,22 +23,41 @@
 
 package jgloss.ui;
 
-import jgloss.*;
-import jgloss.dictionary.*;
-import jgloss.parser.Parser;
-import jgloss.parser.ChasenParser;
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.TextArea;
+import java.awt.event.ActionEvent;
+import java.awt.event.TextEvent;
+import java.awt.event.TextListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import jgloss.JGloss;
+import jgloss.Preferences;
+import jgloss.dictionary.Dictionary;
 import jgloss.parser.Chasen;
+import jgloss.parser.ChasenParser;
+import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.util.CharacterEncodingDetector;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 /**
  * Dialog which allows the user to select a file to import. The user can also specify the

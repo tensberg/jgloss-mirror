@@ -23,8 +23,17 @@
 
 package jgloss.parser;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Find verb/adjective conjugations. This is done by searching through a tree with a

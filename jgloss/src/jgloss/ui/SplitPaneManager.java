@@ -23,12 +23,12 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
-
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JSplitPane;
+
+import jgloss.JGloss;
 
 /**
  * Makes the state of split panes persistent by storing their divider locations in the preferences.

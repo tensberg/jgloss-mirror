@@ -2,10 +2,10 @@ package jgloss.ui;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Component;
-import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
-import java.util.Map;
+import java.awt.event.KeyListener;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;

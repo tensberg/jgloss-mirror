@@ -23,19 +23,32 @@
 
 package jgloss.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
 import jgloss.JGloss;
 import jgloss.Preferences;
-
-import jgloss.dictionary.*;
+import jgloss.dictionary.SearchException;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
-import java.util.ArrayList;
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 /**
  * Frame which ties together a {@link LookupConfigPanel LookupConfigPanel} and a

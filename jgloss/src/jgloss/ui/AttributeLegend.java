@@ -23,22 +23,27 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
-
-import jgloss.dictionary.*;
-import jgloss.dictionary.attribute.*;
-
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Iterator;
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
-import javax.swing.*;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
+import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+import jgloss.JGloss;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.AttributeFormatter;
+import jgloss.dictionary.attribute.CategoryAttributeValue;
+import jgloss.dictionary.attribute.SingletonValueList;
+import jgloss.dictionary.attribute.ValueList;
 
 /**
  * Displays a legend to the attributes used by a dictionary.

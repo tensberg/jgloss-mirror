@@ -23,11 +23,12 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
-
 import java.io.File;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+import jgloss.JGloss;
 
 /**
  * File chooser used for save dialogs. If the accepted file already exists, the user

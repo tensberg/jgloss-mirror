@@ -22,9 +22,9 @@
 
 package jgloss.parser;
 
-import jgloss.util.StringTools;
+import java.util.List;
 
-import java.util.*;
+import jgloss.util.StringTools;
 
 /**
  * Filter reading annotations for kanji from a text fragment. Reading annotations placed in a

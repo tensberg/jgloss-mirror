@@ -23,10 +23,9 @@
 
 package jgloss.dictionary;
 
-import jgloss.dictionary.attribute.Attribute;
-
 import java.util.Set;
-import java.util.Iterator;
+
+import jgloss.dictionary.attribute.Attribute;
 
 /**
  * Generic interface to a dictionary with an arbitrary backend.

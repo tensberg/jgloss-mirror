@@ -23,7 +23,9 @@
 
 package jgloss.ui;
 
-import java.io.*;
+import java.io.FilterReader;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * A reader which can be stopped in mid-stream. If the <CODE>stop</CODE> method of the

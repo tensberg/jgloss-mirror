@@ -23,13 +23,13 @@
 
 package jgloss.ui.export;
 
-import jgloss.JGloss;
-import jgloss.ui.JGlossFrameModel;
-
 import java.awt.Component;
 import java.net.URL;
 
 import javax.swing.JCheckBox;
+
+import jgloss.JGloss;
+import jgloss.ui.JGlossFrameModel;
 
 import org.w3c.dom.Element;
 

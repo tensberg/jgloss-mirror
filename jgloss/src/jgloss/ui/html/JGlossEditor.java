@@ -23,23 +23,38 @@
 
 package jgloss.ui.html;
 
-import jgloss.JGloss;
-import jgloss.Preferences;
-import jgloss.util.StringTools;
-import jgloss.ui.UIUtilities;
-import jgloss.ui.XCVManager;
-import jgloss.ui.AnnotationList;
-import jgloss.ui.annotation.AnnotationListModel;
-import jgloss.ui.xml.JGlossDocument;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.JToolTip;
+import javax.swing.JWindow;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Keymap;
+import javax.swing.text.StyledDocument;
+
+import jgloss.JGloss;
+import jgloss.Preferences;
+import jgloss.ui.AnnotationList;
+import jgloss.ui.UIUtilities;
+import jgloss.ui.annotation.AnnotationListModel;
 
 /**
  * JGlossEditor is a JTextPane with extensions specific to the manipulation on

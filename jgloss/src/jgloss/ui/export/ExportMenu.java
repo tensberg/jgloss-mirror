@@ -23,22 +23,21 @@
 
 package jgloss.ui.export;
 
-import jgloss.JGloss;
-import jgloss.util.StringTools;
-import jgloss.ui.JGlossFrameModel;
-import jgloss.ui.UIUtilities;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
+import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
-import javax.swing.SwingUtilities;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+
+import jgloss.JGloss;
+import jgloss.ui.JGlossFrameModel;
+import jgloss.ui.UIUtilities;
+import jgloss.util.StringTools;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

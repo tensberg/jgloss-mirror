@@ -23,15 +23,21 @@
 
 package jgloss.ui;
 
-import jgloss.*;
-import jgloss.dictionary.*;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import jgloss.JGloss;
 
 /**
  * The preferences frame allows the user to set the varying preferences for the JGloss

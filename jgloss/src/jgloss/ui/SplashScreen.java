@@ -23,12 +23,18 @@
 
 package jgloss.ui;
 
-import jgloss.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 
-import java.awt.*;
-import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JWindow;
+import javax.swing.SwingConstants;
 
-import javax.swing.*;
+import jgloss.JGloss;
 
 /**
  * Displays a splash screen at startup to keep the user entertained while the application

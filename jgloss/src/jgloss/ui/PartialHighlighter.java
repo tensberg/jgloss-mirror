@@ -20,9 +20,11 @@
  */
 package jgloss.ui;
 
-import jgloss.util.StringTools;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 
-import java.awt.*;
+import jgloss.util.StringTools;
 
 public class PartialHighlighter implements Highlighter {
 

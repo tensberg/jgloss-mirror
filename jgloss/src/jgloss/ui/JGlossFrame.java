@@ -23,25 +23,6 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
-import jgloss.JGlossApp;
-import jgloss.Preferences;
-import jgloss.parser.Parser;
-import jgloss.parser.ReadingAnnotationFilter;
-import jgloss.dictionary.DictionaryEntry;
-import jgloss.ui.annotation.Annotation;
-import jgloss.ui.annotation.AnnotationListModel;
-import jgloss.ui.export.ExportMenu;
-import jgloss.ui.html.AnnotationTags;
-import jgloss.ui.html.JGlossEditor;
-import jgloss.ui.html.JGlossEditorKit;
-import jgloss.ui.html.JGlossHTMLDoc;
-import jgloss.ui.html.AnnotationListSynchronizer;
-import jgloss.ui.html.SelectedAnnotationHighlighter;
-import jgloss.ui.xml.JGlossDocument;
-import jgloss.ui.xml.JGlossDocumentBuilder;
-import jgloss.util.CharacterEncodingDetector;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -81,7 +62,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -114,13 +94,32 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
-import javax.swing.text.View;
 import javax.swing.text.Position;
-
+import javax.swing.text.View;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import jgloss.JGloss;
+import jgloss.JGlossApp;
+import jgloss.Preferences;
+import jgloss.dictionary.DictionaryEntry;
+import jgloss.parser.Parser;
+import jgloss.parser.ReadingAnnotationFilter;
+import jgloss.ui.annotation.Annotation;
+import jgloss.ui.annotation.AnnotationListModel;
+import jgloss.ui.export.ExportMenu;
+import jgloss.ui.html.AnnotationListSynchronizer;
+import jgloss.ui.html.AnnotationTags;
+import jgloss.ui.html.JGlossEditor;
+import jgloss.ui.html.JGlossEditorKit;
+import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.ui.html.SelectedAnnotationHighlighter;
+import jgloss.ui.xml.JGlossDocument;
+import jgloss.ui.xml.JGlossDocumentBuilder;
+import jgloss.util.CharacterEncodingDetector;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 

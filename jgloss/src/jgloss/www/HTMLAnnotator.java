@@ -23,12 +23,19 @@
 
 package jgloss.www;
 
-import jgloss.dictionary.*;
-import jgloss.parser.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import jgloss.dictionary.SearchException;
+import jgloss.parser.Parser;
 
 /**
  * Look up words in a Japanese HTML page and add a tag with the dictionary entries.

@@ -23,17 +23,17 @@
 
 package jgloss.ui;
 
-import jgloss.ui.annotation.AnnotationListModel;
-import jgloss.ui.annotation.AnnotationListener;
-import jgloss.ui.annotation.AnnotationEvent;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.ListModel;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
+import jgloss.ui.annotation.AnnotationEvent;
+import jgloss.ui.annotation.AnnotationListModel;
+import jgloss.ui.annotation.AnnotationListener;
 
 public class AnnotationListModelAdapter implements ListModel, AnnotationListener {
     private AnnotationListModel annotations;

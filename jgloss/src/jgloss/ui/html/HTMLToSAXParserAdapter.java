@@ -23,19 +23,19 @@
 
 package jgloss.ui.html;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.Segment;
+import javax.swing.text.html.HTML;
+
 import jgloss.JGloss;
 import jgloss.ui.xml.JGlossDocument;
 
-import java.util.Map;
-import java.util.HashMap;
-
-import javax.swing.text.Element;
-import javax.swing.text.Segment;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.html.HTML;
-
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 

@@ -23,12 +23,13 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
-
 import java.io.File;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileView;
+
+import jgloss.JGloss;
 
 /**
  * File view which adds icons and descriptions for filetypes used by JGloss.

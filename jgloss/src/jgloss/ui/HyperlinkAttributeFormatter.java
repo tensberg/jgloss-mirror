@@ -1,12 +1,12 @@
 package jgloss.ui;
 
-import jgloss.dictionary.attribute.AttributeValueFormatter;
-import jgloss.dictionary.attribute.AttributeFormatter;
-import jgloss.dictionary.attribute.Attribute;
-import jgloss.dictionary.attribute.AttributeValue;
-import jgloss.dictionary.attribute.ValueList;
-
 import java.util.Map;
+
+import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.AttributeFormatter;
+import jgloss.dictionary.attribute.AttributeValue;
+import jgloss.dictionary.attribute.AttributeValueFormatter;
+import jgloss.dictionary.attribute.ValueList;
 
 class HyperlinkAttributeFormatter extends AttributeFormatter {
     class ReferencedAttribute {

@@ -23,21 +23,39 @@
 
 package jgloss;
 
-import jgloss.dictionary.*;
-import jgloss.dictionary.attribute.*;
-import jgloss.parser.*;
-import jgloss.util.CharacterEncodingDetector;
-import jgloss.ui.*;
-import jgloss.www.*;
-
-import java.io.*;
-import java.util.ResourceBundle;
-import java.util.Arrays;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.TextArea;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
-import java.awt.*;
-import java.awt.event.*;
+import java.util.Arrays;
+import java.util.ResourceBundle;
 
-import javax.swing.*;
+import javax.swing.UIManager;
+
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryFactory;
+import jgloss.dictionary.DistanceSearchModes;
+import jgloss.dictionary.EDict;
+import jgloss.dictionary.ExpressionSearchModes;
+import jgloss.dictionary.IndexedDictionary;
+import jgloss.dictionary.KanjiDic;
+import jgloss.dictionary.WadokuJT;
+import jgloss.dictionary.attribute.Attributes;
+import jgloss.ui.AboutFrame;
+import jgloss.ui.AttributeResultFilter;
+import jgloss.ui.Dictionaries;
+import jgloss.ui.LookupModel;
+import jgloss.ui.PreferencesFrame;
+import jgloss.ui.PreferencesPanel;
+import jgloss.ui.SplashScreen;
+import jgloss.ui.StyleDialog;
 
 /**
  * Framework for the initialization of the two applications {@link JGlossApp JGlossApp} and

@@ -23,20 +23,34 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
-
-import jgloss.util.ListFormatter;
-import jgloss.util.StringTools;
-import jgloss.dictionary.*;
-
-import java.util.List;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.awt.*;
+import java.util.List;
 
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
+import javax.swing.ComboBoxEditor;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
+
+import jgloss.JGloss;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.DictionaryEntryFormatter;
+import jgloss.dictionary.ExpressionSearchModes;
+import jgloss.dictionary.SearchException;
+import jgloss.util.StringTools;
 
 /**
  * Combo box which automatically performs searches on the entered text using the

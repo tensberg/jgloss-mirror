@@ -23,19 +23,47 @@
 
 package jgloss.ui;
 
-import jgloss.*;
-import jgloss.dictionary.*;
-
-import java.io.*;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.EventQueue;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import java.awt.*;
-import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import jgloss.JGloss;
+import jgloss.Preferences;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryFactory;
+import jgloss.dictionary.IndexException;
+import jgloss.dictionary.IndexedDictionary;
 
 /**
  * Panel which allows the user to add and manipulate dictionaries used for document parsing.

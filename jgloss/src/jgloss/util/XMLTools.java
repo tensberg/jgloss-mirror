@@ -23,8 +23,8 @@
 
 package jgloss.util;
 
-import org.w3c.dom.Node;
 import org.w3c.dom.CharacterData;
+import org.w3c.dom.Node;
 
 /**
  * Static utility functions for XML handling.

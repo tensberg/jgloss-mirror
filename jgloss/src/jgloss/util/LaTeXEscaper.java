@@ -23,8 +23,8 @@
 
 package jgloss.util;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Escapes LaTeX special characters.

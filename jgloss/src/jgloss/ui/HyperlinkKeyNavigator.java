@@ -23,33 +23,30 @@
 
 package jgloss.ui;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.net.URL;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
+import java.net.URL;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
-import javax.swing.Action;
-import javax.swing.AbstractAction;
-import javax.swing.InputMap;
-import javax.swing.ActionMap;
 import javax.swing.KeyStroke;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.Element;
-import javax.swing.text.Position;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Element;
 import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 
 /**
  * Allow keyboard navigation of links in a <code>JEditorPane</code> showing HTML content.

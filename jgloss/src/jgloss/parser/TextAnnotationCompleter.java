@@ -25,11 +25,10 @@ package jgloss.parser;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.ResultIterator;
-import jgloss.dictionary.UnsupportedSearchModeException;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchFieldSelection;
-import jgloss.dictionary.ExpressionSearchModes;
 
 public class TextAnnotationCompleter {
     private Dictionary[] dictionaries;

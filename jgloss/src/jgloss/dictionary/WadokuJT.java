@@ -23,22 +23,31 @@
 
 package jgloss.dictionary;
 
-import jgloss.util.StringTools;
-import jgloss.util.ListFormatter;
-import jgloss.util.DefaultListFormatter;
-import jgloss.dictionary.attribute.*;
-
-import java.io.*;
-import java.nio.*;
-import java.nio.charset.CharacterCodingException;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.ResourceBundle;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.Reader;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import jgloss.dictionary.attribute.Abbreviation;
+import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.AttributeMapper;
+import jgloss.dictionary.attribute.Attributes;
+import jgloss.dictionary.attribute.DefaultAttributeFormatter;
+import jgloss.dictionary.attribute.DefaultAttributeSet;
+import jgloss.dictionary.attribute.Gairaigo;
+import jgloss.dictionary.attribute.InformationAttributeValue;
+import jgloss.dictionary.attribute.ReferenceAttributeValue;
+import jgloss.dictionary.attribute.SearchReference;
+import jgloss.util.DefaultListFormatter;
 
 /**
  * Implementation for dictionaries in WadokuJT.txt format. 

@@ -23,15 +23,36 @@
 
 package jgloss.ui;
 
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import jgloss.JGloss;
-import jgloss.dictionary.*;
-
-import java.util.List;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryEntryField;
+import jgloss.dictionary.MatchMode;
+import jgloss.dictionary.SearchFieldSelection;
+import jgloss.dictionary.SearchMode;
 
 public class LookupConfigPanel extends JPanel implements LookupChangeListener,
                                                          ActionListener {

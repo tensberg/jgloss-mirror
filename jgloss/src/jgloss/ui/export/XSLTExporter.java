@@ -23,47 +23,34 @@
 
 package jgloss.ui.export;
 
-import jgloss.JGloss;
-import jgloss.util.XMLTools;
-import jgloss.ui.ExtensionFileFilter;
-import jgloss.ui.UIUtilities;
-import jgloss.ui.JGlossFrameModel;
-
 import java.awt.Component;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.net.URL;
-import java.net.MalformedURLException;
+import java.util.List;
 
-import javax.swing.JOptionPane;
-import javax.swing.AbstractButton;
 import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
-import javax.xml.parsers.DocumentBuilder;
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+
+import jgloss.JGloss;
+import jgloss.ui.JGlossFrameModel;
+
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.EntityResolver;
 
 /**
  * Standard exporter which applies an XSLT style sheet to the JGloss document and writes the

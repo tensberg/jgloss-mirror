@@ -19,7 +19,9 @@
  */
 package jgloss.ui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 
 public class MatchHighlighter implements Highlighter {
 

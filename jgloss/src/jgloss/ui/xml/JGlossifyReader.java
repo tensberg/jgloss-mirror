@@ -23,8 +23,14 @@
 
 package jgloss.ui.xml;
 
-import java.util.*;
-import java.io.*;
+import java.io.FilterReader;
+import java.io.IOException;
+import java.io.PushbackReader;
+import java.io.Reader;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Reads a plain text file from a reader and formats it as a JGloss XML file without annotations.

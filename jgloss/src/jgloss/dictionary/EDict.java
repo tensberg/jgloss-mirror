@@ -23,16 +23,24 @@
 
 package jgloss.dictionary;
 
-import jgloss.dictionary.attribute.*;
-
-import java.io.*;
-import java.nio.*;
-import java.nio.charset.CharacterCodingException;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.Reader;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.AttributeMapper;
+import jgloss.dictionary.attribute.Attributes;
+import jgloss.dictionary.attribute.DefaultAttributeSet;
+import jgloss.dictionary.attribute.Priority;
 
 /**
  * Dictionary implementation for dictionaries in EDICT format 

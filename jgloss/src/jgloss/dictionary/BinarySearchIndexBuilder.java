@@ -23,9 +23,10 @@
 
 package jgloss.dictionary;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
+import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.Random;
 
 /**

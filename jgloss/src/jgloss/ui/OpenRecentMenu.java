@@ -23,12 +23,17 @@
 
 package jgloss.ui;
 
-import jgloss.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import java.util.*;
-import java.io.*;
+import javax.swing.AbstractAction;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
-import javax.swing.*;
+import jgloss.JGloss;
+import jgloss.Preferences;
 
 /**
  * Manager for a menu with recently opened documents.

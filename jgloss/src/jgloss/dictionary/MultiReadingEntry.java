@@ -23,11 +23,11 @@
 
 package jgloss.dictionary;
 
-import jgloss.dictionary.attribute.*;
-
-import java.util.List;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
+
+import jgloss.dictionary.attribute.AttributeSet;
+import jgloss.dictionary.attribute.DefaultAttributeSet;
 
 /**
  * Dictionary entry with one word, multiple readings and no attributes.

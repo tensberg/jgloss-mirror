@@ -23,11 +23,9 @@
 
 package jgloss.dictionary;
 
-import jgloss.dictionary.attribute.AttributeSet;
-import jgloss.dictionary.attribute.DefaultAttributeSet;
-
-import java.util.Iterator;
 import java.util.List;
+
+import jgloss.dictionary.attribute.AttributeSet;
 
 public class SingleWordEntry extends BaseEntry {
     protected String word;

@@ -23,9 +23,9 @@
 
 package jgloss.ui.export;
 
-import jgloss.ui.JGlossFrameModel;
-
 import java.awt.Component;
+
+import jgloss.ui.JGlossFrameModel;
 
 import org.w3c.dom.Document;
 

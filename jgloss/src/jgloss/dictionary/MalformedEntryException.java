@@ -23,8 +23,8 @@
 
 package jgloss.dictionary;
 
-import java.util.ResourceBundle;
 import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 /**
  * Thrown when dictionary entry is of a format unparseable by the dictionary

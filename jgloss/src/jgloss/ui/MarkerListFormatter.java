@@ -23,14 +23,13 @@
 
 package jgloss.ui;
 
-import jgloss.util.ListFormatter;
-import jgloss.util.StringTools;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
-
+import java.util.List;
 import java.util.regex.Pattern;
+
+import jgloss.util.ListFormatter;
+import jgloss.util.StringTools;
 
 /**
  * List formatter which will add some additional text to the list items, if they

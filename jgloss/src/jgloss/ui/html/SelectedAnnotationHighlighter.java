@@ -1,10 +1,10 @@
 package jgloss.ui.html;
 
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import jgloss.ui.AnnotationList;
 import jgloss.ui.annotation.Annotation;
-
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
 
 /**
  * Highlights the annotation currently selected in a {@link AnnotationList AnnotationList}

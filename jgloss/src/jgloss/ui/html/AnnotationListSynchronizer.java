@@ -1,12 +1,11 @@
 package jgloss.ui.html;
 
-import jgloss.ui.annotation.AnnotationListModel;
-
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
-
+import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 import javax.swing.text.StyleConstants;
+
+import jgloss.ui.annotation.AnnotationListModel;
 
 /**
  * Update the annotation list in response to changes in the JGloss HTML document. The container

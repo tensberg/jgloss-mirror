@@ -23,11 +23,11 @@
 
 package jgloss.dictionary.attribute;
 
+import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
+
 import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.ResultIterator;
-
-import java.util.ResourceBundle;
-import java.util.NoSuchElementException;
 
 /**
  * Collection of standard attributes.

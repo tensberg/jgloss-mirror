@@ -23,10 +23,10 @@
 
 package jgloss.ui;
 
+import java.awt.Component;
+
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
-
-import java.awt.Component;
 
 public interface LookupResultFilter {
     boolean accept( DictionaryEntry de);

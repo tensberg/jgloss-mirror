@@ -23,12 +23,12 @@
 
 package jgloss.ui.export;
 
+import java.lang.reflect.Method;
+import java.net.URL;
+
 import jgloss.ui.JGlossFrameModel;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
-
-import java.lang.reflect.Method;
-import java.net.URL;
 
 import org.w3c.dom.Element;
 

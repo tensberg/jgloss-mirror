@@ -23,13 +23,10 @@
 
 package jgloss.dictionary.attribute;
 
-import jgloss.dictionary.SearchException;
 import jgloss.dictionary.Dictionary;
-import jgloss.dictionary.SearchMode;
-import jgloss.dictionary.SearchParameters;
 import jgloss.dictionary.ResultIterator;
-
-import java.util.Iterator;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SearchMode;
 
 /**
  * Reference other dictionary entries by storing search parameters and performing the

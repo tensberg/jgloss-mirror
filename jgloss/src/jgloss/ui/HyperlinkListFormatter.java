@@ -1,9 +1,9 @@
 package jgloss.ui;
 
-import jgloss.util.ListFormatter;
-
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import jgloss.util.ListFormatter;
 
 class HyperlinkListFormatter implements ListFormatter {
     protected String protocol;

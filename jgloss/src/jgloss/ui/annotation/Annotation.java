@@ -23,16 +23,16 @@
 
 package jgloss.ui.annotation;
 
-import jgloss.ui.xml.JGlossDocument;
-import jgloss.ui.html.JGlossHTMLDoc;
-import jgloss.util.StringTools;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.BadLocationException;
+
+import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.ui.xml.JGlossDocument;
+import jgloss.util.StringTools;
 
 public class Annotation {
     protected AnnotationListModel owner;

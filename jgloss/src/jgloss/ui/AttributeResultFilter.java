@@ -23,11 +23,11 @@
 
 package jgloss.ui;
 
+import java.awt.Component;
+
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.attribute.Attribute;
-
-import java.awt.Component;
 
 public class AttributeResultFilter implements LookupResultFilter {
     protected String name;

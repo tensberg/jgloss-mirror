@@ -23,17 +23,29 @@
 
 package jgloss.ui;
 
-import jgloss.*;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.UIManager;
+
+import jgloss.JGloss;
+import jgloss.Preferences;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
-
-import java.lang.reflect.Constructor;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 /**
  * Panel which provides an interface to select a specific parser. Available parsers are registered

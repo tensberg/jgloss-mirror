@@ -23,13 +23,15 @@
 
 package jgloss.www;
 
-import java.io.*;
-import java.util.*;
-import java.net.*;
-import java.text.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Utility class for forwarding cookies between client-servlet and servlet-remote server.

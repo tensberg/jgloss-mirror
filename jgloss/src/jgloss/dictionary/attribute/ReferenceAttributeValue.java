@@ -23,8 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
-import jgloss.dictionary.SearchException;
 import jgloss.dictionary.ResultIterator;
+import jgloss.dictionary.SearchException;
 
 /**
  * Reference to other dictionary entries.

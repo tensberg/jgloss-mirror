@@ -25,7 +25,13 @@ package jgloss.ui.export;
 
 import jgloss.util.Escaper;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Apply an escaper to the text nodes of a DOM tree.

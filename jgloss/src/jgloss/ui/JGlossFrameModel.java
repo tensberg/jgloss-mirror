@@ -1,8 +1,8 @@
 package jgloss.ui;
 
-import jgloss.ui.xml.JGlossDocument;
-import jgloss.ui.html.JGlossHTMLDoc;
 import jgloss.ui.annotation.AnnotationListModel;
+import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.ui.xml.JGlossDocument;
 
 public class JGlossFrameModel {
     /**

@@ -23,9 +23,9 @@
 
 package jgloss.ui.im;
 
-import java.awt.im.spi.*;
 import java.awt.Image;
-
+import java.awt.im.spi.InputMethod;
+import java.awt.im.spi.InputMethodDescriptor;
 import java.util.Locale;
 
 public class KanaInputMethodDescriptor implements InputMethodDescriptor {

@@ -23,7 +23,6 @@
 
 package jgloss.dictionary;
 
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 

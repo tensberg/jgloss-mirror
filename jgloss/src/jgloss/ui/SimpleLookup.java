@@ -23,33 +23,30 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
-import jgloss.Preferences;
-import jgloss.dictionary.SearchException;
-import jgloss.dictionary.ExpressionSearchModes;
-import jgloss.dictionary.DictionaryEntryField;
-import jgloss.dictionary.MatchMode;
-import jgloss.dictionary.attribute.ReferenceAttributeValue;
-
-import java.lang.ref.WeakReference;
-
-import java.awt.Color;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.EventQueue;
-import java.awt.Component;
 import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-
+import java.awt.event.ActionListener;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JButton;
-import javax.swing.event.HyperlinkListener;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
+import jgloss.JGloss;
+import jgloss.Preferences;
+import jgloss.dictionary.DictionaryEntryField;
+import jgloss.dictionary.ExpressionSearchModes;
+import jgloss.dictionary.MatchMode;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.attribute.ReferenceAttributeValue;
 
 class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
     private static final String STYLE_SHEET = "/data/lookup-minimal.css";

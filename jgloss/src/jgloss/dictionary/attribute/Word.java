@@ -23,8 +23,6 @@
 
 package jgloss.dictionary.attribute;
 
-import java.util.ResourceBundle;
-import java.util.Locale;
 
 /**
  * Word and code of originating language. This class can't be instantiated directly

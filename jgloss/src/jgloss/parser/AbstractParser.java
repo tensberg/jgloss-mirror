@@ -23,8 +23,8 @@
 
 package jgloss.parser;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Implementation of common methods of the Parser interface.

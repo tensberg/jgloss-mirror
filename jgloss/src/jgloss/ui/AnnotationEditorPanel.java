@@ -23,25 +23,24 @@
 
 package jgloss.ui;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import jgloss.JGloss;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationEvent;
 import jgloss.ui.annotation.AnnotationListener;
-
-import java.awt.Color;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 
 public class AnnotationEditorPanel extends JPanel implements ActionListener, AnnotationListener {
     private Annotation annotation;

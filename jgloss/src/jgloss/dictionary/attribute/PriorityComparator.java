@@ -23,9 +23,9 @@
 
 package jgloss.dictionary.attribute;
 
-import jgloss.dictionary.DictionaryEntry;
-
 import java.util.Comparator;
+
+import jgloss.dictionary.DictionaryEntry;
 
 /**
  * Compare two dictionary entries based on their priority.
@@ -45,16 +45,11 @@ public class PriorityComparator implements Comparator {
             if (!de2.getGeneralAttributes().containsKey( Attributes.PRIORITY, false))
                 return 1;
             
-            try {
-                Priority p1 = (Priority) de1.getGeneralAttributes()
-                    .getAttribute( Attributes.PRIORITY, false).get( 0);
-                Priority p2 = (Priority) de2.getGeneralAttributes()
-                    .getAttribute( Attributes.PRIORITY, false).get( 0);
-                return p1.compareTo( p2);
-            } catch (AttributeNotSetException ex) {
-                ex.printStackTrace();
-                return 0;
-            }
+            Priority p1 = (Priority) de1.getGeneralAttributes()
+                .getAttribute( Attributes.PRIORITY, false).get( 0);
+            Priority p2 = (Priority) de2.getGeneralAttributes()
+                .getAttribute( Attributes.PRIORITY, false).get( 0);
+            return p1.compareTo( p2);
         }
         else if (de2.getGeneralAttributes().containsKey( Attributes.PRIORITY, false))
             return -1;

@@ -23,8 +23,6 @@
 
 package jgloss.dictionary.attribute;
 
-import java.util.ResourceBundle;
-import java.util.Locale;
 
 /**
  * Language code with optional word. Used as value of the gairaigo attribute.

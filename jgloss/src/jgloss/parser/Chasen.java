@@ -22,10 +22,18 @@
 
 package jgloss.parser;
 
-import jgloss.util.CharacterEncodingDetector;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import java.util.*;
-import java.io.*;
+import jgloss.util.CharacterEncodingDetector;
 
 /**
  * Wrapper around the ChaSen morphological analysis program. Each instance starts the

@@ -23,11 +23,11 @@
 
 package jgloss.dictionary;
 
-import jgloss.util.StringTools;
-
-import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
+
+import jgloss.util.StringTools;
 
 /**
  * Character encoding handler for UTF-8 encoded text.

@@ -23,26 +23,25 @@
 
 package jgloss.ui.xml;
 
-import jgloss.parser.Parser;
-import jgloss.parser.TextAnnotation;
-import jgloss.parser.TextAnnotationCompleter;
-import jgloss.parser.ReadingAnnotationFilter;
-import jgloss.dictionary.Dictionary;
-import jgloss.dictionary.SearchException;
-import jgloss.util.StringTools;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.SearchException;
+import jgloss.parser.Parser;
+import jgloss.parser.ReadingAnnotationFilter;
+import jgloss.parser.TextAnnotation;
+import jgloss.parser.TextAnnotationCompleter;
+import jgloss.util.StringTools;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.Locator;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.AttributesImpl;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Insert reading/translation annotations into a document. Instances of this class

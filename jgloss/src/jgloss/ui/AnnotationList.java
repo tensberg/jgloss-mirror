@@ -23,40 +23,36 @@
 
 package jgloss.ui;
 
-import jgloss.JGloss;
-import jgloss.ui.html.JGlossHTMLDoc;
-import jgloss.ui.annotation.Annotation;
-import jgloss.ui.annotation.AnnotationListModel;
-import jgloss.util.StringTools;
-
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import java.awt.Point;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Component;
-import java.awt.event.MouseListener;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Action;
 import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JList;
-import javax.swing.ListSelectionModel;
-import javax.swing.JPopupMenu;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.ComponentInputMap;
+import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
-import javax.swing.text.Element;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.Element;
+
+import jgloss.JGloss;
+import jgloss.ui.annotation.Annotation;
+import jgloss.ui.annotation.AnnotationListModel;
+import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.util.StringTools;
 
 public class AnnotationList extends JList implements MouseListener, ListSelectionListener {
     /**

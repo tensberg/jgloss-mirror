@@ -23,13 +23,26 @@
 
 package jgloss.dictionary;
 
-import jgloss.dictionary.attribute.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import jgloss.dictionary.attribute.Attribute;
 import jgloss.util.NullIterator;
 import jgloss.util.StringTools;
-
-import java.io.*;
-import java.util.*;
-import java.text.MessageFormat;
 
 /**
  * Dictionary implementation for KANJIDIC-style dictionary files. For a documentation

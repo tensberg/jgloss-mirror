@@ -24,11 +24,11 @@
 
 package jgloss.dictionary;
 
-import jgloss.util.NumberTools;
-
-import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
+
+import jgloss.util.NumberTools;
 
 /**
  * Character encoding handler for EUC-JP encoded text.

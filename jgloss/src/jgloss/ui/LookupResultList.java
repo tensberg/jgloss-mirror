@@ -23,28 +23,43 @@
 
 package jgloss.ui;
 
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.StyleSheet;
+
 import jgloss.JGloss;
 import jgloss.Preferences;
-import jgloss.util.ListFormatter;
-import jgloss.dictionary.*;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.DictionaryEntryFormatter;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.UnsupportedSearchModeException;
 import jgloss.dictionary.attribute.Attribute;
-import jgloss.dictionary.attribute.Attributes;
 import jgloss.dictionary.attribute.AttributeFormatter;
+import jgloss.dictionary.attribute.Attributes;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
-import java.awt.*;
-import java.awt.event.*;
-import java.net.URL;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.*;
-import javax.swing.text.html.*;
+import jgloss.util.ListFormatter;
 
 public class LookupResultList extends JPanel implements LookupResultHandler {
     private static class Marker implements DictionaryEntryFormat.Decorator {

@@ -23,7 +23,8 @@
 
 package jgloss.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility functions for handling Japanese characters and strings.

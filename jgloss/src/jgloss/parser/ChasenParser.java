@@ -22,20 +22,16 @@
 
 package jgloss.parser;
 
-import jgloss.dictionary.SearchException;
-
-import jgloss.util.*;
-
-import java.util.Set;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Set;
 
-import java.io.*;
+import jgloss.dictionary.SearchException;
+import jgloss.util.StringTools;
 
 /**
  * Parses Japanese text using the ChaSen morphological analyzer program.
@@ -101,7 +97,7 @@ public class ChasenParser extends AbstractParser {
             Chasen.Result result = chasen.parse( text, start, length);
             while (parsePosition<=end && result.hasNext()) {
                 // test for outside interruption
-                if (Thread.currentThread().interrupted()) {
+                if (Thread.interrupted()) {
                     result.discard();
                     throw new ParsingInterruptedException();
                 }

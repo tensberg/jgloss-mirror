@@ -23,15 +23,16 @@
 
 package jgloss.dictionary.attribute;
 
-import java.lang.reflect.Method;
-import java.io.LineNumberReader;
 import java.io.IOException;
-import java.util.regex.*;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
+import java.io.LineNumberReader;
+import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Mapping from strings used in dictionaries to mark attributes or attribute values to

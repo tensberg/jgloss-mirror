@@ -23,9 +23,15 @@
 
 package jgloss;
 
-import java.io.*;
-import java.util.*;
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.ResourceBundle;
 
 /**
  * Management of the application-wide preferences. The preference storage mechanism varies

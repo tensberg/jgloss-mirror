@@ -23,9 +23,15 @@
 
 package jgloss.ui;
 
-import jgloss.dictionary.*;
-
 import java.util.Iterator;
+
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.ResultIterator;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SearchMode;
+import jgloss.dictionary.SearchParameter;
+import jgloss.dictionary.StandardSearchParameter;
 
 /**
  * Perform a dictionary lookup. The lookup configuration is taken from a {@link LookupModel LookupModel}.

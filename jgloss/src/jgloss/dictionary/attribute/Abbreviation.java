@@ -23,8 +23,6 @@
 
 package jgloss.dictionary.attribute;
 
-import java.util.ResourceBundle;
-import java.util.Locale;
 
 /**
  * Word with an optional language code. Used as value of the abbreviation attribute.

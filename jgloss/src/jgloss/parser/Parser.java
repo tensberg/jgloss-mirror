@@ -23,9 +23,10 @@
 
 package jgloss.parser;
 
-import jgloss.dictionary.SearchException;
+import java.util.List;
+import java.util.Locale;
 
-import java.util.*;
+import jgloss.dictionary.SearchException;
 
 /**
  * Look up words from a text in dictionaries and returns a list of

@@ -23,16 +23,22 @@
 
 package jgloss.ui;
 
-import jgloss.Preferences;
-import jgloss.dictionary.*;
-import jgloss.util.StringTools;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
+
+import jgloss.Preferences;
+import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryEntryField;
+import jgloss.dictionary.MatchMode;
+import jgloss.dictionary.SearchFieldSelection;
+import jgloss.dictionary.SearchMode;
+import jgloss.dictionary.SearchParameters;
+import jgloss.dictionary.StandardSearchParameter;
+import jgloss.util.StringTools;
 
 public class LookupModel implements Cloneable {
     protected List searchModes;
