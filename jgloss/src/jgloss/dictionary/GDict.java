@@ -92,7 +92,11 @@ public class GDict extends FileBasedDictionary {
      * alternatives are stores as single string in group 2.
      */
     protected static final Pattern WORD_PATTERN = Pattern.compile
-        ( "(\\S+)(?:\\s\\{.+?\\})?(?:\\s\\[\\w+\\])?(?:\\s\\((.+?)\\))?(?:\\s\\[\\w+\\])?(?:;\\s|$)");
+        ( "(\\S+)" + // word text
+          "(?:(?:\\s\\[\\w+\\])|(?:\\s\\{.+?\\}))*" + // remarks, cross references
+          "(?:\\s\\((.+?)\\))?" + // alternative spellings
+          "(?:(?:\\s\\[\\w+\\])|(?:\\s\\{.+?\\}))*" + // remarks, cross references
+          "(?:;\\s|$)"); // end of word
     protected static Matcher WORD_MATCHER = WORD_PATTERN.matcher( "");
     /**
      * Matches semicolon-separated alternatives. The separator is a semicolon followed by a single
@@ -295,21 +299,26 @@ public class GDict extends FileBasedDictionary {
                     }
                 } while (off < where);
                 
-                if (wordMatches) {
-                    // Create dictionary entry only for the matching word
-                    // If there would be more than one matching word, the others are ignored.
-                    if (out.getWord( word, alternative).equals( reading))
-                        wordMatches = false;
-                    else
-                        result.add( out.getDictionaryEntry( word, alternative));
-                }
-                if (!wordMatches) {
-                    // Reading or translation matches, add all words
-                    for ( int i=0; i<out.getWordCount(); i++) {
-                        result.add( out.getDictionaryEntry( i, 0));
-                        for ( int j=0; j<out.getAlternativesCount( i); j++)
-                            result.add( out.getDictionaryEntry( i, j+1));
+                try {
+                    if (wordMatches) {
+                        // Create dictionary entry only for the matching word
+                        // If there would be more than one matching word, the others are ignored.
+                        if (out.getWord( word, alternative).equals( reading))
+                            wordMatches = false;
+                        else
+                            result.add( out.getDictionaryEntry( word, alternative));
                     }
+                    if (!wordMatches) {
+                        // Reading or translation matches, add all words
+                        for ( int i=0; i<out.getWordCount(); i++) {
+                            result.add( out.getDictionaryEntry( i, 0));
+                            for ( int j=0; j<out.getAlternativesCount( i); j++)
+                                result.add( out.getDictionaryEntry( i, j+1));
+                        }
+                    }
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    ex.printStackTrace();
+                    System.err.println( entry);
                 }
             }
         } catch (StringIndexOutOfBoundsException ex) {

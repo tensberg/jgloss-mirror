@@ -73,6 +73,7 @@ view.showtranslation=true
 view.showannotation=false
 view.annotationeditorhidden=false
 view.dividerlocation=0.7
+view.maxtranslationlength=50
 
 editor.enableeditingcheckbox=false
 editor.enableediting=false

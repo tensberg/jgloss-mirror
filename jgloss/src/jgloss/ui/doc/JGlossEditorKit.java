@@ -560,10 +560,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
     /**
      * Maximum number of characters displayed by a <code>ReadingTranslationView</code>.
-     * If the content of the reading/translation is longer than <code>MAX_TRANSLATION_LENGTH-3</code>,
-     * only <code>MAX_TRANSLATION_LENGTH</code> chars, followed by "..." will be rendered.
+     * If the content of the reading/translation is longer than <code>MAX_TRANSLATION_LENGTH</code>,
+     * only <code>MAX_TRANSLATION_LENGTH-3</code> chars, followed by "..." will be rendered.
      */
-    private final static int MAX_TRANSLATION_LENGTH = 47;
+    private final static int MAX_TRANSLATION_LENGTH = JGloss.prefs.getInt
+        ( Preferences.VIEW_MAXTRANSLATIONLENGTH, 50);
 
     /**
      * Shared segment used by instances of <code>ReadingTranslationView</code> used to retrieve
@@ -574,7 +575,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
     /**
      * Segment character buffer used by instances of <code>ReadingTranslationView</code>.
      */
-    private char[] segmentBuffer = new char[MAX_TRANSLATION_LENGTH+3];
+    private char[] segmentBuffer = new char[MAX_TRANSLATION_LENGTH];
 
     /**
      * A view which renders a reading or a translation element. These views are placed
@@ -679,10 +680,10 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Return the text in the given span, possibly shortened to {@link #MAX_TRANSLATION_LENGTH}.
          */
         public Segment getText( int p0, int p1) {
-            if (p1-p0 <= MAX_TRANSLATION_LENGTH+3)
+            if (p1-p0 <= MAX_TRANSLATION_LENGTH)
                 return super.getText( p0, p1);
             else try {
-                getDocument().getText( p0, MAX_TRANSLATION_LENGTH, segment);
+                getDocument().getText( p0, MAX_TRANSLATION_LENGTH-3, segment);
                 // segment.count should not be larger than MAX_TRANSLATION_LENGTH
                 System.arraycopy( segment.array, segment.offset, segmentBuffer, 0, segment.count);
                 segmentBuffer[segment.count] = '.';

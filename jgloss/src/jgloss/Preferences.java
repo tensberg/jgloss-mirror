@@ -94,6 +94,7 @@ public abstract class Preferences {
     public static final String VIEW_SHOWANNOTATION = "view.showannotation";
     public static final String VIEW_ANNOTATIONEDITORHIDDEN = "view.annotationeditorhidden";
     public static final String VIEW_DIVIDERLOCATION = "view.dividerlocation";
+    public static final String VIEW_MAXTRANSLATIONLENGTH = "view.maxtranslationlength";
 
     public static final String EDITOR_ENABLEEDITINGCHECKBOX = "editor.enableeditingcheckbox";
     public static final String EDITOR_ENABLEEDITING = "editor.enableediting";
