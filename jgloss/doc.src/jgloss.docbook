@@ -1276,7 +1276,7 @@
             </listitem>
           </varlistentry>
 
-          <varlistentry><term>Remove Anno. & Duplicates</term>
+          <varlistentry><term>Remove Anno. &amp; Duplicates</term>
             <listitem>
               <para>
                 Removes the annotation from the currently selected word, and all duplicate

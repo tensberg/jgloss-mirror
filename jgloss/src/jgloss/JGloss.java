@@ -353,6 +353,29 @@ public class JGloss {
         if (JGlossFrame.getFrameCount()>0 || WordLookup.getFrame().isVisible())
             return false;
 
+        /*
+        // debug memory:
+        // clear all soft references to get a clean heap dump
+        System.err.println( "clearing heap");
+        java.util.List l = new java.util.LinkedList();
+        try {
+            while (true) {
+                l.add( new byte[100000]);
+            }
+        } catch (OutOfMemoryError er) {
+            l = null;
+        }
+        System.gc();
+
+        // debug memory:
+        // Flush events. Sometimes, not all pending events have been processed yet, and
+        // these events keep references to UI objects. Remove these events to clear the memory.
+        System.err.println( "flushing all events");
+        while (Toolkit.getDefaultToolkit().getSystemEventQueue().peekEvent() != null) try {
+            System.err.println( Toolkit.getDefaultToolkit().getSystemEventQueue().getNextEvent());
+        } catch (InterruptedException ex) {}
+        System.gc();*/
+
         System.exit( 0);
 
         return true;

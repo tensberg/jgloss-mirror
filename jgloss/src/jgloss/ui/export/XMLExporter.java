@@ -105,11 +105,7 @@ public class XMLExporter extends JGlossWriter {
     }
 
     protected void endTag( Element elem) throws IOException {
-        /*if (skipElement) {
-            // skip the closing tag of the current element
-            skipElement = false;
-        }
-        else*/ if (matchNameAttribute( elem.getAttributes(), HTML.Tag.HEAD)) {
+        if (matchNameAttribute( elem.getAttributes(), HTML.Tag.HEAD)) {
             inHead = false;
             super.endTag( elem);
         }
@@ -142,13 +138,6 @@ public class XMLExporter extends JGlossWriter {
         else
             super.emptyTag( elem);
     }
-
-    /*protected void write( char[] text, int off, int len) throws IOException {
-        if (skipElement) // don't write the text of the current element
-            return;
-
-        super.write( text, off, len);
-        }*/
 
     /**
      * Writes the XML declaration and the root element open tag.

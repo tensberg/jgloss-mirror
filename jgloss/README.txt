@@ -1,4 +1,4 @@
-JGloss 1.0.4
+JGloss 1.0.5
 ------------
 
 JGloss homepage: http://jgloss.sourceforge.net/
@@ -34,8 +34,8 @@ Known problems:
     sometimes be resized to a minimum when it is opened. Also, Java locks up if
     the preference window is opened after a document is loaded and when
     the print dialog opens. This seems to be a problem in the interaction 
-    between the interaction of Java and the KDE window manager which I don't 
-    know how to fix. Use JRE 1.4 instead.
+    between Java and the KDE window manager which I don't know how to fix. Use 
+    JRE 1.4 instead.
   - On Linux force-quitting JGloss by typing Control-C or using kill -HUP
     sometimes doesn't work.
   - The custom user interface font chosen in the style dialog is applied

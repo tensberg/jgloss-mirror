@@ -119,6 +119,7 @@ public class StyleDialog extends Box {
             if (i != -1) {
                 styleSheets.remove( i); // Style Sheet
                 styleSheets.remove( i); // additionalStyles
+                currentStyles.remove( s);
             }
         }
     }

@@ -31,6 +31,7 @@ import jgloss.dictionary.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -167,26 +168,18 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * <CODE>AnnotationEditor</CODE> keyboard navigation, the listener is wrapped by this delegator,
      * which ignores the <CODE>keyTyped</CODE> events.
      */
-    private static class KeyEventDelegator implements KeyListener {
+    private class KeyEventDelegator implements KeyListener {
         /**
          * Fetch the delegator created for the given delegatee. This will remove the delegator
          * from the map of created delegators.
          */
-        private static KeyEventDelegator fetchDelegator( KeyListener delegatee) {
-            KeyEventDelegator delegator = (KeyEventDelegator) delegators.remove( delegatee);
-            return delegator;
-        }
-
-        /**
-         * Map from delegatees to created delegators.
-         */
-        private final static java.util.Map delegators = new HashMap( 7);
-
         private KeyListener delegatee;
 
         public KeyEventDelegator( KeyListener delegatee) {
             this.delegatee = delegatee;
-            delegators.put( delegatee, this);
+            if (delegators == null)
+                delegators = new LinkedList();
+            delegators.add( this);
         }
         
         public KeyListener getDelegatee() { return delegatee; }
@@ -206,6 +199,23 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         }
     } // class
 
+    private java.util.List delegators;
+
+    /**
+     * Find the delegator which was created for a delegatee and remove it from the list of
+     * delegators for this instance.
+     */
+    private KeyEventDelegator releaseDelegator( KeyListener delegatee) {
+        for ( Iterator i=delegators.iterator(); i.hasNext(); ) {
+            KeyEventDelegator delegator = (KeyEventDelegator) i.next();
+            if (delegator.getDelegatee() == delegatee) {
+                i.remove();
+                return delegator;
+            }
+        }
+        
+        return null;
+    }
 
     /**
      * The model which this JTree displays. Kept here as member variable to prevent the constant
@@ -288,7 +298,11 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     /**
      * Flag if the use reading action is currently added to the popup menu.
      */
-    private boolean pmenuReadingAdded = false; 
+    private boolean pmenuReadingAdded = false;
+    /**
+     * Change the component font in response to preferences changes.
+     */
+    private PropertyChangeListener fontChangeListener;
 
     /**
      * An Enumeration containing no elements.
@@ -838,13 +852,14 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         am.put( hideAction.getValue( Action.NAME), hideAction);
 
         // update display if user changed font
-        UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+        fontChangeListener = new PropertyChangeListener() {
                 public void propertyChange( java.beans.PropertyChangeEvent e) { 
                     if (e.getPropertyName().equals( "Tree.font")) {
                         setFont( (Font) e.getNewValue());
                     }
                 }
-            });
+            };
+        UIManager.getDefaults().addPropertyChangeListener( fontChangeListener);
     }
 
     /**
@@ -1330,11 +1345,18 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      */
     public void removeKeyListener( KeyListener handler) {
         if (handler instanceof BasicTreeUI.KeyHandler) {
-            KeyListener delegator = KeyEventDelegator.fetchDelegator( handler);
+            KeyListener delegator = releaseDelegator( handler);
             if (delegator != null)
                 super.removeKeyListener( delegator);
             else
                 super.removeKeyListener( handler);
         }
+    }
+
+    /**
+     * Release resources held by the annotation editor.
+     */
+    public void dispose() {
+        UIManager.getDefaults().removePropertyChangeListener( fontChangeListener);
     }
 } // class AnnotationEditor

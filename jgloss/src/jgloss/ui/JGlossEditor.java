@@ -30,6 +30,7 @@ import jgloss.ui.annotation.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -190,6 +191,11 @@ public class JGlossEditor extends JTextPane {
     }
 
     /**
+     * Key object of the keymap which contains the "pressed TAB" key action.
+     */
+    private final static String KEYMAP_TAB = "tab map";
+
+    /**
      * Object identifying the currently highlighted annotation in the <CODE>HighlightPainter</CODE>.
      */
     private Object highlightTag = null;
@@ -278,6 +284,11 @@ public class JGlossEditor extends JTextPane {
             };
 
     /**
+     * Update the tooltip font in response to default ui changes.
+     */
+    private PropertyChangeListener fontChangeListener;
+
+    /**
      * Sets the highlight color to a new value. Used if the preferences changed.
      *
      * @param c The new annotation highlight color.
@@ -310,7 +321,7 @@ public class JGlossEditor extends JTextPane {
         // A JTextComponent normally does not do TAB focus traversal since TAB is a valid input
         // character. Because the JGlossEditor is not used for normal text input, I override
         // this behavior for convenience.
-        Keymap map = addKeymap( "tab map", getKeymap());
+        Keymap map = addKeymap( KEYMAP_TAB, getKeymap());
         map.addActionForKeyStroke( KeyStroke.getKeyStroke( "pressed TAB"),
                                    new AbstractAction() {
                                            public void actionPerformed( ActionEvent e) {
@@ -404,15 +415,17 @@ public class JGlossEditor extends JTextPane {
             tooltip.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2));
             tooltip.setBackground( tt.getBackground());
             tooltip.setForeground( tt.getForeground());
+            tt.setComponent( null); // remove reference to this (which prevents garbage collection)
 
             // update display if user changed font
-            UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+            fontChangeListener = new PropertyChangeListener() {
                     public void propertyChange( java.beans.PropertyChangeEvent e) { 
                         if (e.getPropertyName().equals( "ToolTip.font")) {
                             tooltip.setFont( UIManager.getFont( "ToolTip.font"));
                         }
                     }
-                });
+                };
+            UIManager.getDefaults().addPropertyChangeListener( fontChangeListener);
 
             addAnnotationAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
@@ -719,9 +732,9 @@ public class JGlossEditor extends JTextPane {
      * Dispose of resources associated with the editor.
      */
     public void dispose() {
-        editMenu.removeAll();
-        editMenu.removeMenuListener( xcvManager.getEditMenuListener());
+        UIManager.getDefaults().removePropertyChangeListener( fontChangeListener);
         if (annotationEditor != null)
             mouseFollower.haltThread();
+        removeKeymap( KEYMAP_TAB);
     }
 } // class JEditorPane

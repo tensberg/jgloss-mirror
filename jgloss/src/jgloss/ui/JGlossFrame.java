@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -50,7 +50,7 @@ import javax.swing.text.html.*;
  *
  * @author Michael Koch
  */
-public class JGlossFrame extends JFrame implements ActionListener {
+public class JGlossFrame extends JPanel implements ActionListener {
     /**
      * Collection of publically available actions.
      */
@@ -89,7 +89,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss import") {
                                 public void run() {
-                                    ImportDialog d = new ImportDialog( target);
+                                    ImportDialog d = new ImportDialog( target.frame);
                                     if (d.doDialog()) {
                                         JGlossFrame which;
                                         if (target==null || target.documentLoaded)
@@ -151,7 +151,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                         for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
                                             JGlossFrame next = (JGlossFrame) i.next();
                                             if (path.equals( next.documentPath)) {
-                                                next.show();
+                                                next.frame.show();
                                                 return;
                                             }
                                         }
@@ -175,7 +175,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                         for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
                             JGlossFrame next = (JGlossFrame) i.next();
                             if (path.equals( next.documentPath)) {
-                                next.show();
+                                next.frame.show();
                                 return;
                             }
                         }
@@ -229,6 +229,19 @@ public class JGlossFrame extends JFrame implements ActionListener {
      */
     public final static OpenRecentMenu OPEN_RECENT = new OpenRecentMenu( 8);
 
+    /**
+     * JGloss document frame object. The frame keeps the <code>JGlossFrame</code> as sole component
+     * in its content pane.
+     */
+    private JFrame frame;
+    /**
+     * Reacts to the document closed events.
+     */
+    private WindowListener windowListener;
+    /**
+     * Saves changes in window size to the preferences.
+     */
+    private ComponentListener componentListener;
     /**
      * Scrollpane which wraps the document editor.
      */
@@ -379,9 +392,16 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * by using import or open actions.
      */
     public JGlossFrame() {
-        super( JGloss.messages.getString( "main.title"));
         jglossFrames.add( this);
-        
+
+        /* The JGlossFrame does not (any longer) directly inherit from
+         * JFrame, because memory profiling has shown that the JFrame objects are not correctly garbage
+         * collected as expected (at least in JDK1.3). To keep the state associated with the JFrame objects
+         * to a minimum, they are kept separate from the JGlossFrame state.
+         * See also JGlossFrame.dispose().
+         */
+        frame = new JFrame( JGloss.messages.getString( "main.title"));
+         
         // set up the frame
         annotationEditor = new AnnotationEditor();
         annotationEditorScroller = new JScrollPane( annotationEditor,
@@ -408,23 +428,26 @@ public class JGlossFrame extends JFrame implements ActionListener {
         split.setResizeWeight( position);
         split.setOneTouchExpandable( true);
 
-        getContentPane().setBackground( Color.white);
+        setBackground( Color.white);
+        frame.getContentPane().setBackground( Color.white);
 
-        setLocation( JGloss.prefs.getInt( Preferences.FRAME_X, 0),
-                     JGloss.prefs.getInt( Preferences.FRAME_Y, 0));
-        setSize( JGloss.prefs.getInt( Preferences.FRAME_WIDTH, getPreferredSize().width),
-                 JGloss.prefs.getInt( Preferences.FRAME_HEIGHT, getPreferredSize().height));
-        addComponentListener( new ComponentAdapter() {
+        frame.setLocation( JGloss.prefs.getInt( Preferences.FRAME_X, 0),
+                           JGloss.prefs.getInt( Preferences.FRAME_Y, 0));
+        frame.setSize( JGloss.prefs.getInt( Preferences.FRAME_WIDTH, frame.getPreferredSize().width),
+                       JGloss.prefs.getInt( Preferences.FRAME_HEIGHT, frame.getPreferredSize().height));
+
+        componentListener = new ComponentAdapter() {
                 public void componentMoved( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.FRAME_X, getX());
-                    JGloss.prefs.set( Preferences.FRAME_Y, getY());
+                    JGloss.prefs.set( Preferences.FRAME_X, frame.getX());
+                    JGloss.prefs.set( Preferences.FRAME_Y, frame.getY());
                 }
                 public void componentResized( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.FRAME_WIDTH, getWidth());
-                    JGloss.prefs.set( Preferences.FRAME_HEIGHT, getHeight());
+                    JGloss.prefs.set( Preferences.FRAME_WIDTH, frame.getWidth());
+                    JGloss.prefs.set( Preferences.FRAME_HEIGHT, frame.getHeight());
                 }
-            });
-        addWindowListener( new WindowAdapter() {
+            };
+        frame.addComponentListener( componentListener);
+        windowListener = new WindowAdapter() {
                 public void windowClosing( WindowEvent e) {
                     synchronized (this) {
                         if (deferWindowClosing) {
@@ -439,14 +462,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
                         }
                     }
                 }
-
-                public void windowClosed( WindowEvent e) {
-                    if (jglossFrames.size() == 0) { // no more open documents
-                        JGloss.exit();
-                    }
-                }
-            });
-        setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
+            };
+        frame.addWindowListener( windowListener);
+        frame.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
 
         prefsListener = new PropertyChangeListener() {
                 public void propertyChange( PropertyChangeEvent e) {
@@ -607,9 +625,10 @@ public class JGlossFrame extends JFrame implements ActionListener {
         menu.add( aboutItem);
         bar.add( menu);
         
-        setJMenuBar( bar);
+        frame.setJMenuBar( bar);
 
-        show();
+        frame.getContentPane().add( this);
+        frame.show();
     }
 
     /**
@@ -689,9 +708,12 @@ public class JGlossFrame extends JFrame implements ActionListener {
             }
         }
 
-        // close the window
-        hide();
-        dispose();
+        frame.hide();
+        this.dispose(); // this.dispose() calls frame.dispose()
+
+        if (jglossFrames.size() == 0) { // this was the last open document
+            JGloss.exit();
+        }
     }
 
     /**
@@ -1001,7 +1023,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         final Thread currentThread = Thread.currentThread(); // needed to interrupt parsing if user cancels
         javax.swing.Timer progressUpdater = new javax.swing.Timer( 1000, new ActionListener() {
                 public void actionPerformed( ActionEvent e) {
-                    // this handler called from the event dispatching thread
+                    // this handler is called from the event dispatch thread
                     pm.setProgress( ((JGlossDocument) doc).getParsePosition());
                     if (pm.isCanceled() || // cancel button of progress bar pressed
                         !deferWindowClosing) { // close button of document frame pressed
@@ -1051,9 +1073,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     docpane.setStyledDocument( doc);
                     annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
                     
-                    getContentPane().removeAll();
-                    getContentPane().add( split);
-                    validate();
+                    frame.getContentPane().removeAll();
+                    frame.getContentPane().add( split);
+                    frame.validate();
                     if (JGloss.prefs.getBoolean( Preferences.VIEW_ANNOTATIONEDITORHIDDEN, false))
                         split.setDividerLocation( 1.0f);
                     else {
@@ -1101,14 +1123,14 @@ public class JGlossFrame extends JFrame implements ActionListener {
                                 // has to be done in the event dispatch thread
                                 Runnable installer = new Runnable() {
                                         public void run() {
-                                            synchronized (JGlossFrame.this) {
+                                            synchronized (frame) {
                                                 // dispose might already have been called, test if
                                                 // member variables still exist
                                                 if (docpaneScroller!=null && 
                                                     docpane!=null && 
                                                     annotationEditor!=null) {
                                                     docpaneScroller.setViewport( port);
-                                                    validate();
+                                                    frame.validate();
                                                     docpane.followMouse( showAnnotationItem.isSelected(),
                                                                          false);
                                                     // scroll to selected annotation
@@ -1253,7 +1275,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
             PageAttributes pa = new PageAttributes();
             pa.setOrigin( PageAttributes.OriginType.PRINTABLE);
             PrintJob job = getToolkit().getPrintJob
-                ( this, documentName, ja, pa);
+                ( frame, documentName, ja, pa);
 
             if (job != null) {
                 // do the printing
@@ -1419,8 +1441,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
             documentPath =  f.getSelectedFile().getAbsolutePath();
             documentName = f.getSelectedFile().getName();
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-            setTitle( documentName + 
-                      ":" + JGloss.messages.getString( "main.title"));
+            frame.setTitle( documentName + 
+                            ":" + JGloss.messages.getString( "main.title"));
             if (saveDocument())
                 OPEN_RECENT.addDocument( f.getSelectedFile());
         }
@@ -1697,21 +1719,39 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Update the document window title.
      */
     protected void updateTitle() {
-        setTitle( documentName + ":" + JGloss.messages.getString( "main.title"));
+        frame.setTitle( documentName + ":" + JGloss.messages.getString( "main.title"));
     }
 
     /**
      * Dispose resources associated with the JGloss document.
      */
     public synchronized void dispose() {
-        // dump as many references as possible to ensure that the objects are garbage collected
-        jglossFrames.remove( this);   
+        jglossFrames.remove( this);
+
         JGloss.prefs.removePropertyChangeListener( prefsListener);
         if (doc != null)
             StyleDialog.getComponent().removeStyleSheet( doc.getStyleSheet());
         docpane.dispose();
+        annotationEditor.dispose();
+        OPEN_RECENT.removeMenu( openRecentMenu);
+
+        // remove references from static action to menu item
         preferencesItem.setAction( null);
         aboutItem.setAction( null);
+
+        // The JRE1.3 AWT/Swing implementation keeps static references to created JFrames, thus
+        // they are never garbage collected. Remove all references from the JFrame to the JGlossFrame
+        // to ensure that the JGlossFrame can be garbage collected.
+        frame.getJMenuBar().removeAll();
+        frame.setJMenuBar( null);
+        frame.removeComponentListener( componentListener);
+        frame.removeWindowListener( windowListener);
+        frame.setContentPane( new JPanel());
+        frame.dispose();
+
+        // Sometimes, due to the fact that swing keeps internal references, the JGlossFrame is
+        // not garbage collected until a new frame is created. To ensure that the Objects referenced
+        // from the JGlossFrame are freed, set references to null
         docpane = null;
         doc = null;
         kit = null;
@@ -1719,9 +1759,5 @@ public class JGlossFrame extends JFrame implements ActionListener {
         split = null;
         docpaneScroller = null;
         annotationEditorScroller = null;
-        getContentPane().removeAll();
-        OPEN_RECENT.removeMenu( openRecentMenu);
-        openRecentMenu = null;
-        super.dispose();
     }
 } // class JGlossFrame

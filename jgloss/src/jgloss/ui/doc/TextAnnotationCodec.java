@@ -343,13 +343,15 @@ public abstract class TextAnnotationCodec {
      *         with this name.
      */
     private static jgloss.dictionary.Dictionary getDictionary( String dictionary) {
-        jgloss.dictionary.Dictionary d = (jgloss.dictionary.Dictionary) dictionaries.get( dictionary);
-        if (d == null) {
-            d = new NullDictionary( dictionary);
-            dictionaries.put( dictionary, d);
-        }
+        synchronized (dictionaries) {
+            jgloss.dictionary.Dictionary d = (jgloss.dictionary.Dictionary) dictionaries.get( dictionary);
+            if (d == null) {
+                d = new NullDictionary( dictionary);
+                dictionaries.put( dictionary, d);
+            }
 
-        return d;
+            return d;
+        }
     }
 
     /**
