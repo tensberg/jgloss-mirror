@@ -308,7 +308,7 @@ export.latex.title=Export LaTeX
 export.latex.translationsonpage=Place translation on same page as word
 export.latex.header=\
 % This is an EUC-JP encoded Japanese LaTeX document generated\n\
-% by JGloss from {0} on {1,date,medium}, {1,time,medium}.\n\
+% by JGloss from {0} on {1,date,medium}, {1,time,short}.\n\
 % Use platex to process this file.\n\
 % Note that the file ruby-annotation.sty which comes with JGloss\n\
 % must be installed.\n\n

@@ -17,4 +17,12 @@ executable JAR file by typing "make jgloss", create the documentation by
 executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
+Known problems:
+  - On Windows 98/ME the ChaSen window does not close automatically
+    after a document is imported. You will have to close it by hand.
+  - When using JGloss with KDE, the word annotation dialog will sometimes
+    be resized to a minimum when it is opened. This seems to be a problem
+    in the interaction between the interaction of Java and the KDE window
+    manager which I don't know how to fix.
+
 (c) 2001 Michael Koch <tensberg@gmx.net>

@@ -12,11 +12,18 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <style type="text/css">
 <!--
-body { margin: 0px; }
+body { border: 0px; margin: 0px; }
 
-td.toc { width: 14%; font-size: 80%; }
-div.toc { position: fixed; padding: 5px; }
-td.content { width: 88%; }
+h1.title { margin-top: 5px; margin-bottom: 10px; padding-left: 14%; background: #f5f5f1;
+           font-size: 250%; }
+h3 { padding: 1px 0px 2px 5px; color: white; background: #333333; }
+
+td.toc { width: 14%; }
+td.content { width: 86%; }
+
+div.toc { padding: 0px 7px 0px 7px; }
+div.toc a:link { text-decoration: none; }
+div.toc a:visited { text-decoration: none; }
 
 //-->
 </style>
@@ -25,14 +32,17 @@ td.content { width: 88%; }
 
 <body bgcolor="white" text="black">
 
+<!-- Title -->
+<h1 class="title">JGloss-WWW</h1>
+
 <table>
 <tr>
 
 <!-- table of contents -->
-<td valign="top" class="toc" bgcolor="azure">
+<td valign="top" class="toc">
 
 <div class="toc">
-<a href="#title">JGloss-WWW</a><br>
+<a href="#title">About JGloss-WWW</a><br>
 <a href="#urlformat">URL format</a><br>
 <a href="#form2">URL-Converter</a><br>
 <a href="#cookieforwarding">Cookie forwarding</a><br>
@@ -46,7 +56,7 @@ td.content { width: 88%; }
 <!-- content -->
 <td valign="top" class="content">
 
-<h2><a name="title">JGloss-WWW</a></h2>
+<h3><a name="title">About JGloss-WWW</a></h3>
 <p>
 JGloss-WWW is a Java servlet which proxies web content. Words in a Japanese HTML document
 are annotated on the fly with their readings and translations. These annotations are
@@ -63,8 +73,11 @@ file "web.xml" in the WEB-INF subdirectory. The following form shows how you can
 servlet. This assumes that the the servlet is registered with the servlet container under
 the name "jgloss-www" at the same location as this page.
 </p>
+<p>
+Note: The JGloss-WWW servlet is not installed on this server.
+</p>
 
-<h3><a name="form1">Enter a URL</a></h3>
+<h3><a name="urlformat">Entering a URL</a></h3>
 <form action="jgloss-www" method="get">
 <p>
 URL: <input type="text" name="jgurl" size="80"> <input type="submit" value="Go!"><br><br>
@@ -73,7 +86,7 @@ URL: <input type="text" name="jgurl" size="80"> <input type="submit" value="Go!"
 </p>
 </form>
 
-<h4><a name="urlformat">URL format</a></h4>
+<h4>URL format</h4>
 <p>
 The CGI query parameters will be converted by the servlet to a URL of the form
 "<code>path to servlet/flags/base url</code>". There are two flags: 
@@ -102,7 +115,7 @@ Base URL: <br><input type="text" name="baseurl" size="80">
 </p>
 </form>
 
-<h4><a name="cookieforwarding">Cookie forwarding</a></h4>
+<h3><a name="cookieforwarding">Cookie forwarding</a></h3>
 <p>
 JGloss-WWW can forward cookies from client to remote server and back. This feature has
 to be enabled globally on the JGloss-WWW server by setting the initialization parameters
@@ -136,7 +149,7 @@ The cookie forwarding mechanism will not work with cookies set by a JavaScript i
 page transmitted to the client.
 </p>
 
-<h4><a name="formdataforwarding">Form data forwarding</a></h4>
+<h3><a name="formdataforwarding">Form data forwarding</a></h3>
 <p>
 Form data from both GET and POST forms can be forwarded by the JGloss-WWW servlet. This
 feature has to be enabled globally on the JGloss-WWW server by setting the initialization
@@ -155,7 +168,7 @@ the connection. If POST is used, the body of the client request will be copied
 verbatim to the remote server connection.
 </p>
 
-<h4><a name="rewriting">The rewriting process</a></h4>
+<h3><a name="rewriting">The rewriting process</a></h3>
 <p>
 What follows is an (incomplete) description of how the servlet processes a request. 
 </p><p>
@@ -189,7 +202,7 @@ otherwise the <CODE>action</CODE> link will point to the original location and a
 of the form will open a direct connection from the client to the remote server.
 </p>
 
-<h4><a name="security">Security/Privacy considerations</a></h4>
+<h3><a name="security">Security/Privacy considerations</a></h3>
 <p>
 This section describes the security and privacy implications of using the JGloss-WWW servlet.
 I tried to cover all aspects, but don't claim completeness. The main consequence
@@ -198,7 +211,7 @@ relevant data could be transmitted, unless he fully trusts the JGloss-WWW server
 and an administrator of a JGloss-WWW server should carefully consider what features of the
 servlet he enables.
 </p>
-<h5>Secure connections</h5>
+<h4>Secure connections</h4>
 <p>
 The JGloss-WWW servlet supports secure connections between both client and servlet, and
 servlet and remote server. For a secure client/servlet connection, the servlet container
@@ -252,7 +265,7 @@ client. This means that the servlet may accept connections which the client woul
 that a connection may be rejected by the servlet even if the client would accept the connection.
 There is currently no way to avoid this problem.
 </p>
-<h5>Cookies and form data</h5>
+<h4>Cookies and form data</h4>
 <p>
 Regardless of the cookie forwarding configuration, a cookie sent from the server will always
 be seen by the servlet, and all cookies forwarded by JGloss-WWW to a client will always
@@ -285,7 +298,7 @@ no obvious way to disable form data forwarding if it was initially disabled. Cur
 the only way is to change the form forwarding flag in the URL 
 (see <a href="#urlformat">URL format</a>) and reload the page.
 </p>
-<h5>Installation/Implementation</h5>
+<h4>Installation/Implementation</h4>
 <p>
 The implementation is currently experimental and has undergone only minimal testing. This
 means that there is no guarantee that the servlet will really behave in the way documented
@@ -297,7 +310,7 @@ To aid debugging, the servlet currently logs a lot of data which can be consider
 relevant, including remote URLs and cookies.
 </p>
 
-<h4><a name="whyservlet">Why is it implemented as a servlet?</a></h4>
+<h3><a name="whyservlet">Why is it implemented as a servlet?</a></h3>
 <p>
 JGloss-WWW is implemented as servlet, but it functions as a rewriting proxy. So why is it
 not implemented as a proxy in the first place? A proxy would be more transparent to the user,
@@ -323,7 +336,7 @@ I don't think this is possible with the current plugin APIs.
 
 <hr>
 (C) 2001 <a href="mailto:tensberg@gmx.net">Michael Koch &lt;tensberg@gmx.net&gt;</a>;
-    last updated: 2001/09/21<br>
+    last change: 2001/12/14<br>
     Any part of this document may be freely copied, modified and redistributed.
 
 </td>

@@ -272,7 +272,7 @@ export.latex.title=LaTeX exportieren
 export.latex.translationsonpage=Übersetzungen auf selber Seite
 export.latex.header=\
 % Dies ist ein EUC-JP-kodiertes japanisches LaTeX-Dokument,\n\
-% generiert von JGloss aus {0} am {1,date,medium}, {1,time,medium}.\n\
+% generiert von JGloss aus {0} am {1,date,medium}, {1,time,short}.\n\
 % Benutzen sie platex um die Datei zu verarbeiten.\n\
 % Beachten sie das die Datei ruby-annotation.sty, die JGloss beiliegt,\n\
 % installiert sein muss.\n\n
