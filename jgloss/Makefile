@@ -71,7 +71,9 @@ IM_SOURCES := src/jgloss/ui/im/KanaInputMethodDescriptor.java
 WWW_SOURCES := src/jgloss/www/JGlossServlet.java
 
 # files and directories that go into the source distribution
-SOURCE_DIST := README.txt COPYING ChangeLog Makefile MANIFEST.MF src doc.src latex
+SOURCE_DIST := README.txt COPYING ChangeLog Makefile \
+               MANIFEST.MF MANIFEST.MF.jdictionary MANIFEST.MF.kanaim \
+               src doc.src latex
 
 # files that go into the binary distribution jar file
 JGLOSS_BINARY_JAR := jgloss data resources
@@ -201,4 +203,4 @@ index.html: jgloss.docbook doc.src/stylesheet.dsl
 resources: $(RESOURCES)
 
 clean:
-	-rm -r jgloss resources data dist doc jgloss.jar jgloss-www META-INF
+	-rm -r jgloss resources data dist doc jgloss.jar jdictionary.jar jgloss-www META-INF

@@ -4,8 +4,8 @@
 	- Annotated words are looked up when selected, not only
 	  during document import.
 	- Redesign and rewrite of many internals.
-	- Java2 1.3 no longer supported, minimum version is 1.4.
-	- Some features from JGloss 1.0.x missing in this release.
+	- Java2 1.3 is no longer supported, minimum version is 1.4.
+	- Some features from JGloss 1.0.x are missing in this release.
 1.0.6: (2002/08/02)
 	- Improved keyboard navigation.
 	- Added best match search option to word lookup.
