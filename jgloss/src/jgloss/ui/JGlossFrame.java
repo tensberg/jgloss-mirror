@@ -1025,6 +1025,11 @@ public class JGlossFrame extends JFrame implements ActionListener {
 
         Runnable worker = new Runnable() {
                 public void run() {
+                    // Parser must be set to non-strict mode when a document is edited.
+                    // (This constructor is only called during document editing, not when a document
+                    //  is loaded)
+                    doc.setStrictParsing( false);
+
                     docpane.setEditorKit( kit);
                     docpane.setStyledDocument( doc);
                     annotationEditor.setDocument( doc.getDefaultRootElement(), docpane);
@@ -1048,6 +1053,18 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     saveAsAction.setEnabled( true);
 
                     docpane.followMouse( showAnnotationItem.isSelected(), false);
+
+                    doc.addDocumentListener( new DocumentListener() {
+                            public void insertUpdate(DocumentEvent e) {
+                                markChanged();
+                            }
+                            public void removeUpdate(DocumentEvent e) {
+                                markChanged();
+                            }
+                            public void changedUpdate(DocumentEvent e) {
+                                markChanged();
+                            }
+                        });
                 }
             };
         if (EventQueue.isDispatchThread()) {
@@ -1068,18 +1085,6 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     ex.printStackTrace();
             }
         }
-
-        doc.addDocumentListener( new DocumentListener() {
-                public void insertUpdate(DocumentEvent e) {
-                    markChanged();
-                }
-                public void removeUpdate(DocumentEvent e) {
-                    markChanged();
-                }
-                public void changedUpdate(DocumentEvent e) {
-                    markChanged();
-                }
-            });
 
         if (!deferWindowClosing) {
             // close button of document frame pressed while document was loading

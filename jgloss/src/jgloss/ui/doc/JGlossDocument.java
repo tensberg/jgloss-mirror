@@ -691,8 +691,7 @@ public class JGlossDocument extends HTMLDocument {
      * @return A reader for a document.
      */
     public HTMLEditorKit.ParserCallback getReader( int pos) {
-        reader = new JGlossReader( pos);
-        return reader;
+        return new JGlossReader( pos);
     }
 
     /**
@@ -918,5 +917,14 @@ public class JGlossDocument extends HTMLDocument {
      */
     public String getTitle() {
         return (String) getProperty( Document.TitleProperty);
+    }
+
+    /**
+     * Switches strict HTML parsing on or off.
+     *
+     * @see JGlossEditorKit.JGlossParser#setStrict(boolean)
+     */
+    public void setStrictParsing( boolean strict) {
+        ((JGlossEditorKit.JGlossParserWrapper) getParser()).setStrict( strict);
     }
 } // class JGlossDocument

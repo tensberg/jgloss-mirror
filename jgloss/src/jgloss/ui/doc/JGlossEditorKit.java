@@ -137,7 +137,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * <CODE>DocumentParser</CODE>, which prevents it from also being a 
      * <CODE>HTMLEditorKit.Parser</CODE>.
      */
-    private class JGlossParserWrapper extends HTMLEditorKit.Parser {
+    class JGlossParserWrapper extends HTMLEditorKit.Parser {
         /**
          * The parser to which parse requests will be forwarded.
          */
@@ -156,6 +156,15 @@ public class JGlossEditorKit extends HTMLEditorKit {
         public void parse( Reader r, HTMLEditorKit.ParserCallback cb,
                            boolean ignoreCharset) throws IOException {
             parser.parse( r, cb, ignoreCharset);
+        }
+
+        /**
+         * Sets strict parsing mode on the wrapped <CODE>JGlossParser</CODE>.
+         * 
+         * @see JGlossEditorKit.JGlossParser#setStrict(boolean)
+         */
+        public void setStrict( boolean strict) {
+            parser.setStrict( strict);
         }
     }
 
@@ -193,7 +202,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         public void parse( Reader r, HTMLEditorKit.ParserCallback cb,
                            boolean ignoreCharset) throws IOException {
-            long t = System.currentTimeMillis();
             try {
                 super.parse( r, cb, true);
             } finally {
@@ -201,6 +209,16 @@ public class JGlossEditorKit extends HTMLEditorKit {
                     parser.reset();
                 }
             }
+        }
+
+        /**
+         * Sets strict parsing mode. If strict parsing mode is set to <CODE>true</CODE> (default),
+         * SGML specification conformance is enforced, otherwise incorrect content
+         * is handled mimicking the popular browsers' behavior. Strict mode is needed when a
+         * JGloss document is loaded, while non-strict mode is needed when it is edited.
+         */
+        public void setStrict( boolean strict) {
+            this.strict = strict;
         }
 
         /**
