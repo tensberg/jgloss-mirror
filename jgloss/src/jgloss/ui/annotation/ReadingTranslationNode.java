@@ -66,7 +66,8 @@ public class ReadingTranslationNode extends LeafNode {
         this.reading = reading;
         try {
             this.readingText = reading.getDocument().getText( reading.getStartOffset(),
-                                                        reading.getEndOffset()-reading.getStartOffset());
+                                                              reading.getEndOffset()-
+                                                              reading.getStartOffset());
         } catch (BadLocationException ex) {
             ex.printStackTrace();
         }
