@@ -135,10 +135,12 @@ public class CharacterEncodingDetector {
             defaultencoding = System.getProperty( "file.encoding");
 
         byte[] buf = new byte[LOOK_AT_LENGTH];
-        PushbackInputStream pbin = new PushbackInputStream( in, buf.length);
+        PushbackInputStream pbin = new PushbackInputStream( new BufferedInputStream( in), buf.length);
         String enc = null;
         byte[] data;
         int len = in.read( buf);
+        if (len == -1) // empty file
+            return new InputStreamReader( pbin);
         if (len < buf.length) {
             data = new byte[len];
             System.arraycopy( buf, 0, data, 0, len);
