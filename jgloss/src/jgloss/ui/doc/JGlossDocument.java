@@ -99,6 +99,40 @@ public class JGlossDocument extends HTMLDocument {
          */
         private boolean endAnnotation = false;
 
+        /**
+         * Flag if the parser is in an annotation wrapper element. The annotation wrapper element
+         * is inserted by the JGlossWriter to allow an annotation element anywhere in the
+         * document where the wrapper element is allowed by the HTML DTD.
+         */
+        private boolean inAnnotationWrapper = false;
+
+        private char[] EMPTY_CHAR_ARRAY = new char[0];
+        
+        /**
+         * Handle Annotation tags in the document. Annotation elements need special
+         * treatment because they are "inline blocks", something which is not possible in
+         * HTML/CSS. The action ensures that the correct element structure is created
+         * but explicit or implied paragraphs are not interrupted.
+         */
+        private class AnnotationAction extends HTMLDocument.HTMLReader.TagAction {
+            public void start(HTML.Tag t, MutableAttributeSet a) {
+                // Force the creation of an implied paragraph if needed.
+                // An annotation element must always be enclosed by an explicit or
+                // implied paragraph.
+                addContent( EMPTY_CHAR_ARRAY, pos, 0, true);
+
+                a.addAttribute( StyleConstants.NameAttribute, t);
+                ElementSpec es = new ElementSpec
+                    ( a.copyAttributes(), ElementSpec.StartTagType);
+                parseBuffer.addElement( es);
+            }
+            
+            public void end(HTML.Tag t) {
+                ElementSpec es = new ElementSpec( null, ElementSpec.EndTagType);
+                parseBuffer.addElement( es);
+            }
+        }
+        
         public JGlossReader( int pos) {
             super( pos);
             this.pos = pos;
@@ -116,7 +150,7 @@ public class JGlossDocument extends HTMLDocument {
          * this <CODE>HTMLReader</CODE> knows how to handle.
          */
         private void addCustomTags() {
-            registerTag( AnnotationTags.ANNOTATION, new HTMLDocument.HTMLReader.BlockAction());
+            registerTag( AnnotationTags.ANNOTATION, new AnnotationAction());
             registerTag( AnnotationTags.READING, new HTMLDocument.HTMLReader.CharacterAction());
             registerTag( AnnotationTags.KANJI, new HTMLDocument.HTMLReader.CharacterAction());
             registerTag( AnnotationTags.TRANSLATION,
@@ -282,6 +316,13 @@ public class JGlossDocument extends HTMLDocument {
          * @param pos Position in the document.
          */
         public void handleStartTag( HTML.Tag t, MutableAttributeSet a, int pos) {
+            // Skip an annotation wrapper element.
+            if (t.equals( JGlossWriter.ANNOTATION_WRAPPER) &&
+                a.containsAttribute( HTML.Attribute.CLASS, JGlossWriter.ANNOTATION_WRAPPER_CLASS)) {
+                inAnnotationWrapper = true;
+                return;
+            }
+            
             // In a JGloss document the annotation attribute will be encoded as a
             // string. Decode it here.
             if (a.isDefined( TEXT_ANNOTATION) && 
@@ -299,10 +340,15 @@ public class JGlossDocument extends HTMLDocument {
          * @param pos Position in the document.
          */
         public void handleEndTag(HTML.Tag t, int pos) {
+            // Skip an annotation wrapper element.
+            if (inAnnotationWrapper && t.equals( JGlossWriter.ANNOTATION_WRAPPER)) {
+                inAnnotationWrapper = false;
+                return;
+            }
+
             if (t.equals( HTML.Tag.P)) {
                 // make sure end of lines are handled correctly in layout by inserting a '\n'
                 // This is needed when an annotation at the end of a paragraph is removed.
-                // See addContent()
                 super.addContent( NEWLINE, 0, 1, false);
                 pos++;
             }
@@ -329,30 +375,6 @@ public class JGlossDocument extends HTMLDocument {
          */
         public int getParsePosition() {
             return (parser != null) ? pos + parser.getParsePosition() : pos;
-        }
-
-        /**
-         * Adds some content. Overridden to handle a special case when a
-         * <CODE>AnnotationTags.ANNOTATION</CODE> tag is closed.
-         *
-         * @param data The content to add.
-         * @param offs Offset in the data.
-         * @param length Length of the data to add.
-         * @param gi Flags if an embedded &lt;P&gt; should be added when necessary.
-         */
-        protected void addContent( char[] data, int offs, int length, boolean gi) {
-            // For a correct calculation of the cursor position, it is necessary to insert
-            // a newline after a block element. Unfortunately, the superclass inserts this
-            // newline as the last character of the Annotation-Element. The following
-            // statement prevents this. To prevent linebreaks in normal text, a \n
-            // is only inserted at a closing </p> tag. This is done in the above
-            // handleEndTag().
-            if (endAnnotation && data.length==1 && data[0]=='\n' && offs==0 && length==1 && !gi) {
-                endAnnotation = false;
-                return;
-            }
-
-            super.addContent( data, offs, length, gi);
         }
     }
 
