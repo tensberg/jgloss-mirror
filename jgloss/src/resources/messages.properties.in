@@ -71,7 +71,7 @@ splashscreen.loadingPreferences=loading preferences
 splashscreen.initPreferences=loading dictionaries
 splashscreen.initMain=creating application window
 
-main.usage=Usage: jgloss.JGloss [options] file ...\n\
+main.usage=Usage: jgloss.JGloss [option] file ...\n\
 Options:\n\
 \  -h, --help, /?  Print this message\n\
 \  -i, --createindex Create index files for the dictionary files\n\
@@ -201,7 +201,7 @@ annotationeditor.menu.usetranslation=Use this Translation
 annotationeditor.menu.hide=Hide Annotation
 annotationeditor.menu.show=Show Annotation
 annotationeditor.menu.remove=Remove Annotation
-annotationeditor.menu.removeduplicates=Remove Duplicates
+annotationeditor.menu.removeduplicates=Remove Anno. & Duplicates
 annotationeditor.menu.addtoexclusions=Add to Exclusions
 annotationeditor.menu.add=Add Annotation
 annotationeditor.menu.hideduplicates=Hide all Duplicates
