@@ -1,4 +1,5 @@
 1.0: (2001/06/28)
+        - Improved HTML import.
 	- Added index file format JJDX, which can be used instead of
 	  XJDX index files. JGloss will create the index if none is
 	  found.
