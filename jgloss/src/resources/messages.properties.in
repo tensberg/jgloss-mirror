@@ -309,7 +309,8 @@ load.progress=Loading {0}
 
 parserselector.readingbrackets=Brackets delimiting reading annotations:
 parserselector.noreadings=none
-parserselector.firstoccurrence=Only annotate first occurrence of a word
+parserselector.firstoccurrence=Only annotate the first occurrence of a word
+parserselector.detectparagraphs=Guess paragraph breaks
 
 print.title=Print document
 

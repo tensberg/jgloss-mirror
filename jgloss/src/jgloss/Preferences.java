@@ -105,10 +105,12 @@ public abstract class Preferences {
 
     public static final String IMPORT_PARSER = "import.parser";
     public static final String IMPORT_FIRSTOCCURRENCE = "import.firstoccurrence";
+    public static final String IMPORT_DETECTPARAGRAPHS = "import.detectparagraphs";
     public static final String IMPORT_READINGBRACKETS = "import.readingbrackets";
 
     public static final String IMPORTCLIPBOARD_PARSER = "importclipboard.parser";
     public static final String IMPORTCLIPBOARD_FIRSTOCCURRENCE = "importclipboard.firstoccurrence";
+    public static final String IMPORTCLIPBOARD_DETECTPARAGRAPHS = "importclipboard.detectparagraphs";
     public static final String IMPORTCLIPBOARD_READINGBRACKETS = "importclipboard.readingbrackets";
 
     public static final String EXPORT_PLAINTEXT_ENCODING = "export.plaintext.encoding";

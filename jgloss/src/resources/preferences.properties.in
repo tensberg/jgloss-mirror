@@ -85,9 +85,11 @@ annotation.highlight.color=16743034
 
 import.parser=jgloss.dictionary.KanjiParser
 import.firstoccurrence=true
+import.detectparagraphs=true
 import.readingbrackets=
 importclipboard.parser=jgloss.dictionary.KanjiParser
 importclipboard.firstoccurrence=true
+importclipboard.detectparagraphs=true
 importclipboard.readingbrackets=
 
 export.plaintext.writereading=true

@@ -92,6 +92,8 @@ public class ImportDialog extends JDialog implements TextListener {
                                           parserSelector.getSelectedParser().getName());
                         JGloss.prefs.set( Preferences.IMPORT_FIRSTOCCURRENCE,
                                           parserSelector.isFirstOccurrenceOnly());
+                        JGloss.prefs.set( Preferences.IMPORT_DETECTPARAGRAPHS,
+                                          parserSelector.isDetectParagraphs());
                         if (parserSelector.isNoReadingBrackets())
                             JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS, "");
                         else
@@ -180,8 +182,8 @@ public class ImportDialog extends JDialog implements TextListener {
         b3.add( l);
         b3.add( Box.createHorizontalGlue());
         b4.add( b3);
-        // An AWT TextArea is used because cut&paste is implemented differently than Swing cut&paste
-        // and works with X11 primary selection copying and MacOSX.
+        // An AWT TextArea is used because JDK1.3 AWT cut&paste is implemented differently than
+        // Swing cut&paste and works with X11 primary selection copying and MacOSX.
         pastearea = new TextArea( 3, 50);
         pastearea.setEditable( true);
         pastearea.setFont( filename.getFont());
@@ -212,6 +214,8 @@ public class ImportDialog extends JDialog implements TextListener {
         } catch (ClassNotFoundException ex) {}
         parserSelector.setFirstOccurrenceOnly( JGloss.prefs.getBoolean
                                                ( Preferences.IMPORT_FIRSTOCCURRENCE, true));
+        parserSelector.setDetectParagraphs( JGloss.prefs.getBoolean
+                                            ( Preferences.IMPORT_DETECTPARAGRAPHS, true));
         String brackets = JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS);
         if (brackets.length() == 2)
             parserSelector.setReadingBrackets( brackets.charAt( 0), brackets.charAt( 1));
@@ -342,4 +346,11 @@ public class ImportDialog extends JDialog implements TextListener {
         pastearea.setEditable( true);
     }
 
+    /**
+     * Returns the state of the paragraph detection checkbox. If the box is selected, the corresponding
+     * option of the {@link HTMLifyReader HTMLifyReader} should be set.
+     */
+    public boolean isDetectParagraphs() {
+        return parserSelector.isDetectParagraphs();
+    }
 } // class ImportDialog

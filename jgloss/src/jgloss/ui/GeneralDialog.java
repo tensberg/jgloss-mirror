@@ -191,6 +191,8 @@ public class GeneralDialog extends Box {
         }
         importClipboardParserSelector.setFirstOccurrenceOnly
             ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE, true));
+        importClipboardParserSelector.setDetectParagraphs
+            ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true));
         String brackets = JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS);
         if (brackets.length() == 2)
             importClipboardParserSelector.setReadingBrackets
@@ -212,6 +214,8 @@ public class GeneralDialog extends Box {
                           importClipboardParserSelector.getSelectedParser().getName());
         JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE,
                           importClipboardParserSelector.isFirstOccurrenceOnly());
+        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS,
+                          importClipboardParserSelector.isDetectParagraphs());
         if (importClipboardParserSelector.isNoReadingBrackets())
             JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS, "");
         else

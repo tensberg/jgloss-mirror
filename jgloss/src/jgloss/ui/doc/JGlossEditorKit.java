@@ -49,7 +49,7 @@ import javax.swing.text.html.parser.TagElement;
  * <P>
  * The DTD element definition for an annotation element is 
  * <CODE>(#PCDATA|READING|BASETEXT|TRANSLATION)*</CODE>. Additional constraints which are
- * not enforceable through the DTD but used throughout JGloss is that each reading element
+ * not enforceable through the DTD but used throughout JGloss are that each reading element
  * is followed by a kanji element, and there is exactly one translation element which is the
  * last child of the annotation element.
  * </P>
@@ -738,15 +738,18 @@ public class JGlossEditorKit extends HTMLEditorKit {
         
         /**
          * Overridden to always break the line at the last char. 
-         * <p>J2SE 1.4 introduces a new, more
-         * sophisticated way to choose where to break a line with class 
-         * <CODE>java.text.RuleBasedBreakIterator</CODE>. <CODE>GlyphView.getBreakWeight</CODE>
-         * uses this class to decide where to break a line. Unfortunately, this is a major
-         * performance bottleneck. Since the utility of this way of breaking lines for
-         * Japanese text is dubious at best, it is disabled in the overridden method.
-         * Unfortunately there is no cleaner API do do this.</p>
          */
         public int getBreakWeight( int axis, float pos, float len) {
+            /*
+             * J2SE 1.4 introduces a new, more
+             * sophisticated way to choose where to break a line with class 
+             * <CODE>java.text.RuleBasedBreakIterator</CODE>. <CODE>GlyphView.getBreakWeight</CODE>
+             * uses this class to decide where to break a line. Unfortunately, this is a major
+             * performance bottleneck. Since the utility of this way of breaking lines for
+             * Japanese text is dubious at best, it is disabled in the overridden method.
+             * Unfortunately there is no cleaner API do do this.
+             */
+
             if (axis == View.X_AXIS) {
                 checkPainter();
                 int p0 = getStartOffset();

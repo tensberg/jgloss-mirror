@@ -1,4 +1,4 @@
-1.0.5: (2002/06/02)
+1.0.5: (2002/06/06)
 	- Improved paragraph detection on text import.
 	- Added XML export option.
 	- Fixed memory leak. Now all memory used by a document is released

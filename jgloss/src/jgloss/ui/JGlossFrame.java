@@ -101,14 +101,14 @@ public class JGlossFrame extends JPanel implements ActionListener {
                                         
                                         if (d.selectionIsFilename())
                                             which.importDocument
-                                                ( d.getSelection(),
+                                                ( d.getSelection(), d.isDetectParagraphs(),
                                                   d.createParser( Dictionaries.getDictionaries( true),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
                                                   d.getEncoding());
                                         else
                                             which.importString
-                                                ( d.getSelection(), 
+                                                ( d.getSelection(), d.isDetectParagraphs(), 
                                                   d.createParser( Dictionaries.getDictionaries( true),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
@@ -756,7 +756,8 @@ public class JGlossFrame extends JPanel implements ActionListener {
                     which = new JGlossFrame();
                 
                 which.loadDocument
-                    ( new HTMLifyReader( in),
+                    ( new HTMLifyReader( in, JGloss.prefs.getBoolean
+                                         ( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true)),
                       JGloss.messages.getString( "import.clipboard"),
                       JGloss.messages.getString( "import.clipboard"),
                       GeneralDialog.getComponent().createImportClipboardParser
@@ -785,13 +786,14 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * converted to HTML. The method will then call <CODE>loadDocument</CODE> with the newly created reader.
      *
      * @param path URL or path of the file to import.
+     * @param detectParagraphs Flag if the {@link HTMLifyReader HTMLifyReader} should detect paragraphs.
      * @param parser Parser used to annotate the text.
      * @param filter Filter for fetching the reading annotations from a parsed document.
      * @param encoding Character encoding of the file. May be either <CODE>null</CODE> or the
      *                 value of the "encodings.default" resource to use autodetection.
      */
-    private void importDocument( String path, Parser parser, ReadingAnnotationFilter filter, 
-                                 String encoding) {
+    private void importDocument( String path, boolean detectParagraphs, Parser parser, 
+                                 ReadingAnnotationFilter filter, String encoding) {
         try {
             Reader in = null;
             String contenttype = "text/plain";
@@ -863,6 +865,7 @@ public class JGlossFrame extends JPanel implements ActionListener {
      * The method can only be applied on a <CODE>JGlossFrame</CODE> with no open document.
      *
      * @param text The text which will be imported.
+     * @param detectParagraphs Flag if the {@link HTMLifyReader HTMLifyReader} should detect paragraphs.
      * @param title Title of the newly created document.
      * @param path Path to the document.
      * @param setPath If <CODE>true</CODE>, the {@link #documentPath documentPath} variable will
@@ -870,11 +873,12 @@ public class JGlossFrame extends JPanel implements ActionListener {
      *        which the newly created document should be written. If <CODE>false</CODE>,
      *        <CODE>path</CODE> will only be used in informational messages to the user during import.
      */
-    public void importString( String text, Parser parser, ReadingAnnotationFilter filter, String title,
+    public void importString( String text, boolean detectParagraphs, Parser parser, 
+                              ReadingAnnotationFilter filter, String title,
                               String path, boolean setPath) {
         try {
             loadDocument
-                ( new HTMLifyReader( new StringReader( text)), path, title,
+                ( new HTMLifyReader( new StringReader( text), detectParagraphs), path, title,
                   parser, filter, true, text.length());
             documentChanged = true;
             if (setPath)

@@ -117,7 +117,7 @@ public class HTMLifyReader extends FilterReader {
      *
      * @param in The reader from which to read the plain text file.
      * @param title The title to insert in the generated HTML document.
-     * @param detectParagraphs 
+     * @param detectParagraphs If <code>true</code>, 
      * @exception IOException if an error occurrs when accessing the underlying reader.
      */
     public HTMLifyReader( Reader in, String title, boolean detectParagraphs) throws IOException {

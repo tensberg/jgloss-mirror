@@ -74,6 +74,7 @@ public class ParserSelector extends JPanel {
 
     JRadioButton[] parserButtons;
     private JCheckBox firstOccurrenceOnly;
+    private JCheckBox detectParagraphs;
     /**
      * Widget to select the reading annotation delimiters.
      */
@@ -128,6 +129,9 @@ public class ParserSelector extends JPanel {
         b.add( Box.createVerticalStrut( 5));
         firstOccurrenceOnly = new JCheckBox( JGloss.messages.getString( "parserselector.firstoccurrence"));
         b.add( firstOccurrenceOnly);
+        detectParagraphs = new JCheckBox( JGloss.messages.getString
+                                                    ( "parserselector.detectparagraphs"));
+        b.add( detectParagraphs);
         this.add( b, c);
         parserButtons[0].setSelected( true);
 
@@ -341,5 +345,20 @@ public class ParserSelector extends JPanel {
 
     public boolean isFirstOccurrenceOnly() {
         return firstOccurrenceOnly.isSelected();
+    }
+
+    public void setDetectParagraphs( boolean detect) {
+        this.detectParagraphs.setSelected( detect);
+    }
+
+    /**
+     * Determines if the user selected the detect paragraphs checkbox. If <code>true</code>, the
+     * detect paragraphs option of the {@link HTMLifyReader} should be used when importing a text
+     * document. While this option has no relation to the text parser backend, from a UI perspective
+     * it makes sense to place the control here because the user does not make a difference between
+     * text import and parsing.
+     */
+    public boolean isDetectParagraphs() {
+        return detectParagraphs.isSelected();
     }
 } // class ParserSelector

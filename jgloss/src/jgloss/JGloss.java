@@ -472,8 +472,7 @@ public class JGloss {
     }
 
     /**
-     * Return a Preference implementation appropriate for the current Java VM. If this is the first
-     * time that the 
+     * Return a Preference implementation appropriate for the current Java VM.
      *
      * @see PropertiesPreferences
      * @see JavaPreferences
