@@ -119,8 +119,13 @@ public class EDict implements Dictionary {
                 
                 public float getMaxConfidence() { return 1.0f; }
                 
-                public Dictionary createInstance( String descriptor) throws IOException {
-                    return new EDict( descriptor, true);
+                public Dictionary createInstance( String descriptor) 
+                    throws DictionaryFactory.InstantiationException {
+                    try {
+                        return new EDict( descriptor, true);
+                    } catch (IOException ex) {
+                        throw new DictionaryFactory.InstantiationException( ex.getLocalizedMessage(), ex);
+                    }
                 }
 
                 public String getName() { return "EDICT"; }

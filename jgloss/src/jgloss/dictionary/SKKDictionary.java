@@ -96,8 +96,13 @@ public class SKKDictionary implements Dictionary {
                 
                 public float getMaxConfidence() { return 1.0f; }
                 
-                public Dictionary createInstance( String descriptor) throws IOException {
-                    return new SKKDictionary( descriptor);
+                public Dictionary createInstance( String descriptor) 
+                    throws DictionaryFactory.InstantiationException {
+                    try {
+                        return new SKKDictionary( descriptor);
+                    } catch (IOException ex) {
+                        throw new DictionaryFactory.InstantiationException( ex.getLocalizedMessage(), ex);
+                    }
                 }
 
                 public String getName() { return "SKK"; }
@@ -186,7 +191,7 @@ public class SKKDictionary implements Dictionary {
                     }
                 }
                 else {
-                    System.out.println( "WARNING: malformed dictionary entry " + line);
+                    System.err.println( "WARNING: malformed dictionary entry " + line);
                 }
             }
         }
