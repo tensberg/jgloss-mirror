@@ -56,6 +56,14 @@ public abstract class TextAnnotationCodec {
      * Character used to delimit the annotations in the list.
      */
     public final static char LIST_SEPARATOR = '|';
+    /**
+     * Annotation type string used to mark a reading annotation.
+     */
+    public final static String READING_TYPE = "R";
+    /**
+     * Annotation type string used to mark a translation annotation.
+     */
+    public final static String TRANSLATION_TYPE = "T";
 
     /**
      * Remembers all dictionary names so far and the NullDictionaries created for them.
@@ -111,8 +119,6 @@ public abstract class TextAnnotationCodec {
      * @author Michael Koch
      */
     public static class UnknownAnnotation implements Parser.TextAnnotation {
-        private int start;
-        private int length;
         /**
          * The code of this annotation as found in the encoded string.
          *
@@ -126,10 +132,8 @@ public abstract class TextAnnotationCodec {
          * @param start Start offset of this annotation in the document.
          * @param length Length of the annotation.
          */
-        public UnknownAnnotation( String code, int start, int length) {
+        public UnknownAnnotation( String code) {
             this.code = code;
-            this.start = start;
-            this.length = length;
         }
 
         /**
@@ -141,8 +145,8 @@ public abstract class TextAnnotationCodec {
             return code;
         }
 
-        public int getStart() { return start; }
-        public int getLength() { return length; }
+        public int getStart() { return 0; }
+        public int getLength() { return 1; }
     }
 
     /**
@@ -172,13 +176,14 @@ public abstract class TextAnnotationCodec {
      * @return The annotation encoded as string.
      */
     public static String encode( Parser.TextAnnotation ta) {
-        String classname = ta.getClass().getName();
-        // change classname for backwards compatibility with V0.9
-        if (classname.equals( Reading.class.getName()))
-            classname += "_" + JGlossWriter.FORMAT_MAJOR_VERSION + "." + 
-                JGlossWriter.FORMAT_MINOR_VERSION;
-        String code = classname + FIELD_SEPARATOR 
-            + ta.getStart() + FIELD_SEPARATOR + ta.getLength() + FIELD_SEPARATOR;
+        String code;
+        if (ta.getClass().equals( Reading.class))
+            code = READING_TYPE;
+        else if (ta.getClass().equals( Translation.class))
+            code = TRANSLATION_TYPE;
+        else
+            code = ta.getClass().getName();
+        code += FIELD_SEPARATOR;
 
         if (ta instanceof Reading) {
             Reading annotation = (Reading) ta;
@@ -256,33 +261,40 @@ public abstract class TextAnnotationCodec {
         code = unquote( code);
 
         int i = code.indexOf( FIELD_SEPARATOR);
-        int j = code.indexOf( FIELD_SEPARATOR, i+1);
-        int k = code.indexOf( FIELD_SEPARATOR, j+1);
-        String c = code.substring( 0, i);
-        int start = Integer.parseInt( code.substring( i+1, j));
-        int length = Integer.parseInt( code.substring( j+1, k));
-        i = k + 1;
-        if (c.equals( Reading.class.getName())) {
+        String type = code.substring( 0, i);
+        i++;
+
+        // handle backwards compatibility
+        if (type.equals( "jgloss.dictionary.Reading") ||
+            type.equals( "jgloss.dictionary.Reading_1.1") ||
+            type.equals( "jgloss.dictionary.Translation")) {
+            // skip annotation start and length (not used any more)
+            i = code.indexOf( FIELD_SEPARATOR, i) + 1;
+            i = code.indexOf( FIELD_SEPARATOR, i) + 1;
+        }
+        if (type.equals( "jgloss.dictionary.Reading_1.1"))
+            type = READING_TYPE;
+        else if (type.equals( "jgloss.dictionary.Translation"))
+            type = TRANSLATION_TYPE;
+            
+        if (type.equals( "jgloss.dictionary.Reading")) {
             // This is left in for backwards compatibility with JGloss V0.9 files.
-            j = code.indexOf( FIELD_SEPARATOR, i);
+            
+            int j = code.indexOf( FIELD_SEPARATOR, i);
             final String reading = code.substring( i, j);
             final jgloss.dictionary.Dictionary d = getDictionary
                 ( ResourceBundle.getBundle( "resources/messages-dictionary")
                   .getString( "parser.dictionary.document"));
-            return new Reading( start, length, 
-                                new WordReadingPair() {
-                                        public String getWord() { return reading; }
-                                        public String getReading() { return reading; }
-                                        public jgloss.dictionary.Dictionary getDictionary() {
-                                            return d;
-                                        }
-                                    }, null);
+            return new Reading( new WordReadingPair() {
+                    public String getWord() { return reading; }
+                    public String getReading() { return reading; }
+                    public jgloss.dictionary.Dictionary getDictionary() {
+                        return d;
+                    }
+                }, null);
         }
-        else if (c.equals( Reading.class.getName()+
-                           "_" + JGlossWriter.FORMAT_MAJOR_VERSION + "." + 
-                           JGlossWriter.FORMAT_MINOR_VERSION) || 
-                 c.equals( Translation.class.getName())) {
-            j = code.indexOf( FIELD_SEPARATOR, i);
+        else if (type.equals( READING_TYPE) || type.equals( TRANSLATION_TYPE)) {
+            int j = code.indexOf( FIELD_SEPARATOR, i);
             final String word = code.substring( i, j);
             i = j + 1;
 
@@ -300,7 +312,7 @@ public abstract class TextAnnotationCodec {
             if (!t.equals( NULL_STRING)) {
                 List translationList = new ArrayList();
                 int l = t.indexOf( TRANSLATION_SEPARATOR);
-                k = 0;
+                int k = 0;
                 while (l != -1) {
                     translationList.add( t.substring( k, l));
                     k = l + 1;
@@ -327,18 +339,17 @@ public abstract class TextAnnotationCodec {
                 String dictionaryForm = code.substring( i, j);
                 i = j + 1;
                 j = code.indexOf( FIELD_SEPARATOR, i);
-                String type = code.substring( i, j);
-                conjugation = new Conjugation( conjugatedForm, dictionaryForm, type);
+                String conjtype = code.substring( i, j);
+                conjugation = Conjugation.getConjugation( conjugatedForm, dictionaryForm, conjtype);
             }
 
             if (translations != null) {
-                return new Translation( start, length, 
-                                        new DictionaryEntry( word, reading, translations,
+                return new Translation( new DictionaryEntry( word, reading, translations,
                                                              dictionary),
                                         conjugation);
             }
             else {
-                return new Reading( start, length, new WordReadingPair() {
+                return new Reading( new WordReadingPair() {
                         public String getWord() { return word; }
                         public String getReading() { return reading; }
                         public jgloss.dictionary.Dictionary getDictionary() { return dictionary; }
@@ -347,8 +358,8 @@ public abstract class TextAnnotationCodec {
         }
         else {
             System.err.println( JGloss.messages.getString( "error.save.unknownannotation",
-                                                           new Object[] { c }));
-            return new UnknownAnnotation( code, start, length);
+                                                           new Object[] { type }));
+            return new UnknownAnnotation( code);
         }
     }
 

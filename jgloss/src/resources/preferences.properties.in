@@ -67,7 +67,10 @@ editor.enableediting=false
 annotation.highlight.color=16743034
 
 import.parser=jgloss.dictionary.KanjiParser
+import.firstoccurrence=false
+import.readingbrackets=《》
 importclipboard.parser=jgloss.dictionary.KanjiParser
+importclipboard.firstoccurrence=false
 importclipboard.readingbrackets=《》
 
 export.plaintext.writereading=true

@@ -32,7 +32,7 @@ import java.io.*;
  *
  * @author Michael Koch
  */
-public class ChasenParser implements Parser {
+public class ChasenParser extends AbstractParser {
     private final static ResourceBundle messages =
         ResourceBundle.getBundle( "resources/messages-dictionary");
 
@@ -94,33 +94,24 @@ public class ChasenParser implements Parser {
      */
     private BufferedWriter chasenIn;
 
-    private Dictionary[] dictionaries;
-    private Set exclusions;
-
-    private int parsePosition;
-
     private Map lookupCache;
 
-    private boolean ignoreNewlines;
-
     public ChasenParser( Dictionary[] dictionaries, Set exclusions) {
-        this( defaultChasenExecutable, dictionaries, exclusions, true);
+        this( defaultChasenExecutable, dictionaries, exclusions, true, false);
     }
 
     public ChasenParser( Dictionary[] dictionaries, Set exclusions, boolean cacheLookups) {
-        this( defaultChasenExecutable, dictionaries, exclusions, cacheLookups);
+        this( defaultChasenExecutable, dictionaries, exclusions, cacheLookups, false);
     }
 
     public ChasenParser( String chasenExecutable, Dictionary[] dictionaries, Set exclusions) {
-        this( chasenExecutable, dictionaries, exclusions, true);
+        this( chasenExecutable, dictionaries, exclusions, true, false);
     }
 
     public ChasenParser( String chasenExecutable, Dictionary[] dictionaries, Set exclusions,
-                         boolean cacheLookups) {
+                         boolean cacheLookups, boolean firstOccurrenceOnly) {
+        super( dictionaries, exclusions, false, firstOccurrenceOnly);
         this.chasenExecutable = chasenExecutable;
-        this.dictionaries = dictionaries;
-        this.exclusions = exclusions;
-        ignoreNewlines = false;
         if (cacheLookups)
             lookupCache = new HashMap( 5000);
     }
@@ -216,9 +207,6 @@ public class ChasenParser implements Parser {
             for ( int i=0; i<text.length; i++) {
                 if (text[i] == 0x0d)
                     text[i] = 0x0a;
-                // chasen skips normal spaces
-                if (text[i] == ' ')
-                    text[i] = '\u3000'; // Japanese space
             }
             chasenIn.write( text);
             chasenIn.write( (char) 0x0a); // chasen will start parsing when end of line is encountered
@@ -226,6 +214,10 @@ public class ChasenParser implements Parser {
 
             String line;
             while (parsePosition<=text.length && (line=chasenOut.readLine())!=null) {
+                // chasen skips spaces, so we have to adjust parsePosition here
+                while (parsePosition<text.length && text[parsePosition]==' ')
+                    parsePosition++;
+
                 System.out.println( line);
                 if (line.equals( "EOS")) { // end of line in input text
                     parsePosition++;
@@ -267,7 +259,7 @@ public class ChasenParser implements Parser {
                         int to = surfaceInflected.length();
                         do {
                             String word = surfaceInflected.substring( from, to);
-                            if (exclusions!=null && exclusions.contains( word)) {
+                            if (ignoreWord( word)) {
                                 // continue search with remaining suffix
                                 // (loop will terminate if this was remainder of word)
                                 from = to;
@@ -283,6 +275,8 @@ public class ChasenParser implements Parser {
 
                             List translations = search( word);
                             if (translations.size() != 0) {
+                                if (firstOccurrenceOnly)
+                                    annotatedWords.add( word);
                                 if (readingBase != null) {
                                     annotations.add( new Reading
                                         ( parsePosition + from, to-from,
@@ -341,13 +335,15 @@ public class ChasenParser implements Parser {
                     else if (partOfSpeech.equals( "\u52d5\u8a5e") ||  // douji (verb)
                              partOfSpeech.equals( "\u5f62\u5bb9\u8a5e") // keiyoushi ("true" adjective)
                              ) {
-                        if (exclusions!=null && exclusions.contains( surfaceBase)) {
+                        if (ignoreWord( surfaceBase)) {
                             parsePosition += surfaceInflected.length();
                             continue;
                         }
 
                         List translations = search( surfaceBase);
                         if (translations.size() > 0) {
+                            if (firstOccurrenceOnly)
+                                annotatedWords.add( surfaceBase);
                             Conjugation c = getConjugation( surfaceInflected, surfaceBase,
                                                             partOfSpeech + "\u3001" + inflectedForm);
                             annotations.add( new Reading
@@ -378,17 +374,6 @@ public class ChasenParser implements Parser {
         }
         
         return annotations;
-    }
-
-    /**
-     * Returns the position in the text the parser is currently parsing. This is not threadsafe.
-     * If more than one thread is using this Parser object, the result of this method is
-     * undetermined.
-     *
-     * @return The position in the text the parser is currently parsing.
-     */
-    public int getParsePosition() {
-        return parsePosition;
     }
 
     /**
@@ -427,33 +412,20 @@ public class ChasenParser implements Parser {
             if (lookupCache != null)
                 lookupCache.clear();
         }
-    }
-
-    /**
-     * Set if the parser should skip newlines in the imported text. This means that characters
-     * separated by one or several newline characters will be treated as a single word.
-     */
-    public void setIgnoreNewlines( boolean ignoreNewlines) {
-        this.ignoreNewlines = ignoreNewlines;
-    }
-
-    /**
-     * Test if the parser skips newlines in the imported text.
-     */
-    public boolean getIgnoreNewlines() {
-        return ignoreNewlines;
+        super.reset();
     }
 
     /**
      * Starts the chasen process.
      */
     protected void startChasen() throws SearchException {
+        // Initialize platform encoding if not done already. This avoids running chasen
+        // twice at the same time.
+        getChasenPlatformEncoding();
         try {
             chasen = Runtime.getRuntime().exec( chasenExecutable +
                                                 " -F %m\\t%H\\t%Tn\\t%Fn\\t%?T/%M/n/\\t%Y1\\n",
                                                 new String[] { "LANG=ja", "LC_ALL=ja_JP" });
-            InputStreamReader out = new InputStreamReader( chasen.getInputStream(),
-                                                           "JISAutoDetect");
             chasenOut = new BufferedReader( new InputStreamReader
                 ( chasen.getInputStream(), getChasenPlatformEncoding()));
             chasenIn = new BufferedWriter( new OutputStreamWriter
@@ -506,7 +478,7 @@ public class ChasenParser implements Parser {
         inflected = inflected.substring( i);
         base = base.substring( i);
         
-        return new Conjugation( inflected, base, type);
+        return Conjugation.getConjugation( inflected, base, type);
     }
 
     /**
@@ -523,7 +495,7 @@ public class ChasenParser implements Parser {
      * of the output. The test is only done the first time the method is called, the result is
      * cached and reused on further calls.
      *
-     * @return Canonical name of the encoding, or <CODE>null</CODE if the test failed.
+     * @return Canonical name of the encoding, or <CODE>null</CODE> if the test failed.
      */
     protected String getChasenPlatformEncoding() {
         if (platformEncoding != null)

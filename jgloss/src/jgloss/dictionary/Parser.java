@@ -74,7 +74,9 @@ public interface Parser {
 
     /**
      * Clears any caches which may have been filled during parsing. Call this after you have
-     * parsed some text to reclaim the memory.
+     * parsed some text to reclaim the memory. This also resets the occurrence cache used when
+     * {@link setAnnotateFirstOccurrenceOnly(boolean) setAnnotateFirstOccurenceOnly} is set to
+     * <CODE>true</CODE>.
      */
     void reset();
 
@@ -88,6 +90,18 @@ public interface Parser {
      * Test if the parser skips newlines in the imported text.
      */
     boolean getIgnoreNewlines();
+
+    /**
+     * Set if only the first occurrence of a word should be annotated. If this is set to
+     * <CODE>true</CODE>, an annotated word will be cached and further occurrences will be ignored.
+     * The cache of annotated words will be cleared when {@link #reset() reset} is called.
+     */
+    void setAnnotateFirstOccurrenceOnly( boolean firstOccurrence);
+
+    /**
+     * Test if only the first occurrence of a word should be annotated.
+     */
+    boolean getAnnotateFirstOccurrenceOnly();
 
     /**
      * Returns the name of the parser in a user-presentable form.

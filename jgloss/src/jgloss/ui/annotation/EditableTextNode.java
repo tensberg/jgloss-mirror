@@ -37,6 +37,10 @@ public class EditableTextNode extends LeafNode {
      * The static descriptive text of this node.
      */
     protected String description;
+    /**
+     * Text which the node displays in the tree (description + text).
+     */
+    protected String nodeText;
 
     /**
      * Creates a new reading or annotation annotation node which wraps the given element.
@@ -52,6 +56,7 @@ public class EditableTextNode extends LeafNode {
             text = "";
         this.text = text;
         this.description = description;
+        this.nodeText = description + text;
     }
 
     /**
@@ -59,7 +64,7 @@ public class EditableTextNode extends LeafNode {
      * text.
      */
     public String toString() {
-        return description + text;
+        return nodeText;
     }
 
     /**
@@ -88,6 +93,7 @@ public class EditableTextNode extends LeafNode {
             text = "";
 
         this.text = text;
+        this.nodeText = description + text;
         getRootNode().getModel().nodeChanged( this);
     }
 } // class ReadingTranslationNode

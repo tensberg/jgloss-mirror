@@ -50,13 +50,13 @@ public class JGlossWriter extends HTMLWriter {
      * Major version of the JGloss file format. The major version is changed if a
      * new file format revision has changes incompatible to previous versions.
      */
-    public static int FORMAT_MAJOR_VERSION = 2;
+    public static int FILE_FORMAT_MAJOR_VERSION = 2;
     /**
      * Minor version of the JGloss file format. The minor version is changed if a new
      * file format revision is changed in a way that it still is compatible to earlier
      * formats.
      */
-    public static int FORMAT_MINOR_VERSION = 1;
+    public static int FILE_FORMAT_MINOR_VERSION = 1;
 
     /**
      * Document which will be written.
@@ -307,7 +307,7 @@ public class JGlossWriter extends HTMLWriter {
     public static String getFileVersionString() {
         return "JGloss " + (JGLOSS_VERSION/100) + "." + (JGLOSS_VERSION%100) + 
             "; file format version " +
-            FORMAT_MAJOR_VERSION + "." + FORMAT_MINOR_VERSION;
+            FILE_FORMAT_MAJOR_VERSION + "." + FILE_FORMAT_MINOR_VERSION;
     }
 
     /**

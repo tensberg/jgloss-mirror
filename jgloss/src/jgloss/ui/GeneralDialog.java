@@ -69,6 +69,7 @@ public class GeneralDialog extends Box {
 
     private ParserSelector importClipboardParserSelector;
     private Class importClipboardParser;
+    private boolean firstOccurrenceOnly;
     private char readingStart;
     private char readingEnd;
 
@@ -161,6 +162,8 @@ public class GeneralDialog extends Box {
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
+        importClipboardParserSelector.setFirstOccurrenceOnly
+            ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE));
         importClipboardParserSelector.setReadingBrackets
             ( JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS).charAt( 0),
               JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS).charAt( 1));
@@ -175,6 +178,8 @@ public class GeneralDialog extends Box {
         JGloss.prefs.set( Preferences.CHASEN_LOCATION, chasenLocation.getText());
         JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_PARSER,
                           importClipboardParserSelector.getSelectedParser().getName());
+        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE,
+                          importClipboardParserSelector.isFirstOccurrenceOnly());
         if (importClipboardParserSelector.getReadingStart() != '\0' &&
             importClipboardParserSelector.getReadingEnd() != '\0')
             JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS,
@@ -185,6 +190,7 @@ public class GeneralDialog extends Box {
     public void applyPreferences() {
         ChasenParser.setDefaultExecutable( chasenLocation.getText());
         importClipboardParser = importClipboardParserSelector.getSelectedParser();
+        firstOccurrenceOnly = importClipboardParserSelector.isFirstOccurrenceOnly();
         readingStart = importClipboardParserSelector.getReadingStart();
         readingEnd = importClipboardParserSelector.getReadingEnd();
     }
@@ -192,6 +198,7 @@ public class GeneralDialog extends Box {
     public Parser createImportClipboardParser( jgloss.dictionary.Dictionary[] dictionaries,
                                                Set exclusions) {
         return ParserSelector.createParser( importClipboardParser, dictionaries, exclusions,
+                                            firstOccurrenceOnly,
                                             readingStart, readingEnd);
     }
 

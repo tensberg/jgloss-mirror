@@ -734,20 +734,20 @@ public class JGlossFrame extends JFrame implements ActionListener {
             // test the file version of the loaded document
             String formatWarning = null;
             if (doc.getJGlossVersion() != -1) {
-                if (doc.getFileFormatMajorVersion() > JGlossWriter.FORMAT_MAJOR_VERSION)
+                if (doc.getFileFormatMajorVersion() > JGlossWriter.FILE_FORMAT_MAJOR_VERSION)
                     formatWarning = JGloss.messages.getString
                         ( "warning.load.version.larger.major",
                           new Object[] { new Integer( doc.getJGlossVersion()/100),
                                          new Integer( doc.getJGlossVersion()%100) });
-                else if (doc.getFileFormatMajorVersion() == JGlossWriter.FORMAT_MAJOR_VERSION &&
-                         doc.getFileFormatMinorVersion() > JGlossWriter.FORMAT_MINOR_VERSION)
+                else if (doc.getFileFormatMajorVersion() == JGlossWriter.FILE_FORMAT_MAJOR_VERSION &&
+                         doc.getFileFormatMinorVersion() > JGlossWriter.FILE_FORMAT_MINOR_VERSION)
                     formatWarning = JGloss.messages.getString
                         ( "warning.load.version.larger.minor",
                           new Object[] { new Integer( doc.getJGlossVersion()/100),
                                          new Integer( doc.getJGlossVersion()%100) });
-                else if (doc.getFileFormatMajorVersion() < JGlossWriter.FORMAT_MAJOR_VERSION ||
-                         doc.getFileFormatMajorVersion() == JGlossWriter.FORMAT_MAJOR_VERSION &&
-                         doc.getFileFormatMinorVersion() < JGlossWriter.FORMAT_MINOR_VERSION)
+                else if (doc.getFileFormatMajorVersion() < JGlossWriter.FILE_FORMAT_MAJOR_VERSION ||
+                         doc.getFileFormatMajorVersion() == JGlossWriter.FILE_FORMAT_MAJOR_VERSION &&
+                         doc.getFileFormatMinorVersion() < JGlossWriter.FILE_FORMAT_MINOR_VERSION)
                     formatWarning = JGloss.messages.getString
                         ( "warning.load.version.smaller");
                 // else format == current format

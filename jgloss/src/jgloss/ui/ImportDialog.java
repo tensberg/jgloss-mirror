@@ -78,6 +78,13 @@ public class ImportDialog extends JDialog {
                         ImportDialog.this.hide();
                         JGloss.prefs.set( Preferences.IMPORT_PARSER, 
                                           parserSelector.getSelectedParser().getName());
+                        JGloss.prefs.set( Preferences.IMPORT_FIRSTOCCURRENCE,
+                                          parserSelector.isFirstOccurrenceOnly());
+                        if (parserSelector.getReadingStart() != '\0' &&
+                            parserSelector.getReadingEnd() != '\0')
+                            JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS,
+                                              new String( new char[] { parserSelector.getReadingStart(),
+                                                                       parserSelector.getReadingEnd() }));
                     }
                 }
             };
@@ -156,6 +163,11 @@ public class ImportDialog extends JDialog {
         try {
             parserSelector.setSelected( Class.forName( JGloss.prefs.getString( Preferences.IMPORT_PARSER)));
         } catch (ClassNotFoundException ex) {}
+        parserSelector.setFirstOccurrenceOnly( JGloss.prefs.getBoolean
+                                               ( Preferences.IMPORT_FIRSTOCCURRENCE));
+        parserSelector.setReadingBrackets
+            ( JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS).charAt( 0),
+              JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS).charAt( 1));
         parserSelector.setEnabled( ChasenParser.class, ChasenParser.isChasenExecutable
                                    ( ChasenParser.getDefaultExecutable()));
         JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {

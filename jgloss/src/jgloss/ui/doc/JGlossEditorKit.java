@@ -809,7 +809,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
                                DTD.ANY, false, false, null, null, null, null);
             dtd.defineElement( AnnotationTags.READING_BASETEXT.getId(),
                                DTD.ANY, false, false, null, null, null, null);
-
+            
             javax.swing.text.html.parser.Element annotation = dtd.getElement
                 ( AnnotationTags.ANNOTATION.getId());
             javax.swing.text.html.parser.Element word = dtd.getElement
@@ -817,7 +817,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
             javax.swing.text.html.parser.Element reading_base = dtd.getElement
                 ( AnnotationTags.READING_BASETEXT.getId());
 
-            // (anno | word | reading_base | reading | base | translation | #pcdata*)
+            // for JGloss 0.9.2 compatibility
+            dtd.defineElement( "kanji", DTD.ANY, false, false, null, null, null, al);
+            javax.swing.text.html.parser.Element kanji = dtd.getElement( "kanji");
+            
+
+            // (anno | word | reading_base | reading | base | translation | kanji | #pcdata*)
             ContentModel annotationmodel = new ContentModel( '|', new ContentModel
                 ( 0, annotation, new ContentModel
                     ( 0, word, new ContentModel
@@ -825,13 +830,14 @@ public class JGlossEditorKit extends HTMLEditorKit {
                             ( 0, reading, new ContentModel
                                 ( 0, base, new ContentModel
                                     ( 0, translation, new ContentModel
-                                        ( '*', new ContentModel( dtd.pcdata), null))))))));
+                                        ( 0, kanji, new ContentModel
+                                            ( '*', new ContentModel( dtd.pcdata), null)))))))));
             // allow an annotation element or any of its subelements anywhere the DTD allows #pcdata
             for ( Iterator i=dtd.elements.iterator(); i.hasNext(); ) {
                 javax.swing.text.html.parser.Element e =
                     (javax.swing.text.html.parser.Element) i.next();
                 if (e!=annotation && e!=word && e!=reading_base && e!=reading && e!=base 
-                    && e!=translation) {
+                    && e!=translation && e!=kanji) {
                     updateContentModel( dtd, e.getContent(), annotationmodel);
                 }
             }

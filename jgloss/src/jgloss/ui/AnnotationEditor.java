@@ -299,10 +299,11 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             ui.setExpandedIcon( nullIcon);
         }
         this.setCellEditor( new AnnotationTreeCellEditor( r));
-        setEditable( true);
+        this.setEditable( true);
 
         this.setRootVisible( false);
         this.setShowsRootHandles( false);
+        this.setLargeModel( true);
 
         addTreeSelectionListener( this);
 

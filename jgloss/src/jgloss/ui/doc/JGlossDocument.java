@@ -425,6 +425,24 @@ public class JGlossDocument extends HTMLDocument {
                 decodeAnnotation( a);
             }
 
+            if (fileFormatMajorVersion == 1) {
+                // handle JGloss 0.9.2 import
+                // annotation format was <anno><reading>...</><kanji>...</></translation>...</></>
+                // a word element with a single READING_BASETEXT element is created, which contains
+                // the reading element, and the kanji element as BASETEXT
+                if (t.toString().equals( "anno")) {
+                    MutableAttributeSet empty = new SimpleAttributeSet();
+                    super.handleStartTag( t, a, pos);
+                    super.handleStartTag( AnnotationTags.WORD, empty, pos);
+                    super.handleStartTag( AnnotationTags.READING_BASETEXT, empty, pos);
+                    return;
+                }
+                else if (t.toString().equals( "kanji")) {
+                    super.handleStartTag( AnnotationTags.BASETEXT, a, pos);
+                    return;
+                }
+            }
+            
             super.handleStartTag( t, a, pos);
         }
 
@@ -443,6 +461,18 @@ public class JGlossDocument extends HTMLDocument {
             }
             else if (t.equals( AnnotationTags.ANNOTATION))
                 endAnnotation = true;
+
+            if (fileFormatMajorVersion == 1) {
+                // handle JGloss 0.9.2 import
+                // annotation format was <anno><reading>...</><kanji>...</></translation>...</></>
+                if (t.toString().equals( "kanji")) {
+                    super.handleEndTag( AnnotationTags.BASETEXT, pos);
+                    super.handleEndTag( AnnotationTags.READING_BASETEXT, pos);
+                    super.handleEndTag( AnnotationTags.WORD, pos);
+                    return;
+                }
+            }
+            
             super.handleEndTag( t, pos);
         }
 

@@ -236,6 +236,7 @@ import.clipboard=clipboard
 load.progress=Loading {0}
 
 parserselector.readingbrackets=Brackets delimiting reading annotations:
+parserselector.firstoccurrence=Only annotate first occurrence of a word
 
 print.title=Print document
 

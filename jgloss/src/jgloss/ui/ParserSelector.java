@@ -73,6 +73,7 @@ public class ParserSelector extends JPanel {
     private final static String PARSER_CLASS_PROPERTY = "parser class";
 
     JRadioButton[] parserButtons;
+    private JCheckBox firstOccurrenceOnly;
     /**
      * Widget to select the reading annotation delimiters.
      */
@@ -126,6 +127,9 @@ public class ParserSelector extends JPanel {
             b.add( parserButtons[i]);
             i++;
         }
+        b.add( Box.createVerticalStrut( 5));
+        firstOccurrenceOnly = new JCheckBox( JGloss.messages.getString( "parserselector.firstoccurrence"));
+        b.add( firstOccurrenceOnly);
         this.add( b, c);
 
         if (showReadingAnnotationSelector) {
@@ -172,7 +176,8 @@ public class ParserSelector extends JPanel {
      * Creates a new instance of the parser class.
      */
     public static Parser createParser( Class parserClass, jgloss.dictionary.Dictionary[] dictionaries,
-                                       Set exclusions, char readingStart, char readingEnd) {
+                                       Set exclusions, boolean firstOccurrenceOnly, 
+                                       char readingStart, char readingEnd) {
         if (parserClass == null)
             return null;
 
@@ -180,6 +185,7 @@ public class ParserSelector extends JPanel {
             Constructor c = parserClass
                 .getConstructor( new Class[] { jgloss.dictionary.Dictionary[].class, Set.class });
             Parser p = (Parser) c.newInstance( new Object[] { dictionaries, exclusions });
+            p.setAnnotateFirstOccurrenceOnly( firstOccurrenceOnly);
             if (p instanceof ReadingAnnotationParser) {
                 ReadingAnnotationParser rp = (ReadingAnnotationParser) p;
                 rp.setReadingStart( readingStart);
@@ -210,8 +216,9 @@ public class ParserSelector extends JPanel {
      * brackets will be set.
      */
     public Parser createParser( jgloss.dictionary.Dictionary[] dictionaries, Set exclusions) {
-        return createParser( getSelectedParser(), dictionaries, exclusions, getReadingStart(),
-                             getReadingEnd());
+        return createParser( getSelectedParser(), dictionaries, exclusions, 
+                             firstOccurrenceOnly.isSelected(),
+                             getReadingStart(), getReadingEnd());
     }
 
     /**
@@ -306,5 +313,13 @@ public class ParserSelector extends JPanel {
 
     public void setReadingBrackets( char readingStart, char readingEnd) {
         readingBrackets.setSelectedItem( new String( new char[] { readingStart, readingEnd }));
+    }
+
+    public void setFirstOccurrenceOnly( boolean firstOccurrenceOnly) {
+        this.firstOccurrenceOnly.setSelected( firstOccurrenceOnly);
+    }
+
+    public boolean isFirstOccurrenceOnly() {
+        return firstOccurrenceOnly.isSelected();
     }
 } // class ParserSelector

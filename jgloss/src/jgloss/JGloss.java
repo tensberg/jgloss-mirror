@@ -124,7 +124,7 @@ public class JGloss {
             // register text parsers
             ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null).getName());
             ParserSelector.registerParser( ChasenParser.class, 
-                                           new ChasenParser( null, null, null, false).getName());
+                                           new ChasenParser( null, null, null, false, false).getName());
 
             // parse command line options
             if (args.length > 0) {
@@ -207,7 +207,7 @@ public class JGloss {
 
                         for ( int i=0; i<fs.length; i++)
                             d[i] = DictionaryFactory.createDictionary( fs[i]);                        
-                        Parser p = new KanjiParser( d);
+                        Parser p = new KanjiParser( d, null);
                         new HTMLAnnotator( p).annotate( in, out, new URLRewriter() {
                                 public String rewrite( String url) { return url; }
                                 public String rewrite( String url, String tag) { return url; }

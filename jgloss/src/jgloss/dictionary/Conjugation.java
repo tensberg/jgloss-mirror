@@ -117,6 +117,11 @@ public class Conjugation {
     }
 
     /**
+     * Map of all created conjugations.
+     */
+    private static Map conjugations = new HashMap( 500);
+
+    /**
      * The root inflection node. Does not describe a conjugation by itself.
      */
     private static Node root = null;
@@ -128,10 +133,26 @@ public class Conjugation {
      * @param dictionaryForm Dictionary form of the verb/adjective ending.
      * @param type A description of the grammatical type of this conjugation.
      */
-    public Conjugation( String conjugatedForm, String dictionaryForm, String type) {
+    private Conjugation( String conjugatedForm, String dictionaryForm, String type) {
         this.conjugatedForm = conjugatedForm;
         this.dictionaryForm = dictionaryForm;
         this.type = type;
+    }
+
+    /**
+     * Returns a conjugation with the given information. If an identical conjugation has already
+     * been created, the object will be reused.
+     */
+    public static Conjugation getConjugation( String conjugatedForm, String dictionaryForm,
+                                              String type) {
+        String key = conjugatedForm + ":" + dictionaryForm + ":" + type;
+        Conjugation c = (Conjugation) conjugations.get( key);
+        if (c == null) {
+            c = new Conjugation( conjugatedForm, dictionaryForm, type);
+            conjugations.put( key, c);
+        }
+
+        return c;
     }
 
     /**
@@ -263,7 +284,7 @@ public class Conjugation {
         Node pn = null; // parent of n
         boolean stop = false;
         int p = 0; // position in conjugatedForm
-        Conjugation c = new Conjugation( conjugatedForm, dictionaryForm, type);
+        Conjugation c = getConjugation( conjugatedForm, dictionaryForm, type);
 
         while (!stop) {
             boolean childFound = false;
