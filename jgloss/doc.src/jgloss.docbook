@@ -41,7 +41,7 @@
     <sect1><title>What it is</title>
       <para>
         &JGloss; is an application for adding reading and translation annotations
-        to words in a japanese text document. This can be done automatically and
+        to words in a Japanese text document. This can be done automatically and
         manually. When a text document is first opened, kanji words will be looked
         up in a dictionary and the first reading and translation (if any) used to
         annotate the word. The user can then edit the annotations: choose among the
@@ -52,7 +52,7 @@
           <citetitle>Ruby Annotation</citetitle></ulink> XHTML specification) or LaTeX.
       </para>
       <para>
-        I intend it mainly as a translation aid for students of japanese (like me).
+        I intend it mainly as a translation aid for students of Japanese (like me).
         With some new document, you can first skim the text and change the annotations
         to match the likeliest meaning of the word. Then you can print/export the text
         with annotations and start working on the details of understanding the text.
@@ -95,10 +95,10 @@
         Make sure that you have the international version.
       </para>
       <para>
-        Your computer system should already be configured to work with japanese text. You must
-        have a japanese font installed. Having a japanese input method working is not absolutely
-        necessary, but very useful. As a test, if your web browser can display japanese, it should
-        be possible to set up Java do do the same. See also <xref linkend="sect.japanesejava">.
+        Your computer system should already be configured to work with Japanese text. You must
+        have a Japanese font installed. Having a Japanese input method working is not absolutely
+        necessary, but very useful. As a test, if your web browser can display Japanese, it should
+        be possible to set up Java do do the same. See also <xref linkend="sect.Japanesejava">.
       </para>
       <para>
         If you want to use the automatic annotation function, you will need some dictionaries.
@@ -120,24 +120,24 @@
       </para>
     </sect1>
 
-    <sect1 id="sect.japanesejava"><title>Making Java work with japanese text</title>
+    <sect1 id="sect.Japanesejava"><title>Making Java work with Japanese text</title>
       <para>
-        If japanese is set as your computer system's default language, &JGloss; should work without
-        any further setup. If not, you should at least have a japanese font installed.
-        A japanese input method, while not required, should also be installed.
+        If Japanese is set as your computer system's default language, &JGloss; should work without
+        any further setup. If not, you should at least have a Japanese font installed.
+        A Japanese input method, while not required, should also be installed.
         If you are using Sun's <application>Java Runtime Environment</application>, make sure
         that you have the international version installed (the smaller version comes only with
         English locale settings).
       </para>
       <para>
-        The easiest way to get Java to use japanese fonts is to set the 
+        The easiest way to get Java to use Japanese fonts is to set the 
         <envar>user.language</envar> parameter to <literal>ja</literal>: start &JGloss; as
         <userinput>java -Duser.language=ja -jar jgloss.jar</userinput>. Unfortunately, at
         least on my Linux box, this will not make Java use the
-        japanese input method. On <application>Unix</application> systems, a second way is to
+        Japanese input method. On <application>Unix</application> systems, a second way is to
         set the <envar>LANG</envar> environment variable to <literal>ja_JP</literal>
         in a shell and then run &JGloss; from that shell. This will also make Java recognize
-        an installed japanese input method.
+        an installed Japanese input method.
       </para>
       <para>
         An alternative method, and one that allows more customization of what fonts to use,
@@ -146,20 +146,20 @@
         folder in the install directory of the <application>Java Runtime Environment</application>.
         They contain the settings for the fonts to used default fonts, for dialogs and the like.
         Which file is used depends on the locale setting of the operating system, <abbrev>e. g.</abbrev>
-        if you are running in a japanese environment, the <filename>font.properties.ja</filename>
+        if you are running in a Japanese environment, the <filename>font.properties.ja</filename>
         will be used. If there is no matching file for the current locale, the
         <filename>font.properties</filename> file will be used. This file contains no definition
-        for japanese fonts, but you can edit it and add these fonts. The easiest way to do this
+        for Japanese fonts, but you can edit it and add these fonts. The easiest way to do this
         is to simply rename the file <filename>font.properties.ja</filename> to 
         <filename>font.properties</filename> (but make a backup of the original file first). You
         can also edit the file to make it use different fonts. The file 
         <filename>psfonts.properties.ja</filename> controls what fonts are used when printing
-        a document which contains japanese characters.
+        a document which contains Japanese characters.
       </para>
       <para>
         On <application>Windows 2000</application>, the <application>JRE</application> supports
-        the japanese input method regardless of the system language settings, but you will have
-        to use one of the methods mentioned above to get Java to use japanese fonts. I had no luck
+        the Japanese input method regardless of the system language settings, but you will have
+        to use one of the methods mentioned above to get Java to use Japanese fonts. I had no luck
         so far in getting the JRE to use the input method under <application>Windows 98</application>.
       </para>
     </sect1>
@@ -443,14 +443,14 @@
         What format you use depends mainly on what application you want to use the exported
         file with. Modern web browsers should support all of the encodings. For other applications,
         if you are working on Windows, you should try Shift-JIS and on Unix EUC-JP. If the document
-        or your annotations contain characters not in ASCII or the japanese character set
+        or your annotations contain characters not in ASCII or the Japanese character set
         (<abbrev>e. g.</abbrev> umlauts), you should use UTF-8, which takes more disk space
         but can represent all characters.
       </para>
       <sect2><title><acronym>HTML</acronym></title>
         <para>
           If you export the document in HTML format, the document can viewed in any web browser
-          that supports display of japanese characters. The markup defined in the
+          that supports display of Japanese characters. The markup defined in the
           <citetitle>Ruby Annotation</citetitle> specification is used to embed the annotations,
           so browsers which support it can place the annotations above/below the annotated words.
           On browsers which don't support it, the annotations will be rendered after the annotated
@@ -506,7 +506,7 @@
         <para>
           The LaTeX export function will generate a text document in LaTeX format. It
           can be processed with <application>platex</application>. <application>platex</application>
-          is an extension to TeX for typesetting japanese documents. It is bundled with
+          is an extension to TeX for typesetting Japanese documents. It is bundled with
           TeTex.
         </para>
         <para>
@@ -812,7 +812,7 @@
         <para>
           Here you can set the appearance for annotated words in the document view.
           Select the font by using the popup menu. Note that not all fonts in the list
-          can display japanese characters. The font size can be selected from the
+          can display Japanese characters. The font size can be selected from the
           popup menu to the right, or you can enter the font size manually if it is not in
           the list. You can select a different background color by clicking on the button
           with the color label, or disable the use of a background color by unchecking the
@@ -867,7 +867,7 @@
       </listitem>
       <listitem>
         <para>
-          <ulink url="http://www.dgs.monash.edu.au/~jwb/japanese.html">Jim Breen's Japanese Page</ulink>.
+          <ulink url="http://www.dgs.monash.edu.au/~jwb/Japanese.html">Jim Breen's Japanese Page</ulink>.
           Here you will find lots of interesting links, among them links to dictionaries
           in EDict format.
         </para>

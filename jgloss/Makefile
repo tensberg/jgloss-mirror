@@ -49,14 +49,14 @@ CLASSPATH := $(CLASSPATH):./src
 ROOT_SOURCE := src/jgloss/JGloss.java
 RESOURCES := messages.properties messages_de.properties preferences.properties
 # files and directories that go into the source distribution
-SOURCE_DIST := COPYING Makefile MANIFEST.MF src doc.src javadoc latex-ruby
+SOURCE_DIST := README COPYING Makefile MANIFEST.MF src doc.src javadoc latex-ruby
 # files and directories that go into the binary distribution, either in the JGloss jar file
 # or in the zip file.
-BINARY_DIST := jgloss data resources COPYING doc latex-ruby
+BINARY_DIST := README jgloss data resources COPYING doc latex-ruby
 # files that go into the binary distribution jar file
 BINARY_JAR := jgloss data resources
 # files that go into the binary distribution zip file
-BINARY_ZIP := COPYING doc jgloss.jar latex-ruby
+BINARY_ZIP := README COPYING doc jgloss.jar latex-ruby
 
 #
 # end configuration
