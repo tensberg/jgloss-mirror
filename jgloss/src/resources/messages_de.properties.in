@@ -2,7 +2,7 @@
 #
 # German localization of the JGloss messages.
 #
-# Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001-2004 Michael Koch (tensberg@gmx.net)
 #
 # This file is part of JGloss.
 #
@@ -393,7 +393,7 @@ export.annotationlist.menu.tt=Exportiert die Liste der Annotationen in eine Text
 jgloss.about.frame.title=Über JGloss
 jgloss.about.text=\
 Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\
-\nCopyright (c) 2001-2003 Michael Koch (tensberg@gmx.net)\n\
+\nCopyright (c) 2001-2004 Michael Koch (tensberg@gmx.net)\n\
 \n\
 JGloss comes with ABSOLUTELY NO WARRANTY.\n\
 This is free software, and you are welcome to redistribute it\n\
@@ -401,7 +401,7 @@ under certain conditions; select "Show License" for details.
 about.showlicense=Lizenz anzeigen
 about.license.title=GNU General Public License
 jdictionary.about.frame.title=Über JDictionary
-jdictionary.about.text=Ein Front-end für japanische Wörterbücher.\n\nCopyright (c) 2002-2003 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+jdictionary.about.text=Ein Front-end für japanische Wörterbücher.\n\nCopyright (c) 2002-2004 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 
 preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
 preferences.header.obsolete=\

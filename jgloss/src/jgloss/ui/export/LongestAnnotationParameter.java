@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2003-2004 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *

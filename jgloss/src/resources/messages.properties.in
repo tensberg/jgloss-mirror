@@ -2,7 +2,7 @@
 #
 # Default localization for messages in JGloss.
 #
-# Copyright (C) 2001-2003 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001-2004 Michael Koch (tensberg@gmx.net)
 #
 # This file is part of JGloss.
 #
@@ -416,12 +416,12 @@ export.annotationlist.title=Export annotation list
 jgloss.generator=JGloss 2 alpha 1
 jgloss.about.frame.title=About JGloss
 jgloss.about.title=JGloss 2 alpha 1
-jgloss.about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001-2003 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+jgloss.about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001-2004 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
 jdictionary.about.frame.title=About JDictionary
 jdictionary.about.title=JDictionary 2 alpha 1
-jdictionary.about.text=A front-end for Japanese dictionaries.\n\nCopyright (c) 2002-2003 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+jdictionary.about.text=A front-end for Japanese dictionaries.\n\nCopyright (c) 2002-2004 Michael Koch (tensberg@gmx.net)\n\nJDictionary comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 
 preferences.header=This file contains the preferences for the application JGloss.
 preferences.header.obsolete=\

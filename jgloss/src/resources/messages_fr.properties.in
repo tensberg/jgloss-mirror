@@ -2,7 +2,7 @@
 #
 # French localization of the JGloss messages.
 #
-# Copyright (C) 2001/2002 Michael Koch (tensberg@gmx.net)
+# Copyright (C) 2001-2004 Michael Koch (tensberg@gmx.net)
 # French localization by A. Beraud (al_beraud@yahoo.fr)
 #
 # This file is part of JGloss.
@@ -231,7 +231,7 @@ export.html.backwardscompatible=Compatibilité Ascendante
 export.latex.title=Exporter vers LaTeX
 
 about.frame.title=À propos de JGloss
-about.text=Un outil  pour faciliter la lectureet la compréhension de textes japonais.\n\nCopyright (c) 2001/2002 Michael Koch (tensberg@gmx.net)\n\nJGloss n'est livré avec AUCUNE GARANTIE.\nCeci est un Logiciel Libre, et vous êtes libre de le redistribuer\nsous certaines conditions; "Voir License" pour plus de détails.
+about.text=Un outil  pour faciliter la lectureet la compréhension de textes japonais.\n\nCopyright (c) 2001-2004 Michael Koch (tensberg@gmx.net)\n\nJGloss n'est livré avec AUCUNE GARANTIE.\nCeci est un Logiciel Libre, et vous êtes libre de le redistribuer\nsous certaines conditions; "Voir License" pour plus de détails.
 about.showlicense=Voir License
 about.license.title=GNU General Public License
 
