@@ -33,6 +33,7 @@ import javax.servlet.http.*;
 
 /**
  * Utility class for forwarding cookies between client-servlet and servlet-remote server.
+ * This class tries to support both RFC2965 version 1 and Netscape cookies.
  *
  * @author Michael Koch
  */
@@ -43,8 +44,14 @@ public class CookieTools {
      * Date format of the expires cookie attribute as defined in the Netscape cookie
      * specification.
      */
-    public static final DateFormat expiresDateFormat = new SimpleDateFormat
+    public static final DateFormat expiresDateFormat1 = new SimpleDateFormat
         ( "EEE, dd-MMM-yyyy HH:mm:ss z", Locale.US);
+    /**
+     * Date format of the expires cookie attribute as defined in the Netscape cookie
+     * specification; except for spaces instead of dashes in the date (as seen on Yahoo).
+     */
+    public static final DateFormat expiresDateFormat2 = new SimpleDateFormat
+        ( "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
 
     /**
      * Read cookies encapsulated by <CODE>addResponseCookies</CODE> from the client request and
@@ -302,10 +309,15 @@ public class CookieTools {
                       name, value);
                 String expires = (String) cookie.get( "expires");
                 if (expires != null) try {
-                    Date d = expiresDateFormat.parse( expires);
+                    Date d = expiresDateFormat1.parse( expires);
                     c.setMaxAge( (int) ((d.getTime()-System.currentTimeMillis()) / 1000));
                 } catch (ParseException ex) {
-                    context.log( "expires " + expires + " " + ex.getMessage());
+                    try {
+                        Date d = expiresDateFormat2.parse( expires);
+                        c.setMaxAge( (int) ((d.getTime()-System.currentTimeMillis()) / 1000));
+                    } catch (ParseException ex2) {
+                        context.log( "expires attribute: " + ex2.getMessage());
+                    }
                 }
 
                 c.setPath( servletPath);
