@@ -132,6 +132,7 @@ public class WordLookup extends JFrame {
         wordlookup = new WordLookupPanel( p);
         getContentPane().setLayout( new GridLayout( 1, 1));
         getContentPane().add( wordlookup);
+        getRootPane().setDefaultButton( wordlookup.getSearchButton());
 
         // create actions
         /*Action printAction = new AbstractAction() {

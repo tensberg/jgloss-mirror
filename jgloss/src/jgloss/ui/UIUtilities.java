@@ -67,7 +67,7 @@ public class UIUtilities {
             a.putValue( Action.MNEMONIC_KEY, KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
                         .get( null));
         } catch (Exception ex) {
-            System.out.println( "Mnemonic Key " + s);
+            System.out.println( "Error while initializing Mnemonic Key " + s);
             ex.printStackTrace();
         }
         
@@ -77,6 +77,41 @@ public class UIUtilities {
         } catch (MissingResourceException ex) {}
         if (s!=null && s.length()>0)
             a.putValue( Action.SHORT_DESCRIPTION, s);
+    }
+
+    /**
+     * Initializes a button with values taken from the messages resource bundle.
+     * The label of the button, keyboard shortcuts and the tool tip will be
+     * initialized if they are available in the resource bundle. The key is taken as key to
+     * the name property,
+     * the mnemonic key property by adding ".mk" and the tooltip by adding ".tt" to the key.
+     *
+     * @param a The action to initialize.
+     * @param key The base key in the messages resource bundle.
+     * @see javax.swing.Action
+     */
+    public static void initButton( AbstractButton b, String key) {
+        b.setText( JGloss.messages.getString( key));
+
+        String s = null;
+        // mnemonic key
+        try {
+            s = JGloss.messages.getString( key + ".mk");
+        } catch (MissingResourceException ex) {}
+        if (s!=null && s.length()>0) try {
+            b.setMnemonic( ((Integer) KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
+                           .get( null)).intValue());
+        } catch (Exception ex) {
+            System.out.println( "Error while initializing Mnemonic Key " + s);
+            ex.printStackTrace();
+        }
+        
+        // tooltip
+        try {
+            s = JGloss.messages.getString( key + ".tt");
+        } catch (MissingResourceException ex) {}
+        if (s!=null && s.length()>0)
+            b.setToolTipText( s);
     }
 
     /**
@@ -149,5 +184,19 @@ public class UIUtilities {
                 dismantleHierarchy( (Container) child);
             c.remove( c.getComponentCount()-1);
         }
+    }
+
+    /**
+     * Set up the escape keyboard shortcut for a <code>JFrame</code> or <code>JDialog</code>.
+     *
+     * @param cancelAction Action to be performed when the ESCAPE key is hit. Usually cancels
+     *                     the dialog.
+     */
+    public static void setCancelAction( RootPaneContainer c, Action cancelAction) {
+        ((JPanel) c.getContentPane()).getInputMap
+            ( JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put
+            ( KeyStroke.getKeyStroke( "ESCAPE"), "cancelAction");
+        ((JPanel) c.getContentPane()).getActionMap().put
+            ( "cancelAction", cancelAction);
     }
 } // class UIUtilities

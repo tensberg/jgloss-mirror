@@ -114,7 +114,7 @@ public class ImportDialog extends JDialog implements TextListener {
         cancel.setEnabled( true);
         UIUtilities.initAction( cancel, "button.cancel");
         JButton bok = new JButton( ok);
-        bok.setDefaultCapable( true);
+        getRootPane().setDefaultButton( bok);
         b.add( bok);
         b.add( Box.createHorizontalStrut( 5));
         b.add( new JButton( cancel));
@@ -127,6 +127,8 @@ public class ImportDialog extends JDialog implements TextListener {
                     cancel.actionPerformed( null);
                 }
             });        
+
+        UIUtilities.setCancelAction( this, cancel);
 
         b = Box.createVerticalBox();
 

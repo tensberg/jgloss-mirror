@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -145,7 +145,7 @@ public class JGlossEditor extends JTextPane {
                     }
                 };
             UIUtilities.initAction( annotateAction, "button.annotate");
-            Action cancelAction = new AbstractAction() {
+            final Action cancelAction = new AbstractAction() {
                     public void actionPerformed( ActionEvent e) {
                         accepted = false;
                         WordLookupDialog.this.hide();
@@ -168,6 +168,11 @@ public class JGlossEditor extends JTextPane {
             p2.add( buttons);
             p.add( p2, BorderLayout.EAST);
             getContentPane().add( p, BorderLayout.SOUTH);
+
+            WordLookupDialog.this.getRootPane().setDefaultButton( annotateButton);
+
+            UIUtilities.setCancelAction( WordLookupDialog.this, cancelAction);
+
             pack();
         }
 
@@ -182,7 +187,8 @@ public class JGlossEditor extends JTextPane {
             wordlookup.search( text);
             annotateButton.requestFocus();
             WordLookupDialog.this.show();
-            WordLookupDialog.this.dispose(); // works around a bug in the Java/KDE window manager interaction
+            WordLookupDialog.this.dispose(); // works around a bug in the Java/KDE 
+                                             // window manager interaction
             if (accepted)
                 return wordlookup.searchSelection( jgloss.dictionary.Dictionary.RESULT_DICTIONARY_ENTRIES);
             else

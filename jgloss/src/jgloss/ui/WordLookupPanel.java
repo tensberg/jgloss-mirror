@@ -114,15 +114,20 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
 
         // create options part
         ButtonGroup searchType = new ButtonGroup();
-        exact = new JRadioButton( JGloss.messages.getString( "wordlookup.choice.exact"));
+        exact = new JRadioButton();
+        UIUtilities.initButton( exact, "wordlookup.choice.exact");
         searchType.add( exact);
-        startsWith = new JRadioButton( JGloss.messages.getString( "wordlookup.choice.startswith"));
+        startsWith = new JRadioButton();
+        UIUtilities.initButton( startsWith, "wordlookup.choice.startswith");
         searchType.add( startsWith);
-        endsWith = new JRadioButton( JGloss.messages.getString( "wordlookup.choice.endswith"));
+        endsWith = new JRadioButton();
+        UIUtilities.initButton( endsWith, "wordlookup.choice.endswith");
         searchType.add( endsWith);
-        any = new JRadioButton( JGloss.messages.getString( "wordlookup.choice.any"));
+        any = new JRadioButton();
+        UIUtilities.initButton( any, "wordlookup.choice.any");
         searchType.add( any);
-        best = new JRadioButton( JGloss.messages.getString( "wordlookup.choice.best"));
+        best = new JRadioButton();
+        UIUtilities.initButton( best, "wordlookup.choice.best");
         searchType.add( best);
 
         switch (JGloss.prefs.getInt( Preferences.WORDLOOKUP_SEARCHTYPE, 
@@ -145,8 +150,8 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             break;
         }
 
-        verbDeinflection = new JCheckBox( JGloss.messages.getString
-                                          ( "wordlookup.choice.verbdeinflection"));
+        verbDeinflection = new JCheckBox();
+        UIUtilities.initButton( verbDeinflection, "wordlookup.choice.verbdeinflection");
         verbDeinflection.setSelected( JGloss.prefs.getBoolean
                                       ( Preferences.WORDLOOKUP_DEINFLECTION, false));
 
@@ -175,16 +180,17 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         dictionaryChoice.setEditable( false);
 
         ButtonGroup dictionaries = new ButtonGroup();
-        dictionary = new JRadioButton( JGloss.messages.getString
-                                       ( "wordlookup.choice.dictionary"), true);
+        dictionary = new JRadioButton();
+        dictionary.setSelected( true);
+        UIUtilities.initButton( dictionary, "wordlookup.choice.dictionary");
         dictionaries.add( dictionary);
         dictionary.addChangeListener( new ChangeListener() {
                 public void stateChanged( ChangeEvent e) {
                     dictionaryChoice.setEnabled( dictionary.isSelected());
                 }
             });
-        allDictionaries = new JRadioButton
-            ( JGloss.messages.getString( "wordlookup.choice.alldictionaries"));
+        allDictionaries = new JRadioButton();
+        UIUtilities.initButton( allDictionaries, "wordlookup.choice.alldictionaries");
         dictionaries.add( allDictionaries);
         if (JGloss.prefs.getBoolean( Preferences.WORDLOOKUP_ALLDICTIONARIES, true))
             allDictionaries.setSelected( true);
@@ -240,30 +246,21 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                     search();
                 }
             };
-        searchAction.setEnabled( true);
         UIUtilities.initAction( searchAction, "wordlookup.search");
         search = new JButton( searchAction);
+        searchAction.setEnabled( true);
         p.add( search, c2);
         p.add( Box.createHorizontalStrut( 2), c2);
-
-        KeyStroke enter = KeyStroke.getKeyStroke( "ENTER");
-        InputMap im = search.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW);
-        if (im == null)
-            im = new ComponentInputMap( search);
-        im.put( enter, searchAction.getValue( Action.NAME));
-        search.setInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW, im);
-        search.getActionMap().put( searchAction.getValue( Action.NAME), searchAction);
 
         Action clearAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     expression.setSelectedItem( null);
                 }
             };
-        clearAction.setEnabled( true);
         UIUtilities.initAction( clearAction, "wordlookup.clear");
         JButton clear = new JButton( clearAction);
+        clearAction.setEnabled( true);
         p.add( clear, c2);
-        clear.setNextFocusableComponent( exact);
 
         add( p, c);
 
@@ -523,8 +520,11 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
     }
 
     protected void search() {
-        List result = searchSelection( Dictionary.RESULT_NATIVE, true);
+        if (expression.getSelectedItem() == null)
+            return; // empty expression string
+
         String ex = expression.getSelectedItem().toString();
+        List result = searchSelection( Dictionary.RESULT_NATIVE, true);
 
         // generate result text
         StringBuffer resultText = new StringBuffer( result.size()*30);
@@ -762,5 +762,13 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             updateListEventScheduled = true;
             EventQueue.invokeLater( worker);
         }
+    }
+
+    /**
+     * Returns the search button. This button can be set to be the default button
+     * in a <code>JRootPane</code>.
+     */
+    public JButton getSearchButton() {
+        return search;
     }
 } // class WordLookupPanel

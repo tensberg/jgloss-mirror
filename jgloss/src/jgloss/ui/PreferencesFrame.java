@@ -139,6 +139,8 @@ public class PreferencesFrame {
                 }
             });
 
+        UIUtilities.setCancelAction( frame, cancel);
+
         JTabbedPane tab = new JTabbedPane();
         tab.setBorder( BorderFactory.createEmptyBorder( 0, 0, 10, 0));
         tab.addTab( JGloss.messages.getString( "general.title"), GeneralDialog.getComponent());

@@ -127,10 +127,11 @@ public class ParserSelector extends JPanel {
             i++;
         }
         b.add( Box.createVerticalStrut( 5));
-        firstOccurrenceOnly = new JCheckBox( JGloss.messages.getString( "parserselector.firstoccurrence"));
+        firstOccurrenceOnly = new JCheckBox();
+        UIUtilities.initButton( firstOccurrenceOnly, "parserselector.firstoccurrence");
         b.add( firstOccurrenceOnly);
-        detectParagraphs = new JCheckBox( JGloss.messages.getString
-                                                    ( "parserselector.detectparagraphs"));
+        detectParagraphs = new JCheckBox();
+        UIUtilities.initButton( detectParagraphs, "parserselector.detectparagraphs");
         b.add( detectParagraphs);
         this.add( b, c);
         parserButtons[0].setSelected( true);
