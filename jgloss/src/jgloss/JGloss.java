@@ -25,6 +25,7 @@ package jgloss;
 
 import jgloss.dictionary.*;
 import jgloss.ui.*;
+import jgloss.www.*;
 
 import java.io.*;
 import java.util.ResourceBundle;
@@ -146,14 +147,13 @@ public class JGloss {
                 }
                 else if (args[0].equals( "-f") || args[0].equals( "--format")) {
                     for ( int i=1; i<args.length; i++) {
-                        DictionaryFactory.Implementation imp =
-                            DictionaryFactory.getImplementation( args[i]);
-                        if (imp != null) {
+                        try {
+                            DictionaryFactory.Implementation imp =
+                                DictionaryFactory.getImplementation( args[i]);
                             System.out.println( messages.getString
                                                 ( "main.format",
                                                   new String[] { args[i], imp.getName() }));
-                        }
-                        else {
+                        } catch (DictionaryFactory.NotSupportedException ex) {
                             System.out.println( messages.getString
                                                 ( "main.format.unrecognized",
                                                   new String[] { args[i] }));
@@ -163,6 +163,52 @@ public class JGloss {
                 }
                 else if (args[0].equals( "-p") || args[0].equals( "--pastewindow")) {
                     pasteFrameActive = true;
+                }
+                else if (args[0].equals( "-a") || args[0].equals( "--annotatehtml")) {
+                    if (args.length > 3) { 
+                        System.err.println( messages.getString( "main.usage"));
+                        System.exit( 1);
+                    }
+                    try {
+                        prefs.load();
+                    } catch (IOException ex) {
+                        System.err.println( messages.getString( "error.loadPreferences"));
+                        System.exit( 1);
+                    }
+                    String[] fs = prefs.getPaths( Preferences.DICTIONARIES);
+                    Dictionary[] d = new Dictionary[fs.length];
+                    try {
+                        for ( int i=0; i<fs.length; i++)
+                            d[i] = DictionaryFactory.createDictionary( fs[i]);
+                        
+                        InputStreamReader in;
+                        Writer out;
+                        if (args.length == 1 || args[1].equals( "-"))
+                            in = CharacterEncodingDetector.getReader
+                                ( new BufferedInputStream( System.in));
+                        else
+                            in = CharacterEncodingDetector.getReader
+                                ( new BufferedInputStream( new FileInputStream( args[1])));
+                        if (args.length < 3 || args[2].equals( "-"))
+                            out = new BufferedWriter( new OutputStreamWriter
+                                ( System.out, in.getEncoding()));
+                        else
+                            out = new BufferedWriter( new OutputStreamWriter
+                                ( new FileOutputStream( args[2]), in.getEncoding()));
+                        Parser p = new Parser( d);
+                        //p.setIgnoreNewlines( true);
+                        new HTMLAnnotator( p).annotate( in, out, new URLRewriter() {
+                                public String rewrite( String url) { return url; }
+                                public String rewrite( String url, String tag) { return url; }
+                            });
+                        in.close();
+                        out.close();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        System.exit( 1);
+                    }
+
+                    System.exit( 0);
                 }
                 else if (args[0].startsWith( "-") || args[0].startsWith( "/")) {
                     System.err.println( messages.getString( "main.unknownoption",
@@ -184,7 +230,16 @@ public class JGloss {
             
             splash.setInfo( messages.getString( "splashscreen.initPreferences"));
             // Initialize the preferences at startup. This includes loading the dictionaries.
-            PreferencesFrame.getFrame();
+            // Do this in its own thread to decrease perceived initialization time.
+            new Thread() {
+                    public void run() {
+                        try {
+                            setPriority( Math.max( getPriority()-10, Thread.MIN_PRIORITY));
+                        } catch (IllegalArgumentException ex) {}
+
+                        PreferencesFrame.getFrame();
+                    }
+                }.start();
             splash.setInfo( messages.getString( "splashscreen.initMain"));
             if (pasteFrameActive) {
                 PasteImportFrame frame = new PasteImportFrame();
