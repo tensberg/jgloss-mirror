@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -32,7 +32,7 @@ import java.util.*;
  */
 public class StringTools {
     public static void main( String[] args) throws Exception {
-        print( splitWordReading( args[0], args[1]));
+        print( splitWordReading( args[0], StringTools.toHiragana( args[1])));
     }
 
     /**
@@ -82,15 +82,19 @@ public class StringTools {
             c == '\u3005'; // kanji repeat mark
     }
 
+    public static String toHiragana( String s) {
+        return toHiragana( s, true);
+    }
+
     /**
      * Returns a new string with all katakana characters in the original string converted to
      * hiragana.
      */
-    public static String toHiragana( String s) {
+    public static String toHiragana( String s, boolean ignoreSpecialChars) {
         StringBuffer out = null; // create only if needed
         for ( int i=0; i<s.length(); i++) {
             char c = s.charAt( i);
-            if (isKatakana( c)) {
+            if (isKatakana( c) && (!ignoreSpecialChars || !isKatakanaSpecialChar( c))) {
                 if (out == null)
                     out = new StringBuffer( s);
                 out.setCharAt( i, (char) (c-96));
@@ -101,16 +105,33 @@ public class StringTools {
         else // some katakana characters were converted
             return out.toString();
     }
+    
+    /**
+     * Determines if a char is a katakana special char, as used by <code>ignoreSpecialChars</code>
+     * of {@link #toHiragana(String,boolean) toHiragana}.
+     */
+    private static boolean isKatakanaSpecialChar( char c) {
+        return (c == 0x30fb /* centered dot */ ||
+                c == 0x30fc /* dash */);
+    }
 
+    /**
+     * Returns a new string with all hiragana characters in the original string converted to
+     * katakana. Special characters will be ignored.
+     */
+    public static String toKatakana( String s) {
+        return toKatakana( s, true);
+    }
+    
     /**
      * Returns a new string with all hiragana characters in the original string converted to
      * katakana.
      */
-    public static String toKatakana( String s) {
+    public static String toKatakana( String s, boolean ignoreSpecialChars) {
         StringBuffer out = null; // create only if needed
         for ( int i=0; i<s.length(); i++) {
             char c = s.charAt( i);
-            if (isHiragana( c)) {
+            if (isHiragana( c) && (!ignoreSpecialChars || !isHiraganaSpecialChar( c))) {
                 if (out == null)
                     out = new StringBuffer( s);
                 out.setCharAt( i, (char) (c+96));
@@ -120,6 +141,15 @@ public class StringTools {
             return s;
         else // some katakana characters were converted
             return out.toString();
+    }
+
+    /**
+     * Determines if a char is a hiragana special char, as used by <code>ignoreSpecialChars</code>
+     * of {@link #toKatakana(String,boolean) toKatakana}.
+     */
+    private static boolean isHiraganaSpecialChar( char c) {
+        return (c == 0x309b /* quotes */ ||
+                c == 0x309c /* hollow dot */);
     }
 
     /**
@@ -133,6 +163,29 @@ public class StringTools {
         }
 
         return false;
+    }
+
+    /**
+     * Split a string at every occurrence of a separator mark.
+     */
+    public static String[] split( String s, char separator) {
+        int from = 0;
+        int to = 0;
+        List segments = new ArrayList( 5);
+        while (from < s.length()) {
+            to = s.indexOf( separator, from);
+            if (to == -1)
+                to = s.length();
+            segments.add( s.substring( from, to));
+            from = to + 1;
+        }
+        if (to == s.length()-1) {
+            // last character in s is separator, add final empty string
+            segments.add( "");
+        }
+        String[] out = new String[segments.size()];
+        out = (String[]) segments.toArray( out);
+        return out;
     }
 
     /**
@@ -160,6 +213,8 @@ public class StringTools {
      */
     public static String[][] splitWordReading( String inflectedWord, String baseWord, String baseReading) {
         //System.err.println( "splitting " + inflectedWord + "/" + baseWord + "/" + baseReading);
+        // to treat katakana and hiragana equal, translate katakana to hiragana in base word
+        String baseWordH = toHiragana( baseWord);
         List result = new ArrayList( baseWord.length()/2);
         int hStart = 0; // hiragana start
         int hEnd; // hiragana end
@@ -168,11 +223,13 @@ public class StringTools {
         int hStartReading = 0; // hiragana start in reading
         do {
             // search start of hiragana substring
-            while (hStart<baseWord.length() && !isHiragana( baseWord.charAt( hStart)))
+            // use isKana instead of isHiragana to correctly handle katakana dash, which is not
+            // converted by isHiragana
+            while (hStart<baseWord.length() && !isKana( baseWordH.charAt( hStart)))
                 hStart++;
             hEnd = hStart + 1;
             // search end of hiragana substring
-            while (hEnd<baseWord.length() && isHiragana( baseWord.charAt( hEnd)))
+            while (hEnd<baseWord.length() && isKana( baseWordH.charAt( hEnd)))
                 hEnd++;
 
             String kanji = inflectedWord.substring( kStart, hStart);
@@ -182,7 +239,7 @@ public class StringTools {
                     // followed by some kanji characters. Find hiragana character substring in reading.
                     // Characters before the substring must be reading of first kanji part of word.
 
-                    String hiragana = baseWord.substring( hStart, hEnd);
+                    String hiragana = baseWordH.substring( hStart, hEnd);
                     // For every kanji character there must be at least one reading character, so
                     // start search at index kStartReading + kanji.length. The search can still
                     // lead to false results if the hiragana string also appears in the reading
@@ -216,9 +273,9 @@ public class StringTools {
                     // in baseWord, so adjust the length here. This is the last iteration.
                     hEnd = inflectedWord.length();
                 }
-                String hiragana = inflectedWord.substring( hStart, hEnd);
-                result.add( new String[] { hiragana });
-                kStartReading += hiragana.length();
+                String kana = inflectedWord.substring( hStart, hEnd);
+                result.add( new String[] { kana });
+                kStartReading += kana.length();
             }
 
             kStart = hEnd;
@@ -307,6 +364,10 @@ public class StringTools {
             return buf.toString();
     }
 
+    /**
+     * Print result of {@link #splitWordReading(String,String,String) splitWordReading}. Used for
+     * debugging.
+     */
     private static void print( String[][] s) {
         for ( int i=0; i<s.length; i++) {
             System.err.print( s[i][0]);

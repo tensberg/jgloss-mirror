@@ -239,13 +239,28 @@ general.chasen.chooser.title=ChaSen-Programm auswählen
 general.parserselector=Zwischenablage Importieren Parser
 
 style.title=Darstellung
+style.autodetect=Zeichensätze automatisch konfigurieren
+style.autodetect.title=Zeichensatz Auto-Konfiguration
+style.autodetect.progress.description=Teste alle verfügbaren Zeichensätze.
+style.autodetect.progress.font=Teste Zeichensatz {0}.
+style.autodetect.nochange=\
+Alle ausgewählten Zeichensätze können japanische Zeichen darstellen.\n\
+Die Zeichensatz-Einstellungen wurden nicht geändert.
+style.autodetect.selectedfont=\
+Der Zeichensatz {0} wurde als japanischer Zeichensatz ausgewählt,\n\
+und wurde angewendet wo notwendig.
+style.autodetect.nofont=\
+Es wurde kein passender Zeichensatz gefunden. Die Einstellungen\n\
+wurden nicht geändert. Japanischer Text wird möglicherweise nicht\n\
+korrekt dargestellt.
 style.general=Japanischer Zeichensatz
 style.general.default=Default Java-Zeichensatz benutzen
 style.general.custom=Diesen Zeichensatz benutzen:
+style.wordlookup=Wörterbuch-Ergebnisse
 style.text=Text
 style.reading=Lesung
 style.translation=Übersetzung
-style.text.font=Font:
+style.text.font=Zeichensatz:
 style.text.size=Größe:
 style.text.usecolor=Hintergrundfarbe:
 style.text.colorchooser.title=Hintergrundfarbe auswählen

@@ -1,5 +1,9 @@
-1.0.4: (2002/03/22)
+1.0.4: (2002/04/04)
+	- Font and font size of word lookup result is now configurable.
+	- Added auto-configure option to style settings.
+	- Fixed reading generation for mixed Katakana-Kanji words.
 	- Fixed font autodetection under J2SE 1.4.
+	- Fixed LaTeX export under J2SE 1.3.
 1.0.3: (2002/03/17)
 	- Added support for GDICT dictionaries (J2SE 1.4 required).
 	- Reimplementation of EDICT using the NIO API (J2SE 1.4 required).

@@ -99,11 +99,11 @@ public class LaTeXExporter {
                 footnote.append( "}");
                 if (translationsOnPage) {
                     // place translation as footnote on the current page
-                    outtext.append( footnote);
+                    outtext.append( footnote.toString());
                 }
                 else {
                     // place translation in separate list
-                    translations.append( footnote);
+                    translations.append( footnote.toString());
                     translations.append( '\n');
                 }
 

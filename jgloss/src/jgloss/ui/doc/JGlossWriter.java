@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -44,7 +44,7 @@ public class JGlossWriter extends HTMLWriter {
      * Current version of JGloss. Will be written to the generator meta-tag
      * of the generated file.
      */
-    public static int JGLOSS_VERSION = 103;
+    public static int JGLOSS_VERSION = 104;
     
     /**
      * Major version of the JGloss file format. The major version is changed if a
@@ -53,7 +53,7 @@ public class JGlossWriter extends HTMLWriter {
     public static int FILE_FORMAT_MAJOR_VERSION = 2;
     /**
      * Minor version of the JGloss file format. The minor version is changed if a new
-     * file format revision is changed in a way that it still is compatible to earlier
+     * file format revision is changed in a way that still is compatible to earlier
      * formats.
      */
     public static int FILE_FORMAT_MINOR_VERSION = 2;

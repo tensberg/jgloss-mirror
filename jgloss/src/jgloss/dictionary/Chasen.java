@@ -35,6 +35,10 @@ import java.io.*;
  */
 public class Chasen {
     public static void main( String args[]) throws Exception {
+        System.err.println( StringTools.unicodeEscape( args[0].charAt( 0)));
+        System.err.println( Character.UnicodeBlock.of( args[0].charAt( 0)));
+        System.exit( 0);
+
         Chasen c = new Chasen( "/usr/local/bin/chasen", "", '\t');
         Result r = c.parse( args[0].toCharArray());
         while (r.hasNext()) {
@@ -44,27 +48,27 @@ public class Chasen {
     }
 
     /**
-     * End of input line marker. This is used by Chasen if a 0x0a is encountered in the input.
+     * End of input line marker.
      */
     public static final String EOS = "EOS";
     /**
-     * End of path marker. This is used by Chasen if the "-p" (show all paths) option is selected.
+     * End of path marker. This is used by Chasen if all paths are output.
      */
     public static final String EOP = "EOP";
 
     /**
      * Result of the parsing of some text using the Chasen instance of the class.
-     * Instances of this class are returned by {@link Chasen#parse(String) Chasen.parse}.
+     * Instances of this class are returned by {@link Chasen#parse(char[]) Chasen.parse}.
      */
     public class Result {
         /**
          * The next line of the chasen output. This line will be parsed by the next invocation of
-         * {@link next() next}.
+         * {@link #next() next}.
          */
         private String nextLine;
         /**
          * Contains the parsed result of a line of output of chasen. Returned by a call to 
-         * {@link next() next}.
+         * {@link #next() next}.
          */
         private List nextBuffer = new ArrayList( 10);
         /**
@@ -329,7 +333,7 @@ public class Chasen {
      *    }
      * </code>
      *
-     * @param text Text to parse.
+     * @param text Text to parse. The array will be modified.
      * @return Result iterator.
      * @exception IOException if communication with the chasen process failed.
      */
@@ -345,11 +349,12 @@ public class Chasen {
         // all data is parsed, the EOS we expect to see are counted.
         int expectedEOS = 0;
 
-        // replace Dos or Mac line ends with unix line ends to make sure EOS is
-        // treated correctly
         for ( int i=0; i<text.length; i++) {
+            // replace Dos or Mac line ends with unix line ends to make sure EOS is
+            // treated correctly
             if (text[i] == 0x0d)
                 text[i] = 0x0a;
+            // Chasen will return a EOS for every 0x0a
             if (text[i] == 0x0a)
                 expectedEOS++;
         }
@@ -453,6 +458,9 @@ public class Chasen {
         Thread.interrupted();
     }
 
+    /**
+     * Terminate Chasen process if still running.
+     */
     protected void finalize() {
         dispose();
     }

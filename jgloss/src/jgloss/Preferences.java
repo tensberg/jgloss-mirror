@@ -58,6 +58,7 @@ public abstract class Preferences {
     public static final String READING_BRACKET_CHARS = "reading.bracket.chars";
 
     public static final String ENCODINGS = "encodings";
+    public static final String FONTSIZES_WORDLOOKUP = "fontsizes.wordlookup";
     public static final String FONTSIZES_KANJI = "fontsizes.kanji";
     public static final String FONTSIZES_READING = "fontsizes.reading";
     public static final String FONTSIZES_TRANSLATION = "fontsizes.translation";
@@ -65,6 +66,9 @@ public abstract class Preferences {
     public static final String FONT_GENERAL_USEDEFAULT = "font.general.usedefault";
     public static final String FONT_GENERAL = "font.general";
     public static final String FONT_GENERAL_SIZEDIFF = "font.general.sizediff";
+
+    public static final String FONT_WORDLOOKUP = "font.wordlookup";
+    public static final String FONT_WORDLOOKUP_SIZE = "font.wordlookup.size";
 
     public static final String FONT_TEXT = "font.text";
     public static final String FONT_TEXT_SIZE = "font.text.size";

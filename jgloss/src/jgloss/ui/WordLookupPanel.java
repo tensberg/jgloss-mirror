@@ -45,8 +45,7 @@ import javax.swing.text.html.HTMLEditorKit;
  * @author Michael Koch
  */
 public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryListChangeListener {
-    protected final static String STYLE =
-        "body { font-size: 12pt; color: black; background-color: white; }\n";
+    protected final static String STYLE = "body { color: black; background-color: white; }\n";
 
     protected JRadioButton exact;
     protected JRadioButton startsWith;
@@ -246,15 +245,11 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
         resultFancy = new JTextPane();
         resultFancy.setContentType( "text/html");
         resultFancy.setEditable( false);
-        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true)) {
-            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()
-                .addRule( STYLE);
-        }
-        else {
-            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
-                ( "body { font-family: " + JGloss.prefs.getString( Preferences.FONT_GENERAL)
-                  + "; }\n");
-        }
+        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule( STYLE);
+        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
+            ( "body { font-family: '" + JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP) +
+              "'; font-size: " + JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12) + 
+              "pt; }\n");
         resultFancy.getKeymap().addActionForKeyStroke
             ( KeyStroke.getKeyStroke( "pressed TAB"),
               new AbstractAction() {
@@ -264,6 +259,9 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
                   });
 
         resultPlain = new JTextArea();
+        resultPlain.setFont( new Font( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP),
+                                       Font.PLAIN, 
+                                       JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12)));
         resultPlain.setEditable( false);
         resultPlain.getKeymap().addActionForKeyStroke
             ( KeyStroke.getKeyStroke( "pressed TAB"),
@@ -302,27 +300,26 @@ public class WordLookupPanel extends JPanel implements Dictionaries.DictionaryLi
             });
 
         // update display if user changed font
+        JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+                public void propertyChange( java.beans.PropertyChangeEvent e) {
+                    if (e.getPropertyName().equals( Preferences.FONT_WORDLOOKUP) ||
+                        e.getPropertyName().equals( Preferences.FONT_WORDLOOKUP_SIZE)) {
+                        String fontname = JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP);
+                        int size = JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12);
+                        Font font = new Font( fontname, Font.PLAIN, size);
+                        resultPlain.setFont( font);
+                        ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
+                            ( "body { font-family: '" + fontname +
+                              "'; font-size: " + size +
+                              "pt; }\n");
+                        resultFancy.setFont( font);
+                    }
+                } 
+            });
         UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                 public void propertyChange( java.beans.PropertyChangeEvent e) { 
                     if (e.getPropertyName().equals( "ComboBox.font")) {
                         expression.setFont( (Font) e.getNewValue());
-                    }
-                    else if (e.getPropertyName().equals( "TextArea.font")) {
-                        resultPlain.setFont( (Font) e.getNewValue());
-                    }
-                    else if (e.getPropertyName().equals( "TextPane.font")) {
-                        resultFancy.setFont( (Font) e.getNewValue());
-                        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true)) {
-                            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()
-                                .removeStyle( "body");
-                            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet()
-                                .addRule( STYLE);
-                        }
-                        else {
-                            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
-                                ( "body { font-family: " + JGloss.prefs.getString( Preferences.FONT_GENERAL)
-                                  + "; }\n");
-                        }
                     }
                 }
             });

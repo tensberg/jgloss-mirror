@@ -1,4 +1,4 @@
-JGloss 1.0.3
+JGloss 1.0.4
 ------------
 
 JGloss homepage: http://jgloss.sourceforge.net/
@@ -20,7 +20,7 @@ executable JAR file by typing "make jgloss", create the documentation by
 executing "make doc", or you can read the documentation source
 "doc.src/jgloss.docbook".
 
-JGloss 1.0.3 fixes some bugs in the EDICT implementation. To improve dictionary
+JGloss 1.0.3 fixed some bugs in the EDICT implementation. To improve dictionary
 lookup accuracy, you should delete any old .jjdx index files created by
 previous versions of JGloss.
 

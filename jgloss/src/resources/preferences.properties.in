@@ -43,6 +43,7 @@ reading.bracket.chars=�ԡաΡϡڡ�
 
 encodings=ISO-2022-JP,EUC-JP,SHIFT_JIS,UTF-8,UTF-16,UTF-16BE,UTF-16LE
 export.encoding=SHIFT_JIS
+fontsizes.wordlookup=9,11,12,13,14,15,16,18
 fontsizes.kanji=9,11,12,13,14,15,16,18,20,24
 fontsizes.reading=6,7,8,9,10,11,12,13,14,15,16,18
 fontsizes.translation=4,5,6,7,8,9,10,11,12,13,14,15,16
@@ -50,6 +51,8 @@ fontsizes.translation=4,5,6,7,8,9,10,11,12,13,14,15,16
 font.general.usedefault=true
 font.general=Dialog
 font.general.sizediff=2
+font.wordlookup=Serif
+font.wordlookup.size=12
 font.text=Serif
 font.text.size=15
 font.text.bgcolor=16764108
