@@ -25,9 +25,17 @@ package jgloss.dictionary.attribute;
 
 import java.util.ResourceBundle;
 
+/**
+ * Default implementation of a category attribute value. An ID string is used to identify resource
+ * keys which store the short and long names of the attribute value. Resource keys are of the form
+ * <code>getResourcePrefix() + id + ".s"</code> for the short and
+ * <code>getResourcePrefix() + id + ".l"</code> for the long name.
+ *
+ * @author Michael Koch
+ */
 abstract class DefaultCategoryAttributeValue implements CategoryAttributeValue {
-    protected final static String SHORT_NAME_SUFFIX = ".short";
-    protected final static String LONG_NAME_SUFFIX = ".long";
+    protected final static String SHORT_NAME_SUFFIX = ".s";
+    protected final static String LONG_NAME_SUFFIX = ".l";
 
     protected String id;
     protected String shortName;
@@ -38,9 +46,13 @@ abstract class DefaultCategoryAttributeValue implements CategoryAttributeValue {
         setNames();
     }
 
+    /**
+     * Load the short and long name from the resources. This method is called from the constructor,
+     * and may be called afterwards to reload the values if the resource bundle should change.
+     */
     protected void setNames() {
-        this.shortName = getNames().getString( id + SHORT_NAME_SUFFIX);
-        this.longName = getNames().getString( id + LONG_NAME_SUFFIX);
+        this.shortName = getNames().getString( getResourcePrefix() + id + SHORT_NAME_SUFFIX);
+        this.longName = getNames().getString( getResourcePrefix() + id + LONG_NAME_SUFFIX);
     }
     
     public String getId() { return id; }
@@ -49,5 +61,13 @@ abstract class DefaultCategoryAttributeValue implements CategoryAttributeValue {
     public String getShortName() { return shortName; }
     public String getLongName() { return longName; }
 
+    /**
+     * Return the resource bundle from which the attribute value names will be fetched.
+     */
     protected abstract ResourceBundle getNames();
+
+    /**
+     * Return a string which will be used as prefix to the resource key.
+     */
+    protected abstract String getResourcePrefix();
 } // class DefaultCategoryAttributeValue

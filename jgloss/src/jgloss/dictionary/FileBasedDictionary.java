@@ -528,21 +528,59 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      */
     protected abstract boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field);
     /**
-     * Test if the character at the given location is the first in a word.
+     * Test if the character at the given location is the first in a word. The method first tests
+     * if the location is at the start of a field by calling 
+     * {@link #isFieldStart(entry,location,field) isFieldStart}. If it is not at the start of a field,
+     * it calls {@link #isWordBoundary(entry,location,field isWordBoundary}.
      * 
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
      * @param field Field which the location is in.
      */
-    protected abstract boolean isWordStart( ByteBuffer entry, int location, DictionaryEntryField field);
+    protected boolean isWordStart( ByteBuffer entry, int location, DictionaryEntryField field) {
+        if (isFieldStart( entry, location, field))
+            return true;
+        
+        return isWordBoundary( entry, location, field);
+    }
+
     /**
-     * Test if the character at the given location is the last in a word.
+     * Test if the character at the given location is the last in a word. The method first tests
+     * if the location is at the start of a field by calling 
+     * {@link #isFieldStart(entry,location,field) isFieldEnd}. If it is not at the start of a field,
+     * it calls {@link #isWordBoundary(entry,location,field isWordBoundary}.
      * 
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
      * @param field Field which the location is in.
      */
-    protected abstract boolean isWordEnd( ByteBuffer entry, int location, DictionaryEntryField field);
+    protected boolean isWordEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
+        if (isFieldEnd( entry, location, field))
+            return true;
+
+        return isWordBoundary( entry, location, field);
+    }
+
+    /**
+     * Test if the characters before and at the given location form a word boundary.
+     */
+    protected boolean isWordBoundary( ByteBuffer entry, int location, DictionaryEntryField field) {
+        try {
+            entry.position( location);
+            int c1 = characterHandler.readPreviousCharacter( entry);
+            entry.position( location);
+            int c2 = characterHandler.readCharacter( entry);
+            CharacterClass cc1 = characterHandler.getCharacterClass( c1, false);
+            boolean inWord = (cc1 == CharacterClass.ROMAN_WORD);
+            return (cc1 !=
+                    characterHandler.getCharacterClass( c2, inWord));
+        } catch (BufferOverflowException ex) {
+            return true;
+        } catch (CharacterCodingException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * Test if the byte is the separator mark for two entries. This implementation uses
@@ -871,10 +909,15 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                     continue;
                 }
 
+                System.err.println( isFieldStart( entry, match, field));
+                System.err.println( isFieldEnd( entry, match+expressionLength, field));
+                System.err.println( isWordStart( entry, match, field));
+                System.err.println( isWordEnd( entry, match+expressionLength, field));
                 // test if entry matches search mode
                 if (searchmode == ExpressionSearchModes.EXACT ||
                     searchmode == ExpressionSearchModes.PREFIX) {
-                    // test if preceeding character marks beginning of word entry
+                    // test if the index entry location is at the beginning of a word or field
+                    // depending on search parameter.
                     if (match>0 &&
                         !(fields.isSelected( MatchMode.WORD) ? 
                           isWordStart( entry, match, field) :
@@ -883,11 +926,11 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                 }
                 if (searchmode == ExpressionSearchModes.EXACT ||
                     searchmode == ExpressionSearchModes.SUFFIX) {
-                    // test if following character marks end of word entry
-                    if (match+expressionLength+1<entry.limit() &&
+                    int matchend = match+expressionLength;
+                    if (matchend<entry.limit() &&
                         !(fields.isSelected( MatchMode.WORD) ? 
-                          isWordEnd( entry, match, field) :
-                          isFieldEnd( entry, match, field)))
+                          isWordEnd( entry, matchend, field) :
+                          isFieldEnd( entry, matchend, field)))
                         continue;
                 }
                     

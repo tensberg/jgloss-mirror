@@ -23,5 +23,10 @@
 
 package jgloss.dictionary.attribute;
 
+/**
+ * Marker interface for objects used as attribute value.
+ *
+ * @author Michael Koch
+ */
 public interface AttributeValue {
 } // interface AttributeValue

@@ -25,6 +25,7 @@ package jgloss.dictionary.attribute;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public abstract class IDAttributeValueFactory {
     private Map values;
@@ -47,4 +48,8 @@ public abstract class IDAttributeValueFactory {
     }
 
     protected abstract CategoryAttributeValue createValue( String id);
+
+    public Iterator valueIterator() {
+        return values.values().iterator();
+    }
 } // class IDAttributeValueFactory

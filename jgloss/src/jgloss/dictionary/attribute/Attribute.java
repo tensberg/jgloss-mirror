@@ -41,6 +41,8 @@ public interface Attribute {
      */
     String getDescription();
 
+    boolean canHaveValue();
+
     boolean isInheritable();
 
     Class getAttributeValueClass();

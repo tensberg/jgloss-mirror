@@ -23,7 +23,22 @@
 
 package jgloss.dictionary.attribute;
 
-public interface CategoryAttributeValue implements AttributeValue {
+/**
+ * Interface for values of category attributes. Each category has a abbreviated name, and
+ * a longer text explaining the meaning of the value. Typical categories are part of speech
+ * and usage.
+ *
+ * @author Michael Koch
+ */
+public interface CategoryAttributeValue extends AttributeValue {
+    /**
+     * Short or abbreviated name of this value. The name should be localized to the user's
+     * language. Example: "m-sl" for a manga slang expression.
+     */
     public String getShortName();
+    /**
+     * Long name or short explanation of this value. The name should be localized to the user's
+     * language. Example: "manga slang" for a manga slang expression.
+     */
     public String getLongName();
 } // interface CategoryAttributeValue

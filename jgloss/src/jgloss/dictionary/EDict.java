@@ -53,15 +53,13 @@ public class EDict extends FileBasedDictionary {
         f.select( DictionaryEntryField.WORD, true);
         f.select( DictionaryEntryField.READING, true);
         f.select( DictionaryEntryField.TRANSLATION, true);
-        f.select( MatchMode.FIELD, true);
-        System.err.println( f.isSelected( MatchMode.FIELD));
-        System.err.println( f.isSelected( MatchMode.WORD));
+        f.select( MatchMode.WORD, true);
 
-        java.util.Iterator r = d.search( ExpressionSearchModes.PREFIX,
+        java.util.Iterator r = d.search( ExpressionSearchModes.EXACT,
                                new Object[] { args[1], f });
         System.err.println( "Matches:");
         while (r.hasNext())
-          System.err.println( r.next().toString());
+            System.err.println( r.next().toString());
         //r.next();
         d.dispose();
     }
@@ -159,7 +157,8 @@ public class EDict extends FileBasedDictionary {
     protected boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
             byte b = entry.get( location);
-            if (field==DictionaryEntryField.READING && b==']' ||
+            if (field==DictionaryEntryField.WORD && b==' ' ||
+                field==DictionaryEntryField.READING && b==']' ||
                 field==DictionaryEntryField.TRANSLATION && b=='/' 
                 || b==10 || b==13)
                 return true;
@@ -167,43 +166,6 @@ public class EDict extends FileBasedDictionary {
                 return false;
         } catch (IndexOutOfBoundsException ex) {
             return true; // end of entry buffer
-        }
-    }
-
-    protected boolean isWordStart( ByteBuffer entry, int location, DictionaryEntryField field) {
-        if (isFieldStart( entry, location, field))
-            return true;
-        
-        try {
-            entry.position( location);
-            int c1 = characterHandler.readCharacter( entry);
-            entry.position( location);
-            int c2 = characterHandler.readPreviousCharacter( entry);
-            return (characterHandler.getCharacterClass( c1, false) !=
-                    characterHandler.getCharacterClass( c2, false));
-        } catch (BufferOverflowException ex) {
-            return true;
-        } catch (CharacterCodingException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-    }
-    
-    protected boolean isWordEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
-        if (isFieldEnd( entry, location, field))
-            return true;
-
-        try {
-            entry.position( location);
-            int c1 = characterHandler.readCharacter( entry);
-            int c2 = characterHandler.readCharacter( entry);
-            return (characterHandler.getCharacterClass( c1, false) !=
-                    characterHandler.getCharacterClass( c2, false));
-        } catch (BufferOverflowException ex) {
-            return true;
-        } catch (CharacterCodingException ex) {
-            ex.printStackTrace();
-            return false;
         }
     }
 

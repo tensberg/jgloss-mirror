@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2002 Michael Koch (tensberg@gmx.net)
  *
@@ -71,7 +72,8 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
             if ((b2&0x80) == 0)
                 throw new CharacterCodingException();
 
-            character = NumberTools.byteToUnsignedByte( b2)<<8 | b;
+            character = NumberTools.byteToUnsignedByte( b2)<<8 | 
+                NumberTools.byteToUnsignedByte( b);
         }
 
         buffer.position( position);

@@ -25,13 +25,36 @@ package jgloss.dictionary.attribute;
 
 import java.util.ResourceBundle;
 
+/**
+ * Attribute values for part of speech attribute. The values cannot be instantiated directly.
+ * Instead, they are fetched by calling the static {@link get(String) get} method.
+ *
+ * @author Michael Koch
+ */
 public class PartOfSpeech extends DefaultCategoryAttributeValue {
-    protected final static ResourceBundle names = ResourceBundle.getBundle
-        ( "resources/messages-pos");
+    private static final IDAttributeValueFactory factory =
+        new IDAttributeValueFactory() {
+            protected CategoryAttributeValue createValue( String id) {
+                return new PartOfSpeech( id);
+            }
+        };
+    
+    /**
+     * Get the part of speech attribute value with the given id.
+     *
+     * @exception MissingResourceException if the id is not defined.
+     */
+    public static PartOfSpeech get( String id) {
+        return (PartOfSpeech) factory.getValueFor( id);
+    }
 
-    public PartOfSpeech( String id) {
+    protected final static ResourceBundle names = ResourceBundle.getBundle
+        ( "resources/attributes");
+
+    private PartOfSpeech( String id) {
         super( id);
     }
 
     protected ResourceBundle getNames() { return names; }
+    protected String getResourcePrefix() { return "pos."; }
 } // class PartOfSpeech
