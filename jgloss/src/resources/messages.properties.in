@@ -25,8 +25,17 @@
 jgloss.mimetype=application/x-jgloss
 
 error.no_message=(no message)
-error.loadPreferences=An error occured while loading the preferences:
-error.storePreferences=An error occured while saving the preferences:
+error.initialization.title=Error
+error.initialization={0}{1}\n\nThe Java exception was\n{2}: {3}.
+error.initialization.fatal=JGloss cannot be started.\n\n
+error.initialization.generic=An error occurred during initialization.
+error.noclassdef=\
+A Java class was not found. This means that either your Java installation\n\
+is not compatible with Java 2 Version 1.3 or that the JGloss JAR file is broken.\n\
+You can download a compatible Java version from\n\
+http://java.sun.com/j2se/1.3/jre/.
+error.loadPreferences=An error occured while loading the preferences.
+error.storePreferences=An error occured while saving the preferences.
 error.dictionary.title=Error opening dictionary
 error.dictionary.filenotfound=The dictionary {0} could not be opened.\nCheck if the dictionary file {1}\nexists and is readable.
 error.dictionary.ioerror=An error occured while loading\nthe dictionary {0}.
@@ -49,7 +58,7 @@ button.discard=Discard
 button.close=Close
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9
+jgloss.version=Version 1.0pre
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
