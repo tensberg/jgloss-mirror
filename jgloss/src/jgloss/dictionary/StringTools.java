@@ -215,6 +215,7 @@ public class StringTools {
         //System.err.println( "splitting " + inflectedWord + "/" + baseWord + "/" + baseReading);
         // to treat katakana and hiragana equal, translate katakana to hiragana in base word
         String baseWordH = toHiragana( baseWord);
+        baseReading = toHiragana( baseReading);
         List result = new ArrayList( baseWord.length()/2);
         int hStart = 0; // hiragana start
         int hEnd; // hiragana end

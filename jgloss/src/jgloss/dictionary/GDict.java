@@ -315,8 +315,7 @@ public class GDict extends FileBasedDictionary {
                         }
                     }
                 } catch (ArrayIndexOutOfBoundsException ex) {
-                    ex.printStackTrace();
-                    System.err.println( entry);
+                    System.err.println( "GDICT warning: malformed dictionary entry \"" + entry + "\"");
                 }
             }
         } catch (StringIndexOutOfBoundsException ex) {
