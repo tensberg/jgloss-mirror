@@ -341,7 +341,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
                     // yet another ugly alignment hack for annotations that start with
                     // an unannotated character.
                     if (showTranslation)
-                        return 0.27f;
+                        return 0.28f;
                     else
                         return 0.38f;
                 }

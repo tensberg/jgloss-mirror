@@ -1,4 +1,4 @@
-0.9.3: (2001/09/07)
+0.9.3: (2001/09/14)
 	- Annotations can now have more than one reading. In a word with
 	  more than one kanji substring, a reading is added for every
 	  substring. Non-kanji substrings don't get a reading annotation.
@@ -9,6 +9,8 @@
 	  a parser which uses the ChaSen morphological analysis tool.
 	- Manual annotation addition now displays a dialog which lets you
 	  look up the annotation in the dictionaries before you add it.
+	- Fixed bug where the document would sometimes scroll to a
+	  different location if a reading/translation is changed.
 	- Fixed document name setting in save as.
 	- Fixed JJDX creation for dictionaries with more than 500.000
 	  index entries.

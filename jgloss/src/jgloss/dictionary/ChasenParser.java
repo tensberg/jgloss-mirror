@@ -222,7 +222,7 @@ public class ChasenParser extends AbstractParser {
                 while (parsePosition<text.length && text[parsePosition]==' ')
                     parsePosition++;
 
-                System.out.println( line);
+                //System.out.println( line);
                 if (line.equals( "EOS")) { // end of line in input text
                     parsePosition++;
                 }
@@ -446,7 +446,7 @@ public class ChasenParser extends AbstractParser {
                     };
                 wait.start();
                 try {
-                    // give chasen process 3 seconds to terminate normally
+                    // give chasen process 5 seconds to terminate normally
                     wait.join( 5000);
                 } catch (InterruptedException ex) {}
                 if (wait.isAlive()) {

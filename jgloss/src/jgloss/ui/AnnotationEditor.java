@@ -854,7 +854,12 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     private AnnotationNode annotationSelection = null;
 
     /**
-     * Adapt the display to a new selection.
+     * Adapt the display to a new selection. In response to a node selected in the annotation
+     * tree, the annotation the node belongs to will become the selected annotation. This annotation
+     * will be highlighted in the linked {@link JGlossEditor JGlossEditor}, the editor will be
+     * scrolled to this location and the caret will be placed at the beginning of the annotation.
+     * The status of the annotation manipulation actions will be updated according to the current
+     * selection.
      *
      * @param e The tree selection event.
      */
@@ -876,6 +881,11 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                 int end = annotationSelection.getAnnotationElement().getEndOffset();
                 docpane.makeVisible( start, end);
                 docpane.highlightText( start, end);
+                // Move the position of the caret to the start of the annotation. This
+                // works around the problem where the document scrolls to a different
+                // location if some text is changed, which happens because the DefaultCaret 
+                // will scroll to the caret location after document changes.
+                docpane.setCaretPosition( start);
             }
         }
     }

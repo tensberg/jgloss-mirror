@@ -134,7 +134,7 @@ public class StringTools {
      *         a single string is contained.
      */
     public static String[][] splitWordReading( String inflectedWord, String baseWord, String baseReading) {
-        System.err.println( "splitting " + inflectedWord + "/" + baseWord + "/" + baseReading);
+        //System.err.println( "splitting " + inflectedWord + "/" + baseWord + "/" + baseReading);
         List result = new ArrayList( baseWord.length()/2);
         int hStart = 0; // hiragana start
         int hEnd; // hiragana end
@@ -150,7 +150,7 @@ public class StringTools {
             while (hEnd<baseWord.length() && isHiragana( baseWord.charAt( hEnd)))
                 hEnd++;
 
-            String kanji = baseWord.substring( kStart, hStart);
+            String kanji = inflectedWord.substring( kStart, hStart);
             if (kanji.length() > 0) {
                 if (hStart < baseWord.length()) {
                     // Structure of word is some kanji characters followed by some hiragana characters
@@ -204,7 +204,7 @@ public class StringTools {
         String[][] out = new String[result.size()][];
         out = (String[][]) result.toArray( out);
 
-        print( out);
+        //print( out);
         
         return out;
     }

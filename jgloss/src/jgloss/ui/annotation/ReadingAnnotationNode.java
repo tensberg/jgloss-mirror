@@ -60,11 +60,6 @@ public class ReadingAnnotationNode extends LeafNode {
         readingText = reading.getReading();
         if (readingText == null)
             readingText = reading.getWord();
-        if (reading.getConjugation() != null) {
-            // cut off inflection
-            readingText = readingText.substring( 0, readingText.length() - 
-                                                 reading.getConjugation().getDictionaryForm().length());
-        }
 
         description = JGloss.messages.getString( "annotationeditor.readingannotation",
                                                  new Object[] {
