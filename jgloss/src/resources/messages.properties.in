@@ -71,16 +71,22 @@ splashscreen.loadingPreferences=loading preferences
 splashscreen.initPreferences=loading dictionaries
 splashscreen.initMain=creating application window
 
-main.usage=Usage: jgloss.JGloss [option] file ...\n\
+main.usage=Usage: jgloss.JGloss [option] [file [...]]\n\
 Options:\n\
-\  -h, --help, /?  Print this message\n\
-\  -i, --createindex Create index files for the dictionary files\n\
-\                    given on the command line\n\
-\  -f, --format      Prints the dictionary format of the files\n\
-\                    given on the command line\n\
-\  -p, --pastewindow Instead of opening a JGloss document, shows\n\
-\                    a window in which you can paste text which\n\
-\                    will be imported
+\  -h, --help, /?     Print this message\n\
+\  -i, --createindex  Create index files for the dictionary files\n\
+\                     given on the command line\n\
+\  -f, --format       Prints the dictionary format of the files\n\
+\                     given on the command line\n\
+\  -p, --pastewindow  Instead of opening a JGloss document, shows\n\
+\                     a window in which you can paste text which\n\
+\                     will be imported\n\
+\  -a, --annotatehtml Annotate a HTML file with dictionary entries\n\
+\                     for Japanese words. JavaScript will be used\n\
+\                     to display the results in a browser.\n\
+\                     parameter format: -a [in [out]]\n\
+\                     If in or out are left out or are set to '-'\n\
+\                     stdin/stdout will be used.
 main.unknownoption=Unknown option {0}
 main.format=The format of {0} seems to be {1}.
 main.format.unrecognized={0} is not a recognized dictionary format.
@@ -250,3 +256,4 @@ encodings.default=<auto>
 
 pasteimport.title=JGloss Import
 pasteimport.description=Text pasted in this area will be imported\nin a new JGloss document.
+pasteimport.standby=Please wait while the document is opened.
