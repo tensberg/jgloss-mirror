@@ -1,10 +1,10 @@
-1.0.1: (2002/01/21)
+1.0.1: (2002/01/22)
 	- Added user interface font selection to style preference panel.
 	- Font autodetection on first startup. JGloss tries to set
 	  reasonable default fonts depending on the system.
-	- Added dialog to set the document title.
-	- LaTeX export uses document title for page header.
-	- Added a text field to the document window in which Japanese
+	- Added option to set the document title.
+	- LaTeX export uses document title as page header.
+	- Added a text field to the import dialog into which Japanese
 	  text can be pasted. This obsoletes the -p command line option,
 	  which is removed.
 	- Added UTF-16 encodings to import encoding selection.

@@ -2,7 +2,7 @@
 <!ENTITY JGloss "<application>JGloss</application>">
 ]>
 
-<!-- JGloss User's Guide (c) 2001/2002 Michael Koch
+<!-- JGloss User's Guide (c) 2001,2002 Michael Koch
 
  This file is part of JGloss.
 
@@ -30,7 +30,7 @@
       <firstname>Michael</firstname><surname>Koch</surname>
     </author>
     <edition>1.0</edition>
-    <copyright><year>2001/2002</year><holder>Michael Koch</holder></copyright>
+    <copyright><year>2001,2002</year><holder>Michael Koch</holder></copyright>
     <pubdate>2002</pubdate>
   </bookinfo>
 
@@ -196,22 +196,6 @@
               </para>
             </listitem>
           </varlistentry>
-          <varlistentry>
-            <term><option>-p</option></term>
-            <term><option>--pastewindow</option></term>
-            <listitem>
-              <para>
-                At startup a window will be opened in which you can paste text, which will then
-                be imported in a new JGloss document.
-                This is mainly useful with the X11 select-and-paste approach to copying text,
-                which does not work with the <guimenuitem>Import Clipboard</guimenuitem> function.
-                Note that in order to copy Japanese characters from 
-                <application>Netscape Navigator/Communicator</application>
-                or <application>Mozilla</application>, you have to run the applications in a
-                Japanese locale.
-              </para>
-            </listitem>
-          </varlistentry>
 
           <varlistentry>
             <term><option>-a</option></term>
@@ -296,6 +280,15 @@
         the Japanese input method regardless of the system language settings, but you will have
         to use one of the methods mentioned above to get Java to use Japanese fonts. I had no luck
         so far in getting the JRE to use the input method under <application>Windows 98</application>.
+      </para>
+      <para>
+        Copying Japanese text between JGloss and other applications on X11 systems only works
+        if JGloss is running in a Japanese environment. To achieve this, open a shell, set the
+        environment variable <envar>LANG</envar> to <literal>ja_JP</literal> and start JGloss
+        from that shell.
+        Under MacOSX, copying Japanese text is problematic as well. To get copy and paste working
+        properly, move nihongo to the first position in the <guilabel>Language</guilabel> tab of the
+        <guilabel>System preference->International</guilabel> panel.
       </para>
       <sect2><title>Java and X11 fonts</title>
         <para>
@@ -393,10 +386,15 @@
       </para>
       <para>
         Use the <guimenuitem>Import</guimenuitem> item from the <guimenu>File</guimenu> menu
-        to open the import dialog. Enter the URL of the file you want to import, or select 
-        a local file by hitting the <guibutton>Choose file</guibutton> button. Once you push
-        <guibutton>Import</guibutton>, the text will be parsed and annotations will be added
-        by looking up words from the text in the dictionaries. After some time 
+        to open the import dialog. To import a file, select the <guilabel>File</guilabel> tab and
+        enter the URL of the file you want to import. To choose 
+        a local file, click the <guibutton>Choose file</guibutton> button. Alternatively you can
+        select the <guilabel>Text</guilabel> tab and paste the text to import in the area below.
+      </para>
+      <para>
+        Once you have made the text selection, click
+        <guibutton>Import</guibutton>, and the text will be parsed and annotations will be added
+        by looking up words in the dictionaries. After some time 
         (this can take rather long for larger texts) the annotated document will be 
         displayed in the window.
       </para>
@@ -627,7 +625,7 @@
       </para>
       <para>
         Selecting <guimenuitem>Import</guimenuitem> will show the 
-        <guilabel>Import File</guilabel> dialog. In the text field you can enter
+        <guilabel>Import</guilabel> dialog. In the text field you can enter
         an HTTP URL or the file name of a local document. The document should be plain text.
         There is some support for importing <acronym>HTML</acronym> documents, but it will only work
         for simple layouts. If you hit the <guibutton>Choose File</guibutton>
@@ -979,14 +977,6 @@
                 This item will only be enabled if the clipboard currently contains some
                 text.
               </para>
-              <note>
-                <para>
-                  On <application>Linux</application> I have so far been unable to get Java
-                  to properly interact with the X clipboard and let me import the text copied
-                  in another application. Use the <option>-p</option> command line option
-                  instead (see <xref linkend="sect.running">).
-                </para>
-              </note>
             </listitem>
           </varlistentry>
 

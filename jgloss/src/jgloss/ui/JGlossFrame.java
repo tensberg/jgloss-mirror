@@ -641,6 +641,39 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Close the document window and clean up associated resources.
      */
     private void closeDocument() {
+        // save the currently selected node in the preferences
+        if (documentPath != null) {
+            int index = ((javax.swing.tree.DefaultTreeModel) annotationEditor.getModel()).getIndexOfChild
+                ( annotationEditor.getModel().getRoot(), annotationEditor.getLastSelectedAnnotation());
+            if (index != -1) {
+                StringBuffer history = new StringBuffer();
+                String[] oldHistory = JGloss.prefs.getList( Preferences.HISTORY_SELECTION, 
+                                                            File.pathSeparatorChar);
+                // Copy from the old history all files which are not the current file.
+                // Limit the size of the copied history to HISTORY_SIZE-1 by leaving out the
+                // last entry to ensure that there is room for the new entry.
+                int maxsize = JGloss.prefs.getInt( Preferences.HISTORY_SIZE, 20);
+                for ( int i=0; i<oldHistory.length && i<(maxsize-1)*2; i+=2) try {
+                    if (!oldHistory[i].equals( documentPath)) {
+                        if (history.length() > 0)
+                            history.append( File.pathSeparatorChar);
+                        history.append( oldHistory[i]);
+                        history.append( File.pathSeparatorChar);
+                        history.append( oldHistory[i+1]);
+                    }
+                } catch (ArrayIndexOutOfBoundsException ex) {}
+                
+                // create the new history entry
+                if (history.length() > 0)
+                    history.insert( 0, File.pathSeparatorChar);
+                history.insert( 0, index);
+                history.insert( 0, File.pathSeparatorChar);
+                history.insert( 0, documentPath);
+                JGloss.prefs.set( Preferences.HISTORY_SELECTION, history.toString());
+            }
+        }
+
+        // close the window
         hide();
         dispose();
     }
@@ -874,6 +907,22 @@ public class JGlossFrame extends JFrame implements ActionListener {
                     saveAction.setEnabled( true); // will behave like save as
                 }
                 OPEN_RECENT.addDocument( f);
+
+                // re-select the selection at the time the document was closed
+                String[] history = JGloss.prefs.getList( Preferences.HISTORY_SELECTION, 
+                                                         File.pathSeparatorChar);
+                for ( int i=0; i<history.length; i+=2) try {
+                    if (history[i].equals( documentPath)) {
+                        int index = Integer.parseInt( history[i+1]);
+                        AnnotationNode annotation = (AnnotationNode) annotationEditor.getModel()
+                            .getChild( annotationEditor.getModel().getRoot(), index);
+                        annotationEditor.makeVisible( annotation);
+                        annotationEditor.selectNode( annotation);
+                    }
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                } catch (NumberFormatException ex2) {
+                } catch (NullPointerException ex3) {}
+            
             }
         } catch (Exception ex) {
             ex.printStackTrace();

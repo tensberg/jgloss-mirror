@@ -32,5 +32,8 @@ Known problems:
     thorough the application only after JGloss is restarted.
   - Pasting text in the text field of the input dialog does not work with non-
     Japanese Windows. Use Import Clipboard instead.
+  - Import Clipboard does not work in MacOSX, unless the system language is
+    set to Japanese. Paste the text in the text field of the import dialog
+    instead.
 
 (c) 2001,2002 Michael Koch <tensberg@gmx.net>
