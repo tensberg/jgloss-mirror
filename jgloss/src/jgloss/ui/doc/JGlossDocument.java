@@ -107,7 +107,7 @@ public class JGlossDocument extends HTMLDocument {
          * HTML/CSS. The action ensures that the correct element structure is created
          * but explicit or implied paragraphs are not interrupted.
          */
-        private class AnnotationAction extends HTMLDocument.HTMLReader.TagAction {
+        private class AnnotationAction extends HTMLDocument.HTMLReader.BlockAction {
             public void start(HTML.Tag t, MutableAttributeSet a) {
                 // Force the creation of an implied paragraph if needed.
                 // An annotation element must always be enclosed by an explicit or
@@ -129,21 +129,33 @@ public class JGlossDocument extends HTMLDocument {
         public JGlossReader( int pos) {
             super( pos);
             this.pos = pos;
-            addCustomTags();
+            addCustomTags( false);
         }
 
+        /**
+         * Insert just the fragment of the HTML document delimited by <CODE>insertTag</CODE>.
+         */
         public JGlossReader( int pos, int popDepth, int pushDepth, HTML.Tag insertTag) {
             super( pos, popDepth, pushDepth, insertTag);
             this.pos = pos;
-            addCustomTags();
+            addCustomTags( true);
         }
         
         /**
          * Adds the annotation tags from {@link AnnotationTags AnnotationTags} to the set of tags
          * this <CODE>HTMLReader</CODE> knows how to handle.
+         *
+         * @param blockCompatible If this is <CODE>true</CODE>, a BlockAction will be used for
+         *        annotation elements instead of an AnnotationAction. This is needed because
+         *        the canInsertTag, which is needed to correctly handle the case where only a
+         *        fragment of the HTML document should be inserted, is private and thus cannot
+         *        be called from the AnnotationAction.
          */
-        private void addCustomTags() {
-            registerTag( AnnotationTags.ANNOTATION, new AnnotationAction());
+        private void addCustomTags( boolean blockCompatible) {
+            if (blockCompatible)
+                registerTag( AnnotationTags.ANNOTATION, new BlockAction());
+            else
+                registerTag( AnnotationTags.ANNOTATION, new AnnotationAction());
             registerTag( AnnotationTags.READING, new HTMLDocument.HTMLReader.CharacterAction());
             registerTag( AnnotationTags.KANJI, new HTMLDocument.HTMLReader.CharacterAction());
             registerTag( AnnotationTags.TRANSLATION,
