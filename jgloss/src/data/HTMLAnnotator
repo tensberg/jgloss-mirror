@@ -1,0 +1,82 @@
+<!-- start of JGloss embedded file -->
+<!--
+Written by Michael Koch (tensberg@gmx.net)
+
+Original character encoding: UTF-8
+
+The content of this file (everything between
+- start of JGloss embedded file - and - end of JGloss embedded file -) is embedded
+in the HTML document by the class jgloss.www.HTMLAnnotator
+
+The content of this data file is public domain and comes with no warranties. Do with it
+whatever you want.
+
+$Id$
+-->
+
+<STYLE type="text/css">
+<!--
+div.popup { display: none; position: absolute; left: 0px; top: 0px; 
+            font-size: 80%; background-color: yellow; }
+//-->
+</STYLE>
+
+<SCRIPT language="javascript">
+<!--
+
+var popup = null;
+var annotation = null;
+var annotation_text = null;
+
+function sp( el, text) {
+    if (el.style)
+        el.style.color = "blue";
+    
+    if (popup == null) {
+        popup = document.getElementById( "popup");
+        annotation = document.getElementById( "annotation");
+        for ( j=0; j<annotation.childNodes.length; j++) {
+            if (annotation.childNodes[j] == 3) {
+                annotation_text = annotation.childNodes[j];
+                break;
+            }
+        }
+        if (annotation_text == null) {
+            annotation_text = document.createTextNode( " ");
+            annotation.appendChild( annotation_text);
+        }
+    }
+
+    // show floating window with annotation
+    // calculate position of element
+    var posX = 0;
+    var posY = 0;
+    var width = el.offsetWidth;
+    var height = el.offsetHeight;
+    var e = el;
+    while (e!=null && el!=window.document) {
+            posX += e.offsetLeft;
+            posY += e.offsetTop;
+            e = e.offsetParent;
+    }
+     
+    annotation_text.nodeValue = text;
+    popup.style.left = posX;
+    popup.style.top = posY + width + 2;
+    popup.style.display = "inline";
+}
+
+function hp( el) {
+    if (el.style)
+        el.style.color = el.parentNode.style.color;
+
+    // hide popup
+    if (popup && popup.style) {
+        popup.style.display = "none";
+    }
+}
+//-->
+</SCRIPT>
+
+
+<!-- end of JGloss embedded file -->
