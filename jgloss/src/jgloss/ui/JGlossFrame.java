@@ -1198,8 +1198,9 @@ public class JGlossFrame extends JFrame implements ActionListener {
         int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
             documentPath =  f.getSelectedFile().getAbsolutePath();
+            documentName = f.getSelectedFile().getName();
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-            setTitle( f.getSelectedFile().getName() + 
+            setTitle( documentName + 
                       ":" + JGloss.messages.getString( "main.title"));
             saveDocument();
         }
