@@ -651,7 +651,8 @@ public class JGlossFrame implements ActionListener {
                 JOptionPane.showConfirmDialog
                     ( frame, JGloss.messages.getString
                       ( "error.import.exception", new Object[] 
-                          { "import.clipboard", ex.getLocalizedMessage() }),
+                          { "import.clipboard", ex.getClass().getName(),
+                            ex.getLocalizedMessage() }),
                       JGloss.messages.getString( "error.import.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -729,7 +730,8 @@ public class JGlossFrame implements ActionListener {
             JOptionPane.showConfirmDialog
                 ( frame, JGloss.messages.getString
                   ( "error.import.exception", new Object[] 
-                      { path, ex.getLocalizedMessage() }),
+                      { path, ex.getClass().getName(),
+                        ex.getLocalizedMessage() }),
                   JGloss.messages.getString( "error.import.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
@@ -752,7 +754,7 @@ public class JGlossFrame implements ActionListener {
             JOptionPane.showConfirmDialog
                 ( frame, JGloss.messages.getString
                   ( "error.load.exception", new Object[] 
-                      { path, ex.getLocalizedMessage() }),
+                      { path, ex.getClass().getName(), ex.getLocalizedMessage() }),
                   JGloss.messages.getString( "error.load.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
@@ -1062,7 +1064,7 @@ public class JGlossFrame implements ActionListener {
             JOptionPane.showConfirmDialog
                 ( frame, JGloss.messages.getString
                   ( "error.save.exception", new Object[] 
-                      { documentPath, ex.getLocalizedMessage() }),
+                      { documentPath, ex.getClass().getName(), ex.getLocalizedMessage() }),
                   JGloss.messages.getString( "error.save.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
@@ -1198,7 +1200,8 @@ public class JGlossFrame implements ActionListener {
                 JOptionPane.showConfirmDialog
                     ( frame, JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getLocalizedMessage() }),
+                          { documentPath, ex.getClass().getName(),
+                            ex.getLocalizedMessage() }),
                       JGloss.messages.getString( "error.export.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             } finally {
@@ -1300,7 +1303,8 @@ public class JGlossFrame implements ActionListener {
                 JOptionPane.showConfirmDialog
                     ( frame, JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getLocalizedMessage() }),
+                          { documentPath, ex.getClass().getName(),
+                            ex.getLocalizedMessage() }),
                       JGloss.messages.getString( "error.export.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             } finally {
@@ -1427,7 +1431,8 @@ public class JGlossFrame implements ActionListener {
                 JOptionPane.showConfirmDialog
                     ( frame, JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getLocalizedMessage() }),
+                          { documentPath, ex.getClass().getName(),
+                            ex.getLocalizedMessage() }),
                       JGloss.messages.getString( "error.export.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             } finally {
@@ -1524,7 +1529,8 @@ public class JGlossFrame implements ActionListener {
                 JOptionPane.showConfirmDialog
                     ( frame, JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
-                          { documentPath, ex.getLocalizedMessage() }),
+                          { documentPath, ex.getClass().getName(),
+                            ex.getLocalizedMessage() }),
                       JGloss.messages.getString( "error.export.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             } finally {
