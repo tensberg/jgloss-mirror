@@ -29,7 +29,7 @@
     <author>
       <firstname>Michael</firstname><surname>Koch</surname>
     </author>
-    <edition>0.9.1</edition>
+    <edition>0.9.2</edition>
     <copyright><year>2001</year><holder>Michael Koch</holder></copyright>
     <pubdate>2001</pubdate>
   </bookinfo>
@@ -70,6 +70,7 @@
         <ulink url="ftp://ftp.cc.monash.edu.au/pub/nihongo/www-jdict.ps.gz">ideas from the WWWJDIC</ulink>.
         The character encoding detection uses code from Yasuhiro Tonooka's 
         <application>kcc</application> (Kanji Code Converter) program.
+        The French localization is written by Alexandre Beraud.
       </para>
     </sect1>
     <sect1><title>License</title>
@@ -146,7 +147,7 @@
       </para>
     </sect1>
 
-    <sect1><title>Running &JGloss;</title>
+    <sect1 id="sect.running"><title>Running &JGloss;</title>
       <para>
         &JGloss; requires no installation. On a <application>Windows</application> box,
         double-clicking the <filename>jgloss.jar</filename> file should start the application.
@@ -154,7 +155,7 @@
         <acronym>JAR</acronym> file and enter <userinput>java -jar jgloss.jar</userinput>.
         JGloss has some command line options, which can be added to the command line:
         <userinput>java -jar jgloss.jar [option] file ...</userinput>.
-        <variablelist><title>Options</title>
+        <variablelist id="sect.options"><title>Options</title>
           <varlistentry>
             <term><option>-h</option></term>
             <term><option>--help</option></term>
@@ -186,6 +187,22 @@
             <listitem>
               <para>
                 Prints the dictionary format of the files given on the command line.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><option>-p</option></term>
+            <term><option>--pastewindow</option></term>
+            <listitem>
+              <para>
+                Instead of opening an empty JGloss document window, a window will be opened
+                in which you can paste text. The text will be imported in a new JGloss document.
+                This is mainly useful with the X select-and-paste approach to copying text,
+                which does not work with the <guimenuitem>Import Clipboard</guimenuitem> function.
+                Note that in order to copy Japanese characters from 
+                <application>Netscape Navigator/Communicator</application>
+                or <application>Mozilla</application>, you have to run the applications in a
+                Japanese locale.
               </para>
             </listitem>
           </varlistentry>
@@ -241,19 +258,19 @@
       <para>
         This section describes how to build &JGloss; from the sources. You do not need to read
         it if you just want to use &JGloss; and have downloaded the binary release
-        ( no <filename>-src</filename> ending).
+        (no <filename>-src</filename> ending).
       </para>
       <para>
         To build the &JGloss; JAR file, you have to have the
         <ulink url="http://java.sun.com/j2se/1.3/">
-        <application>Java Development Kit 1.3</application></ulink> from SUN (or something compatible) 
+        <application>Java Development Kit 1.3</application></ulink> from Sun (or something compatible) 
         installed (I have not tested &JGloss; with the JDK 1.4 Beta). To create the
-         different documentation files from <filename>jgloss.docbook</filename>
+        documentation files from <filename>jgloss.docbook</filename>
         you need the DocBook 4.1 DTD and various DocBook tools. Look for them at
         the <ulink url="http://www.oasis-open.org/docbook/">OASIS site</ulink>, 
         <ulink url="http://nwalsh.com/docbook/">Norman Walsh</ulink>'s site and
         the <ulink url="http://sourceware.cygnus.com/docbook-tools/">DocBook tools page</ulink>,
-        or on your favorite Linux distribution's CD-ROM.
+        or on your favorite Linux distribution's CD-ROMs.
       </para>
       <para>
         The sources come with a <filename>Makefile</filename> which automates the build process.
@@ -261,16 +278,27 @@
         the GNU tools or equivalent commands installed. Here is an (incomplete) list of
         make targets:
         <variablelist>
-          <varlistentry><term><command>jar</command></term>
+          <varlistentry><term><command>jgloss</command></term>
             <listitem><para>Creates the JGloss JAR archive. This is the default make target.
               </para></listitem>
+          </varlistentry>
+          <varlistentry><term><command>jgloss-www</command></term>
+            <listitem>
+              <para>
+                Builds the JGloss-WWW servlet. The components will be placed in the
+                <filename>jgloss-www</filename> directory. This is an experimental servlet
+                which rewrites Japanese web pages. Words in the page are looked up and
+                annotated with the dictionary entries. JavaScript is used to display the
+                result in the browser.
+              </para>
+            </listitem>
           </varlistentry>
           <varlistentry><term><command>compile</command></term>
             <listitem><para>Compiles all Java class files.</para></listitem>
           </varlistentry>
           <varlistentry><term><command>doc</command></term>
             <listitem><para>Generates the documentation files from 
-                <filename>doc/jgloss.docbook</filename></para>
+                <filename>doc.src/jgloss.docbook</filename></para>
             </listitem>
           </varlistentry>
           <varlistentry><term><command>gen-javadoc</command></term>
@@ -457,6 +485,43 @@
         Note that this algorithm may show wrong grammatical forms and therefore this feature
         should not always be trusted.
       </para>
+      <table><title>Annotation Editor Shortcut Keys</title>
+        <tgroup cols=2>
+          <colspec colname="key" align="center">
+          <colspec colname="function" align="left" colwidth="5*">
+          <thead><row><entry>Key</entry><entry>Function</entry></row></thead>
+          <tbody>
+            <row>
+              <entry><keycap>n</keycap></entry>
+              <entry>Move to the next annotation</entry>
+            </row>
+            <row>
+              <entry><keycap>p</keycap></entry>
+              <entry>Move to the previous annotation</entry>
+            </row>
+            <row>
+              <entry><keycap>space</keycap></entry>
+              <entry>Depending on selection:hide/use reading/use translation/start editing</entry>
+            </row>
+            <row>
+              <entry><keycap>r</keycap></entry>
+              <entry>Remove annotation</entry>
+            </row>
+            <row>
+              <entry><keycap>d</keycap></entry>
+              <entry>Remove annotation and duplicates</entry>
+            </row>
+            <row>
+              <entry><keycap>e</keycap></entry>
+              <entry>Add annotated word to exclusion list</entry>
+            </row>
+            <row>
+              <entry><keycap>h</keycap></entry>
+              <entry>Hide/show annotation</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
     </sect1>
 
     <sect1 id="sect.import"><title>Importing text documents</title>
@@ -639,7 +704,8 @@
                 <para>
                   On <application>Linux</application> I have so far been unable to get Java
                   to properly interact with the X clipboard and let me import the text copied
-                  in another application.
+                  in another application. Use the <option>-p</option> command line option
+                  instead (see <xref linkend="sect.running">).
                 </para>
               </note>
             </listitem>
