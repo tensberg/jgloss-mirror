@@ -278,17 +278,20 @@ public class CookieTools {
                 // The request-host is a HDN (not IP address) and has the form HD,
                 // where D is the value of the Domain attribute, and H is a string
                 // that contains one or more dots.
-                int index = host.indexOf( '.');
-                if (host.endsWith( cdomain) && host.length()>cdomain.length() &&
-                    index != -1 &&
-                    index < host.length()-cdomain.length()) {
-                    context.log( "hd test failed");
-                    continue;
+                // This rule does not apply to Netscape cookies.
+                if (version1) {
+                    int index = host.indexOf( '.');
+                    if (host.endsWith( cdomain) && host.length()>cdomain.length() &&
+                        index != -1 &&
+                        index < host.length()-cdomain.length()) {
+                        context.log( "hd test failed: " + host + "/" + cdomain);
+                        continue;
+                    }
                 }
                 // The Port attribute has a "port-list", and the request-port was
                 // not in the list.
-                if (cportlist.length()!=0 && !portMatch( port, cportlist)) {
-                    context.log( "port test failed");
+                if (cportlist.length()>0 && !portMatch( port, cportlist)) {
+                    context.log( "port test failed: " + port + "/" + cportlist);
                     continue;
                 }
                 context.log( "all test succeeded");
