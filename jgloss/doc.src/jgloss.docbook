@@ -387,10 +387,10 @@
           </mediaobject></screenshot>
         <blockquote>
           <para>
-            The right part is the 
+            The right part of the &JGloss; window shows the 
             annotation editor (see <xref linkend="sect.annotationeditor">), which is used
             to manipulate the annotations in the document.
-            The left part of the &JGloss; window shows the annotated document
+            The left part shows the annotated document
             (see <xref linkend="sect.docview">). An <emphasis>annotated word</emphasis> is
             highlighted in light red, a <emphasis>reading annotation</emphasis> in light green
             and a <emphasis>translation annotation</emphasis> in light blue. The currently
