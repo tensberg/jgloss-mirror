@@ -38,6 +38,7 @@ error.storePreferences=Beim Speichern der Voreinstellungen ist ein Fehler aufget
 error.dictionary.title=Fehler beim Öffnen des Wörterbuchs
 error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\nPrüfen sie, ob die Wörterbuchdatei {1}\n existiert und lesbar ist.
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.
+error.dictionary.format=Die Datei {0} ist keine\nWörterbuchdatei in einem unterstützten Format.
 error.exclusions.save.title=Fehler beim Schreiben der Ausschluss-Liste
 error.exclusions.save=Beim Schreiben der Ausschluss-Liste nach\{0} ist ein Fehler aufgetreten.\nDie Java-Exception war {1}, {2}.
 error.exclusions.load.title=Fehler beim Lesen der Ausschluß-Liste
