@@ -44,7 +44,7 @@ public class LaTeXExporter extends TemplateExporter {
      * Variable which is substituted for the font size string passed to 
      * {@link #export(Reader,JGlossDocument,String,String,AnnotationModel,Writer,boolean) export}.
      */
-    public static final String FONT_SIZE = "%font-size%";
+    public static final String FONT_SIZE = "font-size";
 
     /**
      * Flag if {@link #escape(String) escape} should replace umlauts with the appropriate LaTeX

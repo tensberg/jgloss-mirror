@@ -104,7 +104,7 @@ splashscreen.loadingPreferences=Lade Voreinstellungen
 splashscreen.initPreferences=Lade Wörterbücher
 splashscreen.initMain=Erstelle Anwendungsfenster
 
-main.usage=Benutzung: jgloss.JGloss [Option] Datei ...\n\
+main.usage=Benutzung: java -jar jgloss.jar [Option] Datei ...\n\
 Optionen:\n\
 \  -h, --help, /?     Zeigt diese Nachricht\n\
 \  -i, --createindex  Erzeugt Indexdateien für die in der Kommandozeile\n\
@@ -249,7 +249,9 @@ Alle ausgewählten Zeichensätze können japanische Zeichen darstellen.\n\
 Die Zeichensatz-Einstellungen wurden nicht geändert.
 style.autodetect.selectedfont=\
 Der Zeichensatz {0} wurde als japanischer Zeichensatz ausgewählt,\n\
-und wurde angewendet wo notwendig.
+und wurde konfiguriert. Klicken sie OK oder Anwenden, um die Änderungen\n\
+zu übernehmen. Einige Änderungen werden erst nach einem Neustart von\n\
+JGloss übernommen.
 style.autodetect.nofont=\
 Es wurde kein passender Zeichensatz gefunden. Die Einstellungen\n\
 wurden nicht geändert. Japanischer Text wird möglicherweise nicht\n\
@@ -353,7 +355,7 @@ export.html.backwardscompatible=Abwärtskompatibel
 export.latex.title=LaTeX exportieren
 export.latex.fontsize=Fontgröße:
 
-export.latex.templates=/data/templates/platex-top.tex:platex - Übers. auf selber Seite:/data/templates/platex-list.tex:platex - Übers. in Liste:/data/templates/platex-ruby.tex:platex - nur Lesungen
+export.latex.templates=/data/templates/platex-top.tex:/data/templates/platex-list.tex:/data/templates/platex-ruby.tex
 
 about.frame.title=Über JGloss
 about.text=\
@@ -382,6 +384,7 @@ fileview.description.jgloss=JGloss-Dokument
 fileview.description.html=HTML-Dokument
 fileview.description.tex=LaTeX-Dokument
 fileview.description.text=Textdokument
+fileview.description.template=Export-Format
 
 filechooser.overwrite.title=Datei überschreiben?
 filechooser.overwrite=Die ausgewählte Datei {0} existiert\nbereits. Überschreiben?

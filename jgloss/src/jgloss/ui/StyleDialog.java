@@ -737,8 +737,17 @@ public class StyleDialog extends Box {
             return;
         }
 
+        // try to use well-known font
+        String japaneseFont = getKnownJapaneseFont();
+        if (japaneseFont != null) {
+            selectJapaneseFont( japaneseFont);
+            return;            
+        }
+
         // try to use one of the already selected fonts
-        String japaneseFont = null;
+        // the selected font may be of lower quality of one of the well-known fonts,
+        // so do this step after the previous
+        japaneseFont = null;
         if (canDisplayJapanese( (String) generalFont.getSelectedItem()))
             japaneseFont = (String) generalFont.getSelectedItem();
         else if (canDisplayJapanese( (String) wordLookupFont.getSelectedItem()))
@@ -753,13 +762,6 @@ public class StyleDialog extends Box {
         if (japaneseFont != null) {
             selectJapaneseFont( japaneseFont);
             return;
-        }
-
-        // try to use well-known font
-        japaneseFont = getKnownJapaneseFont();
-        if (japaneseFont != null) {
-            selectJapaneseFont( japaneseFont);
-            return;            
         }
 
         // Try out all fonts. Since this is slow, do this in its own thread.
@@ -797,17 +799,12 @@ public class StyleDialog extends Box {
         }
         else {
             generalFontCustom.setSelected( true);
-            if (!canDisplayJapanese( (String) generalFont.getSelectedItem()))
-                insertAndSelect( generalFont, fontname);
+            insertAndSelect( generalFont, fontname);
         }
-        if (!canDisplayJapanese( (String) wordLookupFont.getSelectedItem()))
-            insertAndSelect( wordLookupFont, fontname);
-        if (!canDisplayJapanese( (String) textFont.getSelectedItem()))
-            insertAndSelect( textFont, fontname);
-        if (!canDisplayJapanese( (String) readingFont.getSelectedItem()))
-            insertAndSelect( readingFont, fontname);
-        if (!canDisplayJapanese( (String) translationFont.getSelectedItem()))
-            insertAndSelect( translationFont, fontname);
+        insertAndSelect( wordLookupFont, fontname);
+        insertAndSelect( textFont, fontname);
+        insertAndSelect( readingFont, fontname);
+        insertAndSelect( translationFont, fontname);
 
         JOptionPane.showMessageDialog( this, 
                                        JGloss.messages.getString( "style.autodetect.selectedfont",

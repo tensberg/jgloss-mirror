@@ -60,6 +60,12 @@ public abstract class TemplateExporter {
      * read by {@link #getReader(InputStream) getReader}.
      */
     public static final String ENCODING_HEADER = "% encoding:";
+    /**
+     * The description header is followed by a short description of the template function.
+     * It must be the second line in the template, preceeded by the 
+     * {@link #ENCODING_HEADER ENCODING_HEADER}.
+     */
+    public static final String DESCRIPTION_HEADER = "% description:";
 
     /**
      * Character which marks the beginning of a variable.
@@ -72,23 +78,23 @@ public abstract class TemplateExporter {
     /**
      * Variable: replaced by the file name of the exported document.
      */
-    public static final String DOCUMENT_FILENAME = "%document-filename%";
+    public static final String DOCUMENT_FILENAME = "document-filename";
     /**
      * Variable: replaced by the time and date of the document generation.
      */
-    public static final String GENERATION_TIME = "%generation-time%";
+    public static final String GENERATION_TIME = "generation-time";
     /**
      * Variable: replaced by the title of the document.
      */
-    public static final String DOCUMENT_TITLE = "%document-title%";
+    public static final String DOCUMENT_TITLE = "document-title";
     /**
      * Variable: replaced by the longest dictionary word in the document.
      */
-    public static final String LONGEST_WORD = "%longest-word%";
+    public static final String LONGEST_WORD = "longest-word";
     /**
      * Variable: replaced by the longest dictionary reading in the document.
      */
-    public static final String LONGEST_READING = "%longest-reading%";
+    public static final String LONGEST_READING = "longest-reading";
 
     /**
      * Text insertion section start marker. The document text is inserted in its place.<br>
@@ -120,31 +126,31 @@ public abstract class TemplateExporter {
     /**
      * Variable: replaced with the word part when used in a {@link #READING_PATTERN reading pattern}.
      */
-    public static final String WORD = "%word%";
+    public static final String WORD = "word";
     /**
      * Variable: replaced with the dictionary word when used in a 
      * {@link #TRANSLATION_PATTERN translation pattern}.
      */
-    public static final String DICTIONARY_WORD = "%dictionary-word%";
+    public static final String DICTIONARY_WORD = "dictionary-word";
     /**
      * Variable: replaced with the dictionary part when used in a {@link #READING_PATTERN reading pattern}.
      */
-    public static final String READING = "%reading%";
+    public static final String READING = "reading";
     /**
      * Variable: replaced with the dictionary reading when used in a 
      * {@link #TRANSLATION_PATTERN translation pattern}.
      */
-    public static final String DICTIONARY_READING = "%dictionary-reading%";
+    public static final String DICTIONARY_READING = "dictionary-reading";
     /**
      * Variable: replaced with the translation when used in a 
      * {@link #TRANSLATION_PATTERN translation pattern}.
      */
-    public static final String TRANSLATION = "%translation%";
+    public static final String TRANSLATION = "translation";
     /**
      * Variable: replaced with the paragraph number when used in a 
      * {@link #PARAGRAPH_START_PATTERN paragraph start pattern}.
      */
-    public static final String PARAGRAPH_NUMBER = "%paragraph-number%";
+    public static final String PARAGRAPH_NUMBER = "paragraph-number";
 
     /**
      * Pattern name: the pattern is applied to every word/reading pair.
@@ -218,7 +224,6 @@ public abstract class TemplateExporter {
      * with the paragraph number is stored.
      */
     protected List parsedText = null;
-
     protected String longestDictionaryWord = "";
     protected String longestDictionaryReading = "";
 
@@ -243,11 +248,14 @@ public abstract class TemplateExporter {
         variables.put( DOCUMENT_FILENAME, documentName);
         variables.put( GENERATION_TIME, DateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.SHORT)
                        .format( new Date( System.currentTimeMillis())));
-        variables.put( DOCUMENT_TITLE, escape( doc.getTitle()));
-        variables.put( LONGEST_WORD, longestDictionaryWord);
-        variables.put( LONGEST_READING, longestDictionaryReading);
+        String docTitle = doc.getTitle();
+        if (docTitle == null) // no title set by user, use document filename to avoid null pointer exception
+            docTitle = documentName;
+        variables.put( DOCUMENT_TITLE, escape( docTitle));
+        variables.put( LONGEST_WORD, escape( longestDictionaryWord));
+        variables.put( LONGEST_READING, escape( longestDictionaryReading));
 
-        // variable substititions used to construct MessageFormat objects from ruby and
+        // variable substititions used to construct java.util.MessageFormat format strings from ruby and
         // translation patterns
         variables.put( WORD, "{0}");
         variables.put( READING, "{1}");
@@ -267,6 +275,11 @@ public abstract class TemplateExporter {
         templateLines.setLineNumber( 1); // start counting at 1 and not 0
         String line;
         while ((line = templateLines.readLine()) != null) {
+            // don't write description header to output
+            if (templateLines.getLineNumber() == 2 &&
+                line.toLowerCase().startsWith( DESCRIPTION_HEADER))
+                continue;
+
             if (line.startsWith( BEGIN_TEXT))
                 handleInsertionSection( templateLines, out, variables, true, true, true, true);
             else if (line.startsWith( BEGIN_ANNOTATION_LIST))
@@ -603,7 +616,7 @@ public abstract class TemplateExporter {
             String replacement = null;
             int length = variableEnd - variableStart + 1;
 
-            replacement = (String) substitutions.get( line.substring( variableStart, variableEnd+1));
+            replacement = (String) substitutions.get( line.substring( variableStart+1, variableEnd));
             if (replacement != null) {
                 if (linebuf == null)
                     linebuf = new StringBuffer( line);

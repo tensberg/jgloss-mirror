@@ -942,7 +942,8 @@
           Note that not all fonts in the list can display Japanese characters.
         </para>
         <para>
-          The other font selection options determine the fonts used in the document view.
+          The other font selection options determine the fonts used in the word lookup
+          result list and in the document view.
           Select a font by using the popup menu. The font size can be selected from the
           popup menu to the right, or you can enter the font size manually if it is not in
           the list. You can select a different background color by clicking on the button

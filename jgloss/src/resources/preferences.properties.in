@@ -49,6 +49,7 @@ fontsizes.translation=4,5,6,7,8,9,10,11,12,13,14,15,16
 
 font.general.usedefault=true
 font.general=Dialog
+# sizediff: difference in pt to the default general font size setting
 font.general.sizediff=2
 font.wordlookup=Serif
 font.wordlookup.size=12

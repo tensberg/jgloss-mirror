@@ -95,14 +95,14 @@ button.annotate=Annotate
 button.add=Add...
 
 jgloss.title=JGloss
-jgloss.version=Version 1.0.4pre1
+jgloss.version=Version 1.0.4pre2
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<creating application window>
 splashscreen.initPreferences=loading dictionaries
 splashscreen.initMain=creating application window
 
-main.usage=Usage: jgloss.JGloss [option] [file [...]]\n\
+main.usage=Usage: java -jar jgloss.jar [option] [file [...]]\n\
 Options:\n\
 \  -h, --help, /?     Print this message\n\
 \  -i, --createindex  Create index files for the dictionary files\n\
@@ -261,7 +261,9 @@ All selected fonts can display Japanese characters.\n\
 The font settings have not been changed.
 style.autodetect.selectedfont=\
 The font {0} has been selected as Japanese font,\n\
-and has been applied where neccessary.
+and has been configured. Click OK or Apply to use the\n\
+new settings. Some font changes will only be applied\n\
+after a restart of JGloss.
 style.autodetect.nofont=\
 No suitable font has been found. The settings have not been\n\
 changed. Japanese text might not be displayed correctly.
@@ -377,11 +379,10 @@ export.latex.fontsize=Font Size:
 export.latex.fontsize_pt=pt
 
 # List of templates stored in jgloss.jar and accessible as resource
-# The format of the list is "path:description:path:description:..."
-export.latex.templates=/data/templates/platex-top.tex:platex - translations on page:/data/templates/platex-list.tex:platex - translations at end:/data/templates/platex-ruby.tex:platex - no translations
+export.latex.templates=/data/templates/platex-top.tex:/data/templates/platex-list.tex:/data/templates/platex-ruby.tex
 
 about.frame.title=About JGloss
-about.title=JGloss 1.0.4pre1
+about.title=JGloss 1.0.4pre2
 about.text=A tool for making reading and understanding Japanese texts easier.\n\nCopyright (c) 2001,2002 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
 about.showlicense=Show License
 about.license.title=GNU General Public License
@@ -402,6 +403,7 @@ fileview.description.jgloss=JGloss document
 fileview.description.html=HTML document
 fileview.description.tex=LaTeX document
 fileview.description.text=Text document
+fileview.description.template=Export template
 
 filechooser.overwrite.title=Overwrite file?
 filechooser.overwrite=The selected file "{0}" already exists. Overwrite?

@@ -47,7 +47,7 @@ PACKAGES := jgloss jgloss.dictionary jgloss.ui jgloss.ui.doc jgloss.ui.annotatio
 
 DATA_WWW := HTMLAnnotator vconj
 
-ICONS := jgloss.png html.png tex.png txt.png chasen.png
+ICONS := jgloss.png html.png tex.png txt.png chasen.png template.png
 
 RESOURCES := messages.properties messages-dictionary.properties \
              messages_de.properties messages-dictionary_de.properties \

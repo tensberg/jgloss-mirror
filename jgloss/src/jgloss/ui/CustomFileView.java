@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -31,7 +31,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileView;
 
 /**
- * File view which adds icons and descriptions for the filetypes JGloss, HTML and TeX.
+ * File view which adds icons and descriptions for filetypes used by JGloss.
  *
  * @author Michael Koch
  */
@@ -52,11 +52,13 @@ public class CustomFileView extends FileView {
     protected static String HTML_DESCRIPTION;
     protected static String TEX_DESCRIPTION;
     protected static String TEXT_DESCRIPTION;
+    protected static String TEMPLATE_DESCRIPTION;
 
     protected static Icon JGLOSS_ICON;
     protected static Icon HTML_ICON;
     protected static Icon TEX_ICON;
     protected static Icon TEXT_ICON;
+    protected static Icon TEMPLATE_ICON;
 
     protected CustomFileView() {
         if (JGLOSS_DESCRIPTION == null) {
@@ -65,11 +67,14 @@ public class CustomFileView extends FileView {
             HTML_DESCRIPTION = JGloss.messages.getString( "fileview.description.html");
             TEX_DESCRIPTION = JGloss.messages.getString( "fileview.description.tex");
             TEXT_DESCRIPTION = JGloss.messages.getString( "fileview.description.text");
+            TEMPLATE_DESCRIPTION = JGloss.messages.getString( "fileview.description.template");
 
             JGLOSS_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/jgloss.png"));
             HTML_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/html.png"));
             TEX_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/tex.png"));
             TEXT_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/txt.png"));
+            TEMPLATE_ICON = new ImageIcon( CustomFileView.class.getResource
+                                           ( "/resources/icons/template.png"));
         }
     }
 
@@ -83,6 +88,8 @@ public class CustomFileView extends FileView {
             return TEX_DESCRIPTION;
         if (name.endsWith( ".txt"))
             return TEXT_DESCRIPTION;
+        if (name.endsWith( ".tmpl"))
+            return TEMPLATE_DESCRIPTION;
         
         return null; // let L&F file view determine the description
     }
@@ -97,6 +104,8 @@ public class CustomFileView extends FileView {
             return TEX_ICON;
         if (name.endsWith( ".txt"))
             return TEXT_ICON;
+        if (name.endsWith( ".tmpl"))
+            return TEMPLATE_ICON;
         
         return null; // let L&F file view determine the icon
     }

@@ -49,57 +49,88 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
      * reader for the represented template, and they must implement <code>toString</code>
      * to return a user-level description of the template.
      */
-    protected interface Template {
+    protected static abstract class Template {
+        protected String description;
+
         /**
          * Return a reader for the template.
          */
-        InputStreamReader getReader() throws IOException;
+        protected abstract InputStreamReader getReader() throws IOException;
         /**
-         * Return a short template description.
+         * Read the description line from the template.
+         *
+         * @return The description, or <code>null</code> if there is no description.
          */
-        String toString();
+        protected String readDescription() {
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader( getReader());
+                String line = reader.readLine();
+                if (line.toLowerCase().startsWith( TemplateExporter.DESCRIPTION_HEADER))
+                    return line.substring( TemplateExporter.DESCRIPTION_HEADER.length()).trim();
+            } catch (IOException ex) {
+            } finally {
+                if (reader != null) try {
+                    reader.close();
+                } catch (IOException ex) {}
+            }
+
+            return null; // no description
+        }
+
+        public String getDescription() { return description; }
+        public String toString() { return description; }
     }
 
     /**
      * Template definition which is accessed as resource from the jgloss.jar.
      */
-    protected static class ResourceTemplate implements Template {
+    protected static class ResourceTemplate extends Template {
         private String path;
-        private String description;
 
-        public ResourceTemplate( String path, String description) {
+        public ResourceTemplate( String path) {
             this.path = path;
-            this.description = description;
+            this.description = readDescription();
+            if (description == null)
+                description = path.substring( path.lastIndexOf( '/')+1);
         }
 
         public String getPath() { return path; }
-        public String getDescription() { return description; }
-        public String toString() { return description; }
 
         public InputStreamReader getReader() throws IOException {
             return TemplateExporter.getReader
                 ( LaTeXExportFileChooser.class.getResourceAsStream( path));
+        }
+
+        public boolean equals( Object o) {
+            return (o instanceof ResourceTemplate &&
+                    path.equals( ((ResourceTemplate) o).path));
         }
     }
 
     /**
      * Template definition which is read from a local file.
      */
-    protected static class FileTemplate implements Template {
+    protected static class FileTemplate extends Template {
         private File file;
-        private String name;
 
         public FileTemplate( String path) {
             file = new File( path);
-            name = file.getName();
+            description = readDescription();
+            if (description == null)
+                description = file.getName();
         }
 
         public File getFile() { return file; }
-        public String toString() { return name; }
 
         public InputStreamReader getReader() throws IOException {
             return TemplateExporter.getReader
                 ( new BufferedInputStream( new FileInputStream( file)));
+        }
+
+        public boolean equals( Object o) {
+            return (o instanceof FileTemplate &&
+                    file.equals( ((FileTemplate) o).file));
         }
     }
 
@@ -130,11 +161,8 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
             // add default templates stored in jgloss.jar
             templates = jgloss.dictionary.StringTools.split
                 ( JGloss.messages.getString( resourceMessagePrefsKey), ':');
-            // format for export.latex.templates is "resource path:description:..."
-            for( int i=0; i<templates.length; i+=2) {
-                comboBoxItems.add( new ResourceTemplate( templates[i],
-                                                         templates[i+1]));
-            }
+            for( int i=0; i<templates.length; i++)
+                comboBoxItems.add( new ResourceTemplate( templates[i]));
         }
 
         // add user-selected templates
@@ -198,19 +226,22 @@ public class TemplateExportFileChooser extends ExportFileChooser implements Acti
         if (result == JFileChooser.APPROVE_OPTION) {
             JGloss.setCurrentDir( chooser.getCurrentDirectory().getAbsolutePath());
             FileTemplate template = new FileTemplate( chooser.getSelectedFile().getAbsolutePath());
-            // insert new template before ADD item
-            templateChooser.insertItemAt( template, templateChooser.getItemCount()-1);
-            // save selection in resources
-            String paths = JGloss.prefs.getString( (String) templateChooser.getClientProperty
-                                                   ( TEMPLATE_LIST_PREFERENCES_KEY));
-            if (paths.length() > 0)
-                paths += File.pathSeparator;
-            paths += chooser.getSelectedFile().getAbsolutePath();
-            JGloss.prefs.set( (String) templateChooser.getClientProperty
-                              ( TEMPLATE_LIST_PREFERENCES_KEY), paths);
+            int index = ((DefaultComboBoxModel) templateChooser.getModel()).getIndexOf( template);
+            if (index<0 || index>=templateChooser.getItemCount()) {
+                // insert new template before ADD item
+                index = templateChooser.getItemCount() - 1;
+                templateChooser.insertItemAt( template, index);
+                // save selection in resources
+                String paths = JGloss.prefs.getString( (String) templateChooser.getClientProperty
+                                                       ( TEMPLATE_LIST_PREFERENCES_KEY));
+                if (paths.length() > 0)
+                    paths += File.pathSeparator;
+                paths += chooser.getSelectedFile().getAbsolutePath();
+                JGloss.prefs.set( (String) templateChooser.getClientProperty
+                                  ( TEMPLATE_LIST_PREFERENCES_KEY), paths);
+            }
+            templateChooser.setSelectedIndex( index);
         }
-        // select item before ADD (new template if chosen)
-        templateChooser.setSelectedIndex( templateChooser.getItemCount()-2);
     }
 
     /**
