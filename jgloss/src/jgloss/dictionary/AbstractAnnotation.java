@@ -70,13 +70,13 @@ public abstract class AbstractAnnotation implements Parser.TextAnnotation {
      */
     public int getLength() { return length; }
     /**
-     * Returns the word of this entry.
+     * Returns the dictionary form of the word of this entry.
      *
      * @return The word.
      */
     public abstract String getWord();
     /**
-     * Returns the reading of this entry.
+     * Returns the dictionary form of the reading of this entry.
      *
      * @return The reading.
      */
