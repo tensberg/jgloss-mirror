@@ -45,20 +45,19 @@ public class CharacterEncodingDetector {
     /**
      * Number of bytes which are read from the stream and looked at for detection.
      */
-    private final static int LOOK_AT_LENGTH = 10000;
+    private final static int DEFAULT_LOOK_AT_LENGTH = 10000;
     
-    private final static String ENC_ISO_2022_JP = "ISO-2022-JP";
-    private final static String ENC_EUC_JP = "EUC-JP";
-    private final static String ENC_SHIFT_JIS = "Shift_JIS";
-    private final static String ENC_UTF_8 = "UTF-8";
-    private final static String ENC_ASCII = "ASCII";
+    public final static String ENC_ISO_2022_JP = "ISO-2022-JP";
+    public final static String ENC_EUC_JP = "EUC-JP";
+    public final static String ENC_SHIFT_JIS = "Shift_JIS";
+    public final static String ENC_UTF_8 = "UTF-8";
+    public final static String ENC_ASCII = "ASCII";
 
     private final static int ESC = 0x1b;
     private final static int SO = 0x0e;
     private final static int SI = 0x0f;
     private final static int SS2 = 0xae; /* EUC single shift 2 */
     private final static int SS3 = 0x8f; /* EUC single shift 3 */
-    
 
     /**
      * Flag set if the byte array contains values outside the ASCII character set.
@@ -130,11 +129,28 @@ public class CharacterEncodingDetector {
      * @return Reader for the input stream.
      * @exception IOException if an error occurs while reading from the stream.
      */
-    public static InputStreamReader getReader( InputStream in, String defaultencoding) throws IOException {
+    public static InputStreamReader getReader( InputStream in, String defaultencoding)
+        throws IOException {
+        return getReader( in, defaultencoding, DEFAULT_LOOK_AT_LENGTH);
+    }
+
+    /**
+     * Creates a reader for the input stream with a character encoding guessed by looking at
+     * the beginning of the stream.
+     *
+     * @param in An input stream for Japanese characters.
+     * @param defaultencoding The encoding to use when the input stream encoding could not be
+     *                        determined (currently unused).
+     * @param lookatlength Length in bytes the method looks at for detection.
+     * @return Reader for the input stream.
+     * @exception IOException if an error occurs while reading from the stream.
+     */
+    public static InputStreamReader getReader( InputStream in, String defaultencoding,
+                                               int lookatlength) throws IOException {
         if (defaultencoding == null)
             defaultencoding = System.getProperty( "file.encoding");
 
-        byte[] buf = new byte[LOOK_AT_LENGTH];
+        byte[] buf = new byte[lookatlength];
         PushbackInputStream pbin = new PushbackInputStream( new BufferedInputStream( in), buf.length);
         String enc = null;
         byte[] data;
@@ -149,19 +165,7 @@ public class CharacterEncodingDetector {
             data = buf;
         pbin.unread( data);
 
-        int code = guessEncoding( data);
-
-        if ((code&JIS) > 0)
-            enc = ENC_ISO_2022_JP;
-        else if ((code&EUC) > 0) // might be ambiguous with shift_jis, in this case prefer euc
-            enc = ENC_EUC_JP;
-        else if ((code&SJIS) > 0)
-            enc = ENC_SHIFT_JIS;
-        else if ((code&NONASCII) > 0) // always assume UTF-8 until real UTF-8 detection is implemented
-            enc = ENC_UTF_8;
-        else
-            enc = ENC_ASCII;
-
+        enc = guessEncodingName( data);
         System.err.println( "CharacterEncodingDetector: using " + enc);
         return new InputStreamReader( pbin, enc);
     }
@@ -181,6 +185,31 @@ public class CharacterEncodingDetector {
             return dlength/2;
     }
 
+    /**
+     * Detects the character encoding used for a byte array. If the detection is ambiguous,
+     * EUC-JP will be preferred.
+     *
+     * @param An array with encoded Japanese characters.
+     * @return The encoding name.
+     */
+    public static String guessEncodingName( byte[] data) {
+        int code = guessEncoding( data);
+
+        String enc;
+        if ((code&JIS) > 0)
+            enc = ENC_ISO_2022_JP;
+        else if ((code&EUC) > 0) // might be ambiguous with shift_jis, in this case prefer euc
+            enc = ENC_EUC_JP;
+        else if ((code&SJIS) > 0)
+            enc = ENC_SHIFT_JIS;
+        else if ((code&NONASCII) > 0) // always assume UTF-8 until real UTF-8 detection is implemented
+            enc = ENC_UTF_8;
+        else
+            enc = ENC_ASCII;
+
+        return enc;
+    }
+    
     /**
      * Detects the character encoding used for a byte array. The flags set in the return value
      * can be one or more of NONASCII, JIS, EUC, SJIS or JIS8. The detection is not always unambiguous.
