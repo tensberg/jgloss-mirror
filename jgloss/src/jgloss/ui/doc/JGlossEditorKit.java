@@ -695,13 +695,13 @@ public class JGlossEditorKit extends HTMLEditorKit {
         
         /**
          * Overridden to always break the line at the last char. 
-         * <P>J2SE 1.4 introduces a new, more
+         * <p>J2SE 1.4 introduces a new, more
          * sophisticated way to choose where to break a line with class 
          * <CODE>java.text.RuleBasedBreakIterator</CODE>. <CODE>GlyphView.getBreakWeight</CODE>
          * uses this class to decide where to break a line. Unfortunately, this is a major
          * performance bottleneck. Since the utility of this way of breaking lines for
          * Japanese text is dubious at best, it is disabled in the overridden method.
-         * Unfortunately there is no cleaner API do do this.
+         * Unfortunately there is no cleaner API do do this.</p>
          */
         public int getBreakWeight( int axis, float pos, float len) {
             if (axis == View.X_AXIS) {

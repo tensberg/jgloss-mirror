@@ -1,7 +1,9 @@
-1.0.3: (2002/03/02)
-	- Support for GDICT dictionaries (J2SE 1.4 required).
+1.0.3: (2002/03/07)
+	- Added support for GDICT dictionaries (J2SE 1.4 required).
 	- Reimplementation of EDICT using the NIO API (J2SE 1.4 required).
 	  Improved load time and decreased RAM usage.
+	- Added escaping of characters not directly supported to user
+	  dictionary. Umlauts now can be used.
         - Fixed EDICT index creation and search bugs. To increase search
 	  accuracy you should delete all old .jjdx index files.
         - Rendering of the document pane is now done in the background.

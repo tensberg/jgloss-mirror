@@ -33,6 +33,65 @@ import java.text.MessageFormat;
 /**
  * Base class for dictionaries stored in a local file with separate index file.
  * The J2 1.4 NIO API is used for file access.
+ * <h3>JJDX index file format</h3>
+ * <p>
+ *   A JJDX index file is an array of byte offsets pointing to words in the corresponding
+ *   dictionary file. Entries are sorted lexicographically to allow fast word lookup using
+ *   binary search. The array is prefixed by a header containing information about the index file.
+ *   The JJDX format itself is independent of a specific dictionary field format or character
+ *   encoding.
+ * </p>
+ * <h4>JJDX file header</h4>
+ * <p>
+ *   The header of an index file consists of several fields containing information about
+ *   the index file. Each field is a 4-byte long signed integer stored in big-endian byte order.
+ * </p>
+ * <table border="1"><tr><th>Field</th><th>Description</th><th>Since</th></tr>
+ * <tr><td>Version</td>
+ * <td>Version of this JJDX index file format</td>
+ * <td>1001</td></tr>
+ * <tr><td>Offset</td>
+ * <td>
+ *   Offset in bytes from the start of the dictionary file to the first index entry.
+ *   This is effectively the length of the header.
+ *   The information can be used to find the first index entry even if the index
+ *   format version differs from the one supported by this index.
+ * </td><td>1001</td></tr>
+ * <tr><td>Size</td>
+ * <td>
+ *   Number of index entries (excluding the header).
+ *   The size of the index file is Offset+Size*4.
+ * </td><td>1001</td></tr>
+ * <tr><td>Byte-Order</td>
+ * <td>
+ *   Byte order used to store the index entries. 1 for big-endian, 2 for
+ *   little-endian. (The header always uses big-endian.)
+ * </td><td>2001</td></tr>
+ * <tr><td>Creator</td>
+ * <td>
+ *   ID of the dictionary implementation creating this index file. This
+ *   can be used to adapt the sorting order to be compatible with the creator.
+ * </td><td>2001</td></tr>
+ * </table>
+ * <p>
+ *   Currently existing index file versions are 1001, used by JGloss 1.0.2 and earlier, and
+ *   2001, used since JGloss 1.0.3.
+ * </p>
+ * <h4>Index entries</h4>
+ * <p>
+ *   Index entries are stored as an array of 4-byte long signed integers. Each index entry is the
+ *   offset in bytes in the dictionary file to the indexed word (the length on the word is not
+ *   specified in the index). The offset is 0-based. Since JJDX version 2001, the byte order
+ *   of the index entries is specified in the header. Index entries in 1001 files are always stored 
+ *   in big-endian format.
+ * </p><p>
+ *   Index entries are sorted lexicographically to enable fast lookups. 
+ *   The precise rules of lexicographical comparison of two entries are not
+ *   specified and depend on the dictionary implementation. For example, an implementation may
+ *   apply uppercase to lowercase or katakana to hiragana conversion, changing the sorting order.
+ *   If a different implementation wants to use the index file, it has to take care to replicate
+ *   this behavior for searches to succeed.
+ * </p>
  *
  * @author Michael Koch
  */
@@ -144,7 +203,7 @@ public abstract class FileBasedDictionary implements Dictionary {
 
     /**
      * Filename extension of a JJDX-format index. Will be added to the filename of the
-     * dictionary.
+     * dictionary to derive the index file name.
      */
     public final static String INDEX_EXTENSION = ".jjdx";
     /**
@@ -164,6 +223,7 @@ public abstract class FileBasedDictionary implements Dictionary {
      * 4 bytes each.
      */
     public final static int INDEX_OFFSET = 4*4;
+
     /**
      * Localizable message resource.
      */
@@ -303,6 +363,7 @@ public abstract class FileBasedDictionary implements Dictionary {
 
     public List search( String expression, short searchmode, short resultmode) throws SearchException {
         List result = new ArrayList( 10);
+        expression = escape( expression);
 
         // do a binary search through the index file
         try {
@@ -409,7 +470,7 @@ public abstract class FileBasedDictionary implements Dictionary {
                         entrystring = decoder.decode( ByteBuffer.wrap( entry, 0, entrylength)).toString();
                     }
                     else { // NIO does not support the required encoding
-                        entrystring = new String( entry, 0, entrylength, getEncoding());
+                        entrystring = unescape( new String( entry, 0, entrylength, getEncoding()));
                     }
                     parseEntry( result, entrystring, start, matchstart, expression, exprbuf,
                                 searchmode, resultmode);
@@ -448,6 +509,53 @@ public abstract class FileBasedDictionary implements Dictionary {
     }
 
     /**
+     * Escape all characters in the string not representable in the dictionary byte array.
+     * This can be either chars not representable through the character encoding used by the
+     * dictionary, or special characters used as field and entry separators.
+     * <p>
+     * The method is called to escape search expressions before the search in the dictionary
+     * array is begun. The case where different escaping rules are needed for different
+     * fields of a dictionary entry is not covered by this escaping scheme.
+     * </p><p>
+     * This implementation calls {@link #escapeChar(char) escapeChar} for every character
+     * in the string and uses a {@link StringTools.unicodeEscape(char) unicode escape sequence}
+     * if the method returns <code>true</code>.
+     * </p>
+     */
+    protected String escape( String str) {
+        StringBuffer buf = null; // initialize only if needed
+        for ( int i=str.length()-1; i>=0; i--) {
+            if (escapeChar( str.charAt( i))) {
+                if (buf == null)
+                    buf = new StringBuffer( str);
+                buf.replace( i, i+1, StringTools.unicodeEscape( str.charAt( i)));
+            }
+        }
+
+        if (buf == null) // no changes
+            return str;
+        else
+            return buf.toString();
+    }
+
+    /**
+     * Test if a character must be escaped if it is to be used in a dictionary entry.
+     *
+     * @param c The character to test.
+     * @return <code>true</code>, if the character must be escaped.
+     */
+    protected abstract boolean escapeChar( char c);
+
+    /**
+     * Replace any escape sequences in the string by the character represented.
+     * This is the inverse method to {@link #escape(String) escape}. This implementation
+     * calls {@link StringTools.unicodeUnescape(String) StringTools.unicodeUnescape}.
+     */
+    protected String unescape( String str) {
+        return StringTools.unicodeUnescape( str);
+    }
+    
+    /**
      * Create <CODE>DictionaryEntries</CODE> from the entry string and add them to the
      * result list. The parsing may create more than one dictionary entry. The method is
      * passed information about what was matched and where in the dictionary the match was
@@ -455,7 +563,8 @@ public abstract class FileBasedDictionary implements Dictionary {
      *
      * @param result List to which new dictionary entries should be added.
      * @param entry String from the dictionary file from which the dictionary entries should be
-     *              created.
+     *              created. The entry is not unescaped, the {@link #unescape(String) unescape} method
+     *              must be called for each field if the dictionary needs escaping for special characters.
      * @param entrystart Position in the dictionary of the first byte of the entry.
      * @param where Position in the dictionary where the expression was found.
      * @param expression The expression searched.
@@ -467,7 +576,7 @@ public abstract class FileBasedDictionary implements Dictionary {
     protected abstract void parseEntry( List result, String entry, int entrystart, int where,
                                         String expression, ByteBuffer exprbuf, short searchmode,
                                         short resultmode);
-
+    
     /**
      * Returns the index of an index entry which matches a word. If there is more than one match,
      * it is not defined which match is returned. If no match is found, <code>-1</code>

@@ -161,7 +161,7 @@ public class GDict extends FileBasedDictionary {
                     return (dictionary.get( offset+2) == '[');
             }
             else if (b==' ' || b==')') // only end marker if not in translation
-                return dictionary.get( offset-1) > 127; // test for non-ASCII character
+                return (dictionary.get( offset-1)&0x80) != 0; // test for non-ASCII character
             return false;
         } catch (IndexOutOfBoundsException ex) {
             return true;
@@ -184,7 +184,7 @@ public class GDict extends FileBasedDictionary {
             int bracket = reading.indexOf( '[');
             if (bracket != -1)
                 // the [ must always be preceeded by a single space, therefore bracket-1
-                reading = reading.substring( 0, bracket-1);
+                reading = unescape( reading.substring( 0, bracket-1));
             if (reading.length() == 0)
                 reading = null;
 
@@ -205,15 +205,15 @@ public class GDict extends FileBasedDictionary {
                 while (WORD_MATCHER.find()) {
                     if (WORD_MATCHER.group( 2) == null) {
                         // word without alternative spellings
-                        wordlist.add( WORD_MATCHER.group( 1));
+                        wordlist.add( unescape( WORD_MATCHER.group( 1)));
                     }
                     else {
                         // word with alternatives
                         List alternatives = new ArrayList( 3);
-                        alternatives.add( WORD_MATCHER.group( 1));
+                        alternatives.add( unescape( WORD_MATCHER.group( 1)));
                         ALTERNATIVES_MATCHER.reset( WORD_MATCHER.group( 2));
                         while (ALTERNATIVES_MATCHER.find())
-                            alternatives.add( ALTERNATIVES_MATCHER.group( 1));
+                            alternatives.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
                         wordlist.add( alternatives);
                     }
                 }
@@ -234,7 +234,7 @@ public class GDict extends FileBasedDictionary {
                     
                     ALTERNATIVES_MATCHER.reset( TRANSLATIONS_MATCHER.group( 2));
                     while (ALTERNATIVES_MATCHER.find()) {
-                        translationlist.add( ALTERNATIVES_MATCHER.group( 1));
+                        translationlist.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
                     }
                 }
                 translationlist.trimToSize();
@@ -427,5 +427,20 @@ public class GDict extends FileBasedDictionary {
 
     public String toString() {
         return FORMAT_NAME + " " + getName();
+    }
+
+    /**
+     * Escape all dictionary special characters.
+     */
+    protected boolean escapeChar( char c) {
+        switch (c) {
+        case 10:
+        case 13:
+        case '|':
+        case ';':
+            return true;
+        }
+
+        return false;
     }
 } // class GDict

@@ -213,6 +213,75 @@ public class StringTools {
         return out;
     }
 
+    /**
+     * Character array containing the characters representing the numbers 0-15 in hexadecimal notation.
+     */
+    private static char[] HEX_CHARS = new char[] { 
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f'
+    };
+
+    /**
+     * Return the unicode escape string for a character. The unicode escape string is
+     * \\u followed by a 4-digit hexadecimal string representing the unicode value of the character.
+     */
+    public static String unicodeEscape( char c) {
+        int v = (int) c;
+
+        char[] hex = new char[] { '\\', 'u', '0', '0', '0', '0' };
+        int i=5;
+        // fill hex array with chars back to front
+        while (v > 0) {
+            hex[i--] = HEX_CHARS[v&0xf];
+            v >>>= 4;
+        }
+
+        return new String( hex);
+    }
+
+    /**
+     * Returns a new string with all unicode escape sequences replaced with the character
+     * represented by the sequence.
+     */
+    public static String unicodeUnescape( String str) {
+        StringBuffer buf = null; // only create if needed
+        for ( int i=str.length()-6; i>=0; i--) {
+            if (str.charAt( i)=='\\' && str.charAt( i+1)=='u') {
+                // Possible unicode escape sequence.
+                // The escape sequence is only valid if the following 4 characters are
+                // hexadecimal values.
+                int replacement = 0;
+                for ( int j=i+2; j<i+6; j++) {
+                    char c = str.charAt( j);
+                    int v = 0;
+                    if (c>='0' && c<='9')
+                        v = c - '0';
+                    else if (c>='a' && c<='f')
+                        v = c - 'a' + 10;
+                    else if (c>='A' && c<='F')
+                        v = c - 'A' + 10;
+                    else { // no hexadecimal value
+                        replacement = -1;
+                        break;
+                    }
+                    replacement = (replacement<<4) | v;
+                }
+                if (replacement >= 0) {
+                    // valid escape sequence
+                    if (buf == null)
+                        buf = new StringBuffer( str);
+                    buf.delete( i, i+5);
+                    buf.setCharAt( i, (char) replacement);
+                }
+            }
+        }
+
+        if (buf == null) // no changes to string
+            return str;
+        else
+            return buf.toString();
+    }
+
     private static void print( String[][] s) {
         for ( int i=0; i<s.length; i++) {
             System.err.print( s[i][0]);

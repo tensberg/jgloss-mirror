@@ -188,6 +188,12 @@ public class EDictNIO extends FileBasedDictionary {
         initImplementation();
 
     /**
+     * Dictionary ID written to the JJDX header. The ASCII-value of the ID is JGEN,
+     * which is short for JGloss EDictNIO.
+     */
+    public final static int DICTIONARY_ID = 0x4a47454e;
+
+    /**
      * Returns a {@link FileBasedDictionary.Implementation FileBasedDictionary.Implementation}
      * which recognizes EUC-JP encoded EDICT dictionaries. Used to initialize the
      * {@link #implementation implementation} final member because the constructor has to
@@ -260,21 +266,21 @@ public class EDictNIO extends FileBasedDictionary {
         String word;
         try {
             int i = entry.indexOf( ' ');
-            word = entry.substring( 0, i);
+            word = unescape( entry.substring( 0, i));
 
             // reading:
             String reading = null;
             i = entry.indexOf( '[');
             if (i != -1) {
                 j = entry.indexOf( ']', i+1);
-                reading = entry.substring( i+1, j);
+                reading = unescape( entry.substring( i+1, j));
             } // else: no reading
         
             // translations
             i = entry.indexOf( '/', i);
             ArrayList translations = new ArrayList( 10);
             while ((k=entry.indexOf( '/', i+1)) != -1) {
-                translations.add( entry.substring( i+1, k));
+                translations.add( unescape( entry.substring( i+1, k)));
                 i = k;
             }
             translations.trimToSize();
@@ -328,6 +334,7 @@ public class EDictNIO extends FileBasedDictionary {
             if (c>='a' && c<='z' ||
                 c>='A' && c<='Z' ||
                 c>='0' && c<='9' ||
+                c=='\\' || // possible start of unicode escape
                 (inWord && c=='-'))
                 return 3; // word character
             else
@@ -337,5 +344,22 @@ public class EDictNIO extends FileBasedDictionary {
 
     public String toString() {
         return "EDICT " + getName();
+    }
+
+    /**
+     * Escape LF/CR, '/' and all characters except ASCII, kanji and kana.
+     */
+    protected boolean escapeChar( char c) {
+        // some special characters need escaping
+        if (c==10 || c==13 || c=='/')
+            return true;
+
+        // ASCII and Kanji/Kana characters don't need escaping
+        // (Danger: The range covered may be too large)
+        if (c<128 || c>=0x2e80 && c<0xa000)
+            return false;
+
+        // escape all other characters
+        return true;
     }
 } // class EDictNIO

@@ -243,6 +243,7 @@ public class EDict implements Dictionary {
      */
     public List search( String expression, short searchmode, short resultmode) throws SearchException {
         List result = new LinkedList();
+        expression = escape( expression);
 
         // do a binary search through the index file
         try {
@@ -326,7 +327,7 @@ public class EDict implements Dictionary {
                         continue;
                     }
                     else {
-                        word = entry.substring( 0, i);
+                        word = unescape( entry.substring( 0, i));
                     }
                     // reading:
                     String reading = null;
@@ -339,7 +340,7 @@ public class EDict implements Dictionary {
                             continue;
                         }
                         else
-                            reading = entry.substring( i+1, j);
+                            reading = unescape( entry.substring( i+1, j));
                     } // else: no reading
 
                     // translations
@@ -351,7 +352,7 @@ public class EDict implements Dictionary {
                     }
                     ArrayList translations = new ArrayList( 10);
                     while ((k=entry.indexOf( '/', i+1)) != -1) {
-                        translations.add( entry.substring( i+1, k));
+                        translations.add( unescape( entry.substring( i+1, k)));
                         i = k;
                     }
                     translations.trimToSize();
@@ -620,7 +621,7 @@ public class EDict implements Dictionary {
         for ( int i=start; i<end; i++) {
             int c = byteToUnsignedByte( dictionary[i]);
             if (inword) {
-                if (!(alphaoreuc( dictionary[i]) || c=='-')) {
+                if (!(alphaoreuc( (byte) c) || c=='-'|| c=='\\')) {
                     inword = false;
                     int len = i - entry;
                     // save all entries with length >= 3 or kanji/kana entries of length >= 2 (bytes).
@@ -652,7 +653,9 @@ public class EDict implements Dictionary {
                 }
             }
             else {
-                if (alphaoreuc( dictionary[i])) {
+                if (alphaoreuc( (byte) c) ||
+                    // match start of unicode escape sequence
+                    c=='\\' && i+1<dictionary.length && dictionary[i+1]=='u') {
                     inword = true;
                     entry = i;
                 }
@@ -932,5 +935,57 @@ public class EDict implements Dictionary {
         } catch (ClassCastException ex) {
             return false;
         }
+    }
+
+    /**
+     * Escape all characters in the string not representable in the dictionary byte array.
+     * This can be either chars not representable through the character encoding used by the
+     * dictionary, or special characters used as field and entry separators.
+     * <p>
+     * This implementation calls {@link #escapeChar(char) escapeChar} for every character
+     * in the string and uses a {@link StringTools.unicodeEscape(char) unicode escape sequence}
+     * if the method returns <code>true</code>.
+     * </p>
+     */
+    protected String escape( String str) {
+        StringBuffer buf = null; // initialize only if needed
+        for ( int i=str.length()-1; i>=0; i--) {
+            if (escapeChar( str.charAt( i))) {
+                if (buf == null)
+                    buf = new StringBuffer( str);
+                buf.replace( i, i+1, StringTools.unicodeEscape( str.charAt( i)));
+            }
+        }
+
+        if (buf == null) // no changes
+            return str;
+        else
+            return buf.toString();
+    }
+
+    /**
+     * Escape LF/CR, '/' and all characters except ASCII, kanji and kana.
+     */
+    protected boolean escapeChar( char c) {
+        // some special characters need escaping
+        if (c==10 || c==13 || c=='/')
+            return true;
+
+        // ASCII and Kanji/Kana characters don't need escaping
+        // (Danger: The range covered may be too large)
+        if (c<128 || c>=0x2e80 && c<0xa000)
+            return false;
+
+        // escape all other characters
+        return true;
+    }
+
+    /**
+     * Replace any escape sequences in the string by the character represented.
+     * This is the inverse method to {@link #escape(String) escape}. This implementation
+     * calls {@link StringTools.unicodeUnescape(String) StringTools.unicodeUnescape}.
+     */
+    protected String unescape( String str) {
+        return StringTools.unicodeUnescape( str);
     }
 } // class EDict

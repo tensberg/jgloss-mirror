@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -197,6 +197,113 @@ public class Dictionaries extends JComponent {
     }
 
     /**
+     * Thread used to load dictionaries asynchronously when the user has selected "add dictionaries".
+     */
+    private class DictionaryLoader implements Runnable {
+        private boolean dictionariesLoaded = false;
+        private JDialog messageDialog;
+        private JLabel message;
+        private Cursor currentCursor;
+        private File[] dictionaries;
+
+        public DictionaryLoader() {}
+
+        /**
+         * Load the dictionaries from the list of files and add them to the current list of
+         * dictionaries. The dictionaries are loaded in their own thread. If the thread does
+         * not terminate after one second, this method will pop up a model information dialog and
+         * return. The thread will dispose the dialog after it has loaded all dictionaries and display
+         * any error messages for errors in dictionary loading.
+         *
+         * @param dictionaries List of dictionary files to load. If a dictionary file is already
+         *        loaded, it will be ignored.
+         */
+        public void loadDictionaries( File[] dictionaries) {
+            this.dictionaries = dictionaries;
+            dictionariesLoaded = false;
+            if (messageDialog == null) {
+                Frame parent = (Frame) SwingUtilities.getRoot( Dictionaries.this);
+                messageDialog = new JDialog( parent, true);
+                messageDialog.setTitle( JGloss.messages.getString( "dictionaries.loading.title"));
+                message = new JLabel( "", JLabel.CENTER);
+                messageDialog.getContentPane().add( message);
+                messageDialog.setSize( 450, 50);
+                messageDialog.setLocation( Math.max( (int) (parent.getLocation().getX() + 
+                                                            parent.getSize().getWidth()/2 - 225), 0),
+                                           (int) (parent.getLocation().getY() + 
+                                                  parent.getSize().getHeight()/2 - 25));
+                messageDialog.setDefaultCloseOperation( JDialog.DO_NOTHING_ON_CLOSE);
+            }
+            currentCursor = getCursor();
+
+            Thread worker = new Thread( this);
+            worker.start();
+
+            try {
+                worker.join( 1000);
+            } catch (InterruptedException ex) {}
+
+            if (!dictionariesLoaded) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+                messageDialog.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+                messageDialog.show();
+            }
+        }
+
+        public void run() {
+            final DefaultListModel model = (DefaultListModel) Dictionaries.this.dictionaries.getModel();
+            List errors = new ArrayList( dictionaries.length*2);
+            for ( int i=0; i<dictionaries.length; i++) {
+                final String descriptor = dictionaries[i].getAbsolutePath();
+                // check if the dictionary is already added
+                boolean alreadyAdded = false;
+                for ( Enumeration e=model.elements(); e.hasMoreElements(); ) {
+                    if (((DictionaryWrapper) e.nextElement()).descriptor.equals( descriptor)) {
+                        alreadyAdded = true;
+                        break;
+                    }
+                }
+                if (!alreadyAdded) {
+                    EventQueue.invokeLater( new Runnable() {
+                            public void run() {
+                                message.setText( JGloss.messages.getString
+                                                 ( "dictionaries.loading",
+                                                   new String[] { new File( descriptor)
+                                                       .getName() }));
+                            }
+                        });
+                    try {
+                        final Dictionary d = DictionaryFactory
+                            .createDictionary( descriptor);
+                        if (d != null) {
+                            EventQueue.invokeLater( new Runnable() {
+                                    public void run() {
+                                        model.addElement( new DictionaryWrapper( descriptor, d));
+                                    }
+                                });
+                        }
+                    } catch (DictionaryFactory.Exception ex) {
+                        // stack the errors and show them after all other dictionaries are
+                        // loaded
+                        errors.add( ex);
+                        errors.add( descriptor);
+                    }
+                }
+            }
+
+            dictionariesLoaded = true;
+            setCursor( currentCursor);
+            messageDialog.hide();
+            messageDialog.dispose();                
+
+            // show error messages for dictionary load failures
+            for ( Iterator i=errors.iterator(); i.hasNext(); )
+                showDictionaryError( (DictionaryFactory.Exception) i.next(),
+                                     (String) i.next());
+        }
+    }
+
+    /**
      * Creates a new instance of dictionaries.
      */
     private Dictionaries() {
@@ -329,71 +436,9 @@ public class Dictionaries extends JComponent {
         int result = chooser.showDialog( SwingUtilities.getRoot( box), JGloss.messages.getString
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
-            final File[] fs = chooser.getSelectedFiles();
-            // Dictionary loading might take some time if an index file has to be created first.
-            // Pop up an informational message if it takes longer than one second.
-            Frame parent = (Frame) SwingUtilities.getRoot( this);
-            final JDialog messageDialog = new JDialog( parent, true);
-            messageDialog.setTitle( JGloss.messages.getString( "dictionaries.loading.title"));
-            final JLabel message = new JLabel( "");
-            messageDialog.getContentPane().add( message);
-            messageDialog.setSize( 500, 50);
-            messageDialog.setLocation( (int) (parent.getLocation().getX() + 
-                                       parent.getSize().getWidth()/2 - 250),
-                                       (int) (parent.getLocation().getY() + 
-                                       parent.getSize().getHeight()/2 - 25));
-            messageDialog.setDefaultCloseOperation( JDialog.DO_NOTHING_ON_CLOSE);
-            final Cursor currentCursor = getCursor();
-            Thread worker = new Thread() {
-                    public void run() {
-                        final DefaultListModel model = (DefaultListModel) dictionaries.getModel();
-                        for ( int i=0; i<fs.length; i++) {
-                            final String descriptor = fs[i].getAbsolutePath();
-                            // check if the dictionary is already added
-                            boolean alreadyAdded = false;
-                            for ( Enumeration e=model.elements(); e.hasMoreElements(); ) {
-                                if (((DictionaryWrapper) e.nextElement()).descriptor.equals( descriptor)) {
-                                    alreadyAdded = true;
-                                    break;
-                                }
-                            }
-                            if (!alreadyAdded) {
-                                EventQueue.invokeLater( new Runnable() {
-                                        public void run() {
-                                            message.setText( JGloss.messages.getString
-                                                             ( "dictionaries.loading",
-                                                               new String[] { new File( descriptor)
-                                                                   .getName() }));
-                                        }
-                                    });
-                                final Dictionary d = loadDictionary( descriptor);
-                                if (d != null) {
-                                    EventQueue.invokeLater( new Runnable() {
-                                            public void run() {
-                                                model.addElement( new DictionaryWrapper( descriptor, d));
-                                            }
-                                        });
-                                }                 
-                            }
-                        }
-                        JGloss.prefs.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
-                                          .getAbsolutePath());
-
-                        setCursor( currentCursor);
-                        messageDialog.hide();
-                        messageDialog.dispose();
-                    }
-                };
-            worker.start();
-            try {
-                worker.join( 1000);
-            } catch (InterruptedException ex) {}
-
-            if (worker.isAlive()) {
-                setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-                messageDialog.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-                messageDialog.show();
-            }
+            new DictionaryLoader().loadDictionaries( chooser.getSelectedFiles());
+            JGloss.prefs.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
+                              .getAbsolutePath());
         }
     }
 
@@ -408,18 +453,24 @@ public class Dictionaries extends JComponent {
      * @see jgloss.dictionary.DictionaryFactory
      */
     private Dictionary loadDictionary( String file) {
+        try {
+            return DictionaryFactory.createDictionary( file);
+        } catch (DictionaryFactory.Exception ex) {
+            showDictionaryError( ex, file);
+            return null;
+        }
+    }
+
+    /**
+     * Show an error dialog for the dictionary exception.
+     */
+    private void showDictionaryError( DictionaryFactory.Exception ex, String file) {
         String msgid;
         String [] objects;
 
-        try {
-            return DictionaryFactory.createDictionary( file);
-        } catch (DictionaryFactory.NotSupportedException ex) {
-            // dictionary format not supported
-            msgid = "error.dictionary.format";
-            objects = new String[] { new File( file).getAbsolutePath() };
-        } catch (DictionaryFactory.InstantiationException ex) {
+        if (ex instanceof DictionaryFactory.InstantiationException) {
             ex.printStackTrace();
-            Exception root = ex.getRootCause();
+            Exception root = ((DictionaryFactory.InstantiationException) ex).getRootCause();
             File f = new File( file);
             if (root instanceof FileNotFoundException) {
                 msgid = "error.dictionary.filenotfound";
@@ -430,13 +481,17 @@ public class Dictionaries extends JComponent {
                 objects = new String[] { f.getAbsolutePath() };
             }
         }
-            
+        else { // DictionaryFactory.NotSupportedException
+            // dictionary format not supported
+            msgid = "error.dictionary.format";
+            objects = new String[] { new File( file).getAbsolutePath() };
+        }
+
         JOptionPane.showConfirmDialog
-            ( SwingUtilities.getRoot( box), JGloss.messages.getString
+            ( SwingUtilities.getRoot( this), JGloss.messages.getString
               ( msgid, objects),
               JGloss.messages.getString( "error.dictionary.title"),
               JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-        return null;
     }
 
     /**

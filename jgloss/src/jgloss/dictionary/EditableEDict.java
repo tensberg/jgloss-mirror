@@ -107,25 +107,18 @@ public class EditableEDict extends EDict {
     public void addEntry( String word, String reading, List translations) {
         try {
             // Replace any special characters in the input
-            word = word.replace( ' ', '\u3000'); // japanese space
-            word = word.replace( (char) 0x0a, '_');
-            word = word.replace( (char) 0x0d, '_');
+            word = escape( word.replace( ' ', '\u3000')); // japanese space
             byte[] wa = word.getBytes( "EUC-JP");
             byte[] ra = null;
             if (reading!=null && reading.length()>0) {
                 reading = reading.replace( '[', '\uff3b'); // japanese [
                 reading = reading.replace( ']', '\uff3d'); // japanese ]
-                reading = reading.replace( (char) 0x0a, '_');
-                reading = reading.replace( (char) 0x0d, '_');
+                reading = escape( reading);
                 ra = reading.getBytes( "EUC-JP");
             }
             byte[][] ta = new byte[translations.size()][];
             for ( int i=0; i<translations.size(); i++) {
-                String translation = ((String) translations.get( i)).replace( '/', '|');
-                translation = translation.replace( '/', '|');
-                translation = translation.replace( (char) 0x0a, '_');
-                translation = translation.replace( (char) 0x0d, '_');
-                ta[i] = translation.getBytes( "EUC-JP");
+                ta[i] = escape( (String) translations.get( i)).getBytes( "EUC-JP");
             }
 
             synchronized (this) {
@@ -259,23 +252,20 @@ public class EditableEDict extends EDict {
                     postBuildIndex();
                 }
             }
+            System.out.println( "added entry");
         } catch (UnsupportedEncodingException ex) {}
     }
 
     public void deleteEntry( String word, String reading) {
         try {
             // Replace any special characters in the input
-            word = word.replace( ' ', '\u3000'); // japanese space
-            word = word.replace( (char) 0x0a, '_');
-            word = word.replace( (char) 0x0d, '_');
+            word = escape( word.replace( ' ', '\u3000')); // japanese space
             byte[] wa = word.getBytes( "EUC-JP");
             byte[] ra = null;
             if (reading!=null && reading.length()>0) {
                 reading = reading.replace( '[', '\uff3b'); // japanese [
                 reading = reading.replace( ']', '\uff3d'); // japanese ]
-                reading = reading.replace( (char) 0x0a, '_');
-                reading = reading.replace( (char) 0x0d, '_');
-                ra = reading.getBytes( "EUC-JP");
+                ra = escape( reading).getBytes( "EUC-JP");
             }
 
             synchronized (this) {

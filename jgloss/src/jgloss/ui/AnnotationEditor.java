@@ -585,29 +585,13 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     String translation = selection.getTranslationNode().getText();
                     if (translation.length() == 0)
                         return;
-                    ArrayList translations = new ArrayList( 5);
-                    // split translations at '/'
-                    int from = 0;
-                    int to = translation.indexOf( '/');
-                    if (to == -1)
-                        to = translation.length();
-                    do {
-                        if (to > from+1)
-                            translations.add( translation.substring( from, to));
-                        from = to;
-                        to = translation.indexOf( '/', from);
-                        if (to == -1)
-                            to = translation.length();
-                    } while (from < translation.length());
-                    if (translations.size() > 0) {
-                        String word = selection.getDictionaryFormNode().getWord();
-                        if (word.length() == 0)
-                            return;
-                        String reading = selection.getDictionaryFormNode().getReading();
-                        if (reading.length() == 0 || reading.equals( word))
-                            reading = null;
-                        Dictionaries.getUserDictionary().addEntry( word, reading, translations);
-                    }
+                    String word = selection.getDictionaryFormNode().getWord();
+                    if (word.length() == 0)
+                        return;
+                    String reading = selection.getDictionaryFormNode().getReading();
+                    if (reading.length() == 0 || reading.equals( word))
+                        reading = null;
+                    Dictionaries.getUserDictionary().addEntry( word, reading, translation);
                 }
             };
         UIUtilities.initAction( addToDictionaryAction, "annotationeditor.menu.addtodictionary");
