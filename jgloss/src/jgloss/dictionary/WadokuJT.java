@@ -214,7 +214,7 @@ public class WadokuJT extends FileBasedDictionary {
             // the match to be successful.
             return new FileBasedDictionary.Implementation
                 ( FORMAT_NAME, "UTF-8", true, Pattern.compile
-                  ( "\\A([^\\|]*\\|){3,}[^\\|]*$", Pattern.MULTILINE),
+                  ( "\\A(.*?\\|){3}.*$", Pattern.MULTILINE),
                   1.0f, 4096, WadokuJT.class.getConstructor( new Class[] { File.class }));
         } catch (Exception ex) {
             ex.printStackTrace();
