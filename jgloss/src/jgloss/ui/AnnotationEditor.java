@@ -170,11 +170,28 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     private JPopupMenu pmenu;
 
     /**
+     * An Enumeration containing no elements.
+     */
+    private final static Enumeration EMPTY_ENUMERATION = new Vector(1).elements();
+
+    /**
+     * Flag if this is the first time the tree is expanded. This is used for optimizing the
+     * <CODE>getExpandedDescendants</CODE> method.
+     */
+    private boolean isInitialExpansion = true;
+    /**
+     * Flag if getExpandedDescendants should return an empty enumeration. This is used together
+     * with <CODE>isInitialExpansion</CODE> to speed up the initial expansion of the tree.
+     */
+    private boolean returnEmptyEnumeration = false;
+
+    /**
      * Creates a new annotation editor. The editor is initially empty and not associated
      * to a document containing annotations. Call {@link #setDocument(Element,JGlossEditor) setDocument}
      * to set the document to edit. The constructor will create a new empty AnnotationModel.
      */
     public AnnotationEditor() {
+        setLargeModel( true);
         model = new AnnotationModel() {
                 public void valueForPathChanged( TreePath path, Object newValue) {
                     ((ReadingTranslationNode) path.getLastPathComponent()).setText( newValue.toString());
@@ -191,10 +208,7 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                             collapsePath( tp);
                         }
                         else {
-                            ArrayList l = new ArrayList( 5);
-                            for ( int i=0; i<tp.getPathCount()-1; i++)
-                                l.add( tp.getPathComponent( i));
-                            expandAll( (TreeNode) tp.getLastPathComponent(), l);
+                            expandAll( tp);
                         }
                     }
                 }
@@ -509,9 +523,36 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
     /**
      * Expands all paths in the tree so that all nodes are visible.
      */
-    public void expandAll() {
+    public synchronized void expandAll() {
+        if (isInitialExpansion)
+            returnEmptyEnumeration = true;
+
         if (!((TreeNode) model.getRoot()).isLeaf())
-            expandAll( (TreeNode) model.getRoot(), new ArrayList( 5));
+            expandAll( new TreePath( model.getRoot()));
+
+        if (isInitialExpansion) {
+            isInitialExpansion = false;
+            returnEmptyEnumeration = false;
+        }
+    }
+
+    /**
+     * Expands all descendants of all annotation nodes which are not hidden.
+     */
+    public synchronized void expandNonHidden() {
+        if (isInitialExpansion)
+            returnEmptyEnumeration = true;
+
+        for ( Iterator i=model.getAnnotationNodes(); i.hasNext(); ) {
+            AnnotationNode a = (AnnotationNode) i.next();
+            if (!a.isHidden())
+                expandAll( a);
+        }
+
+        if (isInitialExpansion) {
+            isInitialExpansion = false;
+            returnEmptyEnumeration = false;
+        }
     }
 
     /**
@@ -521,42 +562,55 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      */
     public void expandAll( TreeNode node) {
         LinkedList path = new LinkedList();
+        path.add( node);
         TreeNode parent = node.getParent();
         while (parent != null) {
             path.addFirst( parent);
             parent = parent.getParent();
         }
-        expandAll( node, path);
+        expandAll( new TreePath( path.toArray()));
     }
 
     /**
-     * Expands all paths in the tree passing through this node
+     * Expands all paths in the tree passing through the node which is last in the path.
      *
-     * @param node Node which will be expanded
-     * @param path Contains the path from root to the node exclusive. The node will be added
-     *             when recursing for children.
+     * @param path Contains the path from root to the node inclusive.
      */
-    private void expandAll( TreeNode node, java.util.List path) {
-        path.add( node);
-        this.expandPath( new TreePath( path.toArray()));
+    private void expandAll( TreePath path) {
+        this.expandPath( path);
+
         boolean childrenAreLeaves = true;
         TreeNode child = null;
-        for ( Enumeration e=node.children(); e.hasMoreElements(); ) {
+        for ( Enumeration e=((TreeNode) path.getLastPathComponent()).children(); e.hasMoreElements(); ) {
             child = (TreeNode) e.nextElement();
             if (!child.isLeaf()) {
                 childrenAreLeaves = false;
-                expandAll( child, path);
+                expandAll( path.pathByAddingChild( child));
             }
         }
 
-        // child is never null since this method will not be called for leaves
+        // child is never null since this method will not be called for leaves.
+        // It doesn't matter which child we use for the expansion since they are all leaves.
         if (childrenAreLeaves) {
-            path.add( child);
-            this.expandPath( new TreePath( path.toArray()));
-            path.remove( path.size()-1);
+            this.expandPath( path.pathByAddingChild( child));
         }
+    }
 
-        path.remove( path.size()-1);
+    /**
+     * Returns an enumeration of expanded descendants. This is overridden to optimize
+     * the initial expansion of the tree from {@link #expandAll() expandAll} or
+     * {@link #expandNonHidden() expandNonHidden}. Profiling has shown that this method
+     * is slowing down the expansion extremely.
+     * If one of this methods is called for
+     * the first time, it will set {@link #returnEmptyEnumeration} to <CODE>true</CODE>,
+     * because it is known that no nodes are expanded at that time. This method will
+     * then return an empty enumeration. 
+     */
+    public Enumeration getExpandedDescendants( TreePath parent) {
+        if (returnEmptyEnumeration)
+            return EMPTY_ENUMERATION;
+        else
+            return super.getExpandedDescendants( parent);
     }
 
     /**
