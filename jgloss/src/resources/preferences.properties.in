@@ -76,8 +76,10 @@ export.html.writehidden=false
 export.latex.writereading=true
 export.latex.writetranslations=false
 export.latex.writehidden=false
-export.latex.preamble=\\usepackage{pslatex}\n\\renewcommand{\\thefootnote}{}\n
 export.latex.documentclass=jarticle
+export.latex.documentclass.options=10pt
+export.latex.preamble=\\usepackage{pslatex}\n\\renewcommand{\\thefootnote}{}\n
+export.latex.ruby.options=overlap,CJK
 
 exclusions.file=.jgloss-exclusions
 

@@ -99,6 +99,10 @@ public class Preferences {
 
     public static final String EXPORT_LATEX_PREAMBLE = "export.latex.preamble";
     public static final String EXPORT_LATEX_DOCUMENTCLASS = "export.latex.documentclass";
+    public static final String EXPORT_LATEX_DOCUMENTCLASS_OPTIONS =
+        "export.latex.documentclass.options";
+    public static final String EXPORT_LATEX_RUBY_OPTIONS =
+        "export.latex.ruby.options";
     public static final String EXPORT_LATEX_WRITEREADING = "export.latex.writereading";
     public static final String EXPORT_LATEX_WRITETRANSLATIONS = 
         "export.latex.writetranslations";
