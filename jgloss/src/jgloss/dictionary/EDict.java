@@ -269,8 +269,44 @@ public class EDict implements Dictionary {
 
                 // read all matching entries
                 for ( match=firstmatch; match<=lastmatch; match++) {
-                    // find beginning of entry line
                     int start = index[match];
+
+                    // test if entry matches search mode
+                    if (mode == SEARCH_EXACT_MATCHES ||
+                        mode == SEARCH_STARTS_WITH) {
+                        // test if preceeding character marks beginning of word entry
+                        if (start > 0) {
+                            switch (dictionary[start-1]) {
+                            case 0x0a: // start of word
+                            case 0x0d: // start of word
+                            case ((byte) '['): // start of reading
+                            case ((byte) '/'): // start of translation
+                                break;
+                            default: // entry does not match
+                                continue;
+                            }
+                        }
+                    }
+                    if (mode == SEARCH_EXACT_MATCHES ||
+                        mode == SEARCH_ENDS_WITH) {
+                        // test if preceeding character marks beginning of word entry
+                        if (start+expr_euc.length < dictionary.length) { 
+                            switch (dictionary[start+expr_euc.length]) {
+                            case ((byte) ' '): // end of word or space in translation
+                                if (dictionary[start+expr_euc.length-1] >= 0)
+                                    // translation; bytes are signed
+                                    continue;
+                                break;
+                            case ((byte) ']'): // end of reading
+                            case ((byte) '/'): // end of translation
+                                break;
+                            default: // entry does not match
+                                continue;
+                            }
+                        }
+                    }
+
+                    // find beginning of entry line
                     while (start>0 && dictionary[start-1]!=0x0a)
                         start--;
 
@@ -334,65 +370,7 @@ public class EDict implements Dictionary {
                         translation[slashes++] = entry.substring( i+1, k);
                         i = k;
                     }
-                    
-                    // test if this entry matches the search mode
-                    boolean addEntry = false;
-                    switch (mode) {
-                    case SEARCH_EXACT_MATCHES:
-                        if (expression.equalsIgnoreCase( word) ||
-                            expression.equalsIgnoreCase( reading)) {
-                            addEntry = true;
-                        }
-                        else {
-                            for ( i=0; i<translation.length; i++) {
-                                if (expression.equalsIgnoreCase( translation[i])) {
-                                    addEntry = true;
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                        
-                    case SEARCH_STARTS_WITH:
-                        if (word.startsWith( expression) ||
-                            reading!=null && reading.startsWith( expression)) {
-                            addEntry = true;
-                        }
-                        else {
-                            for ( i=0; i<translation.length; i++) {
-                                if (translation[i].startsWith( expression)) {
-                                    addEntry = true;
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                        
-                    case SEARCH_ENDS_WITH:
-                        if (word.endsWith( expression) ||
-                            reading!=null && reading.endsWith( expression)) {
-                            addEntry = true;
-                        }
-                        else {
-                            for ( i=0; i<translation.length; i++) {
-                                if (translation[i].endsWith( expression)) {
-                                    addEntry = true;
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                        
-                    case SEARCH_ANY_MATCHES:
-                        addEntry = true;
-                        break;
-                        
-                    default:
-                        throw new IllegalArgumentException( "Invalid search mode");
-                    }
-                    
-                    if (addEntry)
-                        result.add( new DictionaryEntry( word, reading, translation, this));
+                    result.add( new DictionaryEntry( word, reading, translation, this));
                 }
             }
         } catch (IOException ex) {
