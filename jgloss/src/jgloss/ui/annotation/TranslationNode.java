@@ -79,8 +79,11 @@ public class TranslationNode extends InnerNode {
         }
         else {
             word += " (" + translation.getConjugation().getType() + ")";
+            reading = d.getReading(); // may be null if inflected form equals dictionary form
+                                      // for annotated hiragana words
             // cut off inflection
-            reading = d.getReading().substring( 0, d.getReading().length() - 
+            if (reading != null)
+                reading = reading.substring( 0, reading.length() - 
                                              translation.getConjugation().getDictionaryForm().length());
         }
     }

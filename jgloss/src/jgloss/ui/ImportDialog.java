@@ -73,10 +73,12 @@ public class ImportDialog extends JDialog {
         b.add( Box.createHorizontalGlue());
         final Action ok = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
-                    result = true;
-                    ImportDialog.this.hide();
-                    JGloss.prefs.set( Preferences.IMPORT_PARSER, 
-                                      parserSelector.getSelectedParser().getName());
+                    if (getSelection().length() > 0) {
+                        result = true;
+                        ImportDialog.this.hide();
+                        JGloss.prefs.set( Preferences.IMPORT_PARSER, 
+                                          parserSelector.getSelectedParser().getName());
+                    }
                 }
             };
         ok.setEnabled( true);

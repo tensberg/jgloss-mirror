@@ -225,7 +225,8 @@ public class JGlossDocument extends HTMLDocument {
                     // if this is a conjugated verb, cut off the non-kanji part
                     if (ta instanceof AbstractAnnotation) {
                         AbstractAnnotation tr = (AbstractAnnotation) ta;
-                        if (tr.getConjugation() != null) {
+                        if (tr.getConjugation()!=null &&
+                            talen>tr.getConjugation().getConjugatedForm().length()) {
                             talen -= tr.getConjugation().getConjugatedForm().length();
                         }
                     }
@@ -263,7 +264,7 @@ public class JGlossDocument extends HTMLDocument {
                         Reading r = (Reading) ta;
                         reading = r.getReading();
                         Conjugation c = r.getConjugation();
-                        if (c != null) {
+                        if (c!=null && reading!=null) {
                             reading = reading.substring( 0, reading.length() - c
                                                          .getDictionaryForm().length());
                             dictionaryWord = r.getWord();
@@ -297,9 +298,9 @@ public class JGlossDocument extends HTMLDocument {
                         DictionaryEntry de = tr.getDictionaryEntry();
                         reading = de.getReading();
                         // if this is a inflected verb, cut off the conjugation part
-                        if (tr.getConjugation() != null) {
+                        if (tr.getConjugation()!=null && reading!=null) {
                             reading = reading.substring( 0, reading.length() - tr.getConjugation()
-                                                   .getDictionaryForm().length());
+                                                         .getDictionaryForm().length());
 
                             dictionaryWord = de.getWord();
                             dictionaryReading = de.getReading();
@@ -308,7 +309,7 @@ public class JGlossDocument extends HTMLDocument {
                     }
                     if (dictionaryReading!=null && dictionaryReading.equals( dictionaryWord))
                         dictionaryReading = null;
-                    if (reading == null) 
+                    if (reading==null || reading.length()==0) 
                         // there has to be at least 1 character for the layout to work
                         reading = " ";
                     else if (reading.equals( new String( word)))

@@ -40,7 +40,7 @@ public interface ReadingAnnotationParser extends Parser {
             private final static String name = 
                 ResourceBundle.getBundle( "resources/messages-dictionary")
                 .getString( "parser.dictionary.document");
-            public String getName() { return "name"; }
+            public String getName() { return name; }
             public List search( String expression, short mode) { return null; }
             public void dispose() {}
         };

@@ -699,7 +699,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
         try {
             loadDocument
                 ( new HTMLifyReader( new StringReader( text)), path, title,
-                  new KanjiParser( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
+                  GeneralDialog.getComponent().createImportClipboardParser
+                  ( Dictionaries.getDictionaries(), ExclusionList.getExclusions()),
                   true, text.length());
             documentChanged = true;
             if (setPath)
