@@ -289,7 +289,7 @@ public class Parser {
                     }
                     else {
                         out.addAll( findTranslations( wordStart, word.toString(),
-                                                      reading.toString(), true, true));
+                                                      reading.toString(), true, true, true));
                         if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
                             mode = IN_KANJI;
                         else
@@ -316,7 +316,7 @@ public class Parser {
                     }
                     else {
                         out.addAll( findTranslations( wordStart, word.toString(),
-                                                      reading.toString(), true, true));
+                                                      reading.toString(), true, true, true));
                         if (ub == Character.UnicodeBlock.KATAKANA)
                             mode = IN_KATAKANA;
                         else
@@ -331,7 +331,8 @@ public class Parser {
             case IN_INFLECTION: // currently in possible inflection
                 if (ub != Character.UnicodeBlock.HIRAGANA) {
                     out.addAll( findTranslations( wordStart, word.toString(), 
-                                                  reading.toString(), inflection.toString(), true, true));
+                                                  reading.toString(), inflection.toString(), true, true,
+                                                  true));
                     if (ub == Character.UnicodeBlock.KATAKANA)
                         mode = IN_KATAKANA;
                     else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
@@ -350,7 +351,7 @@ public class Parser {
                 if (text[i]=='\n' || (i==text.length-1 && text[i] != readingEnd)) {
                     // Don't allow readings to span multiple lines to avoid runaways when
                     // this is not really a reading. Ignore the text in the "reading" string buffer. 
-                    out.addAll( findTranslations( wordStart, word.toString(), null, true, true));
+                    out.addAll( findTranslations( wordStart, word.toString(), null, true, true, true));
                     // "unread" the string that is not really a reading and try to parse the
                     // content of it
                     i -= reading.length();
@@ -372,10 +373,11 @@ public class Parser {
 
         // look up last word in buffer
         if (mode==IN_KATAKANA || mode==IN_KANJI || mode==END_READING)
-            out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), true, true));
+            out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), true, true,
+                                          true));
         else if (mode == IN_INFLECTION)
             out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), 
-                                          inflection.toString(), true, true));
+                                          inflection.toString(), true, true, true));
 
         return out;
     }
@@ -397,12 +399,13 @@ public class Parser {
      * @param word Word to look up.
      * @return A list of reading and translation annotations for the search word.
      * @exception SearchException If a dictionary lookup failed.
+     * @param useExclusions <CODE>true</CODE> if words in the exclusion list should be ignored.
      * @see #findTranslations(int,String,String,String,boolean,boolean)
      * @see Reading
      * @see Translation
      */
-    public List findTranslations( String word) throws SearchException {
-        return findTranslations( 0, word, null, null, false, false);
+    public List findTranslations( String word, boolean useExclusions) throws SearchException {
+        return findTranslations( 0, word, null, null, false, false, useExclusions);
     }
 
     /**
@@ -413,14 +416,16 @@ public class Parser {
      * @param word Word to look up.
      * @param inflection String of hiragana characters which might contain a verb/adjective inflection.
      *                   May be <CODE>null</CODE>.
+     * @param useExclusions <CODE>true</CODE> if words in the exclusion list should be ignored.
      * @return A list of reading and translation annotations for the search word.
      * @exception SearchException If a dictionary lookup failed.
      * @see #findTranslations(int,String,String,String,boolean,boolean)
      * @see Reading
      * @see Translation
      */
-    public List findTranslations( String word, String inflection) throws SearchException {
-        return findTranslations( 0, word, null, inflection, false, false);
+    public List findTranslations( String word, String inflection, boolean useExclusions)
+        throws SearchException {
+        return findTranslations( 0, word, null, inflection, false, false, useExclusions);
     }
 
     /**
@@ -437,6 +442,7 @@ public class Parser {
      * @param tryPrefixes If no exact match is found, try prefixes of the word.
      * @param trySuffixes If <CODE>tryPrefixes</CODE> is <CODE>true</CODE> and a prefix is found,
      *                    repeat the search with the remaining suffix of <CODE>word</CODE>
+     * @param useExclusions <CODE>true</CODE> if words in the exclusion list should be ignored.
      * @return A list of reading and translation annotations for the search word.
      * @exception SearchException If a dictionary lookup failed.
      * @see #findTranslations(int,String,String,String,boolean,boolean)
@@ -444,9 +450,10 @@ public class Parser {
      * @see Translation
      */
     private List findTranslations( int wordStart, String word, String reading,
-                                   boolean tryPrefixes,
-                                   boolean trySuffixes) throws SearchException {
-        return findTranslations( wordStart, word, reading, null, tryPrefixes, trySuffixes);
+                                   boolean tryPrefixes, boolean trySuffixes,
+                                   boolean useExclusions) throws SearchException {
+        return findTranslations( wordStart, word, reading, null, tryPrefixes, trySuffixes,
+                                 useExclusions);
     }
 
     /**
@@ -477,7 +484,8 @@ public class Parser {
      *                   May be <CODE>null</CODE>.
      * @param tryPrefixes If no exact match is found, try prefixes of the word.
      * @param trySuffixes If <CODE>tryPrefixes</CODE> is <CODE>true</CODE> and a prefix is found,
-     *                    repeat the search with the remaining suffix of <CODE>word</CODE>
+     *                    repeat the search with the remaining suffix of <CODE>word</CODE>.
+     * @param useExclusions <CODE>true</CODE> if words in the exclusion list should be ignored.
      * @return A list of reading and translation annotations for the search word.
      * @exception SearchException If a dictionary lookup failed.
      * @see Reading
@@ -486,7 +494,7 @@ public class Parser {
      */
     private List findTranslations( int wordStart, String word, final String reading,
                                    String inflection, boolean tryPrefixes,
-                                   boolean trySuffixes) throws SearchException {
+                                   boolean trySuffixes, boolean useExclusions) throws SearchException {
         //System.out.println( "Looking up " + word + ":" + reading + ":" + inflection);
         List translations = new ArrayList( 6);
         if (reading!=null && reading.length()>0) {
@@ -509,7 +517,7 @@ public class Parser {
             boolean match = false;
             // try to find exact match with conjugation
             if (conjugations != null) {
-                if (exclusions != null) {
+                if (useExclusions && exclusions!=null) {
                     for ( int i=0; i<conjugations.length; i++) {
                         if (exclusions.contains( word + conjugations[i].getDictionaryForm())) {
                             match = true;
@@ -548,7 +556,7 @@ public class Parser {
             
             if (!match) {
                 // try to find exact match without conjugation
-                if (exclusions!=null && exclusions.contains( word)) {
+                if (useExclusions && exclusions!=null && exclusions.contains( word)) {
                     match = true;
                 }
                 else {
@@ -578,35 +586,29 @@ public class Parser {
                 int[] lengths = new int[dictionaries.length];
                 int maxlength = 0;
 
-                if (exclusions != null) {
-                    // test if one of the prefixes is in the exclusion list
-                    for ( int i=word.length()-1; i>0; i--) {
-                        if (exclusions.contains( word.substring( 0, i))) {
-                            maxlength = i;
-                            break;
-                        }
-                    }
-                }
-                if (maxlength == 0) { // no exclusion found
-                    for ( int i=0; i<dictionaries.length; i++) {
-                        List r = search( dictionaries[i], word.substring( 0, 1), 
-                                         Dictionary.SEARCH_STARTS_WITH);
-                        entries[i] = new LinkedList();
-                        for ( Iterator j=r.iterator(); j.hasNext(); ) {
-                            WordReadingPair wrp = (WordReadingPair) j.next();
-                            String wrpword = wrp.getWord();
-                            if (wrpword.length() >= lengths[i]) {
-                                if (word.startsWith( wrpword)) {
-                                    if (wrpword.length() > lengths[i]) {
-                                        // we have a new longest match for this dictionary
-                                        // throw previous matches away
-                                        lengths[i] = wrpword.length();
-                                        maxlength = Math.max( wrpword.length(), maxlength);
-                                        entries[i].clear();
-                                    }
-                                    
-                                    entries[i].add( wrp);
+                for ( int i=0; i<dictionaries.length; i++) {
+                    List r = search( dictionaries[i], word.substring( 0, 1), 
+                                     Dictionary.SEARCH_STARTS_WITH);
+                    entries[i] = new LinkedList();
+                    for ( Iterator j=r.iterator(); j.hasNext(); ) {
+                        WordReadingPair wrp = (WordReadingPair) j.next();
+                        String wrpword = wrp.getWord();
+                        if (wrpword.length()>=lengths[i] &&
+                            wrpword.length()<word.length()) {
+                            if (word.startsWith( wrpword)) {
+                                // it is important to remember the length of the word
+                                // even if it is in the exclusion list
+                                if (wrpword.length()>lengths[i]) {
+                                    // we have a new longest match for this dictionary
+                                    // throw previous matches away
+                                    lengths[i] = wrpword.length();
+                                    maxlength = Math.max( wrpword.length(), maxlength);
+                                    entries[i].clear();
                                 }
+                                
+                                if (!(useExclusions && exclusions!=null &&
+                                      exclusions.contains( wrpword)))
+                                    entries[i].add( wrp);
                             }
                         }
                     }
