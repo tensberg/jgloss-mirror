@@ -1,4 +1,6 @@
-1.0: (2001/07/20)
+1.0: (2001/07/21)
+	- Extreme speedup of EDICT lookups. The old entry match test was
+	  really broken.
 	- Added French translation, contributed by Alexandre Beraud.
 	- Speed improvements in parser and edict.
 	- Added composite verb detection to parser.
