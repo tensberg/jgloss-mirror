@@ -30,6 +30,8 @@ error.dictionary.filenotfound=Das Wörterbuch {0} konnte nicht geöffnet werden.\n
 error.dictionary.ioerror=Beim Laden des Wörterbuchs {0}\nist ein Fehler aufgetreten.
 error.import.title=Fehler beim Importieren
 error.import.exception=Beim Import von {0} ist ein Fehler aufgetreten:\n{1}.
+error.export.title=Fehler beim Exportieren
+error.export.exception=Beim Exportieren ist ein Fehler aufgetreten:\n{0}.
 error.load.title=Fehler beim Öffnen
 error.load.exception=Beim Öffnen von {0} ist ein Fehler aufgetreten:\n{1}.
 error.save.title=Fehler beim Speichern
@@ -39,12 +41,13 @@ error.save.unknownannotation=Überspringe unbekannten Annotationstyp {0}
 button.ok=OK
 button.cancel=Abbrechen
 button.apply=Anwenden
-button.import=Import
+button.import=Importieren
 button.save=Speichern
 button.discard=Verwerfen
+button.close=Schließen
 
 jgloss.title=JGloss
-jgloss.version=Version 0.1
+jgloss.version=Version 0.9
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<Erstelle Anwendungsfenster>
@@ -56,42 +59,53 @@ main.title=JGloss
 
 main.menu.file=Datei
 main.menu.import=Importieren...
-main.menu.import.ak=control I
 main.menu.import.mk=I
 main.menu.importclipboard=Importiere Zwischenablage
 main.menu.open=Öffnen...
-main.menu.open.ak=control O
-main.menu.open.mk=Ö
+main.menu.open.mk=O
 main.menu.save=Speichern
-main.menu.save.ak=control S
 main.menu.save.mk=S
 main.menu.saveAs=Speichern unter...
+main.menu.export=Export
+main.menu.export.mk=E
+main.menu.export.plaintext=Plain Text...
+main.menu.export.plaintext.mk=P
+main.menu.export.latex=LaTeX...
+main.menu.export.latex.mk=L
+main.menu.export.html=HTML...
+main.menu.export.html.mk=H
+main.menu.export.annotationlist=Annotationsliste...
+main.menu.export.annotationlist.mk=A
 main.menu.print=Drucken...
-main.menu.print.ak=control P
 main.menu.print.mk=D
 main.menu.close=Schließen
-main.menu.close.ak=control W
 main.menu.close.mk=S
 main.menu.preferences=Voreinstellungen
 main.menu.preferences.mk=V
 main.menu.view=Ansicht
 main.menu.compactview=Kompakte Anzeige
-main.menu.showruby=Ruby anzeigen
+main.menu.showreading=Lesungen anzeigen
 main.menu.showtranslation=Übersetzungen anzeigen
 main.menu.showannotation=Zeige Annotations-Tooltips
 main.menu.editorfollowsmouse=Annotationen folgen Maus
 main.menu.help=Hilfe
 main.menu.about=Über JGloss
-main.menu.about.mk=Ü
+main.menu.about.mk=U
 
 main.dialog.close.title=Änderungen speichern
 main.dialog.close.message=Änderungen an {0} speichern?
 
 editor.menu.edit=Bearbeiten
 editor.menu.cut=Ausschneiden
+editor.menu.cut.mk=A
 editor.menu.copy=Kopieren
+editor.menu.copy.mk=K
 editor.menu.paste=Einfügen
-editor.menu.addannotation=Auswahl annotieren
+editor.menu.paste.mk=E
+editor.menu.addannotation=Auswahl annotieren...
+editor.menu.addannotation.mk=u
+editor.addannotation.text=Bitte geben sie das Wort ein das für\ndie neue Annotation in den Wörterbüchern\nnachgesehen wird:
+editor.addannotation.title=Auswahl annotieren
 
 prefs.title=Voreinstellungen
 prefs.button.up=Eintrag nach oben
@@ -108,14 +122,14 @@ import.title=Datei importieren
 import.urlorfile=Geben sie eine URL ein, oder wählen sie die Datei, die sie importieren möchten.
 import.button.choosefile=Datei auswählen...
 import.encodings=Zeichensatz der Datei:
-import.rubybrackets=Klammern für Ruby-Anmerkungen:
+import.readingbrackets=Klammern für Lesungs-Anmerkungen:
 
 import.clipboard=Zwischenablage
 load.progress=Öffne {0}
 
 style.title=Allgemein
 style.text=Text
-style.ruby=Ruby
+style.reading=Lesung
 style.translation=Übersetzung
 style.text.font=Font:
 style.text.size=Größe:
@@ -126,24 +140,45 @@ style.highlight.colorchooser.title=Auswahlfarbe für Annotationen
 
 print.title=Dokument drucken
 
-annotationeditor.ruby=Ruby:\ 
+annotationeditor.reading=Lesung:\ 
 annotationeditor.translation=Übersetzung:\ 
-annotationeditor.rubyannotation=Ruby im Dokument: {0}
+annotationeditor.readingannotation=Lesung im Dokument: {0}
 annotationeditor.menu.title=Annotation
-annotationeditor.menu.useruby=Dieses Ruby benutzen
+annotationeditor.menu.usereading=Diese Lesung benutzen
 annotationeditor.menu.usetranslation=Diese Übersetzung benutzen
 annotationeditor.menu.hide=Annotation ausblenden
 annotationeditor.menu.show=Annotation einblenden
 annotationeditor.menu.remove=Annotation entfernen
 annotationeditor.menu.add=Annotation hinzufügen
 annotationeditor.menu.hideduplicates=Duplikate ausblenden
+annotationeditor.menu.unhide=Alle Annotationen einblenden
 annotationeditor.entry.hidden=\ (ausgeblendet)
 
 annotationeditor.action.next=Nächste Annotation
 annotationeditor.action.previous=Vorherige Annotation
 
+export.encodings=Zeichensatz:
+export.annotationlist.title=Annotationsliste exportieren
+export.annotationlist.header=\# Annotationsliste für {0}\n\# Zeichensatz: {1}\n
+export.writereading=Lesungen schreiben
+export.writetranslations=Übersetzungen schreiben
+export.writehidden=Ausgeblendete Annotationen schreiben
+export.plaintext.title=Plain Text exportieren
+export.html.title=HTML exportieren
+export.html.interactive=Interaktives HTML
+export.html.backwardscompatible=Abwärtskompatibel
+export.latex.title=LaTeX exportieren
+
+about.frame.title=Über JGloss
+about.title=JGloss
+about.text=Ein Werkzeug zur Erleichterung des Lesens und Verstehens von japanischen Texten.\n\nCopyright (c) 2001 Michael Koch (tensberg@gmx.net)\n\nJGloss comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; select "Show License" for details.
+about.showlicense=Lizenz anzeigen
+about.license.title=GNU General Public License
+
 preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
 
-filefilter.description=JGloss-Dokumente (*.jgloss)
+filefilter.description=JGloss Dokumente (*.jgloss)
+filefilter.html.description=HTML Dokumente (*.html)
+filefilter.latex.description=LaTeX Dokumente (*.tex)
 
 encodings.default=<auto>
