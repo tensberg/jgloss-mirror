@@ -26,12 +26,41 @@ package jgloss.www;
 import java.net.*;
 import java.util.Set;
 
+/**
+ * Rewrites a URL so that the request will be routed through the JGloss servlet.
+ *
+ * @author Michael Koch
+ */
 public class JGlossURLRewriter implements URLRewriter {
+    /**
+     * URL (absolute or relative) pointing to the servlet.
+     */
     protected String servletBase;
+    /**
+     * URL of the document from which the URLs to rewrite originate.
+     */
     protected URL docBase;
+    /**
+     * Set with protocol names.
+     */
     protected Set protocols;
+    /**
+     * Flag if form URLs should be changed.
+     */
     protected boolean forwardFormData;
 
+    /**
+     * Creates a rewriter for a specific page.
+     *
+     * @param servletBase URL (absolute or relative) pointing to the servlet. Must not contain
+     *                    a trailing slash.
+     * @param docBase URL of the document from which the URLs to rewrite originate.
+     * @param protocols Set of supported protocols.
+     * @param allowCookieForwarding Flag if the cookie forwarding flag should be set in the
+     *                              rewritten URL.
+     * @param allowFormDataForwarding Flag if the form data forwarding flag should be set in the
+     *                                rewritten URL and if <CODE>FORM</CODE> URLs should be rewritten.
+     */
     public JGlossURLRewriter( String servletBase, URL docBase, Set protocols,
                               boolean allowCookieForwarding, boolean allowFormDataForwarding) {
         this.servletBase = servletBase;
@@ -44,6 +73,18 @@ public class JGlossURLRewriter implements URLRewriter {
             (allowFormDataForwarding ? "1": "0") + "/"; 
     }
 
+    /**
+     * Rewrites a URL. The URL will be made absolute using the {@link #docBase docBase} URL.
+     * If <CODE>tag</CODE> is <CODE>null</CODE>, or one of <CODE>a</CODE>, <CODE>area</CODE>
+     * <CODE>frame</CODE> or form data forwarding is enabled and the tag is <CODE>form</CODE>,
+     * and the protocol is in {@link #protocols protocols}, the URL will be changed to point 
+     * to the JGloss servlet.
+     *
+     * @param in The URL to change.
+     * @param tag Name of the tag in which the URL was found.
+     * @param forceServletRelative Flag if the tag and protocol should be ignored and
+     *                             the URL be changed to point to the servlet.
+     */
     protected String rewrite( String in, String tag, boolean forceServletRelative)
         throws MalformedURLException {
         try {
@@ -53,9 +94,14 @@ public class JGlossURLRewriter implements URLRewriter {
 
             URL target = new URL( docBase, in);
 
+            if (tag != null)
+                tag = tag.toLowerCase();
             if (forceServletRelative ||
-                ((tag==null || tag.equalsIgnoreCase( "a") || tag.equalsIgnoreCase( "area")
-                 || forwardFormData && tag.equalsIgnoreCase( "form"))
+                ((tag==null || 
+                  tag.equals( "a") || 
+                  tag.equals( "area") ||
+                  tag.equals( "frame") ||
+                  forwardFormData && tag.equals( "form"))
                 && protocols.contains( target.getProtocol())))
                 return servletBase + escapeURL( target.toExternalForm());
             else
@@ -80,8 +126,8 @@ public class JGlossURLRewriter implements URLRewriter {
 
     /**
      * Escapes a string so that it can be used in the path component in a URL. Because
-     * the web server may or may not unescape the path before passing it to the servlet
-     * context, the standard '%' escape mechanism cannot be used. Instead, '_' will
+     * the web server may or may not unescape the path before passing it to the servlet,
+     * the standard '%' escape mechanism cannot be used. Instead, '_' will
      * be used as escape mark.
      * Characters not in ISO-8859-1 are not supported and may not appear in the string.
      */
