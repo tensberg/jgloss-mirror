@@ -255,7 +255,7 @@ public class JGlossWriter extends HTMLWriter {
      */
     protected void endTag( Element elem) throws IOException {
         if (elem.getName().equals( HTML.Tag.HEAD.toString())) {
-            if (!titleTagExists) {
+            if (!titleTagExists && doc.getTitle()!=null) {
                 String title = "<title>" + doc.getTitle() + "</title>\n";
                 nonEscapedOutput( title.toCharArray(), 0, title.length());
             }

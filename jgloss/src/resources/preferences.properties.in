@@ -44,6 +44,9 @@ fontsizes.kanji=9,11,12,13,14,15,16,18,20,24
 fontsizes.reading=6,7,8,9,10,11,12,13,14,15,16,18
 fontsizes.translation=4,5,6,7,8,9,10,11,12,13,14,15,16
 
+font.general.usedefault=true
+font.general=Dialog
+font.general.sizediff=2
 font.text=Serif
 font.text.size=15
 font.text.bgcolor=16764108
@@ -56,6 +59,10 @@ font.translation=SansSerif
 font.translation.size=9
 font.translation.bgcolor=13421823
 font.translation.usecolor=true
+# some fonts to try if the generic fonts like Serif, SansSerif etc. don't contain Japanese characters
+font.defaultfonts=MS Gothic,MS Mincho,Osaka,Gothic,Mincho
+# flag if the automatic font setting has already occurred
+font.autodetected=false
 
 view.compactview=false
 view.showreading=true

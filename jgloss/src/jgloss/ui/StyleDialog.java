@@ -60,6 +60,16 @@ public class StyleDialog extends Box {
     }
 
     /**
+     * Four japanese characters used to test the fonts.
+     */
+    private final static String JAPANESE_CHARS_TEST = "\u3042\u30a2\u660e\u3002";
+    /**
+     * Default japanese font used if the generic fonts like SansSerif, Dialog etc. don't contain Japanese
+     * characters.
+     */
+    private static String defaultJapaneseFont;
+
+    /**
      * Adds a new style sheet which will then automatically track any changes made to the
      * user settings. The stylesheet can have styles in addition to the ones set in the dialog
      * by using <CODE>additionalStyles</CODE>, which is a mapping from a HTML tag name as string
@@ -108,6 +118,10 @@ public class StyleDialog extends Box {
         }
     }
 
+    private JRadioButton generalFontDefault;
+    private JRadioButton generalFontCustom;
+
+    private JComboBox generalFont;
     private JComboBox textFont;
     private JComboBox readingFont;
     private JComboBox translationFont;
@@ -215,17 +229,36 @@ public class StyleDialog extends Box {
     public StyleDialog() {
         super( BoxLayout.Y_AXIS);
 
+        // automatically set the fonts the first time JGloss is run
+        if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED)) {
+            autodetectFonts();
+            JGloss.prefs.set( Preferences.FONT_AUTODETECTED, true);
+        }
+
         currentStyles = new HashMap( 10);
         styleSheets = new ArrayList( 10);
 
-        String [] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
+        String[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getAvailableFontFamilyNames();
 
-        textFont = new JComboBox( fontNames);
+        generalFont = new JComboBox( allFonts);
+        generalFont.setEditable( false);
+        generalFontDefault = new JRadioButton( JGloss.messages.getString( "style.general.default"));
+        generalFontCustom = new JRadioButton( JGloss.messages.getString( "style.general.custom"));
+        ButtonGroup bg = new ButtonGroup();
+        bg.add( generalFontDefault);
+        bg.add( generalFontCustom);
+        generalFontCustom.addChangeListener( new ChangeListener() {
+                public void stateChanged( ChangeEvent e) {
+                    generalFont.setEnabled( generalFontCustom.isSelected());
+                }
+            });
+
+        textFont = new JComboBox( allFonts);
         textFont.setEditable( false);
-        readingFont = new JComboBox( fontNames);
+        readingFont = new JComboBox( allFonts);
         readingFont.setEditable( false);
-        translationFont = new JComboBox( fontNames);
+        translationFont = new JComboBox( allFonts);
         translationFont.setEditable( false);
 
         textFontSize = new JComboBox( JGloss.prefs.getList( Preferences.FONTSIZES_KANJI, ','));
@@ -267,8 +300,36 @@ public class StyleDialog extends Box {
                 }
             });
 
+        // general font
+        JPanel p = new JPanel( new GridBagLayout());
+        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
+                                                       ( "style.general")));
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.anchor = GridBagConstraints.NORTHWEST;
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 1;
+        gc.gridwidth = 2;
+        gc.gridx = 0;
+        gc.gridy = 0;
+        p.add( generalFontDefault, gc);
+        gc = new GridBagConstraints();
+        gc.fill = GridBagConstraints.NONE;
+        gc.anchor = GridBagConstraints.NORTHWEST;
+        gc.gridx = 0;
+        gc.gridy = 1;
+        p.add( generalFontCustom, gc);
+        gc = new GridBagConstraints();
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 2;
+        gc.anchor = GridBagConstraints.NORTHWEST;
+        gc.gridx = 1;
+        gc.gridy = 1;
+        p.add( generalFont, gc);
+        this.add( p);
+        this.add( Box.createVerticalStrut( 3));
+
         // text
-        JPanel p = new JPanel( new GridLayout( 1, 1));
+        p = new JPanel( new GridLayout( 1, 1));
         p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
                                                        ( "style.text")));
         Box b = Box.createVerticalBox();
@@ -283,7 +344,7 @@ public class StyleDialog extends Box {
         b.add( UIUtilities.createSpaceEater( b2, true));
         b.add( Box.createVerticalStrut( 7));
         b2 = Box.createHorizontalBox();
-        b2.add( Box.createHorizontalStrut( 5));
+        b2.add( Box.createHorizontalStrut( 3));
         b2.add( textUseColor);
         b2.add( textColor);
         b.add( UIUtilities.createSpaceEater( b2, true));
@@ -307,7 +368,7 @@ public class StyleDialog extends Box {
         b.add( UIUtilities.createSpaceEater( b2, true));
         b.add( Box.createVerticalStrut( 7));
         b2 = Box.createHorizontalBox();
-        b2.add( Box.createHorizontalStrut( 5));
+        b2.add( Box.createHorizontalStrut( 3));
         b2.add( readingUseColor);
         b2.add( readingColor);
         b.add( UIUtilities.createSpaceEater( b2, true));
@@ -331,7 +392,7 @@ public class StyleDialog extends Box {
         b.add( UIUtilities.createSpaceEater( b2, true));
         b.add( Box.createVerticalStrut( 7));
         b2 = Box.createHorizontalBox();
-        b2.add( Box.createHorizontalStrut( 5));
+        b2.add( Box.createHorizontalStrut( 3));
         b2.add( translationUseColor);
         b2.add( translationColor);
         b.add( UIUtilities.createSpaceEater( b2, true));
@@ -381,6 +442,13 @@ public class StyleDialog extends Box {
      * Loads the preferences and initializes the dialog accordingly.
      */
     public void loadPreferences() {
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT))
+            generalFontDefault.setSelected( true);
+        else
+            generalFontCustom.setSelected( true);
+        generalFont.setEnabled( !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT));
+
+        generalFont.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_GENERAL));
         textFont.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TEXT));
         readingFont.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_READING));
         translationFont.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TRANSLATION));
@@ -388,7 +456,7 @@ public class StyleDialog extends Box {
         textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
         readingFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
         translationFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
-        
+
         textUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR));
         readingUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR));
         translationUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR));
@@ -407,7 +475,16 @@ public class StyleDialog extends Box {
      * Saves the current dialog settings.
      */
     public void savePreferences() {
-        String font = (String) textFont.getSelectedItem();
+        // Order of the setting of the preferences of FONT_GENERAL and FONT_GENERAL_USEDEFAULT is
+        // important. If both settings are changed at the same time, the clients of the settings
+        // should only react to the second change event. This can be done by ignoring the FONT_GENERAL
+        // change if FONT_GENERAL_USEDEFAULT is false.
+        String font = (String) generalFont.getSelectedItem();
+        if (font != null)
+            JGloss.prefs.set( Preferences.FONT_GENERAL, font);
+        JGloss.prefs.set( Preferences.FONT_GENERAL_USEDEFAULT, generalFontDefault.isSelected());
+
+        font = (String) textFont.getSelectedItem();
         if (font != null)
             JGloss.prefs.set( Preferences.FONT_TEXT, font);
         font = (String) readingFont.getSelectedItem();
@@ -548,5 +625,68 @@ public class StyleDialog extends Box {
 
         JGlossEditor.setHighlightColor( new Color
             ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
+    }
+
+    /**
+     * Autodetect fonts used for the various font settings. If the currently selected font of a setting
+     * can't display Japanese characters, a default font is set. If no Japanese default font can be
+     * found on the system, the preference is not changed.
+     */
+    public static void autodetectFonts() {
+        String defaultFont = getDefaultJapaneseFont();
+        if (defaultFont == null)
+            // no font available, leave settings as is
+            return;
+
+        // test general font
+        if (!canDisplayJapanese( "Dialog")) {
+            JGloss.prefs.set( Preferences.FONT_GENERAL_USEDEFAULT, false);
+        }
+        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_GENERAL)))
+            JGloss.prefs.set( Preferences.FONT_GENERAL, defaultFont);
+        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_TEXT)))
+            JGloss.prefs.set( Preferences.FONT_TEXT, defaultFont);
+        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_READING)))
+            JGloss.prefs.set( Preferences.FONT_READING, defaultFont);
+    }
+
+    /**
+     * Returns the name of the default font which can display Japanese characters. A list of fonts
+     * with known names is tested for availability, and the first available font is returned. If
+     * none of the fonts is available, <CODE>null</CODE> is returned.
+     */
+    public static String getDefaultJapaneseFont() {
+        if (defaultJapaneseFont != null)
+            return defaultJapaneseFont;
+
+        String[] fonts = JGloss.prefs.getList( Preferences.FONT_DEFAULTFONTS, ',');
+        for ( int i=0; i<fonts.length; i++) {
+            if (canDisplayJapanese( fonts[i])) {
+                defaultJapaneseFont = fonts[i];
+                return defaultJapaneseFont;
+            }
+        }
+
+        // no japanese font available
+        return null;
+    }
+
+    /**
+     * Check if the font with the given name can display Japanese characters.
+     */
+    protected static boolean canDisplayJapanese( String fontName) {
+        return (new Font( fontName, Font.PLAIN, 1).canDisplayUpTo( JAPANESE_CHARS_TEST) ==
+                JAPANESE_CHARS_TEST.length());
+    }
+
+    /**
+     * Create a font with the font name taken from the general font settings and the style and size
+     * taken from the original font. The font size is adjusted by the amount of FONT_GENERAL_SIZEDIFF
+     * to increase readability of japanese characters.
+     */
+    public static Font deriveGeneralFont( Font original) {
+        return new Font( JGloss.prefs.getString( Preferences.FONT_GENERAL),
+                         original.getStyle(), original.getSize() + 
+                         JGloss.prefs.getInt( Preferences.FONT_GENERAL_SIZEDIFF, 1));
     }
 } // class StyleDialog

@@ -627,6 +627,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
                     if (tn instanceof ReadingTranslationNode)
                         ((ReadingTranslationNode) tn).setText( "");
+                    else if (tn instanceof AnnotationNode)
+                        ((ReadingTranslationNode) ((AnnotationNode) tn).getChildAt( 1)).setText( "");
                 }
             };
         UIUtilities.initAction( clearTranslationAction, "annotationeditor.action.cleartranslation");
@@ -789,6 +791,26 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         im.put( KeyStroke.getKeyStroke( JGloss.messages.getString( "annotationeditor.action.hide.ak")),
                 hideAction.getValue( Action.NAME));
         am.put( hideAction.getValue( Action.NAME), hideAction);
+
+        if (!JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+            setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "Tree.font")));
+        }
+
+        // update display if user changed font
+        JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+                public void propertyChange( java.beans.PropertyChangeEvent e) { 
+                    if (e.getPropertyName().equals( Preferences.FONT_GENERAL_USEDEFAULT)) {
+                        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT))
+                            setFont( UIManager.getFont( "Tree.font"));
+                        else
+                            setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "Tree.font")));
+                    }
+                    else if (e.getPropertyName().equals( Preferences.FONT_GENERAL) &&
+                             !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+                            setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "Tree.font")));
+                    }
+                }
+            });
     }
 
     /**
@@ -999,7 +1021,8 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
             equalizeAnnotationsAction.setEnabled( true);
             addToExclusionsAction.setEnabled( true);
             addToDictionaryAction.setEnabled( Dictionaries.getUserDictionary() != null);
-            clearTranslationAction.setEnabled( tn instanceof ReadingTranslationNode);
+            clearTranslationAction.setEnabled( tn instanceof ReadingTranslationNode ||
+                                               tn instanceof AnnotationNode);
 
             updateHideAction( tn);
 

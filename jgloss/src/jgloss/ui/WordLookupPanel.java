@@ -69,12 +69,12 @@ public class WordLookupPanel extends JPanel {
      * Text field used to display the result as plain text. This text field is used when there
      * are more than {@link #resultLimit resultLimit} results.
      */
-    JTextArea resultPlain;
+    protected JTextArea resultPlain;
     /**
      * Text field used to display the result as HTML text. This text field is used when there
      * are less than {@link #resultLimit resultLimit} results.
      */
-    JTextPane resultFancy;
+    protected JTextPane resultFancy;
     /**
      * Text pane which displays the lookup result.
      */
@@ -297,6 +297,19 @@ public class WordLookupPanel extends JPanel {
                 public void componentResized( ComponentEvent e) {
                     JGloss.prefs.set( Preferences.WORDLOOKUP_WIDTH, getWidth());
                     JGloss.prefs.set( Preferences.WORDLOOKUP_HEIGHT, getHeight());
+                }
+            });
+
+        if (!JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT))
+            applyGeneralFontSetting();
+        
+        // update display if user changed font
+        JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+                public void propertyChange( java.beans.PropertyChangeEvent e) {
+                    if (e.getPropertyName().equals( Preferences.FONT_GENERAL) && 
+                        !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)
+                        || e.getPropertyName().equals( Preferences.FONT_GENERAL_USEDEFAULT))
+                        applyGeneralFontSetting();
                 }
             });
     }
@@ -630,5 +643,28 @@ public class WordLookupPanel extends JPanel {
             return super.getPreferredSize();
         else
             return preferredSize;
+    }
+
+    /**
+     * Set the fonts of the user interface elements according to the style preference settings.
+     */
+    private void applyGeneralFontSetting() {
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT)) {
+            // restore the L&F default settings
+            expression.setFont( UIManager.getFont( "ComboBox.font"));
+            resultPlain.setFont( UIManager.getFont( "TextArea.font"));
+            resultFancy.setFont( UIManager.getFont( "TextPane.font"));
+            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().removeStyle( "body");
+            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule( STYLE);
+        }
+        else {
+            // use the custom font set in the preferences
+            expression.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "ComboBox.font")));
+            resultPlain.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "TextArea.font")));
+            resultFancy.setFont( StyleDialog.deriveGeneralFont( UIManager.getFont( "TextPane.font")));
+            ((HTMLEditorKit) resultFancy.getEditorKit()).getStyleSheet().addRule
+                ( "body { font-family: " + JGloss.prefs.getString( Preferences.FONT_GENERAL)
+                  + "; }\n");
+        }
     }
 } // class WordLookupPanel

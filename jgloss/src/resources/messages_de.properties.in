@@ -199,6 +199,9 @@ general.chasen.chooser.title=ChaSen-Programm auswählen
 general.parserselector=Zwischenablage Importieren Parser
 
 style.title=Darstellung
+style.general=Japanischer Zeichensatz
+style.general.default=Default Java-Zeichensatz benutzen
+style.general.custom=Diesen Zeichensatz benutzen:
 style.text=Text
 style.reading=Lesung
 style.translation=Übersetzung
@@ -289,8 +292,8 @@ about.license.title=GNU General Public License
 preferences.header=Diese Datei enthält die Voreinstellungen für die Anwendung JGloss.
 
 filefilter.description.jgloss=JGloss Dokumente (*.jgloss)
-filefilter.html.description=HTML Dokumente (*.html)
-filefilter.latex.description=LaTeX Dokumente (*.tex)
+filefilter.description.html=HTML Dokumente (*.html)
+filefilter.description.latex=LaTeX Dokumente (*.tex)
 
 fileview.description.jgloss=JGloss-Dokument
 fileview.description.html=HTML-Dokument

@@ -53,6 +53,10 @@ public class Preferences {
     public static final String FONTSIZES_READING = "fontsizes.reading";
     public static final String FONTSIZES_TRANSLATION = "fontsizes.translation";
 
+    public static final String FONT_GENERAL_USEDEFAULT = "font.general.usedefault";
+    public static final String FONT_GENERAL = "font.general";
+    public static final String FONT_GENERAL_SIZEDIFF = "font.general.sizediff";
+
     public static final String FONT_TEXT = "font.text";
     public static final String FONT_TEXT_SIZE = "font.text.size";
     public static final String FONT_TEXT_BGCOLOR = "font.text.bgcolor";
@@ -68,6 +72,9 @@ public class Preferences {
     public static final String FONT_TRANSLATION_BGCOLOR = "font.translation.bgcolor";
     public static final String FONT_TRANSLATION_USECOLOR = "font.translation.usecolor";
 
+    public static final String FONT_DEFAULTFONTS = "font.defaultfonts";
+    public static final String FONT_AUTODETECTED = "font.autodetected";
+    
     public static final String ANNOTATION_HIGHLIGHT_COLOR = "annotation.highlight.color";
 
     public static final String DTD_DEFAULT = "dtd.default";
@@ -299,11 +306,16 @@ public class Preferences {
      */
     public synchronized void store() throws IOException {
         if (changed) {
+            System.err.println( "Opening output stream");
             FileOutputStream out = new FileOutputStream( PREFS_FILE);
+            System.err.println( "Writing prefs");
             prefs.store( out, JGloss.messages.getString( "preferences.header"));
+            System.err.println( "Closing output stream");
             out.close();
             changed = false;
         }
+        else
+            System.err.println( "Preferences not changed");
     }
 
     /**

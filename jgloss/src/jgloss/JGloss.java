@@ -318,14 +318,23 @@ public class JGloss {
             pasteFrameActive)
             return false;
 
+        System.err.println( "Exiting JGloss");
         // Instantiate a new Thread because the exit() method may have been called from
         // an event dispatch thread (for example a window close event). The displayError method which might
         // be called needs the event dispatch thread to work, so the exit() method has to return.
         new Thread() {
                 public void run() {
                     try {
-                        prefs.store();
-                    } catch (IOException ex) {
+                        System.err.println( "Saving preferences");
+                        java.security.AccessController.doPrivileged
+                            ( new java.security.PrivilegedExceptionAction() {
+                                    public Object run() throws Exception {
+                                        prefs.store();
+                                        return null;
+                                    }
+                                });
+                        System.err.println( "Preferences saved");
+                    } catch (Exception ex) {
                         displayError( messages.getString( "error.storePreferences"), ex, false);
                     }
 
@@ -333,6 +342,7 @@ public class JGloss {
                     for ( int i=0; i<dicts.length; i++)
                         dicts[i].dispose();
 
+                    System.out.println( "JGloss finished");
                     System.exit( 0);
                 }
             }.start();
