@@ -139,7 +139,7 @@ public class ChasenParser extends AbstractParser {
                     parsePosition++;
                 
                 Object resultLine = result.next();
-                //System.err.println( resultLine);
+                // System.err.println( resultLine);
                 if (resultLine.equals( Chasen.EOS)) { // end of line in input text
                     parsePosition++;
                 }

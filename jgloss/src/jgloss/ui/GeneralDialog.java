@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001,2002 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -54,7 +54,7 @@ public class GeneralDialog extends Box {
      *
      * @return The GeneralDialog component.
      */
-    public static GeneralDialog getComponent() {
+    public static synchronized GeneralDialog getComponent() {
         if (box == null)
             box = new GeneralDialog();
         return box;
@@ -79,7 +79,7 @@ public class GeneralDialog extends Box {
     /**
      * Creates the style dialog.
      */
-    public GeneralDialog() {
+    private GeneralDialog() {
         super( BoxLayout.Y_AXIS);
 
         Box all = Box.createVerticalBox();
@@ -161,6 +161,7 @@ public class GeneralDialog extends Box {
         this.add( UIUtilities.createSpaceEater( all, false));
 
         loadPreferences();
+        applyPreferences();
     }
 
     /**
