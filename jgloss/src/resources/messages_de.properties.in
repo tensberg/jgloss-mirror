@@ -57,7 +57,7 @@ button.discard=Verwerfen
 button.close=Schließen
 
 jgloss.title=JGloss
-jgloss.version=Version 0.9
+jgloss.version=Version 1.0pre
 
 # reserve space in info label with dummy entry:
 splashscreen.dummyinfo=<Erstelle Anwendungsfenster>
@@ -69,8 +69,12 @@ main.usage=Benutzung: jgloss.JGloss [Optionen] Datei ...\n\
 Optionen:\n\
 \  -h, --help, /?  Zeigt diese Nachricht\n\
 \  -i, --createindex Erzeugt Indexdateien für die in der Kommandozeile\n\
-\                    angegebenen Wörterbuchdateien
+\                    angegebenen Wörterbuchdateien\n\
+\  -f, --format      Gibt das Wörterbuchformat für die in der Kommandozeile\n\
+\                    angegebenen Dateien aus.
 main.unknownoption=Unbekannte Option {0}
+main.format=Das Format von {0} scheint {1} zu sein.
+main.format.unrecognized=Das Format von {0} ist nicht bekannt.
 main.title=JGloss
 
 main.menu.file=Datei
@@ -158,7 +162,7 @@ print.title=Dokument drucken
 
 annotationeditor.reading=Lesung:\ 
 annotationeditor.translation=Übersetzung:\ 
-annotationeditor.readingannotation=Lesung im Dokument: {0}
+annotationeditor.readingannotation=Lesung aus {0}: {1}
 annotationeditor.menu.title=Annotation
 annotationeditor.menu.usereading=Diese Lesung benutzen
 annotationeditor.menu.usetranslation=Diese Übersetzung benutzen
@@ -199,8 +203,14 @@ filefilter.latex.description=LaTeX Dokumente (*.tex)
 
 encodings.default=<auto>
 
+dictionary.load=Lade Wörterbuch {0}.
+
 edict.buildindex=Erzeuge Index für Wörterbuch {0}.\nDies kann einige Zeit dauern.
-edict.load=Lade Wörterbuch {0}.
 edict.writejjdx=Schreibe JJDX Index für Wörterbuch {0}.
 edict.warning.jjdxversion=WARNUNG: Die Version der JJDX Indexdatei für {0} ist größer als die von dieser Version\von JGloss unterstützte.
 edict.error.writejjdx=Fehler beim Schreiben der JJDX Indexdatei: {0}, {1}
+
+kanjidic.nanori=(nanori, Namenslesung)
+kanjidic.radicalname=(Name des Radikals)
+
+parser.dictionary.document=Dokument
