@@ -70,13 +70,27 @@ public class EDict implements Dictionary {
      */
     protected byte[] dictionary;
     /**
+     * Length of the dictionary in bytes. This can be smaller than <CODE>dictionary.length</CODE>
+     * if part of the array is unused.
+     */
+    protected int dictionaryLength;
+    /**
      * Array containing the content of the xjdx/jjdx file associated with the dictionary file.
      */
     protected int[] index;
     /**
+     * Length of the index in number of entries. This can be smaller than <CODE>index.length</CODE>
+     * if part of the array is unused.
+     */
+    protected int indexLength;
+    /**
      * Flag if index is in XJDX or JJDX format.
      */
     protected boolean xjdxIndex;
+    /**
+     * Random number generator. Used for randomized quicksort in index creation.
+     */
+    protected Random random;
 
     /**
      * Object describing this implementation of the <CODE>Dictionary</CODE> interface. The
@@ -161,6 +175,7 @@ public class EDict implements Dictionary {
             len -= read;
         }
         is.close();
+        dictionaryLength = dictionary.length - len; // == dictionary.length if the file was read fully
 
         File jindex = new File( dicfile + JJDX_EXTENSION);
         File xindex = new File( dicfile + XJDX_EXTENSION);
@@ -184,6 +199,8 @@ public class EDict implements Dictionary {
                                                                          ex.getLocalizedMessage() }));
             }
         }
+
+        random = new Random();
     }
 
     /**
@@ -205,66 +222,11 @@ public class EDict implements Dictionary {
         // do a binary search through the index file
         try {
             byte[] expr_euc = expression.getBytes( "EUC-JP");
-
-            // do a binary search
-            int from = 0;
-            int to = index.length-1;
-            int match = -1;
-            int curr;
-            // search matching entry
-            do {
-                curr = (to-from)/2 + from;
-
-                // read entry
-                int i = 0;
-                while (i<expr_euc.length && index[curr]+i<dictionary.length)
-                  i++;
-
-                // A simple compareToIgnoreCase does not work, because Kstrcmp, which was used
-                // by the index creation program behaves somewhat differently.
-                // It also does not have the overhead of creating a new string for the search.
-                int c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[curr], i, xjdxIndex);
-                if (c > 0)
-                    from = curr+1;
-                else if (c < 0)
-                    to = curr-1;
-                else
-                    match = curr;
-            } while (from<=to && match==-1);
+            int match = findMatch( expr_euc);
 
             if (match != -1) {
-                int firstmatch = match - 1;
-                int lastmatch = match + 1;
-                // search backwards for the first matching entry
-                while (firstmatch >= from) {
-                    // read entry
-                    int c = -1;
-                    if (expr_euc.length <= dictionary.length-index[firstmatch])
-                        c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[firstmatch],
-                                     expr_euc.length, xjdxIndex);
-                    if (c != 0) { // First non-matching entry. End search.
-                        break;
-                    }
-                    else {
-                        firstmatch--;
-                    }
-                }
-                firstmatch++;
-                // search forward for the last matching entry
-                while (lastmatch <= to) {
-                    // read entry
-                    int c = -1;
-                    if (expr_euc.length <= dictionary.length-index[lastmatch])
-                        c = Kstrcmp( expr_euc, 0, expr_euc.length, dictionary, index[lastmatch],
-                                     expr_euc.length, xjdxIndex);
-                    if (c != 0) { // First non-matching entry. End search.
-                        break;
-                    }
-                    else {
-                        lastmatch++;
-                    }
-                }
-                lastmatch--;
+                int firstmatch = findFirstMatch( expr_euc, match);
+                int lastmatch = findLastMatch( expr_euc, match);
 
                 // Several index entries can point to the same entry line. For example
                 // if a word contains the same kanji twice, and words with this kanji are looked up,
@@ -295,7 +257,7 @@ public class EDict implements Dictionary {
                     if (mode == SEARCH_EXACT_MATCHES ||
                         mode == SEARCH_ENDS_WITH) {
                         // test if preceeding character marks beginning of word entry
-                        if (start+expr_euc.length < dictionary.length) { 
+                        if (start+expr_euc.length < dictionaryLength) { 
                             switch (dictionary[start+expr_euc.length]) {
                             case ((byte) ' '): // end of word or space in translation
                                 if (dictionary[start+expr_euc.length-1] >= 0)
@@ -324,7 +286,7 @@ public class EDict implements Dictionary {
                         seenEntries.add( starti);
                     
                     int end = index[match];
-                    while (end<dictionary.length && dictionary[end]!=0x0a)
+                    while (end<dictionaryLength && dictionary[end]!=0x0a)
                         end++;
 
                     String entry = new String( dictionary, start, end-start, "EUC-JP");
@@ -386,6 +348,88 @@ public class EDict implements Dictionary {
     }
 
     /**
+     * Returns the index of an index entry which matches a word. If there is more than one match,
+     * it is not defined which match is returned. If no match is found, <code>-1</code>
+     * is returned.
+     */
+    protected int findMatch( byte[] word) {
+        // do a binary search
+        int from = 0;
+        int to = indexLength-1;
+        int match = -1;
+        int curr;
+        // search matching entry
+        do {
+            curr = (to-from)/2 + from;
+            
+            // read entry
+            int i = 0;
+            while (i<word.length && index[curr]+i<dictionaryLength)
+                i++;
+            
+            // A simple compareToIgnoreCase does not work, because Kstrcmp, which was used
+            // by the index creation program behaves somewhat differently.
+            // It also does not have the overhead of creating a new string for the search.
+            int c = Kstrcmp( word, 0, word.length, dictionary, index[curr], i, xjdxIndex);
+            if (c > 0)
+                from = curr+1;
+            else if (c < 0)
+                to = curr-1;
+            else
+                match = curr;
+        } while (from<=to && match==-1);
+
+        return match;
+    }
+
+    /**
+     * Searches backward in the index from an already determined match to the first
+     * matching entry.
+     */
+    protected int findFirstMatch( byte[] word, int match) {
+        int firstmatch = match - 1;
+        // search backwards for the first matching entry
+        while (firstmatch >= 0) {
+            // read entry
+            int c = -1;
+            if (word.length <= dictionaryLength-index[firstmatch])
+                c = Kstrcmp( word, 0, word.length, dictionary, index[firstmatch],
+                             word.length, xjdxIndex);
+            if (c != 0) { // First non-matching entry. End search.
+                break;
+            }
+            else {
+                firstmatch--;
+            }
+        }
+        firstmatch++;
+        return firstmatch;
+    }
+
+    /**
+     * Searches forward in the index from an already determined match to the last
+     * matching entry.
+     */
+    protected int findLastMatch( byte[] word, int match) {
+        int lastmatch = match + 1;
+        while (lastmatch < indexLength) {
+            // read entry
+            int c = -1;
+            if (word.length <= dictionaryLength-index[lastmatch])
+                c = Kstrcmp( word, 0, word.length, dictionary, index[lastmatch],
+                             word.length, xjdxIndex);
+            if (c != 0) { // First non-matching entry. End search.
+                break;
+            }
+            else {
+                lastmatch++;
+            }
+        }
+        lastmatch--;
+        return lastmatch;
+    }
+
+    /**
      * Loads an XJDX-format index for the dictionary. 
      */
     protected void loadXJDX( File indexfile) throws IOException {
@@ -408,10 +452,11 @@ public class EDict implements Dictionary {
 
         // read the index
         index = new int[(int) indexfile.length()/4-1];
+        indexLength = index.length;
         InputStream fis = new BufferedInputStream( new FileInputStream( indexfile));
         byte[] ib = new byte[4];
         int[] ii = new int[4];
-        for ( int i=0; i<index.length; i++) {
+        for ( int i=0; i<indexLength; i++) {
             fis.read( ib);
             for ( int j=0; j<4; j++)
                 ii[j] = (ib[j]>=0) ? ib[j] : 256 + ib[j];
@@ -451,6 +496,7 @@ public class EDict implements Dictionary {
         int size = is.readInt();
         is.skip( offset - 4*3); // should be 0 for version 1001 index
         index = new int[size];
+        indexLength = size;
         for ( int i=0; i<size; i++)
             index[i] = is.readInt();
         is.close();
@@ -470,15 +516,18 @@ public class EDict implements Dictionary {
             ( new FileOutputStream( indexfile)));
         os.writeInt( JJDX_VERSION);
         os.writeInt( 12);
-        os.writeInt( index.length);
+        os.writeInt( indexLength);
 
-        for ( int i=0; i<index.length; i++)
+        for ( int i=0; i<indexLength; i++)
             os.writeInt( index[i]);
         os.close();
     }
 
     /**
      * Creates an index for the EDICT dictionary. The dictionary file must have been already loaded.
+     * The method will call {@link #preBuildIndex() preBuildIndex}, 
+     * {@link #addIndexRange(int,int) addIndexRange( 0, dictionaryLength)} and
+     * {@link #postBuildIndex() postBuildIndex()}.
      */
     public void buildIndex() {
         System.err.println( MessageFormat.format( messages.getString( "edict.buildindex"), 
@@ -487,23 +536,33 @@ public class EDict implements Dictionary {
         index = null; // delete old index if any
         xjdxIndex = false;
 
-        // Set containing offsets of words in the dictionary, ordered by lexicographic
-        // comparison of the words.
-        Set indexentries = new TreeSet( new Comparator() {
-                public int compare( Object o1, Object o2) {
-                    return Kstrcmp( ((Integer) o1).intValue(), ((Integer) o2).intValue(), false);
-                }
-                public boolean equals( Object o1) {
-                    return (o1 == this);
-                }
-            });
-        
+        preBuildIndex();
+        addIndexRange( 0, dictionaryLength);
+        postBuildIndex();
+    }
+
+    /**
+     * First step in index creation.
+     */
+    protected void preBuildIndex() {
+        index = new int[50000];
+        indexLength = 0;
+    }
+
+    /**
+     * Parses a subset of the dictionary file for index creation. For each word which should
+     * get an index entry, {@link #addIndexEntry(int) addIndexEntry} is called.
+     *
+     * @param start Byte offset in the dictionary where the parsing should start (inclusive).
+     * @param end Byte offset in the dictionary where the parsing should end (exclusive).
+     */
+    protected void addIndexRange( int start, int end) {
         // Search over the whole dictionary and add an index entry for every kanji/kana string and
         // every alphabetic string with length >= 3.
         // This creates an index similar to one created by xjdxgen.
         boolean inword = false;
         int entry = 0;
-        for ( int i=0; i<dictionary.length; i++) {
+        for ( int i=start; i<end; i++) {
             int c = byteToUnsignedByte( dictionary[i]);
             if (inword) {
                 if (!(alphaoreuc( dictionary[i]) || c=='-' || c=='.' || (c>='0' && c<='9'))) {
@@ -511,7 +570,7 @@ public class EDict implements Dictionary {
                     int len = i - entry;
                     // save all entries with length >= 3 or kanji/kana entries of length 2 (bytes).
                     if (byteToUnsignedByte(dictionary[entry])>=127 || len>2) {
-                        indexentries.add( new Integer( entry));
+                        addIndexEntry( entry);
 
                         if (byteToUnsignedByte( dictionary[entry]) > 127) {
                             // add index entry for every kanji in word.
@@ -520,7 +579,7 @@ public class EDict implements Dictionary {
                             for ( int j=entry+2; j<i; j+=2) {
                                 int cj = byteToUnsignedByte( dictionary[j]);
                                 if (cj >= 0xb0 || cj == 0x8f) {
-                                    indexentries.add( new Integer( j));
+                                    addIndexEntry( j);
                                     
                                     if (cj == 0x8f) // JIS X 0212 3-Byte Kanji
                                         j++;
@@ -537,11 +596,30 @@ public class EDict implements Dictionary {
                 }
             }
         }
+    }
 
-        index = new int[indexentries.size()];
-        int i = 0;
-        for ( Iterator j=indexentries.iterator(); j.hasNext(); )
-            index[i++] = ((Integer) j.next()).intValue();
+    /**
+     * Add a word entry to the index. This method will be called by 
+     * {@link addIndexRange(int,int) addIndexRange} during index creation.
+     *
+     * @param offset Offset in the dictionary file where the word starts.
+     */
+    protected void addIndexEntry( int offset) {
+        if (indexLength == index.length) {
+            // allocate more storage space
+            int[] tindex = new int[index.length*2];
+            System.arraycopy( index, 0, tindex, 0, index.length);
+            index = tindex;
+        }
+        index[indexLength++] = offset;
+    }
+
+    /**
+     * Called as the last step in index file creation. This method will copy the
+     * <CODE>indexentries</CODE> set in the <CODE>index</CODE> array.
+     */
+    protected void postBuildIndex() {
+        quicksortIndex( 0, indexLength-1);
     }
 
     /**
@@ -646,18 +724,18 @@ public class EDict implements Dictionary {
     }
 
     /**
-     * Lexicographic comparison of strings in the dictionary. 
+     * Lexicographic comparison of strings in the dictionary. This is a special comparison
+     * which is used when creating the dictionary index with quicksort. Instead of stopping
+     * the comparison and returning equality at word boundaries, the method will compare at
+     * most 20 bytes starting from the index positions. This increases the chance of
+     * inequality even if the indexed words would compare equal. It is done this way because quicksort
+     * behaves very badly if there are many equalities.
      *
      * @param i1 Index in the dictionary to the first string.
      * @param i2 Index in the dictionary to the second string.
-     * @param backwardsCompatible Flag if the comparison should be backwards compatible to
-     *        an index generated by xjdxgen from xjdic 2.3.
      */
-    protected final int Kstrcmp( int i1, int i2, boolean backwardsCompatible) {
+    protected final int Kstrcmp( int i1, int i2) {
         int c1 = 0, c2 = 0;
-
-        boolean endc1 = false;
-        boolean endc2 = false;
 
         int b = 1; // byte in multibyte character
         int ONE_BYTE = 1;
@@ -666,54 +744,34 @@ public class EDict implements Dictionary {
         int type = ONE_BYTE;
 
         int i = 0;
-        while (i1<dictionary.length && i2<dictionary.length) {
+        while (i1<dictionaryLength && i2<dictionaryLength && i<20) {
             c1 = byteToUnsignedByte( dictionary[i1]);
             c2 = byteToUnsignedByte( dictionary[i2]);
 
-            endc1 = !(alphaoreuc( dictionary[i1]) || c1=='-' || c1=='.' || (c1>='0' && c1<='9'));
-            endc2 = !(alphaoreuc( dictionary[i2]) || c2=='-' || c2=='.' || (c2>='0' && c2<='9'));
-            if (endc1 || endc2)
-                break;
-
-            if (backwardsCompatible) {
-                if ((i++ % 2) == 0) {
-                    // Convert katakana to hiragana
-                    // The i%2 test for first byte in a two-byte character can fail because
-                    // a previous character may have been a 3-byte JIS X 0212 Kanji, but I keep
-                    // it for XJDX compatibility.
-                    if (c1 == 0xA5) {
-                        c1 = 0xA4;
-                    }
-                    if (c2 == 0xA5) {
-                        c2 = 0xA4;
-                    }
+            if (b == 1) {
+                // convert katakana to hiragana
+                if (c1 == 0xA5) {
+                    c1 = 0xA4;
                 }
-            }
-            else {
-                if (b == 1) {
-                    // convert katakana to hiragana
-                    if (c1 == 0xA5) {
-                        c1 = 0xA4;
-                    }
-                    if (c2 == 0xA5) {
-                        c2 = 0xA4;
-                    }
-                    // We only need to test the type of c1, because if c1 and c2 are different,
-                    // the equality test ends.
-                    if (c1 < 127)
-                        type = ONE_BYTE;
-                    else {
-                        if (c1 == 0x8f) // JIS X 0212 3-Byte Kanji
-                            type = THREE_BYTES;
-                        else
-                            type = TWO_BYTES;
-                    }
-                    b++;
+                if (c2 == 0xA5) {
+                    c2 = 0xA4;
                 }
-                else if (b == type) // last byte in char, reset counter
-                    b = 1;
+                // We only need to test the type of c1, because if c1 and c2 are different,
+                // the equality test ends.
+                if (c1 < 127)
+                    type = ONE_BYTE;
+                else {
+                    if (c1 == 0x8f) // JIS X 0212 3-Byte Kanji
+                        type = THREE_BYTES;
+                    else
+                        type = TWO_BYTES;
+                }
+                b++;
             }
+            else if (b == type) // last byte in char, reset counter
+                b = 1;
 
+            // convert katakana to hiragana
             if ((c1 >= 'A') && (c1 <= 'Z')) c1 |= 0x20;
             if ((c2 >= 'A') && (c2 <= 'Z')) c2 |= 0x20;
             if (c1 != c2) break;
@@ -724,20 +782,47 @@ public class EDict implements Dictionary {
         }
 
         if (c1 == c2) { // end of dictionary for one of the strings
-            if (i1 < dictionary.length)
+            if (i1 < dictionaryLength)
                 return 1; // string 1 > string 2
             else
                 return -1;
         }
 
-        if (endc1 && endc2)
-            return 0;
-        if (endc1)
-            return -1;
-        if (endc2)
-            return 1;
-        
         return (c1-c2) > 0 ? 1 : -1;
+    }
+
+    protected void quicksortIndex( int left, int right) {
+        if (left >= right)
+            return;
+
+        int middle = left + random.nextInt( right-left+1);
+        int mv = index[middle];
+        index[middle] = index[left];
+
+        int l = left + 1; // l is the first index which compares greater mv
+        for ( int i=l; i<=right; i++) {
+            if (Kstrcmp( mv, index[i]) > 0) {
+                if (i > l) {
+                    int t = index[i];
+                    index[i] = index[l];
+                    index[l] = t;
+                }
+                l++;
+            }
+        }
+        l--;
+        index[left] = index[l];
+        index[l] = mv;
+        
+        // sorting the smaller subset first will keep the stack depth small
+        if (l < (left+right)/2) {
+            quicksortIndex( left, l-1);
+            quicksortIndex( l+1, right);
+        }
+        else {
+            quicksortIndex( l+1, right);
+            quicksortIndex( left, l-1);
+        }
     }
 
     /**
