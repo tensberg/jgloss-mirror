@@ -304,7 +304,7 @@ public class AnnotationNode extends InnerNode {
         String newNodeText = word.getWord();
         String reading = word.getReading();
         if (reading.length() > 0)
-            newNodeText += " " + reading;
+            newNodeText += " \uff08" + reading + "\uff09";
         String translation = getTranslationNode().getText();
         if (translation.length() > 0)
             newNodeText += " " + translation;

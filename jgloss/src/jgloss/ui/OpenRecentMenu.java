@@ -88,6 +88,8 @@ public class OpenRecentMenu {
         for ( Iterator i=documents.iterator(); i.hasNext(); ) {
             menu.add( createDocumentMenu( (File) i.next(), listener));
         }
+        if (menu.getItemCount() == 0)
+            menu.setEnabled( false);
         menus.add( menu);
         menus.add( listener);
         return menu; 
@@ -128,7 +130,7 @@ public class OpenRecentMenu {
             documents.add( 0, doc);
             for ( Iterator i=menus.iterator(); i.hasNext(); ) {
                 JMenu menu = (JMenu) i.next();
-                JMenuItem item = (JMenuItem) menu.getComponent( index);
+                JMenuItem item = menu.getItem( index);
                 menu.remove( index);
                 menu.insert( item, 0);
                 i.next(); // skip FileSelectedListener
@@ -148,6 +150,7 @@ public class OpenRecentMenu {
             for ( Iterator i=menus.iterator(); i.hasNext(); ) {
                 JMenu menu = (JMenu) i.next();
                 menu.add( createDocumentMenu( doc, (FileSelectedListener) i.next()), 0);
+                menu.setEnabled( true); // was disabled if this is first entry
             }
         }
         // save current entries in preferences

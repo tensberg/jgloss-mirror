@@ -158,13 +158,22 @@ public class JGlossFrame extends JFrame implements ActionListener {
             
             openRecentListener = new OpenRecentMenu.FileSelectedListener() {
                     public void fileSelected( final File file) {
+                        // test if the file is already open
+                        String path = file.getAbsolutePath();
+                        for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
+                            JGlossFrame next = (JGlossFrame) i.next();
+                            if (path.equals( next.documentPath)) {
+                                next.show();
+                                return;
+                            }
+                        }
+                        
+                        // load the file asynchronously
                         new Thread() {
                                 public void run() {
-                                    // load the file
                                     JGlossFrame which = target==null ||
                                         target.documentLoaded ? new JGlossFrame() : target;
                                     which.loadDocument( file);
-                                    OPEN_RECENT.addDocument( file);
                                 }
                             }.start();
                     }
@@ -199,7 +208,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
      * Open recent menu used for JGloss documents. The instance is shared between instances of
      * <CODE>JGlossFrame</CODE> and <CODE>WordLookup</CODE>.
      */
-    public final static OpenRecentMenu OPEN_RECENT = new OpenRecentMenu( 4);
+    public final static OpenRecentMenu OPEN_RECENT = new OpenRecentMenu( 8);
 
     /**
      * Scrollpane which wraps the document editor.
@@ -486,6 +495,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
         menu.add( UIUtilities.createMenuItem( actions.open));
         openRecentMenu = OPEN_RECENT.createMenu( actions.openRecentListener);
         menu.add( openRecentMenu);
+        menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( saveAction));
         menu.add( UIUtilities.createMenuItem( saveAsAction));
         exportMenu = new JMenu( JGloss.messages.getString( "main.menu.export"));
@@ -809,6 +819,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                 documentChanged = true;
                 saveAction.setEnabled( true); // will behave like save as
             }
+            OPEN_RECENT.addDocument( f);
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
@@ -1099,8 +1110,10 @@ public class JGlossFrame extends JFrame implements ActionListener {
     /**
      * Saves the document in JGloss format. This is basically HTML using a UTF-8 character
      * encoding.
+     *
+     * @return <CODE>true</CODE> if the document was successfully saved.
      */
-    private void saveDocument() {
+    private boolean saveDocument() {
         try {
             Writer out = new OutputStreamWriter( new FileOutputStream( documentPath), "UTF-8");
             JGlossWriter w = new JGlossWriter( out, "UTF-8", doc);
@@ -1108,6 +1121,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
             out.close();
             documentChanged = false;
             saveAction.setEnabled( false);
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
@@ -1116,6 +1130,7 @@ public class JGlossFrame extends JFrame implements ActionListener {
                       { documentPath, ex.getClass().getName(), ex.getLocalizedMessage() }),
                   JGloss.messages.getString( "error.save.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            return false;
         }
     }
 
@@ -1139,7 +1154,8 @@ public class JGlossFrame extends JFrame implements ActionListener {
             JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             setTitle( documentName + 
                       ":" + JGloss.messages.getString( "main.title"));
-            saveDocument();
+            if (saveDocument())
+                OPEN_RECENT.addDocument( f.getSelectedFile());
         }
     }
 
