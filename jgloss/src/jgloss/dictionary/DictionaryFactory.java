@@ -37,6 +37,46 @@ import java.util.*;
  * @see DictionaryFactory.Implementation
  */
 public abstract class DictionaryFactory {
+    public static class Exception extends java.lang.Exception {
+        public Exception() {}
+        public Exception( String message) {
+            super( message);
+        }
+    } // class Exception
+
+    /**
+     * Thrown when a descriptor does not match any known dictionary format.
+     */
+    public static class NotSupportedException extends DictionaryFactory.Exception {
+        public NotSupportedException() {}
+        public NotSupportedException( String message) {
+            super( message);
+        }
+    } // class NotSupportedException
+
+    /**
+     * Thrown when the instantiation of a dictionary failed.
+     */
+    public static class InstantiationException extends DictionaryFactory.Exception {
+        private java.lang.Exception rootCause;
+        public InstantiationException() {
+            super();
+        }
+        public InstantiationException( String message) {
+            super( message);
+        }
+        public InstantiationException( Exception rootCause) {
+            super();
+            this.rootCause = rootCause;
+        }
+        public InstantiationException( String message, java.lang.Exception rootCause) {
+            super( message);
+            this.rootCause = rootCause;
+        }
+
+        public java.lang.Exception getRootCause() { return rootCause; }
+    } // class InstantiationException
+
     /**
      * Map from <CODE>Class</CODE> objects of dictionary classes to <CODE>Implementation</CODE>
      * objects describing the classes.
@@ -48,32 +88,31 @@ public abstract class DictionaryFactory {
      * is dependent on the dictionary implementation. For file-based dictionaries it is usually
      * the path to the dictionary file. The factory will test all registered implementations
      * of dictionaries if they can use the descriptor and use the implementation with the
-     * highest confidence to create a new <CODE>Dictionary</CODE> instance. If no matching
-     * implementation is found, <CODE>null</CODE> is returned.
+     * highest confidence to create a new <CODE>Dictionary</CODE> instance.
      *
      * @param descriptor Description of a dictionary instance.
      * @return A new <CODE>Dictionary</CODE> instance based on the descriptor.
-     * @exception java.lang.Exception if the creation of the dictionary instance fails.
+     * @exception NotSupportedException if the descriptor can not be matched to a known dictionary
+     *            format.
+     * @exception InstantiationExeption if the creation of the dictionary instance fails.
      */
-    public static Dictionary createDictionary( String descriptor) throws Exception {
+    public static Dictionary createDictionary( String descriptor) 
+        throws NotSupportedException, InstantiationException {
         Implementation imp = getImplementation( descriptor);
-        if (imp != null)
-            return imp.createInstance( descriptor);
-        else
-            return null;
+        return imp.createInstance( descriptor);
     }
     
     /**
      * Returns the dictionary implementation which best matches the descriptor. 
      * The format of the descriptor is dependent on the dictionary implementation. 
      * For file-based dictionaries it is usually
-     * the path to the dictionary file. If no matching implementation is found,
-     * <CODE>null</CODE> is returned.
+     * the path to the dictionary file.
      *
      * @param descriptor Description of a dictionary instance.
      * @return The implementation which best matches the descriptor.
+     * @exception NotSupportedException if the descriptor does not match a known dictionary format.
      */
-    public static Implementation getImplementation( String descriptor) {
+    public static Implementation getImplementation( String descriptor) throws NotSupportedException {
         Implementation imp = null;
         float conf = Implementation.ZERO_CONFIDENCE;
 
@@ -87,6 +126,9 @@ public abstract class DictionaryFactory {
                 cc = conf;
             }
         }
+
+        if (imp == null)
+            throw new NotSupportedException( descriptor);
 
         return imp;
     }
@@ -116,7 +158,7 @@ public abstract class DictionaryFactory {
      * @autor Michael Koch
      * @see Dictionary
      */
-    public interface Implementation {
+    public static interface Implementation {
         /**
          * Confidence value meaning that the descriptor does not descripe a dictionary in the
          * format described by this implementation.
@@ -165,7 +207,8 @@ public abstract class DictionaryFactory {
          *
          * @param descriptor Descriptor describing the instance. For file-based dictionaries
          *                   this is usually the path to the file.
+         * @exception DictionaryFactory.InstantiationException if the instantiation of the dictionary failed.
          */
-        Dictionary createInstance( String descriptor) throws Exception;
+        Dictionary createInstance( String descriptor) throws DictionaryFactory.InstantiationException;
     } // interface Implementation
 } // class DictionaryFactory
