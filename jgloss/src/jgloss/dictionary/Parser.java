@@ -313,11 +313,12 @@ public class Parser {
                     // end of current word, look for possible inflection and enter new mode
                     if (ub == Character.UnicodeBlock.HIRAGANA) {
                         // catch possible composite verb
-                        if (!compverb && mode!=END_READING && word.length()==1 && i<text.length-3 &&
+                        if (!compverb && mode!=END_READING && word.length()==1 && i<text.length-1 &&
                             Character.UnicodeBlock.of( text[i+1]) == 
                             Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS &&
-                            Character.UnicodeBlock.of( text[i+2]) == 
-                            Character.UnicodeBlock.HIRAGANA) {
+                            (i == text.length-2 ||
+                             Character.UnicodeBlock.of( text[i+2]) ==
+                             Character.UnicodeBlock.HIRAGANA)) {
                             compverb = true;
                             // add hiragana char to word
                         }
@@ -346,28 +347,27 @@ public class Parser {
                 
             case IN_INFLECTION: // currently in possible inflection
                 if (ub != Character.UnicodeBlock.HIRAGANA) {
+                    List result = findTranslations( wordStart, word.toString(), reading.toString(),
+                                                    inflection.toString(), !compverb, !compverb, true);
                     // the tests for the setting of the compverb flag guarantee that the
                     // lookup of a compverb will always happen IN_INFLECTION, and that reading is empty
                     if (compverb) {
-                        List result = findTranslations( wordStart, word.toString(), null,
-                                                        inflection.toString(), false, false, true);
+                        compverb = false;
                         if (result.size() == 0) {
                             // try first part of compverb
                             result = findTranslations( wordStart, word.substring( 0, 1), null,
                                                        word.substring( 1, 2), false, false, true);
                             out.addAll( result);
-                            // try last part
-                            result = findTranslations( wordStart+2, word.substring( 2, 3), null,
-                                                       word.substring( 3), false, false, true);
+                            // reparse last part, which may be the start of a new compverb
+                            mode = OUTSIDE;
+                            word = new StringBuffer();
+                            inflection = new StringBuffer();
+                            i = wordStart + 1; // the for loop will set i to wordStart + 2
+                            continue;
                         }
-                        out.addAll( result);
-                        compverb = false;
                     }
-                    else {
-                        out.addAll( findTranslations( wordStart, word.toString(), 
-                                                      reading.toString(), inflection.toString(), true, true,
-                                                      true));
-                    }
+                    out.addAll( result);
+
                     if (ub == Character.UnicodeBlock.KATAKANA)
                         mode = IN_KATAKANA;
                     else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
@@ -411,9 +411,9 @@ public class Parser {
             out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), true, true,
                                           true));
         else if (mode == IN_INFLECTION) {
+            List result = findTranslations( wordStart, word.toString(), reading.toString(),
+                                            inflection.toString(), !compverb, !compverb, true);
             if (compverb) {
-                List result = findTranslations( wordStart, word.toString(), null,
-                                                inflection.toString(), false, false, true);
                 if (result.size() == 0) {
                     // try first part of compverb
                     result = findTranslations( wordStart, word.substring( 0, 1), null,
@@ -421,15 +421,10 @@ public class Parser {
                     out.addAll( result);
                     // try last part
                     result = findTranslations( wordStart+2, word.substring( 2, 3), null,
-                                               word.substring( 3), false, false, true);
+                                               inflection.toString(), false, false, true);
                 }
-                out.addAll( result);
-                compverb = false;
             }
-            else {
-                out.addAll( findTranslations( wordStart, word.toString(), reading.toString(), 
-                                              inflection.toString(), true, true, true));
-            }
+            out.addAll( result);
         }
 
         return out;
@@ -601,6 +596,7 @@ public class Parser {
                                               wrp, conjugations[i]));
                                     }
                                 }
+                                break; // don't search for shorter entries
                             }
                         }
                     }
@@ -699,6 +695,7 @@ public class Parser {
         lookups++;
         // put the name of the dictionary last to make string comparisons for the TreeMap short
         String key = String.valueOf( mode) + ":" + word + ":" + d.getName();
+        //System.out.println( "searching " + key);
         List result;
 
         if (lookupCache!=null &&
