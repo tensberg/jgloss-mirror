@@ -191,7 +191,6 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
      * to set the document to edit. The constructor will create a new empty AnnotationModel.
      */
     public AnnotationEditor() {
-        setLargeModel( true);
         model = new AnnotationModel() {
                 public void valueForPathChanged( TreePath path, Object newValue) {
                     ((ReadingTranslationNode) path.getLastPathComponent()).setText( newValue.toString());
@@ -378,9 +377,9 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         menu = new JMenu( JGloss.messages.getString( "annotationeditor.menu.title"));
         pmenu = new JPopupMenu();
         menu.add( JGlossFrame.createMenuItem( useReadingAction));
-        pmenu.add( useReadingAction);
+        //pmenu.add( useReadingAction);
         menu.add( JGlossFrame.createMenuItem( useTranslationAction));
-        pmenu.add( useTranslationAction);
+        //pmenu.add( useTranslationAction);
         menu.add( JGlossFrame.createMenuItem( hideAction));
         pmenu.add( hideAction);
         menu.add( JGlossFrame.createMenuItem( removeAction));
@@ -415,7 +414,16 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
                     }
 
                     if (annotation != null) {
-                        LinkedList l = ((AnnotationNode) annotation).getPathToLastDescendant();
+                        LinkedList l;
+                        if (((AnnotationNode) annotation).isHidden()) {
+                            // only show annotation node
+                            l = new LinkedList();
+                            l.add( annotation);
+                        }
+                        else {
+                            // uncollapse complete tree under annotation node
+                            l = ((AnnotationNode) annotation).getPathToLastDescendant();
+                        }
                         l.addFirst( model.getRoot());
                         TreeNode[] tn = new TreeNode[l.size()];
                         tn = (TreeNode[]) l.toArray( tn);
