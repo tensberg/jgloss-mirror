@@ -14,6 +14,7 @@
 	  it is still slow.
 	- The annotation editor shows readings/translations for hidden
 	  annotations.
+	- LaTeX: changed ruby size in ruby-annotation.sty
         - Hidden annotations are not expanded after a document
 	  is loaded.
 	- Fixed apply button in preferences dialog not working.
