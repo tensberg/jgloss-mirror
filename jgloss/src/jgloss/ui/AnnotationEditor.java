@@ -462,15 +462,17 @@ public class AnnotationEditor extends JTree implements TreeSelectionListener, Mo
         UIUtilities.initAction( equalizeAnnotationsAction, "annotationeditor.menu.equalize");
         equalizeAnnotationsAction.setEnabled( false);
         // add the word of the selected annotation to the list of excluded words
+        // The word is added as it appears in the text and in its dictionary form
         addToExclusionsAction = new AbstractAction() {
                 public void actionPerformed( ActionEvent e) {
                     TreeNode tn = (TreeNode) getSelectionPath().getLastPathComponent();
                     while (!(tn instanceof AnnotationNode))
                         tn = tn.getParent();
                     AnnotationNode selection = (AnnotationNode) tn;
+                    String word = selection.getWordNode().getWord();
+                    ExclusionList.addWord( word);
                     // if the annotated word is all hiragana, add the dictionary reading,
                     // else add the dictionary word.
-                    String word = selection.getWordNode().getWord();
                     boolean isHiragana = true;
                     for ( int i=0; i<word.length(); i++) {
                         if (!StringTools.isHiragana( word.charAt( i))) {

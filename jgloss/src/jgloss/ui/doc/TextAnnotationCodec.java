@@ -57,6 +57,10 @@ public abstract class TextAnnotationCodec {
      */
     public final static char LIST_SEPARATOR = '|';
     /**
+     * Escape character for special chars in text fields.
+     */
+    public final static char ESCAPE_CHARACTER = '#';
+    /**
      * Annotation type string used to mark a reading annotation.
      */
     public final static String READING_TYPE = "R";
@@ -195,28 +199,28 @@ public abstract class TextAnnotationCodec {
             if (ta instanceof Translation)
                 translations = ((Translation) ta).getDictionaryEntry().getTranslations();
 
-            code += word + FIELD_SEPARATOR;
+            code += escapeField( word) + FIELD_SEPARATOR;
             if (reading == null)
                 code += NULL_STRING;
             else
-                code += reading;
+                code += escapeField( reading);
             code += FIELD_SEPARATOR;
 
             if (translations != null) {
                 if (translations.length>0) {
-                    code += translations[0];
+                    code += escapeField( translations[0]);
                     for ( int i=1; i<translations.length; i++)
-                        code += TRANSLATION_SEPARATOR + translations[i];
+                        code += TRANSLATION_SEPARATOR + escapeField( translations[i]);
                 }
             }
             else
                 code += NULL_STRING;
         
-            code += FIELD_SEPARATOR + d.getName() + FIELD_SEPARATOR;
+            code += FIELD_SEPARATOR + escapeField( d.getName()) + FIELD_SEPARATOR;
             if (c != null) {
-                code += c.getConjugatedForm() + FIELD_SEPARATOR +
-                    c.getDictionaryForm() + FIELD_SEPARATOR +
-                    c.getType();
+                code += escapeField( c.getConjugatedForm()) + FIELD_SEPARATOR +
+                    escapeField( c.getDictionaryForm()) + FIELD_SEPARATOR +
+                    escapeField( c.getType());
             }
             code += FIELD_SEPARATOR;
         }
@@ -227,7 +231,7 @@ public abstract class TextAnnotationCodec {
             System.err.println( JGloss.messages.getString( "error.save.unknownannotation",
                                                            new Object[] { ta.getClass().getName() }));
 
-        return quote( code);
+        return escape( code);
     }
 
     /**
@@ -258,7 +262,7 @@ public abstract class TextAnnotationCodec {
      * @return The decoded annotation.
      */
     public static Parser.TextAnnotation decodeAnnotation( String code) {
-        code = unquote( code);
+        code = unescape( code);
 
         int i = code.indexOf( FIELD_SEPARATOR);
         String type = code.substring( 0, i);
@@ -295,11 +299,11 @@ public abstract class TextAnnotationCodec {
         }
         else if (type.equals( READING_TYPE) || type.equals( TRANSLATION_TYPE)) {
             int j = code.indexOf( FIELD_SEPARATOR, i);
-            final String word = code.substring( i, j);
+            final String word = unescapeField( code.substring( i, j));
             i = j + 1;
 
             j = code.indexOf( FIELD_SEPARATOR, i);
-            String reading2 = code.substring( i, j);
+            String reading2 = unescapeField( code.substring( i, j));
             if (reading2.equals( NULL_STRING))
                 reading2 = null;
             final String reading = reading2;
@@ -314,12 +318,12 @@ public abstract class TextAnnotationCodec {
                 int l = t.indexOf( TRANSLATION_SEPARATOR);
                 int k = 0;
                 while (l != -1) {
-                    translationList.add( t.substring( k, l));
+                    translationList.add( unescapeField( t.substring( k, l)));
                     k = l + 1;
                     l = t.indexOf( TRANSLATION_SEPARATOR, k);
                 }
                 if (t.length() > k)
-                    translationList.add( t.substring( k));
+                    translationList.add( unescapeField( t.substring( k)));
                 
                 if (translationList.size() > 0)
                     translations = (String[] ) translationList.toArray
@@ -327,19 +331,20 @@ public abstract class TextAnnotationCodec {
             }
 
             j = code.indexOf( FIELD_SEPARATOR, i);
-            final jgloss.dictionary.Dictionary dictionary = getDictionary( code.substring( i, j));
+            final jgloss.dictionary.Dictionary dictionary = getDictionary
+                ( unescapeField( code.substring( i, j)));
             i = j + 1;
 
             Conjugation conjugation = null;
             j = code.indexOf( FIELD_SEPARATOR, i);
             if (j!=-1 && j!=i) {
-                String conjugatedForm = code.substring( i, j);
+                String conjugatedForm = unescapeField( code.substring( i, j));
                 i = j + 1;
                 j = code.indexOf( FIELD_SEPARATOR, i);
-                String dictionaryForm = code.substring( i, j);
+                String dictionaryForm = unescapeField( code.substring( i, j));
                 i = j + 1;
                 j = code.indexOf( FIELD_SEPARATOR, i);
-                String conjtype = code.substring( i, j);
+                String conjtype = unescapeField( code.substring( i, j));
                 conjugation = Conjugation.getConjugation( conjugatedForm, dictionaryForm, conjtype);
             }
 
@@ -388,47 +393,58 @@ public abstract class TextAnnotationCodec {
      * @param text The text containing unsafe characters.
      * @return The string containing the text with unsafe characters replaced by named entities.
      */
-    private static String quote( String text) {
-        StringBuffer sb = new StringBuffer( text);
+    private static String escape( String text) {
+        StringBuffer sb = null; // defer string buffer initialization until it is really needed
 
-        for ( int i=sb.length()-1; i>=0; i--) {
-            switch (sb.charAt( i)) {
+        for ( int i=text.length()-1; i>=0; i--) {
+            String replaceBy = null;
+            switch (text.charAt( i)) {
             case '"':
-                sb.replace( i, i+1, "&quot;");
+                replaceBy = "&quot;";
                 break;
             case '&':
-                sb.replace( i, i+1, "&amp;");
+                replaceBy = "&amp;";
                 break;
             case '<':
-                sb.replace( i, i+1, "&lt;");
+                replaceBy = "&lt;";
                 break;
             case '>':
-                sb.replace( i, i+1, "&gt;");
+                replaceBy = "&gt;";
                 break;
+            }
+            if (replaceBy != null) {
+                if (sb == null) // first occurrence of an escaped character
+                    sb = new StringBuffer( text);
+                sb.replace( i, i+1, replaceBy);
             }
         }
 
-        return sb.toString();
+        if (sb != null) // a character was escaped
+            return sb.toString();
+        else
+            return text; // string was not changed
     }
 
     /**
-     * Unquotes a string previously quoted with {@link #quote(String) quote}.
+     * Unescapes a string previously escaped with {@link #escape(String) escape}.
      *
-     * @param text The text to unquote.
-     * @return The unquoted text.
+     * @param text The text to unescape.
+     * @return The unescaped text.
      */
-    private static String unquote( String text) {
-        StringBuffer sb = new StringBuffer( text);
+    private static String unescape( String text) {
+        StringBuffer sb = null; // defer string buffer initialization until it is really needed
 
         int end = -1;
-        for ( int i=sb.length()-1; i>=0; i--) {
-            switch (sb.charAt( i)) {
+        for ( int i=text.length()-1; i>=0; i--) {
+            switch (text.charAt( i)) {
             case ';':
                 end = i;
                 break;
             case '&':
                 if (end > i) {
-                    String c = sb.substring( i+1, end);
+                    String c = text.substring( i+1, end);
+                    if (sb == null) // first occurrence of an escaped character
+                        sb = new StringBuffer( text);
                     if (c.equals( "quot"))
                         sb.replace( i, end+1, "\"");
                     else if (c.equals( "amp"))
@@ -443,6 +459,77 @@ public abstract class TextAnnotationCodec {
             }
         }
         
-        return sb.toString();
+        if (sb != null) // a character was unescaped
+            return sb.toString();
+        else
+            return text; // string was not changed
+    }
+
+    /**
+     * Escapes special characters in a field entry.
+     *
+     * @param text Text to escape.
+     * @return The escaped text.
+     */
+    private static String escapeField( String text) {
+        StringBuffer sb = null; // defer string buffer initialization until it is really needed
+
+        for ( int i=text.length()-1; i>=0; i--) {
+            switch (text.charAt( i)) {
+            case FIELD_SEPARATOR:
+            case TRANSLATION_SEPARATOR:
+            case LIST_SEPARATOR:
+            case ESCAPE_CHARACTER:
+                if (sb == null) // first occurrence of an escaped character
+                    sb = new StringBuffer( text);
+                sb.replace( i, i+1, ESCAPE_CHARACTER + 
+                            Integer.toString( (int) text.charAt( i)) + ";");
+                break;
+            }
+        }
+
+        if (sb != null) // a character was escaped
+            return sb.toString();
+        else
+            return text; // string was not changed
+    }
+
+    /**
+     * Unescapes a string previously escaped with {@link #escapeField(String) escapeField}.
+     *
+     * @param text The text to unescape.
+     * @return The unescaped text.
+     */
+    private static String unescapeField( String text) {
+        StringBuffer sb = null; // defer string buffer initialization until it is really needed
+
+        int end = -1;
+        for ( int i=text.length()-1; i>=0; i--) {
+            switch (text.charAt( i)) {
+            case ';':
+                end = i;
+                break;
+            case ESCAPE_CHARACTER:
+                if (end > i) {
+                    String code = text.substring( i+1, end);
+                    try {
+                        char c = (char) Integer.parseInt( code);
+                        if (sb == null) // first occurrence of an escaped character
+                            sb = new StringBuffer( text);
+                        sb.setCharAt( i, c);
+                        sb.delete( i+1, end+1);
+                    } catch (NumberFormatException ex) {
+                        ex.printStackTrace();
+                    }
+                    end = 0;
+                }
+                break;
+            }
+        }
+        
+        if (sb != null) // an escaped character was unescaped
+            return sb.toString();
+        else
+            return text; // string was not changed
     }
 } // class TextAnnotationCodec

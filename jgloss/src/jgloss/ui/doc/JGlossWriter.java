@@ -56,7 +56,7 @@ public class JGlossWriter extends HTMLWriter {
      * file format revision is changed in a way that it still is compatible to earlier
      * formats.
      */
-    public static int FILE_FORMAT_MINOR_VERSION = 1;
+    public static int FILE_FORMAT_MINOR_VERSION = 2;
 
     /**
      * Document which will be written.
