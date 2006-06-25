@@ -23,6 +23,8 @@
 
 package jgloss.ui.xml;
 
+import java.io.IOException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -85,7 +87,7 @@ class DocumentGenerator extends DefaultHandler {
         currentParent.appendChild( document.createProcessingInstruction( target, data));
     }
 
-    public InputSource resolveEntity( String publicId, String systemId) throws SAXException {
+    public InputSource resolveEntity( String publicId, String systemId) throws SAXException, IOException {
         if (JGlossDocument.DTD_PUBLIC.equals( publicId)) {
             InputSource dtd = new InputSource( JGlossDocument.class.getResource
                                                ( JGlossDocument.DTD_RESOURCE).toExternalForm());

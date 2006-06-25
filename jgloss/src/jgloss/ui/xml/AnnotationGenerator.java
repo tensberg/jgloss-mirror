@@ -23,6 +23,7 @@
 
 package jgloss.ui.xml;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -246,7 +247,7 @@ class AnnotationGenerator extends DefaultHandler {
         e.printStackTrace();
     }
 
-    public InputSource resolveEntity( String publicId, String systemId) throws SAXException {
+    public InputSource resolveEntity( String publicId, String systemId) throws SAXException, IOException {
         return parent.resolveEntity( publicId, systemId);
     }
 
