@@ -33,6 +33,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Utility class for forwarding cookies between client-servlet and servlet-remote server.
  * This class tries to support both RFC2965 version 1 and Netscape cookies.

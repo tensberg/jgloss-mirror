@@ -44,6 +44,13 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpUtils;
+
 import jgloss.dictionary.DictionaryFactory;
 import jgloss.dictionary.EDict;
 import jgloss.dictionary.KanjiDic;
