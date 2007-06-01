@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
- Copyright (C) 2004 Michael Koch (tensberg@gmx.net)
+ Copyright (C) 2004,2007 Michael Koch (tensberg@gmx.net)
 
  This file is part of JGloss.
 
@@ -28,7 +28,7 @@
 
  To create the JGloss documentation files from the DocBook XML file jgloss.docbook.xml
  you need to install Norman Walsh's DocBook XSL stylesheets (http://docbook.sourceforge.net/projects/xsl/)
- and FOP (http://xml.apache.org/fop/).
+ and FOP (http://xml.apache.org/fop/) and set the environment variables DOCBOOK_HOME and FOP_HOME.
 
 -->
 <project name="JGloss" default="jgloss" basedir=".">
@@ -36,10 +36,12 @@
     Build file for the JGloss project
   </description>
 
+	<property environment="env" />
+	
   <!-- environment-specific properties - change these settings to fit your system -->
   <!-- Norman Walsh's DocBook XSL stylesheets are used to convert the JGloss documentation to HTML and PDF -->
-  <property name="xsl.docbook.html" value="/usr/share/sgml/docbook/xsl-stylesheets/html/chunk.xsl" />
-  <property name="xsl.docbook.pdf" value="/usr/share/sgml/docbook/xsl-stylesheets/fo/docbook.xsl" />
+  <property name="xsl.docbook.html" value="${env.DOCBOOK_HOME}/html/chunk.xsl" />
+  <property name="xsl.docbook.pdf" value="${env.DOCBOOK_HOME}/fo/docbook.xsl" />
   <!-- FOP is used to convert the XSL-FO JGloss documentation file to PDF
        You need to specify a Japanese font which is used in the created PDF. Define the font in the FOP userconfig.xml
        and set the property fop.japanesefont to the font name.
@@ -84,29 +86,36 @@
               MANIFEST.MF MANIFEST.MF.jdictionary MANIFEST.MF.kanaim
               src/** doc.src/** latex/**" />
   <zipfileset id="dist.binary.jgloss" dir="." prefix="${distname.binary.jgloss}"
-    includes="jgloss.jar README.txt COPYING ChangeLog doc/** latex/**" />
+    includes="${dist}/jgloss.jar README.txt COPYING ChangeLog doc/** latex/**" />
   <zipfileset id="dist.binary.jdictionary" dir="." prefix="${distname.binary.jdictionary}"
-    includes="jdictionary.jar README.txt COPYING ChangeLog doc/**" />
+    includes="${dist}/jdictionary.jar README.txt COPYING ChangeLog doc/**" />
     
   <!-- additional task definitions -->
   <!-- define the FOP task -->
-  <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" onerror="report" />
+  <path id="fop.classpath">
+    <fileset file="${env.FOP_HOME}/build/fop.jar" /> 
+    <fileset dir="${env.FOP_HOME}/lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>   
+  <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop"
+  	classpathref="fop.classpath" onerror="report" />
 
   <!-- targets -->
 
   <!-- JAR generation -->
   <target name="jgloss" depends="compile.jgloss,resources,data">
-    <jar destfile="jgloss.jar" basedir="${build}" manifest="MANIFEST.MF" />
+    <jar destfile="${dist}/jgloss.jar" basedir="${build}" manifest="MANIFEST.MF" />
   </target>
 
   <target name="jdictionary" depends="compile.jdictionary,resources,data">
-    <jar destfile="jdictionary.jar" basedir="${build}" manifest="MANIFEST.MF.jdictionary" />
+    <jar destfile="${dist}/jdictionary.jar" basedir="${build}" manifest="MANIFEST.MF.jdictionary" />
   </target>
 
   <target name="im" depends="compile.im">
     <mkdir dir="${build}/META-INF/services" />
     <copy file="${source}/jgloss/ui/im/InputMethodDescriptor" tofile="${build}/META-INF/services/java.awt.im.spi.InputMethodDescriptor" />
-    <jar destfile="jdictionary.jar" basedir="${build}" manifest="MANIFEST.MF.kanaim" />
+    <jar destfile="${dist}/kanaim.jar" basedir="${build}" manifest="MANIFEST.MF.kanaim" />
   </target>
 
   <target name="www" depends="compile.www,resources,data">
@@ -130,7 +139,6 @@
   <target name="dist" depends="clean,dist.source,dist.binary.jdictionary,dist.binary.jgloss" />
 
   <target name="dist.source">
-    <mkdir dir="${dist}" />
     <zip destfile="${dist}/${distname.source}.zip">
       <zipfileset refid="dist.source" />
     </zip>
@@ -151,24 +159,25 @@
   </target>
 
   <!-- compilation -->
-  <target name="prepare-compile">
+  <target name="init">
+  	<tstamp/>
     <mkdir dir="${build}" />
-    <depend srcdir="${source}" destdir="${build}" cache="dependencies" closure="yes" />
+    <mkdir dir="${dist}" />
   </target>
 
-  <target name="compile.jgloss" depends="prepare-compile">
+  <target name="compile.jgloss" depends="init">
     <javac srcdir="${source}" destdir="${build}" includes="${sources.jgloss}" />
   </target>
 
-  <target name="compile.jdictionary" depends="prepare-compile">
+  <target name="compile.jdictionary" depends="init">
     <javac srcdir="${source}" destdir="${build}" includes="${sources.jdictionary}" />
   </target>
 
-  <target name="compile.im" depends="prepare-compile">
+  <target name="compile.im" depends="init">
     <javac srcdir="${source}" destdir="${build}" includes="${sources.im}" />
   </target>
 
-  <target name="compile.www" depends="prepare-compile">
+  <target name="compile.www" depends="init">
     <javac srcdir="${source}" destdir="${build}" includes="${sources.www}" />
   </target>
 
@@ -244,10 +253,6 @@
   <target name="clean">
     <delete dir="${build}" />
     <delete dir="${dist}" />
-    <delete>
-      <fileset dir="." includes="*.jar" />
-    </delete>
-    <delete dir="dependencies" />
     <delete dir="${dest.doc.html}" />
     <delete dir="${dest.doc}" />
     <delete dir="${dest.javadoc}" />

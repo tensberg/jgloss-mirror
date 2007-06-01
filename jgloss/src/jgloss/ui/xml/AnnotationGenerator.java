@@ -247,7 +247,7 @@ class AnnotationGenerator extends DefaultHandler {
         e.printStackTrace();
     }
 
-    public InputSource resolveEntity( String publicId, String systemId) throws SAXException, IOException {
+    public InputSource resolveEntity( String publicId, String systemId) throws SAXException {
         return parent.resolveEntity( publicId, systemId);
     }
 
