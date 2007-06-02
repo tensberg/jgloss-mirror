@@ -21,6 +21,8 @@
  *
  */
 
+// WARNING .. this is unfinished code, it didn't compile in the first place !!! (truell)
+
 package jgloss.www;
 
 import java.io.BufferedInputStream;
@@ -44,19 +46,14 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpUtils;
-
 import jgloss.dictionary.DictionaryFactory;
 import jgloss.dictionary.EDict;
 import jgloss.dictionary.KanjiDic;
 import jgloss.parser.KanjiParser;
 import jgloss.parser.Parser;
 import jgloss.util.CharacterEncodingDetector;
+import javax.servlet.http.*;
+import javax.servlet.*;
 
 /**
  * Servlet which annotates an HTML page with the dictionary entries for
@@ -187,9 +184,9 @@ public class JGlossServlet extends HttpServlet {
         HttpURLConnection.setFollowRedirects( false);
 
         // register dictionaries
-        DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
+        /*DictionaryFactory.registerImplementation( EDict.class, EDict.implementation);
         DictionaryFactory.registerImplementation( KanjiDic.class, KanjiDic.implementation);
-        DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);
+        DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);*/
 
         // load the dictionaries
         List diclist = new LinkedList();

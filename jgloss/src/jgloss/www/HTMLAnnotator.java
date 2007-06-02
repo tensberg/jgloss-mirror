@@ -21,7 +21,10 @@
  *
  */
 
+// WARNING .. this is unfinished code, it didn't compile in the first place !!! (truell)
+
 package jgloss.www;
+import jgloss.parser.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -225,14 +228,14 @@ public class HTMLAnnotator {
         text.getChars( 0, text.length(), chars, 0);
 
         try {
-            List annotations = parser.parse( chars);
+            List annotations = parser.parse( chars, 0, chars.length);
             StringBuffer anno = new StringBuffer( 200);
             int start = 0; // index of first character of annotated word
             int end = 0; // index of first character after annotated word
             String[] prevannotation = new String[3];
 
             for ( Iterator i=annotations.iterator(); i.hasNext(); ) {
-                Parser.TextAnnotation a = (Parser.TextAnnotation) i.next();
+                TextAnnotation a = (TextAnnotation) i.next();
                 if (a.getStart() >= end) {
                     // new annotated word; write the previous annotated word
                     if (anno.length() > 0) { // == 0 for first annotation in list
@@ -271,7 +274,7 @@ public class HTMLAnnotator {
      * @param intext Text to which the annotation is appended.
      * @param a The annotation to append.
      */
-    protected StringBuffer addAnnotationText( StringBuffer text, Parser.TextAnnotation a,
+    protected StringBuffer addAnnotationText( StringBuffer text, TextAnnotation a,
                                               String[] prevannotation) {
         String lastdictionary = prevannotation[0];
         String lastword = prevannotation[1];
@@ -281,7 +284,7 @@ public class HTMLAnnotator {
         // probably because the \ is replaced by the Yen symbol in some Japanese character encodings.
         // I use the custom escape _R instead of \n and replace it at display time using JavaScript
 
-        String dictionary = null;
+        /*String dictionary = null;
         if (a instanceof Reading)
             dictionary = ((Reading) a).getWordReadingPair().getDictionary().getName();
         else if (a instanceof Translation)
@@ -334,7 +337,7 @@ public class HTMLAnnotator {
                 lastword = word;
                 lasttranslation = translation;
             }
-        }
+        }*/
     
         // escape special characters
         for ( int i=text.length()-2; i>=0; i--) {
