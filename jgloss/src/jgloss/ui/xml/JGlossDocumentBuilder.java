@@ -53,10 +53,15 @@ public class JGlossDocumentBuilder {
     public JGlossDocument build( Reader text, boolean detectLineBreaks,
                                  ReadingAnnotationFilter readingFilter, Parser parser,
                                  Dictionary[] dictionaries) throws IOException, SAXException {
-        AnnotationGenerator annoGen = new AnnotationGenerator( docGen, readingFilter, parser,
+        AnnotationGenerator handler = new AnnotationGenerator( docGen, readingFilter, parser,
                                                                dictionaries);
-        xmlParser.parse( new InputSource( new JGlossifyReader( text, null, detectLineBreaks)),
-                         annoGen);
-        return new JGlossDocument( docGen.getGeneratedDocument());
+                                                               
+        InputSource inputSource = new InputSource( new JGlossifyReader( text, null, detectLineBreaks));                                                               
+        
+        // TODO: Progress Bar: this step takes very long:
+        xmlParser.parse( inputSource, handler);
+        
+        JGlossDocument result = new JGlossDocument( docGen.getGeneratedDocument());
+        return result;
     }
 } // class JGlossDocumentBuilder

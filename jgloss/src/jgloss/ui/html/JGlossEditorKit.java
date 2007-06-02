@@ -396,7 +396,10 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         public float getAlignment( int axis) {
             if (axis == View.Y_AXIS) {
-                if (!showReading)
+
+                return 0.25f;
+                
+                /*if (!showReading)
                     return VAdjustedView.BASE_TEXT_ALIGNMENT;
                 else if (!startsAnnotated) {
                     // yet another ugly alignment hack for annotations that start with
@@ -405,7 +408,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
                         return 0.25f;
                     else
                         return 0.36f;
-                }
+                }*/
             }
             
             return super.getAlignment( axis);
@@ -591,6 +594,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @param allocation The allocation the view should be rendered into.
          */
         public void paint( Graphics g, Shape allocation) {
+            if (isHidden())
+                return;
             if (getParent() == null)
                 return;
 
@@ -607,6 +612,31 @@ public class JGlossEditorKit extends HTMLEditorKit {
             }
 
             super.paint( g, allocation);
+        }
+
+        /**
+         * Returns if the annotation is currently hidden. It is hidden if either
+         * all reading/translations annotations are globally hidden by a call to
+         * {@link JGlossEditorKit#showReading(boolean) showReading}/
+         * {@link JGlossEditorKit#showTranslation(boolean) showTranslation}, or if the
+         * hidden attribute of the parent annotation element is set.
+         *
+         * @return <CODE>true</CODE> if the annotation is hidden.
+         */
+        public boolean isHidden() {
+            if ((type==AnnotationTags.READING)&&!showReading ||
+                (type==AnnotationTags.TRANSLATION)&&!showTranslation)
+                return true;
+            
+            /*View parent = getParent();
+            if (parent instanceof AnnotationView)
+                return ((AnnotationView) parent).isAnnotationHidden();
+            else if (parent instanceof ReadingBaseView)
+                return ((ReadingBaseView) parent).isAnnotationHidden();
+            else
+                return false;*/
+                
+            return false;
         }
 
         /**
@@ -945,18 +975,18 @@ public class JGlossEditorKit extends HTMLEditorKit {
     }
 
     public StyleSheet getStyleSheet() {
-	if (jglossStyleSheet == null) {
-	    jglossStyleSheet = new StyleSheet();
-	    try {
-		InputStream is = JGlossEditorKit.class.getResourceAsStream(JGLOSS_STYLE_SHEET);
-		Reader r = new BufferedReader(new InputStreamReader(is));
-		jglossStyleSheet.loadRules(r, null);
-		r.close();
-	    } catch (IOException ex) {
+    if (jglossStyleSheet == null) {
+        jglossStyleSheet = new StyleSheet();
+        try {
+        InputStream is = JGlossEditorKit.class.getResourceAsStream(JGLOSS_STYLE_SHEET);
+        Reader r = new BufferedReader(new InputStreamReader(is));
+        jglossStyleSheet.loadRules(r, null);
+        r.close();
+        } catch (IOException ex) {
                 ex.printStackTrace();
-	    }
-	}
+        }
+    }
 
-	return jglossStyleSheet;
+    return jglossStyleSheet;
     }
 } // class JGlossEditorKit

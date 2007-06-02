@@ -23,7 +23,7 @@ public class SelectedAnnotationHighlighter implements ListSelectionListener {
 
     public void valueChanged( ListSelectionEvent e) {
         if (e.getFirstIndex() >= 0) {
-            highlightSelection((AnnotationList) e.getSource());
+            highlightSelection((AnnotationList) e.getSource()); // HERE
         }
         // else: content of currently selected annotation changed; ignore
     }

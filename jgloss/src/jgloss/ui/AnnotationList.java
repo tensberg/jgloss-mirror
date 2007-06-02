@@ -358,11 +358,18 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         }
     }
 
+    public void setSelectedIndex(int index) {
+        
+        super.setSelectedIndex(index);
+        // Scroll to visible
+        ensureIndexIsVisible(index);
+    }
+
     /**
      * Adapts the state of the annotation-specific actions in response to changes in the selection.
      */
     public void valueChanged(ListSelectionEvent e) {
-        boolean annoSelected = (getSelectedIndex() != -1);
+        boolean annoSelected = (getSelectedIndex() != -1); // HERE
         removeAction.setEnabled(annoSelected);
         addToExclusionsAction.setEnabled(annoSelected);
         addToDictionaryAction.setEnabled(annoSelected);

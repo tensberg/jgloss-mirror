@@ -64,9 +64,9 @@ import jgloss.ui.annotation.AnnotationListModel;
  */
 public class JGlossEditor extends JTextPane {
     private static DefaultHighlighter.DefaultHighlightPainter highlightPainter = 
-        new DefaultHighlighter.DefaultHighlightPainter( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
-
+    new DefaultHighlighter.DefaultHighlightPainter( new Color
+        ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
+    
     /**
      * Manages the automatic display of anntotation tooltips and annotation editor scrolling
      * when the mouse hovers over an annotation.
@@ -79,12 +79,12 @@ public class JGlossEditor extends JTextPane {
          */
         private Point pos = new Point();
         private boolean halt = false;
-
+        
         public MouseFollowerThread() {
             super( "Mouse Follower Thread");
             setDaemon( true);
         }
-
+        
         public void run() {
             boolean updated = false;
             int i=0;
@@ -113,10 +113,10 @@ public class JGlossEditor extends JTextPane {
                 }
             }
         }
-
+        
         public void mouseMoved( MouseEvent e) {
             hideToolTip();
-
+            
             if (tooltips) {
                 synchronized (this) {
                     pos = e.getPoint();
@@ -124,9 +124,9 @@ public class JGlossEditor extends JTextPane {
                 this.interrupt();
             }
         }
-
+        
         public void mouseDragged( MouseEvent e) {}
-
+        
         public void haltThread() {
             halt = true;
             this.interrupt();
@@ -135,14 +135,14 @@ public class JGlossEditor extends JTextPane {
             } catch (InterruptedException ex) {}
         }
     }
-
+    
     /**
      * Key object of the keymap which contains the "pressed TAB" key action.
      */
     private final static String KEYMAP_TAB = "tab map";
-
+    
     private JGlossHTMLDoc htmlDoc;
-
+    
     private AnnotationList annotationList;
     /**
      * Object identifying the currently highlighted annotation in the <CODE>HighlightPainter</CODE>.
@@ -173,7 +173,7 @@ public class JGlossEditor extends JTextPane {
      * Widget which holds the annotation tooltip text.
      */
     private JTextArea tooltip;
-
+    
     /**
      * Searches a string in the document.
      */
@@ -190,12 +190,12 @@ public class JGlossEditor extends JTextPane {
      * Last find position. Used with find again action.
      */
     private int lastFindPosition;
-
+    
     /**
      * Update the tooltip font in response to default ui changes.
      */
     private PropertyChangeListener fontChangeListener;
-
+    
     /**
      * Sets the highlight color to a new value. Used if the preferences changed.
      *
@@ -204,7 +204,7 @@ public class JGlossEditor extends JTextPane {
     public static void setHighlightColor( Color c) {
         highlightPainter = new DefaultHighlighter.DefaultHighlightPainter( c);
     }
-
+    
     /**
      * Creates a new editor for JGloss annotated documents with an associated
      * annotation editor. The annotation editor will be updated based on
@@ -213,93 +213,110 @@ public class JGlossEditor extends JTextPane {
     public JGlossEditor( AnnotationList _annotationList) {
         setAutoscrolls( true);
         setEditable( false);
-
+        
         annotationList = _annotationList;
-
+        
         // A JTextComponent normally does not do TAB focus traversal since TAB is a valid input
         // character. Because the JGlossEditor is not used for normal text input, I override
         // this behavior for convenience.
         Keymap map = addKeymap( KEYMAP_TAB, getKeymap());
         map.addActionForKeyStroke( KeyStroke.getKeyStroke( "pressed TAB"),
-                                   new AbstractAction() {
-                                           public void actionPerformed( ActionEvent e) {
-                                               transferFocus();
-                                           }
-                                       });
+            new AbstractAction() {
+                public void actionPerformed( ActionEvent e) {
+                    transferFocus();
+                }
+            });
         setKeymap( map);
-
+        
         mouseFollower = new MouseFollowerThread();
         mouseFollower.start();
         this.addMouseMotionListener( mouseFollower);
-
+        
         mouseListener = new MouseListener() {
-                private boolean checkPopupTrigger( MouseEvent e) {
-                    if (e.isPopupTrigger()) {
+            public void mousePressed( MouseEvent e) {
+                checkPopupTrigger( e);
+            }
+            
+            public void mouseReleased( MouseEvent e) {
+                checkPopupTrigger( e);
+            }
+            
+            public void mouseClicked( MouseEvent e) 
+            {
+                if (!(checkPopupTrigger( e) || annotationList.getContextMenu().isVisible())) 
+                {
+                    int tooltipButtonMask;
+                    int selectButtonMask;
+                    if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) 
+                    {
+                        // left mouse button shows annotation tooltip, 
+                        // all other select the annotation
+                        tooltipButtonMask = MouseEvent.BUTTON1_MASK;
+                        selectButtonMask = MouseEvent.BUTTON2_MASK | MouseEvent.BUTTON3_MASK;
+                    }
+                    else 
+                    {
+                        // left mouse button selects annotation, 
+                        // all other show annotation tooltip
+                        tooltipButtonMask = MouseEvent.BUTTON2_MASK | MouseEvent.BUTTON3_MASK;
+                        selectButtonMask = MouseEvent.BUTTON1_MASK;
+                    }
+                    
+                    if ((e.getModifiers() & selectButtonMask) != 0) 
+                    {
                         int pos = viewToModel( e.getPoint());
-                        //annotationList.setSelectedItem( doc.getAnnotationAt( int pos));
-                        annotationList.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
-                        return true;
-                    }
-                    return false;
-                }
+                        int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex( pos, AnnotationListModel.BIAS_NONE);
 
-                public void mousePressed( MouseEvent e) {
-                    checkPopupTrigger( e);
-                }
-                    
-                public void mouseReleased( MouseEvent e) {
-                    checkPopupTrigger( e);
-                }
-                    
-                public void mouseClicked( MouseEvent e) {
-                    if (!(checkPopupTrigger( e) || annotationList.getContextMenu().isVisible())) {
-                        int tooltipButtonMask;
-                        int selectButtonMask;
-                        if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) {
-                            // left mouse button shows annotation tooltip, 
-                            // all other select the annotation
-                            tooltipButtonMask = MouseEvent.BUTTON1_MASK;
-                            selectButtonMask = MouseEvent.BUTTON2_MASK|
-                                MouseEvent.BUTTON3_MASK;
+                        if (annoIndex >= 0) 
+                        {
+                            // Selecting the annotation in the AnnotationList also selects it in the Editor
+                            
+                            annotationList.setSelectedIndex( annoIndex);
+                            // transfer input focus to annotation list to enable keyboard
+                            // navigation
+                            annotationList.requestFocus();
                         }
-                        else {
-                            // left mouse button selects annotation, 
-                            // all other show annotation tooltip
-                            tooltipButtonMask = MouseEvent.BUTTON2_MASK|
-                                MouseEvent.BUTTON3_MASK;
-                            selectButtonMask = MouseEvent.BUTTON1_MASK;
-                        }
+                        else
+                        {
+                            // Deselect any selected annotation 
+                            //annotationList.setSelectedIndex(0);
 
-                        if ((e.getModifiers() & selectButtonMask) != 0) {
-                            int pos = viewToModel( e.getPoint());
-                            int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex
-                                ( pos, AnnotationListModel.BIAS_NONE);
-                            if (annoIndex >= 0) {
-                                annotationList.setSelectedIndex( annoIndex);
-                                // transfer input focus to annotation list to enable keyboard
-                                // navigation
-                                annotationList.requestFocus();
-                            }
-                        }
-                        else if (!tooltips && (e.getModifiers() & tooltipButtonMask)!=0) {
-                            /*showToolTip( ((AnnotationModel) annotationEditor.getModel())
-                                         .getAnnotationText( viewToModel( e.getPoint())),
-                                         e.getPoint());*/
+                            // FIXME: does not work!
+                            annotationList.clearSelection();
                         }
                     }
+                    else if (!tooltips && (e.getModifiers() & tooltipButtonMask)!=0) 
+                    {
+                        //    showToolTip( ((AnnotationModel) annotationEditor.getModel())
+                        //                 .getAnnotationText( viewToModel( e.getPoint())),
+                        //                 e.getPoint());
+                    }
                 }
-
-                public void mouseEntered( MouseEvent e) {
-                    inComponent = true;
+            }
+            
+            private boolean checkPopupTrigger( MouseEvent e) 
+            {
+                if (e.isPopupTrigger()) 
+                {
+                    int pos = viewToModel( e.getPoint());
+                    //annotationList.setSelectedItem( doc.getAnnotationAt( int pos));
+                    annotationList.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
+                    return true;
                 }
-
-                public void mouseExited( MouseEvent e) {
-                    inComponent = false;
-                    hideToolTip();
-                }
-            };
+                return false;
+            }
+            
+            public void mouseEntered( MouseEvent e) {
+                inComponent = true;
+            }
+            
+            public void mouseExited( MouseEvent e) {
+                inComponent = false;
+                hideToolTip();
+            }
+        };
         addMouseListener( mouseListener);
-
+        
         tooltip = new JTextArea();
         JToolTip tt = createToolTip();
         tooltip.setEditable( false);
@@ -307,58 +324,58 @@ public class JGlossEditor extends JTextPane {
         tooltip.setBackground( tt.getBackground());
         tooltip.setForeground( tt.getForeground());
         tt.setComponent( null); // remove reference to this (which prevents garbage collection)
-
+        
         // update display if user changed font
         fontChangeListener = new PropertyChangeListener() {
-                public void propertyChange( java.beans.PropertyChangeEvent e) { 
-                    if (e.getPropertyName().equals( "ToolTip.font")) {
-                        tooltip.setFont( UIManager.getFont( "ToolTip.font"));
-                    }
+            public void propertyChange( java.beans.PropertyChangeEvent e) { 
+                if (e.getPropertyName().equals( "ToolTip.font")) {
+                    tooltip.setFont( UIManager.getFont( "ToolTip.font"));
                 }
-            };
+            }
+        };
         UIManager.getDefaults().addPropertyChangeListener( fontChangeListener);
-
+        
         findAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    Object result = JOptionPane.showInputDialog
-                        ( SwingUtilities.getRoot( JGlossEditor.this), 
-                          JGloss.messages.getString( "editor.dialog.find"),
-                          JGloss.messages.getString( "editor.dialog.find.title"),
-                          JOptionPane.PLAIN_MESSAGE, null, null, getSelectedText());
-                    if (result != null) {
-                        String text = result.toString();
-                        if (text.length()>0) {
-                            try {
-                                int where = find( text, 0);
-                                lastFindText = text;
-                                if (where != -1) {
-                                    lastFindPosition = where;
-                                    findAgainAction.setEnabled( true);
-                                }
-                            } catch (BadLocationException ex) {}
-                        }
+            public void actionPerformed( ActionEvent e) {
+                Object result = JOptionPane.showInputDialog
+                ( SwingUtilities.getRoot( JGlossEditor.this), 
+                    JGloss.messages.getString( "editor.dialog.find"),
+                    JGloss.messages.getString( "editor.dialog.find.title"),
+                    JOptionPane.PLAIN_MESSAGE, null, null, getSelectedText());
+                if (result != null) {
+                    String text = result.toString();
+                    if (text.length()>0) {
+                        try {
+                            int where = find( text, 0);
+                            lastFindText = text;
+                            if (where != -1) {
+                                lastFindPosition = where;
+                                findAgainAction.setEnabled( true);
+                            }
+                        } catch (BadLocationException ex) {}
                     }
                 }
-            };
+            }
+        };
         findAction.setEnabled( false);
         UIUtilities.initAction( findAction, "editor.menu.find");
         findAgainAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
-                    try {
-                        int where = find( lastFindText, lastFindPosition + 1);
-                        if (where != -1)
-                            lastFindPosition = where;
-                        else
-                            lastFindPosition = 0; // wrap search
-                    } catch (BadLocationException ex) {
-                        lastFindPosition = 0;
-                    }
+            public void actionPerformed( ActionEvent e) {
+                try {
+                    int where = find( lastFindText, lastFindPosition + 1);
+                    if (where != -1)
+                        lastFindPosition = where;
+                    else
+                        lastFindPosition = 0; // wrap search
+                } catch (BadLocationException ex) {
+                    lastFindPosition = 0;
                 }
-            };
+            }
+        };
         UIUtilities.initAction( findAgainAction, "editor.menu.findagain");
         findAgainAction.setEnabled( false); // will be enabled after first find
     }
-
+    
     /**
      * Scrolls the document such that the text between <CODE>start</CODE> and
      * <CODE>end</CODE> will be visible.
@@ -369,7 +386,7 @@ public class JGlossEditor extends JTextPane {
     public void makeVisible( int start, int end) {
         UIUtilities.makeVisible(this, start, end);
     }
-
+    
     /**
      * Highlights the document text between <CODE>start</CODE> and <CODE>end</CODE>
      * with a highlight color set in the preferences. A call to this will remove the
@@ -381,14 +398,14 @@ public class JGlossEditor extends JTextPane {
     public void highlightText( int start, int end) {
         if (highlightTag != null)
             getHighlighter().removeHighlight( highlightTag);
-
+        
         try {
             highlightTag = getHighlighter().addHighlight( start, end, highlightPainter);
         } catch (BadLocationException ex) {
             ex.printStackTrace();
         }
     }
-
+    
     /**
      * Remove a previously set highlight.
      */
@@ -397,7 +414,7 @@ public class JGlossEditor extends JTextPane {
             getHighlighter().removeHighlight( highlightTag);
         highlightTag = null;
     }
-
+    
     /**
      * Sets the actions to do if the mouse moves over an annotation. Annotation tooltips
      * can be shown, or the annotation editor can be made to scroll to the annotation the
@@ -408,11 +425,11 @@ public class JGlossEditor extends JTextPane {
      */
     public void followMouse( boolean tooltips) {
         this.tooltips = tooltips;
-
+        
         if (!tooltips)
             hideToolTip();
     }
-
+    
     /**
      * Shows a tooltip with the specified tip at the given location. If the mouse pointer
      * is not over the JGlossEditor component, the tooltip will not be shown.
@@ -426,19 +443,19 @@ public class JGlossEditor extends JTextPane {
             hideToolTip();
             return;
         }
-
+        
         if (tooltipWindow==null && getTopLevelAncestor()!=null) {
             tooltipWindow = new JWindow( (Frame) getTopLevelAncestor()) {
-                    public void hide() {
-                        super.hide();
-                        // work around bug in interaction with the KDE2 window manager:
-                        this.removeNotify();
-                    }
-                };
+                public void hide() {
+                    super.hide();
+                    // work around bug in interaction with the KDE2 window manager:
+                    this.removeNotify();
+                }
+            };
             tooltipWindow.getContentPane().setLayout( new GridLayout( 1, 1));
             tooltipWindow.getContentPane().add( tooltip);
         }
-
+        
         if (tooltipWindow != null) {
             Point screen = getLocationOnScreen();
             where.x += screen.x + 15;
@@ -454,20 +471,20 @@ public class JGlossEditor extends JTextPane {
                 if (where.x < 0)
                     where.x = 0;
             }
-
+            
             if (where.y+windowsize.height > screensize.height) {
                 // move window above mouse pointer
                 where.y -= 30 + windowsize.height;
                 if (where.y < 0)
                     where.y = 0;
             }
-
+            
             tooltipWindow.setSize( windowsize);
             tooltipWindow.setLocation( where);
             tooltipWindow.setVisible( true);
         }
     }
-
+    
     /**
      * Hides the tooltip window. Does nothing if it is already hidden.
      */
@@ -475,7 +492,7 @@ public class JGlossEditor extends JTextPane {
         if (tooltipWindow != null)
             tooltipWindow.hide();
     }
-
+    
     /**
      * Sets the document to edit. Calling this method enables the find and document title actions.
      */
@@ -483,7 +500,7 @@ public class JGlossEditor extends JTextPane {
         super.setStyledDocument( _doc);
         htmlDoc = (JGlossHTMLDoc) _doc;
     }
-
+    
     /**
      * Search for some text in the document. If the text is found as part of an annotation, the
      * annotation will be selected.
@@ -501,29 +518,29 @@ public class JGlossEditor extends JTextPane {
             if (from == 0) { 
                 // search in whole document
                 JOptionPane.showMessageDialog
-                    ( SwingUtilities.getRoot( this), 
-                      JGloss.messages.getString( "editor.dialog.find.notfound",
-                                                 new Object[] { text }));
+                ( SwingUtilities.getRoot( this), 
+                    JGloss.messages.getString( "editor.dialog.find.notfound",
+                        new Object[] { text }));
             }
             else {
                 // search in part of the document
                 JOptionPane.showMessageDialog
-                    ( SwingUtilities.getRoot( this),
-                      JGloss.messages.getString( "editor.dialog.findagain.notfound",
-                                                 new Object[] { text }));
+                ( SwingUtilities.getRoot( this),
+                    JGloss.messages.getString( "editor.dialog.findagain.notfound",
+                        new Object[] { text }));
             }
             return -1;
         }
         where += from; // start offset must be taken into account
-
+        
         requestFocus(); // selection will only be visible if editor has the focus
         // select found text
         setCaretPosition( where);
         moveCaretPosition( where + text.length());
-
+        
         return where;
     }
-
+    
     /**
      * Dispose of resources associated with the editor.
      */

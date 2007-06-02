@@ -72,7 +72,23 @@ public abstract class AbstractParser implements Parser {
      *
      * @return The position in the text the parser is currently parsing.
      */
-    public int getParsePosition() { return parsePosition; }
+    public int getParsePosition() { 
+        return parsePosition;
+    }
+
+    int mTick;
+    
+    public int getTick() {
+        return mTick;
+    }
+
+    public void initTick() {
+        mTick = 0;
+    }
+    
+    public void tick(int i) {
+        mTick += i;
+    }
 
     /**
      * Clears any caches which may have been filled during parsing. Call this after you have

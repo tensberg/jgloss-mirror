@@ -81,7 +81,10 @@ public class ChasenParser extends AbstractParser {
     public Locale getLanguage() { return Locale.JAPANESE; }
 
     public List parse( char[] text, int start, int length) throws SearchException {
+        
+        // the parsePosition cannot be correct since the text was converted to HTML!
         parsePosition = start;
+
         int end = start + length;
         List annotations = new ArrayList( length/3);
 

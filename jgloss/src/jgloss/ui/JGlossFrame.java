@@ -22,6 +22,7 @@
  */
 
 package jgloss.ui;
+import jgloss.parser.*;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -1076,7 +1077,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
     private void importFromReader( Reader in, boolean detectParagraphs,
                                    String path, String title, 
-                                   ReadingAnnotationFilter filter, Parser parser, int length) 
+                                   ReadingAnnotationFilter filter, final Parser parser, final int length) 
         throws IOException {
         // Prevent the windowClosing event from directly closing the window.
         // If a windowClosing event is registered while the loadDocument method is executing,
@@ -1085,28 +1086,40 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         
         final StopableReader stin = new StopableReader( in);
 
-        final ProgressMonitor pm = new ProgressMonitor
-            ( this, JGloss.messages.getString( "load.progress", 
-                                               new Object[] { path }),
-              null, 0, length);
+        final ProgressMonitor pm = new ProgressMonitor( this, 
+            JGloss.messages.getString( "load.progress", new Object[] { path }), null, 0, 100);
         final Thread currentThread = Thread.currentThread(); // needed to interrupt parsing if user cancels
-        javax.swing.Timer progressUpdater = new javax.swing.Timer( 1000, new ActionListener() {
-                public void actionPerformed( ActionEvent e) {
-                    // this handler is called from the event dispatch thread
-                    pm.setProgress( stin.getCharCount());
-                    if (pm.isCanceled() || // cancel button of progress bar pressed
-                        !deferWindowClosing) { // close button of document frame pressed
-                        stin.stop();
-                        currentThread.interrupt();
-                    }
+        ((AbstractParser)parser).initTick();
+        
+        javax.swing.Timer progressUpdater = new javax.swing.Timer( 500, new ActionListener() {
+            // this handler is called from the event dispatch thread
+            public void actionPerformed( ActionEvent e) {
+                int progress = ((AbstractParser)parser).getTick();
+                if (progress > 1) {
+                    progress = Math.min(99, progress-1);
                 }
-            });
+                
+                pm.setProgress( progress );
+
+                int step = Math.max(1, (100 - progress) /20);
+                ((AbstractParser)parser).tick(step);
+                
+                if (pm.isCanceled() || // cancel button of progress bar pressed
+                    !deferWindowClosing) { // close button of document frame pressed
+                    stin.stop();
+                    currentThread.interrupt();
+                }
+            }
+        });
+        
+        pm.setMillisToDecideToPopup(0);
+        pm.setMillisToPopup(0);
+        
         progressUpdater.start();
 
         try {
-            model.setDocument( new JGlossDocumentBuilder().build
-                               ( stin, detectParagraphs, filter,
-                                 parser, Dictionaries.getDictionaries( true)));
+            model.setDocument( new JGlossDocumentBuilder().build( stin, 
+                detectParagraphs, filter, parser, Dictionaries.getDictionaries( true)) );
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showConfirmDialog
@@ -1118,6 +1131,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         }
 
         progressUpdater.stop();
+        
         in.close();
         pm.close();
 
@@ -1286,6 +1300,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 EventQueue.invokeAndWait( worker);
             } catch (InterruptedException ex) {
                 // What? Should not happen.
+                // Andreas Winter: happens every time to me (truell)
                 ex.printStackTrace();
             } catch (InvocationTargetException ex2) {
                 if (ex2.getCause() instanceof IOException)
@@ -1374,7 +1389,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      */
     public void valueChanged( ListSelectionEvent e) {
         if (e.getFirstIndex() >= 0) {
-            Annotation anno = (Annotation) annotationList.getSelectedValue();
+            Annotation anno = (Annotation) annotationList.getSelectedValue(); // HERE
             if (anno != null) {
                 annotationEditor.setAnnotation( anno);
                 lookupPanel.search( anno.getDictionaryForm());

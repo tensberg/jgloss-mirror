@@ -21,6 +21,9 @@
  */
 
 package jgloss.parser;
+import java.awt.event.*;
+import javax.swing.*;
+import java.awt.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -254,6 +257,8 @@ public class Chasen {
         return defaultChasenExecutable;
     }
 
+    static boolean mToldUserThatChasenCantRun;
+
     /**
      * Test if the chasen program is available at the specified path. If the path to the executable
      * is the same as in the previous test, and this test was successfull, the test will not be
@@ -270,35 +275,55 @@ public class Chasen {
 
         // The test is done by
         // calling the program with the "-V" (for version) option.
+        
+        Process p = null;
+        
         try {
-            Process p = Runtime.getRuntime().exec( chasenExecutable + " -V");
-
-            try {
-                waitForProcess( p, 3000l);
-                // analyze process output
-                if (p.exitValue() != 0)
-                    return false;
-                BufferedReader out = new BufferedReader
-                    ( new InputStreamReader( p.getInputStream()));
-                String line = out.readLine();
-                out.close();
-                if (line==null || !line.startsWith( "ChaSen"))
-                    return false;
-
-                lastChasenExecutable = chasenExecutable;
-                return true;
-            } catch (InterruptedException ex) {
-                // process didn't terminate normally in time, abort
-                System.err.println( "isChasenExecutable: abnormal process termination");
-                p.destroy();
-                return false;
-            }
+            p = Runtime.getRuntime().exec( chasenExecutable + " -V");
         } catch (IOException ex) {
             // specified program probably doesn't exist
+            // This is due to the fact that 
+            System.err.println( "Error: Cannot start ChaSen now: " + ex );
+            
+            /*if ( !mToldUserThatChasenCantRun )
+            {
+                mToldUserThatChasenCantRun = true;
+                
+                Object[] options = { "OK" };
+                JOptionPane.showOptionDialog(null, "Cannot start ChaSen due to Java Bug. May work after restart of JGloss.", "Warning",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+                    null, options, options[0]);
+            }*/
+            
+            return false;
+        }
+
+        try 
+        {
+            waitForProcess( p, 3000l);
+
+            // analyze process output
+            if (p.exitValue() != 0)
+                return false;
+            BufferedReader out = new BufferedReader
+                ( new InputStreamReader( p.getInputStream()));
+            String line = out.readLine();
+            out.close();
+            if (line==null || !line.startsWith( "ChaSen"))
+                return false;
+
+            lastChasenExecutable = chasenExecutable;
+            return true;
+        } catch (InterruptedException ex) {
+            // process didn't terminate normally in time, abort
+            System.err.println( "isChasenExecutable: abnormal process termination");
+            p.destroy();
+            return false;
+        } catch (IOException ex) {
             return false;
         }
     }
-
+    
     /**
      * Starts a new chasen process using the default executable, no arguments and '\t' as field
      * separator.
@@ -408,9 +433,12 @@ public class Chasen {
                     chasen.getErrorStream().read( buf);
 
                 try {
-                    waitForProcess( chasen, 5000l);
+                    // TODO: Progess Bar: this step takes long
+                    System.out.println( "Waiting for ChaSen to shut down" );
+                    waitForProcess( chasen, 1000l);
                 } catch (InterruptedException ex) {
                     // chasen process did not terminate automatically
+                    // chasen NEVER terminates automatically
                     System.err.println( "Chasen.dispose: abnormal termination of chasen");
                     chasen.destroy();
                 }
