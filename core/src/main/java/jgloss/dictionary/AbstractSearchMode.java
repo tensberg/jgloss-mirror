@@ -25,9 +25,11 @@ package jgloss.dictionary;
 
 import java.util.ResourceBundle;
 
+import jgloss.util.UTF8ResourceBundleControl;
+
 public abstract class AbstractSearchMode implements SearchMode {
     protected static final ResourceBundle MESSAGES = 
-        ResourceBundle.getBundle( "resources/messages-dictionary");
+        ResourceBundle.getBundle( "messages-dictionary", new UTF8ResourceBundleControl());
     protected static final String RESOURCE_PREFIX = "searchmode.";
 
     protected String name;

@@ -135,7 +135,7 @@ public class WadokuJT extends FileBasedDictionary {
     private static AttributeMapper initMapper() {
         try {
             Reader r = new InputStreamReader( WadokuJT.class.getResourceAsStream
-                                              ( "/resources/wadokujt.map"),
+                                              ( "/wadokujt.map"),
                                               "UTF-8");
             AttributeMapper mapper = new AttributeMapper( new LineNumberReader( r));
             r.close();
@@ -156,7 +156,7 @@ public class WadokuJT extends FileBasedDictionary {
             LineNumberReader r = new LineNumberReader
                 ( new InputStreamReader
                   ( WadokuJT.class.getResourceAsStream
-                    ( "/resources/wadokujt-gairaigo.map"), "UTF-8"));
+                    ( "/wadokujt-gairaigo.map"), "UTF-8"));
 
             String line;
             while ((line=r.readLine()) != null) {

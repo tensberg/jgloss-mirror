@@ -52,6 +52,8 @@ import jgloss.dictionary.KanjiDic;
 import jgloss.parser.KanjiParser;
 import jgloss.parser.Parser;
 import jgloss.util.CharacterEncodingDetector;
+import jgloss.util.UTF8ResourceBundleControl;
+
 import javax.servlet.http.*;
 import javax.servlet.*;
 
@@ -66,7 +68,7 @@ public class JGlossServlet extends HttpServlet {
     /**
      * Path to the messages ressource.
      */
-    public final static String MESSAGES = "resources/messages-www";
+    public final static String MESSAGES = "messages-www";
 
     /**
      * Initialization parameter name.
@@ -378,7 +380,7 @@ public class JGlossServlet extends HttpServlet {
             String urlstring = req.getParameter( REMOTE_URL);
             if (urlstring == null) {
                 resp.sendError( HttpServletResponse.SC_BAD_REQUEST,
-                                ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                                ResourceBundle.getBundle( MESSAGES, req.getLocale(), new UTF8ResourceBundleControl())
                                 .getString( "error.nourl"));
                 return;
             }
@@ -404,7 +406,7 @@ public class JGlossServlet extends HttpServlet {
         if (oa == null) {
             resp.sendError( HttpServletResponse.SC_BAD_REQUEST,
                             MessageFormat.format
-                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale())
+                            ( ResourceBundle.getBundle( MESSAGES, req.getLocale(), new UTF8ResourceBundleControl())
                               .getString( "error.malformedrequest"),
                               new Object[] { pathinfo } ));
             return;

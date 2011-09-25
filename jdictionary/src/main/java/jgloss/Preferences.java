@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import jgloss.util.UTF8ResourceBundleControl;
+
 /**
  * Management of the application-wide preferences. The preference storage mechanism varies
  * with the Version of the running VM. Under Java 1.3, {@link PropertiesPreferences PropertiesPreferences}
@@ -40,7 +42,7 @@ import java.util.ResourceBundle;
  * {@link JavaPreferences JavaPreferences} is used, which uses the <CODE>java.util.prefs</CODE> preferences.
  * <p>
  * A set of default preferences is stored with the application jar file and accessed using the
- * <CODE>ResourceBundle</CODE> mechanism from the resource "resources/preferences". 
+ * <CODE>ResourceBundle</CODE> mechanism from the resource "/preferences". 
  * If a user preference is not yet set, the value from the default preferences is used.
  * The default value passed to the methods <CODE>getInt</CODE>,... is only used if the default
  * preference setting (a string) cannot be converted to the requested data type.
@@ -172,7 +174,7 @@ public abstract class Preferences {
     
     /**
      * Default application preferences. The default preferences are loaded from the 
-     * resource "resources/preferences" and stored in a property file and initialized in the
+     * resource "/preferences" and stored in a property file and initialized in the
      * <CODE>Preferences</CODE> constructor.
      */
     protected Properties defaults;
@@ -187,7 +189,7 @@ public abstract class Preferences {
     public Preferences() {
         // load default settings from properties file
         defaults = new Properties();
-        ResourceBundle defrb = ResourceBundle.getBundle( "resources/preferences");
+        ResourceBundle defrb = ResourceBundle.getBundle( "preferences", new UTF8ResourceBundleControl());
         for ( Enumeration e=defrb.getKeys(); e.hasMoreElements(); ) {
             String key = (String) e.nextElement();
             defaults.setProperty( key, (String) defrb.getString( key));

@@ -37,6 +37,7 @@ import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchFieldSelection;
 import jgloss.dictionary.UnsupportedSearchModeException;
 import jgloss.util.StringTools;
+import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Parser implementation which annotates kanji words.
@@ -72,7 +73,7 @@ public class KanjiParser extends AbstractParser {
     private StringBuffer searchKey;
 
     private final static String PARSER_NAME = 
-        ResourceBundle.getBundle( "resources/messages-parser")
+        ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl())
         .getString( "parser.kanji.name");
 
     /**

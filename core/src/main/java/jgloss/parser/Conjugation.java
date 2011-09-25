@@ -35,6 +35,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import jgloss.util.UTF8ResourceBundleControl;
+
 /**
  * Find verb/adjective conjugations. This is done by searching through a tree with a
  * inflection/dictionary form mapping.
@@ -58,7 +60,7 @@ public class Conjugation {
      * Localizable message resource.
      */
     private final static ResourceBundle messages = 
-        ResourceBundle.getBundle( "resources/messages-parser");
+        ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl());
 
     /**
      * Ending of the conjugated verb/adjective.

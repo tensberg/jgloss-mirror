@@ -121,7 +121,7 @@ public class EDict extends FileBasedDictionary {
 
     private static AttributeMapper initMapper() {
         try {
-            Reader r = new InputStreamReader( EDict.class.getResourceAsStream( "/resources/edict.map"));
+            Reader r = new InputStreamReader( EDict.class.getResourceAsStream( "/edict.map"));
             AttributeMapper mapper = new AttributeMapper( new LineNumberReader( r));
             r.close();
             return mapper;

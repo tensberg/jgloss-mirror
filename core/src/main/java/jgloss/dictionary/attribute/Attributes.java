@@ -28,6 +28,7 @@ import java.util.ResourceBundle;
 
 import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.ResultIterator;
+import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Collection of standard attributes.
@@ -36,7 +37,7 @@ import jgloss.dictionary.ResultIterator;
  */
 public class Attributes implements Attribute {
     protected static final ResourceBundle NAMES = ResourceBundle.getBundle
-        ( "resources/messages-dictionary");
+        ( "messages-dictionary", new UTF8ResourceBundleControl());
 
     public static final Priority EXAMPLE_PRIORITY_VALUE = 
         new Priority() {

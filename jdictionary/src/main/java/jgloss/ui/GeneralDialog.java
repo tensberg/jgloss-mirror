@@ -276,7 +276,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         chooser.setFileSelectionMode( JFileChooser.FILES_ONLY);
         chooser.setFileView( new CustomFileView() {
                 private Icon CHASEN_ICON = 
-                    new ImageIcon( CustomFileView.class.getResource( "/resources/icons/chasen.png"));
+                    new ImageIcon( CustomFileView.class.getResource( "/icons/chasen.png"));
                 public Icon getIcon( java.io.File f) {
                     String name = f.getName().toLowerCase();
                     if ((name.equals( "chasen") || name.equals( "chasen.exe")) &&

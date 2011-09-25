@@ -53,6 +53,7 @@ import java.util.Set;
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.util.CharacterEncodingDetector;
 import jgloss.util.StringTools;
+import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Base class for dictionaries stored in a local file with separate index file.
@@ -76,7 +77,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * <code>resources/messages-dictionary</code>
      */
     protected static final ResourceBundle NAMES = ResourceBundle.getBundle
-        ( "resources/messages-dictionary");
+        ( "messages-dictionary", new UTF8ResourceBundleControl());
 
     /**
      * Generic implementation for file-based dictionaries. The {@link #isInstance(String) isInstance}

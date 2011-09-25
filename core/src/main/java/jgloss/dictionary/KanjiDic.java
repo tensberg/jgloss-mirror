@@ -43,6 +43,7 @@ import jgloss.dictionary.attribute.Attribute;
 import jgloss.util.CharacterEncodingDetector;
 import jgloss.util.NullIterator;
 import jgloss.util.StringTools;
+import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Dictionary implementation for KANJIDIC-style dictionary files. For a documentation
@@ -54,7 +55,7 @@ public class KanjiDic implements Dictionary {
      * Localizable message resource.
      */
     private final static ResourceBundle messages = 
-        ResourceBundle.getBundle( "resources/messages-dictionary");
+        ResourceBundle.getBundle( "messages-dictionary", new UTF8ResourceBundleControl());
 
     /**
      * Pathname to the dictionary file.

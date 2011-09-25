@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import jgloss.dictionary.SearchException;
+import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Parser which does not add annotations to the parsed text.
@@ -37,7 +38,7 @@ import jgloss.dictionary.SearchException;
  */
 public class NullParser implements Parser {
     private final static String PARSER_NAME = 
-        ResourceBundle.getBundle( "resources/messages-parser")
+        ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl())
         .getString( "parser.null.name");
 
     public NullParser() {

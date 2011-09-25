@@ -28,6 +28,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import jgloss.util.ListFormatter;
+import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Format word attribute values.
@@ -36,7 +37,7 @@ import jgloss.util.ListFormatter;
  */
 public class WordFormatter extends DefaultAttributeFormatter {
     protected static final ResourceBundle languages =
-        ResourceBundle.getBundle( "resources/languages");
+        ResourceBundle.getBundle( "languages", new UTF8ResourceBundleControl());
 
     protected MessageFormat wordFormat;
     protected MessageFormat langFormat;

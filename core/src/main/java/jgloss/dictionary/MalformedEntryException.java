@@ -26,6 +26,8 @@ package jgloss.dictionary;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import jgloss.util.UTF8ResourceBundleControl;
+
 /**
  * Thrown when dictionary entry is of a format unparseable by the dictionary
  * implementation. If this exception is throws while iterating over a dictionary
@@ -42,7 +44,7 @@ public class MalformedEntryException extends SearchException {
     protected String dictionaryEntry;
 
     public MalformedEntryException( Dictionary _dictionary, String _dictionaryEntry) {
-        super( MessageFormat.format( ResourceBundle.getBundle( "resources/messages-dictionary")
+        super( MessageFormat.format( ResourceBundle.getBundle( "messages-dictionary", new UTF8ResourceBundleControl())
                                      .getString( "exception.malformedentry.message"), 
                                      new Object[] { _dictionary.getName(), _dictionaryEntry }));
         dictionary = _dictionary;
@@ -51,7 +53,7 @@ public class MalformedEntryException extends SearchException {
 
     public MalformedEntryException( Dictionary _dictionary, String _dictionaryEntry,
                                     Throwable _rootCause) {
-        super( MessageFormat.format( ResourceBundle.getBundle( "resources/messages-dictionary")
+        super( MessageFormat.format( ResourceBundle.getBundle( "messages-dictionary", new UTF8ResourceBundleControl())
                                      .getString( "exception.malformedentry.message"), 
                                      new Object[] { _dictionary.getName(), _dictionaryEntry }),
                _rootCause);

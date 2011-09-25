@@ -25,6 +25,8 @@ package jgloss.dictionary.attribute;
 
 import java.util.ResourceBundle;
 
+import jgloss.util.UTF8ResourceBundleControl;
+
 /**
  * Attribute values for usage attribute. The values cannot be instantiated directly.
  * Instead, they are fetched by calling the static {@link #get(String) get} method.
@@ -49,7 +51,7 @@ public class Usage extends DefaultCategoryAttributeValue {
     }
 
     protected final static ResourceBundle names = ResourceBundle.getBundle
-        ( "resources/attributes");
+        ( "attributes", new UTF8ResourceBundleControl());
 
     private Usage( String id) {
         super( id);

@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import jgloss.util.UTF8ResourceBundleControl;
+
 /**
  * Reads a plain text file from a reader and formats it as a JGloss XML file without annotations.
  * Every line in the
@@ -106,7 +108,7 @@ class JGlossifyReader extends FilterReader {
         // an overlong line. To prevent this I approximate it with two non-breakable spaces.
         funnyChars.put( new Character( '\u3000'), "&#160;&#160;".toCharArray());
 
-        ResourceBundle strings = ResourceBundle.getBundle( "resources/jgloss-ui-JGlossifyReader");
+        ResourceBundle strings = ResourceBundle.getBundle( "jgloss-ui-JGlossifyReader", new UTF8ResourceBundleControl());
         NO_PARAGRAPH_START = strings.getString( "no_paragraph_start").toCharArray();
         Arrays.sort( NO_PARAGRAPH_START);
         NO_PARAGRAPH_END = strings.getString( "no_paragraph_end").toCharArray();

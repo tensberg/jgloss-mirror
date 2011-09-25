@@ -32,6 +32,7 @@ import java.util.Set;
 
 import jgloss.dictionary.SearchException;
 import jgloss.util.StringTools;
+import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Parses Japanese text using the ChaSen morphological analyzer program.
@@ -42,7 +43,7 @@ import jgloss.util.StringTools;
  */
 public class ChasenParser extends AbstractParser {
     private final static String PARSER_NAME = 
-        ResourceBundle.getBundle( "resources/messages-parser").getString( "parser.chasen.name");
+        ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl()).getString( "parser.chasen.name");
 
     /**
      * Command line parameter passed to chasen. Detemines the output format.

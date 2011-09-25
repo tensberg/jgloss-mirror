@@ -56,6 +56,7 @@ import jgloss.ui.PreferencesFrame;
 import jgloss.ui.PreferencesPanel;
 import jgloss.ui.SplashScreen;
 import jgloss.ui.StyleDialog;
+import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Framework for the initialization of the two applications {@link JGlossApp JGlossApp} and
@@ -69,7 +70,7 @@ public abstract class JGloss {
     /**
      * Path to the file with message strings.
      */
-    private static final String MESSAGES = "resources/messages";
+    private static final String MESSAGES = "messages";
 
     /**
      * Path to the directory last used.
@@ -90,7 +91,7 @@ public abstract class JGloss {
          * @param bundle Base name of the bundle.
          */
         public Messages( String bundle) {
-            messages = ResourceBundle.getBundle( MESSAGES);
+            messages = ResourceBundle.getBundle( MESSAGES, new UTF8ResourceBundleControl());
         }
 
         /**

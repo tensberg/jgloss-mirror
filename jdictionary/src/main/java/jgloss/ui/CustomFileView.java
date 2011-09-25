@@ -73,13 +73,13 @@ public class CustomFileView extends FileView {
             TEXT_DESCRIPTION = JGloss.messages.getString( "fileview.description.text");
             TEMPLATE_DESCRIPTION = JGloss.messages.getString( "fileview.description.template");
 
-            JGLOSS_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/jgloss.png"));
-            HTML_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/html.png"));
+            JGLOSS_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/jgloss.png"));
+            HTML_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/html.png"));
             XML_ICON = HTML_ICON; // no individual icon for now
-            TEX_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/tex.png"));
-            TEXT_ICON = new ImageIcon( CustomFileView.class.getResource( "/resources/icons/txt.png"));
+            TEX_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/tex.png"));
+            TEXT_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/txt.png"));
             TEMPLATE_ICON = new ImageIcon( CustomFileView.class.getResource
-                                           ( "/resources/icons/template.png"));
+                                           ( "/icons/template.png"));
         }
     }
 
