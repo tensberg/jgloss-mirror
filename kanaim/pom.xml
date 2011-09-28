@@ -13,6 +13,31 @@
 
 	<name>kanaim</name>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>jgloss.JGlossApp</mainClass>
+						    <addDefaultImplementationEntries/>
+						    <addDefaultSpecificationEntries/>
+						</manifest>
+						<manifestEntries>
+							<Extension-Name>jgloss.ui.im</Extension-Name>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
