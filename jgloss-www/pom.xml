@@ -9,9 +9,9 @@
 	</parent>
 
 	<artifactId>jgloss-www</artifactId>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
-	<name>jgloss-core</name>
+	<name>jgloss-www</name>
 
 	<dependencies>
 		<dependency>
