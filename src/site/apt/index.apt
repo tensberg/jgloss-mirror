@@ -1,0 +1,200 @@
+	------------
+	JGloss
+	------------
+	
+About JGloss
+
+  JGloss is an application for adding reading and translation annotations
+  to words in a Japanese text document. This can be done automatically and
+  manually. When a text document is first opened, words will be looked
+  up in dictionary files and the first reading and translation (if any) is used to
+  annotate the word. The user can then edit the annotations: choose among the
+  readings and translations found in the dictionaries, enter own readings and
+  translations, remove annotations and add new annotations. The document
+  can be exported as plain text with annotations, HTML (with support for
+  the {{{http://www.w3.org/TR/ruby/}Ruby Annotation}} XHTML 
+  specification) or LaTeX.
+
+  The application is designed as a translation aid for people learning Japanese.
+  With some new document, you can first skim the text and change the annotations
+  to match the likeliest meaning of the word. Then you can print/export the text
+  with annotations and start working on the details of understanding the text
+  without having to resort to a paper dictionary all the time.
+
+  JGloss is written in Java and should work on any computer with support
+  for the {{{http://www.java.com/}Java 2 Version 1.3/1.4}}
+  platform. It is distributed under the terms
+  of the {{{http://www.gnu.org/licenses/licenses.html#TOCGPL}GNU General Public License}}.
+
+Download
+
+* Stable release: JGloss 1.0.10
+
+  The latest stable version is JGloss 1.0.10, released on 2004/06/20. You can download it here:
+
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-1.0.10.zip}jgloss-1.0.10.zip}}        | ZIP archive of the application.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-1.0.10-src.zip}jgloss-1.0.10-src.zip}}| ZIP archive of the source code.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-1.0.10.tgz}jgloss-1.0.10.tgz}}        | GZipped TAR archive of the application.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-1.0.10-src.tgz}jgloss-1.0.10-src.tgz}}| GZipped TAR archive of the source code.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+
+* Development release: JGloss 2 alpha 3
+
+  JGloss 2 alpha 3, released on 2004/06/20, is a snapshot of the development currently done on JGloss.
+  It offers greater dictionary functionality and an improved user interface in the document editor.
+  Many features from the JGloss 1.0.x series are still missing in this release, and there may be more
+  bugs than in the stable release.
+
+  The dictionary lookup part of JGloss is now also available as a separate application: JDictionary.
+  You can use this if for example you want to offer your language students a dictionary lookup program,
+  but not the (too) easy text parsing of the full JGloss.
+
+  JGloss 2 is no longer compatible with Java2 1.3. You need a Java Runtime Environment
+  compatible with at least Java2 1.4.
+
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-2.0a3.zip}jgloss-2.0a3.zip}}          | ZIP archive of the application.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jdictionary-2.0a3.zip}jdictionary-2.0a3.zip}}| ZIP archive of only the dictionary lookup program.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-2.0a3-src.zip}jgloss-2.0a3-src.zip}}  | ZIP archive of the source code.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+
+
+* Java
+
+  To run JGloss, you need to have a current version of Java installed. {{{http://www.java.com/}Get it here}}.
+
+* Other downloads
+
+  The archive of previous releases is {{{http://sourceforge.net/project/showfiles.php?group_id=29259}here}}.
+
+Links
+
+* JGloss Information
+
+    * {{{doc/index.html}The JGloss User's Guide}} ({{{jgloss.pdf}PDF}}).
+
+    * {{{japanesejava.html}More on Java and Japanese fonts}}.
+
+    * More {{{templates.html}LaTeX export templates}}.
+
+    * The {{{http://sourceforge.net/projects/jgloss/}JGloss project page}} at {{{http://sourceforge.net/}SourceForge}}.
+
+* JGloss mailing list/Newsgroup
+
+    * {{{http://lists.sourceforge.net/lists/listinfo/jgloss-discussion}Mailing list}} ({{{http://news.gmane.org/gmane.comp.java.jgloss}message archive}})
+
+    * {{{news://news.gmane.org/gmane.comp.java.jgloss}Newsgroup}}
+
+  The {{{http://lists.sourceforge.net/lists/listinfo/jgloss-discussion}JGloss
+  mailing list}} is the central discussion forum for all JGloss users and
+  developers. It is open to everyone interested in JGloss. You can post
+  questions about installation and usage, discuss how you currently use
+  JGloss and suggest in what direction the application should be going. To
+  encourage people to post, writing in any language is allowed.
+
+  The mailing list is also available as internet
+  newsgroup, thanks to the {{{http://www.gmane.org/}gmane mail-news gateway}}. To
+  access the list, point your favorite newsreader to
+  {{{news://news.gmane.org/gmane.comp.java.jgloss}news server news.gmane.org,
+  group gmane.comp.java.jgloss}} or {{{http://news.gmane.org/gmane.comp.java.jgloss}access the newsgroup
+  with your web browser}}. All messages posted to the mailing list
+  are also sent to the newsgroup, and vice versa. You do not need to be
+  subscribed to the mailing list to read and post messages via the newsgroup.
+
+* Dictionary Files
+
+  Here are some links to dictionary files which can be used with JGloss. If you know of dictionaries not
+  listed here, {{{mailto:tensberg@gmx.net}drop me a note}}.
+
+    * A list of EDICT and KANJIDIC dictionaries is available at the 
+      {{{http://ftp.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil}Monash Nihongo FTP archive}}.
+
+    * The {{{http://bunmei7.hus.osaka-u.ac.jp/download.htm}WadokuJT}}
+      is an extensive Japanese-German dictionary. Download 
+      {{{http://www.bibiko.de/WadokuJT.zip}WadokuJT.zip}}, unzip it and add the 
+      extracted file "WadokuJT.txt" in the JGloss dictionaries dialog. (The WadokuJT file format is only 
+      supported by JGloss if Java version 1.4 is installed, if you get a "unsupported dictionary format" error
+      when you choose "WadokuJT.txt", install a {{{http://www.java.com/}current version of Java}}
+      or download the EDICT formatted version of WadokuJT.)
+
+* Related Pages
+
+    * {{{http://www.dgs.monash.edu.au/~jwb/Japanese.html}Jim Breen's Japanese Page}} has
+      lots of interesting links. He is the author of several tools on which
+      JGloss is based and one of the authors of EDICT and KANJIDIC.
+
+    * The {{{http://chasen.aist-nara.ac.jp/}ChaSen morphological analysis tool}}
+      can be used by JGloss to parse Japanese text. Download it from its
+      {{{http://chasen.aist-nara.ac.jp/}homepage}}.
+
+    * Two WWW interfaces which provide glosses for any Japanese web page without having to
+      run an extra program:
+      Todd Rudick's {{{http://www.rikai.com/}RIKAI server}}
+      and Jim Breen's {{{http://www.csse.monash.edu.au/cgi-bin/cgiwrap/jwb/wwwjdic?9T}WWWJDIC}}.
+
+    * The {{{http://www.aozora.gr.jp/}Blue Sky Collection}} is an online archive of free
+      Japanese texts.
+
+    * A {{{http://white.sakura.ne.jp/~piro/xul/_rubysupport.html.en}Ruby extension}} for 
+      {{{http://channels.netscape.com/ns/browsers/download.jsp}Netscape 7}},
+      {{{http://www.mozilla.org}Mozilla}} or {{{http://www.mozilla.org/products/firefox/}Firefox}} enables
+      the display of ruby in these browsers.
+
+Examples
+
+  Here is an example for a text annotated using JGloss. It is the story
+  "Kari no Douji" by Kenji Miyazawa. I downloaded the 
+  {{{http://www.aozora.gr.jp/cards/kenji/zipfiles/KARIDOUJI.zip}
+  original text}} from the {{{http://www.aozora.gr.jp/}Blue Sky Collection}}.
+  As you may have already noticed, my English is not perfect, and my Japanese is even worse.
+  The translations are only
+  chosen to allow basic understanding and will often be imprecise or just plain wrong.
+  A website with information about
+  {{{http://www.kenji-world.net/english/}
+  Kenji Miyazawa and his stories is here}}. An
+  {{{http://www.kenji-world.net/english/download/works/goose.html}
+  English translation of "Kari no Douji"}} is available there.
+  {{{karinodouji/kari.jgloss.zip}Here}} is the JGloss file from which the following
+  documents where generated. 
+
+  First an {{{karinodouji/kari.html}example of the HTML export function}}. The generated
+  document uses a subset of the {{{http://www.w3.org/TR/ruby/}Ruby Annotation}} 
+  XHTML specification to display the readings in browsers which support it (currently only
+  recent versions of the Microsoft Internet Explorer). In other browsers, if the neccessary JavaScript
+  functions are available, the readings are shown in a tooltip popup and in the status bar.
+  The translations are also displayed using JavaScript tooltips and in the status bar.
+
+  JGloss also supports exporting in LaTeX and plain text format:
+
+    * {{{karinodouji/kari.pdf}Here}} is a LaTeX
+      example, TeXed from {{{karinodouji/kari.tex}this source file}} and converted to PDF with the
+      Ghostscript ps2pdf tool. This is my favorite export format. 
+      {{{karinodouji/kari_end.pdf}Here}}
+      is an alternative version with the translation list at the end of the document
+      ({{{karinodouji/kari_end.tex}source}}).
+
+    * Plain text output can also be generated. 
+      {{{karinodouji/kari.txt}Here}} is the text with reading and translation annotations
+      and {{{karinodouji/kari.readings.txt}here}} the text with readings only.
+
+    * The {{{karinodouji/kari.annotations.txt}list of annotations}} can be exported to a file.
+
+    * Finally, {{{karinodouji/kari.jgloss.pdf}here}} is a printout of the document, generated
+      via print to file and converted to PDF using Ghostscript's ps2pdf tool.
+
+
+JGloss-WWW
+
+  JGloss-WWW is a Java servlet which adds dictionary lookup results to Japanese HTML pages
+  on the fly. It is currently experimental and only available in the 
+  {{{http://sourceforge.net/project/showfiles.php?group_id=29259}source release}} of JGloss
+  (and from the {{{http://sourceforge.net/scm/?type=svn&group_id=29259}SVN repository}}). If you
+  are running a web server with servlet engine installed you might want to try it out. The
+  {{{jgloss-www.html}documentation is here}}.
+	
