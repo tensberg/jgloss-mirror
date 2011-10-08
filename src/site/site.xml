@@ -3,7 +3,7 @@
 	<version position="right" />
 	<bannerLeft>
 		<name>JGloss</name>
-		<src>http://maven.apache.org/images/apache-maven-project.png</src>
+		<src>images/jgloss-logo.png</src>
 		<href>http://jgloss.sourceforge.net/</href>
 	</bannerLeft>
 
@@ -21,6 +21,9 @@
 	</skin>
 
 	<body>
+		<menu name="JGloss Information">
+			<item name="About JGloss" href="index.html" />
+		</menu>
 		<menu ref="reports" />
 	</body>
 </project>
