@@ -109,13 +109,16 @@ public class JGlossDocument {
         htmlDoc = _htmlDoc;
 
         htmlDoc.addDocumentListener( new DocumentListener() {
-                public void insertUpdate(DocumentEvent e) {
+                @Override
+				public void insertUpdate(DocumentEvent e) {
                     invalidate();
                 }
-                public void removeUpdate(DocumentEvent e) {
+                @Override
+				public void removeUpdate(DocumentEvent e) {
                     invalidate();
                 }
-                public void changedUpdate(DocumentEvent e) {
+                @Override
+				public void changedUpdate(DocumentEvent e) {
                     invalidate();
                 }
             });

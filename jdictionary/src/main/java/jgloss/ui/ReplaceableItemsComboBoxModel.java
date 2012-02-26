@@ -50,9 +50,11 @@ class ReplaceableItemsComboBoxModel extends AbstractListModel implements ComboBo
         items = _items;
     }
 
-    public Object getSelectedItem() { return selection; }
+    @Override
+	public Object getSelectedItem() { return selection; }
 
-    public void setSelectedItem( Object _selection) {
+    @Override
+	public void setSelectedItem( Object _selection) {
         if (selection!=null && !selection.equals( _selection) ||
             selection==null && _selection!=null) {
             selection = _selection;
@@ -80,9 +82,11 @@ class ReplaceableItemsComboBoxModel extends AbstractListModel implements ComboBo
         }
     }
 
-    public int getSize() { return items.size(); }
+    @Override
+	public int getSize() { return items.size(); }
 
-    public Object getElementAt( int i) {
+    @Override
+	public Object getElementAt( int i) {
         return items.get( i);
     }
 } // class ReplaceableItemsComboBoxModel

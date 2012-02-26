@@ -43,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
@@ -71,7 +72,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             child = _child;
         }
 
-        public ListFormatter decorateList( ListFormatter formatter, int type) {
+        @Override
+		public ListFormatter decorateList( ListFormatter formatter, int type) {
             if (type==WORD || type==READING || type==TRANSLATION_SYN) {
                 formatter = new MarkerListFormatter( markerGroup, formatter);
             }
@@ -82,7 +84,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             return formatter;
         }
 
-        public ListFormatter decorateList( ListFormatter formatter, Attribute type,
+        @Override
+		public ListFormatter decorateList( ListFormatter formatter, Attribute type,
                                            int position) {
             if (type == Attributes.EXPLANATION)
                 formatter = new MarkerListFormatter( markerGroup, formatter);
@@ -93,7 +96,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             return formatter;
         }
 
-        public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
+        @Override
+		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
                                                      int position) {
             if (child != null)
                 formatter = child.decorateAttribute( formatter, type, position);
@@ -137,7 +141,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             hyperrefs = new HashMap();
         }
 
-        public ListFormatter decorateList( ListFormatter formatter, int type) {
+        @Override
+		public ListFormatter decorateList( ListFormatter formatter, int type) {
             if (words && type==WORD)
                 formatter = new HyperlinkListFormatter( WORD_PROTOCOL, hyperrefs, formatter);
             else if (readings && type==READING)
@@ -148,7 +153,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             return formatter;
         }
 
-        public AttributeFormatter decorateAttribute( AttributeFormatter formatter,
+        @Override
+		public AttributeFormatter decorateAttribute( AttributeFormatter formatter,
                                                      Attribute type, int position) {
             if (references && type.canHaveValue() && 
                 ReferenceAttributeValue.class.isAssignableFrom
@@ -247,7 +253,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         resultPlain.setWrapStyleWord( true);
 
         Action transferFocus = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     transferFocus();
                 }
             };
@@ -258,7 +265,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
         // update display if user changed font
         JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
-                public void propertyChange( java.beans.PropertyChangeEvent e) {
+                @Override
+				public void propertyChange( java.beans.PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( Preferences.FONT_WORDLOOKUP) ||
                         e.getPropertyName().equals( Preferences.FONT_WORDLOOKUP_SIZE)) {
                         String fontname = JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP);
@@ -274,8 +282,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                 }
             });
 
-        resultScroller = new JScrollPane( resultFancy, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        resultScroller = new JScrollPane( resultFancy, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                          ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add( resultScroller, BorderLayout.CENTER);
         status = new JLabel( " ");
         this.add( status, BorderLayout.SOUTH);
@@ -304,13 +312,15 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         return hyperlinker.getReference( key);
     }
 
-    public void startLookup( String description) {
+    @Override
+	public void startLookup( String description) {
         searchExpression = null;
         multipleDictionaries = true;
         startLookup();
     }
 
-    public void startLookup( LookupModel model) {
+    @Override
+	public void startLookup( LookupModel model) {
         multipleDictionaries = model.getSelectedDictionaries().size() > 1;
         searchExpression = model.isSearchExpressionEnabled() ? model.getSearchExpression() : null;
         startLookup();
@@ -327,24 +337,28 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         entryCount = 0;
     }
 
-    public void dictionary( Dictionary d) {
+    @Override
+	public void dictionary( Dictionary d) {
         if (!addToResultBuffer( d))
             formatNow( d);
     }
 
-    public void dictionaryEntry( DictionaryEntry de) {
+    @Override
+	public void dictionaryEntry( DictionaryEntry de) {
         if (!addToResultBuffer( de))
             formatNow( de);
 
         entryCount++;
     }
 
-    public void exception( SearchException ex) {
+    @Override
+	public void exception( SearchException ex) {
         if (!addToResultBuffer( ex))
             formatNow( ex);
     }
 
-    public void note( String note) {
+    @Override
+	public void note( String note) {
         if (!addToResultBuffer( note))
             formatNow( note);
     }
@@ -456,7 +470,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         resultTextBuffer.append( "\n\n");
     }
 
-    public void endLookup() {
+    @Override
+	public void endLookup() {
         if (resultBuffer != null)
             flushBuffer( true);
         else
@@ -490,7 +505,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
         if (resultScroller.getViewport().getView() != target) {
             Runnable updater = new Runnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                         resultScroller.setViewportView( target);
                     }
                 };
@@ -523,7 +539,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
     protected void updateStatusText( final String text) {
         Runnable updater = new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     status.setText( text);
                 }
             };

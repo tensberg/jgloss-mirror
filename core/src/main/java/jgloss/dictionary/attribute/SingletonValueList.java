@@ -40,12 +40,15 @@ public class SingletonValueList implements ValueList {
         return this;
     }
 
-    public AttributeValue get( int index) {
+    @Override
+	public AttributeValue get( int index) {
         if (index != 0)
             throw new IllegalArgumentException();
         return value;
     }
 
-    public int size() { return 1; }
-    public String toString() { return "[_" + value.toString() + ']'; }
+    @Override
+	public int size() { return 1; }
+    @Override
+	public String toString() { return "[_" + value.toString() + ']'; }
 } // class SingletonValueList

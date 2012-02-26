@@ -39,7 +39,8 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
         parent = _parent;
     }
 
-    public StringBuffer format( AttributeValueFormatter formatter, Attribute att, 
+    @Override
+	public StringBuffer format( AttributeValueFormatter formatter, Attribute att, 
                                 ValueList val, StringBuffer buf) {
         if (linkValues) {
             parent.format( formatter, att, val, buf);
@@ -54,7 +55,8 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
         return buf;
     }
 
-    public StringBuffer format( final Attribute att, final AttributeValue val, StringBuffer buf) {
+    @Override
+	public StringBuffer format( final Attribute att, final AttributeValue val, StringBuffer buf) {
         if (!linkValues) {
             parent.format( att, val, buf);
         }

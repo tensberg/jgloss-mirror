@@ -107,7 +107,8 @@ public class EDict extends FileBasedDictionary {
                 ( name, encoding, true, Pattern.compile
                   ( "\\A\\S+?(\\s\\[.+?\\])?(\\s/)|/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
                   1.0f, 4096, EDict.class.getConstructor( new Class[] { File.class, String.class })) {
-                        protected Object[] getConstructorParameters(String descriptor) {
+                        @Override
+						protected Object[] getConstructorParameters(String descriptor) {
                             return new Object[] { new File(descriptor), this.encoding };
                         }
                   };
@@ -148,28 +149,33 @@ public class EDict extends FileBasedDictionary {
     protected final static String PRIORITY_MARKER = "(P)";
 
     protected final Priority PRIORITY_VALUE = new Priority() {
-            public String getPriority() { return "_P_"; }
-            public int compareTo( Priority p) {
+            @Override
+			public String getPriority() { return "_P_"; }
+            @Override
+			public int compareTo( Priority p) {
                 if (p == PRIORITY_VALUE)
                     return 0;
                 else
                     throw new IllegalArgumentException();
             }
-            public String toString() { return "_P_"; }
+            @Override
+			public String toString() { return "_P_"; }
         };
 
     public EDict( File dicfile, String encoding) throws IOException {
         super( dicfile, encoding);
     }
     
-    protected void initSupportedAttributes() {
+    @Override
+	protected void initSupportedAttributes() {
         super.initSupportedAttributes();
         
         supportedAttributes.putAll( mapper.getAttributes());
         supportedAttributes.put( Attributes.PRIORITY, Collections.singleton( PRIORITY_VALUE));
     }
 
-    protected boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field) {
+    @Override
+	protected boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
             byte b = entry.get( --location);
             if (field==DictionaryEntryField.READING && b=='['
@@ -201,7 +207,8 @@ public class EDict extends FileBasedDictionary {
         }
     }
 
-    protected boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
+    @Override
+	protected boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
             byte b = entry.get( location);
             if (field==DictionaryEntryField.WORD && b==' ' ||
@@ -216,7 +223,8 @@ public class EDict extends FileBasedDictionary {
         }
     }
 
-    protected DictionaryEntryField moveToNextField( ByteBuffer buf, int character,
+    @Override
+	protected DictionaryEntryField moveToNextField( ByteBuffer buf, int character,
                                                     DictionaryEntryField field) {
         if (field == null) {
             // first call to moveToNextField
@@ -239,7 +247,8 @@ public class EDict extends FileBasedDictionary {
         return field;
     }
 
-    protected DictionaryEntryField getFieldType( ByteBuffer buf, int entryStart, int entryEnd,
+    @Override
+	protected DictionaryEntryField getFieldType( ByteBuffer buf, int entryStart, int entryEnd,
                                                  int location) {
         buf.position( location);
         byte b;
@@ -270,7 +279,8 @@ public class EDict extends FileBasedDictionary {
      * <CODE>word [reading] /translation 1/translation 2/...</CODE> with the reading
      * being optional.
      */
-    protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
+    @Override
+	protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
         //System.err.println( entry);
         ENTRY_MATCHER.reset( entry);
         if (!ENTRY_MATCHER.matches())
@@ -402,14 +412,16 @@ public class EDict extends FileBasedDictionary {
                                     roma, this);
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         return "EDICT " + getName();
     }
 
     /**
      * Escape LF/CR, '/' and all characters not supported by the encoding.
      */
-    protected boolean escapeChar( char c) {
+    @Override
+	protected boolean escapeChar( char c) {
         // some special characters need escaping
         if (c==10 || c==13 || c=='/')
             return true;

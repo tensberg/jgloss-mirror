@@ -25,7 +25,8 @@ public class AnnotationListSynchronizer implements DocumentListener {
         annotationModel = _annotationModel;
     }
 
-    public void insertUpdate(DocumentEvent e) {
+    @Override
+	public void insertUpdate(DocumentEvent e) {
         // find out if an annotation element was inserted
 
         Element el = e.getDocument().getDefaultRootElement();
@@ -57,7 +58,8 @@ public class AnnotationListSynchronizer implements DocumentListener {
                 handleInsert( e.getElement( i));
     }
 
-    public void removeUpdate( DocumentEvent e) {
+    @Override
+	public void removeUpdate( DocumentEvent e) {
         // find out if an annotation element was removed
 
         Element el = e.getDocument().getDefaultRootElement();
@@ -87,5 +89,6 @@ public class AnnotationListSynchronizer implements DocumentListener {
                 handleRemove( e.getElement( i));
     }
 
-    public void changedUpdate( DocumentEvent e) {}
+    @Override
+	public void changedUpdate( DocumentEvent e) {}
 } // class AnnotationListSynchronizer

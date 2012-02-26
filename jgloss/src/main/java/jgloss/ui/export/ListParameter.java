@@ -62,7 +62,8 @@ class ListParameter extends UIParameter {
         public String getValue() { return value; }
         public void setValue(String _value) { this.value = _value; }
 
-        public String toString() { return label; }
+        @Override
+		public String toString() { return label; }
     } // class Value
 
     private Box box;
@@ -79,9 +80,11 @@ class ListParameter extends UIParameter {
         box.add( combobox);
     }
 
-    public Component getComponent() { return box; }
+    @Override
+	public Component getComponent() { return box; }
 
-    public Object getValue( JGlossFrameModel source, URL systemId) { 
+    @Override
+	public Object getValue( JGlossFrameModel source, URL systemId) { 
         return getValue();
     }
     
@@ -93,7 +96,8 @@ class ListParameter extends UIParameter {
             return item.toString();
     }
 
-    public void loadFromPrefs() {
+    @Override
+	public void loadFromPrefs() {
         // saveToPrefs stores the selected value, not the label
         // Find the Value object corresponding to the stored preference
         String selection = JGloss.prefs.getString( prefsKey, defaultValue);

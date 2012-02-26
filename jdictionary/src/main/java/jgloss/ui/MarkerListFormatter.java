@@ -131,12 +131,14 @@ public class MarkerListFormatter implements ListFormatter {
     public String getTextBefore() { return textBefore; }
     public String getTextAfter() { return textAfter; }
 
-    public ListFormatter newList( StringBuffer _buffer, int _length) {
+    @Override
+	public ListFormatter newList( StringBuffer _buffer, int _length) {
         parent.newList( _buffer, _length);
         return this;
     }
 
-    public ListFormatter addItem( Object item) {
+    @Override
+	public ListFormatter addItem( Object item) {
         if (markedText == null) {
             parent.addItem( item);
             return this;
@@ -157,9 +159,12 @@ public class MarkerListFormatter implements ListFormatter {
         return this;
     }
 
-    public StringBuffer endList() { return parent.endList(); }
-    public StringBuffer getBuffer() { return parent.getBuffer(); }
-    public Pattern getPattern() { return parent.getPattern(); }
+    @Override
+	public StringBuffer endList() { return parent.endList(); }
+    @Override
+	public StringBuffer getBuffer() { return parent.getBuffer(); }
+    @Override
+	public Pattern getPattern() { return parent.getPattern(); }
 
     protected static final String normalize( String in) {
         return in != null ? StringTools.toHiragana( in.toLowerCase()) : null;

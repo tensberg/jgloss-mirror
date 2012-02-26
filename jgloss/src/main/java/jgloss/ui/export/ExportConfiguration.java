@@ -98,7 +98,8 @@ class ExportConfiguration {
      */
     private static final EntityResolver EXPORT_ENTITY_MAPPER =
         new EntityResolver() {
-            public InputSource resolveEntity( String publicId, String systemId)
+            @Override
+			public InputSource resolveEntity( String publicId, String systemId)
                 throws SAXException, IOException {
                 if (ExportConfiguration.DTD_PUBLIC.equals( publicId) ||
                     ExportConfiguration.DTD_SYSTEM.equals( systemId)) {

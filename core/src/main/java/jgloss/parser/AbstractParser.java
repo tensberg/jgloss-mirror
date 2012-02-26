@@ -72,7 +72,8 @@ public abstract class AbstractParser implements Parser {
      *
      * @return The position in the text the parser is currently parsing.
      */
-    public int getParsePosition() { 
+    @Override
+	public int getParsePosition() { 
         return parsePosition;
     }
 
@@ -95,7 +96,8 @@ public abstract class AbstractParser implements Parser {
      * parsed some text to reclaim the memory. This implementation clears the word occurrence
      * cache if needed.
      */
-    public void reset() {
+    @Override
+	public void reset() {
         if (annotatedWords != null)
             annotatedWords = new HashSet( 101);
     }
@@ -104,21 +106,24 @@ public abstract class AbstractParser implements Parser {
      * Set if the parser should skip newlines in the imported text. This means that characters
      * separated by one or several newline characters will be treated as a single word.
      */
-    public void setIgnoreNewlines( boolean ignoreNewlines) {
+    @Override
+	public void setIgnoreNewlines( boolean ignoreNewlines) {
         this.ignoreNewlines = ignoreNewlines;
     }
 
     /**
      * Test if the parser skips newlines in the imported text.
      */
-    public boolean getIgnoreNewlines() { return ignoreNewlines; }
+    @Override
+	public boolean getIgnoreNewlines() { return ignoreNewlines; }
 
     /**
      * Set if only the first occurrence of a word should be annotated. If this is set to
      * <CODE>true</CODE>, an annotated word will be cached and further occurrences will be ignored.
      * The cache of annotated words will be cleared when {@link #reset() reset} is called.
      */
-    public void setAnnotateFirstOccurrenceOnly( boolean firstOccurrenceOnly) {
+    @Override
+	public void setAnnotateFirstOccurrenceOnly( boolean firstOccurrenceOnly) {
         this.firstOccurrenceOnly = firstOccurrenceOnly;
         if (firstOccurrenceOnly) {
             if (annotatedWords==null)
@@ -131,7 +136,8 @@ public abstract class AbstractParser implements Parser {
     /**
      * Test if only the first occurrence of a word should be annotated.
      */
-    public boolean getAnnotateFirstOccurrenceOnly() {
+    @Override
+	public boolean getAnnotateFirstOccurrenceOnly() {
         return firstOccurrenceOnly;
     }
 

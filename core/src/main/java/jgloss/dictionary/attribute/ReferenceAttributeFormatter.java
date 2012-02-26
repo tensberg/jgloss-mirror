@@ -37,7 +37,8 @@ public class ReferenceAttributeFormatter extends DefaultAttributeFormatter {
         afterValue = _afterValue;
     }
 
-    public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+    @Override
+	public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
         buf.append( beforeValue);
         buf.append( ((ReferenceAttributeValue) val).getReferenceTitle());
         buf.append( afterValue);

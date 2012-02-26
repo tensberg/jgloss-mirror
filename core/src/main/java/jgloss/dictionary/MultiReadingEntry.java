@@ -58,27 +58,33 @@ class MultiReadingEntry implements DictionaryEntry {
         dictionary = _dictionary;
     }
 
-    public AttributeSet getGeneralAttributes() { return EMPTY_ATTRIBUTE_SET; }
+    @Override
+	public AttributeSet getGeneralAttributes() { return EMPTY_ATTRIBUTE_SET; }
  
-    public String getWord( int alternative) {
+    @Override
+	public String getWord( int alternative) {
         if (alternative != 0)
             throw new IllegalArgumentException();
         return word;
     }
 
-    public int getWordAlternativeCount() { return 1; }
+    @Override
+	public int getWordAlternativeCount() { return 1; }
 
-    public AttributeSet getWordAttributes( int alternative) {
+    @Override
+	public AttributeSet getWordAttributes( int alternative) {
         if (alternative != 0)
             throw new IllegalArgumentException();
         return EMPTY_ATTRIBUTE_SET;
     }
 
-    public AttributeSet getWordAttributes() {
+    @Override
+	public AttributeSet getWordAttributes() {
         return EMPTY_ATTRIBUTE_SET;
     }
 
-    public String getReading( int alternative) {
+    @Override
+	public String getReading( int alternative) {
         try {
             return readings[alternative];
         } catch (ArrayIndexOutOfBoundsException ex) {
@@ -86,67 +92,81 @@ class MultiReadingEntry implements DictionaryEntry {
         }
     }
 
-    public int getReadingAlternativeCount() { return readings.length; }
+    @Override
+	public int getReadingAlternativeCount() { return readings.length; }
 
-    public AttributeSet getReadingAttributes( int alternative) {
+    @Override
+	public AttributeSet getReadingAttributes( int alternative) {
         if (alternative<0 || alternative>=readings.length)
             throw new IllegalArgumentException();
         return EMPTY_ATTRIBUTE_SET;
     }
 
-    public AttributeSet getReadingAttributes() { return EMPTY_ATTRIBUTE_SET; }
+    @Override
+	public AttributeSet getReadingAttributes() { return EMPTY_ATTRIBUTE_SET; }
 
-    public String getTranslation( int rom, int crm, int synonym) {
+    @Override
+	public String getTranslation( int rom, int crm, int synonym) {
         if (rom!=0 || synonym!=0 || crm<0 || crm>=translations.length)
             throw new IllegalArgumentException();
         return translations[crm];
     }
 
-    public int getTranslationRomCount() {
+    @Override
+	public int getTranslationRomCount() {
         return translations.length>0 ? 1 : 0;
     }
 
-    public int getTranslationCrmCount( int rom) {
+    @Override
+	public int getTranslationCrmCount( int rom) {
         if (translations.length==0 || rom!=0)
             throw new IllegalArgumentException();
         return translations.length;
     }
 
-    public int getTranslationSynonymCount( int rom, int crm) {
+    @Override
+	public int getTranslationSynonymCount( int rom, int crm) {
         if (rom!=0 || crm<0 || crm>=translations.length)
             throw new IllegalArgumentException();
         return 1;
     }
 
-    public AttributeSet getTranslationAttributes( int rom, int crm, int synonym) {
+    @Override
+	public AttributeSet getTranslationAttributes( int rom, int crm, int synonym) {
         if (rom!=0 || synonym!=0 || crm<0 || crm>=translations.length)
             throw new IllegalArgumentException();
         return EMPTY_ATTRIBUTE_SET;
     }
 
-    public AttributeSet getTranslationAttributes( int rom, int crm) {
+    @Override
+	public AttributeSet getTranslationAttributes( int rom, int crm) {
         if (rom!=0 || crm<0 || crm>=translations.length)
             throw new IllegalArgumentException();
         return EMPTY_ATTRIBUTE_SET;
     }
 
-    public AttributeSet getTranslationAttributes( int rom) {
+    @Override
+	public AttributeSet getTranslationAttributes( int rom) {
         if (translations.length==0 || rom!=0)
             throw new IllegalArgumentException();
         return EMPTY_ATTRIBUTE_SET;
     }
 
-    public AttributeSet getTranslationAttributes() {
+    @Override
+	public AttributeSet getTranslationAttributes() {
         return EMPTY_ATTRIBUTE_SET;
     }
 
-    public Dictionary getDictionary() {
+    @Override
+	public Dictionary getDictionary() {
         return dictionary;
     }
 
-    public DictionaryEntryReference getReference() {
+    @Override
+	public DictionaryEntryReference getReference() {
         return new DictionaryEntryReference() {
-                public DictionaryEntry getEntry() { return MultiReadingEntry.this; }
+                @Override
+				public DictionaryEntry getEntry() { return MultiReadingEntry.this; }
             };
     }
 } // class MultiReadingEntry

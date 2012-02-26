@@ -171,7 +171,8 @@ public class HTMLToSAXParserAdapter {
      * {@link HTMLToSAXParserAdapter#handleChildren(Element) handleChildren}.
      */
     private class StripElementHandler implements ElementHandler {
-        public void handle(Element elem) throws SAXException {
+        @Override
+		public void handle(Element elem) throws SAXException {
             handleChildren(elem);
         }
     }
@@ -181,7 +182,8 @@ public class HTMLToSAXParserAdapter {
      * Attributes of the HTML element are not copied.
      */
     private class CopyElementHandler implements ElementHandler {
-        public void handle(Element elem) throws SAXException {
+        @Override
+		public void handle(Element elem) throws SAXException {
             saxContentHandler.startElement( null, null, elem.getName(),
                                             EMPTY_ATTRIBUTES);
             handleChildren(elem);
@@ -200,7 +202,8 @@ public class HTMLToSAXParserAdapter {
             elementName = _elementName;
         }
 
-        public void handle(Element elem) throws SAXException {
+        @Override
+		public void handle(Element elem) throws SAXException {
             saxContentHandler.startElement( null, null, elementName,
                                             EMPTY_ATTRIBUTES);
             handleChildren(elem);
@@ -212,7 +215,8 @@ public class HTMLToSAXParserAdapter {
      * Creates the head element.
      */
     private class HeadHandler implements ElementHandler {
-        public void handle( Element head) throws SAXException {
+        @Override
+		public void handle( Element head) throws SAXException {
             saxContentHandler.startElement( null, null, JGlossDocument.Elements.HEAD,
                                             EMPTY_ATTRIBUTES);
 
@@ -237,7 +241,8 @@ public class HTMLToSAXParserAdapter {
      * Creates annotation elements.
      */
     private class AnnotationHandler implements ElementHandler {
-        public void handle(Element anno) throws SAXException {
+        @Override
+		public void handle(Element anno) throws SAXException {
             AttributesImpl a = new AttributesImpl();
             String translation = getText( anno.getElement( 1), true);
             if (translation.length() > 0)
@@ -269,7 +274,8 @@ public class HTMLToSAXParserAdapter {
      * Handles a reading/basetext pair.
      */
     private class RBHandler implements ElementHandler {
-        public void handle( Element rb) throws SAXException {
+        @Override
+		public void handle( Element rb) throws SAXException {
             AttributesImpl a = new AttributesImpl();
 
             String reading = getText( rb.getElement( 0), true);
@@ -294,7 +300,8 @@ public class HTMLToSAXParserAdapter {
      * XML export, it is removed here.
      */
     private class PHandler implements ElementHandler {
-        public void handle(Element p) throws SAXException {
+        @Override
+		public void handle(Element p) throws SAXException {
             saxContentHandler.startElement( null, null, HTML.Tag.P.toString(),
                                             EMPTY_ATTRIBUTES);
 

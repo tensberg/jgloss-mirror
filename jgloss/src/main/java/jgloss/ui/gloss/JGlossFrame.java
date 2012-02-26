@@ -82,6 +82,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JViewport;
 import javax.swing.ProgressMonitor;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -127,8 +129,6 @@ import jgloss.ui.SplitPaneManager;
 import jgloss.ui.StopableReader;
 import jgloss.ui.UIUtilities;
 import jgloss.ui.XCVManager;
-import jgloss.ui.LookupResultList.Hyperlinker;
-import jgloss.ui.OpenRecentMenu.FileSelectedListener;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.export.ExportMenu;
@@ -187,9 +187,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
          */
         private Actions( final JGlossFrame target) {
             importDocument = new AbstractAction() {
-                    public void actionPerformed( ActionEvent e) {
+                    @Override
+					public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss import") {
-                                public void run() {
+                                @Override
+								public void run() {
                                     ImportDialog d = new ImportDialog( target != null ? 
                                                                        target.frame :
                                                                        null);
@@ -224,9 +226,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             importDocument.setEnabled( true);
             UIUtilities.initAction( importDocument, "main.menu.import"); 
             importClipboard = new AbstractAction() {
-                    public void actionPerformed( ActionEvent e) {
+                    @Override
+					public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss import") {
-                                public void run() {
+                                @Override
+								public void run() {
                                     if (target == null)
                                         new JGlossFrame().doImportClipboard();
                                     else
@@ -238,9 +242,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             importClipboard.setEnabled( false);
             UIUtilities.initAction( importClipboard, "main.menu.importclipboard"); 
             open = new AbstractAction() {
-                    public void actionPerformed( ActionEvent e) {
+                    @Override
+					public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss open") {
-                                public void run() {
+                                @Override
+								public void run() {
                                     JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
                                     f.addChoosableFileFilter( jglossFileFilter);
                                     f.setFileHidingEnabled( true);
@@ -271,7 +277,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             UIUtilities.initAction( open, "main.menu.open");
             
             openRecentListener = new OpenRecentMenu.FileSelectedListener() {
-                    public void fileSelected( final File file) {
+                    @Override
+					public void fileSelected( final File file) {
                         // test if the file is already open
                         String path = file.getAbsolutePath();
                         for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
@@ -284,7 +291,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                         
                         // load the file asynchronously
                         new Thread() {
-                                public void run() {
+                                @Override
+								public void run() {
                                     JGlossFrame which = target==null ||
                                         target.model.isEmpty() ? new JGlossFrame() : target;
                                     which.loadDocument( file);
@@ -323,14 +331,18 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             importClipboard.setEnabled( UIUtilities.clipboardContainsString());
         }
 
-        public void windowActivated( WindowEvent e) {
+        @Override
+		public void windowActivated( WindowEvent e) {
             checkUpdate();
         }
-        public void menuSelected( MenuEvent e) {
+        @Override
+		public void menuSelected( MenuEvent e) {
             checkUpdate();
         }
-        public void menuDeselected( MenuEvent e) {}
-        public void menuCanceled( MenuEvent e) {}
+        @Override
+		public void menuDeselected( MenuEvent e) {}
+        @Override
+		public void menuCanceled( MenuEvent e) {}
     } // class ImportClipboardListener
 
     /**
@@ -507,18 +519,21 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                        JGloss.prefs.getInt( Preferences.FRAME_HEIGHT, frame.getPreferredSize().height));
         
         componentListener = new ComponentAdapter() {
-                public void componentMoved( ComponentEvent e) {
+                @Override
+				public void componentMoved( ComponentEvent e) {
                     JGloss.prefs.set( Preferences.FRAME_X, frame.getX());
                     JGloss.prefs.set( Preferences.FRAME_Y, frame.getY());
                 }
-                public void componentResized( ComponentEvent e) {
+                @Override
+				public void componentResized( ComponentEvent e) {
                     JGloss.prefs.set( Preferences.FRAME_WIDTH, frame.getWidth());
                     JGloss.prefs.set( Preferences.FRAME_HEIGHT, frame.getHeight());
                 }
             };
         frame.addComponentListener( componentListener);
         windowListener = new WindowAdapter() {
-                public void windowClosing( WindowEvent e) {
+                @Override
+				public void windowClosing( WindowEvent e) {
                     synchronized (this) {
                         if (deferWindowClosing) {
                             // Another thread is currently executing loadDocument.
@@ -567,21 +582,21 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         JScrollPane annotationEditorScroller = 
             new JScrollPane( annotationEditor,
-                             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane annotationListScroller = 
             new JScrollPane( annotationList,
-                             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         JLabel rendering = new JLabel( JGloss.messages.getString( "main.renderingdocument"),
-                                       JLabel.CENTER);
+                                       SwingConstants.CENTER);
         rendering.setBackground( Color.white);
         rendering.setOpaque( true);
         rendering.setFont( rendering.getFont().deriveFont( 18.0f));
         docpaneScroller = new JScrollPane( rendering,
-                                           JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                                           ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                                           ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         KeystrokeForwarder forwarder = new KeystrokeForwarder();
         docpane.addKeyListener(forwarder);
@@ -623,7 +638,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
     private Actions initActions() {
         saveAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     if (model.getDocumentPath() == null)
                         saveDocumentAs();
                     else
@@ -634,7 +650,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( saveAction, "main.menu.save"); 
 
         saveAsAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     saveDocumentAs();
                 }
             };
@@ -642,7 +659,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( saveAsAction, "main.menu.saveAs");
 
         printAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     doPrint();
                 }
             };
@@ -650,7 +668,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( printAction, "main.menu.print"); 
 
         closeAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     if (askCloseDocument()) {
                         closeDocument();
                     }
@@ -659,7 +678,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( closeAction, "main.menu.close");
 
         addAnnotationAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     annotateDocumentSelection();
                 }
             };
@@ -667,7 +687,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( addAnnotationAction, "main.menu.addannotation");
 
         documentTitleAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     String title = model.getHTMLDocument().getTitle();
                     if (title == null)
                         title = "";
@@ -686,7 +707,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( documentTitleAction, "main.menu.doctitle");
 
         wordLookupAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     JGlossApp.getLookupFrame().show();
                     String selection = docpane.getSelectedText();
                     if (selection == null || selection.length() == 0) {
@@ -1060,7 +1082,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                         final int index = Integer.parseInt( history[i+1]);
                         if (index >= 0 && index < annotationList.getModel().getSize()) {
                             Runnable worker = new Runnable() {
-                                    public void run() {
+                                    @Override
+									public void run() {
                                         annotationList.setSelectedIndex( index);
                                     }
                                 };
@@ -1114,7 +1137,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         
         javax.swing.Timer progressUpdater = new javax.swing.Timer( 500, new ActionListener() {
             // this handler is called from the event dispatch thread
-            public void actionPerformed( ActionEvent e) {
+            @Override
+			public void actionPerformed( ActionEvent e) {
                 int progress = ((AbstractParser)parser).getTick();
                 if (progress > 1) {
                     progress = Math.min(99, progress-1);
@@ -1183,7 +1207,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         model.setDocumentName( title);
 
         Runnable worker = new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     final Cursor currentCursor = getCursor();
                     updateTitle();
                     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
@@ -1222,7 +1247,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                     //    renderer.start is wrapped in its own runnable and invoked later in the
                     //    event thread
                     final Thread renderer = new Thread() {
-                            public void run() {
+                            @Override
+							public void run() {
                                 try {
                                     setPriority( Math.max( getPriority()-3, Thread.MIN_PRIORITY));
                                 } catch (IllegalArgumentException ex) {}
@@ -1248,7 +1274,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                 // installing the docpane in the scroller, which is already visible,
                                 // has to be done in the event dispatch thread
                                 Runnable installer = new Runnable() {
-                                        public void run() {
+                                        @Override
+										public void run() {
                                             synchronized (frame) {
                                                 // dispose might already have been called, test if
                                                 // member variables still exist
@@ -1277,7 +1304,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                         };
                     // defer rendering the document until after the window is painted
                     Runnable rendererStart = new Runnable() {
-                            public void run() {
+                            @Override
+							public void run() {
                                 renderer.start();
                             }
                         };
@@ -1295,19 +1323,23 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
                     // get notified of title changes
                     htmlDoc.addPropertyChangeListener( new PropertyChangeListener() {
-                            public void propertyChange( PropertyChangeEvent e) {
+                            @Override
+							public void propertyChange( PropertyChangeEvent e) {
                                 markChanged();
                             }
                         });
                     // mark document as changed if some editing occurs
                     htmlDoc.addDocumentListener( new DocumentListener() {
-                            public void insertUpdate(DocumentEvent e) {
+                            @Override
+							public void insertUpdate(DocumentEvent e) {
                                 markChanged();
                             }
-                            public void removeUpdate(DocumentEvent e) {
+                            @Override
+							public void removeUpdate(DocumentEvent e) {
                                 markChanged();
                             }
-                            public void changedUpdate(DocumentEvent e) {
+                            @Override
+							public void changedUpdate(DocumentEvent e) {
                                 // triggered by style changes, don't react to this
                             }
                         });
@@ -1345,7 +1377,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      *
      * @param e The action event.
      */
-    public void actionPerformed( ActionEvent e) {
+    @Override
+	public void actionPerformed( ActionEvent e) {
         if (kit != null) {
             if (e.getSource() == compactViewItem) {
                 JGloss.prefs.set( Preferences.VIEW_COMPACTVIEW, compactViewItem.isSelected());
@@ -1374,7 +1407,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         }
     }
 
-    public void hyperlinkUpdate( HyperlinkEvent e) {
+    @Override
+	public void hyperlinkUpdate( HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             int colon = e.getDescription().indexOf( ':');
             String protocol = e.getDescription().substring( 0, colon);
@@ -1408,7 +1442,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * React to changes to the selection of the annotation list by selecting the annotation
      * in the annotation editor and lookup panel.
      */
-    public void valueChanged( ListSelectionEvent e) {
+    @Override
+	public void valueChanged( ListSelectionEvent e) {
         if (e.getFirstIndex() >= 0) {
             Annotation anno = (Annotation) annotationList.getSelectedValue(); // HERE
             if (anno != null) {
@@ -1426,7 +1461,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * Reacts to text selection in the annotated document by searching the selected text in
      * the lookup panel.
      */
-    public void caretUpdate( CaretEvent e) {
+    @Override
+	public void caretUpdate( CaretEvent e) {
         if (e.getDot() == e.getMark()) {
             // no selection
             addAnnotationAction.setEnabled(false);

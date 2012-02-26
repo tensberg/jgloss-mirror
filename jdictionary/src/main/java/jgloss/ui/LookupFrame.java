@@ -109,7 +109,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
         setDefaultCloseOperation( DO_NOTHING_ON_CLOSE);
         addWindowListener( new WindowAdapter() {
-                public void windowClosing( WindowEvent e) {
+                @Override
+				public void windowClosing( WindowEvent e) {
                     hide();
                     if (JGloss.exit())
                         dispose();
@@ -155,7 +156,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
                         JGloss.prefs.getInt( Preferences.WORDLOOKUP_HEIGHT, 0)));
         
         addComponentListener( new ComponentAdapter() {
-                public void componentResized( ComponentEvent e) {
+                @Override
+				public void componentResized( ComponentEvent e) {
                     JGloss.prefs.set( Preferences.WORDLOOKUP_WIDTH, getWidth());
                     JGloss.prefs.set( Preferences.WORDLOOKUP_HEIGHT, getHeight());
                 }
@@ -163,14 +165,16 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
         history = new ArrayList( MAX_HISTORY_SIZE);
         historyBackAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     historyBack();
                 }
             };
         UIUtilities.initAction( historyBackAction, "wordlookup.history.back");
         historyBackAction.setEnabled( false);
         historyForwardAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     historyForward();
                 }
             };
@@ -178,7 +182,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         historyForwardAction.setEnabled( false);
 
         Action legendAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     if (legendFrame == null)
                         createLegendFrame();
                     legendFrame.show();
@@ -206,7 +211,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     protected void createFileMenuItems( JMenu menu) {
         Action closeAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     hide();
                     if (JGloss.exit())
                         dispose();
@@ -216,7 +222,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         menu.add( UIUtilities.createMenuItem( closeAction));
     }
 
-    public void actionPerformed( ActionEvent event) {
+    @Override
+	public void actionPerformed( ActionEvent event) {
         if (currentResults.isEmpty())
             // first lookup
             engine.doLookup( (LookupModel) model.clone());
@@ -228,7 +235,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         }
     }
 
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         engine.dispose();
         Dictionaries.removeDictionaryListChangeListener( this);
@@ -236,14 +244,16 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
             legendFrame.dispose();
     }
 
-    public Dimension getPreferredSize() {
+    @Override
+	public Dimension getPreferredSize() {
         if (preferredSize == null)
             return super.getPreferredSize();
         else
             return preferredSize;
     }
 
-    public void hyperlinkUpdate( HyperlinkEvent e) {
+    @Override
+	public void hyperlinkUpdate( HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             int colon = e.getDescription().indexOf( ':');
             String protocol = e.getDescription().substring( 0, colon);
@@ -282,7 +292,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         legendFrame.setSize( legendFrame.getPreferredSize());
     }
 
-    public void dictionaryListChanged() {
+    @Override
+	public void dictionaryListChanged() {
         if (legend != null) {
             synchronized (legend) {
                 legend.setDictionaries( Dictionaries.getDictionaries( false));

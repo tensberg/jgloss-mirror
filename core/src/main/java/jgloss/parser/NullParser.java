@@ -45,34 +45,43 @@ public class NullParser implements Parser {
         super();
     }
 
-    public List parse(char[] text, int start, int length)
+    @Override
+	public List parse(char[] text, int start, int length)
         throws SearchException {
         return Collections.EMPTY_LIST;
     }
 
-    public int getParsePosition() {
+    @Override
+	public int getParsePosition() {
         return 0;
     }
 
-    public void reset() {}
+    @Override
+	public void reset() {}
 
-    public void setIgnoreNewlines(boolean ignoreNewlines) {}
+    @Override
+	public void setIgnoreNewlines(boolean ignoreNewlines) {}
 
-    public boolean getIgnoreNewlines() {
+    @Override
+	public boolean getIgnoreNewlines() {
         return false;
     }
 
-    public void setAnnotateFirstOccurrenceOnly(boolean firstOccurrence) {}
+    @Override
+	public void setAnnotateFirstOccurrenceOnly(boolean firstOccurrence) {}
 
-    public boolean getAnnotateFirstOccurrenceOnly() {
+    @Override
+	public boolean getAnnotateFirstOccurrenceOnly() {
         return false;
     }
 
-    public String getName() {
+    @Override
+	public String getName() {
         return PARSER_NAME;
     }
 
-    public Locale getLanguage() {
+    @Override
+	public Locale getLanguage() {
         // TODO: this parser works for any language. Need to rework API for languages
         // if more than Japanese should ever be supported.
         return Locale.JAPANESE;

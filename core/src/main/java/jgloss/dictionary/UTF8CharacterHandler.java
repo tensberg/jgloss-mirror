@@ -39,7 +39,8 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
 
     public UTF8CharacterHandler() {}
 
-    public int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+    @Override
+	public int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,
                                                         IndexOutOfBoundsException,
                                                         CharacterCodingException {
         byte b = buffer.get();
@@ -77,7 +78,8 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
         return decode( charData, 0, length);
     }
 
-    public int readPreviousCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+    @Override
+	public int readPreviousCharacter( ByteBuffer buffer) throws BufferUnderflowException,
                                                                 CharacterCodingException {
         int position = buffer.position();
         byte b = buffer.get( --position);
@@ -139,7 +141,8 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
         return c;
     }
 
-    public int convertCharacter( int c) {
+    @Override
+	public int convertCharacter( int c) {
         // convert katakana->hiragana
         if (StringTools.isKatakana( (char) c))
             c -= 96; // katakana-hiragana difference is 96 code points
@@ -151,7 +154,8 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
         return c;
     }
 
-    public CharacterClass getCharacterClass( int c, boolean inWord) {
+    @Override
+	public CharacterClass getCharacterClass( int c, boolean inWord) {
         if (c>=0x4e00 && c<0xa000)
             return CharacterClass.KANJI;
         else if (c>=0x3040 && c<0x30a0)
@@ -166,10 +170,12 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
             return CharacterClass.OTHER; // not in word
     }
     
-    public boolean canEncode(char c) {
+    @Override
+	public boolean canEncode(char c) {
         // TODO: check encoding range of UTF-8
         return true;
     }
 
-    public String getEncodingName() { return "UTF-8"; }
+    @Override
+	public String getEncodingName() { return "UTF-8"; }
 } // class UTF8EncodingConverter

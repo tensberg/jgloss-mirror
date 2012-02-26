@@ -122,43 +122,51 @@ public class LookupResultCache extends LookupResultProxy implements Cloneable {
         removeHandler(handler);
     }
 
-    public void startLookup( String description) {
+    @Override
+	public void startLookup( String description) {
         cache.clear();
         cache.add( description);
         super.startLookup( description);
     }
 
-    public void startLookup( LookupModel model) {
+    @Override
+	public void startLookup( LookupModel model) {
         cache.clear();
         cache.add( model);
         super.startLookup(model);
     }
 
-    public void dictionary( Dictionary dictionary) {
+    @Override
+	public void dictionary( Dictionary dictionary) {
         cache.add( dictionary);
         super.dictionary(dictionary);
     }
 
-    public void dictionaryEntry( DictionaryEntry entry) {
+    @Override
+	public void dictionaryEntry( DictionaryEntry entry) {
         cache.add( entry.getReference());
         super.dictionaryEntry(entry);
     }
 
-    public void exception( SearchException ex) {
+    @Override
+	public void exception( SearchException ex) {
         cache.add( ex);
         super.exception(ex);
     }
 
-    public void note( String note) {
+    @Override
+	public void note( String note) {
         cache.add( note);
         super.note(note);
     }
 
-    public void endLookup() {
+    @Override
+	public void endLookup() {
         super.endLookup();
     }
 
-    public Object clone() {
+    @Override
+	public Object clone() {
         try {
             LookupResultCache out = (LookupResultCache) super.clone();
             out.cache = new ArrayList( out.cache);

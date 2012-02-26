@@ -35,7 +35,8 @@ public class MatchHighlighter implements Highlighter {
    * @param g Graphics object to paint on
    * @param text text to paint  
    */
-  public void paintHighlight(Graphics g, String entryText, String searchText) {
+  @Override
+public void paintHighlight(Graphics g, String entryText, String searchText) {
     
     // Allocate a buffer for the entry text
     if(text == null || text.length < entryText.length())

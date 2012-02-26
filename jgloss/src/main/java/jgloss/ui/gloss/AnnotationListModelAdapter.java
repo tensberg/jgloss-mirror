@@ -44,36 +44,44 @@ public class AnnotationListModelAdapter implements ListModel, AnnotationListener
         annotations.addAnnotationListener( this);
     }
 
-    public int getSize() { return annotations.getAnnotationCount(); }
+    @Override
+	public int getSize() { return annotations.getAnnotationCount(); }
     
-    public Object getElementAt( int index) { return annotations.getAnnotation( index); }
+    @Override
+	public Object getElementAt( int index) { return annotations.getAnnotation( index); }
 
-    public void addListDataListener( ListDataListener listener) {
+    @Override
+	public void addListDataListener( ListDataListener listener) {
         List tempListeners = new ArrayList( listeners.size()+1);
         tempListeners.addAll( listeners);
         tempListeners.add( listener);
         listeners = tempListeners;
     }
 
-    public void removeListDataListener( ListDataListener listener) {
+    @Override
+	public void removeListDataListener( ListDataListener listener) {
         List tempListeners = new ArrayList( listeners);
         tempListeners.remove( listener);
         listeners = tempListeners;
     }
 
-    public void annotationInserted( AnnotationEvent ae) {
+    @Override
+	public void annotationInserted( AnnotationEvent ae) {
         fireIntervalAdded( ae.getIndex(), ae.getIndex());
     }
 
-    public void annotationRemoved( AnnotationEvent ae) {
+    @Override
+	public void annotationRemoved( AnnotationEvent ae) {
         fireIntervalRemoved( ae.getIndex(), ae.getIndex());
     }
 
-    public void annotationChanged( AnnotationEvent ae) {
+    @Override
+	public void annotationChanged( AnnotationEvent ae) {
         fireContentsChanged( ae.getIndex(), ae.getIndex());
     }
 
-    public void readingChanged( AnnotationEvent ae) {
+    @Override
+	public void readingChanged( AnnotationEvent ae) {
         fireContentsChanged( ae.getIndex(), ae.getIndex());
     }
 

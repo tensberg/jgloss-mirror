@@ -21,7 +21,8 @@ public class SelectedAnnotationHighlighter implements ListSelectionListener {
         highlightSelection(_list);
     }
 
-    public void valueChanged( ListSelectionEvent e) {
+    @Override
+	public void valueChanged( ListSelectionEvent e) {
         if (e.getFirstIndex() >= 0) {
             highlightSelection((AnnotationList) e.getSource()); // HERE
         }

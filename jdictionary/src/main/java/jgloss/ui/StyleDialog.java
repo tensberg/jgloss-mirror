@@ -98,8 +98,10 @@ public class StyleDialog extends Box implements PreferencesPanel {
      */
     protected static Map defaultLFFonts;
 
-    public String getTitle() { return JGloss.messages.getString( "style.title"); }
-    public Component getComponent() { return this; }
+    @Override
+	public String getTitle() { return JGloss.messages.getString( "style.title"); }
+    @Override
+	public Component getComponent() { return this; }
     
     protected JButton autodetect;
 
@@ -155,13 +157,15 @@ public class StyleDialog extends Box implements PreferencesPanel {
          *
          * @return The width of this icon.
          */
-        public int getIconWidth() { return width; }
+        @Override
+		public int getIconWidth() { return width; }
         /**
          * Returns the height of this icon.
          *
          * @return The height of this icon.
          */
-        public int getIconHeight() { return height; }
+        @Override
+		public int getIconHeight() { return height; }
         /**
          * Returns the color of this icon.
          *
@@ -177,7 +181,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
             this.color = color;
         }
 
-        public void paintIcon( Component c, Graphics g, int x, int y) {
+        @Override
+		public void paintIcon( Component c, Graphics g, int x, int y) {
             g.setColor( color);
             g.setPaintMode();
             g.fillRect( x, y, width, height);
@@ -199,7 +204,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
 
         autodetect = new JButton( JGloss.messages.getString( "style.autodetect"));
         autodetect.addActionListener( new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     autodetectFontsAction( getAutodetectedFonts());
                 }
             });
@@ -212,7 +218,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
         bg.add( generalFontDefault);
         bg.add( generalFontCustom);
         generalFontCustom.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
+                @Override
+				public void stateChanged( ChangeEvent e) {
                     generalFont.setEnabled( generalFontCustom.isSelected());
                 }
             });
@@ -280,7 +287,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
     /**
      * Loads the preferences and initializes the dialog accordingly.
      */
-    public void loadPreferences() {
+    @Override
+	public void loadPreferences() {
         if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true))
             generalFontDefault.setSelected( true);
         else
@@ -297,7 +305,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
     /**
      * Saves the current dialog settings.
      */
-    public void savePreferences() {
+    @Override
+	public void savePreferences() {
         String font = (String) generalFont.getSelectedItem();
         if (font != null)
             JGloss.prefs.set( Preferences.FONT_GENERAL, font);
@@ -320,7 +329,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
     /**
      * Applies the settings from the application preferences to all style sheets.
      */
-    public void applyPreferences() {
+    @Override
+	public void applyPreferences() {
         // apply custom font settings
         applyUIFont();
     }
@@ -422,7 +432,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
 
         // Try out all fonts. Since this is slow, do this in its own thread.
         Thread fontTester = new Thread() {
-                public void run() {
+                @Override
+				public void run() {
                     String font = searchJapaneseFont();
                     if (font == null) {
                         JOptionPane.showMessageDialog
@@ -434,7 +445,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
                     else {
                         final String fontc = font;
                         EventQueue.invokeLater( new Runnable() {
-                                public void run() {
+                                @Override
+								public void run() {
                                     selectJapaneseFont( fontc);
                                 }
                             });
@@ -546,7 +558,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
         final Font[] currentFont = new Font[1]; // mutable final array, accessible by nested class
         // use timer to update progress bar
         javax.swing.Timer timer = new javax.swing.Timer( 1000, new ActionListener() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     monitor.setProgress( i[0]);
                     monitor.setNote( JGloss.messages.getString
                                      ( "style.autodetect.progress.font", 

@@ -83,7 +83,8 @@ public class CustomFileView extends FileView {
         }
     }
 
-    public String getTypeDescription( File f) {
+    @Override
+	public String getTypeDescription( File f) {
         String name = f.getName().toLowerCase();
         String desc = null;
         if (name.endsWith( ".jgloss"))
@@ -106,7 +107,8 @@ public class CustomFileView extends FileView {
         return null; // let L&F file view determine the description
     }
 
-    public Icon getIcon( File f) {
+    @Override
+	public Icon getIcon( File f) {
         String name = f.getName().toLowerCase();
         Icon icon = null;
         if (name.endsWith( ".jgloss"))

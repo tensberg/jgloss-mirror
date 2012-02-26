@@ -90,7 +90,8 @@ public class DictionaryEntryFormatter {
         private String name;
 
         private Position( String _name) { name = _name; }
-        public String toString() { return name; }
+        @Override
+		public String toString() { return name; }
     } // class Position
 
     protected List formats = new ArrayList( 3);

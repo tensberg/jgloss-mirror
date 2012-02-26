@@ -35,7 +35,8 @@ import jgloss.dictionary.DictionaryEntry;
 public class PriorityComparator implements Comparator {
     public PriorityComparator() {}
 
-    public int compare( Object o1, Object o2) {
+    @Override
+	public int compare( Object o1, Object o2) {
         DictionaryEntry de1 = (DictionaryEntry) o1;
         DictionaryEntry de2 = (DictionaryEntry) o2;
         if (de1.getDictionary() != de2.getDictionary())

@@ -67,9 +67,11 @@ public class JGlossApp extends JGloss {
         return lookupFrame;
     }
 
-    protected String getApplicationName() { return "jgloss"; }
+    @Override
+	protected String getApplicationName() { return "jgloss"; }
 
-    protected void registerDictionaries() {
+    @Override
+	protected void registerDictionaries() {
         super.registerDictionaries();
 
         // register text parsers
@@ -88,14 +90,16 @@ public class JGlossApp extends JGloss {
         Chasen.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
     }
 
-    protected PreferencesPanel[] getPreferencesPanels() {
+    @Override
+	protected PreferencesPanel[] getPreferencesPanels() {
         return new PreferencesPanel[] { GeneralDialog.getInstance(),
                                         DocumentStyleDialog.getDocumentStyleDialog(),
                                         Dictionaries.getInstance(),
                                         ExclusionList.getInstance() };
     }
 
-    protected void showMainWindow( String[] args) throws Exception {
+    @Override
+	protected void showMainWindow( String[] args) throws Exception {
         ExportMenu.registerStandardExporters();
 
         if (args.length == 0) {
@@ -112,7 +116,8 @@ public class JGlossApp extends JGloss {
         }   
     }
 
-    protected void backgroundCreateDialogs() {
+    @Override
+	protected void backgroundCreateDialogs() {
         getLookupFrame();
         super.backgroundCreateDialogs();
     }
@@ -125,7 +130,8 @@ public class JGlossApp extends JGloss {
      *
      * @return <CODE>false</CODE>, if the application will not quit.
      */
-    protected boolean doExit() {
+    @Override
+	protected boolean doExit() {
         if (JGlossFrame.getFrameCount()>0 || getLookupFrame().isVisible())
             return false;
 

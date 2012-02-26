@@ -19,11 +19,13 @@ public class FirstEntryCache implements LookupResultHandler {
      */
     public DictionaryEntry getEntry() { return firstEntry; }
 
-    public void startLookup( String description) {
+    @Override
+	public void startLookup( String description) {
         startLookup();
     }
 
-    public void startLookup( LookupModel model) {
+    @Override
+	public void startLookup( LookupModel model) {
         startLookup();
     }
 
@@ -31,16 +33,21 @@ public class FirstEntryCache implements LookupResultHandler {
         firstEntry = null;
     }
 
-    public void dictionary( Dictionary d) {}
+    @Override
+	public void dictionary( Dictionary d) {}
 
-    public void dictionaryEntry( DictionaryEntry de) {
+    @Override
+	public void dictionaryEntry( DictionaryEntry de) {
         if (firstEntry == null)
             firstEntry = de;
     }
 
-    public void exception( SearchException ex) {}
+    @Override
+	public void exception( SearchException ex) {}
 
-    public void note( String note) {}
+    @Override
+	public void note( String note) {}
 
-    public void endLookup() {}
+    @Override
+	public void endLookup() {}
 } // class FirstEntryCache

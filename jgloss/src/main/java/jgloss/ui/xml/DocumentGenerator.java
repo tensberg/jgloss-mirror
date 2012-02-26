@@ -54,15 +54,18 @@ class DocumentGenerator extends DefaultHandler {
         return document;
     }
 
-    public void startDocument() throws SAXException {
+    @Override
+	public void startDocument() throws SAXException {
         document = builder.newDocument();
         currentParent = document;
     }
 
-    public void endDocument() throws SAXException {
+    @Override
+	public void endDocument() throws SAXException {
     }
 
-    public void startElement( String namespaceURI, String localName,
+    @Override
+	public void startElement( String namespaceURI, String localName,
                               String qName, Attributes atts)
         throws SAXException {
         Element elem = document.createElementNS( namespaceURI, qName);
@@ -73,21 +76,25 @@ class DocumentGenerator extends DefaultHandler {
         currentParent = elem;
     }
 
-    public void endElement( String namespaceURI, String localName,
+    @Override
+	public void endElement( String namespaceURI, String localName,
                             String qName) throws SAXException {
         currentParent = currentParent.getParentNode();
     }
 
-    public void characters( char[] c, int start, int length) throws SAXException {
+    @Override
+	public void characters( char[] c, int start, int length) throws SAXException {
         currentParent.appendChild( document.createTextNode( new String( c, start, length)));
     }
 
-    public void processingInstruction( String target, String data)
+    @Override
+	public void processingInstruction( String target, String data)
         throws SAXException {
         currentParent.appendChild( document.createProcessingInstruction( target, data));
     }
 
-    public InputSource resolveEntity( String publicId, String systemId) throws SAXException, IOException {
+    @Override
+	public InputSource resolveEntity( String publicId, String systemId) throws SAXException, IOException {
         if (JGlossDocument.DTD_PUBLIC.equals( publicId)) {
             InputSource dtd = new InputSource( JGlossDocument.class.getResource
                                                ( JGlossDocument.DTD_RESOURCE).toExternalForm());

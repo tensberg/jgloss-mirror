@@ -60,8 +60,11 @@ public class StandardSearchParameter implements SearchParameter {
         this.description = _description;
     }
 
-    public Class getParameterClass() { return paramClass; }
-    public String getDescription() { return description; }
+    @Override
+	public Class getParameterClass() { return paramClass; }
+    @Override
+	public String getDescription() { return description; }
 
-    public String toString() { return getDescription(); }
+    @Override
+	public String toString() { return getDescription(); }
 } // class StandardSearchParameter

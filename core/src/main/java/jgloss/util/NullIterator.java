@@ -35,13 +35,16 @@ public class NullIterator implements Iterator {
 
     private NullIterator() {}
 
-    public boolean hasNext() { return false; }
+    @Override
+	public boolean hasNext() { return false; }
 
-    public Object next() throws NoSuchElementException { 
+    @Override
+	public Object next() throws NoSuchElementException { 
         throw new NoSuchElementException();
     }
 
-    public void remove() throws UnsupportedOperationException {
+    @Override
+	public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 } // class NullIterator

@@ -44,7 +44,8 @@ public class MultiWordEntry extends BaseEntry {
         wordsA = (AttributeSet[]) _wordsA.toArray( wordsA);
     }
 
-    public String getWord( int alternative) {
+    @Override
+	public String getWord( int alternative) {
         try {
             return words[alternative];
         } catch (ArrayIndexOutOfBoundsException ex) {
@@ -52,9 +53,11 @@ public class MultiWordEntry extends BaseEntry {
         }
     }
 
-    public int getWordAlternativeCount() { return words.length; }
+    @Override
+	public int getWordAlternativeCount() { return words.length; }
 
-    public AttributeSet getWordAttributes( int alternative) {
+    @Override
+	public AttributeSet getWordAttributes( int alternative) {
         try {
             if (wordsA[alternative] == null)
                 return emptySet.setParent( wordA);
@@ -65,7 +68,8 @@ public class MultiWordEntry extends BaseEntry {
         }
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer out = new StringBuffer( 30);
         out.append( generalA.toString());
         out.append( ' ');

@@ -38,18 +38,22 @@ public class JDictionaryApp extends JGloss {
         new JDictionaryApp().init( args);
     }
 
-    protected String getApplicationName() { return "jdictionary"; }
+    @Override
+	protected String getApplicationName() { return "jdictionary"; }
 
-    protected void showMainWindow( String[] args) throws Exception {
+    @Override
+	protected void showMainWindow( String[] args) throws Exception {
         new LookupFrame( createLookupModel()).show();
     }
 
-    protected PreferencesPanel[] getPreferencesPanels() {
+    @Override
+	protected PreferencesPanel[] getPreferencesPanels() {
         return new PreferencesPanel[] { StyleDialog.getStyleDialog(),
                                         Dictionaries.getInstance() };
     }
 
-    protected boolean doExit() {
+    @Override
+	protected boolean doExit() {
         System.exit( 0);
 
         return true;

@@ -37,8 +37,10 @@ public class DefaultAttributeSet implements AttributeSet {
 
         public MutableValueList() {}
 
-        public int size() { return values.size(); }
-        public AttributeValue get( int index) { return (AttributeValue) values.get( index); }
+        @Override
+		public int size() { return values.size(); }
+        @Override
+		public AttributeValue get( int index) { return (AttributeValue) values.get( index); }
         public void add( AttributeValue value) { values.add( value); }
         public void addAll( ValueList _values) {
             if (_values instanceof MutableValueList) {
@@ -52,7 +54,8 @@ public class DefaultAttributeSet implements AttributeSet {
         public boolean contains( AttributeValue value) {
             return values.contains( value);
         }
-        public String toString() {
+        @Override
+		public String toString() {
             StringBuffer out = new StringBuffer();
             out.append( '[');
             for ( Iterator i=values.iterator(); i.hasNext(); ) {
@@ -74,16 +77,19 @@ public class DefaultAttributeSet implements AttributeSet {
             parent = _parent;
         }
     
-        public int size() { return base.size() + parent.size(); }
+        @Override
+		public int size() { return base.size() + parent.size(); }
         
-        public AttributeValue get( int index) {
+        @Override
+		public AttributeValue get( int index) {
             if (index < base.size())
                 return base.get( index);
             else
                 return parent.get( index-base.size());
         }
 
-        public String toString() { return "[/" + base.toString() + parent.toString() + "]"; }
+        @Override
+		public String toString() { return "[/" + base.toString() + parent.toString() + "]"; }
     } // class NestedValueList
 
     protected AttributeSet parent = null;
@@ -96,7 +102,8 @@ public class DefaultAttributeSet implements AttributeSet {
         this.parent = _parent;
     }
 
-    public boolean containsKey( Attribute key, boolean resolveInherited) {
+    @Override
+	public boolean containsKey( Attribute key, boolean resolveInherited) {
         if (attributes!=null && attributes.containsKey( key))
             return true;
         else if (resolveInherited && parent!=null)
@@ -105,7 +112,8 @@ public class DefaultAttributeSet implements AttributeSet {
             return false;
     }
 
-    public boolean contains( Attribute key, AttributeValue value, boolean resolveInherited) {
+    @Override
+	public boolean contains( Attribute key, AttributeValue value, boolean resolveInherited) {
         if (attributes!=null && attributes.containsKey( key)) {
             Object v = attributes.get( key);
             if (v instanceof MutableValueList)
@@ -119,7 +127,8 @@ public class DefaultAttributeSet implements AttributeSet {
             return false;
     }
 
-    public ValueList getAttribute( Attribute key, boolean resolveInherited) {
+    @Override
+	public ValueList getAttribute( Attribute key, boolean resolveInherited) {
         ValueList base = null;
         ValueList parentv = null;
 
@@ -144,7 +153,8 @@ public class DefaultAttributeSet implements AttributeSet {
             return new NestedValueList( base, parentv);
     }
 
-    public boolean isInherited( Attribute key) throws AttributeNotSetException {
+    @Override
+	public boolean isInherited( Attribute key) throws AttributeNotSetException {
         if (attributes!=null && attributes.containsKey( key))
             return false;
         else if (parent.containsKey( key, true))
@@ -153,7 +163,8 @@ public class DefaultAttributeSet implements AttributeSet {
             throw new AttributeNotSetException( key);
     }
 
-    public Iterator getAttributeKeys( boolean resolveInherited) {
+    @Override
+	public Iterator getAttributeKeys( boolean resolveInherited) {
         if (resolveInherited)
             return new AttributeSetChainIterator( this);
         else if (attributes != null)
@@ -175,7 +186,8 @@ public class DefaultAttributeSet implements AttributeSet {
         return this;
     }
 
-    public AttributeSet getParent() { return parent; }
+    @Override
+	public AttributeSet getParent() { return parent; }
 
     public void addAttribute( Attribute key, AttributeValue value) {
         if (attributes == null)
@@ -197,11 +209,13 @@ public class DefaultAttributeSet implements AttributeSet {
         }
     }
 
-    public boolean isEmpty() {
+    @Override
+	public boolean isEmpty() {
         return attributes == null;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         if (attributes == null)
             return "()";
 

@@ -41,19 +41,25 @@ public class Attributes implements Attribute {
 
     public static final Priority EXAMPLE_PRIORITY_VALUE = 
         new Priority() {
-            public String getPriority() { return NAMES.getString( "example.priority"); }
-            public int compareTo( Priority p) {
+            @Override
+			public String getPriority() { return NAMES.getString( "example.priority"); }
+            @Override
+			public int compareTo( Priority p) {
                 throw new IllegalArgumentException();
             }
         };
 
     public static final ReferenceAttributeValue EXAMPLE_REFERENCE_VALUE =
         new ReferenceAttributeValue() {
-            public String getReferenceTitle() { return NAMES.getString( "example.reference"); }
-            public ResultIterator getReferencedEntries() {
+            @Override
+			public String getReferenceTitle() { return NAMES.getString( "example.reference"); }
+            @Override
+			public ResultIterator getReferencedEntries() {
                 return new ResultIterator() {
-                        public boolean hasNext() { return false; }
-                        public DictionaryEntry next() { throw new NoSuchElementException(); }
+                        @Override
+						public boolean hasNext() { return false; }
+                        @Override
+						public DictionaryEntry next() { throw new NoSuchElementException(); }
                     };
             }
         };
@@ -178,19 +184,26 @@ public class Attributes implements Attribute {
         groups = _groups;
     }
 
-    public String getName() { return name; }
+    @Override
+	public String getName() { return name; }
 
-    public String getDescription() { return description; }
+    @Override
+	public String getDescription() { return description; }
 
-    public boolean canHaveValue() { return canHaveValue; }
+    @Override
+	public boolean canHaveValue() { return canHaveValue; }
 
-    public boolean alwaysHasValue() { return alwaysHasValue; }
+    @Override
+	public boolean alwaysHasValue() { return alwaysHasValue; }
 
-    public Class getAttributeValueClass() { return valueClass; }
+    @Override
+	public Class getAttributeValueClass() { return valueClass; }
 
-    public AttributeValue getExampleValue() { return exampleAttributeValue; }
+    @Override
+	public AttributeValue getExampleValue() { return exampleAttributeValue; }
 
-    public boolean appliesTo( DictionaryEntry.AttributeGroup _group) {
+    @Override
+	public boolean appliesTo( DictionaryEntry.AttributeGroup _group) {
         for ( int i=0; i<groups.length; i++)
             if (groups[i] == _group)
                 return true;
@@ -198,5 +211,6 @@ public class Attributes implements Attribute {
         return false;
     }
 
-    public String toString() { return getName(); }
+    @Override
+	public String toString() { return getName(); }
 } // class Attributes

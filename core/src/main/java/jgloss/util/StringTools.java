@@ -318,7 +318,7 @@ public class StringTools {
      * @see #unicodeUnescape(String)
      */
     public static String unicodeEscape( char c) {
-        int v = (int) c;
+        int v = c;
 
         char[] hex = new char[] { '\\', 'u', '0', '0', '0', '0' };
         int i=5;

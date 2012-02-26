@@ -29,6 +29,7 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -85,7 +86,8 @@ public class JGlossEditor extends JTextPane {
             setDaemon( true);
         }
         
-        public void run() {
+        @Override
+		public void run() {
             boolean updated = false;
             int i=0;
             while (!halt) {
@@ -114,7 +116,8 @@ public class JGlossEditor extends JTextPane {
             }
         }
         
-        public void mouseMoved( MouseEvent e) {
+        @Override
+		public void mouseMoved( MouseEvent e) {
             hideToolTip();
             
             if (tooltips) {
@@ -125,7 +128,8 @@ public class JGlossEditor extends JTextPane {
             }
         }
         
-        public void mouseDragged( MouseEvent e) {}
+        @Override
+		public void mouseDragged( MouseEvent e) {}
         
         public void haltThread() {
             halt = true;
@@ -222,7 +226,8 @@ public class JGlossEditor extends JTextPane {
         Keymap map = addKeymap( KEYMAP_TAB, getKeymap());
         map.addActionForKeyStroke( KeyStroke.getKeyStroke( "pressed TAB"),
             new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     transferFocus();
                 }
             });
@@ -233,15 +238,18 @@ public class JGlossEditor extends JTextPane {
         this.addMouseMotionListener( mouseFollower);
         
         mouseListener = new MouseListener() {
-            public void mousePressed( MouseEvent e) {
+            @Override
+			public void mousePressed( MouseEvent e) {
                 checkPopupTrigger( e);
             }
             
-            public void mouseReleased( MouseEvent e) {
+            @Override
+			public void mouseReleased( MouseEvent e) {
                 checkPopupTrigger( e);
             }
             
-            public void mouseClicked( MouseEvent e) 
+            @Override
+			public void mouseClicked( MouseEvent e) 
             {
                 if (!(checkPopupTrigger( e) || annotationList.getContextMenu().isVisible())) 
                 {
@@ -251,15 +259,15 @@ public class JGlossEditor extends JTextPane {
                     {
                         // left mouse button shows annotation tooltip, 
                         // all other select the annotation
-                        tooltipButtonMask = MouseEvent.BUTTON1_MASK;
-                        selectButtonMask = MouseEvent.BUTTON2_MASK | MouseEvent.BUTTON3_MASK;
+                        tooltipButtonMask = InputEvent.BUTTON1_MASK;
+                        selectButtonMask = InputEvent.BUTTON2_MASK | InputEvent.BUTTON3_MASK;
                     }
                     else 
                     {
                         // left mouse button selects annotation, 
                         // all other show annotation tooltip
-                        tooltipButtonMask = MouseEvent.BUTTON2_MASK | MouseEvent.BUTTON3_MASK;
-                        selectButtonMask = MouseEvent.BUTTON1_MASK;
+                        tooltipButtonMask = InputEvent.BUTTON2_MASK | InputEvent.BUTTON3_MASK;
+                        selectButtonMask = InputEvent.BUTTON1_MASK;
                     }
                     
                     if ((e.getModifiers() & selectButtonMask) != 0) 
@@ -306,11 +314,13 @@ public class JGlossEditor extends JTextPane {
                 return false;
             }
             
-            public void mouseEntered( MouseEvent e) {
+            @Override
+			public void mouseEntered( MouseEvent e) {
                 inComponent = true;
             }
             
-            public void mouseExited( MouseEvent e) {
+            @Override
+			public void mouseExited( MouseEvent e) {
                 inComponent = false;
                 hideToolTip();
             }
@@ -327,7 +337,8 @@ public class JGlossEditor extends JTextPane {
         
         // update display if user changed font
         fontChangeListener = new PropertyChangeListener() {
-            public void propertyChange( java.beans.PropertyChangeEvent e) { 
+            @Override
+			public void propertyChange( java.beans.PropertyChangeEvent e) { 
                 if (e.getPropertyName().equals( "ToolTip.font")) {
                     tooltip.setFont( UIManager.getFont( "ToolTip.font"));
                 }
@@ -336,7 +347,8 @@ public class JGlossEditor extends JTextPane {
         UIManager.getDefaults().addPropertyChangeListener( fontChangeListener);
         
         findAction = new AbstractAction() {
-            public void actionPerformed( ActionEvent e) {
+            @Override
+			public void actionPerformed( ActionEvent e) {
                 Object result = JOptionPane.showInputDialog
                 ( SwingUtilities.getRoot( JGlossEditor.this), 
                     JGloss.messages.getString( "editor.dialog.find"),
@@ -360,7 +372,8 @@ public class JGlossEditor extends JTextPane {
         findAction.setEnabled( false);
         UIUtilities.initAction( findAction, "editor.menu.find");
         findAgainAction = new AbstractAction() {
-            public void actionPerformed( ActionEvent e) {
+            @Override
+			public void actionPerformed( ActionEvent e) {
                 try {
                     int where = find( lastFindText, lastFindPosition + 1);
                     if (where != -1)
@@ -446,7 +459,8 @@ public class JGlossEditor extends JTextPane {
         
         if (tooltipWindow==null && getTopLevelAncestor()!=null) {
             tooltipWindow = new JWindow( (Frame) getTopLevelAncestor()) {
-                public void hide() {
+                @Override
+				public void hide() {
                     super.hide();
                     // work around bug in interaction with the KDE2 window manager:
                     this.removeNotify();
@@ -496,7 +510,8 @@ public class JGlossEditor extends JTextPane {
     /**
      * Sets the document to edit. Calling this method enables the find and document title actions.
      */
-    public void setStyledDocument( StyledDocument _doc) {
+    @Override
+	public void setStyledDocument( StyledDocument _doc) {
         super.setStyledDocument( _doc);
         htmlDoc = (JGlossHTMLDoc) _doc;
     }

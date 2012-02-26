@@ -33,7 +33,8 @@ import org.w3c.dom.Document;
 class LaTeXExporter extends XSLTExporter {
     LaTeXExporter() {}
 
-    protected Document applyFilter(ExportConfiguration configuration, Document doc) {
+    @Override
+	protected Document applyFilter(ExportConfiguration configuration, Document doc) {
         doc = (Document) doc.cloneNode(true);
         boolean escapeUmlauts = configuration.getEncoding()==null ||
             !configuration.getEncoding().toUpperCase().startsWith("UTF");

@@ -65,7 +65,8 @@ public class SplitPaneManager implements PropertyChangeListener {
         splitPane.addPropertyChangeListener( this);
     }
 
-    public void propertyChange( PropertyChangeEvent e) {
+    @Override
+	public void propertyChange( PropertyChangeEvent e) {
         JSplitPane splitPane = (JSplitPane) e.getSource();
         if (JSplitPane.DIVIDER_LOCATION_PROPERTY.equals( e.getPropertyName())) {
             String prefsKey = (String) splitPane.getClientProperty( PROPERTY_KEY_LOCATION);

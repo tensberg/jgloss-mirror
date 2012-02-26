@@ -149,7 +149,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 this.forceParagraph = forceParagraph;
             }
 
-            public void start(HTML.Tag t, MutableAttributeSet a) {
+            @Override
+			public void start(HTML.Tag t, MutableAttributeSet a) {
                 if (forceParagraph) {
                     // Force the creation of an implied paragraph if needed.
                     // An annotation element must always be enclosed by an explicit or
@@ -163,7 +164,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 parseBuffer.addElement( es);
             }
             
-            public void end(HTML.Tag t) {
+            @Override
+			public void end(HTML.Tag t) {
                 ElementSpec es = new ElementSpec( null, ElementSpec.EndTagType);
                 parseBuffer.addElement( es);
             }
@@ -213,7 +215,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
          * @param data Text data to insert in the document.
          * @param pos Position in the document.
          */
-        public void handleText( char[] data, int pos) {
+        @Override
+		public void handleText( char[] data, int pos) {
             this.pos = pos;
             super.handleText( data, pos);
         }
@@ -224,7 +227,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
          * @param t The tag which is closed.
          * @param pos Position in the document.
          */
-        public void handleEndTag( HTML.Tag t, int pos) {
+        @Override
+		public void handleEndTag( HTML.Tag t, int pos) {
             if (t.equals( HTML.Tag.P)) {
                 // make sure end of lines are handled correctly in layout by inserting a '\n'
                 // This is needed when an annotation at the end of a paragraph is removed.
@@ -242,7 +246,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
          * @param errorMsg The error message.
          * @param pos Position at which the error occured.
          */
-        public void handleError( String errorMsg, int pos) {
+        @Override
+		public void handleError( String errorMsg, int pos) {
             System.err.println( "HTML Parser: " + errorMsg + " at " + pos);
         }
 
@@ -295,7 +300,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
      * @param pos Position in the document.
      * @return A reader for a document.
      */
-    public HTMLEditorKit.ParserCallback getReader( int pos) {
+    @Override
+	public HTMLEditorKit.ParserCallback getReader( int pos) {
         reader = new JGlossReader( pos);
         return reader;
     }
@@ -312,7 +318,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
      * @param insertTag The first tag to start inserting into document.
      * @return The new reader.
      */
-    public HTMLEditorKit.ParserCallback getReader( int pos, int popDepth, int pushDepth,
+    @Override
+	public HTMLEditorKit.ParserCallback getReader( int pos, int popDepth, int pushDepth,
                                                    HTML.Tag insertTag) {
         return new JGlossReader( pos, popDepth, pushDepth, insertTag);
     }
@@ -429,7 +436,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
         return new UnannotatedTextFetcher().getText(start, end).toString();
     }
 
-    public Element getParagraphElement(int offset) {
+    @Override
+	public Element getParagraphElement(int offset) {
         Element para = getDefaultRootElement();
         while (!para.isLeaf() && 
                !para.getAttributes().getAttribute(StyleConstants.NameAttribute)
@@ -759,7 +767,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
             startWalk(_start, _end);
         }
 
-        protected boolean processElement(Element elem) {
+        @Override
+		protected boolean processElement(Element elem) {
             if (elem.getName().equals(AnnotationTags.ANNOTATION.getId())) {
                 removeAnnotationElement(elem);
                 return false;
@@ -773,7 +782,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
          * Recurse over children backwards because children may be removed while the algorithm
          * runs, changing the forward iteration order.
          */
-        protected void recurse(Element elem) {
+        @Override
+		protected void recurse(Element elem) {
             for ( int i=elem.getElementCount()-1; i>=0; i--)
                 walk(elem.getElement( i));            
         }
@@ -801,7 +811,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
             return text;
         }
 
-        protected boolean processElement(Element elem) {
+        @Override
+		protected boolean processElement(Element elem) {
             if (elem.getName().equals(HTML.Tag.CONTENT.toString())) {
                 // element spanning some text, add if the text is not part of an annotation
                 AttributeSet as = elem.getAttributes();

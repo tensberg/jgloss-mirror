@@ -70,7 +70,8 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 
         WeakDictionaryChangeListener( LookupModel model) {
             modelRef = new WeakReference( model) {
-                    public boolean enqueue() {
+                    @Override
+					public boolean enqueue() {
                         boolean enqueued = super.enqueue();
                         if (enqueued)
                             Dictionaries.removeDictionaryListChangeListener
@@ -80,7 +81,8 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
                 };
         }
 
-        public void dictionaryListChanged() {
+        @Override
+		public void dictionaryListChanged() {
             LookupModel model = (LookupModel) modelRef.get();
             if (model != null)
                 model.setDictionaries
@@ -170,7 +172,8 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         // the next search mode and repeats the search.
         modelClone.selectSearchMode( 0);
         engine.doLookup( modelClone, new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     if (list.getEntryCount() == 0) try {
                         model.selectSearchMode( model.getSelectedSearchModeIndex() + 1);
                         engine.doLookup( modelClone, this);
@@ -194,11 +197,13 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         list.addToXCVManager( manager);
     }
 
-    public void actionPerformed( ActionEvent e) {
+    @Override
+	public void actionPerformed( ActionEvent e) {
         search( expression.getSelectedItem().toString());
     }
 
-    public void hyperlinkUpdate( HyperlinkEvent e) {
+    @Override
+	public void hyperlinkUpdate( HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             int colon = e.getDescription().indexOf( ':');
             String protocol = e.getDescription().substring( 0, colon);

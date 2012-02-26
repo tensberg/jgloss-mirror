@@ -17,6 +17,7 @@ import java.util.PropertyResourceBundle;
  *
  */
 public class UTF8ResourceBundleControl extends Control {
+	@Override
 	public ResourceBundle newBundle(String baseName, Locale locale,
 			String format, ClassLoader loader, boolean reload)
 			throws IllegalAccessException, InstantiationException, IOException {

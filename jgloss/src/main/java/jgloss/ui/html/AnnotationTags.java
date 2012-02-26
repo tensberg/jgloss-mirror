@@ -80,7 +80,8 @@ public class AnnotationTags extends HTML.Tag {
      * @param o The object to test for equality.
      * @return <CODE>true</CODE> if the object is equal to this tag.
      */
-    public boolean equals( Object o) {
+    @Override
+	public boolean equals( Object o) {
         if (o instanceof HTML.Tag)
             return toString().equals( o.toString());
         return false;

@@ -128,7 +128,8 @@ public class SearchFieldSelection implements Cloneable {
         return this;
     }
 
-    public boolean equals( Object o) {
+    @Override
+	public boolean equals( Object o) {
         return (o instanceof SearchFieldSelection &&
                 equals( (SearchFieldSelection) o));
     }
@@ -141,7 +142,8 @@ public class SearchFieldSelection implements Cloneable {
             matchWord == sfs.matchWord;
     }
 
-    public Object clone() {
+    @Override
+	public Object clone() {
         try {
             return super.clone();
         } catch (CloneNotSupportedException ex) { return null; }

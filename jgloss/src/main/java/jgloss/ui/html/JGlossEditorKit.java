@@ -49,6 +49,7 @@ import javax.swing.text.html.StyleSheet;
 import javax.swing.text.html.parser.AttributeList;
 import javax.swing.text.html.parser.ContentModel;
 import javax.swing.text.html.parser.DTD;
+import javax.swing.text.html.parser.DTDConstants;
 import javax.swing.text.html.parser.DocumentParser;
 import javax.swing.text.html.parser.ParserDelegator;
 import javax.swing.text.html.parser.TagElement;
@@ -129,15 +130,18 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 htmlTag = AnnotationTags.getAnnotationTagEqualTo( htmlTag);
         }
 
-        public HTML.Tag getHTMLTag() {
+        @Override
+		public HTML.Tag getHTMLTag() {
             return htmlTag;
         }
         
-        public boolean breaksFlow() {
+        @Override
+		public boolean breaksFlow() {
             return htmlTag.breaksFlow();
         }
 
-        public boolean isPreformatted() {
+        @Override
+		public boolean isPreformatted() {
             return htmlTag.isPreformatted();
         }
     }
@@ -164,7 +168,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
         /**
          * Parse a document. This forwards the request to the underlying parser.
          */
-        public void parse( Reader r, HTMLEditorKit.ParserCallback cb,
+        @Override
+		public void parse( Reader r, HTMLEditorKit.ParserCallback cb,
                            boolean ignoreCharset) throws IOException {
             parser.parse( r, cb, ignoreCharset);
         }
@@ -211,7 +216,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          *        should be ignored. This parameter will be ignored.
          * @exception IOException
          */
-        public void parse( Reader r, HTMLEditorKit.ParserCallback cb,
+        @Override
+		public void parse( Reader r, HTMLEditorKit.ParserCallback cb,
                            boolean ignoreCharset) throws IOException {
             super.parse( r, cb, true);
         }
@@ -235,7 +241,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @param fictional <CODE>true</CODE> if the element does not exist in the original document.
          * @return The new tag element.
          */
-        protected TagElement makeTag( javax.swing.text.html.parser.Element e, boolean fictional) {
+        @Override
+		protected TagElement makeTag( javax.swing.text.html.parser.Element e, boolean fictional) {
             return new JGlossTagElement( e, fictional);
         }
     }
@@ -256,7 +263,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @param elem The element to create the view for.
          * @return The newly created view.
          */
-        public View create( Element elem) {
+        @Override
+		public View create( Element elem) {
             Object name = elem.getAttributes().getAttribute( StyleConstants.NameAttribute);
             AttributeSet a = elem.getAttributes();
             if (name.equals( AnnotationTags.ANNOTATION))
@@ -329,7 +337,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * <CODE>ParagraphView.Row</CODE> by calling <CODE>setParent(null)</CODE>, the 
          * <CODE>LogicalView</CODE> has to be made parent again for the layout to work.
          */
-        public void setParent( View parent) {
+        @Override
+		public void setParent( View parent) {
             if (parent==null && logicalViewParent!=null) {
                 // Instead of removing the parent, test if the logical view should be made
                 // parent again.
@@ -362,7 +371,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the minimum span of the view. If compact view is set, the width of the
          * translation view is ignored and only the width of the word is returned.
          */
-        public float getMinimumSpan( int axis) {
+        @Override
+		public float getMinimumSpan( int axis) {
             if (axis==View.X_AXIS && compactView)
                 // view 0 is the view for the WORD element
                 return getView( 0).getMinimumSpan( axis);
@@ -374,7 +384,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the preferred span of the view. If compact view is set, the width of the
          * translation view is ignored and only the width of the word is returned.
          */
-        public float getPreferredSpan( int axis) {
+        @Override
+		public float getPreferredSpan( int axis) {
             if (axis==View.X_AXIS && compactView)
                 // view 0 is the view for the WORD element
                 return getView( 0).getPreferredSpan( axis);
@@ -386,7 +397,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the maximum span of the view. Overridden to prevent it growing beyond
          * the preferred span.
          */
-        public float getMaximumSpan( int axis) {
+        @Override
+		public float getMaximumSpan( int axis) {
             return getPreferredSpan( axis);
         }
 
@@ -394,7 +406,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the alignment of this view. Overridden because the alignment
          * has to be changed if the annotation is not displayed.
          */
-        public float getAlignment( int axis) {
+        @Override
+		public float getAlignment( int axis) {
             if (axis == View.Y_AXIS) {
 
                 return 0.25f;
@@ -432,7 +445,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
         /**
          * Returns the minimum span of the view.
          */
-        public float getMinimumSpan( int axis) {
+        @Override
+		public float getMinimumSpan( int axis) {
             if (axis==View.X_AXIS && getView( 1)!=null)
                 // view 1 is the view for the BASETEXT element
                 return getView( 1).getMinimumSpan( axis);
@@ -444,7 +458,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the preferred span of the view. For the x axis, the width of the base
          * is returned and the width of the reading ignored. This allows bases to align properly.
          */
-        public float getPreferredSpan( int axis) {
+        @Override
+		public float getPreferredSpan( int axis) {
             if (axis==View.X_AXIS && getView( 1)!=null)
                 // view 1 is the view for the BASETEXT element
                 return getView( 1).getPreferredSpan( axis);
@@ -456,7 +471,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the maximum span of the view. Overridden to prevent it to grow beyond
          * the preferred span.
          */
-        public float getMaximumSpan( int axis) {
+        @Override
+		public float getMaximumSpan( int axis) {
             return getPreferredSpan( axis);
         }
 
@@ -472,7 +488,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Returns the alignment of this view. Overridden because the alignment
          * has to be changed if the annotation is not displayed.
          */
-        public float getAlignment( int axis) {
+        @Override
+		public float getAlignment( int axis) {
             if (axis == View.Y_AXIS) {
                 if (!showReading)
                     return VAdjustedView.BASE_TEXT_ALIGNMENT;
@@ -494,14 +511,16 @@ public class JGlossEditorKit extends HTMLEditorKit {
         /**
          * Centers the view along the x-axis.
          */
-        public float getAlignment( int axis) {
+        @Override
+		public float getAlignment( int axis) {
             if (axis == View.X_AXIS)
                 return 0.5f;
             else
                 return super.getAlignment( axis);
         }
 
-        public float getMinimumSpan( int axis) {
+        @Override
+		public float getMinimumSpan( int axis) {
             if (axis == X_AXIS) {
                 float span = 0;
                 for ( int i=0; i<getViewCount(); i++) {
@@ -524,7 +543,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * is used instead of the one returned by <CODE>getPreferredSpan</CODE> so that
          * the word will always have enough space to display the whole reading.
          */
-        public float getPreferredSpan( int axis) {
+        @Override
+		public float getPreferredSpan( int axis) {
             if (axis == X_AXIS) {
                 float span = 0;
                 for ( int i=0; i<getViewCount(); i++) {
@@ -593,7 +613,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @param g Graphics object used for drawing.
          * @param allocation The allocation the view should be rendered into.
          */
-        public void paint( Graphics g, Shape allocation) {
+        @Override
+		public void paint( Graphics g, Shape allocation) {
             if (isHidden())
                 return;
             if (getParent() == null)
@@ -643,7 +664,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Return the text in the given span, possibly shortened to 
          * {@link JGlossEditorKit#MAX_TRANSLATION_LENGTH MAX_TRANSLATION_LENGTH}.
          */
-        public Segment getText( int p0, int p1) {
+        @Override
+		public Segment getText( int p0, int p1) {
             if (p1-p0 <= MAX_TRANSLATION_LENGTH)
                 return super.getText( p0, p1);
             else try {
@@ -692,7 +714,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @param axis The axis for which the alignment is inquired.
          * @return The alignment.
          */
-        public float getAlignment( int axis) {
+        @Override
+		public float getAlignment( int axis) {
             if (axis!=View.Y_AXIS || alignment == DEFAULT_ALIGNMENT)
                 return super.getAlignment( axis);
             else
@@ -702,7 +725,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
         /**
          * Overridden to always break the line at the last char. 
          */
-        public int getBreakWeight( int axis, float pos, float len) {
+        @Override
+		public int getBreakWeight( int axis, float pos, float len) {
             /*
              * J2SE 1.4 introduces a new, more
              * sophisticated way to choose where to break a line with class 
@@ -810,7 +834,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
      *
      * @return The MIME content type.
      */
-    public String getContentType() {
+    @Override
+	public String getContentType() {
         return JGloss.messages.getString( "jgloss.mimetype");
     }
 
@@ -820,7 +845,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
      *
      * @return An instance of {@link JGlossParserWrapper JGlossParserWrapper}.
      */
-    public HTMLEditorKit.Parser getParser() {
+    @Override
+	public HTMLEditorKit.Parser getParser() {
         return new JGlossParserWrapper();
     }
 
@@ -831,7 +857,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
      *
      * @return The new document.
      */
-    public Document createDefaultDocument() {
+    @Override
+	public Document createDefaultDocument() {
         StyleSheet styles = new StyleSheet();
         styles.addStyleSheet(getStyleSheet());
         JGlossHTMLDoc doc = new JGlossHTMLDoc( styles, getParser());
@@ -843,7 +870,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
      *
      * @return The view factory.
      */
-    public ViewFactory getViewFactory() {
+    @Override
+	public ViewFactory getViewFactory() {
         return viewFactory;
     }
 
@@ -885,27 +913,27 @@ public class JGlossEditorKit extends HTMLEditorKit {
                                                     null);
             javax.swing.text.html.parser.Element reading = 
                 dtd.defineElement( AnnotationTags.READING.getId(),
-                                   DTD.MODEL, false, false, pcdata, null, null, null);
+                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
             javax.swing.text.html.parser.Element base = 
                 dtd.defineElement( AnnotationTags.BASETEXT.getId(),
-                                   DTD.MODEL, false, false, pcdata, null, null, null);
+                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
             javax.swing.text.html.parser.Element translation = 
                 dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
-                                   DTD.MODEL, false, false, pcdata, null, null, null);
+                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
             
-            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE, DTD.CDATA, 0, null, null, al);
-            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE_READING, DTD.CDATA, 0, null, null, al);
+            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE, DTDConstants.CDATA, 0, null, null, al);
+            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE_READING, DTDConstants.CDATA, 0, null, null, al);
 
             // The content model of <anno> should really be (word & translation)*,
             // but character level attributes created by a <font> or <a href> tag can be embedded
             // in an annotation element when the document is written by the HTMLWriter,
             // so we have to use DTD.ANY.
             dtd.defineElement( AnnotationTags.ANNOTATION.getId(),
-                               DTD.ANY, false, false, null, null, null, al);
+                               DTDConstants.ANY, false, false, null, null, null, al);
             dtd.defineElement( AnnotationTags.WORD.getId(),
-                               DTD.ANY, false, false, null, null, null, null);
+                               DTDConstants.ANY, false, false, null, null, null, null);
             dtd.defineElement( AnnotationTags.READING_BASETEXT.getId(),
-                               DTD.ANY, false, false, null, null, null, null);
+                               DTDConstants.ANY, false, false, null, null, null, null);
             
             javax.swing.text.html.parser.Element annotation = dtd.getElement
                 ( AnnotationTags.ANNOTATION.getId());
@@ -970,11 +998,13 @@ public class JGlossEditorKit extends HTMLEditorKit {
         return changed;
     }
 
-    public void setStyleSheet(StyleSheet _jglossStyleSheet) {
+    @Override
+	public void setStyleSheet(StyleSheet _jglossStyleSheet) {
         jglossStyleSheet = _jglossStyleSheet;
     }
 
-    public StyleSheet getStyleSheet() {
+    @Override
+	public StyleSheet getStyleSheet() {
     if (jglossStyleSheet == null) {
         jglossStyleSheet = new StyleSheet();
         try {

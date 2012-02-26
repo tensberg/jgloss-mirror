@@ -21,10 +21,6 @@
  */
 
 package jgloss.parser;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.*;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -500,7 +496,8 @@ public class Chasen {
         Timer timer = new Timer();
         final Thread currentThread = Thread.currentThread();
         timer.schedule( new TimerTask() {
-                public void run() {
+                @Override
+				public void run() {
                     // if the run method is called, the started process didn't finish in time
                     currentThread.interrupt();
                 }
@@ -515,7 +512,8 @@ public class Chasen {
     /**
      * Terminate Chasen process if still running.
      */
-    protected void finalize() {
+    @Override
+	protected void finalize() {
         dispose();
     }
 } // class Chasen

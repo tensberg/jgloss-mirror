@@ -75,7 +75,8 @@ class LongestAnnotationParameter extends AbstractParameter {
         super(elem);
     }
 
-    protected void initFromElement( Element elem) {
+    @Override
+	protected void initFromElement( Element elem) {
         super.initFromElement(elem);
         initTypeSelector(elem.getAttribute(ParameterFactory.Attributes.TYPE));
     }
@@ -95,7 +96,8 @@ class LongestAnnotationParameter extends AbstractParameter {
             throw new IllegalArgumentException(type);
     }
 
-    public Object getValue( JGlossFrameModel source, URL systemId) {
+    @Override
+	public Object getValue( JGlossFrameModel source, URL systemId) {
         String longestAnnotation = defaultValue;
 
         AnnotationListModel model = source.getAnnotationListModel();

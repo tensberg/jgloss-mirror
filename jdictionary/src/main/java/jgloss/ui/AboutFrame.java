@@ -42,7 +42,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import jgloss.JGloss;
 
@@ -85,7 +87,8 @@ public class AboutFrame extends JFrame {
     public static void createShowAction( String prefix) {
         synchronized (showActionLock) {
             showAction = new AbstractAction() {
-                    public void actionPerformed( ActionEvent e) {
+                    @Override
+					public void actionPerformed( ActionEvent e) {
                         getFrame().show();
                     }
                 };
@@ -154,7 +157,8 @@ public class AboutFrame extends JFrame {
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
         b.add( new JButton( new AbstractAction( JGloss.messages.getString( "about.showlicense")) {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     if (license == null)
                         createLicenseFrame();
                     license.setVisible( true);
@@ -162,7 +166,8 @@ public class AboutFrame extends JFrame {
             }));
         b.add( Box.createHorizontalStrut( 5));
         b.add( new JButton( new AbstractAction( JGloss.messages.getString( "button.close")) {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     hide();
                 }
             }));
@@ -172,7 +177,7 @@ public class AboutFrame extends JFrame {
         p.add( b);
         getContentPane().add( p, BorderLayout.SOUTH);
 
-        setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE);
+        setDefaultCloseOperation( WindowConstants.HIDE_ON_CLOSE);
         pack();
         setResizable( false);
     }
@@ -195,12 +200,12 @@ public class AboutFrame extends JFrame {
             ta.setEditable( false);
             ta.setCaretPosition( 0);
             ta.setFont( new Font( "Monospaced", Font.PLAIN, 11));
-            JScrollPane p = new JScrollPane( ta, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            JScrollPane p = new JScrollPane( ta, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             license.getContentPane().setLayout( new GridLayout( 1, 1));
             license.getContentPane().add( p);
             license.setSize( 600, 400);
-            license.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE);
+            license.setDefaultCloseOperation( WindowConstants.HIDE_ON_CLOSE);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

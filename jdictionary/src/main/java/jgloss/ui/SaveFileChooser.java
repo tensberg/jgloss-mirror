@@ -46,7 +46,8 @@ public class SaveFileChooser extends JFileChooser {
      * {@link ExtensionFileFilter ExtensionFileFilter}, the selected extension will be added
      * to the file name.
      */
-    public File getSelectedFile() {
+    @Override
+	public File getSelectedFile() {
         File f = super.getSelectedFile();
         if (f != null && 
             getFileFilter() instanceof ExtensionFileFilter)
@@ -59,7 +60,8 @@ public class SaveFileChooser extends JFileChooser {
      * Intercepts the normal approval to show a overwrite confirmation dialog if neccessary.
      * If the user cancels the overwriting the selection will not be approved.
      */
-    public void approveSelection() {
+    @Override
+	public void approveSelection() {
         File f = getSelectedFile();
         if (f!=null && f.exists()) {
             String overwrite = JGloss.messages.getString( "button.overwrite");

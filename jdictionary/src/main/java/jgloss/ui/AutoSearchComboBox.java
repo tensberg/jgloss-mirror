@@ -87,7 +87,8 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         private Insets textInsets = new Insets(0, 0, 0, 0);
         private Rectangle textBounds = new Rectangle();
 
-        public Component getListCellRendererComponent(JList list, Object value, 
+        @Override
+		public Component getListCellRendererComponent(JList list, Object value, 
                                                       int index, boolean isSelected, 
                                                       boolean cellHasFocus) {
 
@@ -105,7 +106,8 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
 
         }
 
-        public void paintComponent(Graphics g) { 
+        @Override
+		public void paintComponent(Graphics g) { 
 
             FontMetrics fm = g.getFontMetrics();
             Insets insets = this.getInsets(textInsets);
@@ -136,7 +138,8 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
             private DefinitionRenderer highlightRenderer = new DefinitionRenderer();
             private Font plainFont = null;
             private Font boldFont = null;
-            public Component getListCellRendererComponent( JList list, Object value,
+            @Override
+			public Component getListCellRendererComponent( JList list, Object value,
                                                            int index,
                                                            boolean isSelected,
                                                            boolean cellHasFocus) {
@@ -240,11 +243,13 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         engine.doLookup( tempModel);
     }
 
-    public void startLookup( String description) {
+    @Override
+	public void startLookup( String description) {
         startLookup();
     }
 
-    public void startLookup( LookupModel model) {
+    @Override
+	public void startLookup( LookupModel model) {
         startLookup();
     }
 
@@ -252,30 +257,36 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         items = new ArrayList( limit + 20);
     }
 
-    public void dictionary( Dictionary d) {
+    @Override
+	public void dictionary( Dictionary d) {
         items.add( new Object[] { Dictionary.class, JGloss.messages.getString
                                   ( "wordlookup.matches",
                                     new String[] { d.getName() }) });
     }
 
-    public void dictionaryEntry( DictionaryEntry de) {
+    @Override
+	public void dictionaryEntry( DictionaryEntry de) {
         tempBuffer.setLength( 0);
         currentFormatter.format( de, tempBuffer);
         items.add( new Object[] { DictionaryEntry.class, tempBuffer.toString() });
     }
 
-    public void exception( SearchException ex){
+    @Override
+	public void exception( SearchException ex){
     }
 
-    public void note( String note) {
+    @Override
+	public void note( String note) {
     }
 
-    public void endLookup() {
+    @Override
+	public void endLookup() {
         final List newItems = items;
         items = null;
 
         Runnable updater = new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     // Changing the combo box model has the side effect of calling
                     // configureEditor. This messes up the editor text and is unneccessary
                     // anyway, so switch it off.
@@ -295,19 +306,23 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         }
     }
 
-    public void insertUpdate( DocumentEvent e) {
+    @Override
+	public void insertUpdate( DocumentEvent e) {
         doLookup();
     }
 
-    public void removeUpdate( DocumentEvent e) {
+    @Override
+	public void removeUpdate( DocumentEvent e) {
         doLookup();
     }
 
-    public void changedUpdate( DocumentEvent e) {
+    @Override
+	public void changedUpdate( DocumentEvent e) {
         doLookup();
     }
 
-    public void setSelectedItem( Object o) {
+    @Override
+	public void setSelectedItem( Object o) {
         if (o instanceof String) {
             dontDoLookup = true;
             super.setSelectedItem( o);
@@ -323,7 +338,8 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
                 }*/
     }
 
-    public void configureEditor( ComboBoxEditor editor, Object anObject) {
+    @Override
+	public void configureEditor( ComboBoxEditor editor, Object anObject) {
         // Changing the combo box model in endLookup has the side effect of calling
         // configureEditor. Since this messes up the editor text and is unneccessary
         // anyway, it can be switched off by setting dontConfigureEditor
@@ -333,7 +349,8 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         super.configureEditor( editor, anObject);
     }
 
-    protected void finalize() {
+    @Override
+	protected void finalize() {
         engine.dispose();
     }
 } // class AutoSearchComboBox

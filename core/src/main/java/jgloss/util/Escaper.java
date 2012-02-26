@@ -43,7 +43,7 @@ public interface Escaper {
     String escape(String text);
 
     /**
-     * Escape all special characters in a string buffer. The modification may be done in place.
+     * Escape all special characters in a string builder. The modification may be done in place.
      */
-    StringBuffer escape(StringBuffer text);
+    StringBuilder escape(StringBuilder text);
 } // interface Escaper

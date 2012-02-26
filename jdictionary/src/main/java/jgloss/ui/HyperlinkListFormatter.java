@@ -18,12 +18,14 @@ class HyperlinkListFormatter implements ListFormatter {
         parent = _parent;
     }
 
-    public ListFormatter newList( StringBuffer _buffer, int _length) {
+    @Override
+	public ListFormatter newList( StringBuffer _buffer, int _length) {
         parent.newList( _buffer, _length);
         return this;
     }
 
-    public ListFormatter addItem( Object item) {
+    @Override
+	public ListFormatter addItem( Object item) {
         String itemString = item.toString();
 
         tempBuffer.setLength( 0);
@@ -37,15 +39,18 @@ class HyperlinkListFormatter implements ListFormatter {
         return this;
     }
 
-    public StringBuffer endList() {
+    @Override
+	public StringBuffer endList() {
         return parent.endList();
     }
 
-    public StringBuffer getBuffer() {
+    @Override
+	public StringBuffer getBuffer() {
         return parent.getBuffer();
     }
 
-    public Pattern getPattern() {
+    @Override
+	public Pattern getPattern() {
         return parent.getPattern();
     }
 

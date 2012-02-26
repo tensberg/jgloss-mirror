@@ -130,7 +130,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * and the {@link #pattern pattern} is tested against it. If the pattern matches, the file
          * is accepted and {@link #maxConfidence maxConfidence} is returned.
          */
-        public DictionaryFactory.TestResult isInstance( String descriptor) {
+        @Override
+		public DictionaryFactory.TestResult isInstance( String descriptor) {
 			float confidence = ZERO_CONFIDENCE;
 			String reason = "";
 			
@@ -177,11 +178,13 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         /**
          * Returns the confidence passed to the constructor.
          */
-        public float getMaxConfidence() { return maxConfidence; }
+        @Override
+		public float getMaxConfidence() { return maxConfidence; }
         /**
          * Returns the dictionary format name passed to the constructor.
          */
-        public String getName() { return name; }
+        @Override
+		public String getName() { return name; }
 
         /**
          * Creates a new dictionary instance using 
@@ -189,14 +192,15 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * The constructor is passed a <code>File</code> wrapping the <code>descriptor</code> as only
          * argument.
          */
-        public Dictionary createInstance( String descriptor) 
+        @Override
+		public Dictionary createInstance( String descriptor) 
             throws DictionaryFactory.InstantiationException {
             try {
                 return (Dictionary) dictionaryConstructor.newInstance
                     ( getConstructorParameters(descriptor));
             } catch (InvocationTargetException ex) {
                 throw new DictionaryFactory.InstantiationException
-                    ( (Exception) ((InvocationTargetException) ex).getTargetException());
+                    ( (Exception) ex.getTargetException());
             } catch (Exception ex) {
                 // should never happen
                 throw new DictionaryFactory.InstantiationException( ex);
@@ -215,7 +219,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             return new Object[] { new File(descriptor) };
         }
 
-        public Class getDictionaryClass( String descriptor) {
+        @Override
+		public Class getDictionaryClass( String descriptor) {
             return dictionaryConstructor.getDeclaringClass();
         }
     } // class Implementation
@@ -338,15 +343,18 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         supportedAttributes = new HashMap( 11);
     }
 
-    public boolean supports( SearchMode mode, boolean fully) {
+    @Override
+	public boolean supports( SearchMode mode, boolean fully) {
         return supportedSearchModes.containsKey( mode);
     }
 
-    public Set getSupportedAttributes() {
+    @Override
+	public Set getSupportedAttributes() {
         return supportedAttributes.keySet();
     }
 
-    public Set getAttributeValues( Attribute att) {
+    @Override
+	public Set getAttributeValues( Attribute att) {
         if (!supportedAttributes.containsKey( att))
             return null;
 
@@ -357,7 +365,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             return out;
     }
     
-    public SearchFieldSelection getSupportedFields( SearchMode mode) {
+    @Override
+	public SearchFieldSelection getSupportedFields( SearchMode mode) {
         SearchFieldSelection fields = (SearchFieldSelection) supportedSearchModes.get( mode);
         if (fields != null)
             return fields;
@@ -365,7 +374,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             throw new IllegalArgumentException();
     }
 
-    public boolean loadIndex() throws IndexException {
+    @Override
+	public boolean loadIndex() throws IndexException {
         // rebuild the index if the dictionary was changed after the index was created
         if (indexFile.lastModified() < dicfile.lastModified()) {
             indexFile.delete();
@@ -394,7 +404,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         return false;
     }
 
-    public void buildIndex() throws IndexException {
+    @Override
+	public void buildIndex() throws IndexException {
         try {
             indexContainer = new FileIndexContainer( indexFile, true);
             if (!indexContainer.hasIndex( binarySearchIndex.getType())) {
@@ -443,11 +454,13 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Return a character handler which understands the character encoding format used by this
      * dictionary.
      */
-    public EncodedCharacterHandler getEncodedCharacterHandler() {
+    @Override
+	public EncodedCharacterHandler getEncodedCharacterHandler() {
         return characterHandler;
     }
 
-    public ResultIterator search( SearchMode searchmode, Object[] parameters) throws SearchException {
+    @Override
+	public ResultIterator search( SearchMode searchmode, Object[] parameters) throws SearchException {
         if (searchmode == ExpressionSearchModes.EXACT ||
             searchmode == ExpressionSearchModes.PREFIX ||
             searchmode == ExpressionSearchModes.SUFFIX ||
@@ -579,7 +592,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Create a dictionary entry from a marker, which is the start offset of the entry.
      * Used from {@link BaseEntry.BaseEntryRef BaseEntryRef} to recreate a dictionary entry.
      */
-    public DictionaryEntry createEntryFromMarker( int marker) throws SearchException {
+    @Override
+	public DictionaryEntry createEntryFromMarker( int marker) throws SearchException {
         dictionary.position( marker);
         ByteBuffer entry = dictionary.slice();
         while (!isEntrySeparator( entry.get()))
@@ -766,7 +780,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      */
     protected abstract DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException;
     
-    public void dispose() {
+    @Override
+	public void dispose() {
         try {
             dicchannel.close();
             if (indexContainer != null)
@@ -781,7 +796,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      *
      * @return The name of this dictionary.
      */
-    public String getName() {
+    @Override
+	public String getName() {
         return name;
     }
     
@@ -895,7 +911,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     protected abstract DictionaryEntryField getFieldType( ByteBuffer buf, int entryStart,
                                                           int entryEnd, int location);
 
-    public int compare( int pos1, int pos2) throws IndexException {
+    @Override
+	public int compare( int pos1, int pos2) throws IndexException {
         try {
             return compare( dictionary, pos1, Integer.MAX_VALUE, dictionaryDuplicate, pos2);
         } catch (java.nio.charset.CharacterCodingException ex) {
@@ -903,7 +920,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         }
     }
 
-    public int compare( ByteBuffer data, int position) throws IndexException {
+    @Override
+	public int compare( ByteBuffer data, int position) throws IndexException {
         try {
             return compare( data, 0, data.limit(), dictionary, position);
         } catch (CharacterCodingException ex) {
@@ -954,7 +972,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         return 0; // equality
     }
 
-    public Indexable.CharData getChar( int position, CharData result) throws IndexException {
+    @Override
+	public Indexable.CharData getChar( int position, CharData result) throws IndexException {
         if (result == null)
             result = new Indexable.CharData();
         dictionary.position( position);
@@ -992,8 +1011,10 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             generateNextEntry();
         }
 
-        public boolean hasNext() { return nextEntry!=null || deferredException!=null; }
-        public DictionaryEntry next() throws SearchException, NoSuchElementException {
+        @Override
+		public boolean hasNext() { return nextEntry!=null || deferredException!=null; }
+        @Override
+		public DictionaryEntry next() throws SearchException, NoSuchElementException {
             if (!hasNext())
                 throw new NoSuchElementException();
 

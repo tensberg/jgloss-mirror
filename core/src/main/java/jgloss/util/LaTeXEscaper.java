@@ -76,7 +76,8 @@ public class LaTeXEscaper extends AbstractEscaper {
         escapeMap = escapeUmlauts ? UMLAUT_ESCAPE_MAP : DEFAULT_ESCAPE_MAP;
     }
 
-    protected Map getEscapeMap() {
+    @Override
+	protected Map getEscapeMap() {
         return escapeMap;
     }
 } // class LaTeXEscaper

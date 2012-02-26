@@ -41,13 +41,16 @@ class BooleanParameter extends UIParameter {
         box = new JCheckBox( label);
     }
 
-    public Component getComponent() { return box; }
+    @Override
+	public Component getComponent() { return box; }
 
-    public Object getValue( JGlossFrameModel source, URL systemId) {
+    @Override
+	public Object getValue( JGlossFrameModel source, URL systemId) {
         return Boolean.valueOf( box.isSelected()); 
     }
 
-    public void loadFromPrefs() {
+    @Override
+	public void loadFromPrefs() {
         box.setSelected( JGloss.prefs.getBoolean( prefsKey, "true".equalsIgnoreCase( defaultValue)));
     }
 } // class BooleanParameter

@@ -95,7 +95,7 @@ public class WadokuJT extends FileBasedDictionary {
         StringBuffer out = new StringBuffer( 128);
         while (r.hasNext()) {
             out.setLength( 0);
-            DictionaryEntry de = (DictionaryEntry) r.next();
+            DictionaryEntry de = r.next();
             System.err.println( de);
             System.err.println( formatter.format( de, out).toString());
         }
@@ -272,7 +272,8 @@ public class WadokuJT extends FileBasedDictionary {
         super( dicfile, "UTF-8");
     }
 
-    protected void initSupportedAttributes() {
+    @Override
+	protected void initSupportedAttributes() {
         super.initSupportedAttributes();
         
         supportedAttributes.putAll( mapper.getAttributes());
@@ -291,7 +292,8 @@ public class WadokuJT extends FileBasedDictionary {
         return new UTF8CharacterHandler();
     }
 
-    protected boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field) {
+    @Override
+	protected boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field) {
         if (location == 0)
             return true;
 
@@ -314,7 +316,8 @@ public class WadokuJT extends FileBasedDictionary {
         }
     }
 
-    protected boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
+    @Override
+	protected boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
             byte b = entry.get( location);
             if (b==';' || b=='|' || b==10 || b==13)
@@ -336,7 +339,8 @@ public class WadokuJT extends FileBasedDictionary {
         }
     }
 
-    protected DictionaryEntryField moveToNextField( ByteBuffer buf, int character,
+    @Override
+	protected DictionaryEntryField moveToNextField( ByteBuffer buf, int character,
                                                     DictionaryEntryField field) {
         if (field == null) {
             // first call to moveToNextField
@@ -378,7 +382,8 @@ public class WadokuJT extends FileBasedDictionary {
         return field;
     }
 
-    protected DictionaryEntryField getFieldType( ByteBuffer buf, int entryStart, int entryEnd,
+    @Override
+	protected DictionaryEntryField getFieldType( ByteBuffer buf, int entryStart, int entryEnd,
                                                  int position) {
         // count field delimiters from location to entry start or end (whatever is closer)
         // note: entryEnd is the first position not to be read
@@ -422,7 +427,8 @@ public class WadokuJT extends FileBasedDictionary {
         }
     }
 
-    protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
+    @Override
+	protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
         try {
             DictionaryEntry out = null; 
             List wordlist = new ArrayList( 10);
@@ -739,14 +745,16 @@ public class WadokuJT extends FileBasedDictionary {
         }
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return FORMAT_NAME + " " + getName();
     }
 
     /**
      * Escape all dictionary special characters.
      */
-    protected boolean escapeChar( char c) {
+    @Override
+	protected boolean escapeChar( char c) {
         switch (c) {
         case 10:
         case 13:

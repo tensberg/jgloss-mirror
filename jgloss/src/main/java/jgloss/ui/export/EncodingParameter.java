@@ -51,9 +51,11 @@ class EncodingParameter extends UIParameter {
         box.add( encodings);
     }
 
-    public Component getComponent() { return box; }
+    @Override
+	public Component getComponent() { return box; }
 
-    public Object getValue( JGlossFrameModel source, URL systemId) {
+    @Override
+	public Object getValue( JGlossFrameModel source, URL systemId) {
         return getValue();
     }
 
@@ -61,7 +63,8 @@ class EncodingParameter extends UIParameter {
         return encodings.getSelectedItem().toString();
     }
 
-    public void loadFromPrefs() {
+    @Override
+	public void loadFromPrefs() {
         encodings.setSelectedItem( JGloss.prefs.getString( prefsKey, defaultValue));
     }
 } // class EncodingParameter

@@ -331,11 +331,13 @@ public class RomajiTranslator {
 
         }
   
-        public String getName() {
+        @Override
+		public String getName() {
             return name;
         }
     
-        public String toString() {
+        @Override
+		public String toString() {
             return getName();
         }
     
@@ -506,11 +508,13 @@ public class RomajiTranslator {
             translation.put("cho", "\u30C1\u30E7");
         }
     
-        public String getName() {
+        @Override
+		public String getName() {
             return name;
         }
     
-        public String toString() {
+        @Override
+		public String toString() {
             return getName();
         }
 

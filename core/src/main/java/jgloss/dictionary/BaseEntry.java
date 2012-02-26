@@ -83,7 +83,8 @@ abstract class BaseEntry implements DictionaryEntry {
             dictionary = entry.getDictionary();
         }
 
-        public DictionaryEntry getEntry() throws SearchException {
+        @Override
+		public DictionaryEntry getEntry() throws SearchException {
             DictionaryEntry out = (DictionaryEntry) entryRef.get();
             if (out == null) { // garbage collected
                 out = ((MarkerDictionary) dictionary).createEntryFromMarker( entryMarker);
@@ -115,40 +116,50 @@ abstract class BaseEntry implements DictionaryEntry {
         dictionary = _dictionary;
     }
 
-    public AttributeSet getGeneralAttributes() {
+    @Override
+	public AttributeSet getGeneralAttributes() {
         return generalA;
     }
  
-    public abstract String getWord( int alternative);
+    @Override
+	public abstract String getWord( int alternative);
 
-    public abstract int getWordAlternativeCount();
+    @Override
+	public abstract int getWordAlternativeCount();
 
-    public abstract AttributeSet getWordAttributes( int alternative);
+    @Override
+	public abstract AttributeSet getWordAttributes( int alternative);
 
-    public AttributeSet getWordAttributes() {
+    @Override
+	public AttributeSet getWordAttributes() {
         return wordA;
     }
 
-    public String getReading( int alternative) {
+    @Override
+	public String getReading( int alternative) {
         if (alternative != 0)
             throw new IllegalArgumentException();
         return reading;
     }
 
-    public int getReadingAlternativeCount() { return 1; }
+    @Override
+	public int getReadingAlternativeCount() { return 1; }
 
-    public AttributeSet getReadingAttributes( int alternative) {
+    @Override
+	public AttributeSet getReadingAttributes( int alternative) {
         if (alternative != 0)
             throw new IllegalArgumentException();
 
         return emptySet.setParent( generalA);
     }
 
-    public AttributeSet getReadingAttributes() {
+    @Override
+	public AttributeSet getReadingAttributes() {
         return emptySet.setParent( generalA);
     }
 
-    public String getTranslation( int rom, int crm, int synonym) {
+    @Override
+	public String getTranslation( int rom, int crm, int synonym) {
         if (synonym != 0)
             throw new IllegalArgumentException();
         try {
@@ -158,9 +169,11 @@ abstract class BaseEntry implements DictionaryEntry {
         }
     }
 
-    public int getTranslationRomCount() { return translations.length; }
+    @Override
+	public int getTranslationRomCount() { return translations.length; }
 
-    public int getTranslationCrmCount( int rom) {
+    @Override
+	public int getTranslationCrmCount( int rom) {
         try {
             return translations[rom].length;
         } catch (ArrayIndexOutOfBoundsException ex) {
@@ -168,15 +181,18 @@ abstract class BaseEntry implements DictionaryEntry {
         }
     }
 
-    public int getTranslationSynonymCount( int rom, int crm) { return 1; }
+    @Override
+	public int getTranslationSynonymCount( int rom, int crm) { return 1; }
 
-    public AttributeSet getTranslationAttributes( int rom, int crm, int synonym) {
+    @Override
+	public AttributeSet getTranslationAttributes( int rom, int crm, int synonym) {
         if (synonym != 0)
             throw new IllegalArgumentException();
         return getTranslationAttributes( rom, crm);
     }
 
-    public AttributeSet getTranslationAttributes( int rom, int crm) {
+    @Override
+	public AttributeSet getTranslationAttributes( int rom, int crm) {
         try {
             if (crm<0 || crm >= translations[rom].length)
                 throw new IllegalArgumentException();
@@ -189,7 +205,8 @@ abstract class BaseEntry implements DictionaryEntry {
         }
     }
 
-    public AttributeSet getTranslationAttributes( int rom) {
+    @Override
+	public AttributeSet getTranslationAttributes( int rom) {
         try {
             if (translationRomA[rom] != null)
                 return translationRomA[rom];
@@ -200,13 +217,16 @@ abstract class BaseEntry implements DictionaryEntry {
         }
     }
 
-    public AttributeSet getTranslationAttributes() {
+    @Override
+	public AttributeSet getTranslationAttributes() {
         return translationA;
     }
 
-    public Dictionary getDictionary() { return dictionary; }
+    @Override
+	public Dictionary getDictionary() { return dictionary; }
 
-    public boolean equals( Object o) {
+    @Override
+	public boolean equals( Object o) {
         return (o instanceof BaseEntry &&
                 ((BaseEntry) o).dictionary == dictionary &&
                 ((BaseEntry) o).entryMarker == entryMarker);
@@ -218,13 +238,15 @@ abstract class BaseEntry implements DictionaryEntry {
      * {@link BaseEntryRef BaseEntryRef} is created, otherwise a reference which simply stores
      * and returns the reference to this entry is returned.
      */
-    public DictionaryEntryReference getReference() {
+    @Override
+	public DictionaryEntryReference getReference() {
         if (reference == null) {
             if (dictionary instanceof MarkerDictionary)
                 reference = new BaseEntryRef( this);
             else 
                 reference = new DictionaryEntryReference() {
-                        public DictionaryEntry getEntry() { return BaseEntry.this; }
+                        @Override
+						public DictionaryEntry getEntry() { return BaseEntry.this; }
                     };
         }
         return reference;

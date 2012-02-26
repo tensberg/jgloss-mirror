@@ -55,46 +55,56 @@ class KanaInputMethod implements InputMethod {
 
     KanaInputMethod() {}
 
-    public void activate() {
+    @Override
+	public void activate() {
         active = true;
         conversionBuffer.setLength( 0);
     }
 
-    public void deactivate( boolean isTemporary) {
+    @Override
+	public void deactivate( boolean isTemporary) {
         endComposition();
         active = false;
     }
 
-    public void setInputMethodContext( InputMethodContext _context) {
+    @Override
+	public void setInputMethodContext( InputMethodContext _context) {
         context = _context;
     }
 
-    public boolean setLocale( Locale _locale) {
+    @Override
+	public boolean setLocale( Locale _locale) {
         locale = _locale;
         return true;
     }
 
-    public Locale getLocale() {
+    @Override
+	public Locale getLocale() {
         return locale;
     }
     
-    public void setCharacterSubsets( Character.Subset[] _subsets) {
+    @Override
+	public void setCharacterSubsets( Character.Subset[] _subsets) {
         subsets = _subsets;
     }
 
-    public void setCompositionEnabled( boolean enable) {
+    @Override
+	public void setCompositionEnabled( boolean enable) {
         compositionEnabled = enable;
     }
 
-    public boolean isCompositionEnabled() {
+    @Override
+	public boolean isCompositionEnabled() {
         return compositionEnabled;
     }
 
-    public void reconvert() throws UnsupportedOperationException {
+    @Override
+	public void reconvert() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    public void dispatchEvent( AWTEvent _event) {
+    @Override
+	public void dispatchEvent( AWTEvent _event) {
         if (!(active && compositionEnabled))
             return;
 
@@ -133,22 +143,28 @@ class KanaInputMethod implements InputMethod {
         event.consume();
     }
 
-    public void notifyClientWindowChange( Rectangle bounds) {}
+    @Override
+	public void notifyClientWindowChange( Rectangle bounds) {}
 
-    public void hideWindows() {}
+    @Override
+	public void hideWindows() {}
   
-    public void removeNotify() {}
+    @Override
+	public void removeNotify() {}
 
-    public void endComposition() {
+    @Override
+	public void endComposition() {
         if (conversionBuffer.length() > 0) {
             dispatchString( conversionBuffer.toString(), true);
             conversionBuffer.setLength( 0);
         }
     }
 
-    public void dispose() {}
+    @Override
+	public void dispose() {}
 
-    public Object getControlObject() { return null; }   
+    @Override
+	public Object getControlObject() { return null; }   
 
     protected void dispatchString( String s, boolean committed) {
         if (committed) {

@@ -41,7 +41,8 @@ abstract class AbstractParameter implements Parameter {
         initFromElement( elem);
     }
 
-    public String getName() { return name; }
+    @Override
+	public String getName() { return name; }
 
     /**
      * Initializes the name and default value from an XML element.

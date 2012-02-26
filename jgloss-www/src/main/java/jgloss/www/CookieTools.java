@@ -603,7 +603,7 @@ public class CookieTools {
         for ( int i=out.length()-1; i>=0; i--) {
             char c = out.charAt( i);
             if (c=='|' || c=='%' || !isTokenChar( c)) {
-                String hex = Integer.toHexString( (int) c);
+                String hex = Integer.toHexString( c);
                 if (hex.length() == 1)
                     hex = "0" + hex;
                 out.replace( i, i+1, "%" + hex);

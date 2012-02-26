@@ -637,7 +637,8 @@ public class LookupModel implements Cloneable {
         }
     }
 
-    public Object clone() {
+    @Override
+	public Object clone() {
         try {
             LookupModel out = (LookupModel) super.clone();
             // clone fields

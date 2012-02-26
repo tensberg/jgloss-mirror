@@ -59,7 +59,8 @@ public class CharacterClass {
         this.name = _name;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Character class: " + name;
     }
 } // class CharacterClass

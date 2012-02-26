@@ -38,7 +38,8 @@ import jgloss.util.NumberTools;
 public class EUCJPCharacterHandler implements EncodedCharacterHandler {
     public EUCJPCharacterHandler() {}
 
-    public int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+    @Override
+	public int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,
                                                         IndexOutOfBoundsException,
                                                         CharacterCodingException {
         int c = NumberTools.byteToUnsignedByte( buffer.get());
@@ -55,7 +56,8 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
         return c;
     }
 
-    public int readPreviousCharacter( ByteBuffer buffer) throws BufferUnderflowException,
+    @Override
+	public int readPreviousCharacter( ByteBuffer buffer) throws BufferUnderflowException,
                                                          IndexOutOfBoundsException,
                                                          CharacterCodingException {
         // NOTE: currently no support for 3-byte Kanji. Needs to be added as soon as I know
@@ -80,7 +82,8 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
         return character;
     }
 
-    public int convertCharacter( int c) {
+    @Override
+	public int convertCharacter( int c) {
         if ((c >= 'A') && (c <= 'Z')) // uppercase -> lowercase conversion
             c |= 0x20;
         if ((c&0xff00) == 0xa500) // convert katakana to hiragana
@@ -88,7 +91,8 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
         return c;
     }
 
-    public CharacterClass getCharacterClass( int c, boolean inWord) {
+    @Override
+	public CharacterClass getCharacterClass( int c, boolean inWord) {
         if (c > 127) { // multibyte character in EUC-JP encoding
             if (c >= 0xb000) // 2- or 3-byte kanji
                 return CharacterClass.KANJI;
@@ -109,11 +113,13 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
         }
     }
 
-    public boolean canEncode(char c) {
+    @Override
+	public boolean canEncode(char c) {
         // ASCII and Kanji/Kana characters can be encoded
         // TODO: look up the real supported range, the given range also includes chinese and korean chars
         return (c<128 || c>=0x2e80 && c<0xa000);
     }
 
-    public String getEncodingName() { return "EUC-JP"; }
+    @Override
+	public String getEncodingName() { return "EUC-JP"; }
 } // class EUCJPCharacterHandler

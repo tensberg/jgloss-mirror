@@ -37,9 +37,11 @@ class AttributeSetChainIterator implements Iterator {
         getNextKey();
     }
 
-    public boolean hasNext() { return nextKey != null; }
+    @Override
+	public boolean hasNext() { return nextKey != null; }
 
-    public Object next() throws NoSuchElementException {
+    @Override
+	public Object next() throws NoSuchElementException {
         if (!hasNext())
             throw new NoSuchElementException();
         Object currentKey = nextKey;
@@ -47,7 +49,8 @@ class AttributeSetChainIterator implements Iterator {
         return currentKey;
     }
 
-    public void remove() throws UnsupportedOperationException {
+    @Override
+	public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

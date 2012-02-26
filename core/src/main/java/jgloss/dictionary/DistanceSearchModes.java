@@ -49,5 +49,6 @@ public class DistanceSearchModes extends AbstractSearchMode {
      * {@link StandardSearchParameter#SEARCH_FIELDS SEARCH_FIELDS} and
      * {@link StandardSearchParameter#DISTANCE DISTANCE}
      */
-    public SearchParameters getParameters() { return PARAMETERS; }
+    @Override
+	public SearchParameters getParameters() { return PARAMETERS; }
 } // class DistanceSearchModes

@@ -38,8 +38,10 @@ public class BinarySearchIndex implements Index {
             currentEntry = firstEntry;
         }
 
-        public boolean hasNext() { return currentEntry <= lastEntry; }
-        public int next() {
+        @Override
+		public boolean hasNext() { return currentEntry <= lastEntry; }
+        @Override
+		public int next() {
             if (!hasNext())
                 throw new java.util.NoSuchElementException();
             return index.get( currentEntry++);
@@ -64,15 +66,18 @@ public class BinarySearchIndex implements Index {
         type = _type;
     }
     
-    public int getType() {
+    @Override
+	public int getType() {
         return type;
     }
 
-    public void setContainer( IndexContainer container) throws IndexException {
+    @Override
+	public void setContainer( IndexContainer container) throws IndexException {
         index = container.getIndexData( type).asIntBuffer();
     }
 
-    public Index.Iterator getEntryPositions( Indexable dictionary, ByteBuffer expression,
+    @Override
+	public Index.Iterator getEntryPositions( Indexable dictionary, ByteBuffer expression,
                                              Object[] parameters) throws IndexException {
         int match = findMatch( dictionary, expression);
         if (match == -1)

@@ -36,6 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.WindowConstants;
 
 import jgloss.JGloss;
 
@@ -58,7 +59,8 @@ public class PreferencesFrame {
 
     static {
         showAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     getFrame().show();
                 }
             };
@@ -117,7 +119,8 @@ public class PreferencesFrame {
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
         final Action ok = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     frame.hide();
                     savePreferences();
                     applyPreferences();
@@ -126,7 +129,8 @@ public class PreferencesFrame {
         ok.setEnabled( true);
         UIUtilities.initAction( ok, "button.ok");
         final Action cancel = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     frame.hide();
                     loadPreferences();
                     applyPreferences();
@@ -135,7 +139,8 @@ public class PreferencesFrame {
         cancel.setEnabled( true);
         UIUtilities.initAction( cancel, "button.cancel");
         final Action apply = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     savePreferences();
                     applyPreferences();
                 }
@@ -150,9 +155,10 @@ public class PreferencesFrame {
         b.add( Box.createHorizontalStrut( 5));
         main.add( b, BorderLayout.SOUTH);
 
-        frame.setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener( new WindowAdapter() {
-                public void windowClosing( WindowEvent e) {
+                @Override
+				public void windowClosing( WindowEvent e) {
                     cancel.actionPerformed( null);
                 }
             });

@@ -35,23 +35,28 @@ public class KanaInputMethodDescriptor implements InputMethodDescriptor {
         System.err.println( "instantiation");
     }
 
-    public InputMethod createInputMethod() {
+    @Override
+	public InputMethod createInputMethod() {
         System.err.println( "creating kana input");
         return new KanaInputMethod();
     }
 
-    public Locale[] getAvailableLocales() {
+    @Override
+	public Locale[] getAvailableLocales() {
         System.err.println( "getting locales");
         return LOCALES;
     }
 
-    public String getInputMethodDisplayName( Locale inputLocale, Locale displayLanguage) {
+    @Override
+	public String getInputMethodDisplayName( Locale inputLocale, Locale displayLanguage) {
         return "simple kana input";
     }
 
-    public Image getInputMethodIcon( Locale inputLocale) {
+    @Override
+	public Image getInputMethodIcon( Locale inputLocale) {
         return null;
     }
 
-    public boolean hasDynamicLocaleList() { return false; }
+    @Override
+	public boolean hasDynamicLocaleList() { return false; }
 } // class KanaInputMethodDescriptor

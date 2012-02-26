@@ -129,7 +129,8 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
         readingEditor.setAnnotation( _annotation);
     }
 
-    public void actionPerformed( ActionEvent e) {
+    @Override
+	public void actionPerformed( ActionEvent e) {
         if (annotation == null)
             return;
 
@@ -172,7 +173,8 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
         }
     }
 
-    public void setEnabled( boolean _enabled) {
+    @Override
+	public void setEnabled( boolean _enabled) {
         super.setEnabled( _enabled);
         enabled = _enabled;
         
@@ -182,18 +184,23 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
         grammaticalType.setEnabled( enabled);
     }
 
-    public boolean isEnabled() { return enabled; }
+    @Override
+	public boolean isEnabled() { return enabled; }
 
-    public void annotationInserted( AnnotationEvent ae) {}
-    public void annotationRemoved( AnnotationEvent ae) {}
+    @Override
+	public void annotationInserted( AnnotationEvent ae) {}
+    @Override
+	public void annotationRemoved( AnnotationEvent ae) {}
 
-    public void annotationChanged( AnnotationEvent ae) {
+    @Override
+	public void annotationChanged( AnnotationEvent ae) {
         if (ae.getAnnotation() == annotation) {
             updateDisplay();
         }
     }
 
-    public void readingChanged( AnnotationEvent ae) {
+    @Override
+	public void readingChanged( AnnotationEvent ae) {
        if (ae.getAnnotation() == annotation) {
             readingEditor.updateDisplay();
        } 
@@ -279,7 +286,8 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
             }
         }
 
-        public void actionPerformed( ActionEvent e) {
+        @Override
+		public void actionPerformed( ActionEvent e) {
             if (annotation == null)
                 return;
 

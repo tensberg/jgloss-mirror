@@ -36,7 +36,8 @@ import jgloss.util.UTF8ResourceBundleControl;
 public class Category extends DefaultCategoryAttributeValue {
     private static final IDAttributeValueFactory factory =
         new IDAttributeValueFactory() {
-            protected CategoryAttributeValue createValue( String id) {
+            @Override
+			protected CategoryAttributeValue createValue( String id) {
                 return new Category( id);
             }
         };
@@ -57,6 +58,8 @@ public class Category extends DefaultCategoryAttributeValue {
         super( id);
     }
 
-    protected ResourceBundle getNames() { return names; }
-    protected String getResourcePrefix() { return "cat."; }
+    @Override
+	protected ResourceBundle getNames() { return names; }
+    @Override
+	protected String getResourcePrefix() { return "cat."; }
 } // class Category

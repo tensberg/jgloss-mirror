@@ -87,14 +87,16 @@ public class DefaultListFormatter implements ListFormatter {
             return new String[] { in.substring( 0, i), in.substring( i+1) };
     }
 
-    public ListFormatter newList( StringBuffer _buffer, int _length) {
+    @Override
+	public ListFormatter newList( StringBuffer _buffer, int _length) {
         buffer = _buffer;
         itemNo = 0;
         length = _length;
         return this;
     }
 
-    public ListFormatter addItem( Object item) {
+    @Override
+	public ListFormatter addItem( Object item) {
         appendText( length==1 ? singleListBefore : 
                     (itemNo==0 ? multiListBefore : multiListBetween), itemNo);
         doAppendItem( item);
@@ -125,16 +127,19 @@ public class DefaultListFormatter implements ListFormatter {
         }
     }
 
-    public StringBuffer endList() {
+    @Override
+	public StringBuffer endList() {
         if (length == 0)
             buffer.append( emptyList);
 
         return buffer;
     }
 
-    public StringBuffer getBuffer() { return buffer; }
+    @Override
+	public StringBuffer getBuffer() { return buffer; }
 
-    public Pattern getPattern() {
+    @Override
+	public Pattern getPattern() {
         StringBuffer pattern = new StringBuffer();
 
         pattern.append( "(?:(?:");

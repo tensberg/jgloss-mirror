@@ -65,16 +65,19 @@ class DictionaryEntryFormat {
     static class IdentityDecorator implements Decorator {
         IdentityDecorator() {}
 
-        public ListFormatter decorateList( ListFormatter formatter, int type) {
+        @Override
+		public ListFormatter decorateList( ListFormatter formatter, int type) {
             return formatter;
         }
 
-        public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
+        @Override
+		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
                                                      int position) {
             return formatter;
         }
 
-        public ListFormatter decorateList( ListFormatter formatter, Attribute type, int position) {
+        @Override
+		public ListFormatter decorateList( ListFormatter formatter, Attribute type, int position) {
             return formatter;
         }
     } // class IdentityDecorator

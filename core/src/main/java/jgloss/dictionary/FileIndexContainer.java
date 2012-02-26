@@ -98,7 +98,8 @@ public class FileIndexContainer implements IndexContainer {
                 return data.duplicate();
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return "Index data: " + Integer.toHexString( type) + "/" + start + "/" + length;
         }
     } // class IndexMetaData
@@ -151,11 +152,13 @@ public class FileIndexContainer implements IndexContainer {
         }
     }
 
-    public boolean hasIndex( int indexType) {
+    @Override
+	public boolean hasIndex( int indexType) {
         return getIndexMetaData( indexType) != null;
     }
 
-    public ByteBuffer getIndexData( int indexType) throws IndexException,
+    @Override
+	public ByteBuffer getIndexData( int indexType) throws IndexException,
                                                           IllegalStateException {
         if (editMode)
             throw new IllegalStateException();
@@ -171,11 +174,13 @@ public class FileIndexContainer implements IndexContainer {
         }
     }
 
-    public ByteOrder getIndexByteOrder() {
+    @Override
+	public ByteOrder getIndexByteOrder() {
         return indexByteOrder;
     }
 
-    public void createIndex( int indexType, ByteBuffer data) throws IndexException,
+    @Override
+	public void createIndex( int indexType, ByteBuffer data) throws IndexException,
                                                                     IllegalStateException {
         if (!editMode)
             throw new IllegalStateException();
@@ -194,15 +199,18 @@ public class FileIndexContainer implements IndexContainer {
         }
     }
 
-    public boolean canAccess() {
+    @Override
+	public boolean canAccess() {
         return !editMode;
     }
 
-    public boolean canEdit() {
+    @Override
+	public boolean canEdit() {
         return editMode;
     }
 
-    public void deleteIndex( int indexType) throws IndexException, IllegalStateException {
+    @Override
+	public void deleteIndex( int indexType) throws IndexException, IllegalStateException {
         if (!editMode)
             throw new IllegalStateException();
 
@@ -227,14 +235,16 @@ public class FileIndexContainer implements IndexContainer {
         }
     }
 
-    public void endEditing() throws IndexException, IllegalStateException {
+    @Override
+	public void endEditing() throws IndexException, IllegalStateException {
         if (!editMode)
             throw new IllegalStateException();
 
         editMode = false;
     }
 
-    public void close() {
+    @Override
+	public void close() {
         try {
             indexFile.close();
         } catch (IOException ex) {}

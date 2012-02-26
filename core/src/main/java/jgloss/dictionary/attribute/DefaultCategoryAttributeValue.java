@@ -56,10 +56,13 @@ abstract class DefaultCategoryAttributeValue implements CategoryAttributeValue {
     }
     
     public String getId() { return id; }
-    public String getShortName() { return shortName; }
-    public String getLongName() { return longName; }
+    @Override
+	public String getShortName() { return shortName; }
+    @Override
+	public String getLongName() { return longName; }
 
-    public String toString() { return shortName; }
+    @Override
+	public String toString() { return shortName; }
 
     /**
      * Return the resource bundle from which the attribute value names will be fetched.
@@ -71,7 +74,8 @@ abstract class DefaultCategoryAttributeValue implements CategoryAttributeValue {
      */
     protected abstract String getResourcePrefix();
 
-    public boolean equals( Object o) {
+    @Override
+	public boolean equals( Object o) {
         return (o!=null && o instanceof DefaultCategoryAttributeValue &&
                 ((DefaultCategoryAttributeValue) o).id.equals( id));
     }

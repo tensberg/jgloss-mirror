@@ -39,6 +39,8 @@ class ConstantParameter implements Parameter {
         this.value = _value;
     }
 
-    public String getName() { return name; }
-    public Object getValue( JGlossFrameModel source, URL systemId) { return value; }
+    @Override
+	public String getName() { return name; }
+    @Override
+	public Object getValue( JGlossFrameModel source, URL systemId) { return value; }
 } // class ConstantParameter

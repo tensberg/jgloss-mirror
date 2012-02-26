@@ -161,7 +161,8 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
         }
     }
 
-    public void propertyChange(PropertyChangeEvent event) {
+    @Override
+	public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equalsIgnoreCase("document")) {
             if (document != null)
                 document.removeDocumentListener(this);
@@ -175,7 +176,8 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
         }
     }
 
-    public void changedUpdate(DocumentEvent e) {
+    @Override
+	public void changedUpdate(DocumentEvent e) {
         if (currentElement == null ||
             currentElement.getStartOffset()<=e.getOffset()+e.getLength() &&
             currentElement.getEndOffset()>=e.getOffset())
@@ -183,12 +185,14 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
             resetSelection();
     }
 
-    public void insertUpdate(DocumentEvent e) {
+    @Override
+	public void insertUpdate(DocumentEvent e) {
         if (currentElement == null)
             resetSelection();
     }
 
-    public void removeUpdate(DocumentEvent e) {
+    @Override
+	public void removeUpdate(DocumentEvent e) {
         if (currentElement!=null &&
             currentElement.getStartOffset()<=e.getOffset()+e.getLength() &&
             currentElement.getEndOffset()>=e.getOffset())
@@ -272,7 +276,8 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
             putValue(ACCELERATOR_KEY, acceleratorKey);
         }
 
-        public void actionPerformed(ActionEvent event) {
+        @Override
+		public void actionPerformed(ActionEvent event) {
             if (event.getSource()==editor && document!=null)
                 moveLink(editor, document);
         }
@@ -327,7 +332,8 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
             putValue(ACCELERATOR_KEY, acceleratorKey);
         }
 
-        public void actionPerformed(ActionEvent event) {
+        @Override
+		public void actionPerformed(ActionEvent event) {
             if (event.getSource()==editor && document!=null)
                 activateLink();
         }

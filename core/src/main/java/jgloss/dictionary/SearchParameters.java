@@ -74,9 +74,12 @@ public class SearchParameters {
     public Iterator iterator() {
         return new Iterator() {
                 private int index = 0;
-                public boolean hasNext() { return index<parameters.length; }
-                public Object next() { return parameters[index++]; }
-                public void remove() throws UnsupportedOperationException {
+                @Override
+				public boolean hasNext() { return index<parameters.length; }
+                @Override
+				public Object next() { return parameters[index++]; }
+                @Override
+				public void remove() throws UnsupportedOperationException {
                     throw new UnsupportedOperationException();
                 }
             };

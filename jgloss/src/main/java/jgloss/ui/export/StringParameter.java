@@ -49,11 +49,14 @@ class StringParameter extends UIParameter {
         box.add( text);
     }
 
-    public Component getComponent() { return box; }
+    @Override
+	public Component getComponent() { return box; }
 
-    public Object getValue( JGlossFrameModel source, URL systemId) { return text.getText(); }
+    @Override
+	public Object getValue( JGlossFrameModel source, URL systemId) { return text.getText(); }
 
-    public void loadFromPrefs() {
+    @Override
+	public void loadFromPrefs() {
         text.setText( JGloss.prefs.getString( prefsKey, defaultValue));
     }
 } // class StringParameter

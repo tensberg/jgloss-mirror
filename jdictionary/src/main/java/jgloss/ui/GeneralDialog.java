@@ -141,8 +141,10 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         chasenLocation = new JTextField( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
         chasenLocation.setInputVerifier( new InputVerifier() {
                 private String lastInput = chasenLocation.getText();
-                public boolean verify( JComponent input) { return true; }
-                public boolean shouldYieldFocus( JComponent input) {
+                @Override
+				public boolean verify( JComponent input) { return true; }
+                @Override
+				public boolean shouldYieldFocus( JComponent input) {
                     if (!lastInput.equals( chasenLocation.getText())) {
                         testChasenLocation();
                         lastInput = chasenLocation.getText();
@@ -154,7 +156,8 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         b.add( Box.createHorizontalStrut( 2));
         JButton chasenLocationChoice = new JButton( JGloss.messages.getString( "button.choose"));
         chasenLocationChoice.addActionListener( new ActionListener() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     chooseChasenLocation();
                 }
             });
@@ -182,13 +185,16 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         applyPreferences();
     }
 
-    public String getTitle() { return JGloss.messages.getString( "general.title"); }
-    public Component getComponent() { return this; }
+    @Override
+	public String getTitle() { return JGloss.messages.getString( "general.title"); }
+    @Override
+	public Component getComponent() { return this; }
 
     /**
      * Loads the preferences and initializes the dialog accordingly.
      */
-    public void loadPreferences() {
+    @Override
+	public void loadPreferences() {
         if (JGloss.prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
             startWordLookup.setSelected( true);
         else
@@ -226,7 +232,8 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     /**
      * Saves the current dialog settings.
      */
-    public void savePreferences() {
+    @Override
+	public void savePreferences() {
         JGloss.prefs.set( Preferences.STARTUP_WORDLOOKUP, startWordLookup.isSelected());
         JGloss.prefs.set( Preferences.LEFTCLICK_TOOLTIP, clickTooltip.isSelected());
         if (enableEditing != null)
@@ -246,7 +253,8 @@ public class GeneralDialog extends Box implements PreferencesPanel {
                                                        importClipboardParserSelector.getReadingEnd() }));
     }
 
-    public void applyPreferences() {
+    @Override
+	public void applyPreferences() {
         Chasen.setDefaultExecutable( chasenLocation.getText());
         importClipboardParser = importClipboardParserSelector.getSelectedParser();
         firstOccurrenceOnly = importClipboardParserSelector.isFirstOccurrenceOnly();
@@ -277,7 +285,8 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         chooser.setFileView( new CustomFileView() {
                 private Icon CHASEN_ICON = 
                     new ImageIcon( CustomFileView.class.getResource( "/icons/chasen.png"));
-                public Icon getIcon( java.io.File f) {
+                @Override
+				public Icon getIcon( java.io.File f) {
                     String name = f.getName().toLowerCase();
                     if ((name.equals( "chasen") || name.equals( "chasen.exe")) &&
                         f.isFile())

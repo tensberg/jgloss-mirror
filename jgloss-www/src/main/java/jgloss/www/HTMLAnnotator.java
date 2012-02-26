@@ -108,7 +108,7 @@ public class HTMLAnnotator {
      */
     public HTMLAnnotator( Parser parser, String script) {
         this.parser = parser;
-        this.script = script;
+        HTMLAnnotator.script = script;
     }
 
     /**

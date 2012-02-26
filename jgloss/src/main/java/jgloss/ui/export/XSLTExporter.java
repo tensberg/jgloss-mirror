@@ -77,7 +77,8 @@ class XSLTExporter implements Exporter {
     /**
      * Shows the export file chooser and runs the export.
      */
-    public void export(ExportConfiguration configuration,
+    @Override
+	public void export(ExportConfiguration configuration,
                        JGlossFrameModel source,
                        Document doc, Component parent) {
         File outfile = chooseOutputFile(configuration, parent);

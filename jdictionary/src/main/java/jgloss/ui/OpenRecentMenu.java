@@ -170,7 +170,8 @@ public class OpenRecentMenu {
     
     private JMenuItem createDocumentMenu( final File doc, final FileSelectedListener listener) {
         return new JMenuItem( new AbstractAction( doc.getName()) {
-                public void actionPerformed( java.awt.event.ActionEvent e) {
+                @Override
+				public void actionPerformed( java.awt.event.ActionEvent e) {
                     listener.fileSelected( doc);
                 }
             });

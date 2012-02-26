@@ -56,7 +56,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -133,11 +135,13 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         /**
          * Returns the name of the dictionary.
          */
-        public String toString() {
+        @Override
+		public String toString() {
             return dictionary.toString();
         }
 
-        public boolean equals( Object o) {
+        @Override
+		public boolean equals( Object o) {
             try {
                 DictionaryWrapper d = (DictionaryWrapper) o;
                 return (d.descriptor.equals( descriptor) && d.dictionary.equals( dictionary));
@@ -248,7 +252,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             this.dictionaries = dictionaries;
             dictionariesLoaded = false;
             if (message == null)
-                message = new JLabel( "", JLabel.CENTER);
+                message = new JLabel( "", SwingConstants.CENTER);
             currentCursor = getCursor();
 
             Thread worker = new Thread( this);
@@ -270,14 +274,15 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                                                                 parent.getSize().getWidth()/2 - 225), 0),
                                                (int) (parent.getLocation().getY() + 
                                                       parent.getSize().getHeight()/2 - 25));
-                    messageDialog.setDefaultCloseOperation( JDialog.DO_NOTHING_ON_CLOSE);
+                    messageDialog.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
                 }
                 messageDialog.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
                 messageDialog.setVisible(true);
             }
         }
 
-        public void run() {
+        @Override
+		public void run() {
             final DefaultListModel model = (DefaultListModel) Dictionaries.this.dictionaries.getModel();
             List errors = new ArrayList( dictionaries.length*2);
             for ( int i=0; i<dictionaries.length; i++) {
@@ -292,7 +297,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 }
                 if (!alreadyAdded) {
                     EventQueue.invokeLater( new Runnable() {
-                            public void run() {
+                            @Override
+							public void run() {
                                 message.setText( JGloss.messages.getString
                                                  ( "dictionaries.loading",
                                                    new String[] { new File( descriptor)
@@ -308,7 +314,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                         }
                         if (d != null) {
                             EventQueue.invokeLater( new Runnable() {
-                                    public void run() {
+                                    @Override
+									public void run() {
                                         model.addElement( new DictionaryWrapper( descriptor, d));
                                     }
                                 });
@@ -348,6 +355,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         final Action up = new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
@@ -361,6 +369,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         final Action down = new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
@@ -374,6 +383,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         final Action add = new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     addDictionary();
                 }
@@ -383,6 +393,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         final Action remove = new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
@@ -399,7 +410,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         UIUtilities.initAction( remove, "dictionaries.button.remove");
 
         dictionaries.addListSelectionListener( new ListSelectionListener() {
-                public void valueChanged( ListSelectionEvent e) {
+                @Override
+				public void valueChanged( ListSelectionEvent e) {
                     if (dictionaries.isSelectionEmpty()) {
                         up.setEnabled( false);
                         down.setEnabled( false);
@@ -459,8 +471,10 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             }*/
     }
 
-    public String getTitle() { return JGloss.messages.getString( "dictionaries.title"); }
-    public Component getComponent() { return this; }
+    @Override
+	public String getTitle() { return JGloss.messages.getString( "dictionaries.title"); }
+    @Override
+	public Component getComponent() { return this; }
 
     /**
      * Runs the dialog to add a new dictionary to the list.
@@ -550,7 +564,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * Makes the list of currently displayed dictionaries the active dictionaries. The list
      * will be stored in the preferences.
      */
-    public synchronized void savePreferences() {
+    @Override
+	public synchronized void savePreferences() {
         ListModel model = dictionaries.getModel();
         StringBuffer paths = new StringBuffer( model.getSize()*32);
         List newDictionaries = new ArrayList( model.getSize());
@@ -622,7 +637,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             }*/
         
         EventQueue.invokeLater( new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     // show dialogs for all errors which occurred while the dictionaries were opened
                     for ( Iterator i=exceptions.iterator(); i.hasNext(); ) {
                         showDictionaryError( (Exception) i.next(), (String) i.next());
@@ -634,7 +650,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * Initializes the list of displayed dictionaries from the preferences setting.
      */
-    public synchronized void loadPreferences() {
+    @Override
+	public synchronized void loadPreferences() {
         // activeDictionaries is only initialized from the preferences if it does not
         // already contain dictionaries.
         boolean prefsLoaded = false;
@@ -660,7 +677,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 model.addElement( i.next());
         }
         Runnable worker = new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     dictionaries.setModel( model);
                 }
             };
@@ -678,5 +696,6 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * Apply the new preference setting to already opened document. Does nothing since
      * there are no changes which will apply instantly.
      */
-    public void applyPreferences() {}
+    @Override
+	public void applyPreferences() {}
 } // class Dictionaries

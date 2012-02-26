@@ -139,7 +139,8 @@ public class AnnotationListModel {
         // Find the index where the new annotation has to be inserted.
         int insertionPoint = Collections.binarySearch
             (annotations, anno, new Comparator() {
-                    public int compare(Object o1, Object o2) {
+                    @Override
+					public int compare(Object o1, Object o2) {
                         // compare two annotations by their element start offset
                         int so1 = ((Annotation) o1).getStartOffset();
                         int so2 = ((Annotation) o2).getStartOffset();
@@ -160,7 +161,8 @@ public class AnnotationListModel {
         // binary search through the list of annotations, which is ordered by start offsets.
         int annoOffset = Collections.binarySearch
             (annotations, annoElement, new Comparator() {
-                    public int compare(Object o1, Object o2) {
+                    @Override
+					public int compare(Object o1, Object o2) {
                         Element e1 = (o1 instanceof Element) ?
                             (Element) o1 : ((Annotation) o1).getAnnotationElement();
                         Element e2 = (o2 instanceof Element) ? 

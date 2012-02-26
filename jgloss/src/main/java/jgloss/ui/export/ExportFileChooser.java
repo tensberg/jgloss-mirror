@@ -81,7 +81,8 @@ class ExportFileChooser extends SaveFileChooser {
     /**
      * Runs the dialog. If the dialog is approved, the ui element settings will be saved.
      */
-    public int showSaveDialog( Component parent) {
+    @Override
+	public int showSaveDialog( Component parent) {
         if (accessory != null) {
             JPanel container = new JPanel( new GridLayout( 1, 1));
             container.setBorder( BorderFactory.createEmptyBorder( 3, 3, 3, 3));

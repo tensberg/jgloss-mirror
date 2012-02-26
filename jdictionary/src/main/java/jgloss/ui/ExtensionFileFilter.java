@@ -67,7 +67,8 @@ public class ExtensionFileFilter extends FileFilter {
         this.ignoreCase = ignoreCase;
     }
 
-    public boolean accept( File f) {
+    @Override
+	public boolean accept( File f) {
         String name = f.getName();
         if (ignoreCase)
             name = name.toLowerCase();
@@ -75,7 +76,8 @@ public class ExtensionFileFilter extends FileFilter {
             name.endsWith( extension);
     }
     
-    public String getDescription() { 
+    @Override
+	public String getDescription() { 
         return description;
     }
 

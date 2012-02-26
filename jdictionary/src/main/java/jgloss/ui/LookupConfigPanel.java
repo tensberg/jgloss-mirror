@@ -98,7 +98,8 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
             parent = _parent;
         }
 
-        public Component getListCellRendererComponent( JList list, Object value, int index,
+        @Override
+		public Component getListCellRendererComponent( JList list, Object value, int index,
                                                        boolean isSelected, boolean cellHasFocus) {
             boolean isEnabled = index<0 ||
                 index>=model.getDictionaryCount() ||
@@ -209,7 +210,8 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         UIUtilities.initButton( dictionary, "wordlookup.choice.dictionary");
         dictionaries.add( dictionary);
         dictionary.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
+                @Override
+				public void stateChanged( ChangeEvent e) {
                     dictionaryChoice.setEnabled( dictionary.isSelected());
                 }
             });
@@ -329,7 +331,8 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
         // update font if prefs change
         UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
-                public void propertyChange( java.beans.PropertyChangeEvent e) { 
+                @Override
+				public void propertyChange( java.beans.PropertyChangeEvent e) { 
                     if (e.getPropertyName().equals( "TextField.font")) {
                         expression.setFont( (Font) e.getNewValue());
                     }
@@ -469,7 +472,8 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         distance.setEnabled( model.isDistanceEnabled());
     }
 
-    public void stateChanged( LookupChangeEvent event) {
+    @Override
+	public void stateChanged( LookupChangeEvent event) {
         enableActionEvents = false;
 
         if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_AVAILABILITY))
@@ -516,7 +520,8 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         return distance;
     }
 
-    public void actionPerformed( ActionEvent action) {
+    @Override
+	public void actionPerformed( ActionEvent action) {
         if (!enableActionEvents)
             // ignore action events during panel setup phase
             return;

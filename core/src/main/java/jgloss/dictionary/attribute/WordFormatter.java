@@ -53,7 +53,8 @@ public class WordFormatter extends DefaultAttributeFormatter {
         langAndWordFormat = new MessageFormat( _langAndWordFormat);
     }
 
-    public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+    @Override
+	public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
         Word w = (Word) val;
             
         String lang = null;

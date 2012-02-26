@@ -77,11 +77,14 @@ public class ChasenParser extends AbstractParser {
         this.chasenExecutable = chasenExecutable;
     }
 
-    public String getName() { return PARSER_NAME; }
+    @Override
+	public String getName() { return PARSER_NAME; }
 
-    public Locale getLanguage() { return Locale.JAPANESE; }
+    @Override
+	public Locale getLanguage() { return Locale.JAPANESE; }
 
-    public List parse( char[] text, int start, int length) throws SearchException {
+    @Override
+	public List parse( char[] text, int start, int length) throws SearchException {
         
         // the parsePosition cannot be correct since the text was converted to HTML!
         parsePosition = start;
@@ -192,7 +195,8 @@ public class ChasenParser extends AbstractParser {
     /**
      * Ends the chasen application and clears the lookup cache.
      */
-    public void reset() {
+    @Override
+	public void reset() {
         if (chasen != null)
             chasen.dispose();
 
@@ -205,7 +209,8 @@ public class ChasenParser extends AbstractParser {
     /**
      * Overridden to terminate a chasen process if it is still running.
      */
-    protected void finalize() {
+    @Override
+	protected void finalize() {
         reset();
     }
 } // class ChasenParser

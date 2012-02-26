@@ -83,7 +83,8 @@ public class TextAnnotation extends ReadingAnnotation {
     }
     public void setTranslation( String _translation) { translation = _translation; }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return start + "/" + length + "/" + reading + "/" + dictionaryForm + "/"
             + dictionaryFormReading + "/" + grammaticalType + "/" + translation;
     }

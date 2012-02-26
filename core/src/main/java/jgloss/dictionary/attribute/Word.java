@@ -48,5 +48,6 @@ public abstract class Word implements AttributeValue {
 
     public String getLanguageCode() { return langCode; }
 
-    public String toString() { return word + "(" + langCode + ")"; }
+    @Override
+	public String toString() { return word + "(" + langCode + ")"; }
 } // class Word

@@ -40,7 +40,8 @@ class TemplateChooser extends ListParameter {
         super( elem);
     }
 
-    public Object getValue( JGlossFrameModel source, URL systemId) {
+    @Override
+	public Object getValue( JGlossFrameModel source, URL systemId) {
         String value = getValue();
 
         if (systemId != null) {

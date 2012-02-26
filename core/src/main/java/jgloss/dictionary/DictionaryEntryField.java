@@ -51,5 +51,6 @@ public class DictionaryEntryField {
         this.type = _type;
     }
 
-    public String toString() { return type; }
+    @Override
+	public String toString() { return type; }
 } // class DictionaryEntryField

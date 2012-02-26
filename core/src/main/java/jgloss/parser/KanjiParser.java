@@ -124,7 +124,8 @@ public class KanjiParser extends AbstractParser {
      *         list will be returned.
      * @exception SearchException If an error occurrs during a dictionary lookup.
      */
-    public List parse( char[] text, int start, int length) throws SearchException {
+    @Override
+	public List parse( char[] text, int start, int length) throws SearchException {
         int end = start + length;
         List out = new ArrayList( length/3);
         
@@ -444,7 +445,8 @@ public class KanjiParser extends AbstractParser {
     /**
      * Clears the lookup cache.
      */
-    public void reset() {
+    @Override
+	public void reset() {
         if (lookupCache != null)
             lookupCache.clear();
 
@@ -467,9 +469,11 @@ public class KanjiParser extends AbstractParser {
      */
     public int getCacheHits() { return cacheHits; }
 
-    public String getName() { return PARSER_NAME; }
+    @Override
+	public String getName() { return PARSER_NAME; }
 
-    public Locale getLanguage() {
+    @Override
+	public Locale getLanguage() {
         return Locale.JAPANESE;
     }
 } // class Parser

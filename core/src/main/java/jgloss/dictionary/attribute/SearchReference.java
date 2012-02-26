@@ -48,15 +48,18 @@ public class SearchReference implements ReferenceAttributeValue {
         searchParameters = _searchParameters;
     }   
 
-    public ResultIterator getReferencedEntries() throws SearchException {
+    @Override
+	public ResultIterator getReferencedEntries() throws SearchException {
         return dictionary.search( searchMode, searchParameters);
     }
 
-    public String getReferenceTitle() { return title; }
+    @Override
+	public String getReferenceTitle() { return title; }
 
     public Dictionary getDictionary() { return dictionary; }
     public SearchMode getSearchMode() { return searchMode; }
     public Object[] getSearchParameters() { return searchParameters; }
 
-    public String toString() { return "\u2192" + title; }
+    @Override
+	public String toString() { return "\u2192" + title; }
 } // class SearchReference

@@ -133,7 +133,8 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         exclusionList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
         // update display if user changed font
         UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
-                public void propertyChange( java.beans.PropertyChangeEvent e) { 
+                @Override
+				public void propertyChange( java.beans.PropertyChangeEvent e) { 
                     if (e.getPropertyName().equals( "List.font")) {
                         exclusionList.setFont( (Font) e.getNewValue());
                     }
@@ -141,14 +142,16 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             });
 
         final Action add = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     inputExclusion();
                 }
             };
         add.setEnabled( true);
         UIUtilities.initAction( add, "exclusions.button.add");
         final Action remove = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     int i = exclusionList.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) exclusionList.getModel();
                     m.remove( i);
@@ -164,14 +167,16 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         remove.setEnabled( false);
         UIUtilities.initAction( remove, "exclusions.button.remove");
         final Action export = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     exportList();
                 }
             };
         export.setEnabled( true);
         UIUtilities.initAction( export, "exclusions.button.export");
         final Action importA = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     importList();
                 }
             };
@@ -179,7 +184,8 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         UIUtilities.initAction( importA, "exclusions.button.import");
 
         exclusionList.addListSelectionListener( new ListSelectionListener() {
-                public void valueChanged( ListSelectionEvent e) {
+                @Override
+				public void valueChanged( ListSelectionEvent e) {
                     if (exclusionList.isSelectionEmpty()) {
                         remove.setEnabled( false);
                     }
@@ -223,13 +229,16 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         changed = false;
     }
 
-    public String getTitle() { return JGloss.messages.getString( "exclusions.title"); }
-    public Component getComponent() { return this; }
+    @Override
+	public String getTitle() { return JGloss.messages.getString( "exclusions.title"); }
+    @Override
+	public Component getComponent() { return this; }
 
     /**
      * Copies the content of the JList into the exclusion set.
      */
-    public void savePreferences() {
+    @Override
+	public void savePreferences() {
         if (changed) {
             DefaultListModel m = (DefaultListModel) exclusionList.getModel();
             synchronized (exclusions) {
@@ -245,7 +254,8 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     /**
      * Initializes the content of the JList with the words from the exclusion set.
      */
-    public void loadPreferences() {
+    @Override
+	public void loadPreferences() {
         DefaultListModel m = (DefaultListModel) exclusionList.getModel();
         m.removeAllElements();
         // Sort the exclusions by putting them in a tree set.
@@ -254,7 +264,8 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         }
     }
 
-    public void applyPreferences() {}
+    @Override
+	public void applyPreferences() {}
 
     /**
      * Displays a dialog where the user can input a new exclusion word.

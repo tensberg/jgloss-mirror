@@ -81,7 +81,8 @@ public class KanjiDic implements Dictionary {
      */
     public final static DictionaryFactory.Implementation implementation = 
         new DictionaryFactory.Implementation() {
-                public DictionaryFactory.TestResult isInstance( String descriptor) {
+                @Override
+				public DictionaryFactory.TestResult isInstance( String descriptor) {
                     float confidence = ZERO_CONFIDENCE;
                     String reason = "";
                     try {
@@ -113,9 +114,11 @@ public class KanjiDic implements Dictionary {
                     return new DictionaryFactory.TestResult(confidence, reason);
                 }
                 
-                public float getMaxConfidence() { return 1.0f; }
+                @Override
+				public float getMaxConfidence() { return 1.0f; }
                 
-                public Dictionary createInstance( String descriptor) 
+                @Override
+				public Dictionary createInstance( String descriptor) 
                     throws DictionaryFactory.InstantiationException {
                     try {
                         return new KanjiDic( descriptor);
@@ -124,9 +127,11 @@ public class KanjiDic implements Dictionary {
                     }
                 }
 
-                public String getName() { return "KANJIDIC"; }
+                @Override
+				public String getName() { return "KANJIDIC"; }
 
-                public Class getDictionaryClass( String descriptor) { return KanjiDic.class; }
+                @Override
+				public Class getDictionaryClass( String descriptor) { return KanjiDic.class; }
             };
 
     /**
@@ -494,7 +499,8 @@ public class KanjiDic implements Dictionary {
      * fully supported, the other search modes will return a superset of exact match search,
      * but not all matches which should be returned.
      */
-    public ResultIterator search( SearchMode mode, Object[] parameters) throws SearchException {
+    @Override
+	public ResultIterator search( SearchMode mode, Object[] parameters) throws SearchException {
         if (mode instanceof ExpressionSearchModes)
             return searchExpression( (ExpressionSearchModes) mode, (String) parameters[0], 
                                      (SearchFieldSelection) parameters[1]);
@@ -520,7 +526,8 @@ public class KanjiDic implements Dictionary {
         return new EntryListIterator( i, mode, expression, fields);
     }
 
-    public boolean supports( SearchMode searchmode, boolean fully) {
+    @Override
+	public boolean supports( SearchMode searchmode, boolean fully) {
         if (fully && searchmode==ExpressionSearchModes.EXACT)
             return true;
         else if (searchmode instanceof ExpressionSearchModes)
@@ -529,10 +536,13 @@ public class KanjiDic implements Dictionary {
             return false;
     }
 
-    public Set getSupportedAttributes() { return Collections.EMPTY_SET; }
-    public Set getAttributeValues( Attribute att) { return null; }
+    @Override
+	public Set getSupportedAttributes() { return Collections.EMPTY_SET; }
+    @Override
+	public Set getAttributeValues( Attribute att) { return null; }
 
-    public SearchFieldSelection getSupportedFields( SearchMode searchmode) {
+    @Override
+	public SearchFieldSelection getSupportedFields( SearchMode searchmode) {
         return new SearchFieldSelection( true, true, true, true, false);
     }
     
@@ -550,7 +560,8 @@ public class KanjiDic implements Dictionary {
      *
      * @return The name of this dictionary.
      */
-    public String getName() {
+    @Override
+	public String getName() {
         return name;
     }
 
@@ -559,13 +570,16 @@ public class KanjiDic implements Dictionary {
      *
      * @return A string representation of this dictionary.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "KANJIDIC " + name;
     }
 
-    public void dispose() {}
+    @Override
+	public void dispose() {}
 
-    public boolean equals( Object o) {
+    @Override
+	public boolean equals( Object o) {
         try {
             return new File(((KanjiDic) o).dicfile).equals( new File( dicfile));
         } catch (Exception ex) {
@@ -597,9 +611,11 @@ public class KanjiDic implements Dictionary {
             fillEntryCache();
         }
 
-        public boolean hasNext() { return !entryCache.isEmpty(); }
+        @Override
+		public boolean hasNext() { return !entryCache.isEmpty(); }
 
-        public DictionaryEntry next() throws NoSuchElementException {
+        @Override
+		public DictionaryEntry next() throws NoSuchElementException {
             if (!hasNext())
                 throw new NoSuchElementException();
 

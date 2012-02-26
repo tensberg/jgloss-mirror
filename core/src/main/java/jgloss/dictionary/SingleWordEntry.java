@@ -39,22 +39,26 @@ public class SingleWordEntry extends BaseEntry {
         this.word = _word;
     }
 
-    public String getWord( int alternative) {
+    @Override
+	public String getWord( int alternative) {
         if (alternative != 0)
             throw new IllegalArgumentException();
         return word;
     }
 
-    public int getWordAlternativeCount() { return 1; }
+    @Override
+	public int getWordAlternativeCount() { return 1; }
 
-    public AttributeSet getWordAttributes( int alternative) {
+    @Override
+	public AttributeSet getWordAttributes( int alternative) {
         if (alternative != 0)
             throw new IllegalArgumentException();
 
         return emptySet.setParent( wordA);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer out = new StringBuffer( 30);
         out.append( generalA.toString());
         out.append( ' ');

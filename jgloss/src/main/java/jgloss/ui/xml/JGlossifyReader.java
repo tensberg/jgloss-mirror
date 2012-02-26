@@ -164,7 +164,8 @@ class JGlossifyReader extends FilterReader {
         line = lineBuf.toString().toCharArray();
     }
 
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         /* line buffers the data read from the underlying reader and additional HTML markup added
          * by this class.
          * line[position] contains the character which is returned from this call to read(). If
@@ -263,7 +264,8 @@ class JGlossifyReader extends FilterReader {
         return lastChar;
     }
 
-    public int read( char[] buf, int off, int len) throws IOException {
+    @Override
+	public int read( char[] buf, int off, int len) throws IOException {
         if (eof)
             return -1;
 
@@ -278,7 +280,8 @@ class JGlossifyReader extends FilterReader {
         return len;
     }
 
-    public boolean ready() throws IOException {
+    @Override
+	public boolean ready() throws IOException {
         return (!eof && (position<line.length || super.ready()));
     }
 

@@ -153,7 +153,8 @@ public class ParserSelector extends JPanel {
             if (readingStart!='\0' && readingEnd!='\0')
                 setReadingBrackets( readingStart, readingEnd);
             UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
-                    public void propertyChange( java.beans.PropertyChangeEvent e) { 
+                    @Override
+					public void propertyChange( java.beans.PropertyChangeEvent e) { 
                         if (e.getPropertyName().equals( "ComboBox.font")) {
                             readingBrackets.setFont( (Font) e.getNewValue());
                         }

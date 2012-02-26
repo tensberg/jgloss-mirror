@@ -158,7 +158,8 @@ public abstract class JGloss {
 
             Runtime.getRuntime().addShutdownHook
                 ( new Thread() {
-                        public void run() {
+                        @Override
+						public void run() {
                             shutdownHook();
                         }
                     });
@@ -170,7 +171,8 @@ public abstract class JGloss {
             splash.close();
 
             new Thread() {
-                public void run() {
+                @Override
+				public void run() {
                     try {
                         setPriority( Thread.MIN_PRIORITY);
                     } catch (IllegalArgumentException ex) {}
@@ -359,7 +361,8 @@ public abstract class JGloss {
         
         Button ok = new Button( messages.getString( "button.ok"));
         ok.addActionListener( new ActionListener() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     synchronized (f) {
                         f.hide();
                         f.dispose();
@@ -406,7 +409,8 @@ public abstract class JGloss {
                   }));
         Dictionaries.addDictionaryListChangeListener
             ( new Dictionaries.DictionaryListChangeListener() {
-                    public void dictionaryListChanged() {
+                    @Override
+					public void dictionaryListChanged() {
                         mainLookupModel.setDictionaries
                             ( Arrays.asList( Dictionaries.getDictionaries( false)));
                     }

@@ -31,14 +31,14 @@ import java.util.Map;
  * @author Michael Koch
  */
 public abstract class AbstractEscaper implements Escaper {
-    public AbstractEscaper() {}
-
+ 
     /**
      * Returns the escape sequence for the character, or <code>null</code>. This implementation
      * calls {@link #getEscapeMap() getEscapeMap} and looks up the character in the map.
      */
-    public String escapeChar(char c) {
-        return (String) getEscapeMap().get(new Character(c));
+    @Override
+	public String escapeChar(char c) {
+        return getEscapeMap().get(new Character(c));
     }
 
     /**
@@ -46,13 +46,14 @@ public abstract class AbstractEscaper implements Escaper {
      * Subclasses typically return a <code>Map</code> instance which is a static final
      * member of the class.
      */
-    protected abstract Map getEscapeMap();
+    protected abstract Map<Character, String> getEscapeMap();
 
     /**
      * Escape all special characters in a string.
      */
-    public String escape(String text) {
-        StringBuffer out = escape((CharSequence) text);
+    @Override
+	public String escape(String text) {
+    	StringBuilder out = escape((CharSequence) text);
 
         return out==null ? text : out.toString();
     }
@@ -60,8 +61,9 @@ public abstract class AbstractEscaper implements Escaper {
     /**
      * Escape all special characters in a string buffer. The modification may be done in place.
      */
-    public StringBuffer escape(StringBuffer text) {
-        StringBuffer out = escape((CharSequence) text);
+    @Override
+	public StringBuilder escape(StringBuilder text) {
+        StringBuilder out = escape((CharSequence) text);
 
         return out==null ? text : out;
     }
@@ -72,17 +74,17 @@ public abstract class AbstractEscaper implements Escaper {
      * @return A <code>StringBuffer</code> containing the escaped text sequence, or
      *         <code>null</code> if no characters needed escaping.
      */
-    protected StringBuffer escape(CharSequence text) {
-        StringBuffer out = null; // only initialized if escaping must be done
+    protected StringBuilder escape(CharSequence text) {
+        StringBuilder out = null; // only initialized if escaping must be done
 
         for ( int i=text.length()-1; i>=0; i--) {
             String replacement = escapeChar(text.charAt( i));
             if (replacement != null) {
                 if (out == null) {
-                    if (text instanceof StringBuffer)
-                        out = (StringBuffer) text; // in-place escaping for string buffers
+                    if (text instanceof StringBuilder)
+                        out = (StringBuilder) text; // in-place escaping for string buffers
                     else
-                        out = new StringBuffer(text.toString());
+                        out = new StringBuilder(text.toString());
                 }
 
                 out.replace(i, i+1, replacement);

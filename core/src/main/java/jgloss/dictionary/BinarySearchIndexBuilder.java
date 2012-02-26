@@ -52,7 +52,8 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
         type = _type;
     }
     
-    public void startBuildIndex( IndexContainer _container, Indexable _dictionary) throws IndexException {
+    @Override
+	public void startBuildIndex( IndexContainer _container, Indexable _dictionary) throws IndexException {
         this.indexContainer = _container;
         this.dictionary = _dictionary;
 
@@ -65,7 +66,8 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
         tempIndexInt = tempIndex.asIntBuffer();
     }
                                                                                   
-    public boolean addEntry( int location, int length, DictionaryEntryField field) throws IndexException {
+    @Override
+	public boolean addEntry( int location, int length, DictionaryEntryField field) throws IndexException {
         if (field == DictionaryEntryField.WORD ||
             field == DictionaryEntryField.READING ||
             field == DictionaryEntryField.TRANSLATION) {
@@ -95,7 +97,8 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
             return false;
     }
 
-    public void endBuildIndex( boolean commit) throws IndexException {
+    @Override
+	public void endBuildIndex( boolean commit) throws IndexException {
         try {
             if (commit) {
                 // position of tempIndexInt is now one after the last int written

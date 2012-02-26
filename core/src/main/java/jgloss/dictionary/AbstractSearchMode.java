@@ -40,7 +40,10 @@ public abstract class AbstractSearchMode implements SearchMode {
         description = MESSAGES.getString( RESOURCE_PREFIX + id + ".desc");
     }
 
-    public String getName() { return name; }
-    public String getDescription() { return description; }
-    public String toString() { return getName(); }
+    @Override
+	public String getName() { return name; }
+    @Override
+	public String getDescription() { return description; }
+    @Override
+	public String toString() { return getName(); }
 } // class AbstractSearchMode

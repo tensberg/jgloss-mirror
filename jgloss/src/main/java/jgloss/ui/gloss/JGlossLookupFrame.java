@@ -34,7 +34,8 @@ public class JGlossLookupFrame extends LookupFrame {
         super( _model);
     }
 
-    protected void createFileMenuItems( JMenu menu) {
+    @Override
+	protected void createFileMenuItems( JMenu menu) {
         menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importDocument));
         menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importClipboard));
         addWindowListener( JGlossFrame.actions.importClipboardListener);

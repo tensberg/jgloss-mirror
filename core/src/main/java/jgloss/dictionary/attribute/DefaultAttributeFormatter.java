@@ -60,7 +60,8 @@ public class DefaultAttributeFormatter extends AttributeFormatter {
         tempBuffer = new StringBuffer();
     }
 
-    public StringBuffer format( AttributeValueFormatter valueFormatter, Attribute att, 
+    @Override
+	public StringBuffer format( AttributeValueFormatter valueFormatter, Attribute att, 
                                 ValueList val, StringBuffer out) {
         out.append( printBefore);
 
@@ -83,7 +84,8 @@ public class DefaultAttributeFormatter extends AttributeFormatter {
         return out;
     }
 
-    public StringBuffer format( Attribute att, AttributeValue val, StringBuffer out) {
+    @Override
+	public StringBuffer format( Attribute att, AttributeValue val, StringBuffer out) {
         out.append( String.valueOf( val));
         return out;
     }

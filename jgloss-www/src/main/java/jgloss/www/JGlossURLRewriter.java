@@ -115,7 +115,8 @@ public class JGlossURLRewriter implements URLRewriter {
             return target.toExternalForm();
     }
 
-    public String rewrite( String in, String tag) throws MalformedURLException {
+    @Override
+	public String rewrite( String in, String tag) throws MalformedURLException {
         return rewrite( in, tag, false);
     }
 
@@ -123,7 +124,8 @@ public class JGlossURLRewriter implements URLRewriter {
         return rewrite( in, null, forceServletRelative);
     }
 
-    public String rewrite( String in) throws MalformedURLException {
+    @Override
+	public String rewrite( String in) throws MalformedURLException {
         return rewrite( in, null, false);
     }
 
@@ -131,7 +133,8 @@ public class JGlossURLRewriter implements URLRewriter {
      * Sets the base URL of the document from which the URLs to rewrite originate. Relative URLs should
      * be interpreted relative to this URL.
      */
-    public void setDocumentBase( String docBase) {
+    @Override
+	public void setDocumentBase( String docBase) {
         try {
             synchronized (this.docBase) {
                 this.docBase = new URL( docBase);
@@ -142,7 +145,8 @@ public class JGlossURLRewriter implements URLRewriter {
     /**
      * Returns the base URL of the document from which the URLs to rewrite originate. 
      */
-    public String getDocumentBase() {
+    @Override
+	public String getDocumentBase() {
         return docBase.toString();
     }
 
@@ -179,7 +183,7 @@ public class JGlossURLRewriter implements URLRewriter {
             }
 
             if (escape)
-                out.append( "_" + Integer.toHexString( (int) c));
+                out.append( "_" + Integer.toHexString( c));
             else
                 out.append( c);
         }

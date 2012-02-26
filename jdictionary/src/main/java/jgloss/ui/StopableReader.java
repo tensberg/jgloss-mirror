@@ -57,7 +57,8 @@ public class StopableReader extends FilterReader {
      * @return The character read, or -1 if the end of stream has been reached.
      * @exception IOException if the read has failed.
      */
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         if (stopped)
             return -1;
         else {
@@ -78,7 +79,8 @@ public class StopableReader extends FilterReader {
      * @return Number of characters actually read, or -1 if the end of stream has been reached.
      * @exception IOException if the read has failed.
      */
-    public int read( char[] cbuf, int off, int len) throws IOException {
+    @Override
+	public int read( char[] cbuf, int off, int len) throws IOException {
         if (stopped)
             return -1;
         else {

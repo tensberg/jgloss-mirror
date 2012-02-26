@@ -36,6 +36,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import jgloss.JGloss;
 import jgloss.dictionary.Dictionary;
@@ -52,21 +53,25 @@ import jgloss.dictionary.attribute.ValueList;
  */
 public class AttributeLegend extends JPanel {
     private static final Comparator attributeComparator = new Comparator() {
-            public int compare( Object o1, Object o2) {
+            @Override
+			public int compare( Object o1, Object o2) {
                 return ((Attribute) o1).getDescription().compareToIgnoreCase
                     ( ((Attribute) o2).getDescription());
             }
 
-            public boolean equals( Object o) { return o == this; }
+            @Override
+			public boolean equals( Object o) { return o == this; }
         };
 
     private static final Comparator categoryComparator = new Comparator() {
-            public int compare( Object o1, Object o2) {
+            @Override
+			public int compare( Object o1, Object o2) {
                 return ((CategoryAttributeValue) o1).getShortName().
                     compareToIgnoreCase( ((CategoryAttributeValue) o2).getShortName());
             }
 
-            public boolean equals( Object o) { return o == this; }            
+            @Override
+			public boolean equals( Object o) { return o == this; }            
         };
 
     private static final class DictionaryItem {
@@ -78,7 +83,8 @@ public class AttributeLegend extends JPanel {
             text = _text;
         }
         
-        public String toString() { return dictionaryName; }
+        @Override
+		public String toString() { return dictionaryName; }
         public String getText() { return text; }
     } // class DictionaryItem
 
@@ -91,7 +97,8 @@ public class AttributeLegend extends JPanel {
         dictionaryChoice = new JComboBox();
         dictionaryChoice.setEditable( false);
         dictionaryChoice.addActionListener( new ActionListener() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     showSelectedDictionary();
                 }
             });
@@ -104,8 +111,8 @@ public class AttributeLegend extends JPanel {
         legend = new JEditorPane();
         legend.setEditable( false);
         legend.setContentType( "text/html");
-        legendScroller = new JScrollPane( legend, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                                          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        legendScroller = new JScrollPane( legend, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                                          ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add( legendScroller, BorderLayout.CENTER);
     }
 

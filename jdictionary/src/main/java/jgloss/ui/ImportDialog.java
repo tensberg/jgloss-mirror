@@ -47,6 +47,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -108,7 +110,8 @@ public class ImportDialog extends JDialog implements TextListener {
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
         final Action ok = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     if (getSelection().length() > 0) {
                         result = true;
                         ImportDialog.this.hide();
@@ -130,7 +133,8 @@ public class ImportDialog extends JDialog implements TextListener {
         ok.setEnabled( true);
         UIUtilities.initAction( ok, "button.import");
         final Action cancel = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     result = false;
                     ImportDialog.this.hide();
                 }
@@ -145,9 +149,10 @@ public class ImportDialog extends JDialog implements TextListener {
         b.add( Box.createHorizontalStrut( 5));
         main.add( b, BorderLayout.SOUTH);
 
-        this.setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
         this.addWindowListener( new WindowAdapter() {
-                public void windowClosing( WindowEvent e) {
+                @Override
+				public void windowClosing( WindowEvent e) {
                     cancel.actionPerformed( null);
                 }
             });        
@@ -156,7 +161,7 @@ public class ImportDialog extends JDialog implements TextListener {
 
         b = Box.createVerticalBox();
 
-        selectionPane = new JTabbedPane( JTabbedPane.TOP);
+        selectionPane = new JTabbedPane( SwingConstants.TOP);
         Box b2 = Box.createVerticalBox();
         Box b3 = Box.createHorizontalBox();
         JLabel l = new JLabel( JGloss.messages.getString( "import.urlorfile"));
@@ -169,7 +174,8 @@ public class ImportDialog extends JDialog implements TextListener {
         b3.add( filename);
         
         final Action choosefile = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
                     f.setFileHidingEnabled( true);
                     f.setFileView( CustomFileView.getFileView());
@@ -225,7 +231,8 @@ public class ImportDialog extends JDialog implements TextListener {
         // To get the layering in the tabbed pane correct, I have to remove the paste area
         // if the tab is not selected.
         selectionPane.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
+                @Override
+				public void stateChanged( ChangeEvent e) {
                     pastearea.setVisible( selectionPane.getSelectedIndex() == 1);
                 }
             });
@@ -250,7 +257,8 @@ public class ImportDialog extends JDialog implements TextListener {
         parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
                                    ( Chasen.getDefaultExecutable()));
         JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {
-                public void propertyChange( PropertyChangeEvent e) {
+                @Override
+				public void propertyChange( PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( Preferences.CHASEN_LOCATION))
                         parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
                                                    ( (String) e.getNewValue()));
@@ -331,7 +339,8 @@ public class ImportDialog extends JDialog implements TextListener {
      * correctly by the Java environment. This is only done if the text area was empty prior to the
      * change which triggered the event.
      */
-    public void textValueChanged( TextEvent e) {
+    @Override
+	public void textValueChanged( TextEvent e) {
         String text = pastearea.getText();
         if (!pasteareaWasEmpty) {
             pasteareaWasEmpty = text.length() == 0;

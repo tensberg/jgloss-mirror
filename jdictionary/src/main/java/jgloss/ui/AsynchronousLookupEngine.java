@@ -43,7 +43,8 @@ public class AsynchronousLookupEngine extends LookupEngine {
             setDaemon( true);
         }
 
-        public void run() {
+        @Override
+		public void run() {
             synchronized (THREAD_LOCK) {
                 while (!terminateThread) try {
                     if (model == null)
@@ -112,7 +113,8 @@ public class AsynchronousLookupEngine extends LookupEngine {
     }
 
 
-    public void doLookup( LookupModel model) {
+    @Override
+	public void doLookup( LookupModel model) {
         doLookup( model, null);
     }
 
@@ -139,7 +141,8 @@ public class AsynchronousLookupEngine extends LookupEngine {
         searchThread = null;
     }
 
-    protected void finalize() {
+    @Override
+	protected void finalize() {
         dispose();
     }
 } // class AsynchronousLookupEngine

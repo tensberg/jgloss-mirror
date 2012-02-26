@@ -43,7 +43,8 @@ public class AttributeResultFilter implements LookupResultFilter {
         acceptIfSet = _acceptIfSet;
     }
 
-    public boolean accept( DictionaryEntry de) { 
+    @Override
+	public boolean accept( DictionaryEntry de) { 
         if (!enableFor( de.getDictionary()))
             return true;
 
@@ -103,11 +104,15 @@ public class AttributeResultFilter implements LookupResultFilter {
         return false;
     }
 
-    public boolean enableFor( Dictionary dic) { 
+    @Override
+	public boolean enableFor( Dictionary dic) { 
         return dic.getSupportedAttributes().contains( attribute);
     }
 
-    public String getName() { return name; }
-    public String getDescription() { return description; }
-    public Component getCustomConfigUI() { return null; }
+    @Override
+	public String getName() { return name; }
+    @Override
+	public String getDescription() { return description; }
+    @Override
+	public Component getCustomConfigUI() { return null; }
 } // class AttributeResultFilter

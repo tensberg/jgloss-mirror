@@ -217,7 +217,8 @@ public class Annotation {
         annotatedTextReading = reading.toString();
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer out = new StringBuffer();
         out.append( annotatedText);
         if (annotatedTextReading!=null &&

@@ -31,5 +31,6 @@ public class InformationAttributeValue implements AttributeValue {
     }
 
     public String getInformation() { return information; }
-    public String toString() { return '"' + information + '"'; }
+    @Override
+	public String toString() { return '"' + information + '"'; }
 } // class InformationAttributeValue

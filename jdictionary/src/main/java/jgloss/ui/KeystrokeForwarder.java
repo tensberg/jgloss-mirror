@@ -44,15 +44,18 @@ public class KeystrokeForwarder implements KeyListener {
         forwardedKeystrokes.put(keystroke, target);
     }
 
-    public void keyPressed(KeyEvent event) {
+    @Override
+	public void keyPressed(KeyEvent event) {
         forwardKeyEvent(event);
     }
 
-    public void keyReleased(KeyEvent event) {
+    @Override
+	public void keyReleased(KeyEvent event) {
         forwardKeyEvent(event);
     }
     
-    public void keyTyped(KeyEvent event) {
+    @Override
+	public void keyTyped(KeyEvent event) {
         forwardKeyEvent(event);
     }
 

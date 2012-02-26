@@ -77,33 +77,39 @@ class AnnotationGenerator extends DefaultHandler {
         readingAtts.addAttribute( "", "", JGlossDocument.Attributes.READING, CDATA, "");
     }
 
-    public void setDocumentLocator( Locator locator) {
+    @Override
+	public void setDocumentLocator( Locator locator) {
         parent.setDocumentLocator( locator);
     }
 
-    public void startDocument() throws SAXException {
+    @Override
+	public void startDocument() throws SAXException {
         parent.startDocument();
 
         annotateText = true;
         inP = false;
     }
 
-    public void endDocument() throws SAXException {
+    @Override
+	public void endDocument() throws SAXException {
         parent.endDocument();
 
         // TODO: Progress Bar: the next command takes very long
         parser.reset();
     }
 
-    public void startPrefixMapping( String prefix, String uri) throws SAXException {
+    @Override
+	public void startPrefixMapping( String prefix, String uri) throws SAXException {
         parent.startPrefixMapping( prefix, uri);
     }
 
-    public void endPrefixMapping( String prefix) throws SAXException {
+    @Override
+	public void endPrefixMapping( String prefix) throws SAXException {
         parent.endPrefixMapping( prefix);
     }
 
-    public void startElement( String namespaceURI, String localName,
+    @Override
+	public void startElement( String namespaceURI, String localName,
                               String qName, Attributes atts)
         throws SAXException {
         parent.startElement( namespaceURI, localName, qName, atts);
@@ -111,7 +117,8 @@ class AnnotationGenerator extends DefaultHandler {
             inP = true;
     }
 
-    public void endElement( String namespaceURI, String localName,
+    @Override
+	public void endElement( String namespaceURI, String localName,
                             String qName) throws SAXException {
         parent.endElement( namespaceURI, localName, qName);
         if (P_ELEMENT.equals( localName) || P_ELEMENT.equals( qName))
@@ -122,7 +129,8 @@ class AnnotationGenerator extends DefaultHandler {
      * Handle character strings in the document. The string is parsed and annotations are
      * inserted.
      */
-    public void characters( char[] c, int start, int length) throws SAXException {
+    @Override
+	public void characters( char[] c, int start, int length) throws SAXException {
         if (!(inP && annotateText)) {
             parent.characters( c, start, length);
             return;
@@ -231,38 +239,46 @@ class AnnotationGenerator extends DefaultHandler {
             parent.characters( c, lastEnd, start+length-lastEnd);
     }
 
-    public void ignorableWhitespace( char[] ch, int start, int length)
+    @Override
+	public void ignorableWhitespace( char[] ch, int start, int length)
         throws SAXException {
         parent.ignorableWhitespace( ch, start, length);
     }
 
-    public void processingInstruction( String target, String data)
+    @Override
+	public void processingInstruction( String target, String data)
         throws SAXException {
         parent.processingInstruction( target, data);
     }
 
-    public void skippedEntity( String name) throws SAXException {
+    @Override
+	public void skippedEntity( String name) throws SAXException {
         parent.skippedEntity( name);
     }
 
-    public void error( SAXParseException e) throws SAXException {
+    @Override
+	public void error( SAXParseException e) throws SAXException {
         e.printStackTrace();
     }
 
-    public void warning( SAXParseException e) throws SAXException {
+    @Override
+	public void warning( SAXParseException e) throws SAXException {
         e.printStackTrace();
     }
 
-    public InputSource resolveEntity( String publicId, String systemId) throws SAXException, IOException {
+    @Override
+	public InputSource resolveEntity( String publicId, String systemId) throws SAXException, IOException {
         return parent.resolveEntity( publicId, systemId);
     }
 
-    public void notationDecl( String name, String publicId, String systemId)
+    @Override
+	public void notationDecl( String name, String publicId, String systemId)
         throws SAXException {
         parent.notationDecl( name, publicId, systemId);
     }
 
-    public void unparsedEntityDecl( String name, String publicId, String systemId,
+    @Override
+	public void unparsedEntityDecl( String name, String publicId, String systemId,
                                     String notationName)
         throws SAXException {
         parent.unparsedEntityDecl( name, publicId, systemId, notationName);

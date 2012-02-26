@@ -80,42 +80,50 @@ public class LookupResultProxy implements LookupResultHandler, Cloneable {
         handlers.clear();
     }
 
-    public void startLookup( String description) {
+    @Override
+	public void startLookup( String description) {
         for (Iterator i=handlers.iterator(); i.hasNext(); )
             ((LookupResultHandler) i.next()).startLookup( description);
     }
 
-    public void startLookup( LookupModel model) {
+    @Override
+	public void startLookup( LookupModel model) {
         for (Iterator i=handlers.iterator(); i.hasNext(); )
             ((LookupResultHandler) i.next()).startLookup( model);
     }
 
-    public void dictionary( Dictionary dictionary) {
+    @Override
+	public void dictionary( Dictionary dictionary) {
         for (Iterator i=handlers.iterator(); i.hasNext(); )
             ((LookupResultHandler) i.next()).dictionary( dictionary);
     }
 
-    public void dictionaryEntry( DictionaryEntry entry) {
+    @Override
+	public void dictionaryEntry( DictionaryEntry entry) {
         for (Iterator i=handlers.iterator(); i.hasNext(); )
             ((LookupResultHandler) i.next()).dictionaryEntry( entry);
     }
 
-    public void exception( SearchException ex) {
+    @Override
+	public void exception( SearchException ex) {
         for (Iterator i=handlers.iterator(); i.hasNext(); )
             ((LookupResultHandler) i.next()).exception( ex);
     }
 
-    public void note( String note) {
+    @Override
+	public void note( String note) {
         for (Iterator i=handlers.iterator(); i.hasNext(); )
             ((LookupResultHandler) i.next()).note( note);
     }
 
-    public void endLookup() {
+    @Override
+	public void endLookup() {
         for (Iterator i=handlers.iterator(); i.hasNext(); )
             ((LookupResultHandler) i.next()).endLookup();
     }
 
-    public Object clone() throws CloneNotSupportedException {
+    @Override
+	public Object clone() throws CloneNotSupportedException {
         try {
             LookupResultProxy out = (LookupResultProxy) super.clone();
             out.handlers = new ArrayList(out.handlers);

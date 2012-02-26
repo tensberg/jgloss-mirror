@@ -52,7 +52,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param key Key to a preference.
      * @return The corresponding preference string.
      */
-    public String getString( String key, String d) {
+    @Override
+	public String getString( String key, String d) {
         String defaultPref = defaults.getProperty( key);
         if (defaultPref == null)
             defaultPref = d;
@@ -65,7 +66,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param key Key to the preference.
      * @param value The new value. May be <CODE>null</CODE> to reset to the default preference.
      */
-    public void set( String key, String value) {
+    @Override
+	public void set( String key, String value) {
         if (value != null)
             prefs.put( key, value);
         else
@@ -80,7 +82,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param d Default value, if the preference is not parseable as int.
      * @return The corresponding preference value.
      */
-    public int getInt( String key, int d) {
+    @Override
+	public int getInt( String key, int d) {
         int def = d;
         try {
             def = Integer.parseInt( defaults.getProperty( key));
@@ -96,7 +99,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public void set( String key, int value) {
+    @Override
+	public void set( String key, int value) {
         prefs.putInt( key, value);
     }
 
@@ -108,7 +112,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param d Default value, if the preference is not parseable as double.
      * @return The corresponding preference value.
      */
-    public double getDouble( String key, double d) {
+    @Override
+	public double getDouble( String key, double d) {
         double def = d;
         try {
             def = Double.parseDouble( defaults.getProperty( key));
@@ -124,7 +129,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public void set( String key, double value) {
+    @Override
+	public void set( String key, double value) {
         prefs.putDouble( key, value);
     }
 
@@ -135,7 +141,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param key Key to the preference.
      * @return The corresponding preference value.
      */
-    public boolean getBoolean( String key, boolean d) {
+    @Override
+	public boolean getBoolean( String key, boolean d) {
         boolean def;
         String value = defaults.getProperty( key);
         if ("true".equalsIgnoreCase( value))
@@ -153,7 +160,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public void set( String key, boolean value) {
+    @Override
+	public void set( String key, boolean value) {
         prefs.putBoolean( key, value);
     }
 
@@ -162,7 +170,8 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      * The field <CODE>oldValue</CODE> of the property change event is not supported and
      * set to <CODE>null</CODE>.
      */
-    public void preferenceChange( PreferenceChangeEvent e) {
+    @Override
+	public void preferenceChange( PreferenceChangeEvent e) {
         firePropertyChanged( e.getKey(), null, e.getNewValue());
     }
 } // class JavaPreferences

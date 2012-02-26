@@ -49,7 +49,6 @@ import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.ui.StyleDialog;
 import jgloss.ui.UIUtilities;
-import jgloss.ui.StyleDialog.ColorIcon;
 import jgloss.ui.html.AnnotationTags;
 import jgloss.ui.html.JGlossEditor;
 
@@ -113,7 +112,8 @@ public class DocumentStyleDialog extends StyleDialog {
         super();
     }
 
-    protected void insertAdditionalControls( String[] allFonts) {
+    @Override
+	protected void insertAdditionalControls( String[] allFonts) {
         currentStyles = new HashMap( 10);
         styleSheets = new ArrayList( 10);
 
@@ -133,7 +133,8 @@ public class DocumentStyleDialog extends StyleDialog {
         translationFontSize.setEditable( true);
 
         ActionListener colorActionListener = new ActionListener() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     doColorChooser( (JButton) e.getSource());
                 }
             };
@@ -146,19 +147,22 @@ public class DocumentStyleDialog extends StyleDialog {
 
         textUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
         textUseColor.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
+                @Override
+				public void stateChanged( ChangeEvent e) {
                     textColor.setEnabled( textUseColor.isSelected());
                 }
             });
         readingUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
         readingUseColor.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
+                @Override
+				public void stateChanged( ChangeEvent e) {
                     readingColor.setEnabled( readingUseColor.isSelected());
                 }
             });
         translationUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
         translationUseColor.addChangeListener( new ChangeListener() {
-                public void stateChanged( ChangeEvent e) {
+                @Override
+				public void stateChanged( ChangeEvent e) {
                     translationColor.setEnabled( translationUseColor.isSelected());
                 }
             });
@@ -282,7 +286,8 @@ public class DocumentStyleDialog extends StyleDialog {
         }
     }
 
-    public void loadPreferences() {
+    @Override
+	public void loadPreferences() {
         super.loadPreferences();
         
         insertAndSelect( textFont, JGloss.prefs.getString( Preferences.FONT_TEXT));
@@ -311,7 +316,8 @@ public class DocumentStyleDialog extends StyleDialog {
             ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xffffff))));
     }
 
-    public void savePreferences() {
+    @Override
+	public void savePreferences() {
         super.savePreferences();
 
         String font = (String) textFont.getSelectedItem();
@@ -362,7 +368,8 @@ public class DocumentStyleDialog extends StyleDialog {
         JGloss.prefs.set( Preferences.ANNOTATION_HIGHLIGHT_COLOR, color.getRGB() & 0xffffff);
     }
 
-    public void applyPreferences() {
+    @Override
+	public void applyPreferences() {
         super.applyPreferences();
 
         // apply document view styles
@@ -469,14 +476,16 @@ public class DocumentStyleDialog extends StyleDialog {
                                    ( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
     }
 
-    protected void selectJapaneseFont( String fontname) {
+    @Override
+	protected void selectJapaneseFont( String fontname) {
         insertAndSelect( textFont, fontname);
         insertAndSelect( readingFont, fontname);
         insertAndSelect( translationFont, fontname);
         super.selectJapaneseFont( fontname);
     }
 
-    protected JComboBox[] getAutodetectedFonts() {
+    @Override
+	protected JComboBox[] getAutodetectedFonts() {
         return new JComboBox[] { wordLookupFont, textFont, readingFont, translationFont };
     }
 } // class DocumentStyleDialog

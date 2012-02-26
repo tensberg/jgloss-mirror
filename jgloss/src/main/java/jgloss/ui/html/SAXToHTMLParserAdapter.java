@@ -51,11 +51,13 @@ class SAXToHTMLParserAdapter extends DefaultHandler {
         dtd = _dtd;
     }
 
-    public void startDocument() throws SAXException {
+    @Override
+	public void startDocument() throws SAXException {
         position = 0;
     }
 
-    public void endDocument() throws SAXException {
+    @Override
+	public void endDocument() throws SAXException {
         htmlHandler.handleEndOfLineString( "\n");
         try {
             htmlHandler.flush();
@@ -72,7 +74,8 @@ class SAXToHTMLParserAdapter extends DefaultHandler {
         return tag;
     }
 
-    public void startElement( String uri, String localName, String qName,
+    @Override
+	public void startElement( String uri, String localName, String qName,
                               Attributes attributes) throws SAXException {
         MutableAttributeSet htmlAtts = new SimpleAttributeSet();
         for ( int i=0; i<attributes.getLength(); i++) {
@@ -87,7 +90,8 @@ class SAXToHTMLParserAdapter extends DefaultHandler {
         position += qName.length();
     }
 
-    public void endElement( String uri, String localName, String qName)
+    @Override
+	public void endElement( String uri, String localName, String qName)
         throws SAXException {
         if (!dtd.getElement( qName).isEmpty()) {
             htmlHandler.handleEndTag( getTag( qName), position);
@@ -95,7 +99,8 @@ class SAXToHTMLParserAdapter extends DefaultHandler {
         }
     }
 
-    public void characters( char[] c, int start, int length) throws SAXException {
+    @Override
+	public void characters( char[] c, int start, int length) throws SAXException {
         // don't forward ignorable whitespace
         // TODO: implement real ignorable whitespace handling
         if (length==1 && c[start]=='\n')
@@ -111,15 +116,18 @@ class SAXToHTMLParserAdapter extends DefaultHandler {
         position += length;
     }
 
-    public void warning( SAXParseException e) throws SAXException {
+    @Override
+	public void warning( SAXParseException e) throws SAXException {
         htmlHandler.handleError( "WARNING: " + e.getMessage(), position);
     }
 
-    public void error( SAXParseException e) throws SAXException {
+    @Override
+	public void error( SAXParseException e) throws SAXException {
         htmlHandler.handleError( "ERROR: " + e.getMessage(), position);   
     }
 
-    public void fatalError( SAXParseException e) throws SAXException {
+    @Override
+	public void fatalError( SAXParseException e) throws SAXException {
         htmlHandler.handleError( "FATAL ERROR: " + e.getMessage(), position);
         throw e;
     }

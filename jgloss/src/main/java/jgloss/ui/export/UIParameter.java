@@ -73,7 +73,8 @@ abstract class UIParameter extends AbstractParameter {
      * Configure the UI parameter from a XML element. Initializes the name, default value,
      * preferences key and label.
      */
-    protected void initFromElement( Element elem) {
+    @Override
+	protected void initFromElement( Element elem) {
         super.initFromElement( elem);
         label = JGloss.messages.getString( elem.getAttribute( ExportConfiguration.Attributes.LABEL_KEY));
         prefsKey = elem.getAttribute( ExportConfiguration.Attributes.PREFS_KEY);

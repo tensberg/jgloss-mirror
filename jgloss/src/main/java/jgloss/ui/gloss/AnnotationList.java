@@ -80,15 +80,18 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         
         public KeyListener getDelegatee() { return delegatee; }
 
-        public void keyPressed( KeyEvent event) {
+        @Override
+		public void keyPressed( KeyEvent event) {
             delegatee.keyPressed( event);
         }
 
-        public void keyReleased( KeyEvent event) {
+        @Override
+		public void keyReleased( KeyEvent event) {
             delegatee.keyReleased( event);
         }
 
-        public void keyTyped( KeyEvent event) {
+        @Override
+		public void keyTyped( KeyEvent event) {
             // ignore this event
             // FIXME: if the keyTyped event is ever used for something useful in later Java releases,
             // this will break.
@@ -146,7 +149,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 
         // remove the currently selected annotation
         removeAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     removeSelectedAnnotation();
                 }
             };
@@ -155,7 +159,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         // add the word of the selected annotation to the list of excluded words
         // The word is added as it appears in the text and in its dictionary form
         addToExclusionsAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     addSelectionToExclusions();
                 }
             };
@@ -163,7 +168,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         addToExclusionsAction.setEnabled( false);
         // add the selected annotation to the user dictionary
         addToDictionaryAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     addSelectionToDictionary();
                 }
             };
@@ -184,7 +190,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         // add keyboard shortcuts for editing the tree
         // set reading/translation text to the empty string
         clearTranslationAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     Annotation selection = (Annotation) getSelectedValue();
                     if (selection != null)
                         selection.setTranslation( null);
@@ -194,7 +201,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         clearTranslationAction.setEnabled( false);
         // select the following annotation
         Action nextAnnotationAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     int selection = getSelectedIndex();
                     if (selection>-1 && selection<annotationList.getAnnotationCount()-1)
                         setSelectedIndex( selection+1);
@@ -203,7 +211,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         UIUtilities.initAction( nextAnnotationAction, "annotationeditor.action.next");
         // select the previous annotation
         Action previousAnnotationAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     int selection = getSelectedIndex();
                     if (selection > 0)
                         setSelectedIndex( selection-1);
@@ -259,7 +268,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
      *
      * @param e The mouse event.
      */
-    public void mouseClicked(MouseEvent e) {
+    @Override
+	public void mouseClicked(MouseEvent e) {
       checkPopupMenu( e);
     }
 
@@ -268,7 +278,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
      *
      * @param e The mouse event.
      */
-    public void mousePressed(MouseEvent e) {
+    @Override
+	public void mousePressed(MouseEvent e) {
       checkPopupMenu( e);
     }
 
@@ -277,12 +288,15 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
      *
      * @param e The mouse event.
      */
-    public void mouseReleased(MouseEvent e) {
+    @Override
+	public void mouseReleased(MouseEvent e) {
       checkPopupMenu( e);
     }
 
-    public void mouseEntered(MouseEvent e) {}
-    public void mouseExited(MouseEvent e) {}
+    @Override
+	public void mouseEntered(MouseEvent e) {}
+    @Override
+	public void mouseExited(MouseEvent e) {}
 
     /**
      * Display a context menu for the current position if the mouse event is a popup trigger.
@@ -339,7 +353,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
     /**
      * Wraps the handler in a {@link AnnotationList.KeyEventDelegator KeyEventDelegator}.
      */
-    public void addKeyListener( KeyListener handler) {
+    @Override
+	public void addKeyListener( KeyListener handler) {
         if (handler.getClass().getName().equals( "javax.swing.plaf.basic.BasicListUI$KeyHandler")) {
             super.addKeyListener( new KeyEventDelegator( handler));
         }
@@ -350,7 +365,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
     /**
      * Removes the {@link AnnotationList.KeyEventDelegator KeyEventDelegator} which wraps the handler.
      */
-    public void removeKeyListener( KeyListener handler) {
+    @Override
+	public void removeKeyListener( KeyListener handler) {
         if (handler.getClass().getName().equals( "javax.swing.plaf.basic.BasicListUI$KeyHandler")) {
             KeyListener delegator = releaseDelegator( handler);
             if (delegator != null)
@@ -360,7 +376,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         }
     }
 
-    public void setSelectedIndex(int index) {
+    @Override
+	public void setSelectedIndex(int index) {
         
         super.setSelectedIndex(index);
         // Scroll to visible
@@ -370,7 +387,8 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
     /**
      * Adapts the state of the annotation-specific actions in response to changes in the selection.
      */
-    public void valueChanged(ListSelectionEvent e) {
+    @Override
+	public void valueChanged(ListSelectionEvent e) {
         boolean annoSelected = (getSelectedIndex() != -1); // HERE
         removeAction.setEnabled(annoSelected);
         addToExclusionsAction.setEnabled(annoSelected);

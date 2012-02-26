@@ -47,8 +47,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 import jgloss.dictionary.DictionaryFactory;
-import jgloss.dictionary.EDict;
-import jgloss.dictionary.KanjiDic;
 import jgloss.parser.KanjiParser;
 import jgloss.parser.Parser;
 import jgloss.util.CharacterEncodingDetector;
@@ -180,7 +178,8 @@ public class JGlossServlet extends HttpServlet {
     /**
      * Reads the initialization parameters and loads the dictionaries.
      */
-    public void init( ServletConfig config) throws ServletException {
+    @Override
+	public void init( ServletConfig config) throws ServletException {
         super.init( config);
 
         HttpURLConnection.setFollowRedirects( false);
@@ -350,19 +349,22 @@ public class JGlossServlet extends HttpServlet {
         getServletContext().log( "content compression " + (enableCompression ? "enabled" : "disabled"));
     }
 
-    public void destroy() {
+    @Override
+	public void destroy() {
         super.destroy();
 
         for ( int i=0; i<dictionaries.length; i++)
             dictionaries[i].dispose();
     }
 
-    protected void doGet( HttpServletRequest req, HttpServletResponse resp)
+    @Override
+	protected void doGet( HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
         doGetPost( req, resp, false);
     }
 
-    protected void doPost( HttpServletRequest req, HttpServletResponse resp)
+    @Override
+	protected void doPost( HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
         doGetPost( req, resp, true);
     }

@@ -44,5 +44,6 @@ public class MatchMode {
         this.name = _name;
     }
 
-    public String toString() { return name; }
+    @Override
+	public String toString() { return name; }
 } // class MatchMode

@@ -100,21 +100,24 @@ public class XCVManager {
         sourceActions = new HashMap( 5);
 
         cutAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     delegateeCutAction.actionPerformed( e);
                 }
             };
         cutAction.setEnabled( false);
         UIUtilities.initAction( cutAction, "xcv.menu.cut");
         copyAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     delegateeCopyAction.actionPerformed( e);
                 }
             };
         copyAction.setEnabled( false);
         UIUtilities.initAction( copyAction, "xcv.menu.copy");
         pasteAction = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+                @Override
+				public void actionPerformed( ActionEvent e) {
                     delegateePasteAction.actionPerformed( e);
                 }
             };
@@ -122,19 +125,24 @@ public class XCVManager {
         UIUtilities.initAction( pasteAction, "xcv.menu.paste");
 
         editMenuListener = new MenuListener() {
-                public void menuSelected( MenuEvent e) {
+                @Override
+				public void menuSelected( MenuEvent e) {
                     updateActionState();
                 }
-                public void menuDeselected( MenuEvent e) {}
-                public void menuCanceled( MenuEvent e) {}
+                @Override
+				public void menuDeselected( MenuEvent e) {}
+                @Override
+				public void menuCanceled( MenuEvent e) {}
             };
 
         setActiveActionListener = new FocusListener() {
-                public void focusGained( FocusEvent e) {
+                @Override
+				public void focusGained( FocusEvent e) {
                     setActiveSource( (JTextComponent) e.getSource());
                 }
 
-                public void focusLost( FocusEvent e) {
+                @Override
+				public void focusLost( FocusEvent e) {
                     if (!e.isTemporary())
                         setActiveSource( null);
                 }

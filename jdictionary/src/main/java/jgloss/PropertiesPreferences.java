@@ -59,7 +59,8 @@ class PropertiesPreferences extends Preferences {
         }
         // store the preferences at shutdown
         Runtime.getRuntime().addShutdownHook( new Thread() {
-                public void run() {
+                @Override
+				public void run() {
                     try {
                         store();
                     } catch (IOException ex) {
@@ -69,7 +70,8 @@ class PropertiesPreferences extends Preferences {
             });
     }
 
-    public synchronized String getString( String key, String d) {
+    @Override
+	public synchronized String getString( String key, String d) {
         String out = prefs.getProperty( key);
         if (out == null)
             out = d;
@@ -83,7 +85,8 @@ class PropertiesPreferences extends Preferences {
      * @param key Key to the preference.
      * @param value The new value. May be <CODE>null</CODE> to reset to the default preference.
      */
-    public synchronized void set( String key, String value) {
+    @Override
+	public synchronized void set( String key, String value) {
         // test if the value really changed
         String orig = getString( key);
         if (value!=null && !value.equals( orig) || orig==null) {
@@ -101,7 +104,8 @@ class PropertiesPreferences extends Preferences {
      * @param d Default value, if the preference is not parseable as int.
      * @return The corresponding preference value.
      */
-    public synchronized int getInt( String key, int d) {
+    @Override
+	public synchronized int getInt( String key, int d) {
         int out = d;
         try {
             out = Integer.parseInt( getString( key));
@@ -118,7 +122,8 @@ class PropertiesPreferences extends Preferences {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public synchronized void set( String key, int value) {
+    @Override
+	public synchronized void set( String key, int value) {
         set( key, Integer.toString( value));
     }
 
@@ -130,7 +135,8 @@ class PropertiesPreferences extends Preferences {
      * @param d Default value, if the preference is not parseable as double.
      * @return The corresponding preference value.
      */
-    public synchronized double getDouble( String key, double d) {
+    @Override
+	public synchronized double getDouble( String key, double d) {
         double out = d;
         try {
             out = Double.parseDouble( getString( key));
@@ -147,7 +153,8 @@ class PropertiesPreferences extends Preferences {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public synchronized void set( String key, double value) {
+    @Override
+	public synchronized void set( String key, double value) {
         set( key, Double.toString( value));
     }
 
@@ -158,7 +165,8 @@ class PropertiesPreferences extends Preferences {
      * @param key Key to the preference.
      * @return The corresponding preference value.
      */
-    public synchronized boolean getBoolean( String key, boolean d) {
+    @Override
+	public synchronized boolean getBoolean( String key, boolean d) {
         String value = getString( key);
         if ("true".equalsIgnoreCase( value))
             return true;
@@ -174,7 +182,8 @@ class PropertiesPreferences extends Preferences {
      * @param key Key to the preference.
      * @param value The new value.
      */
-    public synchronized void set( String key, boolean value) {
+    @Override
+	public synchronized void set( String key, boolean value) {
         set( key, value ? "true" : "false");
     }
 
