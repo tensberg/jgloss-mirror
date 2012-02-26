@@ -37,5 +37,5 @@ public interface AttributeValueFormatter {
      * @param buf String buffer to which the formatted attribute is appended.
      * @return The string buffer passed in.
      */
-    StringBuilder format( Attribute att, AttributeValue val, StringBuilder buf);
+    StringBuilder format( Attribute<?> att, AttributeValue val, StringBuilder buf);
 } // interface AttributeValueFormatter

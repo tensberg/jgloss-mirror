@@ -38,7 +38,7 @@ public class ReferenceAttributeFormatter extends DefaultAttributeFormatter {
     }
 
     @Override
-	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder buf) {
+	public StringBuilder format( Attribute<?> att, AttributeValue val, StringBuilder buf) {
         buf.append( beforeValue);
         buf.append( ((ReferenceAttributeValue) val).getReferenceTitle());
         buf.append( afterValue);

@@ -24,7 +24,9 @@
 package jgloss.dictionary.attribute;
 
 public class AttributeNotSetException extends Exception {
-    protected Attribute attribute;
+    private static final long serialVersionUID = 1L;
+
+    protected Attribute<?> attribute;
 
     public AttributeNotSetException() {}
 
@@ -32,9 +34,9 @@ public class AttributeNotSetException extends Exception {
         super( message);
     }
 
-    public AttributeNotSetException( Attribute _attribute) {
+    public AttributeNotSetException( Attribute<?> _attribute) {
         this.attribute = _attribute;
     }
 
-    public Attribute getAttribute() { return attribute; }
+    public Attribute<?> getAttribute() { return attribute; }
 } // class AttributeNotDefinedException

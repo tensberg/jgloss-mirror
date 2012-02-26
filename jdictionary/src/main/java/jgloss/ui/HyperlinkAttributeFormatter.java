@@ -1,37 +1,37 @@
 package jgloss.ui;
 
+import java.util.List;
 import java.util.Map;
 
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeFormatter;
 import jgloss.dictionary.attribute.AttributeValue;
 import jgloss.dictionary.attribute.AttributeValueFormatter;
-import jgloss.dictionary.attribute.ValueList;
 
 class HyperlinkAttributeFormatter extends AttributeFormatter {
     class ReferencedAttribute {
-        protected Attribute attribute;
-        protected ValueList values;
+        protected Attribute<?> attribute;
+        protected List<? extends AttributeValue> values;
         protected AttributeValue value;
 
-        protected ReferencedAttribute( Attribute _attribute, ValueList _values,
+        protected ReferencedAttribute( Attribute<?> _attribute, List<? extends AttributeValue> _values,
                                        AttributeValue _value) {
             attribute = _attribute;
             values = _values;
             value = _value;
         }
 
-        Attribute getAttribute() { return attribute; }
-        ValueList getValueList() { return values; }
+        Attribute<?> getAttribute() { return attribute; }
+        List<? extends AttributeValue> getValueList() { return values; }
         AttributeValue getValue() { return value; }
     } // interface ReferencedAttribute
 
     protected AttributeFormatter parent;
-    protected Map references;
+    protected Map<String, ReferencedAttribute> references;
     protected String protocol;
     protected boolean linkValues;
 
-    HyperlinkAttributeFormatter( String _protocol, boolean _linkValues, Map _references, 
+    HyperlinkAttributeFormatter( String _protocol, boolean _linkValues, Map<String, ReferencedAttribute> _references, 
                                  AttributeFormatter _parent) {
         protocol = _protocol;
         references = _references;
@@ -40,8 +40,8 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuilder format( AttributeValueFormatter formatter, Attribute att, 
-                                ValueList val, StringBuilder buf) {
+	public StringBuilder format( AttributeValueFormatter formatter, Attribute<?> att, 
+                                List<? extends AttributeValue> val, StringBuilder buf) {
         if (linkValues) {
             parent.format( formatter, att, val, buf);
         }
@@ -56,7 +56,7 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuilder format( final Attribute att, final AttributeValue val, StringBuilder buf) {
+	public StringBuilder format( Attribute<?> att, AttributeValue val, StringBuilder buf) {
         if (!linkValues) {
             parent.format( att, val, buf);
         }

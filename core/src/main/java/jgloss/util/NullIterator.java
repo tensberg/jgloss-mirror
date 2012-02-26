@@ -30,8 +30,13 @@ import java.util.NoSuchElementException;
  * Iterator implementation without any elements. The singleton instance of this
  * iterator can be used wherever an iteration over an empty collection is required.
  */
-public class NullIterator implements Iterator {
-    public static final Iterator INSTANCE = new NullIterator();
+public class NullIterator<T> implements Iterator<T> {
+    public static final Iterator<Object> INSTANCE = new NullIterator<Object>();
+    
+    @SuppressWarnings("unchecked")
+    public static <T> Iterator<T> instance() {
+    	return (Iterator<T>) INSTANCE;
+    }
 
     private NullIterator() {}
 
@@ -39,7 +44,7 @@ public class NullIterator implements Iterator {
 	public boolean hasNext() { return false; }
 
     @Override
-	public Object next() throws NoSuchElementException { 
+	public T next() throws NoSuchElementException { 
         throw new NoSuchElementException();
     }
 

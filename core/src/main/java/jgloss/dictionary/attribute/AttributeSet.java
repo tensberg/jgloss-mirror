@@ -24,6 +24,7 @@
 package jgloss.dictionary.attribute;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Set of attribute key/object mappings used by {@link jgloss.dictionary.DictionaryEntry DictionaryEntry}.
@@ -39,19 +40,19 @@ public interface AttributeSet {
      * @param resolveInherited <code>true</code> if the key is searched in the parent sets too, 
      *                  <code>false</code> if inherited attributes should be ignored.
      */
-    boolean containsKey( Attribute key, boolean resolveInherited);
+    boolean containsKey( Attribute<?> key, boolean resolveInherited);
     /**
      * Test if the attribute is set and has the specified value.
      */
-    boolean contains( Attribute key, AttributeValue value, boolean resolveInherited);
+    boolean contains( Attribute<?> key, AttributeValue value, boolean resolveInherited);
     /**
-     * Returns the attribute for a given key. The type of the attribute depends on the key.
+     * Returns the attribute values for a given attribute. The type of the values depends on the attribute.
      *
      * @param key Attribute key for which the attribute is requested.
      * @param resolveInherited <code>true</code> if the attribute is searched in the parent sets too, 
      *                  <code>false</code> if inherited attributes should be ignored.
      */
-    ValueList getAttribute( Attribute key, boolean resolveInherited);
+    <T extends AttributeValue> List<T> getAttribute( Attribute<T> key, boolean resolveInherited);
     /**
      * Test if a given attribute is inherited from a parent attribute set.
      *
@@ -59,7 +60,7 @@ public interface AttributeSet {
      *         is contained in this set.
      * @exception AttributeNotSetException if the attribute is not defined in this set or a parent set.
      */
-    boolean isInherited( Attribute key) throws AttributeNotSetException;
+    boolean isInherited( Attribute<?> key) throws AttributeNotSetException;
     /**
      * Returns an iteration of attribute keys defined in the attribute set.
      * 
@@ -67,7 +68,7 @@ public interface AttributeSet {
      *                  <code>false</code> if inherited attributes should be ignored.
      * @return Iteration of {@link Attribute Attributes}.
      */
-    Iterator getAttributeKeys( boolean resolveInherited);
+    Iterator<Attribute<?>> getAttributeKeys( boolean resolveInherited);
     /**
      * Get the parent attribute set of this set. Returns <code>null</code> if this is a root set.
      */

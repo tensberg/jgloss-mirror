@@ -44,7 +44,7 @@ public class InformationAttributeFormatter extends DefaultAttributeFormatter {
     }
 
     @Override
-	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder buf) {
+	public StringBuilder format( Attribute<?> att, AttributeValue val, StringBuilder buf) {
         buf.append( ((InformationAttributeValue) val).getInformation());
         return buf;
     }

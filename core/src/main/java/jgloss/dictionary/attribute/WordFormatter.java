@@ -54,7 +54,7 @@ public class WordFormatter extends DefaultAttributeFormatter {
     }
 
     @Override
-	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder buf) {
+	public StringBuilder format( Attribute<?> att, AttributeValue val, StringBuilder buf) {
         Word w = (Word) val;
             
         String lang = null;

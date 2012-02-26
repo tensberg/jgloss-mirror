@@ -57,9 +57,9 @@ class DictionaryEntryFormat {
 
         ListFormatter decorateList( ListFormatter formatter, int type);
 
-        AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
+        AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute<?> type,
                                               int position);
-        ListFormatter decorateList( ListFormatter formatter, Attribute type, int position);
+        ListFormatter decorateList( ListFormatter formatter, Attribute<?> type, int position);
     } // interface Decorator
 
     static class IdentityDecorator implements Decorator {
@@ -71,13 +71,13 @@ class DictionaryEntryFormat {
         }
 
         @Override
-		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
+		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute<?> type,
                                                      int position) {
             return formatter;
         }
 
         @Override
-		public ListFormatter decorateList( ListFormatter formatter, Attribute type, int position) {
+		public ListFormatter decorateList( ListFormatter formatter, Attribute<?> type, int position) {
             return formatter;
         }
     } // class IdentityDecorator
@@ -104,20 +104,20 @@ class DictionaryEntryFormat {
     public static ListFormatter getTranslationCrmFormatter() { return new DefaultListFormatter( crm); }
     public static ListFormatter getTranslationSynonymFormatter() { return new DefaultListFormatter( syn); }
 
-    public static AttributeFormatter getAttributeFormatter( Attribute att) {
+    public static AttributeFormatter getAttributeFormatter( Attribute<?> att) {
         return getAttributeFormatter( att, false, new IdentityDecorator(), Decorator.POSITION_BEFORE);
     }
 
-    public static AttributeFormatter getAttributeFormatter( Attribute att, boolean nameOnly) {
+    public static AttributeFormatter getAttributeFormatter( Attribute<?> att, boolean nameOnly) {
         return getAttributeFormatter( att, nameOnly, new IdentityDecorator(), Decorator.POSITION_BEFORE);
     }
 
-    public static AttributeFormatter getAttributeFormatter( Attribute att,
+    public static AttributeFormatter getAttributeFormatter( Attribute<?> att,
                                                             Decorator decorator, int position) {
         return getAttributeFormatter( att, false, decorator, position);
     }
 
-    public static AttributeFormatter getAttributeFormatter( Attribute att, boolean nameOnly,
+    public static AttributeFormatter getAttributeFormatter( Attribute<?> att, boolean nameOnly,
                                                             Decorator decorator, int position) {
         ListFormatter commaList = decorator.decorateList
             ( new DefaultListFormatter( ","), att, position);

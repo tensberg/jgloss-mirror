@@ -33,7 +33,7 @@ import jgloss.dictionary.DictionaryEntry;
  *
  * @author Michael Koch
  */
-public interface Attribute {
+public interface Attribute<T extends AttributeValue> {
     /**
      * Return a short name describing the attribute to the user.
      */
@@ -53,11 +53,11 @@ public interface Attribute {
     /**
      * Returns the class of attribute values this attribute uses.
      */
-    Class getAttributeValueClass();
+    Class<T> getAttributeValueClass();
     /**
      * Returns an example value of the type this attribute uses.
      */
-    AttributeValue getExampleValue();
+    T getExampleValue();
     /**
      * Test if this attribute type is applicable to an attribute group.
      */

@@ -28,14 +28,14 @@ import java.util.Iterator;
 import java.util.Map;
 
 public abstract class IDAttributeValueFactory {
-    private Map values;
+    private Map<String, CategoryAttributeValue> values;
 
     public IDAttributeValueFactory() {
-        values = new HashMap();
+        values = new HashMap<String, CategoryAttributeValue>();
     }
 
     public IDAttributeValueFactory( int size) {
-        values = new HashMap( size);
+        values = new HashMap<String, CategoryAttributeValue>( size);
     }
 
     public CategoryAttributeValue getValueFor( String id) {
@@ -44,12 +44,12 @@ public abstract class IDAttributeValueFactory {
             values.put( id, createValue( id));
         }
 
-        return (CategoryAttributeValue) values.get( id);
+        return values.get( id);
     }
 
     protected abstract CategoryAttributeValue createValue( String id);
 
-    public Iterator valueIterator() {
+    public Iterator<CategoryAttributeValue> valueIterator() {
         return values.values().iterator();
     }
 } // class IDAttributeValueFactory

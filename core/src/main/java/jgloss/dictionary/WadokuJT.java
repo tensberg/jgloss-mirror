@@ -479,9 +479,9 @@ public class WadokuJT extends FileBasedDictionary {
             // POS attributes for longes possible prefix of pos, and repeat with the remainder.
             nextpos: while (pos.length() > 0) {
                 for ( int i=pos.length(); i>0; i--) {
-                    AttributeMapper.Mapping mapping = mapper.getMapping( pos.substring( 0, i));
+                    AttributeMapper.Mapping<?> mapping = mapper.getMapping( pos.substring( 0, i));
                     if (mapping != null) {
-                        generalA.addAttribute( mapping.getAttribute(), mapping.getValue());
+                        generalA.addAttribute( mapping);
                         // continue outer loop with remainder
                         pos = pos.substring( i);
                         continue nextpos;

@@ -26,10 +26,10 @@ package jgloss.dictionary.attribute;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-class AttributeSetChainIterator implements Iterator {
-    protected Object nextKey;
+class AttributeSetChainIterator implements Iterator<Attribute<?>> {
+    protected Attribute<?> nextKey;
     protected AttributeSet currentSet;
-    protected Iterator currentIterator;
+    protected Iterator<Attribute<?>> currentIterator;
 
     public AttributeSetChainIterator( AttributeSet first) {
         currentSet = first;
@@ -41,10 +41,10 @@ class AttributeSetChainIterator implements Iterator {
 	public boolean hasNext() { return nextKey != null; }
 
     @Override
-	public Object next() throws NoSuchElementException {
+	public Attribute<?> next() throws NoSuchElementException {
         if (!hasNext())
             throw new NoSuchElementException();
-        Object currentKey = nextKey;
+        Attribute<?> currentKey = nextKey;
         getNextKey();
         return currentKey;
     }

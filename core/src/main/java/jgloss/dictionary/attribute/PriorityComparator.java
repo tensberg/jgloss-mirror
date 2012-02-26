@@ -32,11 +32,11 @@ import jgloss.dictionary.DictionaryEntry;
  *
  * @author Michael Koch
  */
-public class PriorityComparator implements Comparator {
+public class PriorityComparator implements Comparator<Priority> {
     public PriorityComparator() {}
 
     @Override
-	public int compare( Object o1, Object o2) {
+	public int compare( Priority o1, Priority o2) {
         DictionaryEntry de1 = (DictionaryEntry) o1;
         DictionaryEntry de2 = (DictionaryEntry) o2;
         if (de1.getDictionary() != de2.getDictionary())
@@ -46,9 +46,9 @@ public class PriorityComparator implements Comparator {
             if (!de2.getGeneralAttributes().containsKey( Attributes.PRIORITY, false))
                 return 1;
             
-            Priority p1 = (Priority) de1.getGeneralAttributes()
+            Priority p1 = de1.getGeneralAttributes()
                 .getAttribute( Attributes.PRIORITY, false).get( 0);
-            Priority p2 = (Priority) de2.getGeneralAttributes()
+            Priority p2 = de2.getGeneralAttributes()
                 .getAttribute( Attributes.PRIORITY, false).get( 0);
             return p1.compareTo( p2);
         }

@@ -23,77 +23,21 @@
 
 package jgloss.dictionary.attribute;
 
+import static java.util.Collections.checkedList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import jgloss.util.NullIterator;
 
 public class DefaultAttributeSet implements AttributeSet {
-    protected class MutableValueList implements ValueList {
-        private List values = new ArrayList( 2);
-
-        public MutableValueList() {}
-
-        @Override
-		public int size() { return values.size(); }
-        @Override
-		public AttributeValue get( int index) { return (AttributeValue) values.get( index); }
-        public void add( AttributeValue value) { values.add( value); }
-        public void addAll( ValueList _values) {
-            if (_values instanceof MutableValueList) {
-                values.addAll( ((MutableValueList) _values).values);
-            }
-            else {
-                for ( int i=0; i<_values.size(); i++)
-                    values.add( _values.get( i));
-            }
-        }
-        public boolean contains( AttributeValue value) {
-            return values.contains( value);
-        }
-        @Override
-		public String toString() {
-            StringBuilder out = new StringBuilder();
-            out.append( '[');
-            for ( Iterator i=values.iterator(); i.hasNext(); ) {
-                out.append( i.next().toString());
-                if (i.hasNext())
-                    out.append( ',');
-            }
-            out.append( ']');
-            return out.toString();
-        }
-    } // class MutableValueList
-
-    protected class NestedValueList implements ValueList {
-        private ValueList base;
-        private ValueList parent;
-
-        public NestedValueList( ValueList _base, ValueList _parent) {
-            base = _base;
-            parent = _parent;
-        }
-    
-        @Override
-		public int size() { return base.size() + parent.size(); }
-        
-        @Override
-		public AttributeValue get( int index) {
-            if (index < base.size())
-                return base.get( index);
-            else
-                return parent.get( index-base.size());
-        }
-
-        @Override
-		public String toString() { return "[/" + base.toString() + parent.toString() + "]"; }
-    } // class NestedValueList
 
     protected AttributeSet parent = null;
-    protected Map attributes = null;
+    protected Map<Attribute<?>, List<? extends AttributeValue>> attributes = null;
 
     public DefaultAttributeSet() {
     }
@@ -103,7 +47,7 @@ public class DefaultAttributeSet implements AttributeSet {
     }
 
     @Override
-	public boolean containsKey( Attribute key, boolean resolveInherited) {
+	public boolean containsKey( Attribute<?> key, boolean resolveInherited) {
         if (attributes!=null && attributes.containsKey( key))
             return true;
         else if (resolveInherited && parent!=null)
@@ -113,48 +57,47 @@ public class DefaultAttributeSet implements AttributeSet {
     }
 
     @Override
-	public boolean contains( Attribute key, AttributeValue value, boolean resolveInherited) {
+	public boolean contains( Attribute<?> key, AttributeValue value, boolean resolveInherited) {
         if (attributes!=null && attributes.containsKey( key)) {
-            Object v = attributes.get( key);
-            if (v instanceof MutableValueList)
-                return ((MutableValueList) v).contains( value);
-            else // v is SingletonValueList
-                return ((SingletonValueList) v).get( 0).equals( value);
-        }
-        else if (resolveInherited && parent!=null)
+            return attributes.get( key).contains(value);
+            
+        } else if (resolveInherited && parent!=null) {
             return parent.contains( key, value, true);
-        else
+        } else {
             return false;
+        }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-	public ValueList getAttribute( Attribute key, boolean resolveInherited) {
-        ValueList base = null;
-        ValueList parentv = null;
+	public <T extends AttributeValue> List<T> getAttribute( Attribute<T> key, boolean resolveInherited) {
+        List<T> base = null;
+        List<T> parentv = null;
 
         if (resolveInherited && parent!=null)
             parentv = parent.getAttribute( key, true);
 
         if (attributes!=null && attributes.containsKey( key)) {
-            Object v = attributes.get( key);
+            List<? extends AttributeValue> v = attributes.get( key);
             if (v != null) {
-                if (v instanceof ValueList)
-                    base = (ValueList) v;
-                else
-                    base = new SingletonValueList( (AttributeValue) v);
+                base = (List<T>) v;
             }
         }
 
-        if (parentv == null)
+        if (parentv == null) {
             return base; // this also covers the case where base==parentv==null (att not set)
-        else if (base == null)
+        } else if (base == null) {
             return parentv; // just inherited attributes
-        else
-            return new NestedValueList( base, parentv);
+        } else {
+        	List<T> combined = new ArrayList<T>(base.size() + parentv.size());
+        	combined.addAll(base);
+        	combined.addAll(parentv);
+            return combined;
+        }
     }
 
     @Override
-	public boolean isInherited( Attribute key) throws AttributeNotSetException {
+	public boolean isInherited( Attribute<?> key) throws AttributeNotSetException {
         if (attributes!=null && attributes.containsKey( key))
             return false;
         else if (parent.containsKey( key, true))
@@ -164,13 +107,13 @@ public class DefaultAttributeSet implements AttributeSet {
     }
 
     @Override
-	public Iterator getAttributeKeys( boolean resolveInherited) {
+	public Iterator<Attribute<?>> getAttributeKeys( boolean resolveInherited) {
         if (resolveInherited)
             return new AttributeSetChainIterator( this);
         else if (attributes != null)
             return attributes.keySet().iterator();
         else
-            return NullIterator.INSTANCE;
+            return NullIterator.instance();
     }
 
     /**
@@ -189,23 +132,23 @@ public class DefaultAttributeSet implements AttributeSet {
     @Override
 	public AttributeSet getParent() { return parent; }
 
-    public void addAttribute( Attribute key, AttributeValue value) {
+    public <T extends AttributeValue> void addAttribute(AttributeMapper.Mapping<T> mapping) {
+    	addAttribute(mapping.getAttribute(), mapping.getValue());
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T extends AttributeValue> void addAttribute( Attribute<T> key, T value) {
         if (attributes == null)
-            attributes = new HashMap();
-        Object v = attributes.get( key);
+            attributes = new HashMap<Attribute<?>, List<? extends AttributeValue>>();
+        List<? extends AttributeValue> v = attributes.get( key);
 
         if (v == null)
-            attributes.put( key, value!=null ? new SingletonValueList( value) : null);
+            attributes.put( key, value!=null ? checkedList(new ArrayList<T>(3), key.getAttributeValueClass()) : null);
         else if (value == null)
             // nothing to be done, since attibute already set
             return;
-        else if (v instanceof MutableValueList)
-            ((MutableValueList) v).add( value);
-        else { // SingletonValueList
-            MutableValueList list = new MutableValueList();
-            list.add( ((ValueList) v).get( 0));
-            list.add( value);
-            attributes.put( key, list);
+        else {
+            ((List<T>) v).add( value);
         }
     }
 
@@ -221,15 +164,18 @@ public class DefaultAttributeSet implements AttributeSet {
 
         StringBuilder out = new StringBuilder( 128);
         out.append( '(');
-        for ( Iterator i=attributes.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) i.next();
+        boolean firstEntry = true;
+        for ( Entry<Attribute<?>, List<? extends AttributeValue>> entry : attributes.entrySet()) {
+        	if (firstEntry) {
+        		firstEntry = false;
+        	} else {
+        		out.append( ',');
+        	}
             out.append( entry.getKey().toString());
             if (entry.getValue() != null) {
                 out.append( ':');
                 out.append( entry.getValue().toString());
             }
-            if (i.hasNext())
-                out.append( ',');
         }
         out.append( ')');
         return out.toString();

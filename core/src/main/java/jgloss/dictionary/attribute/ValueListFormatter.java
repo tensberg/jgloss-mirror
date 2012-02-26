@@ -23,6 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
+import java.util.List;
+
 /**
  * Format an attribute and its value as a string.
  *
@@ -40,6 +42,6 @@ public interface ValueListFormatter {
      * @param buf String buffer to which the formatted attribute is appended.
      * @return The string buffer passed in.
      */
-    StringBuilder format( AttributeValueFormatter valueFormatter, Attribute att, ValueList val,
+    StringBuilder format( AttributeValueFormatter valueFormatter, Attribute<?> att, List<? extends AttributeValue> val,
                          StringBuilder buf);
 } // interface ValueListFormatter

@@ -23,6 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
+import java.util.List;
+
 /**
  * Attribute formatter which only prints the name of the attribute, not its values.
  *
@@ -41,7 +43,7 @@ public class AttributeNameFormatter extends AttributeFormatter {
         after = _after;
     }
 
-    protected StringBuilder format( Attribute att, StringBuilder buf) {
+    protected StringBuilder format( Attribute<?> att, StringBuilder buf) {
         if (before != null)
             buf.append( before);
         buf.append( att.getName());
@@ -51,13 +53,13 @@ public class AttributeNameFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuilder format( AttributeValueFormatter formatter, Attribute att, 
-                                ValueList val, StringBuilder buf) {
+	public StringBuilder format( AttributeValueFormatter formatter, Attribute<?> att, 
+                                List<? extends AttributeValue> val, StringBuilder buf) {
         return format( att, buf);
     }
 
     @Override
-	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder buf) {
+	public StringBuilder format( Attribute<?> att, AttributeValue val, StringBuilder buf) {
         return format( att, buf);
     }
 } // class AttributeNameFormatter

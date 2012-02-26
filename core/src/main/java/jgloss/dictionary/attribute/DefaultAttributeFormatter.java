@@ -23,6 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
+import java.util.List;
+
 import jgloss.util.DefaultListFormatter;
 import jgloss.util.ListFormatter;
 
@@ -61,8 +63,8 @@ public class DefaultAttributeFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuilder format( AttributeValueFormatter valueFormatter, Attribute att, 
-                                ValueList val, StringBuilder out) {
+	public StringBuilder format( AttributeValueFormatter valueFormatter, Attribute<?> att, 
+                                List<? extends AttributeValue> val, StringBuilder out) {
         out.append( printBefore);
 
         if (printAttributeName)
@@ -85,7 +87,7 @@ public class DefaultAttributeFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder out) {
+	public StringBuilder format( Attribute<?> att, AttributeValue val, StringBuilder out) {
         out.append( String.valueOf( val));
         return out;
     }

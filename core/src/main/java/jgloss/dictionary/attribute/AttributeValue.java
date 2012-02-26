@@ -29,4 +29,5 @@ package jgloss.dictionary.attribute;
  * @author Michael Koch
  */
 public interface AttributeValue {
+	// marker interface only
 } // interface AttributeValue

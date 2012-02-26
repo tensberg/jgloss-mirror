@@ -26,8 +26,9 @@ package jgloss.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -42,9 +43,8 @@ import jgloss.JGloss;
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeFormatter;
+import jgloss.dictionary.attribute.AttributeValue;
 import jgloss.dictionary.attribute.CategoryAttributeValue;
-import jgloss.dictionary.attribute.SingletonValueList;
-import jgloss.dictionary.attribute.ValueList;
 
 /**
  * Displays a legend to the attributes used by a dictionary.
@@ -52,26 +52,22 @@ import jgloss.dictionary.attribute.ValueList;
  * @author Michael Koch
  */
 public class AttributeLegend extends JPanel {
-    private static final Comparator attributeComparator = new Comparator() {
-            @Override
-			public int compare( Object o1, Object o2) {
-                return ((Attribute) o1).getDescription().compareToIgnoreCase
-                    ( ((Attribute) o2).getDescription());
-            }
+	private static final long serialVersionUID = 1L;
 
+	private static final Comparator<Attribute<?>> attributeComparator = new Comparator<Attribute<?>>() {
             @Override
-			public boolean equals( Object o) { return o == this; }
+			public int compare(Attribute<?> o1, Attribute<?> o2) {
+                return o1.getDescription().compareToIgnoreCase
+                    (o2.getDescription());
+            }
         };
 
-    private static final Comparator categoryComparator = new Comparator() {
+    private static final Comparator<CategoryAttributeValue> categoryComparator = new Comparator<CategoryAttributeValue>() {
             @Override
-			public int compare( Object o1, Object o2) {
-                return ((CategoryAttributeValue) o1).getShortName().
-                    compareToIgnoreCase( ((CategoryAttributeValue) o2).getShortName());
+			public int compare(CategoryAttributeValue o1, CategoryAttributeValue o2) {
+                return o1.getShortName().
+                    compareToIgnoreCase( o2.getShortName());
             }
-
-            @Override
-			public boolean equals( Object o) { return o == this; }            
         };
 
     private static final class DictionaryItem {
@@ -129,17 +125,16 @@ public class AttributeLegend extends JPanel {
         }
     }
 
-    protected void createLegend( Dictionary dic, StringBuilder buf) {
+	protected void createLegend( Dictionary dic, StringBuilder buf) {
         buf.append( "<h2>");
         buf.append( JGloss.messages.getString( "legend.dictionary", new String[] { dic.getName() }));
         buf.append( "</h2>\n");
 
-        SortedSet attributes = new TreeSet( attributeComparator);
+        SortedSet<Attribute<?>> attributes = new TreeSet<Attribute<?>>( attributeComparator);
         attributes.addAll( dic.getSupportedAttributes());
         boolean noAttributes = true;
 
-        for ( Iterator ai=attributes.iterator(); ai.hasNext(); ) {
-            Attribute att = (Attribute) ai.next();
+        for (Attribute<?> att : attributes) {
             AttributeFormatter formatter = DictionaryEntryFormat.getAttributeFormatter( att);
             if (formatter == null)
                 // attribute not displayed by UI, ignore
@@ -155,14 +150,14 @@ public class AttributeLegend extends JPanel {
             if (att.canHaveValue()) {
                 if (!att.alwaysHasValue()) {
                     DictionaryEntryFormat.getAttributeFormatter( att, true).format
-                        ( att, (ValueList) null, buf);
+                        ( att, (List<AttributeValue>) null, buf);
                     buf.append( " / ");
                 }
-                formatter.format( att, new SingletonValueList( att.getExampleValue()), buf);
-                createLegendForValue( dic, att, buf);
+                formatter.format( att, Collections.singletonList( att.getExampleValue()), buf);
+                createLegendForValueIfSupported(dic, buf, att);
             }
             else
-                formatter.format( att, (ValueList) null, buf);
+                formatter.format( att, (List<AttributeValue>) null, buf);
             buf.append( "</p>\n");
         }
 
@@ -173,12 +168,20 @@ public class AttributeLegend extends JPanel {
         }
     }
 
-    protected void createLegendForValue( Dictionary dic, Attribute att, StringBuilder buf) {
+	@SuppressWarnings("unchecked")
+	private void createLegendForValueIfSupported(Dictionary dic,
+			StringBuilder buf, Attribute<?> att) {
+		if (CategoryAttributeValue.class.isAssignableFrom(att.getAttributeValueClass())) {
+			createLegendForValue( dic, (Attribute<? extends CategoryAttributeValue>) att, buf);
+		}
+	}
+
+    protected void createLegendForValue( Dictionary dic, Attribute<? extends CategoryAttributeValue> att, StringBuilder buf) {
         // currently only CategoryAttributeValues are supported
         if (!CategoryAttributeValue.class.isAssignableFrom( att.getAttributeValueClass()))
             return;
 
-        SortedSet values = new TreeSet( categoryComparator);
+        SortedSet<CategoryAttributeValue> values = new TreeSet<CategoryAttributeValue>( categoryComparator);
         values.addAll( dic.getAttributeValues( att));
         if (values.isEmpty())
             return;
@@ -186,8 +189,7 @@ public class AttributeLegend extends JPanel {
         buf.append( "<br>\n");
         buf.append( JGloss.messages.getString( "legend.values"));
         buf.append( "\n<table border=\"0\">");
-        for ( Iterator vi=values.iterator(); vi.hasNext(); ) {
-            CategoryAttributeValue value = (CategoryAttributeValue) vi.next();
+        for (CategoryAttributeValue value : values) {
             buf.append( "<tr><td>");
             buf.append( value.getShortName());
             buf.append( "</td><td>");

@@ -39,35 +39,41 @@ import java.util.regex.Pattern;
  * attribute/value objects. Dictionaries use strings, which are usually abbreviated words,
  * to mark attributes and their values in entries.
  *
- * @author Michael Koch
+ * @author Michael Koch <tensberg@gmx.net>
  */
 public class AttributeMapper {
     protected final static char COMMENT_CHAR = '#';
 
-    public static class Mapping {
-        private Attribute attribute;
-        private AttributeValue value;
+    /**
+     * Mapping of an attribute to its value.
+     * 
+     * @author Michael Koch <tensberg@gmx.net>
+     */
+    public static class Mapping<T extends AttributeValue> {
+        private Attribute<T> attribute;
+        private T value;
 
-        private Mapping( Attribute _attribute, AttributeValue _value) {
+        private Mapping( Attribute<T> _attribute, T _value) {
             this.attribute = _attribute;
             this.value = _value;
         }
 
-        public Attribute getAttribute() { return attribute; }
+        public Attribute<T> getAttribute() { return attribute; }
         public boolean hasValue() { return (value != null); }
-        public AttributeValue getValue() { return value; }
+        public T getValue() { return value; }
     }
 
-    protected Map mappings;
-    protected Map allAttributes;
+    protected Map<String, Mapping<?>> mappings;
+    protected Map<Attribute<?>, Set<AttributeValue>> allAttributes;
     
     /**
      * Initializes a new mapping from dictionary-specific names to attribute/value objects by
      * reading the configuration from a reader.
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public AttributeMapper( LineNumberReader mapping) throws IOException {
-        mappings = new HashMap( 61);
-        allAttributes = new HashMap( 61);
+        mappings = new HashMap<String, Mapping<?>>();
+        allAttributes = new HashMap<Attribute<?>, Set<AttributeValue>>();
 
         String line;
 
@@ -86,7 +92,7 @@ public class AttributeMapper {
                     name = name.toLowerCase().replace( '~', ' ');
 
                     String attributeS = lineMatcher.group( 2);
-                    Class attClass = Attributes.class;
+                    Class<?> attClass = Attributes.class;
                     int dot = attributeS.lastIndexOf( '.');
                     if (dot != -1) {
                         try {
@@ -99,9 +105,9 @@ public class AttributeMapper {
                         attributeS = attributeS.substring( dot);
                     }
 
-                    Attribute attribute;
+                    Attribute<?> attribute;
                     try {
-                        attribute = (Attribute) attClass.getField( attributeS).get( null);
+                        attribute = (Attribute<?>) attClass.getField( attributeS).get( null);
                     } catch (Exception ex) {
                         throw new IOException( "Unknown attribute " + 
                                                attributeS + "; line " + 
@@ -115,7 +121,7 @@ public class AttributeMapper {
                     if (attValueName != null) {
                         if (attValueName.indexOf( '.') == -1)
                             attValueName = "jgloss.dictionary.attribute." + attValueName;
-                        Class attValueClass;
+                        Class<?> attValueClass;
                         try {
                             attValueClass = Class.forName( attValueName);
                         } catch (ClassNotFoundException ex) {
@@ -123,6 +129,12 @@ public class AttributeMapper {
                                                    attValueName + "; line " + 
                                                    mapping.getLineNumber());
                         }
+
+                        if (!attribute.getAttributeValueClass().isAssignableFrom(attValueClass)) {
+                        	throw new IllegalArgumentException("expected attribute value class " + attribute.getAttributeValueClass() + ", was " + attValueName);
+                        }
+
+                        
                         try {
                             Method get = attValueClass.getMethod( "get", 
                                                                   new Class[] { String.class });
@@ -135,11 +147,12 @@ public class AttributeMapper {
                                                    mapping.getLineNumber());
                         }
                     }
+                    
 
                     mappings.put( name, new Mapping( attribute, attValue));
-                    Set attValues = (Set) allAttributes.get( attribute);
+                    Set<AttributeValue> attValues = allAttributes.get( attribute);
                     if (attValues == null) {
-                        attValues = new HashSet( 11);
+                        attValues = new HashSet<AttributeValue>();
                         allAttributes.put( attribute, attValues);
                     }
                     attValues.add( attValue);
@@ -154,9 +167,12 @@ public class AttributeMapper {
      * Return the mapping for the dictionary-specific name. Returns <code>null</code> if there
      * is no such mapping.
      */
-    public Mapping getMapping( String name) {
-        return (Mapping) mappings.get( name.toLowerCase());
+    public Mapping<?> getMapping( String name) {
+        return mappings.get( name.toLowerCase());
     }
 
-    public Map getAttributes() { return Collections.unmodifiableMap( allAttributes); }
+    /**
+     * @return Unmodifiable view of all mapped attributes.
+     */
+    public Map<Attribute<?>, Set<AttributeValue>> getAttributes() { return Collections.unmodifiableMap( allAttributes); }
 } // class AttributeMapper

@@ -24,31 +24,13 @@
 package jgloss.dictionary.attribute;
 
 /**
- * Attribute list which stores a single value.
- *
- * @author Michael Koch
+ * Used for attributes which don't have values.
+ * 
+ * @author Michael Koch <tensberg@gmx.net>
  */
-public class SingletonValueList implements ValueList {
-    private AttributeValue value;
-
-    public SingletonValueList( AttributeValue _value) {
-        this.value = _value;
-    }
-
-    public SingletonValueList set( AttributeValue _value) {
-        this.value = _value;
-        return this;
-    }
-
-    @Override
-	public AttributeValue get( int index) {
-        if (index != 0)
-            throw new IllegalArgumentException();
-        return value;
-    }
-
-    @Override
-	public int size() { return 1; }
-    @Override
-	public String toString() { return "[_" + value.toString() + ']'; }
-} // class SingletonValueList
+public class WithoutValue implements AttributeValue {
+	public static final WithoutValue NO_VALUE = new WithoutValue();
+	
+	private WithoutValue() {
+	}
+}
