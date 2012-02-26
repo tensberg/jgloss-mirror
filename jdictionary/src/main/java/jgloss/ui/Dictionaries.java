@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -75,7 +76,9 @@ import jgloss.dictionary.IndexedDictionary;
  * @author Michael Koch
  */
 public class Dictionaries extends JComponent implements PreferencesPanel {
-    /**
+	private static final long serialVersionUID = 1L;
+
+	/**
      * The single application-wide instance.
      */
     private static Dictionaries box;
@@ -92,7 +95,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * the dictionary list in the preference dialog, but not yet applied the changes,
      * this list is different from the dictionary list displayed.
      */
-    private static List activeDictionaries = new ArrayList( 10);
+    private static List<DictionaryWrapper> activeDictionaries = new ArrayList<DictionaryWrapper>( 10);
     /**
      * An EDICT editable by the user.
      */
@@ -188,8 +191,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         synchronized (activeDictionaries) {
             Dictionary[] out = new Dictionary[activeDictionaries.size()];
             int index = 0;
-            for ( Iterator i=activeDictionaries.iterator(); i.hasNext(); )
-                out[index++] = ((DictionaryWrapper) i.next()).dictionary;
+            for ( DictionaryWrapper wrapper : activeDictionaries)
+                out[index++] = wrapper.dictionary;
 
             return out;
         }
@@ -203,25 +206,19 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         return userDictionary;
         }*/
 
-    private final static List dictionaryListChangeListeners = new ArrayList( 4);
+    private final static List<DictionaryListChangeListener> dictionaryListChangeListeners = new CopyOnWriteArrayList<DictionaryListChangeListener>();
 
     public static void addDictionaryListChangeListener( DictionaryListChangeListener listener) {
-        synchronized (dictionaryListChangeListeners) {
-            dictionaryListChangeListeners.add( listener);
-        }
+    	dictionaryListChangeListeners.add( listener);
     }
 
     public static void removeDictionaryListChangeListener( DictionaryListChangeListener listener) {
-        synchronized (dictionaryListChangeListeners) {
-            dictionaryListChangeListeners.remove( listener);
-        }
+    	dictionaryListChangeListeners.remove( listener);
     }
 
     protected static void fireDictionaryListChanged() {
-        synchronized (dictionaryListChangeListeners) {
-            for ( Iterator i=dictionaryListChangeListeners.iterator(); i.hasNext(); ) {
-                ((DictionaryListChangeListener) i.next()).dictionaryListChanged();
-            }
+        for (DictionaryListChangeListener listener : dictionaryListChangeListeners) {
+            listener.dictionaryListChanged();
         }
     }
 
@@ -276,7 +273,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                     messageDialog.setDefaultCloseOperation( JDialog.DO_NOTHING_ON_CLOSE);
                 }
                 messageDialog.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-                messageDialog.show();
+                messageDialog.setVisible(true);
             }
         }
 
@@ -328,7 +325,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             dictionariesLoaded = true;
             setCursor( currentCursor);
             if (messageDialog != null) {
-                messageDialog.hide();
+                messageDialog.setVisible(false);
                 messageDialog.dispose(); 
             }               
 
@@ -349,7 +346,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         dictionaries.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
 
         final Action up = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+			private static final long serialVersionUID = 1L;
+
+				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
                     Object o = m.remove( i);
@@ -360,7 +359,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         up.setEnabled( false);
         UIUtilities.initAction( up, "dictionaries.button.up");
         final Action down = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+			private static final long serialVersionUID = 1L;
+
+				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
                     Object o = m.remove( i);
@@ -371,14 +372,18 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         down.setEnabled( false);
         UIUtilities.initAction( down, "dictionaries.button.down");
         final Action add = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+			private static final long serialVersionUID = 1L;
+
+				public void actionPerformed( ActionEvent e) {
                     addDictionary();
                 }
             };
         add.setEnabled( true);
         UIUtilities.initAction( add, "dictionaries.button.add");
         final Action remove = new AbstractAction() {
-                public void actionPerformed( ActionEvent e) {
+			private static final long serialVersionUID = 1L;
+
+				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
                     DictionaryWrapper d = (DictionaryWrapper) m.remove( i);

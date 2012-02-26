@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import jgloss.util.UTF8ResourceBundleControl;
 
@@ -181,7 +182,7 @@ public abstract class Preferences {
     /**
      * List of objects being notified of preference changes.
      */
-    protected List propertyChangeListeners;
+    protected List<PropertyChangeListener> propertyChangeListeners;
 
     /**
      * Initializes the preferences with the user's settings.
@@ -190,11 +191,10 @@ public abstract class Preferences {
         // load default settings from properties file
         defaults = new Properties();
         ResourceBundle defrb = ResourceBundle.getBundle( "preferences", new UTF8ResourceBundleControl());
-        for ( Enumeration e=defrb.getKeys(); e.hasMoreElements(); ) {
-            String key = (String) e.nextElement();
-            defaults.setProperty( key, (String) defrb.getString( key));
+        for (String key : defrb.keySet()) {
+            defaults.setProperty( key, defrb.getString( key));
         }
-        propertyChangeListeners = new ArrayList( 5);
+        propertyChangeListeners = new CopyOnWriteArrayList<PropertyChangeListener>();
     }
 
     /**
