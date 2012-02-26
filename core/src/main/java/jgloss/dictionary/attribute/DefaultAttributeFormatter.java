@@ -37,7 +37,7 @@ public class DefaultAttributeFormatter extends AttributeFormatter {
     protected String printBeforeValue;
     protected boolean printAttributeName;
     protected ListFormatter valueFormat;
-    protected StringBuffer tempBuffer;
+    protected StringBuilder tempBuffer;
 
     public DefaultAttributeFormatter() {
         this( "(", ")", ":", true, new DefaultListFormatter( "", "", "", "[", ",", "]"));
@@ -57,12 +57,12 @@ public class DefaultAttributeFormatter extends AttributeFormatter {
         printAttributeName = _printAttributeName;
         valueFormat = _valueFormat;
 
-        tempBuffer = new StringBuffer();
+        tempBuffer = new StringBuilder();
     }
 
     @Override
-	public StringBuffer format( AttributeValueFormatter valueFormatter, Attribute att, 
-                                ValueList val, StringBuffer out) {
+	public StringBuilder format( AttributeValueFormatter valueFormatter, Attribute att, 
+                                ValueList val, StringBuilder out) {
         out.append( printBefore);
 
         if (printAttributeName)
@@ -85,7 +85,7 @@ public class DefaultAttributeFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuffer format( Attribute att, AttributeValue val, StringBuffer out) {
+	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder out) {
         out.append( String.valueOf( val));
         return out;
     }

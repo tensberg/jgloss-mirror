@@ -159,7 +159,7 @@ public class OpenRecentMenu {
             }
         }
         // save current entries in preferences
-        StringBuffer docs = new StringBuffer();
+        StringBuilder docs = new StringBuilder();
         for ( Iterator i=documents.iterator(); i.hasNext(); ) {
             docs.append( ((File) i.next()).getAbsolutePath());
             if (i.hasNext())

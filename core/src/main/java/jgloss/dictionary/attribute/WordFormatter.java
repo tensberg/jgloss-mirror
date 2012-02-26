@@ -54,7 +54,7 @@ public class WordFormatter extends DefaultAttributeFormatter {
     }
 
     @Override
-	public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder buf) {
         Word w = (Word) val;
             
         String lang = null;
@@ -70,16 +70,16 @@ public class WordFormatter extends DefaultAttributeFormatter {
             
         if (lang == null) {
             langAndWord[0] = w.getWord();
-            wordFormat.format( langAndWord, buf, null); 
+            buf.append(wordFormat.format( langAndWord)); 
         }
         else {
             langAndWord[0] = lang;
             if (w.getWord() == null) {
-                langFormat.format( langAndWord, buf, null);
+            	buf.append(langFormat.format( langAndWord));
             }
             else {
                 langAndWord[1] = w.getWord();
-                langAndWordFormat.format( langAndWord, buf, null);
+                buf.append(langAndWordFormat.format( langAndWord));
             }
         }
 

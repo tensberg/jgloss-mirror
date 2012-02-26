@@ -191,7 +191,7 @@ class AnnotationGenerator extends DefaultHandler {
 
             if (anno.getReading() == null) {
                 // derive inflected reading from splitWordReading
-                StringBuffer inflectedReading = new StringBuffer( 64);
+                StringBuilder inflectedReading = new StringBuilder( 64);
                 for ( int j=0; j<parts.length; j++) {
                     if (parts[j].length == 1)
                         inflectedReading.append( parts[j][0]);

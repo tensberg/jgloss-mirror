@@ -97,11 +97,11 @@ public class DictionaryEntryFormatter {
     protected List formats = new ArrayList( 3);
     protected Map attributeFormats = new HashMap( 51);
 
-    protected StringBuffer tempBuf = new StringBuffer( 128);
-    protected StringBuffer tempBuf2 = new StringBuffer( 128);
-    protected StringBuffer tempBuf3 = new StringBuffer( 128);
-    protected StringBuffer tempBuf4 = new StringBuffer( 128);
-    protected StringBuffer tempBuf5 = new StringBuffer( 128);
+    protected StringBuilder tempBuf = new StringBuilder( 128);
+    protected StringBuilder tempBuf2 = new StringBuilder( 128);
+    protected StringBuilder tempBuf3 = new StringBuilder( 128);
+    protected StringBuilder tempBuf4 = new StringBuilder( 128);
+    protected StringBuilder tempBuf5 = new StringBuilder( 128);
 
     public DictionaryEntryFormatter() {}
 
@@ -176,7 +176,7 @@ public class DictionaryEntryFormatter {
         fl.add( new Object[] { att, formatter });
     }
 
-    public StringBuffer format( DictionaryEntry de, StringBuffer buf) {
+    public StringBuilder format( DictionaryEntry de, StringBuilder buf) {
         formatAttributes( de, buf, Position.BEFORE_ENTRY, de.getGeneralAttributes());
 
         for ( int i=0; i<formats.size(); i++) {
@@ -200,7 +200,7 @@ public class DictionaryEntryFormatter {
         return buf;
     }
 
-    protected StringBuffer formatWords( DictionaryEntry de, StringBuffer buf,
+    protected StringBuilder formatWords( DictionaryEntry de, StringBuilder buf,
                                         ListFormatter format) {
         formatAttributes( de, buf, Position.BEFORE_WORDS, de.getWordAttributes());
 
@@ -221,7 +221,7 @@ public class DictionaryEntryFormatter {
         return buf;
     }
 
-    protected StringBuffer formatReadings( DictionaryEntry de, StringBuffer buf,
+    protected StringBuilder formatReadings( DictionaryEntry de, StringBuilder buf,
                                            ListFormatter format) {
         formatAttributes( de, buf, Position.BEFORE_READINGS, de.getReadingAttributes());
 
@@ -242,7 +242,7 @@ public class DictionaryEntryFormatter {
         return buf;
     }
 
-    protected StringBuffer formatTranslations( DictionaryEntry de, StringBuffer buf,
+    protected StringBuilder formatTranslations( DictionaryEntry de, StringBuilder buf,
                                                ListFormatter romFormat, ListFormatter crmFormat,
                                                ListFormatter synFormat) {
         formatAttributes( de, buf, Position.BEFORE_TRANSLATIONS, de.getTranslationAttributes());
@@ -286,7 +286,7 @@ public class DictionaryEntryFormatter {
         return buf;
     }
 
-    protected StringBuffer formatAttributes( DictionaryEntry de, StringBuffer buf,
+    protected StringBuilder formatAttributes( DictionaryEntry de, StringBuilder buf,
                                              Position pos, AttributeSet atts) {
         if (atts.isEmpty())
             return buf; // nothing to do

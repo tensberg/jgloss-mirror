@@ -71,7 +71,7 @@ public abstract class AbstractEscaper implements Escaper {
     /**
      * Escapes the characters in a <code>CharSequence</code>.
      *
-     * @return A <code>StringBuffer</code> containing the escaped text sequence, or
+     * @return A <code>StringBuilder</code> containing the escaped text sequence, or
      *         <code>null</code> if no characters needed escaping.
      */
     protected StringBuilder escape(CharSequence text) {

@@ -9,7 +9,7 @@ class HyperlinkListFormatter implements ListFormatter {
     protected String protocol;
     protected Map references;
     protected ListFormatter parent;
-    protected StringBuffer tempBuffer = new StringBuffer();
+    protected StringBuilder tempBuffer = new StringBuilder();
 
     public HyperlinkListFormatter( String _protocol, Map _references, 
                                    ListFormatter _parent) {
@@ -19,7 +19,7 @@ class HyperlinkListFormatter implements ListFormatter {
     }
 
     @Override
-	public ListFormatter newList( StringBuffer _buffer, int _length) {
+	public ListFormatter newList( StringBuilder _buffer, int _length) {
         parent.newList( _buffer, _length);
         return this;
     }
@@ -40,12 +40,12 @@ class HyperlinkListFormatter implements ListFormatter {
     }
 
     @Override
-	public StringBuffer endList() {
+	public StringBuilder endList() {
         return parent.endList();
     }
 
     @Override
-	public StringBuffer getBuffer() {
+	public StringBuilder getBuffer() {
         return parent.getBuffer();
     }
 
@@ -54,7 +54,7 @@ class HyperlinkListFormatter implements ListFormatter {
         return parent.getPattern();
     }
 
-    protected String createLinkStart( StringBuffer buf) {
+    protected String createLinkStart( StringBuilder buf) {
         String refKey = Integer.toString( references.size()+1);
         buf.append( "<a href=\"");
         buf.append( protocol);
@@ -67,7 +67,7 @@ class HyperlinkListFormatter implements ListFormatter {
         return refKey;
     }
 
-    protected void createLinkEnd( StringBuffer buf) {
+    protected void createLinkEnd( StringBuilder buf) {
         buf.append( "</a>");
     }
 } // class HyperlinkListFormatter

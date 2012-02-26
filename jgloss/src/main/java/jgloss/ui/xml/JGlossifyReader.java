@@ -150,7 +150,7 @@ class JGlossifyReader extends FilterReader {
 
         this.detectParagraphs = detectParagraphs;
 
-        StringBuffer lineBuf = new StringBuffer( 128);
+        StringBuilder lineBuf = new StringBuilder( 128);
 
         lineBuf.append( HEADER);
         lineBuf.append( "<title>");
@@ -186,7 +186,7 @@ class JGlossifyReader extends FilterReader {
                 // eof at underlying reader. Generate HTML document end tags.
                 eof = true;
                 line = END_HTML;
-                StringBuffer lastLine = new StringBuffer(32);
+                StringBuilder lastLine = new StringBuilder(32);
                 if (inParagraph) {
                     lastLine.append(END_PARAGRAPH);
                     inParagraph = false;
@@ -295,7 +295,7 @@ class JGlossifyReader extends FilterReader {
         if (in == null)
             return null;
 
-        StringBuffer line = new StringBuffer( in);
+        StringBuilder line = new StringBuilder( in);
         for ( int i=line.length()-1; i>=0; i--) {
             Character c = new Character( line.charAt( i));
             if (funnyChars.containsKey( c))

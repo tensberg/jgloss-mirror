@@ -70,7 +70,7 @@ public class KanjiParser extends AbstractParser {
      */
     private int cacheHits = 0;
     private Object[] searchParameters;
-    private StringBuffer searchKey;
+    private StringBuilder searchKey;
 
     private final static String PARSER_NAME = 
         ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl())
@@ -135,8 +135,8 @@ public class KanjiParser extends AbstractParser {
         final byte IN_INFLECTION = 3;
         int mode = OUTSIDE;
         int wordStart = 0;
-        StringBuffer word = new StringBuffer();
-        StringBuffer inflection = new StringBuffer();
+        StringBuilder word = new StringBuilder();
+        StringBuilder inflection = new StringBuilder();
         Character.UnicodeBlock ub;
         boolean compverb = false;
         for ( int i=start; i<end; i++) {
@@ -189,7 +189,7 @@ public class KanjiParser extends AbstractParser {
                         else {
                             // catch possible verb/adjective inflections
                             mode = IN_INFLECTION;
-                            inflection = new StringBuffer().append( text[i]);
+                            inflection = new StringBuilder().append( text[i]);
                         }
                     }
                     else {
@@ -219,8 +219,8 @@ public class KanjiParser extends AbstractParser {
                                                word.substring( 1, 2), false, false, out);
                             // reparse last part, which may be the start of a new compverb
                             mode = OUTSIDE;
-                            word = new StringBuffer();
-                            inflection = new StringBuffer();
+                            word = new StringBuilder();
+                            inflection = new StringBuilder();
                             i = wordStart + 1; // the for loop will set i to wordStart + 2
                             continue;
                         }
@@ -408,7 +408,7 @@ public class KanjiParser extends AbstractParser {
     private boolean hasMatch( Dictionary d, String word) throws SearchException {
         lookups++;
         if (searchKey == null)
-            searchKey = new StringBuffer( 128);
+            searchKey = new StringBuilder( 128);
         searchKey.setLength( 0);
         searchKey.append( word);
         searchKey.append( ':');

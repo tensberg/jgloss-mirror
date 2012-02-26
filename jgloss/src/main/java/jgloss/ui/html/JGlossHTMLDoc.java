@@ -533,7 +533,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
             // Split word in base/readings. Add a reading/base pair for every kanji substring of the
             // word and a base element for every other substring. If there is no kanji substring, add
             // a reading for the whole string since there has to be at least one reading.
-            StringBuffer wordhtml = new StringBuffer(128);
+            StringBuilder wordhtml = new StringBuilder(128);
             int baseStart = 0;
             boolean hasReading = false;
             boolean needsReading = needsReading( text, 0);
@@ -566,7 +566,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 }
             }
 
-            StringBuffer html = new StringBuffer(128);
+            StringBuilder html = new StringBuilder(128);
             html.append("<html><body><p>");
             appendTag(html, AnnotationTags.ANNOTATION, false);
             appendTag(html, AnnotationTags.WORD, false);
@@ -633,7 +633,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
     /**
      * Adds an opening or closing HTML tag to a string buffer.
      */
-    private static void appendTag(StringBuffer buf, AnnotationTags tag, boolean endTag) {
+    private static void appendTag(StringBuilder buf, AnnotationTags tag, boolean endTag) {
         buf.append('<');
         if (endTag)
             buf.append('/');
@@ -656,7 +656,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         // get unannotated text
         Element word = annotation.getElement(0);
         Segment textSegment = new Segment();
-        StringBuffer unannotatedText = new StringBuffer(word.getEndOffset()-word.getStartOffset());
+        StringBuilder unannotatedText = new StringBuilder(word.getEndOffset()-word.getStartOffset());
         for (int i=0; i<word.getElementCount(); i++) {
             Element basetext = word.getElement(i);
             if (basetext.getName().equals(AnnotationTags.READING_BASETEXT.getId()))
@@ -793,7 +793,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
      * Fetch a span of text from the document, leaving out text with is part of an annotation.
      */
     private class UnannotatedTextFetcher extends TreeWalker {
-        private StringBuffer text;
+        private StringBuilder text;
         private Segment textSegment;
 
         UnannotatedTextFetcher() {
@@ -805,8 +805,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
         /**
          * Returns the unannotated text between the given start and end offsets.
          */
-        public StringBuffer getText( int _start, int _end) {
-            text = new StringBuffer(_end - _start);
+        public StringBuilder getText( int _start, int _end) {
+            text = new StringBuilder(_end - _start);
             startWalk(_start, _end);
             return text;
         }

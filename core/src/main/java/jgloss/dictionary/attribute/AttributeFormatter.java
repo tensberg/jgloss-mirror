@@ -38,7 +38,7 @@ public abstract class AttributeFormatter implements ValueListFormatter, Attribut
      * @param buf String buffer to which the formatted attribute is appended.
      * @return The string buffer passed in.
      */
-    public StringBuffer format( Attribute att, ValueList val, StringBuffer buf) {
+    public StringBuilder format( Attribute att, ValueList val, StringBuilder buf) {
         return format( this, att, val, buf);
     }
 } // class AttributeFormatter

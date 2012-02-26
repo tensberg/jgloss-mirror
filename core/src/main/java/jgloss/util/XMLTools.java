@@ -38,10 +38,10 @@ public class XMLTools {
     /**
      * Returns the text under the node.
      *
-     * @see #getText(Node,StringBuffer)
+     * @see #getText(Node,StringBuilder)
      */
     public static String getText( Node node) {
-        return getText( node, new StringBuffer()).toString();
+        return getText( node, new StringBuilder()).toString();
     }
 
     /**
@@ -51,7 +51,7 @@ public class XMLTools {
      *
      * @return the provided string buffer.
      */
-    public static StringBuffer getText( Node node, StringBuffer buf) {
+    public static StringBuilder getText( Node node, StringBuilder buf) {
         if (node instanceof CharacterData) {
             buf.append( ((CharacterData) node).getData());
         }

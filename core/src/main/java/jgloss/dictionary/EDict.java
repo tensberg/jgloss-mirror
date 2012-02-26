@@ -319,7 +319,7 @@ public class EDict extends FileBasedDictionary {
             else {
                 BRACKET_MATCHER.reset( translation);
                 int matchend = 0;
-                StringBuffer unrecognized = null;
+                StringBuilder unrecognized = null;
                 
                 while (BRACKET_MATCHER.find()) {
                     matchend = BRACKET_MATCHER.end();
@@ -380,7 +380,7 @@ public class EDict extends FileBasedDictionary {
                                 // will be cut off from the translation, store it seperately and
                                 // prepend it.
                                 if (unrecognized == null)
-                                    unrecognized = new StringBuffer();
+                                    unrecognized = new StringBuilder();
                                 if (!hasUnrecognized) {
                                     unrecognized.append( '(');
                                     hasUnrecognized = true;

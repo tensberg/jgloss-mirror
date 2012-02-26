@@ -853,7 +853,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         if (model.getDocumentPath() != null) {
             int index = annotationList.getSelectedIndex();
             if (index != -1) {
-                StringBuffer history = new StringBuffer();
+                StringBuilder history = new StringBuilder();
                 String[] oldHistory = JGloss.prefs.getList( Preferences.HISTORY_SELECTION, 
                                                             File.pathSeparatorChar);
                 // Copy from the old history all files which are not the current file.

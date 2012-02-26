@@ -40,8 +40,8 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuffer format( AttributeValueFormatter formatter, Attribute att, 
-                                ValueList val, StringBuffer buf) {
+	public StringBuilder format( AttributeValueFormatter formatter, Attribute att, 
+                                ValueList val, StringBuilder buf) {
         if (linkValues) {
             parent.format( formatter, att, val, buf);
         }
@@ -56,7 +56,7 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuffer format( final Attribute att, final AttributeValue val, StringBuffer buf) {
+	public StringBuilder format( final Attribute att, final AttributeValue val, StringBuilder buf) {
         if (!linkValues) {
             parent.format( att, val, buf);
         }
@@ -70,7 +70,7 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
         return buf;
     }
 
-    protected String createLinkStart( StringBuffer buf) {
+    protected String createLinkStart( StringBuilder buf) {
         String refKey = Integer.toString( references.size()+1);
         buf.append( "<a href=\"");
         buf.append( protocol);
@@ -83,7 +83,7 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
         return refKey;
     }
 
-    protected void createLinkEnd( StringBuffer buf) {
+    protected void createLinkEnd( StringBuilder buf) {
         buf.append( "</a>");
     }
 } // class HyperlinkAttributeFormatter

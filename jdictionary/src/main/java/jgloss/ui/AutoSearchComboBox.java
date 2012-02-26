@@ -72,7 +72,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     protected int limit;
     protected List items;
     protected String searchText;
-    protected StringBuffer tempBuffer = new StringBuffer( 1024);
+    protected StringBuilder tempBuffer = new StringBuilder( 1024);
 
     private boolean dontConfigureEditor;
     private boolean dontDoLookup;

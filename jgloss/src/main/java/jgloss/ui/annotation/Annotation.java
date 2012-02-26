@@ -53,8 +53,8 @@ public class Annotation {
         Element word = anno.getElement( 0);
         List readingsl = new ArrayList( word.getElementCount());
         List rbasesl = new ArrayList( word.getElementCount());
-        StringBuffer text = new StringBuffer();
-        StringBuffer reading = new StringBuffer();
+        StringBuilder text = new StringBuilder();
+        StringBuilder reading = new StringBuilder();
         for ( int i=0; i<word.getElementCount(); i++) {
             Element child = word.getElement( i);
             if (child.getElementCount() == 0) { // base text
@@ -199,7 +199,7 @@ public class Annotation {
     }
 
     private void updateAnnotatedTextReading() {
-        StringBuffer reading = new StringBuffer();
+        StringBuilder reading = new StringBuilder();
         Element word = anno.getElement( 0);
         for ( int i=0; i<word.getElementCount(); i++) {
             Element child = word.getElement( i);
@@ -219,7 +219,7 @@ public class Annotation {
 
     @Override
 	public String toString() {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         out.append( annotatedText);
         if (annotatedTextReading!=null &&
             annotatedTextReading.length() > 0) {

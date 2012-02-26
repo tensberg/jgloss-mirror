@@ -41,7 +41,7 @@ public class AttributeNameFormatter extends AttributeFormatter {
         after = _after;
     }
 
-    protected StringBuffer format( Attribute att, StringBuffer buf) {
+    protected StringBuilder format( Attribute att, StringBuilder buf) {
         if (before != null)
             buf.append( before);
         buf.append( att.getName());
@@ -51,13 +51,13 @@ public class AttributeNameFormatter extends AttributeFormatter {
     }
 
     @Override
-	public StringBuffer format( AttributeValueFormatter formatter, Attribute att, 
-                                ValueList val, StringBuffer buf) {
+	public StringBuilder format( AttributeValueFormatter formatter, Attribute att, 
+                                ValueList val, StringBuilder buf) {
         return format( att, buf);
     }
 
     @Override
-	public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder buf) {
         return format( att, buf);
     }
 } // class AttributeNameFormatter

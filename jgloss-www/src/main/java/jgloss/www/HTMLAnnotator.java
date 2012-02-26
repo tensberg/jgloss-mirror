@@ -87,7 +87,7 @@ public class HTMLAnnotator {
                 Reader resource = new InputStreamReader
                     ( HTMLAnnotator.class.getResourceAsStream( HTMLAnnotator.SCRIPT_RESOURCE), "UTF-8");
                 char[] buf = new char[4096];
-                StringBuffer scriptbuf = new StringBuffer();
+                StringBuilder scriptbuf = new StringBuilder();
                 int r;
                 while ((r=resource.read( buf)) != -1) {
                     scriptbuf.append( buf, 0, r);
@@ -120,7 +120,7 @@ public class HTMLAnnotator {
         rewriter.setDocumentBase( docBase);
         in = new BufferedReader( in);
         
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         text.ensureCapacity( 4096);
 
         boolean scriptWritten = false;
@@ -219,7 +219,7 @@ public class HTMLAnnotator {
     /**
      * Annotates the text with dictionary lookup results and writes it to <CODE>out</CODE>
      */
-    protected void annotateText( Writer out, StringBuffer text)
+    protected void annotateText( Writer out, StringBuilder text)
         throws IOException {
         if (text.length() == 0)
             return;
@@ -229,7 +229,7 @@ public class HTMLAnnotator {
 
         try {
             List annotations = parser.parse( chars, 0, chars.length);
-            StringBuffer anno = new StringBuffer( 200);
+            StringBuilder anno = new StringBuilder( 200);
             int start = 0; // index of first character of annotated word
             int end = 0; // index of first character after annotated word
             String[] prevannotation = new String[3];
@@ -274,7 +274,7 @@ public class HTMLAnnotator {
      * @param intext Text to which the annotation is appended.
      * @param a The annotation to append.
      */
-    protected StringBuffer addAnnotationText( StringBuffer text, TextAnnotation a,
+    protected StringBuilder addAnnotationText( StringBuilder text, TextAnnotation a,
                                               String[] prevannotation) {
         String lastdictionary = prevannotation[0];
         String lastword = prevannotation[1];
@@ -298,7 +298,7 @@ public class HTMLAnnotator {
 
         String translation = "";
         if (a instanceof Translation) {
-            StringBuffer t = new StringBuffer();
+            StringBuilder t = new StringBuilder();
             for ( Iterator j=((Translation) a).getDictionaryEntry().getTranslations().iterator();
                   j.hasNext(); ) {
                 t.append( "    ");
@@ -357,7 +357,7 @@ public class HTMLAnnotator {
         return text;
     }
 
-    protected String getTagName( StringBuffer text) {
+    protected String getTagName( StringBuilder text) {
         int end = 2;
         while (end<text.length()-1 && text.charAt( end)>0x20)
             end++;
@@ -383,7 +383,7 @@ public class HTMLAnnotator {
      * @param tag Complete tag, including the leading &lt; and trailing &gt;.
      * @param rewriter Used to change the URL.
      */
-    protected StringBuffer rewriteURL( String name, StringBuffer tag, URLRewriter rewriter) {
+    protected StringBuilder rewriteURL( String name, StringBuilder tag, URLRewriter rewriter) {
         String target = null;
         
         if (name.equals( "a") || name.equals( "area") || name.equals( "base"))
@@ -453,7 +453,7 @@ public class HTMLAnnotator {
      */
     protected String generateAnnotatedWord( String annotation, char[] text, int wordStart,
                                             int wordLength) {
-        StringBuffer out = new StringBuffer( annotation.length() + wordLength + 20);
+        StringBuilder out = new StringBuilder( annotation.length() + wordLength + 20);
         // look up ID of this annotation text if already generated
         Integer id = null;
         id = (Integer) generatedAnnotations.get( annotation);

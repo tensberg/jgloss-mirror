@@ -92,7 +92,7 @@ public class WadokuJT extends FileBasedDictionary {
         ResultIterator r = d.search( ExpressionSearchModes.ANY,
                                      new Object[] { args[1], f });
         System.err.println( "Matches:");
-        StringBuffer out = new StringBuffer( 128);
+        StringBuilder out = new StringBuilder( 128);
         while (r.hasNext()) {
             out.setLength( 0);
             DictionaryEntry de = r.next();
@@ -611,7 +611,7 @@ public class WadokuJT extends FileBasedDictionary {
                 if (crm.charAt( 0) == '{') try {
                     int endb = crm.indexOf( '}');
                     // attribute strings unrecognized by mapping
-                    StringBuffer unrecognized = null;
+                    StringBuilder unrecognized = null;
 
                     CATEGORY_MATCHER.reset( crm.substring( 1, endb));
                     while (CATEGORY_MATCHER.find()) {
@@ -646,7 +646,7 @@ public class WadokuJT extends FileBasedDictionary {
                         else {
                             // unrecognized category
                             if (unrecognized == null) {
-                                unrecognized = new StringBuffer( cat.length() + 128);
+                                unrecognized = new StringBuilder( cat.length() + 128);
                                 unrecognized.append( '{');
                                 unrecognized.append( cat);
                             }

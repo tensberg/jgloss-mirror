@@ -31,9 +31,9 @@ import java.util.regex.Pattern;
  * @author Michael Koch
  */
 public interface ListFormatter {
-    public ListFormatter newList( StringBuffer _buffer, int _length);
+    public ListFormatter newList( StringBuilder _buffer, int _length);
     public ListFormatter addItem( Object item);
-    public StringBuffer endList();
-    public StringBuffer getBuffer();
+    public StringBuilder endList();
+    public StringBuilder getBuffer();
     public Pattern getPattern();
 } // interface ListFormatter

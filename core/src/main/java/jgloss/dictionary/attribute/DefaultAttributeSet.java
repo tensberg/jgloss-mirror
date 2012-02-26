@@ -56,7 +56,7 @@ public class DefaultAttributeSet implements AttributeSet {
         }
         @Override
 		public String toString() {
-            StringBuffer out = new StringBuffer();
+            StringBuilder out = new StringBuilder();
             out.append( '[');
             for ( Iterator i=values.iterator(); i.hasNext(); ) {
                 out.append( i.next().toString());
@@ -219,7 +219,7 @@ public class DefaultAttributeSet implements AttributeSet {
         if (attributes == null)
             return "()";
 
-        StringBuffer out = new StringBuffer( 128);
+        StringBuilder out = new StringBuilder( 128);
         out.append( '(');
         for ( Iterator i=attributes.entrySet().iterator(); i.hasNext(); ) {
             Map.Entry entry = (Map.Entry) i.next();

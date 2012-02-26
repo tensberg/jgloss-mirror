@@ -567,7 +567,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     @Override
 	public synchronized void savePreferences() {
         ListModel model = dictionaries.getModel();
-        StringBuffer paths = new StringBuffer( model.getSize()*32);
+        StringBuilder paths = new StringBuilder( model.getSize()*32);
         List newDictionaries = new ArrayList( model.getSize());
 
         synchronized (model) {

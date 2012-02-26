@@ -122,7 +122,7 @@ class ListParameter extends UIParameter {
 
     protected Vector getItems( Element elem) {
         Vector out = new Vector();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         Node item = elem.getFirstChild();
         while (item != null) {

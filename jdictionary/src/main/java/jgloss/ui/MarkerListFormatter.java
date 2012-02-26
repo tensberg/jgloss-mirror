@@ -132,7 +132,7 @@ public class MarkerListFormatter implements ListFormatter {
     public String getTextAfter() { return textAfter; }
 
     @Override
-	public ListFormatter newList( StringBuffer _buffer, int _length) {
+	public ListFormatter newList( StringBuilder _buffer, int _length) {
         parent.newList( _buffer, _length);
         return this;
     }
@@ -145,7 +145,7 @@ public class MarkerListFormatter implements ListFormatter {
         }
 
         String s = String.valueOf( item);
-        StringBuffer tempBuffer = new StringBuffer( s);        
+        StringBuilder tempBuffer = new StringBuilder( s);        
         String sN = normalize( s);
 
         int from = sN.length()-1;
@@ -160,9 +160,9 @@ public class MarkerListFormatter implements ListFormatter {
     }
 
     @Override
-	public StringBuffer endList() { return parent.endList(); }
+	public StringBuilder endList() { return parent.endList(); }
     @Override
-	public StringBuffer getBuffer() { return parent.getBuffer(); }
+	public StringBuilder getBuffer() { return parent.getBuffer(); }
     @Override
 	public Pattern getPattern() { return parent.getPattern(); }
 

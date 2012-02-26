@@ -204,7 +204,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     
     protected boolean multipleDictionaries;
     protected List resultBuffer;
-    protected StringBuffer resultTextBuffer = new StringBuffer( 8192);
+    protected StringBuilder resultTextBuffer = new StringBuilder( 8192);
     protected int entriesInTextBuffer;
     protected int dictionaryEntries;
     protected String previousDictionaryName;

@@ -703,7 +703,7 @@ public class JGlossServlet extends HttpServlet {
             for ( Enumeration names=req.getHeaderNames(); names!=null && names.hasMoreElements(); ) {
                 String name = (String) names.nextElement();
                 if (!noForwardHeaders.contains( name.toLowerCase())) {
-                    StringBuffer value = new StringBuffer();
+                    StringBuilder value = new StringBuilder();
                     for ( Enumeration values=req.getHeaders( name); values.hasMoreElements(); ) {
                         if (value.length() > 0)
                             value.append( ',');
@@ -788,7 +788,7 @@ public class JGlossServlet extends HttpServlet {
         List out = new LinkedList();
 
         boolean inword = false;
-        StringBuffer word = new StringBuffer();
+        StringBuilder word = new StringBuilder();
         for ( int i=0; i<s.length(); i++) {
             char c = s.charAt( i);
             if (!inword) {
@@ -837,7 +837,7 @@ public class JGlossServlet extends HttpServlet {
             usedeflate = (acceptEncoding.indexOf( "deflate") != -1);
         }
 
-        StringBuffer out = new StringBuffer( 30);
+        StringBuilder out = new StringBuilder( 30);
         if (usegzip)
             out.append( "gzip,");
         if (usedeflate)

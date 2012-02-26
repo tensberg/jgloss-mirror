@@ -38,12 +38,12 @@ public class RomajiTranslator {
      * Translate a string of romanji text into a string of unicode
      * by applying the given conversion
      *
-     * @param buf StringBuffer to place result into
+     * @param buf StringBuilder to place result into
      * @param conv Conversion to apply
      *
      * @return translated String
      */
-    static public String translate(StringBuffer buf, Conversion c) {
+    static public String translate(StringBuilder buf, Conversion c) {
 
         int len = buf.length();
 

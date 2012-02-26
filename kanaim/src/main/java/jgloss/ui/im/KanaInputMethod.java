@@ -42,7 +42,7 @@ class KanaInputMethod implements InputMethod {
     protected InputMethodContext context;
     protected boolean active = false;
     protected boolean compositionEnabled = true;
-    protected StringBuffer conversionBuffer = new StringBuffer( 3);
+    protected StringBuilder conversionBuffer = new StringBuilder( 3);
     protected Locale locale;
     protected Character.Subset[] subsets;
 

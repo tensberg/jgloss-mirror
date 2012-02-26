@@ -189,7 +189,7 @@ public class AboutFrame extends JFrame {
         try {
             BufferedReader r = new BufferedReader( new InputStreamReader
                 ( AboutFrame.class.getResourceAsStream( "/data/COPYING"), "ASCII"));
-            StringBuffer gpl = new StringBuffer();
+            StringBuilder gpl = new StringBuilder();
             String line;
             while ((line=r.readLine()) != null)
                 gpl.append( line + "\n");

@@ -118,7 +118,7 @@ public class AttributeLegend extends JPanel {
 
     public void setDictionaries( Dictionary[] dictionaries) {
         dictionaryChoice.removeAllItems();
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         for ( int i=0; i<dictionaries.length; i++) {
             text.setLength( 0);
             text.append( "<html><head></head><body>");
@@ -129,7 +129,7 @@ public class AttributeLegend extends JPanel {
         }
     }
 
-    protected void createLegend( Dictionary dic, StringBuffer buf) {
+    protected void createLegend( Dictionary dic, StringBuilder buf) {
         buf.append( "<h2>");
         buf.append( JGloss.messages.getString( "legend.dictionary", new String[] { dic.getName() }));
         buf.append( "</h2>\n");
@@ -173,7 +173,7 @@ public class AttributeLegend extends JPanel {
         }
     }
 
-    protected void createLegendForValue( Dictionary dic, Attribute att, StringBuffer buf) {
+    protected void createLegendForValue( Dictionary dic, Attribute att, StringBuilder buf) {
         // currently only CategoryAttributeValues are supported
         if (!CategoryAttributeValue.class.isAssignableFrom( att.getAttributeValueClass()))
             return;

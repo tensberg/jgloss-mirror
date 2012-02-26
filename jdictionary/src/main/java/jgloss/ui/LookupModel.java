@@ -676,7 +676,7 @@ public class LookupModel implements Cloneable {
     public void saveToPreferences( Preferences prefs, String prefix) {
         prefs.set( prefix + PREF_SEARCHMODE, getSelectedSearchModeIndex());
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
             buf.append( String.valueOf( ((StateWrapper) i.next()).isSelected()));
             if (i.hasNext())

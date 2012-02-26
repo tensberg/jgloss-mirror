@@ -28,7 +28,7 @@ import jgloss.util.ListFormatter;
 public class ReferenceAttributeFormatter extends DefaultAttributeFormatter {
     protected String beforeValue;
     protected String afterValue;
-    protected StringBuffer itemBuffer = new StringBuffer( 128);
+    protected StringBuilder itemBuffer = new StringBuilder( 128);
 
     public ReferenceAttributeFormatter( String _beforeValue, String _afterValue,
                                         ListFormatter _formatter) {
@@ -38,7 +38,7 @@ public class ReferenceAttributeFormatter extends DefaultAttributeFormatter {
     }
 
     @Override
-	public StringBuffer format( Attribute att, AttributeValue val, StringBuffer buf) {
+	public StringBuilder format( Attribute att, AttributeValue val, StringBuilder buf) {
         buf.append( beforeValue);
         buf.append( ((ReferenceAttributeValue) val).getReferenceTitle());
         buf.append( afterValue);

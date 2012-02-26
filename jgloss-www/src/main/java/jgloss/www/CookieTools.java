@@ -42,7 +42,7 @@ import javax.servlet.*;
  * @author Michael Koch
  */
 public class CookieTools {
-    private static final StringBuffer parser = new StringBuffer( 100);
+    private static final StringBuilder parser = new StringBuilder( 100);
 
     /**
      * Date format of the expires cookie attribute as defined in the Netscape cookie
@@ -98,7 +98,7 @@ public class CookieTools {
         }
         String port = String.valueOf( porti);
 
-        StringBuffer cookietext = new StringBuffer( 10000);
+        StringBuilder cookietext = new StringBuilder( 10000);
         int maxVersion = 0;
         for ( int i=0; i<cookies.length; i++) {
             Cookie c = cookies[i];
@@ -437,8 +437,8 @@ public class CookieTools {
         // the first name/value pair does not set an attribute but the cookies NAME and VALUE
         boolean firstPair = true;
 
-        StringBuffer name = new StringBuffer( 100);
-        StringBuffer value = new StringBuffer( 100);
+        StringBuilder name = new StringBuilder( 100);
+        StringBuilder value = new StringBuilder( 100);
 
         // Guarantee that the last attribute pair is written.
         cookie = cookie + (version1 ? "," : ";");
@@ -599,7 +599,7 @@ public class CookieTools {
     }
 
     protected static String escape( String in) {
-        StringBuffer out = new StringBuffer( in);
+        StringBuilder out = new StringBuilder( in);
         for ( int i=out.length()-1; i>=0; i--) {
             char c = out.charAt( i);
             if (c=='|' || c=='%' || !isTokenChar( c)) {
@@ -614,7 +614,7 @@ public class CookieTools {
     }
 
     protected static String unescape( String in) {
-        StringBuffer out = new StringBuffer( in);
+        StringBuilder out = new StringBuilder( in);
         for ( int i=out.length()-3; i>=0; i--) try {
             if (out.charAt( i) == '%') {
                 out.setCharAt( i, (char) Integer.parseInt( out.substring( i+1, i+3), 16));

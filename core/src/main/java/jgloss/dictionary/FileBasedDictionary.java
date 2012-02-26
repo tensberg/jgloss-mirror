@@ -739,11 +739,11 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * </p>
      */
     protected String escape( String str) {
-        StringBuffer buf = null; // initialize only if needed
+        StringBuilder buf = null; // initialize only if needed
         for ( int i=str.length()-1; i>=0; i--) {
             if (escapeChar( str.charAt( i))) {
                 if (buf == null)
-                    buf = new StringBuffer( str);
+                    buf = new StringBuilder( str);
                 buf.replace( i, i+1, StringTools.unicodeEscape( str.charAt( i)));
             }
         }

@@ -179,7 +179,7 @@ public class ChasenParser extends AbstractParser {
         if (noInflectionType && noInflectedForm)
             return partOfSpeech;
 
-        StringBuffer out = new StringBuffer( partOfSpeech);
+        StringBuilder out = new StringBuilder( partOfSpeech);
         if (!noInflectionType) {
             out.append( '\u3001');
             out.append( inflectionType);

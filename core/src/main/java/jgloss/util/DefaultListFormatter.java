@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class DefaultListFormatter implements ListFormatter {
     public static final char ITEMNO_MARKER = 'n';
 
-    protected StringBuffer buffer;
+    protected StringBuilder buffer;
     protected int length;
     protected int itemNo;
 
@@ -88,7 +88,7 @@ public class DefaultListFormatter implements ListFormatter {
     }
 
     @Override
-	public ListFormatter newList( StringBuffer _buffer, int _length) {
+	public ListFormatter newList( StringBuilder _buffer, int _length) {
         buffer = _buffer;
         itemNo = 0;
         length = _length;
@@ -112,8 +112,8 @@ public class DefaultListFormatter implements ListFormatter {
         if (item instanceof String) {
             buffer.append( (String) item);
         }
-        else if (item instanceof StringBuffer) {
-            buffer.append( (StringBuffer) item);
+        else if (item instanceof StringBuilder) {
+            buffer.append( (StringBuilder) item);
         }
         else
             buffer.append( String.valueOf( item));
@@ -128,7 +128,7 @@ public class DefaultListFormatter implements ListFormatter {
     }
 
     @Override
-	public StringBuffer endList() {
+	public StringBuilder endList() {
         if (length == 0)
             buffer.append( emptyList);
 
@@ -136,11 +136,11 @@ public class DefaultListFormatter implements ListFormatter {
     }
 
     @Override
-	public StringBuffer getBuffer() { return buffer; }
+	public StringBuilder getBuffer() { return buffer; }
 
     @Override
 	public Pattern getPattern() {
-        StringBuffer pattern = new StringBuffer();
+        StringBuilder pattern = new StringBuilder();
 
         pattern.append( "(?:(?:");
         addToRegex( multiListBefore, pattern);
@@ -160,7 +160,7 @@ public class DefaultListFormatter implements ListFormatter {
         return Pattern.compile( pattern.toString());
     }
 
-    private void addToRegex( String[] format, StringBuffer regex) {
+    private void addToRegex( String[] format, StringBuilder regex) {
         StringTools.addToRegex( format[0], regex);
         if (format.length == 2) {
             // match itemno marker

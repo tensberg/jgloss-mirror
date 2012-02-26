@@ -88,12 +88,12 @@ public class StringTools {
      * hiragana.
      */
     public static String toHiragana( String s, boolean ignoreSpecialChars) {
-        StringBuffer out = null; // create only if needed
+        StringBuilder out = null; // create only if needed
         for ( int i=0; i<s.length(); i++) {
             char c = s.charAt( i);
             if (isKatakana( c) && (!ignoreSpecialChars || !isKatakanaSpecialChar( c))) {
                 if (out == null)
-                    out = new StringBuffer( s);
+                    out = new StringBuilder( s);
                 out.setCharAt( i, (char) (c-96));
             }
         }
@@ -125,12 +125,12 @@ public class StringTools {
      * katakana.
      */
     public static String toKatakana( String s, boolean ignoreSpecialChars) {
-        StringBuffer out = null; // create only if needed
+        StringBuilder out = null; // create only if needed
         for ( int i=0; i<s.length(); i++) {
             char c = s.charAt( i);
             if (isHiragana( c) && (!ignoreSpecialChars || !isHiraganaSpecialChar( c))) {
                 if (out == null)
-                    out = new StringBuffer( s);
+                    out = new StringBuilder( s);
                 out.setCharAt( i, (char) (c+96));
             }
         }
@@ -338,7 +338,7 @@ public class StringTools {
      * @see #unicodeEscape(char)
      */
     public static String unicodeUnescape( String str) {
-        StringBuffer buf = null; // create only if needed
+        StringBuilder buf = null; // create only if needed
         for ( int i=str.length()-6; i>=0; i--) {
             if (str.charAt( i)=='\\' && str.charAt( i+1)=='u') {
                 // Possible unicode escape sequence.
@@ -363,7 +363,7 @@ public class StringTools {
                 if (replacement >= 0) {
                     // valid escape sequence
                     if (buf == null)
-                        buf = new StringBuffer( str);
+                        buf = new StringBuilder( str);
                     buf.delete( i, i+5);
                     buf.setCharAt( i, (char) replacement);
                 }
@@ -379,7 +379,7 @@ public class StringTools {
     /**
      * Appends a character to a regular expression pattern, escaping any special characters.
      */
-    public static StringBuffer addToRegex( char c, StringBuffer regex) {
+    public static StringBuilder addToRegex( char c, StringBuilder regex) {
         // A \ escape char may be prepended to every non-aphabetical character,
         // even if it does not need escaping.
         // Do this to err on the safe side.
@@ -394,7 +394,7 @@ public class StringTools {
      * Appends a character sequence to a regular expression pattern, escaping any
      * special characters.
      */
-    public static StringBuffer addToRegex( CharSequence text, StringBuffer regex) {
+    public static StringBuilder addToRegex( CharSequence text, StringBuilder regex) {
         for ( int i=0; i<text.length(); i++)
             addToRegex( text.charAt( i), regex);
         return regex;

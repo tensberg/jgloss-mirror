@@ -59,7 +59,7 @@ public class SingleWordEntry extends BaseEntry {
 
     @Override
 	public String toString() {
-        StringBuffer out = new StringBuffer( 30);
+        StringBuilder out = new StringBuilder( 30);
         out.append( generalA.toString());
         out.append( ' ');
         out.append( wordA.toString());
