@@ -23,6 +23,11 @@
 
 package jgloss.dictionary;
 
+import static java.util.Collections.unmodifiableList;
+
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Collection of distance search modes. Distance search modes take a positive integer as
  * distance.
@@ -32,13 +37,11 @@ package jgloss.dictionary;
 public class DistanceSearchModes extends AbstractSearchMode {
     public static final SearchMode NEAR = new DistanceSearchModes( "near");
     public static final SearchMode RADIUS = new DistanceSearchModes( "radius");
-
-    private String name;
     
-    private final static SearchParameters PARAMETERS = new SearchParameters
-        ( new SearchParameter[] { StandardSearchParameter.EXPRESSION,
-                                  StandardSearchParameter.SEARCH_FIELDS,
-                                  StandardSearchParameter.DISTANCE });
+    private final static List<SearchParameter> PARAMETERS = unmodifiableList(Arrays.asList(
+    				StandardSearchParameter.EXPRESSION,
+    				StandardSearchParameter.SEARCH_FIELDS,
+    				StandardSearchParameter.DISTANCE));
 
     private DistanceSearchModes( String id) {
         super( id);
@@ -50,5 +53,5 @@ public class DistanceSearchModes extends AbstractSearchMode {
      * {@link StandardSearchParameter#DISTANCE DISTANCE}
      */
     @Override
-	public SearchParameters getParameters() { return PARAMETERS; }
+	public List<SearchParameter> getParameters() { return PARAMETERS; }
 } // class DistanceSearchModes

@@ -231,7 +231,7 @@ public abstract class JGloss {
         DictionaryFactory.registerImplementation(EDict.implementationEUC);
         DictionaryFactory.registerImplementation(EDict.implementationUTF8);
         DictionaryFactory.registerImplementation(WadokuJT.implementation);
-        DictionaryFactory.registerImplementation(KanjiDic.implementation);
+        DictionaryFactory.registerImplementation(KanjiDic.IMPLEMENTATION);
     }
 
     protected void initUI() throws Exception {

@@ -47,11 +47,11 @@ class MultiReadingEntry implements DictionaryEntry {
         this( _word, Collections.singletonList( _reading), _translations, _dictionary);
     }
 
-    public MultiReadingEntry( String _word, List _readings, String[] _translations,
+    public MultiReadingEntry( String _word, List<String> _readings, String[] _translations,
                               Dictionary _dictionary) {
         word = _word;
         readings = new String[_readings.size()];
-        readings = (String[]) _readings.toArray( readings);
+        readings = _readings.toArray(new String[_readings.size()]);
         translations = _translations;
         if (translations == null)
             translations = new String[0];

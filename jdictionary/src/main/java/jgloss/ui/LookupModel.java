@@ -36,7 +36,7 @@ import jgloss.dictionary.DictionaryEntryField;
 import jgloss.dictionary.MatchMode;
 import jgloss.dictionary.SearchFieldSelection;
 import jgloss.dictionary.SearchMode;
-import jgloss.dictionary.SearchParameters;
+import jgloss.dictionary.SearchParameter;
 import jgloss.dictionary.StandardSearchParameter;
 import jgloss.util.StringTools;
 
@@ -575,7 +575,7 @@ public class LookupModel implements Cloneable {
         boolean changed = false;
 
         if (searchmode != null) {
-            SearchParameters params = searchmode.getParameters();
+            List<SearchParameter> params = searchmode.getParameters();
             boolean hasExpression = params.contains( StandardSearchParameter.EXPRESSION);
             if (hasExpression != searchExpressionEnabled) {
                 searchExpressionEnabled = hasExpression;

@@ -31,6 +31,7 @@ import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -89,7 +90,7 @@ public class WadokuJT extends FileBasedDictionary {
         formatter.addAttributeFormat( Attributes.EXPLANATION, new DefaultAttributeFormatter
                                       ( " (", ")", "", false, new DefaultListFormatter( ",")), false);
 
-        ResultIterator r = d.search( ExpressionSearchModes.ANY,
+        Iterator<DictionaryEntry> r = d.search( ExpressionSearchModes.ANY,
                                      new Object[] { args[1], f });
         System.err.println( "Matches:");
         StringBuilder out = new StringBuilder( 128);

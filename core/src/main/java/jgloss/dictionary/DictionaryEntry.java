@@ -32,21 +32,11 @@ import jgloss.dictionary.attribute.AttributeSet;
  */
 public interface DictionaryEntry {
     /**
-     * Typesafe enumeration of attribute groups dictionary entries have.
+     * Attribute groups dictionary entries have.
      */
-    public static class AttributeGroup {
-        public static final AttributeGroup GENERAL = new AttributeGroup( "GENERAL");
-        public static final AttributeGroup WORD = new AttributeGroup( "WORD");
-        public static final AttributeGroup READING = new AttributeGroup( "READING");
-        public static final AttributeGroup TRANSLATION = new AttributeGroup( "TRANSLATION");
-
-        private String name;
-
-        private AttributeGroup( String _name) { this.name = _name; }
-
-        @Override
-		public String toString() { return name; }
-    } // class AttributeGroup
+    public enum AttributeGroup {
+    	GENERAL, WORD, READING, TRANSLATION
+    }
 
     /**
      * Return the set of attributes which apply to the whole entry.

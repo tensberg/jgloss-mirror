@@ -40,6 +40,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.AttributeValue;
 import jgloss.util.CharacterEncodingDetector;
 import jgloss.util.NullIterator;
 import jgloss.util.StringTools;
@@ -70,7 +71,7 @@ public class KanjiDic implements Dictionary {
      * Map from a word to an entry of list of entries. Contains a key for all kanjis,
      * readings and translations.
      */
-    protected Map entries;
+    protected Map<Object, List<String>> entries;
 
     /**
      * Object describing this implementation of the <CODE>Dictionary</CODE> interface. The
@@ -79,8 +80,8 @@ public class KanjiDic implements Dictionary {
      *
      * @see DictionaryFactory
      */
-    public final static DictionaryFactory.Implementation implementation = 
-        new DictionaryFactory.Implementation() {
+    public final static DictionaryFactory.Implementation<KanjiDic> IMPLEMENTATION = 
+        new DictionaryFactory.Implementation<KanjiDic>() {
                 @Override
 				public DictionaryFactory.TestResult isInstance( String descriptor) {
                     float confidence = ZERO_CONFIDENCE;
@@ -109,7 +110,10 @@ public class KanjiDic implements Dictionary {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                         reason = messages.getString("dictionary.reason.read");
-                    } catch (NumberFormatException ex) {}
+                    } catch (NumberFormatException ex) {
+                    	ex.printStackTrace();
+                        reason = messages.getString("dictionary.reason.read");
+                    }
                     
                     return new DictionaryFactory.TestResult(confidence, reason);
                 }
@@ -118,7 +122,7 @@ public class KanjiDic implements Dictionary {
 				public float getMaxConfidence() { return 1.0f; }
                 
                 @Override
-				public Dictionary createInstance( String descriptor) 
+				public KanjiDic createInstance( String descriptor) 
                     throws DictionaryFactory.InstantiationException {
                     try {
                         return new KanjiDic( descriptor);
@@ -131,21 +135,21 @@ public class KanjiDic implements Dictionary {
 				public String getName() { return "KANJIDIC"; }
 
                 @Override
-				public Class getDictionaryClass( String descriptor) { return KanjiDic.class; }
+				public Class<KanjiDic> getDictionaryClass( String descriptor) { return KanjiDic.class; }
             };
 
     /**
      * Used during entry parsing in constructor.
      */
-    private final static List readingsl = new ArrayList( 10);
+    private final static List<String> readingsl = new ArrayList<String>( 10);
     /**
      * Used during entry parsing in constructor.
      */
-    private final static List nanoril = new ArrayList( 10);
+    private final static List<String> nanoril = new ArrayList<String>( 10);
     /**
      * Used during entry parsing in constructor.
      */
-    private final static List translationsl = new ArrayList( 10);
+    private final static List<String> translationsl = new ArrayList<String>( 10);
 
     /**
      * Represents a single entry in the kanji dictionary file. Only a subset of the fields
@@ -229,7 +233,7 @@ public class KanjiDic implements Dictionary {
                 readingsl.clear();
                 nanoril.clear();
                 translationsl.clear();
-                List currentl = readingsl;
+                List<String> currentl = readingsl;
 
                 kanji = dicline.charAt( 0);
                 
@@ -373,7 +377,7 @@ public class KanjiDic implements Dictionary {
      * @exception IOException when the dictionary file cannot be read.
      */
     public KanjiDic( String dicfile) throws IOException {
-        entries = new HashMap( 25001);
+        entries = new HashMap<Object, List<String>>( 25001);
         this.dicfile = dicfile;
         File dic = new File( dicfile);
         name = dic.getName();
@@ -402,10 +406,9 @@ public class KanjiDic implements Dictionary {
         }
 
         // compact all stored array lists to minimize memory usage
-        for ( Iterator i=entries.entrySet().iterator(); i.hasNext(); ) {
-            Object value = ((Map.Entry) i.next()).getValue();
+        for (Object value : entries.values()) {
             if (value instanceof ArrayList)
-                ((ArrayList) value).trimToSize();
+                ((ArrayList<?>) value).trimToSize();
         }
     }
 
@@ -418,25 +421,17 @@ public class KanjiDic implements Dictionary {
      * @param entry The entry which will be stored.
      */
     protected void addEntry( Object key, String entry) {
-        Object o = entries.get( key);
-        if (o == entry)
-            return;
-        if (o == null) {
-            entries.put( key, entry);
-        }
-        else if (o instanceof List) {
-            List l = (List) o;
-            // Entries are stored one after the other, so in the case of duplicate keys
-            // only the last item of the entry list has to be tested for equality to prevent
-            // duplicate insertions
-            if (l.get( l.size()-1) != entry)
-                ((List) o).add( entry);
-        }
-        else {
-            List l = new ArrayList( 5);
-            l.add( o);
-            l.add( entry);
+        List<String> l = entries.get( key);
+        if (l == null) {
+        	l = new ArrayList<String>();
             entries.put( key, l);
+        }
+
+        // Entries are stored one after the other, so in the case of duplicate keys
+        // only the last item of the entry list has to be tested for equality to prevent
+        // duplicate insertions
+        if (l.get( l.size()-1) != entry) {
+        	l.add( entry);
         }
     }
 
@@ -475,22 +470,18 @@ public class KanjiDic implements Dictionary {
      * The key can be a kanji, a reading or a
      * translation. If no match is found, the empty list will be returned.
      */
-    public List lookup( String key) {
-        List r = null;
-        Object o = entries.get( key);
-        if (o == null)
-            return Collections.EMPTY_LIST;
-        else if (o instanceof List) {
-            // create list of entries from list of strings
-            List original = (List) o;
-            r = new ArrayList( original.size());
-            for ( Iterator i=original.iterator(); i.hasNext(); )
-                r.add( new Entry( (String) i.next(), true));
-        }
+    public List<Entry> lookup( String key) {
+        List<Entry> r = null;
+        List<String> original = entries.get( key);
+        if (original == null)
+            return Collections.emptyList();
         else {
-            r = new ArrayList( 1);
-            r.add( new Entry( (String) o, true));
+            // create list of entries from list of strings
+            r = new ArrayList<Entry>( original.size());
+            for (String entry : original)
+                r.add( new Entry( entry, true));
         }
+        
         return r;
     }
 
@@ -500,7 +491,7 @@ public class KanjiDic implements Dictionary {
      * but not all matches which should be returned.
      */
     @Override
-	public ResultIterator search( SearchMode mode, Object[] parameters) throws SearchException {
+	public Iterator<DictionaryEntry> search( SearchMode mode, Object[] parameters) throws SearchException {
         if (mode instanceof ExpressionSearchModes)
             return searchExpression( (ExpressionSearchModes) mode, (String) parameters[0], 
                                      (SearchFieldSelection) parameters[1]);
@@ -508,20 +499,15 @@ public class KanjiDic implements Dictionary {
             throw new UnsupportedSearchModeException( mode);
     }
 
-    public ResultIterator searchExpression( ExpressionSearchModes mode, String expression, 
+    public Iterator<DictionaryEntry> searchExpression( ExpressionSearchModes mode, String expression, 
                                             SearchFieldSelection fields) {
-        Object o = entries.get( expression);
-        Iterator i;
-        if (o != null) {
-
-            if (o instanceof List) // list of entries
-                i = ((List) o).iterator();
-            else { // single entry
-                i = Collections.singletonList( o).iterator();
-            }
+        List<String> l = entries.get( expression);
+        Iterator<String> i;
+        if (l != null) {
+        	i = l.iterator();
+        } else {
+        	i = NullIterator.instance();
         }
-        else
-            i = NullIterator.INSTANCE;
 
         return new EntryListIterator( i, mode, expression, fields);
     }
@@ -537,9 +523,9 @@ public class KanjiDic implements Dictionary {
     }
 
     @Override
-	public Set getSupportedAttributes() { return Collections.EMPTY_SET; }
+	public Set<Attribute<?>> getSupportedAttributes() { return Collections.emptySet(); }
     @Override
-	public Set getAttributeValues( Attribute att) { return null; }
+	public <T extends AttributeValue> Set<T> getAttributeValues( Attribute<T> att) { return null; }
 
     @Override
 	public SearchFieldSelection getSupportedFields( SearchMode searchmode) {
@@ -576,7 +562,9 @@ public class KanjiDic implements Dictionary {
     }
 
     @Override
-	public void dispose() {}
+	public void dispose() {
+    	// nothing to do
+    }
 
     @Override
 	public boolean equals( Object o) {
@@ -588,21 +576,21 @@ public class KanjiDic implements Dictionary {
         }
     }
 
-    protected class EntryListIterator implements ResultIterator {
-        protected Iterator entries;
+    protected class EntryListIterator implements Iterator<DictionaryEntry> {
+        protected Iterator<String> entries;
         
         protected ExpressionSearchModes searchmode;
         protected String expression;
         protected SearchFieldSelection searchfields;
 
-        protected LinkedList entryCache = new LinkedList();
+        protected LinkedList<DictionaryEntry> entryCache = new LinkedList<DictionaryEntry>();
 
-        protected List readings = new ArrayList( 10);
-        protected List readingsOkuri = new ArrayList( 10);
+        protected List<String> readings = new ArrayList<String>( 10);
+        protected List<String[]> readingsOkuri = new ArrayList<String[]>( 10);
 
         protected char[] singleChar = new char[1];
 
-        public EntryListIterator( Iterator _entries, ExpressionSearchModes _searchmode,
+        public EntryListIterator( Iterator<String> _entries, ExpressionSearchModes _searchmode,
                                   String _expression, SearchFieldSelection _searchfields) {
             entries = _entries;
             searchmode = _searchmode;
@@ -619,7 +607,7 @@ public class KanjiDic implements Dictionary {
             if (!hasNext())
                 throw new NoSuchElementException();
 
-            DictionaryEntry out = (DictionaryEntry) entryCache.removeFirst();
+            DictionaryEntry out = entryCache.removeFirst();
 
             if (entryCache.isEmpty())
                 fillEntryCache();
@@ -639,7 +627,7 @@ public class KanjiDic implements Dictionary {
                 if (!entries.hasNext())
                     return; // no next entry
 
-                KanjiDic.Entry entry = new KanjiDic.Entry( (String) entries.next(), false);
+                KanjiDic.Entry entry = new KanjiDic.Entry( entries.next(), false);
                 
                 fillReadingsList( entry.getReadings());
 
@@ -655,8 +643,7 @@ public class KanjiDic implements Dictionary {
 
                 // test if any of the non-okurigana readings match
                 if (searchfields.isSelected( DictionaryEntryField.READING)) {
-                    for ( Iterator i=readings.iterator(); i.hasNext(); ) {
-                        String reading = (String) i.next();
+                    for (String reading : readings) {
                         String readingN = StringTools.toHiragana( reading.toLowerCase());
                         if (expressionMatches( readingN)) {
                             entryCache.add( new MultiReadingEntry( kanji, readings,
@@ -670,8 +657,8 @@ public class KanjiDic implements Dictionary {
                 // test readings with okurigana
                 if (searchfields.isSelected( DictionaryEntryField.WORD) ||
                     searchfields.isSelected( DictionaryEntryField.READING)) {
-                    for ( Iterator i=readingsOkuri.iterator(); i.hasNext(); ) {
-                        String[] reading = (String[]) i.next();
+                    for (Iterator<String[]> i=readingsOkuri.iterator(); i.hasNext(); ) {
+                    	String[] reading = i.next();
                         String wordokuri = kanji + reading[1];
                         if (searchfields.isSelected( DictionaryEntryField.WORD) &&
                             expressionMatches( wordokuri) ||
@@ -696,8 +683,7 @@ public class KanjiDic implements Dictionary {
                                                    ( translations[i].toLowerCase()))) {
                                 entryCache.add( new MultiReadingEntry( kanji, readings, translations,
                                                                        KanjiDic.this));
-                                for ( Iterator j=readingsOkuri.iterator(); j.hasNext(); ) {
-                                    String[] reading = (String[]) j.next();
+                                for (String[] reading : readingsOkuri) {
                                     entryCache.add( new MultiReadingEntry
                                                     ( kanji + reading[1], reading[2],
                                                       translations, KanjiDic.this));
@@ -735,6 +721,11 @@ public class KanjiDic implements Dictionary {
                     readingsOkuri.add( new String[] { pre, post, pre+post });
                 }
             }
+        }
+
+		@Override
+        public void remove() {
+			throw new UnsupportedOperationException();
         }
     } // class EntryListIterator
 } // class KanjiDic

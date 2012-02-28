@@ -32,12 +32,15 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeMapper;
+import jgloss.dictionary.attribute.AttributeSet;
+import jgloss.dictionary.attribute.AttributeValue;
 import jgloss.dictionary.attribute.Attributes;
 import jgloss.dictionary.attribute.DefaultAttributeSet;
 import jgloss.dictionary.attribute.Priority;
@@ -66,7 +69,7 @@ public class EDict extends FileBasedDictionary {
         f.select( DictionaryEntryField.TRANSLATION, true);
         f.select( MatchMode.WORD, true);
 
-        ResultIterator r = d.search( ExpressionSearchModes.ANY,
+        Iterator<DictionaryEntry> r = d.search( ExpressionSearchModes.ANY,
                                      new Object[] { args[1], f });
         System.err.println( "Matches:");
         while (r.hasNext())
@@ -82,19 +85,19 @@ public class EDict extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-	public final static DictionaryFactory.Implementation implementationEUC = 
+	public final static DictionaryFactory.Implementation<EDict> implementationEUC = 
 		initImplementation("EDICT", "EUC-JP");
-	public final static DictionaryFactory.Implementation implementationUTF8 = 
+	public final static DictionaryFactory.Implementation<EDict> implementationUTF8 = 
 		initImplementation("EDICT (Unicode)", "UTF-8");
 
     /**
      * Returns a {@link FileBasedDictionary.Implementation FileBasedDictionary.Implementation}
      * which recognizes EUC-JP encoded EDICT dictionaries. Used to initialize the
-     * {@link #implementation implementation} final member because the constructor has to
+     * {@link #IMPLEMENTATION implementation} final member because the constructor has to
      * be wrapped in a try/catch block.
      * 
      */
-    private static DictionaryFactory.Implementation initImplementation(String name, String encoding) {
+    private static DictionaryFactory.Implementation<EDict> initImplementation(String name, String encoding) {
         try {
             // Explanation of the pattern:
             // The EDICT format is "word [reading] /translation/translation/.../", with
@@ -103,7 +106,7 @@ public class EDict extends FileBasedDictionary {
             // To distinguish an EDICT dictionary from a SKK dictionary, which uses a similar format,
             // it is tested that the first char in the translation is not a Kanji
             // (InCJKUnifiedIdeographs)
-            return new FileBasedDictionary.Implementation
+            return new FileBasedDictionary.Implementation<EDict>
                 ( name, encoding, true, Pattern.compile
                   ( "\\A\\S+?(\\s\\[.+?\\])?(\\s/)|/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
                   1.0f, 4096, EDict.class.getConstructor( new Class[] { File.class, String.class })) {
@@ -171,7 +174,7 @@ public class EDict extends FileBasedDictionary {
         super.initSupportedAttributes();
         
         supportedAttributes.putAll( mapper.getAttributes());
-        supportedAttributes.put( Attributes.PRIORITY, Collections.singleton( PRIORITY_VALUE));
+        supportedAttributes.put( Attributes.PRIORITY, Collections.<AttributeValue> singleton( PRIORITY_VALUE));
     }
 
     @Override
@@ -291,14 +294,14 @@ public class EDict extends FileBasedDictionary {
         if (reading == null) // no reading in entry string
             reading = word;
         String translations = ENTRY_MATCHER.group( 3);
-        List rom = new ArrayList( 10);
-        List crm = new ArrayList( 10);
+        List<List<String>> rom = new ArrayList<List<String>>( 10);
+        List<String> crm = new ArrayList<String>( 10);
         rom.add( crm);
 
         DefaultAttributeSet generalA = new DefaultAttributeSet();
         DefaultAttributeSet wordA = new DefaultAttributeSet( generalA);
         DefaultAttributeSet translationA = new DefaultAttributeSet( generalA);
-        List roma = new ArrayList( 10);
+        List<AttributeSet> roma = new ArrayList<AttributeSet>( 10);
         DefaultAttributeSet translationromA = new DefaultAttributeSet( translationA);
         roma.add( translationromA);
 
@@ -337,7 +340,7 @@ public class EDict extends FileBasedDictionary {
                     if (isNumber) {
                         // ROM marker, start new ROM unless this is the first ROM
                         if (crm.size() > 0) {
-                            crm = new ArrayList( 10);
+                            crm = new ArrayList<String>( 10);
                             rom.add( crm);
                             translationromA = new DefaultAttributeSet( translationA);
                             roma.add( translationromA);
@@ -353,22 +356,22 @@ public class EDict extends FileBasedDictionary {
                             if (endc == -1)
                                 endc = att.length();
                             String attsub = att.substring( startc, endc);
-                            AttributeMapper.Mapping mapping = mapper.getMapping( attsub);
+                            AttributeMapper.Mapping<?> mapping = mapper.getMapping( attsub);
                             if (mapping != null) {
-                                Attribute a = mapping.getAttribute();
+                                Attribute<?> a = mapping.getAttribute();
                                 if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
                                     (!seenROM || 
                                      !a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION))) {
-                                    generalA.addAttribute( a, mapping.getValue());
+                                    generalA.addAttribute(mapping);
                                 }
                                 else if (a.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
-                                    wordA.addAttribute( a, mapping.getValue());
+                                    wordA.addAttribute(mapping);
                                 }
                                 else if (a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
                                     if (seenROM)
-                                        translationromA.addAttribute( a, mapping.getValue());
+                                        translationromA.addAttribute(mapping);
                                     else
-                                        translationA.addAttribute( a, mapping.getValue());
+                                        translationA.addAttribute(mapping);
                                 }
                                 else {
                                     // should not happen, edict does not support READING attributes

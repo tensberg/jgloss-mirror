@@ -23,6 +23,11 @@
 
 package jgloss.dictionary;
 
+import static java.util.Collections.unmodifiableList;
+
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Collection of standard expression search modes.
  *
@@ -34,12 +39,9 @@ public class ExpressionSearchModes extends AbstractSearchMode {
     public static final SearchMode SUFFIX = new ExpressionSearchModes( "suffix");
     public static final SearchMode ANY = new ExpressionSearchModes( "any");
 
-    private String name;
-    private String description;
-    
-    private final static SearchParameters PARAMETERS = new SearchParameters
-        ( new SearchParameter[] { StandardSearchParameter.EXPRESSION,
-                                  StandardSearchParameter.SEARCH_FIELDS });
+    private final static List<SearchParameter> PARAMETERS = unmodifiableList(Arrays.asList(
+    				StandardSearchParameter.EXPRESSION,
+    				StandardSearchParameter.SEARCH_FIELDS));
 
     private ExpressionSearchModes( String _id) {
         super( _id);
@@ -50,5 +52,5 @@ public class ExpressionSearchModes extends AbstractSearchMode {
      * {@link StandardSearchParameter#SEARCH_FIELDS SEARCH_FIELDS}.
      */
     @Override
-	public SearchParameters getParameters() { return PARAMETERS; }
+	public List<SearchParameter> getParameters() { return PARAMETERS; }
 } // class ExpressionSearchModes

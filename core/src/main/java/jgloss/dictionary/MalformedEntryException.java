@@ -40,8 +40,10 @@ import jgloss.util.UTF8ResourceBundleControl;
  * @author Michael Koch
  */
 public class MalformedEntryException extends SearchException {
-    protected Dictionary dictionary;
-    protected String dictionaryEntry;
+    private static final long serialVersionUID = 1L;
+
+    protected final Dictionary dictionary;
+    protected final String dictionaryEntry;
 
     public MalformedEntryException( Dictionary _dictionary, String _dictionaryEntry) {
         super( MessageFormat.format( ResourceBundle.getBundle( "messages-dictionary", new UTF8ResourceBundleControl())

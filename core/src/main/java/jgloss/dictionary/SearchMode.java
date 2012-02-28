@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import java.util.List;
+
 /**
  * Interface which describes a search mode. Each {@link Dictionary Dictionary} supports some
  * search modes, which take different parameters. Each instance of this interface describes
@@ -46,5 +48,5 @@ public interface SearchMode {
      * Return the list of parameters which are needed for a search using this search mode
      * to be executed.
      */
-    SearchParameters getParameters();
+    List<SearchParameter> getParameters();
 } // interface SearchMode

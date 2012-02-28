@@ -30,9 +30,9 @@ import jgloss.dictionary.attribute.AttributeSet;
 public class SingleWordEntry extends BaseEntry {
     protected String word;
 
-    public SingleWordEntry( int _entryMarker, String _word, String _reading, List _translations,
+    public SingleWordEntry( int _entryMarker, String _word, String _reading, List<List<String>> _translations,
                        AttributeSet _generalA, AttributeSet _wordA, AttributeSet _translationA,
-                       List _translationRomA, Dictionary _dictionary) {
+                       List<AttributeSet> _translationRomA, Dictionary _dictionary) {
         super( _entryMarker, _reading, _translations,
                _generalA, _wordA, _translationA,
                _translationRomA, _dictionary);

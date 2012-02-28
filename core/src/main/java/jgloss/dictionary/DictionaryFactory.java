@@ -24,7 +24,6 @@
 package jgloss.dictionary;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -41,19 +40,23 @@ public abstract class DictionaryFactory {
     /**
      * Base class for other <CODE>DictionaryFactory</CODE> exceptions.
      */
-    public static class Exception extends java.lang.Exception {
-        public Exception() {}
-        public Exception( String message) {
+    public static class DictionaryFactoryException extends Exception {
+        private static final long serialVersionUID = 1L;
+
+        public DictionaryFactoryException() {}
+        public DictionaryFactoryException( String message) {
             super( message);
         }
-        public Exception( java.lang.Exception root) { super( root); }
-        public Exception( String message, java.lang.Exception root) { super( message, root); }
+        public DictionaryFactoryException( Exception root) { super( root); }
+        public DictionaryFactoryException( String message, java.lang.Exception root) { super( message, root); }
     } // class Exception
 
     /**
      * Thrown when a descriptor does not match any known dictionary format.
      */
-    public static class NotSupportedException extends DictionaryFactory.Exception {
+    public static class NotSupportedException extends DictionaryFactoryException {
+        private static final long serialVersionUID = 1L;
+
         public NotSupportedException() {}
         public NotSupportedException( String message) {
             super( message);
@@ -63,7 +66,9 @@ public abstract class DictionaryFactory {
     /**
      * Thrown when the instantiation of a dictionary failed.
      */
-    public static class InstantiationException extends DictionaryFactory.Exception {
+    public static class InstantiationException extends DictionaryFactory.DictionaryFactoryException {
+        private static final long serialVersionUID = 1L;
+
         public InstantiationException() {
             super();
         }
@@ -81,7 +86,7 @@ public abstract class DictionaryFactory {
     /**
      * Collection of dictionary implementations.
      */
-    private static Set implementations = new HashSet( 10);
+    private static Set<Implementation<?>> implementations = new HashSet<Implementation<?>>( 10);
 
     /**
      * Creates a dictionary instance based on the descriptor. The format of the descriptor
@@ -98,7 +103,7 @@ public abstract class DictionaryFactory {
      */
     public static Dictionary createDictionary( String descriptor) 
         throws NotSupportedException, InstantiationException {
-        Implementation imp = getImplementation( descriptor);
+        Implementation<?> imp = getImplementation( descriptor);
         return imp.createInstance( descriptor);
     }
     
@@ -112,15 +117,14 @@ public abstract class DictionaryFactory {
      * @return The implementation which best matches the descriptor.
      * @exception NotSupportedException if the descriptor does not match a known dictionary format.
      */
-    public static Implementation getImplementation( String descriptor) throws NotSupportedException {
-        Implementation imp = null;
+    public static Implementation<?> getImplementation( String descriptor) throws NotSupportedException {
+        Implementation<?> imp = null;
         float conf = Implementation.ZERO_CONFIDENCE;
 
         // search for implementation with greatest confidence that the descriptor is a
         // dictionary handled by the instance.
         String reasons = ""; // reasons for dictionary confidences
-        for ( Iterator i=implementations.iterator(); i.hasNext(); ) {
-            Implementation ic = (Implementation) i.next();
+        for (Implementation<?> ic : implementations) {
             TestResult result = ic.isInstance( descriptor);
             if (result.getConfidence() > conf) {
                 imp = ic;
@@ -145,7 +149,7 @@ public abstract class DictionaryFactory {
      *
      * @param imp <CODE>Implementation</CODE> object which describes the implementation.
      */
-    public static void registerImplementation(Implementation imp) {
+    public static <T extends Dictionary> void registerImplementation(Implementation<T> imp) {
         implementations.add(imp);
     }
 
@@ -155,7 +159,7 @@ public abstract class DictionaryFactory {
      * @author Michael Koch
      * @see Dictionary
      */
-    public interface Implementation {
+    public interface Implementation<T extends Dictionary> {
         /**
          * Confidence value meaning that the descriptor does not descripe a dictionary in the
          * format described by this implementation.
@@ -205,12 +209,12 @@ public abstract class DictionaryFactory {
          *                   this is usually the path to the file.
          * @exception DictionaryFactory.InstantiationException if the instantiation of the dictionary failed.
          */
-        Dictionary createInstance( String descriptor) throws DictionaryFactory.InstantiationException;
+        T createInstance( String descriptor) throws DictionaryFactory.InstantiationException;
         /**
          * Returns the class of the dictionary which would be created for this descriptor by
          * {@link #createInstance(String) createInstance}.
          */
-        Class getDictionaryClass( String descriptor);
+        Class<? extends T> getDictionaryClass( String descriptor);
     } // interface Implementation
     
     /**

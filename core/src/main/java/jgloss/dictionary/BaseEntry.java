@@ -24,7 +24,6 @@
 package jgloss.dictionary;
 
 import java.lang.ref.SoftReference;
-import java.util.Iterator;
 import java.util.List;
 
 import jgloss.dictionary.attribute.AttributeSet;
@@ -67,51 +66,49 @@ abstract class BaseEntry implements DictionaryEntry {
 
     /**
      * Reference to a base dictionary entry. The dictionary entry object which is referenced
-     * is stored using a <code>WeakReference</code>. If the object is garbage collected when
+     * is stored using a <code>SoftReference</code>. If the object is garbage collected when
      * {@link #getEntry() getEntry} is called, it will be recreated by calling 
      * {@link BaseEntry.MarkerDictionary#createEntryFromMarker(int) createEntryFromMarker} on the entry's
      * dictionary.
      */
     protected static class BaseEntryRef implements DictionaryEntryReference {
-        protected SoftReference entryRef;
+        protected SoftReference<DictionaryEntry> entryRef;
         protected int entryMarker;
         protected Dictionary dictionary;
 
         public BaseEntryRef( BaseEntry entry) {
-            entryRef = new SoftReference( entry);
+            entryRef = new SoftReference<DictionaryEntry>( entry);
             entryMarker = entry.entryMarker;
             dictionary = entry.getDictionary();
         }
 
         @Override
 		public DictionaryEntry getEntry() throws SearchException {
-            DictionaryEntry out = (DictionaryEntry) entryRef.get();
+            DictionaryEntry out = entryRef.get();
             if (out == null) { // garbage collected
                 out = ((MarkerDictionary) dictionary).createEntryFromMarker( entryMarker);
-                entryRef = new SoftReference( out);
+                entryRef = new SoftReference<DictionaryEntry>( out);
             }
             return out;
         }
     } // class BaseEntryRef
 
-    public BaseEntry( int _entryMarker, String _reading, List _translations,
+    public BaseEntry( int _entryMarker, String _reading, List<List<String>> _translations,
                       AttributeSet _generalA, AttributeSet _wordA,
                       AttributeSet _translationA,
-                      List _translationRomA, Dictionary _dictionary) {
+                      List<AttributeSet> _translationRomA, Dictionary _dictionary) {
         entryMarker = _entryMarker;
         reading = _reading;
         translations = new String[_translations.size()][];
         int rom = 0;
-        for ( Iterator i=_translations.iterator(); i.hasNext(); ) {
-            List crm = (List) i.next();
-            translations[rom++] = (String[]) crm.toArray( new String[crm.size()]);
+        for (List<String> crm : _translations) {
+            translations[rom++] = crm.toArray( new String[crm.size()]);
         }
 
         generalA = _generalA;
         wordA = _wordA;
         translationA = _translationA;
-        translationRomA = new AttributeSet[_translationRomA.size()];
-        translationRomA = (AttributeSet[]) _translationRomA.toArray( translationRomA);
+        translationRomA = _translationRomA.toArray( new AttributeSet[_translationRomA.size()]);
 
         dictionary = _dictionary;
     }

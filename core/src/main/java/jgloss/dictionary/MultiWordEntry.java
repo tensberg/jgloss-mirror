@@ -31,17 +31,15 @@ public class MultiWordEntry extends BaseEntry {
     protected String[] words;
     protected AttributeSet[] wordsA;
 
-    public MultiWordEntry( int _entryMarker, List _words, String _reading, List _translations,
-                           AttributeSet _generalA, AttributeSet _wordA, List _wordsA,
+    public MultiWordEntry( int _entryMarker, List<String> _words, String _reading, List<List<String>> _translations,
+                           AttributeSet _generalA, AttributeSet _wordA, List<AttributeSet> _wordsA,
                            AttributeSet _translationA,
-                           List _translationRomA, Dictionary _dictionary) {
+                           List<AttributeSet> _translationRomA, Dictionary _dictionary) {
         super( _entryMarker, _reading, _translations,
                _generalA, _wordA,
                _translationA, _translationRomA, _dictionary);
-        words = new String[_words.size()];
-        words = (String[]) _words.toArray( words);
-        wordsA = new AttributeSet[_wordsA.size()];
-        wordsA = (AttributeSet[]) _wordsA.toArray( wordsA);
+        words = _words.toArray( new String[_words.size()]);
+        wordsA = _wordsA.toArray( new AttributeSet[_wordsA.size()]);
     }
 
     @Override

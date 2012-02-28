@@ -28,8 +28,10 @@ package jgloss.dictionary;
  *
  * @author Michael Koch
  */
-public class SearchException extends Exception {
-    /**
+public class SearchException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
+	/**
      * Constructs a SearchException without a detail message.
      */
     public SearchException() {}

@@ -23,8 +23,10 @@
 
 package jgloss.dictionary.attribute;
 
+import java.util.Iterator;
+
 import jgloss.dictionary.Dictionary;
-import jgloss.dictionary.ResultIterator;
+import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchMode;
 
@@ -49,7 +51,7 @@ public class SearchReference implements ReferenceAttributeValue {
     }   
 
     @Override
-	public ResultIterator getReferencedEntries() throws SearchException {
+	public Iterator<DictionaryEntry> getReferencedEntries() throws SearchException {
         return dictionary.search( searchMode, searchParameters);
     }
 

@@ -30,7 +30,6 @@ import java.util.Iterator;
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.DictionaryEntryReference;
-import jgloss.dictionary.ResultIterator;
 import jgloss.dictionary.SearchException;
 
 /**
@@ -51,13 +50,13 @@ public class LookupResultCache extends LookupResultProxy implements Cloneable {
         addHandler(_forwardTo);
     }
 
-    public LookupResultCache( String description, ResultIterator dictionaryEntries) 
+    public LookupResultCache( String description, Iterator<DictionaryEntry> dictionaryEntries) 
         throws SearchException {
         this();
         setData( description, dictionaryEntries);
     }
 
-    public void setData( String description, ResultIterator dictionaryEntries)
+    public void setData( String description, Iterator<DictionaryEntry> dictionaryEntries)
         throws SearchException {
         cache.clear();
         cache.add( description);

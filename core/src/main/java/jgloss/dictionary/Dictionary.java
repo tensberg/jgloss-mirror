@@ -23,6 +23,7 @@
 
 package jgloss.dictionary;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import jgloss.dictionary.attribute.Attribute;
@@ -49,11 +50,11 @@ public interface Dictionary {
      *                   dictionary.
      * @param parameters Search parameters as required by the {@link SearchMode searchmode}.
      *        The parameters must be valid for the selected search mode according to
-     *        {@link SearchParameters#isValid(Object[]) SearchParameters.isValid}.
+     *        {@link List<SearchParameter>#isValid(Object[]) List<SearchParameter>.isValid}.
      * @exception SearchException if the search mode is not supported or there was an error 
      *            during the search.
      */
-    ResultIterator search( SearchMode searchmode, Object[] parameters) throws SearchException;
+    Iterator<DictionaryEntry> search( SearchMode searchmode, Object[] parameters) throws SearchException;
 
     /**
      * Test if this dictionary supports searches of a certain type. If it fully supports the

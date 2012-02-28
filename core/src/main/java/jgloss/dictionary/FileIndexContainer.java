@@ -33,7 +33,6 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -124,7 +123,7 @@ public class FileIndexContainer implements IndexContainer {
     
     protected RandomAccessFile indexFile;
     protected boolean editMode;
-    protected List indexes = new ArrayList( 5);
+    protected List<IndexMetaData> indexes = new ArrayList<IndexMetaData>( 5);
     protected ByteOrder indexByteOrder;
 
     /**
@@ -247,7 +246,9 @@ public class FileIndexContainer implements IndexContainer {
 	public void close() {
         try {
             indexFile.close();
-        } catch (IOException ex) {}
+        } catch (IOException ex) {
+        	ex.printStackTrace();
+        }
         indexes.clear(); // free index meta data for garbage collection, which clears the file mappings
     }
 
@@ -307,8 +308,7 @@ public class FileIndexContainer implements IndexContainer {
     }
 
     protected IndexMetaData getIndexMetaData( int indexType) {
-        for ( Iterator i=indexes.iterator(); i.hasNext(); ) {
-            IndexMetaData data = (IndexMetaData) i.next();
+        for (IndexMetaData data : indexes) {
             if (data.getType() == indexType)
                 return data;
         }

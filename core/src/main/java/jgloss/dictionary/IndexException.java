@@ -29,7 +29,9 @@ package jgloss.dictionary;
  * @author Michael Koch
  */
 public class IndexException extends SearchException {
-    public IndexException() {}
+    private static final long serialVersionUID = 1L;
+
+	public IndexException() {}
 
     public IndexException( String message) {
         super( message);

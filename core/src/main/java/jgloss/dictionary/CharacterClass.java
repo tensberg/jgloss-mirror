@@ -24,43 +24,32 @@
 package jgloss.dictionary;
 
 /**
- * Typesafe enumeration of character classes used for index creation. The character classes
+ * Enumeration of character classes used for index creation. The character classes
  * are used as return parameters of {@link EncodedCharacterHandler#getCharacterClass(int,boolean)
  * getCharacterClass} to decide how a character is to be treated during index creation.
  *
  * @author Michael Koch
  */
-public class CharacterClass {
+public enum CharacterClass {
     /**
      * The character is a kanji character.
      */
-    public static final CharacterClass KANJI = new CharacterClass( "KANJI");
+    KANJI,
     /**
      * The character is a hiragana character.
      */
-    public static final CharacterClass HIRAGANA = new CharacterClass( "HIRAGANA");
+    HIRAGANA,
     /**
      * The character is a katakana character. This includes the katakana dash.
      */
-    public static final CharacterClass KATAKANA = new CharacterClass( "KATAKANA");
+     KATAKANA,
     /**
      * The character is part of a roman word. This includes all characters of the western
      * alphabet, may include numbers and other characters like dashes in the middle of a word.
      */
-    public static final CharacterClass ROMAN_WORD = new CharacterClass( "ROMAN WORD");
+     ROMAN_WORD,
     /**
      * The character is not in any of the other character classes.
      */
-    public static final CharacterClass OTHER = new CharacterClass( "OTHER");
-
-    private String name;
-
-    private CharacterClass( String _name) {
-        this.name = _name;
-    }
-
-    @Override
-	public String toString() {
-        return "Character class: " + name;
-    }
+    OTHER;
 } // class CharacterClass

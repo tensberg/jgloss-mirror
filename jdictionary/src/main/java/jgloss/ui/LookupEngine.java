@@ -27,7 +27,6 @@ import java.util.Iterator;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
-import jgloss.dictionary.ResultIterator;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.SearchParameter;
@@ -82,7 +81,7 @@ public class LookupEngine {
                 Dictionary d = (Dictionary) i.next();
                 handler.dictionary( d);
                 try {
-                    ResultIterator results = d.search( mode, parameters);
+                    Iterator<DictionaryEntry> results = d.search( mode, parameters);
                     results:
                     while (dictionaryEntries<dictionaryEntryLimit &&
                            results.hasNext()) try {

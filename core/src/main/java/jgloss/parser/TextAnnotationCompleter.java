@@ -23,10 +23,11 @@
 
 package jgloss.parser;
 
+import java.util.Iterator;
+
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.ExpressionSearchModes;
-import jgloss.dictionary.ResultIterator;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchFieldSelection;
 
@@ -47,7 +48,7 @@ public class TextAnnotationCompleter {
 
         searchParameters[0] = anno.getDictionaryForm();
         for ( int i=0; i<dictionaries.length; i++) try {
-            ResultIterator r = dictionaries[i].search( ExpressionSearchModes.EXACT,
+            Iterator<DictionaryEntry> r = dictionaries[i].search( ExpressionSearchModes.EXACT,
                                                        searchParameters);
             while (r.hasNext()) try {
                 DictionaryEntry de = r.next();

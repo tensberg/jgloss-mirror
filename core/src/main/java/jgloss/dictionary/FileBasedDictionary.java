@@ -45,12 +45,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import jgloss.dictionary.attribute.Attribute;
+import jgloss.dictionary.attribute.AttributeValue;
 import jgloss.util.CharacterEncodingDetector;
 import jgloss.util.StringTools;
 import jgloss.util.UTF8ResourceBundleControl;
@@ -84,14 +86,14 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * test reads some bytes from the file to test, converts them to a string using the
      * superclass-supplied encoding and tests it against a regular expression.
      */
-    public static class Implementation implements DictionaryFactory.Implementation {
+    public static class Implementation<T extends FileBasedDictionary> implements DictionaryFactory.Implementation<T> {
         protected String name;
         protected String encoding;
         private boolean doEncodingTest;
         private java.util.regex.Pattern pattern;
         private float maxConfidence;
         private int lookAtLength;
-        private Constructor dictionaryConstructor;
+        private Constructor<T> dictionaryConstructor;
 
         /**
          * Creates a new implementation instance for some file based dictionary format.
@@ -113,7 +115,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         public Implementation( String name, String encoding, boolean doEncodingTest,
                                java.util.regex.Pattern pattern,
                                float maxConfidence, int lookAtLength, 
-                               Constructor dictionaryConstructor) {
+                               Constructor<T> dictionaryConstructor) {
             this.name = name;
             this.encoding = encoding;
             this.doEncodingTest = doEncodingTest;
@@ -153,7 +155,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 					encodingMatches = encoding.equals(bufferEncoding);
 					if (!encodingMatches) {
                         reason = MessageFormat.format(NAMES.getString("dictionary.reason.encoding"),
-                            new String[] { bufferEncoding, encoding } );
+                            bufferEncoding, encoding);
                     }
                 }
 
@@ -193,10 +195,10 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * argument.
          */
         @Override
-		public Dictionary createInstance( String descriptor) 
+		public T createInstance( String descriptor) 
             throws DictionaryFactory.InstantiationException {
             try {
-                return (Dictionary) dictionaryConstructor.newInstance
+                return dictionaryConstructor.newInstance
                     ( getConstructorParameters(descriptor));
             } catch (InvocationTargetException ex) {
                 throw new DictionaryFactory.InstantiationException
@@ -220,7 +222,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         }
 
         @Override
-		public Class getDictionaryClass( String descriptor) {
+		public Class<T> getDictionaryClass( String descriptor) {
             return dictionaryConstructor.getDeclaringClass();
         }
     } // class Implementation
@@ -274,12 +276,12 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Stores the supported search modes of this dictionary. Initialized in 
      * {@link #initSearchModes() initSearchModes}.
      */
-    protected Map supportedSearchModes;
+    protected Map<SearchMode, SearchFieldSelection> supportedSearchModes;
     /**
      * Set of attributes supported by this dictionary implementation. Initialized in
      * {@link #initSupportedAttributes() initSupportedAttributes}.
      */
-    protected Map supportedAttributes;
+    protected Map<Attribute<?>, Set<AttributeValue>> supportedAttributes;
     
     /**
      * Initializes the dictionary. The dictionary file is opened and mapped into memory.
@@ -324,7 +326,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         // is stored as value of the search mode key and getSupportedFields() will return this
         // selection.
 
-        supportedSearchModes = new HashMap( 11);
+        supportedSearchModes = new HashMap<SearchMode, SearchFieldSelection>( 11);
         
         SearchFieldSelection fields = new SearchFieldSelection( true, true, true, true, true);
 
@@ -340,7 +342,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * an empty set. Derived classes should add their supported attributes.
      */
     protected void initSupportedAttributes() {
-        supportedAttributes = new HashMap( 11);
+        supportedAttributes = new HashMap<Attribute<?>, Set<AttributeValue>>( 11);
     }
 
     @Override
@@ -349,25 +351,26 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     }
 
     @Override
-	public Set getSupportedAttributes() {
+	public Set<Attribute<?>> getSupportedAttributes() {
         return supportedAttributes.keySet();
     }
 
     @Override
-	public Set getAttributeValues( Attribute att) {
+	public <T extends AttributeValue> Set<T> getAttributeValues( Attribute<T> att) {
         if (!supportedAttributes.containsKey( att))
             return null;
 
-        Set out = (Set) supportedAttributes.get( att);
+        @SuppressWarnings("unchecked")
+        Set<T> out = (Set<T>) supportedAttributes.get( att);
         if (out == null)
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         else
             return out;
     }
     
     @Override
 	public SearchFieldSelection getSupportedFields( SearchMode mode) {
-        SearchFieldSelection fields = (SearchFieldSelection) supportedSearchModes.get( mode);
+        SearchFieldSelection fields = supportedSearchModes.get( mode);
         if (fields != null)
             return fields;
         else
@@ -460,7 +463,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     }
 
     @Override
-	public ResultIterator search( SearchMode searchmode, Object[] parameters) throws SearchException {
+	public Iterator<DictionaryEntry> search( SearchMode searchmode, Object[] parameters) throws SearchException {
         if (searchmode == ExpressionSearchModes.EXACT ||
             searchmode == ExpressionSearchModes.PREFIX ||
             searchmode == ExpressionSearchModes.SUFFIX ||
@@ -475,7 +478,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Implements search for expression search modes.
      */
-    protected ResultIterator searchExpression( SearchMode searchmode, String expression,
+    protected Iterator<DictionaryEntry> searchExpression( SearchMode searchmode, String expression,
                                                SearchFieldSelection searchFields) 
         throws SearchException {
         expression = escape( expression);
@@ -511,7 +514,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      *         <code>entrybuf</code> buffer, its limit will be the length of the entry data and its
      *         position will be the byte pointed to by <code>matchstart</code>.
      */
-    protected ByteBuffer copyEntry( int matchstart, byte[] entrybuf, EntrySet seenEntries,
+    protected ByteBuffer copyEntry( int matchstart, byte[] entrybuf, Set<Integer> seenEntries,
                                     int[] outOffsets) {
         if (entrybuf == null)
             entrybuf = new byte[8192];
@@ -817,74 +820,80 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         int indexsize = 0;
         dictionary.position( 0);
-        ArrayList termStarts = new ArrayList( 25);
+        ArrayList<Integer> termStarts = new ArrayList<Integer>( 25);
 
         int previousTerm = -1;
         
         DictionaryEntryField field = moveToNextField( dictionary, 0, null);
-        while (dictionary.position() < dictionarySize) try {
-            boolean inWord = false;
-            int c;
-            CharacterClass clazz;
-            int termStart;
-            DictionaryEntryField termField;
-            // find first character of indexable term
-            do {
-                termStart = dictionary.position();
-                c = characterHandler.readCharacter( dictionary);
-                clazz = characterHandler.getCharacterClass( c, inWord);
-                field = moveToNextField( dictionary, c, field);
-            } while (clazz == CharacterClass.OTHER);
-            termStarts.clear();
-            termStarts.add( new Integer( termStart));
-            termField = field;
-            if (clazz == CharacterClass.ROMAN_WORD)
-                inWord = true;
+        while (dictionary.position() < dictionarySize) { 
+        	try {
+        		boolean inWord = false;
+        		int c;
+        		CharacterClass clazz;
+        		int termStart;
+        		DictionaryEntryField termField;
+        		// find first character of indexable term
+        		do {
+        			termStart = dictionary.position();
+        			c = characterHandler.readCharacter( dictionary);
+        			clazz = characterHandler.getCharacterClass( c, inWord);
+        			field = moveToNextField( dictionary, c, field);
+        		} while (clazz == CharacterClass.OTHER);
+        		termStarts.clear();
+        		termStarts.add( new Integer( termStart));
+        		termField = field;
+        		if (clazz == CharacterClass.ROMAN_WORD)
+        			inWord = true;
 
-            int termLength = 1; // term length in number of characters
-            // find end of term
-            int termEnd;
-            CharacterClass clazz2;
-            do {
-                termLength++;
-                termEnd = dictionary.position(); // first position not part of term
-                c = characterHandler.readCharacter( dictionary);
-                clazz2 = characterHandler.getCharacterClass( c, inWord);
+        		int termLength = 1; // term length in number of characters
+        		// find end of term
+        		int termEnd;
+        		CharacterClass clazz2;
+        		do {
+        			termLength++;
+        			termEnd = dictionary.position(); // first position not part of term
+        			c = characterHandler.readCharacter( dictionary);
+        			clazz2 = characterHandler.getCharacterClass( c, inWord);
 
-                // for kanji terms, each kanji in the term is indexed
-                if (clazz == CharacterClass.KANJI && clazz2==clazz)
-                    termStarts.add( new Integer( termEnd));
-            } while (clazz2 == clazz);
+        			// for kanji terms, each kanji in the term is indexed
+        			if (clazz == CharacterClass.KANJI && clazz2==clazz)
+        				termStarts.add( new Integer( termEnd));
+        		} while (clazz2 == clazz);
 
-            // add the term to the index
-            if (clazz==CharacterClass.KANJI || 
-                clazz==CharacterClass.HIRAGANA ||
-                clazz==CharacterClass.KATAKANA ||
-                clazz==CharacterClass.ROMAN_WORD && termLength >= 3) {
-                for ( int i=0; i<termStarts.size(); i++) {
-                    termStart = ((Integer) termStarts.get( i)).intValue();
+        		// add the term to the index
+        		if (clazz==CharacterClass.KANJI || 
+        						clazz==CharacterClass.HIRAGANA ||
+        						clazz==CharacterClass.KATAKANA ||
+        						clazz==CharacterClass.ROMAN_WORD && termLength >= 3) {
+        			for ( int i=0; i<termStarts.size(); i++) {
+        				termStart = termStarts.get( i).intValue();
 
-                    // debug index creation
-                    if (termStart <= previousTerm)
-                        System.err.println( "Warning: possible duplicate index entry");
-                    previousTerm = termStart;
-                    // debug index creation
+        				// debug index creation
+        				if (termStart <= previousTerm)
+        					System.err.println( "Warning: possible duplicate index entry");
+        				previousTerm = termStart;
+        				// debug index creation
 
-                    if (builder.addEntry( termStart, termEnd-termStart, termField))
-                        indexsize++;
-                }
-            }
-            
-            if (clazz2 != CharacterClass.OTHER) {
-                // unread the last character, because it may be the start of the
-                // next indexable term
-                dictionary.position( termEnd);
-            }
-            else { // char may be a field seperator
-                field = moveToNextField( dictionary, c, field);
-            }
-        } catch (BufferUnderflowException ex) {
-        } catch (IndexOutOfBoundsException ex) {} // end of dictionary file
+        				if (builder.addEntry( termStart, termEnd-termStart, termField))
+        					indexsize++;
+        			}
+        		}
+
+        		if (clazz2 != CharacterClass.OTHER) {
+        			// unread the last character, because it may be the start of the
+        			// next indexable term
+        			dictionary.position( termEnd);
+        		}
+        		else { // char may be a field seperator
+        			field = moveToNextField( dictionary, c, field);
+        		}
+        	} catch (BufferUnderflowException ex) {
+        		throw new IndexException(ex);
+        	} catch (IndexOutOfBoundsException ex) {
+        		throw new IndexException(ex);
+        	}
+        	// end of dictionary file
+        }
         
         return indexsize;
     }
@@ -990,13 +999,13 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Iterator returning results from an expression search.
      */
-    protected class ExpressionSearchIterator implements ResultIterator {
+    protected class ExpressionSearchIterator implements Iterator<DictionaryEntry> {
         protected SearchMode searchmode;
         protected SearchFieldSelection fields;
         protected int expressionLength;
         protected Index.Iterator matchingIndexEntries;
         protected byte[] entrybuf = new byte[8192];
-        protected EntrySet seenEntries = new EntrySet();
+        protected Set<Integer> seenEntries = new HashSet<Integer>();
         protected int[] entryOffsets = new int[2];
         protected DictionaryEntry nextEntry = null;
         protected SearchException deferredException = null;
@@ -1013,8 +1022,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         @Override
 		public boolean hasNext() { return nextEntry!=null || deferredException!=null; }
+
         @Override
-		public DictionaryEntry next() throws SearchException, NoSuchElementException {
+		public DictionaryEntry next() {
             if (!hasNext())
                 throw new NoSuchElementException();
 
@@ -1035,6 +1045,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                 throw out;
             }
         }
+        
+        @Override
         public void remove() throws UnsupportedOperationException {
             throw new UnsupportedOperationException();
         }
@@ -1097,23 +1109,4 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             }
         }
     }
-
-    /**
-     * Set of integers which represent entry start indexes in the dictionary.
-     */
-    private static class EntrySet {
-        private HashSet entries;
-
-        public EntrySet() {
-            entries = new HashSet( 51);
-        }
-
-        public boolean contains( int entry) {
-            return (entries.contains( new Integer( entry)));
-        }
-
-        public void add( int entry) {
-            entries.add( new Integer( entry));
-        }
-    } // class EntrySet
 } // class FileBasedDictionary

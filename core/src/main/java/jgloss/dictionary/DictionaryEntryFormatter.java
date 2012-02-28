@@ -52,25 +52,25 @@ public class DictionaryEntryFormatter {
      * ROM attribute set. The exceptions are {@link #BEFORE_FIELD2 BEFORE_FIELD2} and
      * {@link #BEFORE_FIELD2 BEFORE_FIELD2}, which are used with the general attribute set.
      */
-    public static class Position {
-        public static final Position BEFORE_WORDS = new Position( "BEFORE_WORDS");
-        public static final Position AFTER_WORDS = new Position( "AFTER_WORDS");
-        public static final Position BEFORE_WORD = new Position( "BEFORE_WORD");
-        public static final Position AFTER_WORD = new Position( "AFTER_WORD");
-        public static final Position BEFORE_READINGS = new Position( "BEFORE_READINGS");
-        public static final Position AFTER_READINGS = new Position( "AFTER_READINGS");
-        public static final Position BEFORE_READING = new Position( "BEFORE_READING");
-        public static final Position AFTER_READING = new Position( "AFTER_READING");
-        public static final Position BEFORE_TRANSLATIONS = new Position( "BEFORE_TRANSLATIONS");
-        public static final Position AFTER_TRANSLATIONS = new Position( "AFTER_TRANSLATIONS");
-        public static final Position BEFORE_ROM = new Position( "BEFORE_ROM");
-        public static final Position AFTER_ROM = new Position( "AFTER_ROM");
-        public static final Position BEFORE_CRM = new Position( "BEFORE_CRM");
-        public static final Position AFTER_CRM = new Position( "AFTER_CRM");
-        public static final Position BEFORE_TRANSLATION = new Position( "BEFORE_TRANSLATION");
-        public static final Position AFTER_TRANSLATION = new Position( "AFTER_TRANSLATION");
-        public static final Position BEFORE_ENTRY = new Position( "BEFORE_ENTRY");
-        public static final Position AFTER_ENTRY = new Position( "AFTER_ENTRY");
+    public enum Position {
+        BEFORE_WORDS,
+        AFTER_WORDS,
+        BEFORE_WORD,
+        AFTER_WORD,
+        BEFORE_READINGS,
+        AFTER_READINGS,
+        BEFORE_READING,
+        AFTER_READING,
+        BEFORE_TRANSLATIONS,
+        AFTER_TRANSLATIONS,
+        BEFORE_ROM,
+        AFTER_ROM,
+        BEFORE_CRM,
+        AFTER_CRM,
+        BEFORE_TRANSLATION,
+        AFTER_TRANSLATION,
+        BEFORE_ENTRY,
+        AFTER_ENTRY,
 
         /**
          * Special position for general attributes. This position can be used
@@ -78,24 +78,19 @@ public class DictionaryEntryFormatter {
          * using {@link #BEFORE_ENTRY BEFORE_ENTRY}
          * and {@link #AFTER_ENTRY AFTER_ENTRY} to place it at the beginning or end of the string.
          */
-        public static final Position BEFORE_FIELD2 = new Position( "BEFORE_FIELD2");
+        BEFORE_FIELD2,
         /**
          * Special position for general attributes. This position can be used
          * to place a general attribute before the third field instead of
          * using {@link #BEFORE_ENTRY BEFORE_ENTRY}
          * and {@link #AFTER_ENTRY AFTER_ENTRY} to place it at the beginning or end of the string.
          */
-        public static final Position BEFORE_FIELD3 = new Position( "BEFORE_FIELD3");
+        BEFORE_FIELD3;
 
-        private String name;
+    }
 
-        private Position( String _name) { name = _name; }
-        @Override
-		public String toString() { return name; }
-    } // class Position
-
-    protected List formats = new ArrayList( 3);
-    protected Map attributeFormats = new HashMap( 51);
+    protected List<Object[]> formats = new ArrayList<Object[]>( 3);
+    protected Map<Position, List<Object[]>> attributeFormats = new HashMap<Position, List<Object[]>>( 51);
 
     protected StringBuilder tempBuf = new StringBuilder( 128);
     protected StringBuilder tempBuf2 = new StringBuilder( 128);
@@ -129,11 +124,11 @@ public class DictionaryEntryFormatter {
                                     crmFormat, synFormat });
     }
 
-    public void addAttributeFormat( Attribute att, AttributeFormatter format, boolean before) {
+    public void addAttributeFormat( Attribute<?> att, AttributeFormatter format, boolean before) {
         addAttributeFormat( att, format, null, before);
     }
 
-    public void addAttributeFormat( Attribute att, AttributeFormatter format,
+    public void addAttributeFormat( Attribute<?> att, AttributeFormatter format,
                                     Position generalAttributePosition, boolean before) {
         if (att.appliesTo( DictionaryEntry.AttributeGroup.GENERAL)) {
             if (generalAttributePosition == null)
@@ -167,10 +162,10 @@ public class DictionaryEntryFormatter {
         }
     }
 
-    public void addAttributeFormat( Attribute att, AttributeFormatter formatter, Position pos) {
-        List fl = (List) attributeFormats.get( pos);
+    public void addAttributeFormat( Attribute<?> att, AttributeFormatter formatter, Position pos) {
+        List<Object[]> fl = attributeFormats.get( pos);
         if (fl == null) { // first attribute at this position
-            fl = new ArrayList( 3);
+            fl = new ArrayList<Object[]>( 3);
             attributeFormats.put( pos, fl);
         }
         fl.add( new Object[] { att, formatter });
@@ -185,7 +180,7 @@ public class DictionaryEntryFormatter {
             else if (i > 1)
                 formatAttributes( de, buf, Position.BEFORE_FIELD3, de.getGeneralAttributes());
 
-            Object[] format = (Object[]) formats.get( i);
+            Object[] format = formats.get( i);
             if (format[0] == DictionaryEntryField.WORD)
                 formatWords( de, buf, (ListFormatter) format[1]);
             else if (format[0] == DictionaryEntryField.READING)
@@ -291,13 +286,13 @@ public class DictionaryEntryFormatter {
         if (atts.isEmpty())
             return buf; // nothing to do
         
-        List formats = (List) attributeFormats.get( pos);
+        List<Object[]> formats = attributeFormats.get( pos);
         if (formats == null)
             return buf; // nothing to do
 
         for ( int i=0; i<formats.size(); i++) {
-            Object[] o = (Object[]) formats.get( i);
-            Attribute att = (Attribute) o[0];
+            Object[] o = formats.get( i);
+            Attribute<?> att = (Attribute<?>) o[0];
             if (atts.containsKey( att, false)) {
                 ((AttributeFormatter) o[1]).format( att, atts.getAttribute( att, false), buf);
             }
