@@ -25,7 +25,6 @@
 		<module>jgloss</module>
 		<module>kanaim</module>
 		<module>jgloss-www</module>
-		<module>distribution</module>
 	</modules>
 
 	<build>
