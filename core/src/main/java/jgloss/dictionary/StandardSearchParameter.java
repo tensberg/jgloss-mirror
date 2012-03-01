@@ -30,7 +30,7 @@ package jgloss.dictionary;
  * @author Michael Koch
  */
 public class StandardSearchParameter implements SearchParameter {
-    protected Class paramClass;
+    protected Class<?> paramClass;
     protected String description;
 
     /**
@@ -55,13 +55,13 @@ public class StandardSearchParameter implements SearchParameter {
     public static final SearchParameter DISTANCE =
         new StandardSearchParameter( Short.class, "Distance");
 
-    public StandardSearchParameter( Class _paramClass, String _description) {
+    public StandardSearchParameter( Class<?> _paramClass, String _description) {
         this.paramClass = _paramClass;
         this.description = _description;
     }
 
     @Override
-	public Class getParameterClass() { return paramClass; }
+	public Class<?> getParameterClass() { return paramClass; }
     @Override
 	public String getDescription() { return description; }
 

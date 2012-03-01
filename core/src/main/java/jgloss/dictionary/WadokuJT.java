@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 import jgloss.dictionary.attribute.Abbreviation;
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeMapper;
+import jgloss.dictionary.attribute.AttributeSet;
 import jgloss.dictionary.attribute.Attributes;
 import jgloss.dictionary.attribute.DefaultAttributeFormatter;
 import jgloss.dictionary.attribute.DefaultAttributeSet;
@@ -47,6 +48,7 @@ import jgloss.dictionary.attribute.Gairaigo;
 import jgloss.dictionary.attribute.InformationAttributeValue;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
 import jgloss.dictionary.attribute.SearchReference;
+import jgloss.dictionary.attribute.WithoutValue;
 import jgloss.util.DefaultListFormatter;
 
 /**
@@ -104,20 +106,20 @@ public class WadokuJT extends FileBasedDictionary {
         d.dispose();
     }
 
-    public static final Attribute MAIN_ENTRY = new Attributes
+    public static final Attribute<WithoutValue> MAIN_ENTRY = new Attributes<WithoutValue>
         ( NAMES.getString( "wadoku.att.main_entry.name"),
           NAMES.getString( "wadoku.att.main_entry.desc"),
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
-    public static final Attribute MAIN_ENTRY_REF = new Attributes
+    public static final Attribute<ReferenceAttributeValue> MAIN_ENTRY_REF = new Attributes<ReferenceAttributeValue>
         ( NAMES.getString( "wadoku.att.main_entry_ref.name"),
           NAMES.getString( "wadoku.att.main_entry_ref.desc"),
           true, ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
           new DictionaryEntry.AttributeGroup[] 
             { DictionaryEntry.AttributeGroup.GENERAL });
 
-    public static final Attribute ALT_READING = new Attributes
+    public static final Attribute<ReferenceAttributeValue> ALT_READING = new Attributes<ReferenceAttributeValue>
         ( NAMES.getString( "wadoku.att.alt_reading.name"),
           NAMES.getString( "wadoku.att.alt_reading.desc"),
           true, ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
@@ -147,11 +149,11 @@ public class WadokuJT extends FileBasedDictionary {
         }
     }
 
-    protected static final Map gairaigoMap = initGairaigoMap();
+    protected static final Map<String, String> gairaigoMap = initGairaigoMap();
 
-    private static Map initGairaigoMap() {
+    private static Map<String, String> initGairaigoMap() {
         try {
-            Map map = new HashMap( 19);
+            Map<String, String> map = new HashMap<String, String>( 19);
             
             Matcher matcher = Pattern.compile( "\\A(\\S+)\\s+(\\S+)\\Z").matcher( "");
             LineNumberReader r = new LineNumberReader
@@ -192,7 +194,7 @@ public class WadokuJT extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-    public static final DictionaryFactory.Implementation implementation = 
+    public static final DictionaryFactory.Implementation<WadokuJT> implementation = 
         initImplementation();
 
     /**
@@ -202,14 +204,14 @@ public class WadokuJT extends FileBasedDictionary {
      * be wrapped in a try/catch block.
      * 
      */
-    private static DictionaryFactory.Implementation initImplementation() {
+    private static DictionaryFactory.Implementation<WadokuJT> initImplementation() {
         try {
             // Dictionary entries are of the form
             // japanese|reading|part of speech|translation|comment|reference
             // reading,part of speech, comment and reference may be empty.
             // At least four of the fields must be present in the first line of the file for
             // the match to be successful.
-            return new FileBasedDictionary.Implementation
+            return new FileBasedDictionary.Implementation<WadokuJT>
                 ( FORMAT_NAME, "UTF-8", true, Pattern.compile
                   ( "\\A(.*?\\|){3}.*$", Pattern.MULTILINE),
                   1.0f, 4096, WadokuJT.class.getConstructor( new Class[] { File.class }));
@@ -389,7 +391,6 @@ public class WadokuJT extends FileBasedDictionary {
         // count field delimiters from location to entry start or end (whatever is closer)
         // note: entryEnd is the first position not to be read
         int fields = 0;
-        byte c;
         if (position-entryStart <= entryEnd-position-1) {
             // read from start to location
             buf.position( entryStart);
@@ -432,14 +433,14 @@ public class WadokuJT extends FileBasedDictionary {
 	protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
         try {
             DictionaryEntry out = null; 
-            List wordlist = new ArrayList( 10);
+            List<String> wordlist = new ArrayList<String>( 10);
             String reading;
-            List rom = new ArrayList( 10);
+            List<List<String>> rom = new ArrayList<List<String>>( 10);
             DefaultAttributeSet generalA = new DefaultAttributeSet( null);
             DefaultAttributeSet wordA = new DefaultAttributeSet( generalA);
-            List wordsA = new ArrayList( 10);
+            List<AttributeSet> wordsA = new ArrayList<AttributeSet>( 10);
             DefaultAttributeSet translationA = new DefaultAttributeSet( generalA);
-            List romA = new ArrayList( 10);
+            List<AttributeSet> romA = new ArrayList<AttributeSet>( 10);
 
             int start = 0;
             int end = entry.indexOf( '|');
@@ -522,7 +523,7 @@ public class WadokuJT extends FileBasedDictionary {
                         String lang = ABBR_MATCHER.group( 1);
                         String code = null;
                         if (lang != null) {
-                            code = (String) gairaigoMap.get( lang.toLowerCase());
+                            code = gairaigoMap.get( lang.toLowerCase());
                             if (code == null) {
                                 System.err.println( "WadokuJT warning: unrecognized language " +
                                                     lang + " (" + ex + ")");
@@ -566,7 +567,7 @@ public class WadokuJT extends FileBasedDictionary {
                             lang = GAIRAIGO_MATCHER.group( 3);
                         }
 			    
-                        String code = (String) gairaigoMap.get( lang.toLowerCase());
+                        String code = gairaigoMap.get( lang.toLowerCase());
                         if (code != null) {
                             Gairaigo gairaigo = new Gairaigo( word, code);
                             if (allTranslations)
@@ -617,16 +618,16 @@ public class WadokuJT extends FileBasedDictionary {
                     CATEGORY_MATCHER.reset( crm.substring( 1, endb));
                     while (CATEGORY_MATCHER.find()) {
                         String cat = CATEGORY_MATCHER.group( 1);
-                        AttributeMapper.Mapping mapping = mapper.getMapping( cat);
+                        AttributeMapper.Mapping<?> mapping = mapper.getMapping( cat);
                         if (mapping != null) {
-                            Attribute att = mapping.getAttribute();
+                            Attribute<?> att = mapping.getAttribute();
                             if (allTranslations) {
                                 if (att.appliesTo
                                     ( DictionaryEntry.AttributeGroup.GENERAL))
-                                    generalA.addAttribute( att, mapping.getValue());
+                                    generalA.addAttribute(mapping);
                                 else if (att.appliesTo
                                          ( DictionaryEntry.AttributeGroup.TRANSLATION))
-                                    translationA.addAttribute( att, mapping.getValue());
+                                    translationA.addAttribute(mapping);
                                 else // program error, should not happen
                                     throw new SearchException
                                         ( "wrong attribute type for " + cat);
@@ -634,11 +635,11 @@ public class WadokuJT extends FileBasedDictionary {
                             else {
                                 if (att.appliesTo
                                     ( DictionaryEntry.AttributeGroup.TRANSLATION)) {
-                                    thisRomA.addAttribute( att, mapping.getValue());
+                                    thisRomA.addAttribute(mapping);
                                 }
                                 else if (att.appliesTo
                                          ( DictionaryEntry.AttributeGroup.GENERAL))
-                                    generalA.addAttribute( att, mapping.getValue());
+                                    generalA.addAttribute(mapping);
                                 else // program error, should not happen
                                     throw new SearchException
                                         ( "wrong attribute type for " + cat);
@@ -678,7 +679,7 @@ public class WadokuJT extends FileBasedDictionary {
                     // can be safely ignored
                 }
 
-                List crml = new ArrayList( 10);
+                List<String> crml = new ArrayList<String>( 10);
                 rom.add( crml);
                 ALTERNATIVES_MATCHER.reset( crm);
                 while (ALTERNATIVES_MATCHER.find()) {
@@ -699,7 +700,7 @@ public class WadokuJT extends FileBasedDictionary {
                 REFERENCE_MATCHER.reset( comment);
                 while (REFERENCE_MATCHER.find()) {
                     char tc = REFERENCE_MATCHER.group( 1).charAt( 0);
-                    Attribute type;
+                    Attribute<ReferenceAttributeValue> type;
                     if (tc == '\u2192')
                         type = ALT_READING;
                     else if (tc == '\u21d2')
@@ -732,7 +733,7 @@ public class WadokuJT extends FileBasedDictionary {
 
             // create entry
             if (wordlist.size() == 1) {
-                out = new SingleWordEntry( startOffset, (String) wordlist.get( 0), reading, rom,
+                out = new SingleWordEntry( startOffset, wordlist.get( 0), reading, rom,
                                            generalA, wordA, translationA, romA, this);
             }
             else {

@@ -30,6 +30,8 @@ package jgloss.dictionary;
  * @author Michael Koch
  */
 public class UnsupportedSearchModeException extends SearchException {
+    private static final long serialVersionUID = 1L;
+
     protected SearchMode searchmode;
 
     public UnsupportedSearchModeException( SearchMode _searchmode) {

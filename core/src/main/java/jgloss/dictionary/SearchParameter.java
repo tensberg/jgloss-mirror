@@ -37,7 +37,7 @@ public interface SearchParameter {
     /**
      * Get the class which objects used as values of this parameter type must be instances of.
      */
-    Class getParameterClass();
+    Class<?> getParameterClass();
     /**
      * Return a short description of what this parameter controls. This could be as short as a single
      * word.
