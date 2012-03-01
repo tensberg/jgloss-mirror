@@ -61,17 +61,17 @@ public class ChasenParser extends AbstractParser {
     /**
      * Cache of words looked up in the dictionaries.
      */
-    private Map lookupCache;
+    private Map<String, Boolean> lookupCache;
 
-    public ChasenParser( Set exclusions) {
+    public ChasenParser( Set<String> exclusions) {
         this( null, exclusions, true);
     }
 
-    public ChasenParser( Set exclusions, boolean firstOccurrenceOnly) {
+    public ChasenParser( Set<String> exclusions, boolean firstOccurrenceOnly) {
         this( null, exclusions, firstOccurrenceOnly);
     }
 
-    public ChasenParser( String chasenExecutable, Set exclusions,
+    public ChasenParser( String chasenExecutable, Set<String> exclusions,
                          boolean firstOccurrenceOnly) {
         super( exclusions, false, firstOccurrenceOnly);
         this.chasenExecutable = chasenExecutable;
@@ -84,13 +84,13 @@ public class ChasenParser extends AbstractParser {
 	public Locale getLanguage() { return Locale.JAPANESE; }
 
     @Override
-	public List parse( char[] text, int start, int length) throws SearchException {
+	public List<TextAnnotation> parse( char[] text, int start, int length) throws SearchException {
         
         // the parsePosition cannot be correct since the text was converted to HTML!
         parsePosition = start;
 
         int end = start + length;
-        List annotations = new ArrayList( length/3);
+        List<TextAnnotation> annotations = new ArrayList<TextAnnotation>( length/3);
 
         try {
             if (chasen == null) {
@@ -119,23 +119,24 @@ public class ChasenParser extends AbstractParser {
                     parsePosition++;
                 }
                 else {
-                    List resultList = (List) resultLine;
-                    String surfaceInflected = (String) resultList.get( 0);
+                    @SuppressWarnings("unchecked")
+                    List<String> resultList = (List<String>) resultLine;
+                    String surfaceInflected = resultList.get( 0);
                     // don't annotate romaji (may be interpreted as meishi by chasen)
                     if (surfaceInflected.charAt( 0) < 256) {
                         parsePosition += surfaceInflected.length();
                         continue;
                     }
-                    String partOfSpeech = (String) resultList.get( 1);
+                    String partOfSpeech = resultList.get( 1);
                     if (!annotate( partOfSpeech)) {
                         parsePosition += surfaceInflected.length();
                         continue;
                     }
-                    String inflectionType = (String) resultList.get( 2);
-                    String inflectedForm = (String) resultList.get( 3);
-                    String surfaceBase = (String) resultList.get( 4);
-                    String readingBase = StringTools.toHiragana( (String) resultList.get( 5));
-                    String readingInflected = StringTools.toHiragana( (String) resultList.get( 6));
+                    String inflectionType = resultList.get( 2);
+                    String inflectedForm = resultList.get( 3);
+                    String surfaceBase = resultList.get( 4);
+                    String readingBase = StringTools.toHiragana( resultList.get( 5));
+                    String readingInflected = StringTools.toHiragana( resultList.get( 6));
 
                     if (!ignoreWord( surfaceBase)) {
                         annotations.add

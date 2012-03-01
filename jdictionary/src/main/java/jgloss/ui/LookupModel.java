@@ -715,8 +715,7 @@ public class LookupModel implements Cloneable {
             ((StateWrapper) searchModes.get( i)).setSelected( i==searchmode);
         }
 
-        String[] dictionarySelection = StringTools.split
-            ( prefs.getString( prefix + PREF_DICTIONARY_SELECTION), ':');
+        String[] dictionarySelection = prefs.getString( prefix + PREF_DICTIONARY_SELECTION).split(":");
         synchronized (dictionaries) {
             for ( int i=0; i<Math.min( dictionarySelection.length, dictionaries.size()); i++) {
                 ((StateWrapper) dictionaries.get( i)).setSelected( Boolean.valueOf
@@ -730,8 +729,7 @@ public class LookupModel implements Cloneable {
         multiDictionaryMode = prefs.getBoolean( prefix + PREF_MULTI_DICTIONARY_MODE, 
                                                 multiDictionaryMode);
 
-        String[] filterSelection = StringTools.split
-            ( prefs.getString( prefix + PREF_FILTER_SELECTION), ':');
+        String[] filterSelection = prefs.getString( prefix + PREF_FILTER_SELECTION).split(":");
         for ( int i=0; i<Math.min( filterSelection.length, filters.size()); i++) {
             ((StateWrapper) filters.get( i)).setSelected( Boolean.valueOf
                                                           ( filterSelection[i]).booleanValue());

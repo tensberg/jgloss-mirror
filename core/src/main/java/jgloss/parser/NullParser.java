@@ -46,9 +46,9 @@ public class NullParser implements Parser {
     }
 
     @Override
-	public List parse(char[] text, int start, int length)
+	public List<TextAnnotation> parse(char[] text, int start, int length)
         throws SearchException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override

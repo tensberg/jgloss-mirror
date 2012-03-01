@@ -71,7 +71,7 @@ public class ReadingAnnotationFilter {
      * @param readings List of reading annotations from the text, with start offsets in the returned array.
      * @return Text without the reading annotations.
      */
-    public char[] filter( char[] text, int start, int length, List readings) {
+    public char[] filter( char[] text, int start, int length, List<ReadingAnnotation> readings) {
         char[] outtext = new char[length];
         int outtextIndex = 0; // current position in outtext
         int kanjiStart = -1; // start index of current kanji substring in text, or -1

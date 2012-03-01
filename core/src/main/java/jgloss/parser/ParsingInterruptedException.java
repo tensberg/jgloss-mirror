@@ -33,7 +33,9 @@ import jgloss.dictionary.SearchException;
  * @see java.lang.Thread#interrupt()
  */
 public class ParsingInterruptedException extends SearchException {
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * Creates a new exception without a description.
      */
     public ParsingInterruptedException() {

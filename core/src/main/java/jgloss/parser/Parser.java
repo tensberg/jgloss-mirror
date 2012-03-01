@@ -43,7 +43,7 @@ public interface Parser {
      *         list will be returned.
      * @exception SearchException If an error occurrs during a dictionary lookup.
      */
-    List parse( char[] text, int start, int length) throws SearchException;
+    List<TextAnnotation> parse( char[] text, int start, int length) throws SearchException;
 
     /**
      * Returns the position in the text the parser is currently parsing.

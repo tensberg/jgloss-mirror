@@ -79,7 +79,7 @@ public class Chasen {
          * Contains the parsed result of a line of output of chasen. Returned by a call to 
          * {@link #next() next}.
          */
-        private List nextBuffer = new ArrayList( 10);
+        private List<String> nextBuffer = new ArrayList<String>( 10);
         /**
          * EOS lines expected from Chasen process for this iteration. The last EOS signals the end
          * of the Chasen result for the current parse.
@@ -167,7 +167,9 @@ public class Chasen {
                         System.err.println( "Chasen.java WARNING: unexpected chasen process output");
                         discard();
                     }
-                } catch (IOException ex) {}
+                } catch (IOException ex) {
+                	ex.printStackTrace();
+                }
             }
             else { 
                 try {

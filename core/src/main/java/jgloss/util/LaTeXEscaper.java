@@ -23,6 +23,8 @@
 
 package jgloss.util;
 
+import static java.util.Collections.unmodifiableMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +34,13 @@ import java.util.Map;
  * @author Michael Koch
  */
 public class LaTeXEscaper extends AbstractEscaper {
-    protected static final Map DEFAULT_ESCAPE_MAP;
-    protected static final Map UMLAUT_ESCAPE_MAP;
+    protected static final Map<Character, String> DEFAULT_ESCAPE_MAP;
+    protected static final Map<Character, String> UMLAUT_ESCAPE_MAP;
 
-    protected Map escapeMap;
+    protected Map<Character, String> escapeMap;
 
     static {
-        DEFAULT_ESCAPE_MAP = new HashMap();
+        DEFAULT_ESCAPE_MAP = new HashMap<Character, String>();
         DEFAULT_ESCAPE_MAP.put( new Character('#'), "\\#");
         DEFAULT_ESCAPE_MAP.put( new Character('$'), "\\$");
         DEFAULT_ESCAPE_MAP.put( new Character('%'), "\\%");
@@ -51,7 +53,7 @@ public class LaTeXEscaper extends AbstractEscaper {
         DEFAULT_ESCAPE_MAP.put( new Character('\\'), "$\\backslash$");
         DEFAULT_ESCAPE_MAP.put( new Character('\u00a0'), "~"); // non-breakable space
 
-        UMLAUT_ESCAPE_MAP = new HashMap(DEFAULT_ESCAPE_MAP);
+        UMLAUT_ESCAPE_MAP = new HashMap<Character, String>(DEFAULT_ESCAPE_MAP);
         // German umlauts
         UMLAUT_ESCAPE_MAP.put( new Character('\u00e4'), "\\\"{a}");
         UMLAUT_ESCAPE_MAP.put( new Character('\u00f6'), "\\\"{o}");
@@ -77,7 +79,7 @@ public class LaTeXEscaper extends AbstractEscaper {
     }
 
     @Override
-	protected Map getEscapeMap() {
-        return escapeMap;
+	protected Map<Character, String> getEscapeMap() {
+        return unmodifiableMap(escapeMap);
     }
 } // class LaTeXEscaper

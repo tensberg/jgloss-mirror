@@ -163,29 +163,6 @@ public class StringTools {
     }
 
     /**
-     * Split a string at every occurrence of a separator mark.
-     */
-    public static String[] split( String s, char separator) {
-        int from = 0;
-        int to = 0;
-        List segments = new ArrayList( 5);
-        while (from < s.length()) {
-            to = s.indexOf( separator, from);
-            if (to == -1)
-                to = s.length();
-            segments.add( s.substring( from, to));
-            from = to + 1;
-        }
-        if (to == s.length()-1) {
-            // last character in s is separator, add final empty string
-            segments.add( "");
-        }
-        String[] out = new String[segments.size()];
-        out = (String[]) segments.toArray( out);
-        return out;
-    }
-
-    /**
      * Split a kanji/kana compound word in kanji and kana parts. Calls 
      * {@link #splitWordReading(String,String,String) splitWordReading( word, word, reading)}.
      */
@@ -213,7 +190,7 @@ public class StringTools {
         // to treat katakana and hiragana equal, translate katakana to hiragana in base word
         String baseWordH = toHiragana( baseWord);
         baseReading = toHiragana( baseReading);
-        List result = new ArrayList( baseWord.length()/2);
+        List<String[]> result = new ArrayList<String[]>( baseWord.length()/2);
         int hStart = 0; // hiragana start
         int hEnd; // hiragana end
         int kStart = 0; // kanji start
@@ -281,10 +258,7 @@ public class StringTools {
         } while (kStart<baseWord.length() && 
                  kStart<inflectedWord.length()); // inflected word might be shorter than base word
 
-        String[][] out = new String[result.size()][];
-        out = (String[][]) result.toArray( out);
-
-        //print( out);
+        String[][] out = result.toArray( new String[result.size()][]);
         
         return out;
     }
@@ -400,16 +374,4 @@ public class StringTools {
         return regex;
     }
 
-    /**
-     * Print result of {@link #splitWordReading(String,String,String) splitWordReading}. Used for
-     * debugging.
-     */
-    private static void print( String[][] s) {
-        for ( int i=0; i<s.length; i++) {
-            System.err.print( s[i][0]);
-            if (s[i].length > 1)
-                System.err.print( "(" + s[i][1] + ")");
-            System.err.println();
-        }
-    }
 } // class StringTools

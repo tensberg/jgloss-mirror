@@ -60,7 +60,7 @@ public class KanjiParser extends AbstractParser {
     /**
      * Cache which stores previously looked-up words.
      */
-    private Map lookupCache;
+    private Map<String, Boolean> lookupCache;
     /**
      * Number of dictionary lookups so far.
      */
@@ -83,7 +83,7 @@ public class KanjiParser extends AbstractParser {
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      */
-    public KanjiParser( Dictionary[] dictionaries, Set exclusions) {
+    public KanjiParser( Dictionary[] dictionaries, Set<String> exclusions) {
         this( dictionaries, exclusions, true, false, true);
     }
 
@@ -94,7 +94,7 @@ public class KanjiParser extends AbstractParser {
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      */
-    public KanjiParser( Dictionary[] dictionaries, Set exclusions, boolean firstOccurrenceOnly) {
+    public KanjiParser( Dictionary[] dictionaries, Set<String> exclusions, boolean firstOccurrenceOnly) {
         this( dictionaries, exclusions, true, false, firstOccurrenceOnly);
     }
 
@@ -108,12 +108,12 @@ public class KanjiParser extends AbstractParser {
      *                       will be ignored and the character immediately before and after the newline
      *                       will be treated as if forming a single word.
      */
-    public KanjiParser( Dictionary[] dictionaries, Set exclusions,
+    public KanjiParser( Dictionary[] dictionaries, Set<String> exclusions,
                         boolean cacheLookups, boolean ignoreNewlines, boolean firstOccurrenceOnly) {
         super( exclusions, ignoreNewlines, firstOccurrenceOnly);
         this.dictionaries = dictionaries;
         if (cacheLookups)
-            lookupCache = new HashMap( 5000);
+            lookupCache = new HashMap<String, Boolean>( 5000);
     }
 
     /**
@@ -125,9 +125,9 @@ public class KanjiParser extends AbstractParser {
      * @exception SearchException If an error occurrs during a dictionary lookup.
      */
     @Override
-	public List parse( char[] text, int start, int length) throws SearchException {
+	public List<TextAnnotation> parse( char[] text, int start, int length) throws SearchException {
         int end = start + length;
-        List out = new ArrayList( length/3);
+        List<TextAnnotation> out = new ArrayList<TextAnnotation>( length/3);
         
         final byte OUTSIDE = 0;
         final byte IN_KATAKANA = 1;
@@ -267,7 +267,7 @@ public class KanjiParser extends AbstractParser {
     }
 
     private boolean createAnnotations( int wordStart, String word, boolean tryPrefixes, 
-                                       boolean trySuffixes, List out) throws SearchException {
+                                       boolean trySuffixes, List<TextAnnotation> out) throws SearchException {
         return createAnnotations( wordStart, word, null, tryPrefixes, trySuffixes, out);
     }
 
@@ -303,7 +303,7 @@ public class KanjiParser extends AbstractParser {
      */
     private boolean createAnnotations( int wordStart, String word,
                                        String inflection, boolean tryPrefixes,
-                                       boolean trySuffixes, List annotations) throws SearchException {
+                                       boolean trySuffixes, List<TextAnnotation> annotations) throws SearchException {
         boolean result = false;
 
         Conjugation[] conjugations = null;
@@ -332,7 +332,7 @@ public class KanjiParser extends AbstractParser {
                                 conjugations[i].getConjugatedForm();
                             annotations.add( new TextAnnotation
                                              ( wordStart, word.length() + 
-                                               conjugations[i].getConjugatedForm().length(),
+                                               conjugatedForm.length(),
                                                null, dictionaryWord, null, conjugations[i].getType()));
                             if (firstOccurrenceOnly)
                                 annotatedWords.add( dictionaryWord);
@@ -361,18 +361,15 @@ public class KanjiParser extends AbstractParser {
             // Still no luck? If this is a kanji compound, try prefixes of the word.
             if (tryPrefixes && StringTools.isKanji( word.charAt( 0)) &&
                 word.length()>1) {
-                List[] entries = new List[dictionaries.length]; // stores lookup results of prefix
                 int matchlength; // length of the prefix
-                boolean ignore = false;
                 String subword = null;
-                boolean match = false;
 
                 for ( matchlength=word.length()-1; matchlength>0; matchlength--) {
                     subword = word.substring( 0, matchlength);
                     if (ignoreWord( subword))
                         break;
 
-                    for ( int j=0; j<entries.length; j++) {
+                    for ( int j=0; j<dictionaries.length; j++) {
                         if (hasMatch( dictionaries[j], subword))
                             break;
                     }
@@ -418,7 +415,7 @@ public class KanjiParser extends AbstractParser {
 
         if (lookupCache!=null &&
             lookupCache.containsKey( key)) {
-            boolean result = ((Boolean) lookupCache.get( key)).booleanValue();
+            boolean result = lookupCache.get( key).booleanValue();
             cacheHits++;
             return result;
         }

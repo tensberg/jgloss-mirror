@@ -43,26 +43,26 @@ public abstract class AbstractParser implements Parser {
     /**
      * Set of words excluded from annotation by the user.
      */
-    protected Set exclusions;
+    protected Set<String> exclusions;
     /**
      * Set of words already annotated since parser creation or the last call to {@link #reset() reset}.
      * If {@link #firstOccurrenceOnly firstOccurrenceOnly} is set to <CODE>false</CODE>, the variable
      * is set to <CODE>null</CODE>. Derived classes are responsible for adding annotated words to
      * this set.
      */
-    protected Set annotatedWords;
+    protected Set<String> annotatedWords;
     /**
      * Flag if only the first occurrence of a word should be annotated.
      */
     protected boolean firstOccurrenceOnly;
 
-    public AbstractParser( Set exclusions, boolean ignoreNewlines,
+    public AbstractParser( Set<String> exclusions, boolean ignoreNewlines,
                            boolean firstOccurrenceOnly) {
         this.exclusions = exclusions;
         this.ignoreNewlines = ignoreNewlines;
         this.firstOccurrenceOnly = firstOccurrenceOnly;
         if (firstOccurrenceOnly)
-            annotatedWords = new HashSet( 101);
+            annotatedWords = new HashSet<String>( 101);
     }
 
     /**
@@ -99,7 +99,7 @@ public abstract class AbstractParser implements Parser {
     @Override
 	public void reset() {
         if (annotatedWords != null)
-            annotatedWords = new HashSet( 101);
+            annotatedWords = new HashSet<String>( 101);
     }
 
     /**
@@ -127,7 +127,7 @@ public abstract class AbstractParser implements Parser {
         this.firstOccurrenceOnly = firstOccurrenceOnly;
         if (firstOccurrenceOnly) {
             if (annotatedWords==null)
-                annotatedWords = new HashSet( 101);
+                annotatedWords = new HashSet<String>( 101);
         }
         else
             annotatedWords = null;

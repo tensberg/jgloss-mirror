@@ -130,7 +130,7 @@ public class Conjugation {
     /**
      * Map of all created conjugations.
      */
-    private static Map conjugations = new HashMap( 501);
+    private static Map<String, Conjugation> conjugations = new HashMap<String, Conjugation>( 501);
 
     /**
      * The root inflection node. Does not describe a conjugation by itself.
@@ -157,7 +157,7 @@ public class Conjugation {
     public static Conjugation getConjugation( String conjugatedForm, String dictionaryForm,
                                               String type) {
         String key = conjugatedForm + ":" + dictionaryForm + ":" + type;
-        Conjugation c = (Conjugation) conjugations.get( key);
+        Conjugation c = conjugations.get( key);
         if (c == null) {
             c = new Conjugation( conjugatedForm, dictionaryForm, type);
             conjugations.put( key, c);
@@ -236,7 +236,7 @@ public class Conjugation {
 
             // the vconj files begin with a mapping of abbreviations to longer type
             // descriptions, which will be stored in labels
-            Map labels = new HashMap();
+            Map<String, String> labels = new HashMap<String, String>();
 
             int mode = 0; // read labels
             while ((line=in.readLine()) != null) {
@@ -272,7 +272,7 @@ public class Conjugation {
                     String d = line.substring( 0, i); // dictionary form
                     String l = line.substring( i+1); // label
                     //System.out.println( "Conjugation " + c + " " + d + " " + l);
-                    addConjugation( c, d, (String) labels.get( l.trim()));
+                    addConjugation( c, d, labels.get( l.trim()));
                 }
             }
             
@@ -379,7 +379,7 @@ public class Conjugation {
         if (n.conjugations != null) {
             // build a list of conjugation in this node plus all conjugations in ancestor nodes
             // which have a different dictionary form
-            List conjugations = new ArrayList( c.length + n.conjugations.length);
+            List<Conjugation> conjugations = new ArrayList<Conjugation>( c.length + n.conjugations.length);
             for ( int i=0; i<n.conjugations.length; i++)
                 conjugations.add( n.conjugations[i]);
                 
@@ -399,7 +399,7 @@ public class Conjugation {
 
             // store new list in this node
             if (conjugations.size() != n.conjugations.length)
-                n.conjugations = (Conjugation[]) conjugations.toArray( n.conjugations);
+                n.conjugations = conjugations.toArray( n.conjugations);
             c = n.conjugations; // propagate conjugations of this node
         }
         
@@ -424,8 +424,8 @@ public class Conjugation {
      * @param path Edge labels from root to this child.
      * @return Set of conjugations already seen.
      */
-    private static Set dump( Node n, String path) {
-        Set out = new HashSet();
+    private static Set<String> dump( Node n, String path) {
+        Set<String> out = new HashSet<String>();
         if (n.conjugations != null) {
             System.out.print( path + " ");
             for ( int i=0; i<n.conjugations.length; i++) {
@@ -437,7 +437,7 @@ public class Conjugation {
             System.out.println();
         }
         for ( int i=0; i<n.children.length; i++) {
-            Set s = dump( n.children[i], path + n.children[i].edge);
+            Set<String> s = dump( n.children[i], path + n.children[i].edge);
             if (n.conjugations != null) {
                 // check if any of the descendants of this node have a dictionary form
                 // different from the ones in this node
