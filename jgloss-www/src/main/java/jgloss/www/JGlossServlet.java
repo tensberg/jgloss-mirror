@@ -38,7 +38,6 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -46,14 +45,18 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryFactory;
 import jgloss.parser.KanjiParser;
 import jgloss.parser.Parser;
 import jgloss.util.CharacterEncodingDetector;
 import jgloss.util.UTF8ResourceBundleControl;
-
-import javax.servlet.http.*;
-import javax.servlet.*;
 
 /**
  * Servlet which annotates an HTML page with the dictionary entries for
@@ -63,7 +66,9 @@ import javax.servlet.*;
  * @author Michael Koch
  */
 public class JGlossServlet extends HttpServlet {
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * Path to the messages ressource.
      */
     public final static String MESSAGES = "messages-www";
@@ -128,12 +133,12 @@ public class JGlossServlet extends HttpServlet {
     /**
      * Set of protocols allowed in remote urls.
      */
-    private Set allowedProtocols;
+    private Set<String> allowedProtocols;
     /**
      * Set of protocols allowed in remote urls used when the Client-Servlet connection is
      * secure.
      */
-    private Set secureAllowedProtocols;
+    private Set<String> secureAllowedProtocols;
     /**
      * List of MIME types which will be annotated.
      */
@@ -141,7 +146,7 @@ public class JGlossServlet extends HttpServlet {
     /**
      * Set of request and response header keys which will not be forwarded.
      */
-    private Set noForwardHeaders;
+    private Set<String> noForwardHeaders;
 
     /**
      * Flag if cookie forwarding should be enabled globally. If enabled, it can still
@@ -190,46 +195,44 @@ public class JGlossServlet extends HttpServlet {
         DictionaryFactory.registerImplementation( SKKDictionary.class, SKKDictionary.implementation);*/
 
         // load the dictionaries
-        List diclist = new LinkedList();
+        List<Dictionary> diclist = new LinkedList<Dictionary>();
         String d = config.getInitParameter( DICTIONARIES);
         if (d==null || d.length()==0)
             throw new ServletException( MessageFormat.format
                                         ( ResourceBundle.getBundle( MESSAGES)
                                           .getString( "error.nodictionary"),
                                           new Object[] { DICTIONARIES }));
-        for ( Iterator i=split( d, ' ').iterator(); i.hasNext(); ) {
-            d = (String) i.next();
+        for (String dictionaryName : split( d, ' ')) {
             jgloss.dictionary.Dictionary dic = null;
             try {
-                dic = DictionaryFactory.createDictionary( d);
+                dic = DictionaryFactory.createDictionary( dictionaryName);
             } catch (DictionaryFactory.InstantiationException ex) {
                 throw new ServletException( MessageFormat.format
                                             ( ResourceBundle.getBundle( MESSAGES)
                                               .getString( "error.loaddictionary"),
-                                              new Object[] { d })
+                                              new Object[] { dictionaryName })
                                             , ex);
             } catch (DictionaryFactory.NotSupportedException ex) {
                 throw new ServletException( MessageFormat.format
                                             ( ResourceBundle.getBundle( MESSAGES)
                                               .getString( "error.unknowndictionary"),
-                                              new Object[] { d }));
+                                              new Object[] { dictionaryName }));
             }
             diclist.add( dic);
         }
-        dictionaries = new jgloss.dictionary.Dictionary[diclist.size()];
-        dictionaries = (jgloss.dictionary.Dictionary[]) diclist.toArray( dictionaries);
+        dictionaries = diclist.toArray(new Dictionary[diclist.size()]);
 
         // construct a throwaway annotator to test for a misconfiguration in the initializer
         Parser parser = new KanjiParser( dictionaries, null);
         parser.setIgnoreNewlines( true);
         try {
-            HTMLAnnotator annotator = new HTMLAnnotator( parser);
+            new HTMLAnnotator( parser);
         } catch (IOException ex) {
             throw new ServletException( ex);
         }
 
         // read allowed protocols
-        allowedProtocols = new HashSet( 5);
+        allowedProtocols = new HashSet<String>( 5);
         String p = config.getInitParameter( ALLOWED_PROTOCOLS);
         if (p==null || p.length()==0)
             throw new ServletException( MessageFormat.format
@@ -239,26 +242,26 @@ public class JGlossServlet extends HttpServlet {
         allowedProtocols.addAll( split( p, ','));
         // write log entry
         p = "";
-        for ( Iterator i=allowedProtocols.iterator(); i.hasNext(); ) {
+        for (String protocol : allowedProtocols) {
             if (p.length() > 0)
                 p += ", ";
-            p += (String) i.next();
+            p += protocol;
         }
         if (p.length() == 0)
             p = "none";
         getServletContext().log( "allowed protocols: " + p);
 
         // read secure allowed protocols
-        secureAllowedProtocols = new HashSet( 5);
+        secureAllowedProtocols = new HashSet<String>( 5);
         p = config.getInitParameter( SECURE_ALLOWED_PROTOCOLS);
         if (p != null)
             secureAllowedProtocols.addAll( split( p, ','));
         // write log entry
         p = "";
-        for ( Iterator i=secureAllowedProtocols.iterator(); i.hasNext(); ) {
+        for (String protocol : secureAllowedProtocols) {
             if (p.length() > 0)
                 p += ", ";
-            p += (String) i.next();
+            p += protocol;
         }
         if (p.length() == 0)
             p = "none";
@@ -266,7 +269,7 @@ public class JGlossServlet extends HttpServlet {
 
         // Set of all headers which are not forwarded in forwardRequestHeaders or
         // forwardResponseHeaders. All unknown headers must be forwarded as per rfc2616.
-        noForwardHeaders = new HashSet( 51);
+        noForwardHeaders = new HashSet<String>( 51);
         // general header fields
         noForwardHeaders.add( "connection"); // the content of this field is currently not handled
         noForwardHeaders.add( "upgrade");
@@ -305,7 +308,7 @@ public class JGlossServlet extends HttpServlet {
         rewrittenContentTypes = new String[0];
         p = config.getInitParameter( REWRITTEN_TYPES);
         if (p != null) {
-            rewrittenContentTypes = (String[]) split( p, ',').toArray( rewrittenContentTypes);
+            rewrittenContentTypes = split( p, ',').toArray( rewrittenContentTypes);
         }
         if (rewrittenContentTypes.length == 0) {
             rewrittenContentTypes = new String[1];
@@ -391,13 +394,13 @@ public class JGlossServlet extends HttpServlet {
                 "true".equals( req.getParameter( ALLOW_FORM_DATA_FORWARDING));
             String target = new JGlossURLRewriter
                 ( req.getContextPath() + req.getServletPath(),
-                  new URL( HttpUtils.getRequestURL( req).toString()), null,
+                  new URL( req.getRequestURL().toString()), null,
                   allowCookieForwarding, allowFormDataForwarding).rewrite( urlstring, true);
             resp.sendRedirect( target);
             return;
         }
 
-        Set connectionAllowedProtocols;
+        Set<String> connectionAllowedProtocols;
         if (req.isSecure())
             connectionAllowedProtocols = secureAllowedProtocols;
         else
@@ -661,6 +664,7 @@ public class JGlossServlet extends HttpServlet {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void forwardRequestHeaders( URLConnection connection, HttpServletRequest req) {
         String via = req.getHeader( "Via");
         if (via == null)
@@ -700,14 +704,14 @@ public class JGlossServlet extends HttpServlet {
 
             // According to the documentation, some servet containers don't allow getHeaderNames,
             // which returns null in that case.
-            for ( Enumeration names=req.getHeaderNames(); names!=null && names.hasMoreElements(); ) {
-                String name = (String) names.nextElement();
+            for (Enumeration<String> names=req.getHeaderNames(); names!=null && names.hasMoreElements(); ) {
+                String name = names.nextElement();
                 if (!noForwardHeaders.contains( name.toLowerCase())) {
                     StringBuilder value = new StringBuilder();
-                    for ( Enumeration values=req.getHeaders( name); values.hasMoreElements(); ) {
+                    for ( Enumeration<String> values=req.getHeaders( name); values.hasMoreElements(); ) {
                         if (value.length() > 0)
                             value.append( ',');
-                    value.append( (String) values.nextElement());
+                    value.append( values.nextElement());
                     }
                     connection.setRequestProperty( name, value.toString());
                     getServletContext().log( "request header " + name + ": " + value.toString());
@@ -784,8 +788,8 @@ public class JGlossServlet extends HttpServlet {
      *        split on any whitespace.
      * @return List of strings with whitespace at beginning and end removed.
      */
-    protected List split( String s, char separator) {
-        List out = new LinkedList();
+    protected List<String> split( String s, char separator) {
+        List<String> out = new LinkedList<String>();
 
         boolean inword = false;
         StringBuilder word = new StringBuilder();

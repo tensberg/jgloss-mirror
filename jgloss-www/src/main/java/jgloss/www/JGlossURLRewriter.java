@@ -44,7 +44,7 @@ public class JGlossURLRewriter implements URLRewriter {
     /**
      * Set with protocol names.
      */
-    protected Set protocols;
+    protected Set<String> protocols;
     /**
      * Flag if form URLs should be changed.
      */
@@ -62,7 +62,7 @@ public class JGlossURLRewriter implements URLRewriter {
      * @param allowFormDataForwarding Flag if the form data forwarding flag should be set in the
      *                                rewritten URL and if <CODE>FORM</CODE> URLs should be rewritten.
      */
-    public JGlossURLRewriter( String servletBase, URL docBase, Set protocols,
+    public JGlossURLRewriter( String servletBase, URL docBase, Set<String> protocols,
                               boolean allowCookieForwarding, boolean allowFormDataForwarding) {
         this.servletBase = servletBase;
         this.docBase = docBase;

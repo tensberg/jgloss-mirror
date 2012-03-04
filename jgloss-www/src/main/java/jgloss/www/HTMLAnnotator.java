@@ -24,8 +24,6 @@
 // WARNING .. this is unfinished code, it didn't compile in the first place !!! (truell)
 
 package jgloss.www;
-import jgloss.parser.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,12 +31,12 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import jgloss.dictionary.SearchException;
 import jgloss.parser.Parser;
+import jgloss.parser.TextAnnotation;
 
 /**
  * Look up words in a Japanese HTML page and add a tag with the dictionary entries.
@@ -67,7 +65,7 @@ public class HTMLAnnotator {
     /**
      * Map from previously generated annotation texts to their corresponding ids.
      */
-    private Map generatedAnnotations;
+    private Map<String, Integer> generatedAnnotations;
 
     /**
      * Constructs an annotator which uses the given parser and the default 
@@ -79,7 +77,7 @@ public class HTMLAnnotator {
     public HTMLAnnotator( Parser parser) throws IOException {
         this( parser, null);
 
-        generatedAnnotations = new HashMap();
+        generatedAnnotations = new HashMap<String, Integer>();
 
         // read the default script
         if (script == null) {
@@ -127,10 +125,8 @@ public class HTMLAnnotator {
         boolean inBody = false;
         boolean inTag = false;
         boolean inForm = false;
-        char quote = '\0';
         int commentchar = 0;
         boolean inComment = false;
-        boolean expectQuote = false;
 
         int i = in.read();
         while (i != -1) {
@@ -228,14 +224,13 @@ public class HTMLAnnotator {
         text.getChars( 0, text.length(), chars, 0);
 
         try {
-            List annotations = parser.parse( chars, 0, chars.length);
+            List<TextAnnotation> annotations = parser.parse( chars, 0, chars.length);
             StringBuilder anno = new StringBuilder( 200);
             int start = 0; // index of first character of annotated word
             int end = 0; // index of first character after annotated word
             String[] prevannotation = new String[3];
 
-            for ( Iterator i=annotations.iterator(); i.hasNext(); ) {
-                TextAnnotation a = (TextAnnotation) i.next();
+            for (TextAnnotation a : annotations) {
                 if (a.getStart() >= end) {
                     // new annotated word; write the previous annotated word
                     if (anno.length() > 0) { // == 0 for first annotation in list
@@ -456,7 +451,7 @@ public class HTMLAnnotator {
         StringBuilder out = new StringBuilder( annotation.length() + wordLength + 20);
         // look up ID of this annotation text if already generated
         Integer id = null;
-        id = (Integer) generatedAnnotations.get( annotation);
+        id = generatedAnnotations.get( annotation);
         if (id == null) {
             // new annotation text, insert annotation in document
             id = new Integer( antid);

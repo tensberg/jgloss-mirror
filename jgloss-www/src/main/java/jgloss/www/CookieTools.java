@@ -216,7 +216,7 @@ public class CookieTools {
         // differing values.
         int i = 1; // header fields are 1-based. Header 0 does not exist.
         String header;
-        Map cookie = new HashMap( 10);
+        Map<String, String> cookie = new HashMap<String, String>( 10);
         while ((header = connection.getHeaderFieldKey( i++)) != null) {
             boolean version1 = false;
             if (header.equalsIgnoreCase( "set-cookie2"))
@@ -239,18 +239,18 @@ public class CookieTools {
                 if (cookie.containsKey( "secure") && !secure)
                     continue;
                     
-                String name = (String) cookie.remove( " NAME");                   
-                String value = (String) cookie.remove( " VALUE");
+                String name = cookie.remove( " NAME");                   
+                String value = cookie.remove( " VALUE");
                 context.log( "name " + name + " value " + value);
                 if (value.length() == 0)
                     continue;
-                String cdomain = (String) cookie.remove( "domain");
+                String cdomain = cookie.remove( "domain");
                 if (cdomain == null)
                     cdomain = host;
-                String cpath = (String) cookie.remove( "path");
+                String cpath = cookie.remove( "path");
                 if (cpath == null)
                     cpath = path;
-                String cportlist = (String) cookie.remove( "port");
+                String cportlist = cookie.remove( "port");
                 if (cportlist == null)
                     cportlist = "";
                 else if (cportlist.length() == 0)
@@ -317,7 +317,7 @@ public class CookieTools {
                 Cookie c = new Cookie
                     ( escape( cdomain) + "|" + escape( cpath) + "|" + escape( cportlist) + "|" +
                       name, value);
-                String expires = (String) cookie.get( "expires");
+                String expires = cookie.get( "expires");
                 if (expires != null) try {
                     Date d = expiresDateFormat1.parse( expires);
                     c.setMaxAge( (int) ((d.getTime()-System.currentTimeMillis()) / 1000));
@@ -336,11 +336,11 @@ public class CookieTools {
                     c.setSecure( true);
                 
                 if (version1) {
-                    c.setVersion( Integer.parseInt( (String) cookie.get( "version")));
+                    c.setVersion( Integer.parseInt( cookie.get( "version")));
                     if (cookie.containsKey( "max-age"))
-                        c.setMaxAge( Integer.parseInt( (String) cookie.get( "max-age")));
+                        c.setMaxAge( Integer.parseInt( cookie.get( "max-age")));
                     if (cookie.containsKey( "comment"))
-                        c.setComment( (String) cookie.get( "comment"));
+                        c.setComment( cookie.get( "comment"));
                 }
 
                 resp.addCookie( c);
@@ -420,7 +420,7 @@ public class CookieTools {
      * @return The index in the cookie string where the cookie ended, or -1 if there was no
      *         valid cookie definition.
      */
-    protected static int parseCookie( String cookie, Map attributes, int from,
+    protected static int parseCookie( String cookie, Map<String, String> attributes, int from,
                                       boolean version1) {
         parser.delete( 0, parser.length());
         attributes.clear();
