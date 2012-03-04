@@ -40,28 +40,23 @@ import org.w3c.dom.Element;
 class LongestAnnotationParameter extends AbstractParameter {
     /**
      * Return some annotation text based on the type of the annotation.
-     * The class uses inflection to choose the appropriate member function of
+     * The class uses reflection to choose the appropriate member function of
      * the annotation instance.
      */
     private class TypeSelector {
-        String type;
-        Method annotationMethod;
+        private Method annotationMethod;
 
-        public TypeSelector(String _type, String methodName) {
-            this.type = _type;
-            
+        public TypeSelector(String methodName) {
             try {
                 annotationMethod = Annotation.class.getMethod(methodName, new Class[] {});
             } catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
+                throw new IllegalArgumentException(methodName);
             }
         }
 
-        public String getType() { return type; }
-
         public String getAnnotationText(Annotation anno) {
             try {
-                return (String) annotationMethod.invoke(anno, null);
+                return (String) annotationMethod.invoke(anno);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return null;
@@ -83,15 +78,15 @@ class LongestAnnotationParameter extends AbstractParameter {
     
     private void initTypeSelector(String type) {
         if (type.equals(ParameterFactory.AttributeValues.WORD))
-            selector = new TypeSelector(type, "getAnnotatedText");
+            selector = new TypeSelector("getAnnotatedText");
         else if (type.equals(ParameterFactory.AttributeValues.READING))
-            selector = new TypeSelector(type, "getAnnotatedTextReading");
+            selector = new TypeSelector("getAnnotatedTextReading");
         else if (type.equals(ParameterFactory.AttributeValues.DICTIONARY_WORD))
-            selector = new TypeSelector(type, "getDictionaryForm");
+            selector = new TypeSelector("getDictionaryForm");
         else if (type.equals(ParameterFactory.AttributeValues.DICTIONARY_READING))
-            selector = new TypeSelector(type, "getDictionaryFormReading");
+            selector = new TypeSelector("getDictionaryFormReading");
         else if (type.equals(ParameterFactory.AttributeValues.TRANSLATION))
-            selector = new TypeSelector(type, "getTranslation");
+            selector = new TypeSelector("getTranslation");
         else // should be prevented by validation against DTD
             throw new IllegalArgumentException(type);
     }

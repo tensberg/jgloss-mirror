@@ -68,7 +68,7 @@ class JGlossifyReader extends FilterReader {
      * Keys are <CODE>Character</CODE> instances,
      * values strings with the entities used to replace the chars.
      */
-    private static Map funnyChars;
+    private static Map<Character, char[]> funnyChars;
     /** 
      * Flag if a &lt;p&gt; has been opened.
      */
@@ -96,7 +96,7 @@ class JGlossifyReader extends FilterReader {
     private final static char[] END_PARAGRAPH = "</p>\n".toCharArray();
 
     static {
-        funnyChars = new HashMap( 11);
+        funnyChars = new HashMap<Character, char[]>( 11);
         funnyChars.put( new Character( '&'), "&amp;".toCharArray());
         funnyChars.put( new Character( '<'), "&lt;".toCharArray());
         funnyChars.put( new Character( '>'), "&gt;".toCharArray());
@@ -299,7 +299,7 @@ class JGlossifyReader extends FilterReader {
         for ( int i=line.length()-1; i>=0; i--) {
             Character c = new Character( line.charAt( i));
             if (funnyChars.containsKey( c))
-                line.replace( i, i+1, (String) funnyChars.get( c));
+                line.replace( i, i+1, new String(funnyChars.get( c)));
         }
 
         return line.toString();
@@ -377,7 +377,7 @@ class JGlossifyReader extends FilterReader {
     private char[] escape( char c) {
         Character co = new Character( c);
         if (funnyChars.containsKey( co))
-            return (char[]) funnyChars.get( co);
+            return funnyChars.get( co);
         else {
             singleChar[0] = c;
             return singleChar;

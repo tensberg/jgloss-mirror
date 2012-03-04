@@ -33,7 +33,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerFactory;
 
 import jgloss.JGloss;
 import jgloss.ui.ExtensionFileFilter;
@@ -125,14 +124,11 @@ class ExportConfiguration {
         return docFactory;
     }
 
-    private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-
     private String menuKey;
     private EncodingParameter encoding;
     private String title;
-    private List parameters;
+    private List<Parameter> parameters;
     private FileFilter fileFilter;
-    private List localizedStrings;
     private Parameter template;
     private URL systemId;
     private String exportClass;
@@ -172,7 +168,7 @@ class ExportConfiguration {
 
     public FileFilter getFileFilter() { return fileFilter; }
     public String getTitle() { return title; }
-    public List getParameters() { return parameters; }
+    public List<Parameter> getParameters() { return parameters; }
     public String getEncoding() { return encoding!=null ? (String) encoding.getValue() : null; }
     public URL getSystemId() { return systemId; }
     public Parameter getTemplate() { return template; }
@@ -207,7 +203,7 @@ class ExportConfiguration {
     }
 
     private void initParameters( Element _parameters) {
-        parameters = new ArrayList();
+        parameters = new ArrayList<Parameter>();
         Node parameterNode = _parameters.getFirstChild();
         while (parameterNode != null) {
             if (parameterNode.getNodeType() == Node.ELEMENT_NODE) {

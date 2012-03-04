@@ -23,9 +23,8 @@
 
 package jgloss.ui.gloss;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
@@ -37,7 +36,7 @@ import jgloss.ui.annotation.AnnotationListener;
 
 public class AnnotationListModelAdapter implements ListModel, AnnotationListener {
     private AnnotationListModel annotations;
-    private List listeners = new ArrayList( 0);
+    private final List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 
     public AnnotationListModelAdapter( AnnotationListModel _annotations) {
         annotations = _annotations;
@@ -52,17 +51,12 @@ public class AnnotationListModelAdapter implements ListModel, AnnotationListener
 
     @Override
 	public void addListDataListener( ListDataListener listener) {
-        List tempListeners = new ArrayList( listeners.size()+1);
-        tempListeners.addAll( listeners);
-        tempListeners.add( listener);
-        listeners = tempListeners;
+        listeners.add(listener);
     }
 
     @Override
 	public void removeListDataListener( ListDataListener listener) {
-        List tempListeners = new ArrayList( listeners);
-        tempListeners.remove( listener);
-        listeners = tempListeners;
+        listeners.remove(listener);
     }
 
     @Override
@@ -88,24 +82,24 @@ public class AnnotationListModelAdapter implements ListModel, AnnotationListener
     private void fireIntervalAdded( int startIndex, int endIndex) {
         ListDataEvent e = new ListDataEvent( this, ListDataEvent.INTERVAL_ADDED, 
                                              startIndex, endIndex);
-        for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((ListDataListener) i.next()).intervalAdded( e);
+        for (ListDataListener listener : listeners) {
+        	listener.intervalAdded( e);
         }
     }
 
     private void fireIntervalRemoved( int startIndex, int endIndex) {
         ListDataEvent e = new ListDataEvent( this, ListDataEvent.INTERVAL_REMOVED, 
                                              startIndex, endIndex);
-        for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((ListDataListener) i.next()).intervalRemoved( e);
+        for (ListDataListener listener : listeners) {
+        	listener.intervalRemoved( e);
         }
     }
 
     private void fireContentsChanged( int startIndex, int endIndex) {
         ListDataEvent e = new ListDataEvent( this, ListDataEvent.CONTENTS_CHANGED, 
                                              startIndex, endIndex);
-        for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((ListDataListener) i.next()).contentsChanged( e);
+        for (ListDataListener listener : listeners) {
+        	listener.contentsChanged( e);
         }
     }
 } // class AnnotationListModelAdapter

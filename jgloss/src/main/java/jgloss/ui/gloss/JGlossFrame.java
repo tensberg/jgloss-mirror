@@ -22,8 +22,6 @@
  */
 
 package jgloss.ui.gloss;
-import jgloss.parser.*;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -63,7 +61,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -108,6 +105,7 @@ import jgloss.JGloss;
 import jgloss.JGlossApp;
 import jgloss.Preferences;
 import jgloss.dictionary.DictionaryEntry;
+import jgloss.parser.AbstractParser;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.ui.AboutFrame;
@@ -152,7 +150,9 @@ import org.xml.sax.SAXException;
  */
 public class JGlossFrame extends JPanel implements ActionListener, ListSelectionListener,
                                                    HyperlinkListener, CaretListener {
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * Collection of publically available actions.
      */
     public static class Actions {
@@ -187,7 +187,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
          */
         private Actions( final JGlossFrame target) {
             importDocument = new AbstractAction() {
-                    @Override
+                    private static final long serialVersionUID = 1L;
+
+					@Override
 					public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss import") {
                                 @Override
@@ -226,7 +228,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             importDocument.setEnabled( true);
             UIUtilities.initAction( importDocument, "main.menu.import"); 
             importClipboard = new AbstractAction() {
-                    @Override
+                    private static final long serialVersionUID = 1L;
+
+					@Override
 					public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss import") {
                                 @Override
@@ -242,7 +246,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             importClipboard.setEnabled( false);
             UIUtilities.initAction( importClipboard, "main.menu.importclipboard"); 
             open = new AbstractAction() {
-                    @Override
+                    private static final long serialVersionUID = 1L;
+
+					@Override
 					public void actionPerformed( ActionEvent e) {
                         new Thread( "JGloss open") {
                                 @Override
@@ -256,10 +262,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                         JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
                                         // test if the file is already open
                                         String path = f.getSelectedFile().getAbsolutePath();
-                                        for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
-                                            JGlossFrame next = (JGlossFrame) i.next();
-                                            if (path.equals( next.model.getDocumentPath())) {
-                                                next.frame.setVisible(true);
+                                        for (JGlossFrame frame : jglossFrames) {
+                                            if (path.equals( frame.model.getDocumentPath())) {
+                                            	frame.frame.setVisible(true);
                                                 return;
                                             }
                                         }
@@ -281,10 +286,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 					public void fileSelected( final File file) {
                         // test if the file is already open
                         String path = file.getAbsolutePath();
-                        for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
-                            JGlossFrame next = (JGlossFrame) i.next();
-                            if (path.equals( next.model.getDocumentPath())) {
-                                next.frame.setVisible(true);
+                        for (JGlossFrame frame : jglossFrames) {
+                            if (path.equals( frame.model.getDocumentPath())) {
+                                frame.frame.setVisible(true);
                                 return;
                             }
                         }
@@ -480,7 +484,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * List of open JGloss documents.
      */
-    private static LinkedList jglossFrames = new LinkedList();
+    private static LinkedList<JGlossFrame> jglossFrames = new LinkedList<JGlossFrame>();
 
     /**
      * Returns the number of currently open JGlossFrames.
@@ -554,7 +558,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         // set up actions and menu
         xcvManager = new XCVManager();
         
-        Actions action = initActions();
+        initActions();
+
         frame.addWindowListener( actions.importClipboardListener);
 
         // annotation list must be created before initMenuBar is called
@@ -638,7 +643,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
     private Actions initActions() {
         saveAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     if (model.getDocumentPath() == null)
                         saveDocumentAs();
@@ -650,7 +657,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( saveAction, "main.menu.save"); 
 
         saveAsAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     saveDocumentAs();
                 }
@@ -659,7 +668,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( saveAsAction, "main.menu.saveAs");
 
         printAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     doPrint();
                 }
@@ -668,7 +679,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( printAction, "main.menu.print"); 
 
         closeAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     if (askCloseDocument()) {
                         closeDocument();
@@ -678,7 +691,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( closeAction, "main.menu.close");
 
         addAnnotationAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     annotateDocumentSelection();
                 }
@@ -687,7 +702,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( addAnnotationAction, "main.menu.addannotation");
 
         documentTitleAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     String title = model.getHTMLDocument().getTitle();
                     if (title == null)
@@ -707,7 +724,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         UIUtilities.initAction( documentTitleAction, "main.menu.doctitle");
 
         wordLookupAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     JGlossApp.getLookupFrame().setVisible(true);
                     String selection = docpane.getSelectedText();
@@ -966,7 +985,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                  ReadingAnnotationFilter filter, String encoding) {
         try {
             Reader in = null;
-            String contenttype = "text/plain";
             int contentlength = 0;
             if (JGloss.messages.getString( "encodings.default").equals( encoding))
                 encoding = null; // autodetect the encoding
@@ -976,7 +994,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 URL url = new URL( path);
                 URLConnection c = url.openConnection();
                 contentlength = c.getContentLength();
-                contenttype = c.getContentType();
                 String enc = c.getContentEncoding();
                 InputStream is = new BufferedInputStream( c.getInputStream());
                 // a user-selected value for encoding overrides enc
@@ -994,8 +1011,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 File f = new File( path);
                 contentlength = (int) f.length();
                 title = f.getName();
-                if (title.toLowerCase().endsWith( "htm") || title.toLowerCase().endsWith( "html"))
-                    contenttype = "text/html";
                 InputStream is = new BufferedInputStream( new FileInputStream( path));
                 if (encoding != null) // use user-selected encoding
                     in = new InputStreamReader( is, encoding);
@@ -1539,7 +1554,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                         View v = root;
                         Rectangle r = docbounds;
                         int i = 0;
-                        int c = 0;
                         while (i < v.getViewCount()) {
                             View cv = v.getView( i);
                             Shape s = v.getChildAllocation( i, r);

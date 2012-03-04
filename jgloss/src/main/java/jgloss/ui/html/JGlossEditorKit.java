@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Iterator;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -56,6 +55,7 @@ import javax.swing.text.html.parser.TagElement;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
+import jgloss.ui.xml.JGlossDocument;
 
 /**
  * The <CODE>JGlossEditorKit</CODE> is an extension of the <CODE>HTMLEditorKit</CODE> 
@@ -75,7 +75,9 @@ import jgloss.Preferences;
  * @author Michael Koch
  */
 public class JGlossEditorKit extends HTMLEditorKit {
-    private static final String JGLOSS_STYLE_SHEET = "/data/jgloss.css";
+    private static final long serialVersionUID = 1L;
+
+	private static final String JGLOSS_STYLE_SHEET = "/data/jgloss.css";
 
     /**
      * The factory used to create views for document elements.
@@ -314,19 +316,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
         private View logicalViewParent = null;
 
         /**
-         * Flag if the first child of the word of this annotation has a reading (is a READING_BASETEXT).
-         */
-        private boolean startsAnnotated;
-
-        /**
          * Creates a new view for an annotation element.
          *
          * @param elem The element rendered by the view.
          */
         public AnnotationView( Element elem) {
             super( elem, View.Y_AXIS);
-            startsAnnotated = elem.getElement( 0).getElement( 0).getAttributes()
-                .getAttribute( StyleConstants.NameAttribute).equals( AnnotationTags.READING_BASETEXT);
         }
 
         /**
@@ -952,9 +947,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
                                     ( 0, translation, new ContentModel
                                       ( '*', new ContentModel( dtd.pcdata), null))))))));
             // allow an annotation element or any of its subelements anywhere the DTD allows #pcdata
-            for ( Iterator i=dtd.elements.iterator(); i.hasNext(); ) {
-                javax.swing.text.html.parser.Element e =
-                    (javax.swing.text.html.parser.Element) i.next();
+            for (javax.swing.text.html.parser.Element e : dtd.elements) {
                 if (e!=annotation && e!=word && e!=reading_base && e!=reading && e!=base 
                     && e!=translation) {
                     updateContentModel( dtd, e.getContent(), annotationmodel);

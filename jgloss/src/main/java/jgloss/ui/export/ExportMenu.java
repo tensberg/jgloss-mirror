@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JMenu;
@@ -37,7 +36,6 @@ import javax.swing.SwingUtilities;
 import jgloss.JGloss;
 import jgloss.ui.UIUtilities;
 import jgloss.ui.gloss.JGlossFrameModel;
-import jgloss.util.StringTools;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -48,7 +46,9 @@ import org.xml.sax.SAXException;
  * @author Michael Koch
  */
 public class ExportMenu extends JMenu implements ActionListener {
-    private static List exporters = new ArrayList();
+    private static final long serialVersionUID = 1L;
+
+	private static List<ExportConfiguration> exporters = new ArrayList<ExportConfiguration>();
 
     private static final String EXPORTCONFIG_CLIENT_PROPERTY = "export config client property";
     
@@ -85,8 +85,7 @@ public class ExportMenu extends JMenu implements ActionListener {
     public ExportMenu() {
         super( JGloss.messages.getString( "main.menu.export"));
 
-        for ( Iterator i=exporters.iterator(); i.hasNext(); ) {
-            ExportConfiguration export = (ExportConfiguration) i.next();
+        for (ExportConfiguration export : exporters) {
             JMenuItem item = new JMenuItem();
             UIUtilities.initButton(item, export.getMenuKey());
             item.putClientProperty( EXPORTCONFIG_CLIENT_PROPERTY, export);

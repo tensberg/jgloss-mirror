@@ -34,7 +34,9 @@ import java.util.EventObject;
  * @see AnnotationListModel
  */
 public class AnnotationEvent extends EventObject {
-    protected Annotation annotation;
+    private static final long serialVersionUID = 1L;
+ 
+	protected Annotation annotation;
     protected int index;
     protected int readingIndex;
 

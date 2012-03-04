@@ -48,7 +48,7 @@ public class HTMLToSAXParserAdapter {
     private ElementHandler copyElementHandler;
     private Segment segment;
 
-    private Map elementHandlers;
+    private Map<String, ElementHandler> elementHandlers;
 
     private static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl();
 
@@ -61,7 +61,7 @@ public class HTMLToSAXParserAdapter {
     }
 
     private void initElementHandlers() {
-        elementHandlers = new HashMap(23);
+        elementHandlers = new HashMap<String, ElementHandler>(23);
         elementHandlers.put(HTML.Tag.HTML.toString(), 
                             new NameMapperHandler(JGlossDocument.Elements.JGLOSS));
         elementHandlers.put(HTML.Tag.HEAD.toString(),
@@ -105,7 +105,7 @@ public class HTMLToSAXParserAdapter {
      * is no leaf, a {@link CopyElementHandler CopyElementHandler} is called..
      */
     private void handleElement(Element elem) throws SAXException {
-        ElementHandler handler = (ElementHandler) elementHandlers.get(elem.getName());
+        ElementHandler handler = elementHandlers.get(elem.getName());
         if (handler != null) {
             handler.handle(elem);
         }

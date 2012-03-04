@@ -23,11 +23,13 @@
 
 package jgloss.ui.annotation;
 
+import static jgloss.ui.annotation.Annotation.COMPARE_BY_START_OFFSET;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.text.Element;
 
@@ -36,20 +38,20 @@ public class AnnotationListModel {
     public static final int BIAS_LEFT = 1;
     public static final int BIAS_RIGHT = 2;
 
-    private List annotations;
-    private List annotationListeners = new ArrayList( 5);
+    private List<Annotation> annotations;
+    private final List<AnnotationListener> annotationListeners = new CopyOnWriteArrayList<AnnotationListener>();
     private int searchindex;
 
-    public AnnotationListModel( List _annoElements) {
-        annotations = new ArrayList( _annoElements.size()+10);
-        for ( Iterator i=_annoElements.iterator(); i.hasNext(); )
-            annotations.add( new Annotation( this, (Element) i.next()));
+    public AnnotationListModel( List<Element> _annoElements) {
+        annotations = new ArrayList<Annotation>( _annoElements.size()+10);
+        for (Element element : _annoElements)
+            annotations.add( new Annotation( this, element));
     }
 
     public int getAnnotationCount() { return annotations.size(); }
 
     public Annotation getAnnotation( int index) { 
-        return (Annotation) annotations.get( index);
+        return annotations.get( index);
     }
 
     public int indexOf( Annotation anno) {
@@ -81,10 +83,10 @@ public class AnnotationListModel {
         int min = 0;
         int max = annotations.size()-1;
         do {
-            anno = (Annotation) annotations.get( searchindex);
+            anno = annotations.get( searchindex);
             if (pos < anno.getStartOffset()) {
                 if (searchindex == min || // no annotation for this position
-                    ((Annotation) annotations.get( searchindex-1))
+                    annotations.get( searchindex-1)
                     .getEndOffset()-1 < pos) { // pos is between two annotation elements
                     switch (bias) {
                     case BIAS_NONE:
@@ -104,7 +106,7 @@ public class AnnotationListModel {
             }
             else if (pos > anno.getEndOffset()-1) {
                 if (searchindex == max || // no annotation for this position
-                    ((Annotation) annotations.get( searchindex+1))
+                    annotations.get( searchindex+1)
                     .getStartOffset() > pos) {
                     switch (bias) {
                     case BIAS_NONE:
@@ -137,16 +139,7 @@ public class AnnotationListModel {
         Annotation anno = new Annotation(this, annoElement);
         // The annotation list is in ascending order by element start offset.
         // Find the index where the new annotation has to be inserted.
-        int insertionPoint = Collections.binarySearch
-            (annotations, anno, new Comparator() {
-                    @Override
-					public int compare(Object o1, Object o2) {
-                        // compare two annotations by their element start offset
-                        int so1 = ((Annotation) o1).getStartOffset();
-                        int so2 = ((Annotation) o2).getStartOffset();
-                        return so1-so2;
-                    }
-                });
+		int insertionPoint = Collections.binarySearch(annotations, anno, COMPARE_BY_START_OFFSET);
         insertionPoint = -1 - insertionPoint; // Collections.binarySearch returns (-(insertion point) - 1)
         annotations.add(insertionPoint, anno);
         fireAnnotationInserted(anno, insertionPoint);
@@ -160,13 +153,13 @@ public class AnnotationListModel {
         // find the index of the Annotation object representing the annoElement by doing a
         // binary search through the list of annotations, which is ordered by start offsets.
         int annoOffset = Collections.binarySearch
-            (annotations, annoElement, new Comparator() {
+            (annotations, new Annotation(null, annoElement), new Comparator<Annotation>() {
                     @Override
-					public int compare(Object o1, Object o2) {
+					public int compare(Annotation o1, Annotation o2) {
                         Element e1 = (o1 instanceof Element) ?
-                            (Element) o1 : ((Annotation) o1).getAnnotationElement();
+                            (Element) o1 : o1.getAnnotationElement();
                         Element e2 = (o2 instanceof Element) ? 
-                            (Element) o2 : ((Annotation) o2).getAnnotationElement();
+                            (Element) o2 : o2.getAnnotationElement();
                         return e1.getStartOffset()-e2.getStartOffset();
                     }
                 });
@@ -180,26 +173,26 @@ public class AnnotationListModel {
 
             // search backward
             while (annoOffset >= 0 &&
-                   annoElement != ((Annotation) annotations.get(annoOffset)).getAnnotationElement() &&
+                   annoElement != annotations.get(annoOffset).getAnnotationElement() &&
                    annoElement.getStartOffset() == 
-                   ((Annotation) annotations.get(annoOffset)).getAnnotationElement().getStartOffset())
+                   annotations.get(annoOffset).getAnnotationElement().getStartOffset())
                 annoOffset--;
             
             // if not found, search forward
             if (annoOffset < 0 ||
-                annoElement != ((Annotation) annotations.get(annoOffset)).getAnnotationElement()) {
+                annoElement != annotations.get(annoOffset).getAnnotationElement()) {
                 annoOffset = annoOffsetStore;
 
                 while (annoOffset < annotations.size() &&
-                       annoElement != ((Annotation) annotations.get(annoOffset)).getAnnotationElement() &&
+                       annoElement != annotations.get(annoOffset).getAnnotationElement() &&
                        annoElement.getStartOffset() == 
-                       ((Annotation) annotations.get(annoOffset)).getAnnotationElement().getStartOffset())
+                       annotations.get(annoOffset).getAnnotationElement().getStartOffset())
                     annoOffset++;
             }
 
             if (annoOffset < annotations.size() &&
-                ((Annotation) annotations.get(annoOffset)).getAnnotationElement()==annoElement) {
-                Annotation annotation = (Annotation) annotations.remove(annoOffset);
+                annotations.get(annoOffset).getAnnotationElement()==annoElement) {
+                Annotation annotation = annotations.remove(annoOffset);
                 fireAnnotationRemoved(annotation, annoOffset);
             }
             else {
@@ -221,33 +214,29 @@ public class AnnotationListModel {
 
     private void fireAnnotationInserted( Annotation anno, int index) {
         AnnotationEvent event = new AnnotationEvent( this, anno, index);
-        List listeners = new ArrayList( annotationListeners);
-        for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((AnnotationListener) i.next()).annotationInserted( event);
+        for (AnnotationListener listener : annotationListeners) {
+        	listener.annotationInserted( event);
         }
     }
 
     private void fireAnnotationRemoved( Annotation anno, int index) {
         AnnotationEvent event = new AnnotationEvent( this, anno, index);
-        List listeners = new ArrayList( annotationListeners);
-        for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((AnnotationListener) i.next()).annotationRemoved( event);
+        for (AnnotationListener listener : annotationListeners) {
+        	listener.annotationRemoved( event);
         }
     }
 
     public void fireAnnotationChanged( Annotation anno) {
         AnnotationEvent event = new AnnotationEvent( this, anno, indexOf( anno));
-        List listeners = new ArrayList( annotationListeners);
-        for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((AnnotationListener) i.next()).annotationChanged( event);
+        for (AnnotationListener listener : annotationListeners) {
+        	listener.annotationChanged( event);
         }
     }
 
     public void fireReadingChanged( Annotation anno, int readingIndex) {
         AnnotationEvent event = new AnnotationEvent( this, anno, indexOf( anno), readingIndex);
-        List listeners = new ArrayList( annotationListeners);
-        for ( Iterator i=listeners.iterator(); i.hasNext(); ) {
-            ((AnnotationListener) i.next()).readingChanged( event);
+        for (AnnotationListener listener : annotationListeners) {
+        	listener.readingChanged( event);
         }
     }
 } // class AnnotationListModel

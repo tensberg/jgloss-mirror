@@ -24,6 +24,7 @@
 package jgloss.ui.annotation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.text.BadLocationException;
@@ -35,6 +36,17 @@ import jgloss.ui.xml.JGlossDocument;
 import jgloss.util.StringTools;
 
 public class Annotation {
+	/** Compare two annotations by their element start offset. */
+	public static final Comparator<Annotation> COMPARE_BY_START_OFFSET = new Comparator<Annotation>() {
+        @Override
+		public int compare(Annotation o1, Annotation o2) {
+            int so1 = o1.getStartOffset();
+            int so2 = o2.getStartOffset();
+            return so1-so2;
+        }
+    };
+
+	
     protected AnnotationListModel owner;
     protected Element anno;
 
@@ -51,8 +63,8 @@ public class Annotation {
 
         translation = new TextElement( anno.getElement( 1));
         Element word = anno.getElement( 0);
-        List readingsl = new ArrayList( word.getElementCount());
-        List rbasesl = new ArrayList( word.getElementCount());
+        List<TextElement> readingsl = new ArrayList<TextElement>( word.getElementCount());
+        List<String> rbasesl = new ArrayList<String>( word.getElementCount());
         StringBuilder text = new StringBuilder();
         StringBuilder reading = new StringBuilder();
         for ( int i=0; i<word.getElementCount(); i++) {
@@ -74,8 +86,8 @@ public class Annotation {
         }
         annotatedText = text.toString();
         annotatedTextReading = reading.toString();
-        rbases = (String[]) rbasesl.toArray( new String[rbasesl.size()]);
-        readings = (TextElement[]) readingsl.toArray( new TextElement[readingsl.size()]);
+        rbases = rbasesl.toArray( new String[rbasesl.size()]);
+        readings = readingsl.toArray( new TextElement[readingsl.size()]);
     }
 
     public Element getAnnotationElement() { return anno; }

@@ -120,8 +120,8 @@ class ListParameter extends UIParameter {
         }
     }
 
-    protected Vector getItems( Element elem) {
-        Vector out = new Vector();
+    protected Vector<Value> getItems( Element elem) {
+        Vector<Value> out = new Vector<Value>();
         StringBuilder buf = new StringBuilder();
 
         Node item = elem.getFirstChild();

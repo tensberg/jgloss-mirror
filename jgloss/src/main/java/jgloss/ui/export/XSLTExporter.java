@@ -30,12 +30,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
@@ -59,17 +57,6 @@ import org.xml.sax.InputSource;
  * @author Michael Koch
  */
 class XSLTExporter implements Exporter {
-    private static final DocumentBuilderFactory docFactory = initDocFactory();
-
-    private static DocumentBuilderFactory initDocFactory() {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setIgnoringComments( true);
-        docFactory.setCoalescing( true);
-        docFactory.setIgnoringElementContentWhitespace( true);
-        docFactory.setValidating( true);
-        return docFactory;
-    }
-
     private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
     XSLTExporter() {}
@@ -104,12 +91,11 @@ class XSLTExporter implements Exporter {
      * @return The chosen file, or <code>null</code> if the dialog was cancelled.
      */
     protected File chooseOutputFile(ExportConfiguration configuration, Component parent) {
-        List parameters = configuration.getParameters();
-        List uiparameters = new ArrayList( parameters.size());
-        for ( Iterator i=parameters.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (o instanceof UIParameter)
-                uiparameters.add( o);
+        List<Parameter> parameters = configuration.getParameters();
+        List<UIParameter> uiparameters = new ArrayList<UIParameter>(parameters.size());
+        for (Parameter parameter : parameters) {
+            if (parameter instanceof UIParameter)
+                uiparameters.add( (UIParameter) parameter);
         }
         ExportFileChooser filechooser = 
             new ExportFileChooser( JGloss.getCurrentDir(), configuration.getTitle(),
@@ -180,9 +166,8 @@ class XSLTExporter implements Exporter {
      */
     protected void setParameters(ExportConfiguration configuration,
                                  JGlossFrameModel source, Transformer transformer) {
-        for ( Iterator i=configuration.getParameters().iterator(); i.hasNext(); ) {
-            Parameter p = (Parameter) i.next();
-            transformer.setParameter(p.getName(), p.getValue( source, configuration.getSystemId()));
+        for (Parameter parameter : configuration.getParameters()) {
+            transformer.setParameter(parameter.getName(), parameter.getValue( source, configuration.getSystemId()));
         }
     }
 } // class Exporter

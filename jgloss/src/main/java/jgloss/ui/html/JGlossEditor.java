@@ -49,7 +49,6 @@ import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Keymap;
-import javax.swing.text.StyledDocument;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
@@ -64,7 +63,9 @@ import jgloss.ui.gloss.AnnotationList;
  * @author Michael Koch
  */
 public class JGlossEditor extends JTextPane {
-    private static DefaultHighlighter.DefaultHighlightPainter highlightPainter = 
+    private static final long serialVersionUID = 1L;
+
+	private static DefaultHighlighter.DefaultHighlightPainter highlightPainter = 
     new DefaultHighlighter.DefaultHighlightPainter( new Color
         ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
     
@@ -89,7 +90,6 @@ public class JGlossEditor extends JTextPane {
         @Override
 		public void run() {
             boolean updated = false;
-            int i=0;
             while (!halt) {
                 try {
                     if (!updated)
@@ -102,7 +102,6 @@ public class JGlossEditor extends JTextPane {
                             // processed.
                             sleep( 500);
                             synchronized (this) {
-                                int p = viewToModel( pos);
                                 if (tooltips) {
                                     showToolTip( "FIXME", pos);
                                 }
@@ -144,8 +143,6 @@ public class JGlossEditor extends JTextPane {
      * Key object of the keymap which contains the "pressed TAB" key action.
      */
     private final static String KEYMAP_TAB = "tab map";
-    
-    private JGlossHTMLDoc htmlDoc;
     
     private AnnotationList annotationList;
     /**
@@ -226,7 +223,9 @@ public class JGlossEditor extends JTextPane {
         Keymap map = addKeymap( KEYMAP_TAB, getKeymap());
         map.addActionForKeyStroke( KeyStroke.getKeyStroke( "pressed TAB"),
             new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     transferFocus();
                 }
@@ -302,11 +301,8 @@ public class JGlossEditor extends JTextPane {
                 }
             }
             
-            private boolean checkPopupTrigger( MouseEvent e) 
-            {
-                if (e.isPopupTrigger()) 
-                {
-                    int pos = viewToModel( e.getPoint());
+            private boolean checkPopupTrigger( MouseEvent e) {
+                if (e.isPopupTrigger()) {
                     //annotationList.setSelectedItem( doc.getAnnotationAt( int pos));
                     annotationList.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
                     return true;
@@ -347,7 +343,9 @@ public class JGlossEditor extends JTextPane {
         UIManager.getDefaults().addPropertyChangeListener( fontChangeListener);
         
         findAction = new AbstractAction() {
-            @Override
+            private static final long serialVersionUID = 1L;
+
+			@Override
 			public void actionPerformed( ActionEvent e) {
                 Object result = JOptionPane.showInputDialog
                 ( SwingUtilities.getRoot( JGlossEditor.this), 
@@ -372,7 +370,9 @@ public class JGlossEditor extends JTextPane {
         findAction.setEnabled( false);
         UIUtilities.initAction( findAction, "editor.menu.find");
         findAgainAction = new AbstractAction() {
-            @Override
+            private static final long serialVersionUID = 1L;
+
+			@Override
 			public void actionPerformed( ActionEvent e) {
                 try {
                     int where = find( lastFindText, lastFindPosition + 1);
@@ -507,15 +507,6 @@ public class JGlossEditor extends JTextPane {
     private void hideToolTip() {
         if (tooltipWindow != null)
             tooltipWindow.setVisible(false);
-    }
-    
-    /**
-     * Sets the document to edit. Calling this method enables the find and document title actions.
-     */
-    @Override
-	public void setStyledDocument( StyledDocument _doc) {
-        super.setStyledDocument( _doc);
-        htmlDoc = (JGlossHTMLDoc) _doc;
     }
     
     /**

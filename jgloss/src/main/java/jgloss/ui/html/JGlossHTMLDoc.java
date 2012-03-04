@@ -65,7 +65,9 @@ import jgloss.util.StringTools;
  * @author Michael Koch
  */
 public class JGlossHTMLDoc extends HTMLDocument {
-    public interface Attributes {
+    private static final long serialVersionUID = 1L;
+
+	public interface Attributes {
         /**
          * Name of the attribute of an annotation element which contains the dictionary form
          * of the annotated word. If the attribute is not set, the dictionary form is per
@@ -371,8 +373,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
     /**
      * Returns a list of all annotation elements.
      */
-    public List getAnnotationElements() {
-        List out = new ArrayList( 10);
+    public List<Element> getAnnotationElements() {
+        List<Element> out = new ArrayList<Element>( 10);
         readLock();
         try {
             findElements( getDefaultRootElement(), AnnotationTags.ANNOTATION, out);
@@ -383,7 +385,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         return out;
     }
 
-    private void findElements( Element elem, HTML.Tag tag, List elemList) {
+    private void findElements( Element elem, HTML.Tag tag, List<Element> elemList) {
         if (elem.getName().equals( tag.toString())) {
             elemList.add( elem);
             // don't recurse over children, it is assumed that the elements can't have children

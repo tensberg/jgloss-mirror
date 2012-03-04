@@ -24,9 +24,7 @@
 package jgloss.ui.gloss;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -34,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -57,7 +56,9 @@ import jgloss.ui.html.JGlossHTMLDoc;
 import jgloss.util.StringTools;
 
 public class AnnotationList extends JList implements MouseListener, ListSelectionListener {
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * Delegator for key events which only forwards <CODE>keyPressed</CODE> and <CODE>keyReleased</CODE>
      * events. In Swing 1.4, the <CODE>BasicTreeUI</CODE> key listener adds first letter navigation, 
      * triggered by a <CODE>keyTyped</CODE> event. Since this behavior conflicts with the 
@@ -74,7 +75,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         public KeyEventDelegator( KeyListener delegatee) {
             this.delegatee = delegatee;
             if (delegators == null)
-                delegators = new LinkedList();
+                delegators = new LinkedList<KeyEventDelegator>();
             delegators.add( this);
         }
         
@@ -98,16 +99,16 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         }
     } // class KeyEventDelegator
 
-    private java.util.List delegators;
+    private List<KeyEventDelegator> delegators;
 
     /**
      * Find the delegator which was created for a delegatee and remove it from the list of
      * delegators for this instance.
      */
     private KeyEventDelegator releaseDelegator( KeyListener delegatee) {
-        for ( Iterator i=delegators.iterator(); i.hasNext(); ) {
-            KeyEventDelegator delegator = (KeyEventDelegator) i.next();
-            if (delegator.getDelegatee() == delegatee) {
+        for (Iterator<KeyEventDelegator> i=delegators.iterator(); i.hasNext(); ) {
+            KeyEventDelegator delegator = i.next();
+            if (delegator.getDelegatee().equals(delegatee)) {
                 i.remove();
                 return delegator;
             }
@@ -149,7 +150,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 
         // remove the currently selected annotation
         removeAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     removeSelectedAnnotation();
                 }
@@ -159,7 +162,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         // add the word of the selected annotation to the list of excluded words
         // The word is added as it appears in the text and in its dictionary form
         addToExclusionsAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     addSelectionToExclusions();
                 }
@@ -168,7 +173,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         addToExclusionsAction.setEnabled( false);
         // add the selected annotation to the user dictionary
         addToDictionaryAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     addSelectionToDictionary();
                 }
@@ -190,7 +197,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         // add keyboard shortcuts for editing the tree
         // set reading/translation text to the empty string
         clearTranslationAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     Annotation selection = (Annotation) getSelectedValue();
                     if (selection != null)
@@ -201,7 +210,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         clearTranslationAction.setEnabled( false);
         // select the following annotation
         Action nextAnnotationAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     int selection = getSelectedIndex();
                     if (selection>-1 && selection<annotationList.getAnnotationCount()-1)
@@ -211,7 +222,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         UIUtilities.initAction( nextAnnotationAction, "annotationeditor.action.next");
         // select the previous annotation
         Action previousAnnotationAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     int selection = getSelectedIndex();
                     if (selection > 0)
@@ -344,8 +357,6 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         Point sc = invoker.getLocationOnScreen();
         x += sc.x;
         y += sc.y;
-        Dimension size = pmenu.getSize();
-        Rectangle screen = invoker.getGraphicsConfiguration().getBounds();
 
         pmenu.show( invoker, x - sc.x, y - sc.y);
     }

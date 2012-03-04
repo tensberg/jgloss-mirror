@@ -25,7 +25,6 @@ package jgloss.ui.export;
 
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -44,8 +43,10 @@ import jgloss.ui.UIUtilities;
  * @author Michael Koch
  */
 class ExportFileChooser extends SaveFileChooser {
-    protected Box accessory;
-    protected List uiparameters;
+    private static final long serialVersionUID = 1L;
+    
+	protected Box accessory;
+    protected List<UIParameter> uiparameters;
 
     /**
      * Creates a new file chooser for selecting a export output file.
@@ -53,7 +54,7 @@ class ExportFileChooser extends SaveFileChooser {
      * @param path Directory initially visible in the chooser.
      * @param title Title of the dialog.
      */
-    public ExportFileChooser( String path, String title, List _uiparameters) {
+    public ExportFileChooser( String path, String title, List<UIParameter> _uiparameters) {
         super( path);
         setDialogTitle( title);
         setFileHidingEnabled( true);
@@ -61,8 +62,8 @@ class ExportFileChooser extends SaveFileChooser {
         accessory = Box.createVerticalBox();
         uiparameters = _uiparameters;
         
-        for ( Iterator i=uiparameters.iterator(); i.hasNext(); ) {
-            addComponent( ((UIParameter) i.next()).getComponent());
+        for (UIParameter uiparameter : uiparameters) {
+            addComponent(uiparameter.getComponent());
         }
 
         loadFromPrefs();
@@ -98,15 +99,15 @@ class ExportFileChooser extends SaveFileChooser {
     }
 
     private void loadFromPrefs() {
-        for ( Iterator i=uiparameters.iterator(); i.hasNext(); ) {
-            ((UIParameter) i.next()).loadFromPrefs();
+        for (UIParameter uiparameter : uiparameters) {
+        	uiparameter.loadFromPrefs();
         }
     }
 
     private void saveToPrefs() {
         JGloss.setCurrentDir( getCurrentDirectory().getAbsolutePath());
-        for ( Iterator i=uiparameters.iterator(); i.hasNext(); ) {
-            ((UIParameter) i.next()).saveToPrefs();
+        for (UIParameter uiparameter : uiparameters) {
+        	uiparameter.saveToPrefs();
         }
     }
 } // class ExportFileChooser

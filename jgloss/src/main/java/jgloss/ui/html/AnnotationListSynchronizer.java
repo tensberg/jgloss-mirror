@@ -30,16 +30,12 @@ public class AnnotationListSynchronizer implements DocumentListener {
         // find out if an annotation element was inserted
 
         Element el = e.getDocument().getDefaultRootElement();
-        Element elp = el;
-        // find the first element which does not fully contain the
-        // changed region and store it in elp
         while (el!=null && el.getStartOffset() <= e.getOffset() &&
                el.getEndOffset() >= e.getOffset()+e.getLength()) {
             DocumentEvent.ElementChange change = e.getChange( el);
             if (change != null)
                 handleInsert( change.getChildrenAdded());
 
-            elp = el;
             el = el.getElement( el.getElementIndex( e.getOffset()));
         }
     }
@@ -63,14 +59,10 @@ public class AnnotationListSynchronizer implements DocumentListener {
         // find out if an annotation element was removed
 
         Element el = e.getDocument().getDefaultRootElement();
-        Element elp = el;
-        // find the first element which does not fully contain the
-        // changed region and store it in elp
         while (el != null) {
             DocumentEvent.ElementChange change = e.getChange( el);
             if (change != null)
                 handleRemove( change.getChildrenRemoved());
-            elp = el;
             el = el.getElement( el.getElementIndex( e.getOffset()));
         }
     }

@@ -25,13 +25,13 @@ package jgloss.ui.xml;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.SearchException;
 import jgloss.parser.AbstractParser;
 import jgloss.parser.Parser;
+import jgloss.parser.ReadingAnnotation;
 import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.parser.TextAnnotation;
 import jgloss.parser.TextAnnotationCompleter;
@@ -60,7 +60,7 @@ class AnnotationGenerator extends DefaultHandler {
     private Parser parser;
     private TextAnnotationCompleter taCompleter;
 
-    private List readingsList = new ArrayList( 5);
+    private final List<ReadingAnnotation> readingsList = new ArrayList<ReadingAnnotation>( 5);
     private boolean annotateText;
     private boolean inP;
     private AttributesImpl readingAtts = new AttributesImpl(); 
@@ -144,7 +144,7 @@ class AnnotationGenerator extends DefaultHandler {
         }
         // TODO: use readings list
 
-        List annotations = null;
+        List<TextAnnotation> annotations = null;
         try {
             annotations = parser.parse( c, start, length);
         } catch (SearchException ex) {
@@ -152,44 +152,44 @@ class AnnotationGenerator extends DefaultHandler {
         }
 
         int lastEnd = start; // index one after the end of the last annotation
-        for ( Iterator i=annotations.iterator(); i.hasNext(); ) {
+        for (TextAnnotation annotation : annotations) {
             // Progress Bar: this loop takes very long
             ((AbstractParser)parser).tick(1);
             
-            TextAnnotation anno = taCompleter.complete( (TextAnnotation) i.next());
+            TextAnnotation completedAnnotation = taCompleter.complete(annotation);
             // handle text between annotations
-            if (anno.getStart() > lastEnd)
-                parent.characters( c, lastEnd, anno.getStart() - lastEnd);
-            lastEnd = anno.getStart() + anno.getLength();
+            if (completedAnnotation.getStart() > lastEnd)
+                parent.characters( c, lastEnd, completedAnnotation.getStart() - lastEnd);
+            lastEnd = completedAnnotation.getStart() + completedAnnotation.getLength();
             
-            String annotatedWord = new String( c, anno.getStart(), anno.getLength());
+            String annotatedWord = new String( c, completedAnnotation.getStart(), completedAnnotation.getLength());
 
             // start annotation element
             AttributesImpl annoAtts = new AttributesImpl();
-            if (anno.getTranslation() != null)
+            if (completedAnnotation.getTranslation() != null)
                 annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TRANSLATION,
-                                       CDATA, anno.getTranslation());
-            if (anno.getGrammaticalType() != null)
+                                       CDATA, completedAnnotation.getTranslation());
+            if (completedAnnotation.getGrammaticalType() != null)
                 annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TYPE,
-                                       CDATA, anno.getGrammaticalType());
-            if (!annotatedWord.equals( anno.getDictionaryForm()))
+                                       CDATA, completedAnnotation.getGrammaticalType());
+            if (!annotatedWord.equals( completedAnnotation.getDictionaryForm()))
                 annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE,
-                                       CDATA, anno.getDictionaryForm());
+                                       CDATA, completedAnnotation.getDictionaryForm());
 
             // generate reading elements for kanji substrings
             String[][] parts;
             try {
                 parts = StringTools.splitWordReading( annotatedWord,
-                                                      anno.getDictionaryForm(),
-                                                      anno.getDictionaryFormReading());
+                                                      completedAnnotation.getDictionaryForm(),
+                                                      completedAnnotation.getDictionaryFormReading());
             } catch (StringIndexOutOfBoundsException ex) {
                 System.err.println( "Warning: unparseable word/reading: " +
-                                    annotatedWord + "/" + anno.getDictionaryForm() + "/" +
-                                    anno.getDictionaryFormReading());
+                                    annotatedWord + "/" + completedAnnotation.getDictionaryForm() + "/" +
+                                    completedAnnotation.getDictionaryFormReading());
                 parts = new String[][] { { annotatedWord } };
             }
 
-            if (anno.getReading() == null) {
+            if (completedAnnotation.getReading() == null) {
                 // derive inflected reading from splitWordReading
                 StringBuilder inflectedReading = new StringBuilder( 64);
                 for ( int j=0; j<parts.length; j++) {
@@ -198,15 +198,15 @@ class AnnotationGenerator extends DefaultHandler {
                     else
                         inflectedReading.append( parts[j][1]);
                 }
-                anno.setReading( inflectedReading.toString());
+                completedAnnotation.setReading( inflectedReading.toString());
             }
 
-            if (!anno.getReading().equals( anno.getDictionaryFormReading()))
+            if (!completedAnnotation.getReading().equals( completedAnnotation.getDictionaryFormReading()))
                 annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE_READING,
-                                       CDATA, anno.getDictionaryFormReading());
+                                       CDATA, completedAnnotation.getDictionaryFormReading());
 
             parent.startElement( "", "", JGlossDocument.Elements.ANNOTATION, annoAtts);
-            int partPosition = anno.getStart(); // position of part substring in c array
+            int partPosition = completedAnnotation.getStart(); // position of part substring in c array
             for ( int j=0; j<parts.length; j++) {
                 if (parts[j].length == 2) {
                     // reading annotation

@@ -30,7 +30,9 @@ import jgloss.ui.LookupModel;
 import jgloss.ui.UIUtilities;
 
 public class JGlossLookupFrame extends LookupFrame {
-    public JGlossLookupFrame( LookupModel _model) {
+    private static final long serialVersionUID = 1L;
+
+	public JGlossLookupFrame( LookupModel _model) {
         super( _model);
     }
 

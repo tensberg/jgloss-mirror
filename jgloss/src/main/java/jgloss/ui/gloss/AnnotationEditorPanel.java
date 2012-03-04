@@ -43,7 +43,9 @@ import jgloss.ui.annotation.AnnotationEvent;
 import jgloss.ui.annotation.AnnotationListener;
 
 public class AnnotationEditorPanel extends JPanel implements ActionListener, AnnotationListener {
-    private Annotation annotation;
+    private static final long serialVersionUID = 1L;
+
+	private Annotation annotation;
 
     private JLabel title;
     private JTextField translation;
@@ -207,11 +209,13 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
     }
 
     private static class ReadingEditor extends JPanel implements ActionListener {
-        private Annotation annotation;
+        private static final long serialVersionUID = 1L;
+
+		private Annotation annotation;
         private JLabel multiReadingLabel = new JLabel
             ( JGloss.messages.getString( "annotationeditor.readings"));
-        private List readingLabels = new ArrayList( 5);
-        private List readings = new ArrayList( 5);
+        private List<JLabel> readingLabels = new ArrayList<JLabel>( 5);
+        private List<JTextField> readings = new ArrayList<JTextField>( 5);
         private GridBagConstraints multiReadingLabelC;
         private GridBagConstraints multiReadingBaseC;
         private GridBagConstraints multiReadingTextC;
@@ -261,8 +265,8 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
                     if (_annotation.getReadingCount() > 0) {
                         add( multiReadingLabel, multiReadingLabelC);
                         for ( int i=0; i<_annotation.getReadingCount(); i++) {
-                            add( (JLabel) readingLabels.get( i), multiReadingBaseC);
-                            add( (JTextField) readings.get( i), multiReadingTextC);
+                            add( readingLabels.get( i), multiReadingBaseC);
+                            add( readings.get( i), multiReadingTextC);
                         }
                     }
                 }
@@ -279,9 +283,9 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
             String[] base = new String[1];
             for ( int i=0; i<annotation.getReadingCount(); i++) {
                 base[0] = annotation.getReadingBase( i);
-                ((JLabel) readingLabels.get( i)).setText
+                readingLabels.get( i).setText
                     ( JGloss.messages.getString( "annotationeditor.reading.base", base));
-                ((JTextField) readings.get( i)).setText
+                readings.get( i).setText
                     ( annotation.getReading( i));
             }
         }

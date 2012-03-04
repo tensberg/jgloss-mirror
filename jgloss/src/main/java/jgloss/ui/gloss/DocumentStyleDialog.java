@@ -29,7 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -58,7 +58,9 @@ import jgloss.ui.html.JGlossEditor;
  * @author Michael Koch
  */
 public class DocumentStyleDialog extends StyleDialog {
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * The single application-wide instance.
      */
     private static DocumentStyleDialog box;
@@ -100,12 +102,12 @@ public class DocumentStyleDialog extends StyleDialog {
      * The styles currently applied to the documents. Map from managed style sheet to style string.
      * Will be updated when {@link #applyPreferences() applyPreferences} is called.
      */
-    protected Map currentStyles;
+    protected Map<StyleSheet, String> currentStyles;
 
     /**
      * The list of managed style sheets.
      */
-    protected java.util.List styleSheets;
+    protected List<StyleSheet> styleSheets;
 
 
     protected DocumentStyleDialog() {
@@ -114,8 +116,8 @@ public class DocumentStyleDialog extends StyleDialog {
 
     @Override
 	protected void insertAdditionalControls( String[] allFonts) {
-        currentStyles = new HashMap( 10);
-        styleSheets = new ArrayList( 10);
+        currentStyles = new HashMap<StyleSheet, String>( 10);
+        styleSheets = new ArrayList<StyleSheet>( 10);
 
         textFont = new JComboBox( allFonts);
         textFont.setEditable( false);
@@ -374,8 +376,8 @@ public class DocumentStyleDialog extends StyleDialog {
 
         // apply document view styles
         synchronized (styleSheets) {
-            for ( Iterator i=styleSheets.iterator(); i.hasNext(); )
-                applyPreferences( (StyleSheet) i.next());
+            for (StyleSheet styleSheet : styleSheets)
+                applyPreferences(styleSheet);
         }
     }
 
