@@ -136,7 +136,7 @@ public class ParserSelector extends JPanel {
         c.weightx = 1;
 
         Box b = Box.createVerticalBox();
-        parserButtons = new JRadioButton[parsers.size()/2];
+        parserButtons = new JRadioButton[parsers.size()];
         ButtonGroup bg = new ButtonGroup();
         int i = 0;
         for (ParserSelection parser : parsers) {
