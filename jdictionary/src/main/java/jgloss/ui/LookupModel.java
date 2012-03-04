@@ -25,10 +25,10 @@ package jgloss.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import jgloss.Preferences;
 import jgloss.dictionary.Dictionary;
@@ -38,7 +38,6 @@ import jgloss.dictionary.SearchFieldSelection;
 import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.SearchParameter;
 import jgloss.dictionary.StandardSearchParameter;
-import jgloss.util.StringTools;
 
 /**
  * Model for user configuration of dictionary lookups.
@@ -46,14 +45,14 @@ import jgloss.util.StringTools;
  * @author Michael Koch
  */
 public class LookupModel implements Cloneable {
-    protected List searchModes;
+    protected List<StateWrapper<SearchMode>> searchModes;
 
-    protected List dictionaries;
+    protected List<StateWrapper<Dictionary>> dictionaries;
     protected boolean allDictionariesSelected = false;
     protected boolean multiDictionaryMode = false;
     protected boolean multiDictionarySelection = false;
 
-    protected List filters;
+    protected List<StateWrapper<LookupResultFilter>> filters;
 
     protected SearchFieldSelection searchFields = 
         new SearchFieldSelection( true, true, true, true, false);
@@ -64,34 +63,33 @@ public class LookupModel implements Cloneable {
     protected int distance = 1;
     protected boolean distanceEnabled = false;
 
-    protected List listeners = new ArrayList( 5);
+    protected final List<LookupChangeListener> listeners = new CopyOnWriteArrayList<LookupChangeListener>();
 
-    public LookupModel( List _searchModes, List _dictionaries, List _filters) {
-        searchModes = new ArrayList( _searchModes.size());
-        for ( Iterator i=_searchModes.iterator(); i.hasNext(); ) {
-            searchModes.add( new StateWrapper( i.next()));
+    public LookupModel( List<SearchMode> _searchModes, List<Dictionary> _dictionaries, List<LookupResultFilter> _filters) {
+        searchModes = new ArrayList<StateWrapper<SearchMode>>( _searchModes.size());
+        for (SearchMode searchMode : _searchModes) {
+            searchModes.add( new StateWrapper<SearchMode>(searchMode));
         }
 
-        dictionaries = new ArrayList( _dictionaries.size());
-        for ( Iterator i=_dictionaries.iterator(); i.hasNext(); ) {
-            dictionaries.add( new StateWrapper( i.next()));
+        dictionaries = new ArrayList<StateWrapper<Dictionary>>( _dictionaries.size());
+        for (Dictionary dictionary : _dictionaries) {
+            dictionaries.add( new StateWrapper<Dictionary>(dictionary));
         }
 
-        filters = new ArrayList( _filters.size());
-        for ( Iterator i=_filters.iterator(); i.hasNext(); ) {
-            filters.add( new StateWrapper( i.next()));
+        filters = new ArrayList<StateWrapper<LookupResultFilter>>( _filters.size());
+        for (LookupResultFilter filter : _filters) {
+            filters.add( new StateWrapper<LookupResultFilter>(filter));
         }
         
         if (dictionaries.size() > 0) {
-            ((StateWrapper) dictionaries.get( 0)).setEnabled( true);
-            ((StateWrapper) dictionaries.get( 0)).setSelected( true);
+            dictionaries.get( 0).setEnabled( true);
+            dictionaries.get( 0).setSelected( true);
             updateSearchModeAvailability();
             SearchMode selectedMode = null;
-            for ( Iterator i=searchModes.iterator(); i.hasNext(); ) {
-                StateWrapper wrapper = (StateWrapper) i.next();
+            for (StateWrapper<SearchMode> wrapper : searchModes) {
                 if (wrapper.isEnabled()) {
                     wrapper.setSelected( true);
-                    selectedMode = (SearchMode) wrapper.getObject();
+                    selectedMode = wrapper.getObject();
                     break;
                 }
             }
@@ -105,13 +103,13 @@ public class LookupModel implements Cloneable {
     }
 
     public SearchMode getSearchMode( int index) {
-        return (SearchMode) ((StateWrapper) searchModes.get( index)).getObject();
+        return searchModes.get( index).getObject();
     }
 
     public SearchMode[] getSearchModes() {
         SearchMode[] out = new SearchMode[searchModes.size()];
-        for ( ListIterator i=searchModes.listIterator(); i.hasNext(); ) {
-            SearchMode mode = (SearchMode) ((StateWrapper) i.next()).getObject();
+        for ( ListIterator<StateWrapper<SearchMode>> i=searchModes.listIterator(); i.hasNext(); ) {
+            SearchMode mode = i.next().getObject();
             out[i.previousIndex()] = mode;
         }
         return out;
@@ -128,8 +126,8 @@ public class LookupModel implements Cloneable {
     public int getSelectedSearchModeIndex() {
         boolean selectedIsEnabled = true;
 
-        for ( ListIterator i=searchModes.listIterator(); i.hasNext(); ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
+        for ( ListIterator<StateWrapper<SearchMode>> i=searchModes.listIterator(); i.hasNext(); ) {
+            StateWrapper<SearchMode> wrapper =  i.next();
             if (wrapper.isSelected()) {
                 if (wrapper.isEnabled()) {
                     return i.previousIndex();
@@ -142,8 +140,8 @@ public class LookupModel implements Cloneable {
         }
 
         if (!selectedIsEnabled) {
-            for ( ListIterator i=searchModes.listIterator(); i.hasNext(); ) {
-                StateWrapper wrapper = (StateWrapper) i.next();
+            for ( ListIterator<StateWrapper<SearchMode>> i=searchModes.listIterator(); i.hasNext(); ) {
+                StateWrapper<SearchMode> wrapper = i.next();
                 if (wrapper.isEnabled()) {
                     return i.previousIndex();
                 }
@@ -154,16 +152,16 @@ public class LookupModel implements Cloneable {
     }
 
     public boolean isSearchModeSelected( int index) {
-        return ((StateWrapper) searchModes.get( index)).isSelected();
+        return searchModes.get( index).isSelected();
     }
 
     public boolean isSearchModeEnabled( int index) {
-        return ((StateWrapper) searchModes.get( index)).isEnabled();
+        return searchModes.get( index).isEnabled();
     }
 
     public boolean selectSearchMode( SearchMode mode) {
-        for ( ListIterator i=searchModes.listIterator(); i.hasNext(); ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
+        for ( ListIterator<StateWrapper<SearchMode>> i=searchModes.listIterator(); i.hasNext(); ) {
+            StateWrapper<SearchMode> wrapper = i.next();
             if (wrapper.getObject() == mode) {
                 selectSearchMode( i.previousIndex());
                 return true;
@@ -173,14 +171,13 @@ public class LookupModel implements Cloneable {
     }
 
     public void selectSearchMode( int index) {
-        StateWrapper newModeWrapper = (StateWrapper) searchModes.get( index);
+        StateWrapper<SearchMode> newModeWrapper = searchModes.get( index);
         if (newModeWrapper.isSelected()) {
             return; // nothing to do
         }
 
         // unselect the old selected search mode
-        for ( Iterator i=searchModes.iterator(); i.hasNext(); ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
+        for (StateWrapper<SearchMode> wrapper : searchModes) {
             if (wrapper.isSelected()) {
                 wrapper.setSelected( false);
                 break;
@@ -212,8 +209,7 @@ public class LookupModel implements Cloneable {
         boolean dictionarySelectionChanged = false;
         if (multiDictionarySelection) {
             boolean firstDictionary = true;
-            for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
-                StateWrapper wrapper = (StateWrapper) i.next();
+            for (StateWrapper<Dictionary> wrapper : dictionaries) {
                 if (wrapper.isSelected()) {
                     if (firstDictionary)
                         firstDictionary = false;
@@ -275,22 +271,21 @@ public class LookupModel implements Cloneable {
 
     public boolean isAllDictionariesSelected() { return allDictionariesSelected; }
 
-    public void setDictionaries( List _newDictionaries) {
-        List newDictionaries = new ArrayList( _newDictionaries);
-        Map oldDictionaries = new HashMap( (int) (dictionaries.size()*1.5));
-        for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
+    public void setDictionaries( List<Dictionary> _newDictionaries) {
+        List<Dictionary> newDictionaries = new ArrayList<Dictionary>( _newDictionaries);
+        Map<Dictionary, StateWrapper<Dictionary>> oldDictionaries = new HashMap<Dictionary, StateWrapper<Dictionary>>( (int) (dictionaries.size()*1.5));
+        for (StateWrapper<Dictionary> wrapper : dictionaries) {
             oldDictionaries.put( wrapper.getObject(), wrapper);
         }
 
         boolean seenSelectedDictionary = false;
         multiDictionarySelection = false;
 
-        for ( ListIterator i=newDictionaries.listIterator(); i.hasNext(); ) {
-            Object d = i.next();
-            StateWrapper wrapper = (StateWrapper) oldDictionaries.get( d);
+        List<StateWrapper<Dictionary>> newDictionaryWrappers = new ArrayList<StateWrapper<Dictionary>>(newDictionaries.size());
+        for (Dictionary d : newDictionaries) {
+            StateWrapper<Dictionary> wrapper = oldDictionaries.get( d);
             if (wrapper == null)
-                wrapper = new StateWrapper( d, false, false);
+                wrapper = new StateWrapper<Dictionary>( d, false, false);
             else {
                 if (wrapper.isSelected() && wrapper.isEnabled()) {
                     if (seenSelectedDictionary) {
@@ -301,16 +296,16 @@ public class LookupModel implements Cloneable {
                     }
                 }
             }
-            i.set( wrapper);
+            newDictionaryWrappers.add(wrapper);
         }
 
         boolean selectNewDictionary = dictionaries.size()==0 && newDictionaries.size()>0 && 
             !multiDictionarySelection;
-        dictionaries = newDictionaries;
+        dictionaries = newDictionaryWrappers;
 
         if (selectNewDictionary) {
-            ((StateWrapper) newDictionaries.get( 0)).setEnabled( true);
-            ((StateWrapper) newDictionaries.get( 0)).setSelected( true);
+        	dictionaries.get( 0).setEnabled( true);
+        	dictionaries.get( 0).setSelected( true);
         }
 
         boolean searchModeChanged = updateSearchModeAvailability();
@@ -332,7 +327,7 @@ public class LookupModel implements Cloneable {
     }
 
     public void selectDictionary( int index, boolean select) {
-        StateWrapper newDictionaryWrapper = (StateWrapper) dictionaries.get( index);
+        StateWrapper<Dictionary> newDictionaryWrapper = dictionaries.get( index);
         if (newDictionaryWrapper.isSelected() == select)
             return; // nothing to do
         if (select && !newDictionaryWrapper.isEnabled())
@@ -340,8 +335,7 @@ public class LookupModel implements Cloneable {
 
         if (!multiDictionaryMode && select) {
             // clear old selection
-            for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
-                StateWrapper wrapper = (StateWrapper) i.next();
+            for (StateWrapper<Dictionary> wrapper : dictionaries) {
                 if (wrapper.isSelected()) {
                     wrapper.setSelected( false);
                     break;
@@ -355,13 +349,14 @@ public class LookupModel implements Cloneable {
             // check if more than one dictionary is selected
             boolean seenDictionary = false;
             multiDictionarySelection = false;
-            for ( Iterator i=dictionaries.iterator(); i.hasNext() && !multiDictionarySelection; ) {
-                StateWrapper wrapper = (StateWrapper) i.next();
+            for (StateWrapper<Dictionary> wrapper : dictionaries) {
                 if (wrapper.isSelected()) {
-                    if (seenDictionary)
+                    if (seenDictionary) {
                         multiDictionarySelection = true;
-                    else
+                        break;
+                    } else {
                         seenDictionary = true;
+                    }
                 }
             }
         }
@@ -383,11 +378,11 @@ public class LookupModel implements Cloneable {
     }
 
     public boolean isDictionarySelected( int index) {
-        return allDictionariesSelected || ((StateWrapper) dictionaries.get( index)).isSelected();
+        return allDictionariesSelected || dictionaries.get( index).isSelected();
     }
 
     public boolean isDictionaryEnabled( int index) {
-        return ((StateWrapper) dictionaries.get( index)).isEnabled();
+        return dictionaries.get( index).isEnabled();
     }
 
     public int getDictionaryCount() {
@@ -396,17 +391,16 @@ public class LookupModel implements Cloneable {
 
     public Dictionary[] getDictionaries() {
         Dictionary[] out = new Dictionary[dictionaries.size()];
-        for ( ListIterator i=dictionaries.listIterator(); i.hasNext(); ) {
-            Dictionary dictionary = (Dictionary) ((StateWrapper) i.next()).getObject();
+        for ( ListIterator<StateWrapper<Dictionary>> i=dictionaries.listIterator(); i.hasNext(); ) {
+            Dictionary dictionary = i.next().getObject();
             out[i.previousIndex()] = dictionary;
         }
         return out;
     }
 
-    public List getSelectedDictionaries() {
-        List out = new ArrayList( dictionaries.size());
-        for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
+    public List<Dictionary> getSelectedDictionaries() {
+        List<Dictionary> out = new ArrayList<Dictionary>( dictionaries.size());
+        for (StateWrapper<Dictionary> wrapper : dictionaries) {
             if ((allDictionariesSelected || wrapper.isSelected()) && wrapper.isEnabled())
                 out.add( wrapper.getObject());
         }
@@ -438,7 +432,7 @@ public class LookupModel implements Cloneable {
     public SearchFieldSelection getEnabledSearchFields() { return searchFieldsEnabled; }
 
     public void selectFilter( int index, boolean select) {
-        StateWrapper filterWrapper = (StateWrapper) filters.get( index);
+        StateWrapper<LookupResultFilter> filterWrapper = filters.get( index);
         if (filterWrapper.isSelected() == select)
             return; // nothing to do
         if (select && !filterWrapper.isEnabled())
@@ -449,26 +443,25 @@ public class LookupModel implements Cloneable {
     }
 
     public boolean isFilterSelected( int index) {
-        return ((StateWrapper) filters.get( index)).isSelected();
+        return filters.get( index).isSelected();
     }
 
     public boolean isFilterEnabled( int index) {
-        return ((StateWrapper) filters.get( index)).isEnabled();
+        return filters.get( index).isEnabled();
     }
 
     public LookupResultFilter[] getFilters() {
         LookupResultFilter[] out = new LookupResultFilter[filters.size()];
-        for ( ListIterator i=filters.listIterator(); i.hasNext(); ) {
-            LookupResultFilter filter = (LookupResultFilter) ((StateWrapper) i.next()).getObject();
+        for ( ListIterator<StateWrapper<LookupResultFilter>> i=filters.listIterator(); i.hasNext(); ) {
+            LookupResultFilter filter = i.next().getObject();
             out[i.previousIndex()] = filter;
         }
         return out;
     }
 
-    public List getSelectedFilters() {
-        List out = new ArrayList( filters.size());
-        for ( Iterator i=filters.iterator(); i.hasNext(); ) {
-            StateWrapper filterWrapper = (StateWrapper) i.next();
+    public List<LookupResultFilter> getSelectedFilters() {
+        List<LookupResultFilter> out = new ArrayList<LookupResultFilter>( filters.size());
+        for (StateWrapper<LookupResultFilter> filterWrapper : filters) {
             if (filterWrapper.isSelected() && filterWrapper.isEnabled())
                 out.add( filterWrapper.getObject());
         }
@@ -501,23 +494,22 @@ public class LookupModel implements Cloneable {
     protected boolean updateSearchModeAvailability() {
         boolean changed = false;
 
-        modes: for ( Iterator i=searchModes.iterator(); i.hasNext(); ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
-            SearchMode mode = (SearchMode) wrapper.getObject();
-            for ( Iterator j=dictionaries.iterator(); j.hasNext(); ) {
-                StateWrapper wrapperd = (StateWrapper) j.next();
-                Dictionary dic = (Dictionary) wrapperd.getObject();
-                if (wrapperd.isEnabled() && (allDictionariesSelected || wrapperd.isSelected()) &&
+        modes: 
+        for (StateWrapper<SearchMode> searchModeWrapper : searchModes) {
+            SearchMode mode = searchModeWrapper.getObject();
+            for (StateWrapper<Dictionary> dictionaryWrapper : dictionaries) {
+                Dictionary dic = dictionaryWrapper.getObject();
+                if (dictionaryWrapper.isEnabled() && (allDictionariesSelected || dictionaryWrapper.isSelected()) &&
                     !dic.supports( mode, false)) {
-                    if (wrapper.isEnabled()) {
-                        wrapper.setEnabled( false);
+                    if (searchModeWrapper.isEnabled()) {
+                        searchModeWrapper.setEnabled( false);
                         changed = true;
                     }
                     continue modes;
                 }
                 // if we get here, this search mode is supported by all selected dictionaries
-                if (!wrapper.isEnabled()) {
-                    wrapper.setEnabled( true);
+                if (!searchModeWrapper.isEnabled()) {
+                    searchModeWrapper.setEnabled( true);
                     changed = true;
                 }
             }
@@ -529,9 +521,8 @@ public class LookupModel implements Cloneable {
     protected boolean updateDictionaryAvailability( SearchMode searchmode) {
         boolean changed = false;
 
-        for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
-            Dictionary dic = (Dictionary) wrapper.getObject();
+        for (StateWrapper<Dictionary> wrapper : dictionaries) {
+            Dictionary dic = wrapper.getObject();
             boolean newState = searchmode==null ||
                 dic.supports( searchmode, !(allDictionariesSelected || multiDictionarySelection));
             if (newState != wrapper.isEnabled()) {
@@ -546,24 +537,23 @@ public class LookupModel implements Cloneable {
     protected boolean updateFilterAvailability() {
         boolean changed = false;
         
-        filters: for ( Iterator i=filters.iterator(); i.hasNext(); ) {
-            StateWrapper wrapper = (StateWrapper) i.next();
-            LookupResultFilter filter = (LookupResultFilter) wrapper.getObject();
-            for ( Iterator j=dictionaries.iterator(); j.hasNext(); ) {
-                StateWrapper wrapperd = (StateWrapper) j.next();
-                Dictionary dic = (Dictionary) wrapperd.getObject();
-                if (wrapperd.isEnabled() && (allDictionariesSelected || wrapperd.isSelected()) &&
+        filters: 
+        for (StateWrapper<LookupResultFilter> filterWrapper : filters) {
+            LookupResultFilter filter = filterWrapper.getObject();
+            for (StateWrapper<Dictionary> dictionaryWrapper : dictionaries) {
+                Dictionary dic = dictionaryWrapper.getObject();
+                if (dictionaryWrapper.isEnabled() && (allDictionariesSelected || dictionaryWrapper.isSelected()) &&
                     filter.enableFor( dic)) {
-                    if (!wrapper.isEnabled()) {
-                        wrapper.setEnabled( true);
+                    if (!filterWrapper.isEnabled()) {
+                        filterWrapper.setEnabled( true);
                         changed = true;
                     }
                     continue filters;
                 }
             }
             // no fitting dictionary, filter should be disabled
-            if (wrapper.isEnabled()) {
-                wrapper.setEnabled( false);
+            if (filterWrapper.isEnabled()) {
+                filterWrapper.setEnabled( false);
                 changed = true;
             }
         }
@@ -603,9 +593,8 @@ public class LookupModel implements Cloneable {
 
         if (searchmode != null &&
             searchmode.getParameters().contains( StandardSearchParameter.SEARCH_FIELDS)) {
-            for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
-                StateWrapper wrapper = (StateWrapper) i.next();
-                Dictionary dic = (Dictionary) wrapper.getObject();
+            for (StateWrapper<Dictionary> wrapper : dictionaries) {
+                Dictionary dic = wrapper.getObject();
                 if (wrapper.isSelected() && wrapper.isEnabled() &&
                     dic.supports( searchmode, 
                                   !(allDictionariesSelected || multiDictionarySelection))) {
@@ -631,14 +620,13 @@ public class LookupModel implements Cloneable {
     }
 
     protected void fireLookupChange( LookupChangeEvent event) {
-        List tempListeners = new ArrayList( listeners);
-        for ( Iterator i=tempListeners.iterator(); i.hasNext(); ) {
-            ((LookupChangeListener) i.next()).stateChanged( event);
+        for (LookupChangeListener listener : listeners) {
+            listener.stateChanged( event);
         }
     }
 
     @Override
-	public Object clone() {
+	public LookupModel clone() {
         try {
             LookupModel out = (LookupModel) super.clone();
             // clone fields
@@ -647,16 +635,17 @@ public class LookupModel implements Cloneable {
             out.filters = cloneStateList( filters);
             out.searchFields = (SearchFieldSelection) searchFields.clone();
             out.searchFieldsEnabled = (SearchFieldSelection) searchFieldsEnabled.clone();
-            out.listeners = new ArrayList( 5);
 
             return out;
-        } catch (CloneNotSupportedException ex) { return null; }
+        } catch (CloneNotSupportedException ex) { 
+        	throw new RuntimeException(ex);
+        }
     }
     
-    private List cloneStateList( List in) {
-        List out = new ArrayList( in.size());
-        for ( Iterator i=in.iterator(); i.hasNext(); ) {
-            out.add( ((StateWrapper) i.next()).clone());
+    private <T> List<StateWrapper<T>> cloneStateList( List<StateWrapper<T>> in) {
+        List<StateWrapper<T>> out = new ArrayList<StateWrapper<T>>( in.size());
+        for (StateWrapper<T> wrapper : in) {
+            out.add(wrapper.clone());
         }
         return out;
     }
@@ -677,10 +666,14 @@ public class LookupModel implements Cloneable {
         prefs.set( prefix + PREF_SEARCHMODE, getSelectedSearchModeIndex());
 
         StringBuilder buf = new StringBuilder();
-        for ( Iterator i=dictionaries.iterator(); i.hasNext(); ) {
-            buf.append( String.valueOf( ((StateWrapper) i.next()).isSelected()));
-            if (i.hasNext())
+        boolean firstDictionary = false;
+        for (StateWrapper<Dictionary> dictionary : dictionaries) {
+            if (firstDictionary) {
+            	firstDictionary = false;
+            } else {
                 buf.append( ":");
+            }
+            buf.append( String.valueOf(dictionary.isSelected()));
         }
         prefs.set( prefix + PREF_DICTIONARY_SELECTION, buf.toString());
 
@@ -688,10 +681,14 @@ public class LookupModel implements Cloneable {
         prefs.set( prefix + PREF_MULTI_DICTIONARY_MODE, multiDictionaryMode);
         
         buf.setLength( 0);
-        for ( Iterator i=filters.iterator(); i.hasNext(); ) {
-            buf.append( String.valueOf( ((StateWrapper) i.next()).isSelected()));
-            if (i.hasNext())
+        boolean firstFilter = false;
+        for (StateWrapper<LookupResultFilter> filter : filters) {
+            if (firstFilter) {
+            	firstFilter = false;
+            } else {
                 buf.append( ":");
+            }
+            buf.append( String.valueOf(filter.isSelected()));
         }
         prefs.set( prefix + PREF_FILTER_SELECTION, buf.toString());
 
@@ -712,15 +709,13 @@ public class LookupModel implements Cloneable {
         if (searchmode<0 || searchmode>=searchModes.size())
             searchmode = 0; // select first search mode
         for ( int i=0; i<searchModes.size(); i++) {
-            ((StateWrapper) searchModes.get( i)).setSelected( i==searchmode);
+            searchModes.get( i).setSelected( i==searchmode);
         }
 
         String[] dictionarySelection = prefs.getString( prefix + PREF_DICTIONARY_SELECTION).split(":");
         synchronized (dictionaries) {
             for ( int i=0; i<Math.min( dictionarySelection.length, dictionaries.size()); i++) {
-                ((StateWrapper) dictionaries.get( i)).setSelected( Boolean.valueOf
-                                                                   ( dictionarySelection[i])
-                                                                   .booleanValue());
+                dictionaries.get( i).setSelected( Boolean.parseBoolean( dictionarySelection[i]));
             }
         }
 
@@ -731,8 +726,7 @@ public class LookupModel implements Cloneable {
 
         String[] filterSelection = prefs.getString( prefix + PREF_FILTER_SELECTION).split(":");
         for ( int i=0; i<Math.min( filterSelection.length, filters.size()); i++) {
-            ((StateWrapper) filters.get( i)).setSelected( Boolean.valueOf
-                                                          ( filterSelection[i]).booleanValue());
+            filters.get( i).setSelected( Boolean.parseBoolean(filterSelection[i]));
         }
 
         searchFields.select( DictionaryEntryField.WORD,

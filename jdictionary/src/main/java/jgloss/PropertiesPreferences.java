@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -235,8 +234,7 @@ class PropertiesPreferences extends Preferences {
      */
     public void copyPreferences( Preferences newPrefs) {
         // iterate over all entries in the preference Hashtable (but not the default prefs)
-        for ( Iterator entries=prefs.entrySet().iterator(); entries.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) entries.next();
+        for (Map.Entry<Object, Object> entry : prefs.entrySet()) {
             String key = (String) entry.getKey();
             String value = (String) entry.getValue();
             try {

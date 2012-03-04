@@ -33,6 +33,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -42,7 +44,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -68,7 +69,8 @@ import jgloss.util.CharacterEncodingDetector;
  * @author Michael Koch
  */
 public class ImportDialog extends JDialog implements TextListener {
-    /**
+    private static final long serialVersionUID = 1L;
+	/**
      * Path to the selected file or a URL.
      */
     private JTextField filename;
@@ -102,6 +104,7 @@ public class ImportDialog extends JDialog implements TextListener {
      *
      * @param parent Parent of this dialog.
      */
+    @SuppressWarnings("unchecked")
     public ImportDialog( Frame parent) {
         super( parent, JGloss.messages.getString( "import.title"));
         setModal( true);
@@ -110,11 +113,13 @@ public class ImportDialog extends JDialog implements TextListener {
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
         final Action ok = new AbstractAction() {
-                @Override
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     if (getSelection().length() > 0) {
                         result = true;
-                        ImportDialog.this.hide();
+                        ImportDialog.this.setVisible(false);
                         JGloss.prefs.set( Preferences.IMPORT_PARSER, 
                                           parserSelector.getSelectedParser().getName());
                         JGloss.prefs.set( Preferences.IMPORT_FIRSTOCCURRENCE,
@@ -133,10 +138,15 @@ public class ImportDialog extends JDialog implements TextListener {
         ok.setEnabled( true);
         UIUtilities.initAction( ok, "button.import");
         final Action cancel = new AbstractAction() {
-                @Override
+                /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     result = false;
-                    ImportDialog.this.hide();
+                    ImportDialog.this.setVisible(false);
                 }
             };
         cancel.setEnabled( true);
@@ -174,7 +184,12 @@ public class ImportDialog extends JDialog implements TextListener {
         b3.add( filename);
         
         final Action choosefile = new AbstractAction() {
-                @Override
+                /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
                     f.setFileHidingEnabled( true);
@@ -192,7 +207,7 @@ public class ImportDialog extends JDialog implements TextListener {
         b2.add( b3);
         b2.add( Box.createVerticalStrut( 10));
 
-        java.util.Vector v = new java.util.Vector();
+        Vector<String> v = new Vector<String>();
         v.add( JGloss.messages.getString( "encodings.default"));
         String[] enc = JGloss.prefs.getList( Preferences.ENCODINGS, ',');
         for ( int i=0; i<enc.length; i++)
@@ -243,7 +258,7 @@ public class ImportDialog extends JDialog implements TextListener {
         parserSelector.setBorder( BorderFactory.createTitledBorder 
                                   ( JGloss.messages.getString( "import.parserselector")));
         try {
-            parserSelector.setSelected( Class.forName( JGloss.prefs.getString( Preferences.IMPORT_PARSER)));
+            parserSelector.setSelected( (Class<? extends Parser>) Class.forName( JGloss.prefs.getString( Preferences.IMPORT_PARSER)));
         } catch (ClassNotFoundException ex) {}
         parserSelector.setFirstOccurrenceOnly( JGloss.prefs.getBoolean
                                                ( Preferences.IMPORT_FIRSTOCCURRENCE, true));
@@ -285,7 +300,7 @@ public class ImportDialog extends JDialog implements TextListener {
      * @return <CODE>true</CODE>, if the user selected the OK button.
      */
     public boolean doDialog() {
-        this.show(); // blocks until dialog is closed
+        this.setVisible(true); // blocks until dialog is closed
         this.dispose();
 
         return result;
@@ -323,7 +338,7 @@ public class ImportDialog extends JDialog implements TextListener {
     /**
      * Creates a new parser instance using the parser class selected by the user.
      */
-    public Parser createParser( Dictionary[] dictionaries, java.util.Set exclusions) {
+    public Parser createParser( Dictionary[] dictionaries, Set<String> exclusions) {
         return parserSelector.createParser( dictionaries, exclusions);
     }
 

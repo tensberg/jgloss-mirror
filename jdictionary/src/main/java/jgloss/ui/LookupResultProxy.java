@@ -24,7 +24,6 @@
 package jgloss.ui;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jgloss.dictionary.Dictionary;
@@ -43,14 +42,14 @@ public class LookupResultProxy implements LookupResultHandler, Cloneable {
      * List of {@link LookupResultHandler LookupResultHandlers} to which the events will be
      * forwarded.
      */
-    protected List handlers;
+    protected List<LookupResultHandler> handlers;
     
     /**
      * Initialize the proxy with an empty list of handlers. Handlers can be added by calling
      * {@link #addHandler(LookupResultHandler) addHandler}.
      */
     public LookupResultProxy() {
-        handlers = new ArrayList( 2);
+        handlers = new ArrayList<LookupResultHandler>( 2);
     }
 
     /**
@@ -64,8 +63,8 @@ public class LookupResultProxy implements LookupResultHandler, Cloneable {
     /**
      * Initialize the proxy with a list of lookup result handlers.
      */
-    protected LookupResultProxy(List _handlers) {
-        handlers = new ArrayList(_handlers);
+    protected LookupResultProxy(List<LookupResultHandler> _handlers) {
+        handlers = new ArrayList<LookupResultHandler>(_handlers);
     }
 
     public void addHandler(LookupResultHandler handler) {
@@ -82,54 +81,54 @@ public class LookupResultProxy implements LookupResultHandler, Cloneable {
 
     @Override
 	public void startLookup( String description) {
-        for (Iterator i=handlers.iterator(); i.hasNext(); )
-            ((LookupResultHandler) i.next()).startLookup( description);
+        for (LookupResultHandler handler : handlers)
+            handler.startLookup( description);
     }
 
     @Override
 	public void startLookup( LookupModel model) {
-        for (Iterator i=handlers.iterator(); i.hasNext(); )
-            ((LookupResultHandler) i.next()).startLookup( model);
+        for (LookupResultHandler handler : handlers)
+        	handler.startLookup( model);
     }
 
     @Override
 	public void dictionary( Dictionary dictionary) {
-        for (Iterator i=handlers.iterator(); i.hasNext(); )
-            ((LookupResultHandler) i.next()).dictionary( dictionary);
+        for (LookupResultHandler handler : handlers)
+        	handler.dictionary( dictionary);
     }
 
     @Override
 	public void dictionaryEntry( DictionaryEntry entry) {
-        for (Iterator i=handlers.iterator(); i.hasNext(); )
-            ((LookupResultHandler) i.next()).dictionaryEntry( entry);
+        for (LookupResultHandler handler : handlers)
+        	handler.dictionaryEntry( entry);
     }
 
     @Override
 	public void exception( SearchException ex) {
-        for (Iterator i=handlers.iterator(); i.hasNext(); )
-            ((LookupResultHandler) i.next()).exception( ex);
+        for (LookupResultHandler handler : handlers)
+        	handler.exception( ex);
     }
 
     @Override
 	public void note( String note) {
-        for (Iterator i=handlers.iterator(); i.hasNext(); )
-            ((LookupResultHandler) i.next()).note( note);
+        for (LookupResultHandler handler : handlers)
+        	handler.note( note);
     }
 
     @Override
 	public void endLookup() {
-        for (Iterator i=handlers.iterator(); i.hasNext(); )
-            ((LookupResultHandler) i.next()).endLookup();
+        for (LookupResultHandler handler : handlers)
+        	handler.endLookup();
     }
 
     @Override
-	public Object clone() throws CloneNotSupportedException {
+	public LookupResultProxy clone() {
         try {
             LookupResultProxy out = (LookupResultProxy) super.clone();
-            out.handlers = new ArrayList(out.handlers);
+            out.handlers = new ArrayList<LookupResultHandler>(out.handlers);
             return out;
         } catch (CloneNotSupportedException ex) {
-            return null;
+            throw new RuntimeException(ex);
         }
     }
 } // class LookupResultProxy

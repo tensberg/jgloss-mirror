@@ -284,12 +284,12 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         @Override
 		public void run() {
             final DefaultListModel model = (DefaultListModel) Dictionaries.this.dictionaries.getModel();
-            List errors = new ArrayList( dictionaries.length*2);
+            List<Object> errors = new ArrayList<Object>( dictionaries.length*2);
             for ( int i=0; i<dictionaries.length; i++) {
                 final String descriptor = dictionaries[i].getAbsolutePath();
                 // check if the dictionary is already added
                 boolean alreadyAdded = false;
-                for ( Enumeration e=model.elements(); e.hasMoreElements(); ) {
+                for ( Enumeration<?> e=model.elements(); e.hasMoreElements(); ) {
                     if (((DictionaryWrapper) e.nextElement()).descriptor.equals( descriptor)) {
                         alreadyAdded = true;
                         break;
@@ -337,7 +337,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             }               
 
             // show error messages for dictionary load failures
-            for ( Iterator i=errors.iterator(); i.hasNext(); )
+            for ( Iterator<Object> i=errors.iterator(); i.hasNext(); )
                 showDictionaryError( (Exception) i.next(), (String) i.next());
         }
     }
@@ -397,7 +397,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
-                    DictionaryWrapper d = (DictionaryWrapper) m.remove( i);
+                    m.remove( i);
                     if (i < m.getSize())
                         dictionaries.setSelectedIndex( i);
                     else if (m.getSize() > 0)
@@ -568,20 +568,20 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 	public synchronized void savePreferences() {
         ListModel model = dictionaries.getModel();
         StringBuilder paths = new StringBuilder( model.getSize()*32);
-        List newDictionaries = new ArrayList( model.getSize());
+        List<DictionaryWrapper> newDictionaries = new ArrayList<DictionaryWrapper>( model.getSize());
 
         synchronized (model) {
             for ( int i=0; i<model.getSize(); i++) {
-                newDictionaries.add( model.getElementAt( i));
+                DictionaryWrapper dictionaryWrapper = (DictionaryWrapper) model.getElementAt( i);
+				newDictionaries.add( dictionaryWrapper);
                 if (paths.length() > 0)
                     paths.append( File.pathSeparatorChar);
-                paths.append( ((DictionaryWrapper) model.getElementAt( i)).descriptor);
+                paths.append( dictionaryWrapper.descriptor);
             }
         }
         synchronized (activeDictionaries) {
             // dispose any dictionaries which are no longer active
-            for ( Iterator i=activeDictionaries.iterator(); i.hasNext(); ) {
-                DictionaryWrapper d = (DictionaryWrapper) i.next();
+            for (DictionaryWrapper d : activeDictionaries) {
                 if (!newDictionaries.contains( d))
                     d.dictionary.dispose();
             }
@@ -601,7 +601,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     private synchronized void loadDictionariesFromPreferences() {
         String[] fs = JGloss.prefs.getPaths( Preferences.DICTIONARIES);
         // exceptions occurring during dictionary loading
-        final List exceptions = new ArrayList( 5);
+        final List<Object> exceptions = new ArrayList<Object>( 5);
 
         for ( int i=0; i<fs.length; i++) {
             try {
@@ -640,7 +640,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 @Override
 				public void run() {
                     // show dialogs for all errors which occurred while the dictionaries were opened
-                    for ( Iterator i=exceptions.iterator(); i.hasNext(); ) {
+                    for ( Iterator<Object> i=exceptions.iterator(); i.hasNext(); ) {
                         showDictionaryError( (Exception) i.next(), (String) i.next());
                     }
                 }
@@ -673,8 +673,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 }
             }
             
-            for ( Iterator i=activeDictionaries.iterator(); i.hasNext(); )
-                model.addElement( i.next());
+            for (DictionaryWrapper dictionaryWrapper : activeDictionaries) {
+                model.addElement(dictionaryWrapper);
+            }
         }
         Runnable worker = new Runnable() {
                 @Override

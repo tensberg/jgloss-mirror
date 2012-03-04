@@ -105,7 +105,7 @@ public class SplashScreen {
      * Hides and disposes the splash screen.
      */
     public void close() {
-        splash.hide();
+        splash.setVisible(false);
         splash.dispose();
     }
 

@@ -48,10 +48,29 @@ public class OpenRecentMenu {
         void fileSelected( File file);
     } // class FileSelectedAction
 
+    private static class MenuWithListener {
+    	private final JMenu menu;
+    	
+    	private final FileSelectedListener listener;
+    	
+    	public MenuWithListener(JMenu menu, FileSelectedListener listener) {
+	        this.menu = menu;
+	        this.listener = listener;
+        }
+
+		public JMenu getMenu() {
+	        return menu;
+        }
+    	
+    	public FileSelectedListener getListener() {
+	        return listener;
+        }
+    }
+    
     /**
      * List of Files with documents shown in the menu.
      */
-    private List documents;
+    private List<File> documents;
     /**
      * Maximum number of entries in the document menu.
      */
@@ -59,7 +78,7 @@ public class OpenRecentMenu {
     /**
      * List of managed open recent menus with associated FileSelectedListener.
      */
-    private List menus;
+    private List<MenuWithListener> menus;
 
     /**
      * Create a new open recent menu.
@@ -69,7 +88,7 @@ public class OpenRecentMenu {
      */
     public OpenRecentMenu( int size) {
         this.size = size;
-        documents = new ArrayList( size);
+        documents = new ArrayList<File>( size);
         String[] files = JGloss.prefs.getList( Preferences.OPENRECENT_FILES, File.pathSeparatorChar);
         for ( int i=0; i<files.length&&documents.size()<size; i++) {
             final File doc = new File( files[i]);
@@ -77,7 +96,7 @@ public class OpenRecentMenu {
                 documents.add( doc);
             }
         }
-        menus = new ArrayList( 10);
+        menus = new ArrayList<MenuWithListener>( 10);
     }
 
     /**
@@ -90,13 +109,12 @@ public class OpenRecentMenu {
      */
     public synchronized JMenu createMenu( FileSelectedListener listener) { 
         JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.openrecent"));
-        for ( Iterator i=documents.iterator(); i.hasNext(); ) {
-            menu.add( createDocumentMenu( (File) i.next(), listener));
+        for (File document : documents) {
+            menu.add( createDocumentMenu(document, listener));
         }
         if (menu.getItemCount() == 0)
             menu.setEnabled( false);
-        menus.add( menu);
-        menus.add( listener);
+        menus.add(new MenuWithListener(menu, listener));
         return menu; 
     }
 
@@ -107,11 +125,13 @@ public class OpenRecentMenu {
      * @param menu The menu to removed.
      */
     public synchronized void removeMenu( JMenu menu) {
-        int i = menus.indexOf( menu);
-        if (i != -1) {
-            menus.remove( i); // JMenu
-            menus.remove( i); // FileSelectedListener
-        }
+    	for (Iterator<MenuWithListener> menuWithListenerIterator=menus.iterator(); menuWithListenerIterator.hasNext(); ) {
+    		MenuWithListener menuWithListener = menuWithListenerIterator.next();
+    		if (menu.equals(menuWithListener.getMenu())) {
+    			menuWithListenerIterator.remove();
+    			break;
+    		}
+    	}
     }
 
     /**
@@ -133,12 +153,11 @@ public class OpenRecentMenu {
             // move entry to first position
             documents.remove( index);
             documents.add( 0, doc);
-            for ( Iterator i=menus.iterator(); i.hasNext(); ) {
-                JMenu menu = (JMenu) i.next();
-                JMenuItem item = menu.getItem( index);
+            for (MenuWithListener menuWithListener : menus) {
+                JMenu menu = menuWithListener.getMenu();
+				JMenuItem item = menu.getItem( index);
                 menu.remove( index);
                 menu.insert( item, 0);
-                i.next(); // skip FileSelectedListener
             }
         }
         else {
@@ -146,31 +165,36 @@ public class OpenRecentMenu {
             if (documents.size() == size) {
                 // remove oldest entry
                 documents.remove( size-1);
-                for ( Iterator i=menus.iterator(); i.hasNext(); ) {
-                    ((JMenu) i.next()).remove( size-1);
-                    i.next(); // skip FileSelectedListener
+                for (MenuWithListener menuWithListener : menus) {
+                    menuWithListener.getMenu().remove( size-1);
                 }
             }
             documents.add( 0, doc);
-            for ( Iterator i=menus.iterator(); i.hasNext(); ) {
-                JMenu menu = (JMenu) i.next();
-                menu.add( createDocumentMenu( doc, (FileSelectedListener) i.next()), 0);
+            for (MenuWithListener menuWithListener : menus) {
+                JMenu menu = menuWithListener.getMenu();
+                menu.add( createDocumentMenu( doc, menuWithListener.getListener()), 0);
                 menu.setEnabled( true); // was disabled if this is first entry
             }
         }
         // save current entries in preferences
         StringBuilder docs = new StringBuilder();
-        for ( Iterator i=documents.iterator(); i.hasNext(); ) {
-            docs.append( ((File) i.next()).getAbsolutePath());
-            if (i.hasNext())
-                docs.append( File.pathSeparatorChar);
+        boolean firstDoc = true;
+        for (File document : documents) {
+        	if (firstDoc) {
+        		firstDoc = false;
+        	} else {
+        		docs.append( File.pathSeparatorChar);
+        	}
+            docs.append( document.getAbsolutePath());
         }
         JGloss.prefs.set( Preferences.OPENRECENT_FILES, docs.toString());
     }
     
     private JMenuItem createDocumentMenu( final File doc, final FileSelectedListener listener) {
         return new JMenuItem( new AbstractAction( doc.getName()) {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( java.awt.event.ActionEvent e) {
                     listener.fileSelected( doc);
                 }

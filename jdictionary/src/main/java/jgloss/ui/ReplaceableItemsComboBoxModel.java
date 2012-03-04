@@ -37,16 +37,18 @@ import javax.swing.ComboBoxModel;
  * @author Michael Koch
  */
 class ReplaceableItemsComboBoxModel extends AbstractListModel implements ComboBoxModel {
-    protected List items;
+    private static final long serialVersionUID = 1L;
+    
+	protected List<? extends Object> items;
     protected Object selection;
 
     public ReplaceableItemsComboBoxModel() {
-        this( Collections.EMPTY_LIST);
+        this( Collections.emptyList());
     }
 
-    public ReplaceableItemsComboBoxModel( List _items) {
+    public ReplaceableItemsComboBoxModel( List<? extends Object> _items) {
         if (!(_items instanceof RandomAccess))
-            _items = new ArrayList( _items);
+            _items = new ArrayList<Object>( _items);
         items = _items;
     }
 
@@ -62,11 +64,11 @@ class ReplaceableItemsComboBoxModel extends AbstractListModel implements ComboBo
         }
     }
 
-    public void replaceItems( List newItems) {
+    public void replaceItems( List<? extends Object> newItems) {
         if (!(newItems instanceof RandomAccess))
-            newItems = new ArrayList( newItems);
+            newItems = new ArrayList<Object>( newItems);
 
-        List oldItems = items;
+        List<? extends Object> oldItems = items;
         items = newItems;
         
         if ((newItems.size() - oldItems.size()) < 0) {

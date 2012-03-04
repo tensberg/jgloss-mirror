@@ -46,12 +46,14 @@ import jgloss.dictionary.EDict;
 import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.IndexedDictionary;
 import jgloss.dictionary.KanjiDic;
+import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.WadokuJT;
 import jgloss.dictionary.attribute.Attributes;
 import jgloss.ui.AboutFrame;
 import jgloss.ui.AttributeResultFilter;
 import jgloss.ui.Dictionaries;
 import jgloss.ui.LookupModel;
+import jgloss.ui.LookupResultFilter;
 import jgloss.ui.PreferencesFrame;
 import jgloss.ui.PreferencesPanel;
 import jgloss.ui.SplashScreen;
@@ -294,7 +296,7 @@ public abstract class JGloss {
             else if (args[0].equals( "-f") || args[0].equals( "--format")) {
                 for ( int i=1; i<args.length; i++) {
                     try {
-                        DictionaryFactory.Implementation imp =
+                        DictionaryFactory.Implementation<?> imp =
                             DictionaryFactory.getImplementation( args[i]);
                         System.out.println( messages.getString
                                             ( "main.format",
@@ -364,7 +366,7 @@ public abstract class JGloss {
                 @Override
 				public void actionPerformed( ActionEvent e) {
                     synchronized (f) {
-                        f.hide();
+                        f.setVisible(false);
                         f.dispose();
                         f.notify();
                     }
@@ -377,7 +379,7 @@ public abstract class JGloss {
         f.setLocation( (d.width-f.getWidth())/2, (d.height-f.getHeight())/2);
         f.setSize( f.getPreferredSize());
         
-        f.show();
+        f.setVisible(true);
         synchronized (f) {
             try {
                 f.wait();
@@ -388,14 +390,14 @@ public abstract class JGloss {
     protected LookupModel createLookupModel() {
         mainLookupModel = new LookupModel
             ( Arrays.asList
-              ( new Object[] { ExpressionSearchModes.EXACT,
+              ( new SearchMode[] { ExpressionSearchModes.EXACT,
                                ExpressionSearchModes.ANY,
                                ExpressionSearchModes.PREFIX,
                                ExpressionSearchModes.SUFFIX,
                                DistanceSearchModes.NEAR,
                                DistanceSearchModes.RADIUS }),
               Arrays.asList( Dictionaries.getDictionaries( false)),
-              Arrays.asList( new Object[] 
+              Arrays.asList( new LookupResultFilter[] 
                   { 
                       new AttributeResultFilter( messages.getString( "filter.mainentry.name"),
                                                  messages.getString( "filter.mainentry.desc"),

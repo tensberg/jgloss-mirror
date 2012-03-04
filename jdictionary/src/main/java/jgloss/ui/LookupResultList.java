@@ -23,6 +23,11 @@
 
 package jgloss.ui;
 
+import static jgloss.ui.DictionaryEntryFormat.DecorationPosition.POSITION_BEFORE;
+import static jgloss.ui.DictionaryEntryFormat.DecorationType.READING;
+import static jgloss.ui.DictionaryEntryFormat.DecorationType.TRANSLATION_SYN;
+import static jgloss.ui.DictionaryEntryFormat.DecorationType.WORD;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -31,7 +36,6 @@ import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -60,10 +64,14 @@ import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeFormatter;
 import jgloss.dictionary.attribute.Attributes;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
+import jgloss.ui.DictionaryEntryFormat.DecorationPosition;
+import jgloss.ui.DictionaryEntryFormat.DecorationType;
 import jgloss.util.ListFormatter;
 
 public class LookupResultList extends JPanel implements LookupResultHandler {
-    private static class Marker implements DictionaryEntryFormat.Decorator {
+    private static final long serialVersionUID = 1L;
+
+	private static class Marker implements DictionaryEntryFormat.Decorator {
         private MarkerListFormatter.Group markerGroup = 
             new MarkerListFormatter.Group( "<font color=\"blue\">", "</font>");
         private DictionaryEntryFormat.Decorator child;
@@ -73,7 +81,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         }
 
         @Override
-		public ListFormatter decorateList( ListFormatter formatter, int type) {
+		public ListFormatter decorateList( ListFormatter formatter, DecorationType type) {
             if (type==WORD || type==READING || type==TRANSLATION_SYN) {
                 formatter = new MarkerListFormatter( markerGroup, formatter);
             }
@@ -85,8 +93,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         }
 
         @Override
-		public ListFormatter decorateList( ListFormatter formatter, Attribute type,
-                                           int position) {
+		public ListFormatter decorateList( ListFormatter formatter, Attribute<?> type,
+						DecorationPosition position) {
             if (type == Attributes.EXPLANATION)
                 formatter = new MarkerListFormatter( markerGroup, formatter);
 
@@ -97,8 +105,8 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         }
 
         @Override
-		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute type,
-                                                     int position) {
+		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute<?> type,
+						DecorationPosition position) {
             if (child != null)
                 formatter = child.decorateAttribute( formatter, type, position);
 
@@ -124,7 +132,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         private boolean references;
         private boolean allAttributes;
 
-        private Map hyperrefs;
+        private Map<String, Object> hyperrefs;
 
         public Hyperlinker() {
             this( false, false, false, true, false);
@@ -138,11 +146,11 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             references = _references | _allAttributes;
             allAttributes = _allAttributes;
 
-            hyperrefs = new HashMap();
+            hyperrefs = new HashMap<String, Object>();
         }
 
         @Override
-		public ListFormatter decorateList( ListFormatter formatter, int type) {
+		public ListFormatter decorateList( ListFormatter formatter, DecorationType type) {
             if (words && type==WORD)
                 formatter = new HyperlinkListFormatter( WORD_PROTOCOL, hyperrefs, formatter);
             else if (readings && type==READING)
@@ -155,7 +163,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
         @Override
 		public AttributeFormatter decorateAttribute( AttributeFormatter formatter,
-                                                     Attribute type, int position) {
+                                                     Attribute<?> type, DecorationPosition position) {
             if (references && type.canHaveValue() && 
                 ReferenceAttributeValue.class.isAssignableFrom
                 ( type.getAttributeValueClass())) {
@@ -203,7 +211,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected Hyperlinker hyperlinker;
     
     protected boolean multipleDictionaries;
-    protected List resultBuffer;
+    protected List<Object> resultBuffer;
     protected StringBuilder resultTextBuffer = new StringBuilder( 8192);
     protected int entriesInTextBuffer;
     protected int dictionaryEntries;
@@ -253,7 +261,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         resultPlain.setWrapStyleWord( true);
 
         Action transferFocus = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     transferFocus();
                 }
@@ -333,7 +343,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         previousDictionaryHasMatch = true;
         dictionaryEntries = 0;
         entriesInTextBuffer = 0;
-        resultBuffer = new ArrayList( fancyLimit);
+        resultBuffer = new ArrayList<Object>( fancyLimit);
         entryCount = 0;
     }
 
@@ -481,8 +491,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }
 
     protected void flushBuffer( final boolean fancy) {
-        for ( Iterator i=resultBuffer.iterator(); i.hasNext(); ) {
-            Object o = i.next();
+        for (Object o : resultBuffer) {
             if (o instanceof Dictionary)
                 format( (Dictionary) o, fancy);
             else if (o instanceof DictionaryEntry)

@@ -259,7 +259,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                         for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
                                             JGlossFrame next = (JGlossFrame) i.next();
                                             if (path.equals( next.model.getDocumentPath())) {
-                                                next.frame.show();
+                                                next.frame.setVisible(true);
                                                 return;
                                             }
                                         }
@@ -284,7 +284,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                         for ( Iterator i=jglossFrames.iterator(); i.hasNext(); ) {
                             JGlossFrame next = (JGlossFrame) i.next();
                             if (path.equals( next.model.getDocumentPath())) {
-                                next.frame.show();
+                                next.frame.setVisible(true);
                                 return;
                             }
                         }
@@ -633,7 +633,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         splitPanes = new JSplitPane[] { split1, split2, split3 };
 
         // show the created frame
-        frame.show();
+        frame.setVisible(true);
     }
 
     private Actions initActions() {
@@ -709,7 +709,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         wordLookupAction = new AbstractAction() {
                 @Override
 				public void actionPerformed( ActionEvent e) {
-                    JGlossApp.getLookupFrame().show();
+                    JGlossApp.getLookupFrame().setVisible(true);
                     String selection = docpane.getSelectedText();
                     if (selection == null || selection.length() == 0) {
                         Annotation anno = (Annotation) annotationList.getSelectedValue();
@@ -880,7 +880,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             }
         }
 
-        frame.hide();
+        frame.setVisible(false);
         this.dispose(); // this.dispose() calls frame.dispose()
 
         if (jglossFrames.size() == 0) { // this was the last open document

@@ -62,7 +62,9 @@ import jgloss.parser.ReadingAnnotationFilter;
  * @author Michael Koch
  */
 public class GeneralDialog extends Box implements PreferencesPanel {
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * The single application-wide instance.
      */
     private static GeneralDialog box;
@@ -89,7 +91,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     private JTextField chasenLocation;
 
     private ParserSelector importClipboardParserSelector;
-    private Class importClipboardParser;
+    private Class<? extends Parser> importClipboardParser;
     private boolean firstOccurrenceOnly;
     private char readingStart;
     private char readingEnd;
@@ -193,6 +195,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     /**
      * Loads the preferences and initializes the dialog accordingly.
      */
+    @SuppressWarnings("unchecked")
     @Override
 	public void loadPreferences() {
         if (JGloss.prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
@@ -211,9 +214,11 @@ public class GeneralDialog extends Box implements PreferencesPanel {
                                                   Chasen.isChasenExecutable
                                                   ( chasenLocation.getText()));
         try {
-            importClipboardParserSelector.setSelected( Class.forName
-                                                       ( JGloss.prefs.getString
-                                                         ( Preferences.IMPORTCLIPBOARD_PARSER)));
+            Class<?> selectedParser = Class.forName( JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_PARSER));
+            if (!Parser.class.isAssignableFrom(selectedParser)) {
+            	throw new IllegalArgumentException(selectedParser + " must be a parser class");
+            }
+			importClipboardParserSelector.setSelected( (Class<? extends Parser>) selectedParser);
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -263,7 +268,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     }
 
     public Parser createImportClipboardParser( jgloss.dictionary.Dictionary[] dictionaries,
-                                               Set exclusions) {
+                                               Set<String> exclusions) {
         return ParserSelector.createParser( importClipboardParser, dictionaries, exclusions,
                                             firstOccurrenceOnly);
     }

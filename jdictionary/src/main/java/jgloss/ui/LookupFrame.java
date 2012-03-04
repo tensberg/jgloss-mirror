@@ -58,13 +58,15 @@ import jgloss.dictionary.attribute.ReferenceAttributeValue;
  */
 public class LookupFrame extends JFrame implements ActionListener, HyperlinkListener,
                                                    Dictionaries.DictionaryListChangeListener {
-    protected LookupConfigPanel config;
+    private static final long serialVersionUID = 1L;
+    
+	protected LookupConfigPanel config;
     protected LookupModel model;
     protected AsynchronousLookupEngine engine;
     protected LookupResultList list;
     protected LookupResultCache currentResults;
     
-    protected List history;
+    protected List<HistoryItem> history;
     protected int historyPosition;
     protected static final int MAX_HISTORY_SIZE = 20;
     protected Action historyBackAction;
@@ -111,7 +113,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         addWindowListener( new WindowAdapter() {
                 @Override
 				public void windowClosing( WindowEvent e) {
-                    hide();
+                    setVisible(false);
                     if (JGloss.exit())
                         dispose();
                 }
@@ -163,9 +165,11 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
                 }
             });
 
-        history = new ArrayList( MAX_HISTORY_SIZE);
+        history = new ArrayList<HistoryItem>( MAX_HISTORY_SIZE);
         historyBackAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     historyBack();
                 }
@@ -173,7 +177,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         UIUtilities.initAction( historyBackAction, "wordlookup.history.back");
         historyBackAction.setEnabled( false);
         historyForwardAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     historyForward();
                 }
@@ -182,11 +188,13 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         historyForwardAction.setEnabled( false);
 
         Action legendAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     if (legendFrame == null)
                         createLegendFrame();
-                    legendFrame.show();
+                    legendFrame.setVisible(true);
                 }
             };
         UIUtilities.initAction( legendAction, "wordlookup.showlegend");
@@ -211,9 +219,11 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     protected void createFileMenuItems( JMenu menu) {
         Action closeAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
-                    hide();
+                    setVisible(false);
                     if (JGloss.exit())
                         dispose();
                 }
@@ -226,7 +236,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 	public void actionPerformed( ActionEvent event) {
         if (currentResults.isEmpty())
             // first lookup
-            engine.doLookup( (LookupModel) model.clone());
+            engine.doLookup( model.clone());
         else {
             // save current state in history
             HistoryItem hi = createHistoryItem();
@@ -303,7 +313,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     protected void historyBack() {
         historyPosition--;
-        HistoryItem hi = (HistoryItem) history.get( historyPosition);
+        HistoryItem hi = history.get( historyPosition);
 
         history.set( historyPosition, createHistoryItem());
 
@@ -314,7 +324,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
     }
 
     protected void historyForward() {
-        HistoryItem hi = (HistoryItem) history.get( historyPosition);
+        HistoryItem hi = history.get( historyPosition);
         historyPosition++;
 
         history.set( historyPosition-1, createHistoryItem());
@@ -350,8 +360,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
     }
 
     protected HistoryItem createHistoryItem() {
-        return new HistoryItem( (LookupModel) model.clone(), 
-                                (LookupResultCache) currentResults.clone(),
+        return new HistoryItem( model.clone(), 
+                                currentResults.clone(),
                                 list.saveViewState());
     }
 

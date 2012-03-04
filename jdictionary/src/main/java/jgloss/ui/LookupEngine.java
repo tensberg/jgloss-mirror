@@ -70,15 +70,15 @@ public class LookupEngine {
             else
                 throw new IllegalArgumentException( "Unimplemented search parameter " + param);
         }
-        LookupResultFilter[] filters = (LookupResultFilter[]) model.getSelectedFilters()
+        LookupResultFilter[] filters = model.getSelectedFilters()
             .toArray( new LookupResultFilter[0]);
 
         int dictionaryEntries = 0;
 
         try {
-            for ( Iterator i=model.getSelectedDictionaries().iterator(); i.hasNext() &&
+            for ( Iterator<Dictionary> i=model.getSelectedDictionaries().iterator(); i.hasNext() &&
                       dictionaryEntries<dictionaryEntryLimit; ) {
-                Dictionary d = (Dictionary) i.next();
+                Dictionary d = i.next();
                 handler.dictionary( d);
                 try {
                     Iterator<DictionaryEntry> results = d.search( mode, parameters);

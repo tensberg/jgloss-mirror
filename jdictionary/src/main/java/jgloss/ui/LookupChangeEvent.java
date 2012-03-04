@@ -26,7 +26,9 @@ package jgloss.ui;
 import java.util.EventObject;
 
 class LookupChangeEvent extends EventObject {
-    public static final int SEARCH_MODE_SELECTION = 0x01;
+    private static final long serialVersionUID = 1L;
+
+	public static final int SEARCH_MODE_SELECTION = 0x01;
     public static final int SEARCH_MODE_AVAILABILITY = 0x02;
     public static final int DICTIONARY_SELECTION = 0x04;
     public static final int MULTI_DICTIONARY_MODE = 0x08;

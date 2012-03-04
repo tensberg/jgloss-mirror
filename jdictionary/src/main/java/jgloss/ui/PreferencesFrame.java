@@ -59,9 +59,11 @@ public class PreferencesFrame {
 
     static {
         showAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
-                    getFrame().show();
+                    getFrame().setVisible(true);
                 }
             };
         UIUtilities.initAction( showAction, "main.menu.preferences");
@@ -104,8 +106,8 @@ public class PreferencesFrame {
     /**
      * Shows the dialog.
      */
-    public void show() {
-        frame.show();
+    public void setVisible(boolean visible) {
+        frame.setVisible(visible);
     }
 
     /**
@@ -119,9 +121,11 @@ public class PreferencesFrame {
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
         final Action ok = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
-                    frame.hide();
+                    frame.setVisible(false);
                     savePreferences();
                     applyPreferences();
                 }
@@ -129,9 +133,11 @@ public class PreferencesFrame {
         ok.setEnabled( true);
         UIUtilities.initAction( ok, "button.ok");
         final Action cancel = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
-                    frame.hide();
+                    frame.setVisible(false);
                     loadPreferences();
                     applyPreferences();
                 }
@@ -139,7 +145,9 @@ public class PreferencesFrame {
         cancel.setEnabled( true);
         UIUtilities.initAction( cancel, "button.cancel");
         final Action apply = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     savePreferences();
                     applyPreferences();

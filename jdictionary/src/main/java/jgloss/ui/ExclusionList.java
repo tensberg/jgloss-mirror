@@ -38,10 +38,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -71,7 +70,9 @@ import jgloss.util.CharacterEncodingDetector;
  * @author Michael Koch
  */
 public class ExclusionList extends JPanel implements PreferencesPanel {
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * The single application-wide instance.
      */
     private static ExclusionList box;
@@ -81,7 +82,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      * displayed in the <CODE>exclusionList</CODE> if the user has not yet applied
      * the changes.
      */
-    private Set exclusions;
+    private Set<String> exclusions;
     /**
      * The widget which displays the excluded words.
      */
@@ -109,7 +110,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      *
      * @return Array of currently active dictionaries.
      */
-    public static Set getExclusions() {
+    public static Set<String> getExclusions() {
         return getInstance().exclusions;
     }
 
@@ -126,7 +127,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     private ExclusionList() {
         setLayout( new GridBagLayout());
 
-        exclusions = new HashSet( 101);
+        exclusions = new HashSet<String>( 101);
         // construct the dictionaries list editor
         exclusionList = new JList();
         exclusionList.setModel( new DefaultListModel());
@@ -142,7 +143,9 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             });
 
         final Action add = new AbstractAction() {
-                @Override
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     inputExclusion();
                 }
@@ -150,7 +153,9 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         add.setEnabled( true);
         UIUtilities.initAction( add, "exclusions.button.add");
         final Action remove = new AbstractAction() {
-                @Override
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     int i = exclusionList.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) exclusionList.getModel();
@@ -167,7 +172,9 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         remove.setEnabled( false);
         UIUtilities.initAction( remove, "exclusions.button.remove");
         final Action export = new AbstractAction() {
-                @Override
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     exportList();
                 }
@@ -175,7 +182,9 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         export.setEnabled( true);
         UIUtilities.initAction( export, "exclusions.button.export");
         final Action importA = new AbstractAction() {
-                @Override
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     importList();
                 }
@@ -244,7 +253,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             synchronized (exclusions) {
                 exclusions.clear();
                 for ( int i=0; i<m.size(); i++)
-                    exclusions.add( m.get( i));
+                    exclusions.add( (String) m.get( i));
             }
             saveExclusionList( getExclusionListFile());
             changed = false;
@@ -258,9 +267,11 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
 	public void loadPreferences() {
         DefaultListModel m = (DefaultListModel) exclusionList.getModel();
         m.removeAllElements();
-        // Sort the exclusions by putting them in a tree set.
-        for ( Iterator i=new TreeSet( exclusions).iterator(); i.hasNext(); ) {
-            m.addElement( i.next());
+        String[] exclusionArray = new String[exclusions.size()];
+        exclusions.toArray(exclusionArray);
+        Arrays.sort(exclusionArray);
+        for (String exclusion : exclusionArray) {
+            m.addElement(exclusion);
         }
     }
 
@@ -307,7 +318,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             BufferedReader r = new BufferedReader( new InputStreamReader
                 ( new FileInputStream( filename), 
                   JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
-            Set newExclusions = new HashSet( 1001);
+            Set<String> newExclusions = new HashSet<String>( 1001);
             String line;
             while ((line=r.readLine()) != null) {
                 if (line.length() > 0)
@@ -335,9 +346,8 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             BufferedWriter w = new BufferedWriter( new OutputStreamWriter
                 ( new FileOutputStream( filename), 
                   JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
-            for ( Iterator i=exclusions.iterator(); i.hasNext(); ) {
-                String word = i.next().toString();
-                w.write( word, 0, word.length());
+            for (String exclusion : exclusions) {
+                w.write( exclusion, 0, exclusion.length());
                 w.newLine();
             }
             w.close();

@@ -45,39 +45,43 @@ import jgloss.util.ListFormatter;
  * @author Michael Koch
  */
 class DictionaryEntryFormat {
+	enum DecorationType {
+		WORD,
+		READING,
+		TRANSLATION_ROM,
+		TRANSLATION_CRM,
+		TRANSLATION_SYN;
+	}
+	
+	enum DecorationPosition {
+		POSITION_BEFORE,
+		POSITION_AFTER;
+	}
+	
     interface Decorator {
-        int WORD = 0;
-        int READING = 1;
-        int TRANSLATION_ROM = 2;
-        int TRANSLATION_CRM = 3;
-        int TRANSLATION_SYN = 4;
-
-        int POSITION_BEFORE = 0;
-        int POSITION_AFTER = 1;
-
-        ListFormatter decorateList( ListFormatter formatter, int type);
+        ListFormatter decorateList( ListFormatter formatter, DecorationType type);
 
         AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute<?> type,
-                                              int position);
-        ListFormatter decorateList( ListFormatter formatter, Attribute<?> type, int position);
+        				DecorationPosition position);
+        ListFormatter decorateList( ListFormatter formatter, Attribute<?> type, DecorationPosition position);
     } // interface Decorator
 
     static class IdentityDecorator implements Decorator {
         IdentityDecorator() {}
 
         @Override
-		public ListFormatter decorateList( ListFormatter formatter, int type) {
+		public ListFormatter decorateList( ListFormatter formatter, DecorationType type) {
             return formatter;
         }
 
         @Override
 		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute<?> type,
-                                                     int position) {
+						DecorationPosition position) {
             return formatter;
         }
 
         @Override
-		public ListFormatter decorateList( ListFormatter formatter, Attribute<?> type, int position) {
+		public ListFormatter decorateList( ListFormatter formatter, Attribute<?> type, DecorationPosition position) {
             return formatter;
         }
     } // class IdentityDecorator
@@ -105,20 +109,20 @@ class DictionaryEntryFormat {
     public static ListFormatter getTranslationSynonymFormatter() { return new DefaultListFormatter( syn); }
 
     public static AttributeFormatter getAttributeFormatter( Attribute<?> att) {
-        return getAttributeFormatter( att, false, new IdentityDecorator(), Decorator.POSITION_BEFORE);
+        return getAttributeFormatter( att, false, new IdentityDecorator(), DecorationPosition.POSITION_BEFORE);
     }
 
     public static AttributeFormatter getAttributeFormatter( Attribute<?> att, boolean nameOnly) {
-        return getAttributeFormatter( att, nameOnly, new IdentityDecorator(), Decorator.POSITION_BEFORE);
+        return getAttributeFormatter( att, nameOnly, new IdentityDecorator(), DecorationPosition.POSITION_BEFORE);
     }
 
     public static AttributeFormatter getAttributeFormatter( Attribute<?> att,
-                                                            Decorator decorator, int position) {
+                                                            Decorator decorator, DecorationPosition position) {
         return getAttributeFormatter( att, false, decorator, position);
     }
 
     public static AttributeFormatter getAttributeFormatter( Attribute<?> att, boolean nameOnly,
-                                                            Decorator decorator, int position) {
+                                                            Decorator decorator, DecorationPosition position) {
         ListFormatter commaList = decorator.decorateList
             ( new DefaultListFormatter( ","), att, position);
 
@@ -184,15 +188,15 @@ class DictionaryEntryFormat {
             decorator = new IdentityDecorator();
 
         out.addWordFormat( decorator.decorateList( new DefaultListFormatter( word),
-                                                   Decorator.WORD));
+        				DecorationType.WORD));
         out.addReadingFormat( decorator.decorateList( new DefaultListFormatter( reading),
-                                                      Decorator.READING));
+        				DecorationType.READING));
         out.addTranslationFormat( decorator.decorateList( new DefaultListFormatter( rom),
-                                                          Decorator.TRANSLATION_ROM), 
+        				DecorationType.TRANSLATION_ROM), 
                                   decorator.decorateList( new DefaultListFormatter( crm),
-                                                          Decorator.TRANSLATION_CRM),
+                                				  DecorationType.TRANSLATION_CRM),
                                   decorator.decorateList( new DefaultListFormatter( syn),
-                                                          Decorator.TRANSLATION_SYN));
+                                				  DecorationType.TRANSLATION_SYN));
 
         addAttributeFormats( out, decorator);
         
@@ -203,49 +207,49 @@ class DictionaryEntryFormat {
                                              Decorator decorator) {
         out.addAttributeFormat( Attributes.PART_OF_SPEECH, 
                                 getAttributeFormatter( Attributes.PART_OF_SPEECH, decorator,
-                                                       Decorator.POSITION_BEFORE),
+                                				DecorationPosition.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         out.addAttributeFormat( Attributes.ABBREVIATION,
                                 getAttributeFormatter( Attributes.ABBREVIATION, true, decorator,
-                                                       Decorator.POSITION_BEFORE),
+                                				DecorationPosition.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3, true);
         out.addAttributeFormat( Attributes.EXAMPLE,
                                 getAttributeFormatter( Attributes.EXAMPLE, decorator,
-                                                       Decorator.POSITION_BEFORE),
+                                				DecorationPosition.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3);
         out.addAttributeFormat( Attributes.USAGE,
                                 getAttributeFormatter( Attributes.USAGE, decorator,
-                                                       Decorator.POSITION_BEFORE),
+                                				DecorationPosition.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3, true);
         out.addAttributeFormat( Attributes.CATEGORY,
                                 getAttributeFormatter( Attributes.CATEGORY, decorator,
-                                                       Decorator.POSITION_BEFORE),
+                                				DecorationPosition.POSITION_BEFORE),
                                 DictionaryEntryFormatter.Position.BEFORE_FIELD3, true);
 
 
         out.addAttributeFormat( Attributes.GAIRAIGO, 
                                 getAttributeFormatter( Attributes.GAIRAIGO, decorator,
-                                                       Decorator.POSITION_AFTER),
+                                				DecorationPosition.POSITION_AFTER),
                                 false);
         out.addAttributeFormat( Attributes.EXPLANATION, 
                                 getAttributeFormatter( Attributes.EXPLANATION, decorator,
-                                                       Decorator.POSITION_AFTER), false);
+                                				DecorationPosition.POSITION_AFTER), false);
         out.addAttributeFormat( Attributes.REFERENCE,
                                 getAttributeFormatter( Attributes.REFERENCE, decorator,
-                                                       Decorator.POSITION_AFTER), false);
+                                				DecorationPosition.POSITION_AFTER), false);
         out.addAttributeFormat( Attributes.SYNONYM,
                                 getAttributeFormatter( Attributes.SYNONYM, decorator,
-                                                       Decorator.POSITION_AFTER), false);
+                                				DecorationPosition.POSITION_AFTER), false);
         out.addAttributeFormat( Attributes.ANTONYM,
                                 getAttributeFormatter( Attributes.ANTONYM, decorator,
-                                                       Decorator.POSITION_AFTER), false);
+                                				DecorationPosition.POSITION_AFTER), false);
         out.addAttributeFormat( WadokuJT.ALT_READING,
                                 getAttributeFormatter( WadokuJT.ALT_READING, decorator,
-                                                       Decorator.POSITION_AFTER), false);
+                                				DecorationPosition.POSITION_AFTER), false);
 
         out.addAttributeFormat( Attributes.ABBREVIATION,
                                 getAttributeFormatter( Attributes.ABBREVIATION, decorator,
-                                                       Decorator.POSITION_AFTER),
+                                				DecorationPosition.POSITION_AFTER),
                                 DictionaryEntryFormatter.Position.AFTER_ENTRY, false);
     }
 } // class DictionaryEntryFormat

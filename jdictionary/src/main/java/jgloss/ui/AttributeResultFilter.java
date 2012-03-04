@@ -32,11 +32,11 @@ import jgloss.dictionary.attribute.Attribute;
 public class AttributeResultFilter implements LookupResultFilter {
     protected String name;
     protected String description;
-    protected Attribute attribute;
+    protected Attribute<?> attribute;
     protected boolean acceptIfSet;
 
     public AttributeResultFilter( String _name, String _description,
-                                  Attribute _attribute, boolean _acceptIfSet) {
+                                  Attribute<?> _attribute, boolean _acceptIfSet) {
         name = _name;
         description = _description;
         attribute = _attribute;

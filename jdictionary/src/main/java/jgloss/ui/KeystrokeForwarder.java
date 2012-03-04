@@ -20,10 +20,10 @@ import javax.swing.KeyStroke;
  * Forwarded keystroke events are always consumed and will not reach the source component.
  */
 public class KeystrokeForwarder implements KeyListener {
-    private Map forwardedKeystrokes;
+    private Map<AWTKeyStroke, Component> forwardedKeystrokes;
 
     public KeystrokeForwarder() {
-        forwardedKeystrokes = new HashMap();
+        forwardedKeystrokes = new HashMap<AWTKeyStroke, Component>();
     }
 
     /**
@@ -64,7 +64,7 @@ public class KeystrokeForwarder implements KeyListener {
      * to the event. If the event is forwarded, it will always be consumed.
      */
     protected void forwardKeyEvent(KeyEvent event) {
-        Component target = (Component) forwardedKeystrokes.get
+        Component target = forwardedKeystrokes.get
             (AWTKeyStroke.getAWTKeyStrokeForEvent(event));
         if (target != null) {
             target.dispatchEvent(event);

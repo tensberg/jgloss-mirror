@@ -43,7 +43,7 @@ public class JDictionaryApp extends JGloss {
 
     @Override
 	protected void showMainWindow( String[] args) throws Exception {
-        new LookupFrame( createLookupModel()).show();
+        new LookupFrame( createLookupModel()).setVisible(true);
     }
 
     @Override

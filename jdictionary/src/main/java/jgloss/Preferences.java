@@ -27,7 +27,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -181,7 +180,7 @@ public abstract class Preferences {
     /**
      * List of objects being notified of preference changes.
      */
-    protected List<PropertyChangeListener> propertyChangeListeners;
+    protected final List<PropertyChangeListener> propertyChangeListeners = new CopyOnWriteArrayList<PropertyChangeListener>();
 
     /**
      * Initializes the preferences with the user's settings.
@@ -193,7 +192,6 @@ public abstract class Preferences {
         for (String key : defrb.keySet()) {
             defaults.setProperty( key, defrb.getString( key));
         }
-        propertyChangeListeners = new CopyOnWriteArrayList<PropertyChangeListener>();
     }
 
     /**
@@ -299,7 +297,7 @@ public abstract class Preferences {
      *         set, an empty array will be returned.
      */
     public synchronized String[] getList( String key, char separator) {
-        List paths = new ArrayList( 10);
+        List<String> paths = new ArrayList<String>( 10);
         String s = getString( key);
         if (s != null) {
             s = s.trim();
@@ -315,8 +313,7 @@ public abstract class Preferences {
             }
         }
 
-        String p[] = new String[paths.size()];
-        return (String[]) paths.toArray( p);
+        return paths.toArray(new String[paths.size()]);
     }
 
     /**
@@ -352,10 +349,8 @@ public abstract class Preferences {
     protected void firePropertyChanged( String name, Object oldValue, Object newValue) {
         PropertyChangeEvent e = new PropertyChangeEvent( this, name, oldValue, newValue);
 
-        synchronized (propertyChangeListeners) {
-            for ( Iterator i=propertyChangeListeners.iterator(); i.hasNext(); ) {
-                ((PropertyChangeListener) i.next()).propertyChange( e);
-            }
+        for (PropertyChangeListener listener : propertyChangeListeners) {
+        	listener.propertyChange( e);
         }
     }
 } // class Preferences

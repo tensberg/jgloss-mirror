@@ -46,10 +46,13 @@ import jgloss.dictionary.DictionaryEntryField;
 import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.MatchMode;
 import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
 
 public class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
-    private static final String STYLE_SHEET = "/data/lookup-minimal.css";
+    private static final long serialVersionUID = 1L;
+
+	private static final String STYLE_SHEET = "/data/lookup-minimal.css";
 
     private AutoSearchComboBox expression;
     private LookupModel model;
@@ -66,10 +69,10 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
      */
     private static class WeakDictionaryChangeListener 
         implements Dictionaries.DictionaryListChangeListener {
-        private WeakReference modelRef;
+        private WeakReference<LookupModel> modelRef;
 
         WeakDictionaryChangeListener( LookupModel model) {
-            modelRef = new WeakReference( model) {
+            modelRef = new WeakReference<LookupModel>( model) {
                     @Override
 					public boolean enqueue() {
                         boolean enqueued = super.enqueue();
@@ -83,7 +86,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 
         @Override
 		public void dictionaryListChanged() {
-            LookupModel model = (LookupModel) modelRef.get();
+            LookupModel model = modelRef.get();
             if (model != null)
                 model.setDictionaries
                     ( Arrays.asList( Dictionaries.getDictionaries( false)));
@@ -92,11 +95,11 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 
     public SimpleLookup( Component[] additionalControls, LookupResultList.Hyperlinker hyperlinker) {
         model = new LookupModel
-            ( Arrays.asList( new Object[] { ExpressionSearchModes.EXACT,
+            ( Arrays.asList( new SearchMode[] { ExpressionSearchModes.EXACT,
                                             ExpressionSearchModes.PREFIX,
                                             ExpressionSearchModes.ANY }),
               Arrays.asList( Dictionaries.getDictionaries( false)),
-              Collections.EMPTY_LIST);
+              Collections.<LookupResultFilter> emptyList());
         Dictionaries.addDictionaryListChangeListener
             ( new WeakDictionaryChangeListener( model));
         model.selectAllDictionaries( true);
@@ -163,7 +166,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 
         expression.setSelectedItem( text);
 
-        final LookupModel modelClone = (LookupModel) model.clone();
+        final LookupModel modelClone = model.clone();
         modelClone.setSearchExpression( text);
 
         // Try a lookup with each search mode until at least one entry is found.

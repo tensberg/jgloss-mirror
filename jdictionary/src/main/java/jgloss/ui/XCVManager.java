@@ -86,7 +86,7 @@ public class XCVManager {
     /**
      * Map from source text components to an array of the delegatee cut/copy/paste actions.
      */
-    private Map sourceActions;
+    private Map<JTextComponent, Action[]> sourceActions;
 
     /**
      * The currently active text component. The action state will be updated based on the state
@@ -97,10 +97,12 @@ public class XCVManager {
     private FocusListener setActiveActionListener;
 
     public XCVManager() {
-        sourceActions = new HashMap( 5);
+        sourceActions = new HashMap<JTextComponent, Action[]>( 5);
 
         cutAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     delegateeCutAction.actionPerformed( e);
                 }
@@ -108,7 +110,9 @@ public class XCVManager {
         cutAction.setEnabled( false);
         UIUtilities.initAction( cutAction, "xcv.menu.cut");
         copyAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     delegateeCopyAction.actionPerformed( e);
                 }
@@ -116,7 +120,9 @@ public class XCVManager {
         copyAction.setEnabled( false);
         UIUtilities.initAction( copyAction, "xcv.menu.copy");
         pasteAction = new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     delegateePasteAction.actionPerformed( e);
                 }
@@ -219,7 +225,7 @@ public class XCVManager {
     protected synchronized void setActiveSource( JTextComponent source) {
         activeSource = source;
         if (activeSource != null) {
-            Action[] actions = (Action[]) sourceActions.get( source);
+            Action[] actions = sourceActions.get( source);
             delegateeCutAction = actions[0];
             delegateeCopyAction = actions[1];
             delegateePasteAction = actions[2];

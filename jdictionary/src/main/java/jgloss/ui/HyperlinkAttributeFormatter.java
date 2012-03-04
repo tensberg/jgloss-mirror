@@ -27,11 +27,11 @@ class HyperlinkAttributeFormatter extends AttributeFormatter {
     } // interface ReferencedAttribute
 
     protected AttributeFormatter parent;
-    protected Map<String, ReferencedAttribute> references;
+    protected Map<String, Object> references;
     protected String protocol;
     protected boolean linkValues;
 
-    HyperlinkAttributeFormatter( String _protocol, boolean _linkValues, Map<String, ReferencedAttribute> _references, 
+    HyperlinkAttributeFormatter( String _protocol, boolean _linkValues, Map<String, Object> _references, 
                                  AttributeFormatter _parent) {
         protocol = _protocol;
         references = _references;

@@ -7,11 +7,11 @@ import jgloss.util.ListFormatter;
 
 class HyperlinkListFormatter implements ListFormatter {
     protected String protocol;
-    protected Map references;
+    protected Map<String, Object> references;
     protected ListFormatter parent;
     protected StringBuilder tempBuffer = new StringBuilder();
 
-    public HyperlinkListFormatter( String _protocol, Map _references, 
+    public HyperlinkListFormatter( String _protocol, Map<String, Object> _references, 
                                    ListFormatter _parent) {
         protocol = _protocol;
         references = _references;

@@ -23,32 +23,33 @@
 
 package jgloss.ui;
 
-class StateWrapper implements Cloneable {
-    private Object obj;
+class StateWrapper<T> implements Cloneable {
+    private T obj;
     private boolean selected;
     private boolean enabled;
 
-    public StateWrapper( Object _obj) {
+    public StateWrapper( T _obj) {
         this( _obj, false, false);
     }
 
-    public StateWrapper( Object _obj, boolean _selected, boolean _enabled) {
+    public StateWrapper( T _obj, boolean _selected, boolean _enabled) {
         obj = _obj;
         selected = _selected;
         enabled = _enabled;
     }
 
-    public Object getObject() { return obj; }
+    public T getObject() { return obj; }
     public boolean isSelected() { return selected; }
     public boolean isEnabled() { return enabled; }
 
     public void setSelected( boolean _selected) { selected = _selected; }
     public void setEnabled( boolean _enabled) { enabled = _enabled; }
 
+    @SuppressWarnings("unchecked")
     @Override
-	public Object clone() {
+	public StateWrapper<T> clone() {
         try {
-            return super.clone();
+            return (StateWrapper<T>) super.clone();
         } catch (CloneNotSupportedException ex) { return null; }
     }
 } // class StateWrapper

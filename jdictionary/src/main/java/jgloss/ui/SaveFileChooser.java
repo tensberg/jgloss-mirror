@@ -37,7 +37,9 @@ import jgloss.JGloss;
  * @author Michael Koch
  */
 public class SaveFileChooser extends JFileChooser {
-    public SaveFileChooser( String path) {
+    private static final long serialVersionUID = 1L;
+
+	public SaveFileChooser( String path) {
         super( path);
     }
 

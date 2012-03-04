@@ -268,6 +268,8 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
     }
 
     protected class MoveLinkAction extends AbstractAction {
+        private static final long serialVersionUID = 1L;
+
         protected boolean backwards;
 
         protected MoveLinkAction(String name, boolean _backwards, KeyStroke acceleratorKey) {
@@ -327,7 +329,9 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
     }
 
     protected class ActivateLinkAction extends AbstractAction {
-        protected ActivateLinkAction(String name, KeyStroke acceleratorKey) {
+        private static final long serialVersionUID = 1L;
+
+		protected ActivateLinkAction(String name, KeyStroke acceleratorKey) {
             super(name);
             putValue(ACCELERATOR_KEY, acceleratorKey);
         }

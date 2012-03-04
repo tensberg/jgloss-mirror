@@ -28,7 +28,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
@@ -56,10 +55,31 @@ import jgloss.parser.ReadingAnnotationFilter;
  * @author Michael Koch
  */
 public class ParserSelector extends JPanel {
+
+	private static class ParserSelection {
+		private final Class<? extends Parser> parserClass;
+		private final String displayName;
+
+		ParserSelection(Class<? extends Parser> parserClass, String displayName) {
+			this.parserClass = parserClass;
+			this.displayName = displayName;
+		}
+		
+		public Class<? extends Parser> getParserClass() {
+	        return parserClass;
+        }
+		
+		public String getDisplayName() {
+	        return displayName;
+        }
+	}
+
+	private static final long serialVersionUID = 1L;
+	
     /**
      * List of registered parsers and their display names.
      */
-    private static java.util.List parsers = new ArrayList( 10);
+    private static java.util.List<ParserSelection> parsers = new ArrayList<ParserSelection>( 10);
 
     /**
      * Registers a parser class with the parser selector. Instances of
@@ -72,12 +92,8 @@ public class ParserSelector extends JPanel {
      * @exception NoSuchMethodException if the parser class has no constructor of the form 
      *            <CODE>(Dictionary[] dictionaries,Set exclusions)</CODE>.
      */
-    public static void registerParser( Class parserClass, String displayName) {
-        if (!Parser.class.isAssignableFrom( parserClass))
-            throw new ClassCastException();
-
-        parsers.add( parserClass);
-        parsers.add( displayName);
+    public static void registerParser(Class<? extends Parser> parserClass, String displayName) {
+        parsers.add(new ParserSelection(parserClass, displayName));
     }
 
     private final static String PARSER_CLASS_PROPERTY = "parser class";
@@ -123,11 +139,9 @@ public class ParserSelector extends JPanel {
         parserButtons = new JRadioButton[parsers.size()/2];
         ButtonGroup bg = new ButtonGroup();
         int i = 0;
-        for ( Iterator j=parsers.iterator(); j.hasNext(); ) {
-            Class parser = (Class) j.next();
-            String name = (String) j.next();
-            parserButtons[i] = new JRadioButton( name);
-            parserButtons[i].putClientProperty( PARSER_CLASS_PROPERTY, parser);
+        for (ParserSelection parser : parsers) {
+            parserButtons[i] = new JRadioButton(parser.getDisplayName());
+            parserButtons[i].putClientProperty( PARSER_CLASS_PROPERTY, parser.getParserClass());
             bg.add( parserButtons[i]);
             b.add( parserButtons[i]);
             i++;
@@ -143,7 +157,7 @@ public class ParserSelector extends JPanel {
         parserButtons[0].setSelected( true);
 
         if (showReadingAnnotationSelector) {
-            Vector v = new Vector();
+            Vector<String> v = new Vector<String>();
             v.add( JGloss.messages.getString( "parserselector.noreadings"));
             String s = JGloss.prefs.getString( Preferences.READING_BRACKET_CHARS);
             for ( i=0; i<s.length()-1; i+=2)
@@ -179,21 +193,21 @@ public class ParserSelector extends JPanel {
     /**
      * Creates a new instance of the parser class.
      */
-    public static Parser createParser( Class parserClass, jgloss.dictionary.Dictionary[] dictionaries,
-                                       Set exclusions, boolean firstOccurrenceOnly) {
+    public static Parser createParser( Class<? extends Parser> parserClass, jgloss.dictionary.Dictionary[] dictionaries,
+                                       Set<String> exclusions, boolean firstOccurrenceOnly) {
         // Try different combination of constructor parameters. The array contains several
         // parameter combinations with the parameters in "parameters[][0]" and the
         // corresponding type classes in "parameters[][1]".
         Object[][] parameters = 
             new Object[][] { { dictionaries, exclusions }, { exclusions }, {} };
-        Class[][] paramClasses =
+        Class<?>[][] paramClasses =
             new Class[][] { { jgloss.dictionary.Dictionary[].class, Set.class},
                             { Set.class }, {} };
 
         // loop over the sets of parameters until a matching constructor is found.
         for ( int i=0; i<parameters.length; i++) try {
-            Constructor c = parserClass.getConstructor( paramClasses[i]);
-            Parser p = (Parser) c.newInstance( parameters[i]);
+            Constructor<? extends Parser> c = parserClass.getConstructor( paramClasses[i]);
+            Parser p = c.newInstance( parameters[i]);
             p.setAnnotateFirstOccurrenceOnly( firstOccurrenceOnly);
             return p;
         } catch (NoSuchMethodException ex) {
@@ -222,17 +236,18 @@ public class ParserSelector extends JPanel {
     /**
      * Returns the class of the currently selected parser.
      */
-    public Class getSelectedParser() {
+    @SuppressWarnings("unchecked")
+    public Class<? extends Parser> getSelectedParser() {
         for ( int i=0; i<parserButtons.length; i++)
             if (parserButtons[i].isSelected())
-                return (Class) parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY);
+                return (Class<? extends Parser>) parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY);
         return null;
     }
 
     /**
      * Creates a new instance of the currently selected parser.
      */
-    public Parser createParser( jgloss.dictionary.Dictionary[] dictionaries, Set exclusions) {
+    public Parser createParser( jgloss.dictionary.Dictionary[] dictionaries, Set<String> exclusions) {
         return createParser( getSelectedParser(), dictionaries, exclusions, 
                              firstOccurrenceOnly.isSelected());
     }
@@ -250,7 +265,7 @@ public class ParserSelector extends JPanel {
      * must always be enabled. If the currently selected parser is disabled, the first enabled
      * parser in the list is selected.
      */
-    public void setEnabled( Class parserClass, boolean enabled) {
+    public void setEnabled( Class<? extends Parser> parserClass, boolean enabled) {
         for ( int i=0; i<parserButtons.length; i++) {
             if (parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY).equals( parserClass)) {
                 setEnabled( i, enabled);
@@ -297,7 +312,7 @@ public class ParserSelector extends JPanel {
      * Makes the parser the currently selected parser. If the parser is disabled, the selection
      * will not be changed.
      */
-    public void setSelected( Class parserClass) {
+    public void setSelected( Class<? extends Parser> parserClass) {
         for ( int i=0; i<parserButtons.length; i++) {
             if (parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY).equals( parserClass)) {
                 if (parserButtons[i].isEnabled())

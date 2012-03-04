@@ -55,6 +55,8 @@ import jgloss.JGloss;
  * @author Michael Koch
  */
 public class AboutFrame extends JFrame {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The application-wide instance used to display the about information.
      */
@@ -87,9 +89,11 @@ public class AboutFrame extends JFrame {
     public static void createShowAction( String prefix) {
         synchronized (showActionLock) {
             showAction = new AbstractAction() {
-                    @Override
+                private static final long serialVersionUID = 1L;
+
+					@Override
 					public void actionPerformed( ActionEvent e) {
-                        getFrame().show();
+                        getFrame().setVisible(true);
                     }
                 };
             UIUtilities.initAction( showAction, prefix + ".main.menu.about");
@@ -157,7 +161,9 @@ public class AboutFrame extends JFrame {
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
         b.add( new JButton( new AbstractAction( JGloss.messages.getString( "about.showlicense")) {
-                @Override
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     if (license == null)
                         createLicenseFrame();
@@ -166,9 +172,11 @@ public class AboutFrame extends JFrame {
             }));
         b.add( Box.createHorizontalStrut( 5));
         b.add( new JButton( new AbstractAction( JGloss.messages.getString( "button.close")) {
-                @Override
+            private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
-                    hide();
+                    setVisible(false);
                 }
             }));
         p = new JPanel();

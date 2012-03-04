@@ -39,10 +39,10 @@ import jgloss.dictionary.SearchException;
  * @author Michael Koch
  */
 public class LookupResultCache extends LookupResultProxy implements Cloneable {
-    protected Collection cache;
+    protected Collection<Object> cache;
     
     public LookupResultCache() {
-        cache = new ArrayList( 100);
+        cache = new ArrayList<Object>( 100);
     }
 
     public LookupResultCache( LookupResultHandler _forwardTo) {
@@ -82,7 +82,7 @@ public class LookupResultCache extends LookupResultProxy implements Cloneable {
 
         // to prevent the events from being re-recorded, all events are forwarded directly
         // to the proxy superclass
-        Iterator i = cache.iterator();
+        Iterator<Object> i = cache.iterator();
         Object o = i.next();
         if (o instanceof String)
             super.startLookup( (String) o);
@@ -165,13 +165,9 @@ public class LookupResultCache extends LookupResultProxy implements Cloneable {
     }
 
     @Override
-	public Object clone() {
-        try {
-            LookupResultCache out = (LookupResultCache) super.clone();
-            out.cache = new ArrayList( out.cache);
-            return out;
-        } catch (CloneNotSupportedException ex) {
-            return null;
-        }
+	public LookupResultCache clone() {
+    	LookupResultCache out = (LookupResultCache) super.clone();
+    	out.cache = new ArrayList<Object>( out.cache);
+    	return out;
     }
 } // class LookupResultCache

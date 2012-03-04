@@ -459,9 +459,11 @@ public class JGlossEditor extends JTextPane {
         
         if (tooltipWindow==null && getTopLevelAncestor()!=null) {
             tooltipWindow = new JWindow( (Frame) getTopLevelAncestor()) {
-                @Override
-				public void hide() {
-                    super.hide();
+                private static final long serialVersionUID = 1L;
+
+				@Override
+				public void setVisible(boolean visible) {
+                    super.setVisible(visible);
                     // work around bug in interaction with the KDE2 window manager:
                     this.removeNotify();
                 }
@@ -504,7 +506,7 @@ public class JGlossEditor extends JTextPane {
      */
     private void hideToolTip() {
         if (tooltipWindow != null)
-            tooltipWindow.hide();
+            tooltipWindow.setVisible(false);
     }
     
     /**

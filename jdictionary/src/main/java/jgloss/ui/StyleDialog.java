@@ -32,8 +32,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -67,7 +65,9 @@ import jgloss.Preferences;
  * @author Michael Koch
  */
 public class StyleDialog extends Box implements PreferencesPanel {
-    /**
+    private static final long serialVersionUID = 1L;
+
+	/**
      * The single application-wide instance.
      */
     private static StyleDialog box;
@@ -96,7 +96,7 @@ public class StyleDialog extends Box implements PreferencesPanel {
     /**
      * Map from Swing L&F property keys to the default L&F fonts.
      */
-    protected static Map defaultLFFonts;
+    protected static Map<Object, Font> defaultLFFonts;
 
     @Override
 	public String getTitle() { return JGloss.messages.getString( "style.title"); }
@@ -204,7 +204,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
 
         autodetect = new JButton( JGloss.messages.getString( "style.autodetect"));
         autodetect.addActionListener( new AbstractAction() {
-                @Override
+                private static final long serialVersionUID = 1L;
+
+				@Override
 				public void actionPerformed( ActionEvent e) {
                     autodetectFontsAction( getAutodetectedFonts());
                 }
@@ -342,8 +344,7 @@ public class StyleDialog extends Box implements PreferencesPanel {
         if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true)) {
             // restore java default fonts
             if (defaultLFFonts != null) {
-                for ( Iterator i=defaultLFFonts.entrySet().iterator(); i.hasNext(); ) {
-                    Map.Entry entry = (Map.Entry) i.next();
+                for (Map.Entry<Object, Font> entry : defaultLFFonts.entrySet()) {
                     UIManager.put( entry.getKey(), entry.getValue());
                 }
             }
@@ -351,19 +352,17 @@ public class StyleDialog extends Box implements PreferencesPanel {
         else {
             // save java default fonts
             if (defaultLFFonts == null) {
-                defaultLFFonts = new TreeMap();
-                for ( Enumeration e=UIManager.getDefaults().keys(); e.hasMoreElements(); ) {
-                    Object key = e.nextElement();
-                    Object value = UIManager.getDefaults().get( key);
+                defaultLFFonts = new TreeMap<Object,Font>();
+                for (Map.Entry<Object, Object> defaults : UIManager.getDefaults().entrySet()) {
+                    Object value = defaults.getValue();
                     if (value instanceof Font) {
-                        defaultLFFonts.put( key, value);
+                        defaultLFFonts.put( defaults.getKey(), (Font) value);
                     }
                 }
             }
             // set custom font
-            for ( Iterator i=defaultLFFonts.entrySet().iterator(); i.hasNext(); ) {
-                Map.Entry entry = (Map.Entry) i.next();
-                UIManager.put( entry.getKey(), deriveGeneralFont( (Font) entry.getValue()));
+            for (Map.Entry<Object, Font> defaultFont : defaultLFFonts.entrySet()) {
+                UIManager.put( defaultFont.getKey(), deriveGeneralFont( defaultFont.getValue()));
             }
         }
     }

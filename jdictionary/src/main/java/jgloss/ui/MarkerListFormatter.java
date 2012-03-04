@@ -24,7 +24,6 @@
 package jgloss.ui;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,7 +41,7 @@ public class MarkerListFormatter implements ListFormatter {
      * Group of marker list formatters which share a common configuration.
      */
     public static class Group {
-        private List formatters = new ArrayList( 5);
+        private List<MarkerListFormatter> formatters = new ArrayList<MarkerListFormatter>( 5);
         private String markedText;
         private String textBefore;
         private String textAfter;
@@ -75,20 +74,20 @@ public class MarkerListFormatter implements ListFormatter {
 
         public void setMarkedText( String _markedText) {
             markedText = normalize( _markedText);
-            for ( Iterator i=formatters.iterator(); i.hasNext(); )
-                ((MarkerListFormatter) i.next()).setMarkedText( _markedText);
+            for (MarkerListFormatter formatter : formatters)
+                formatter.setMarkedText( _markedText);
         }
 
         public void setTextBefore( String _textBefore) {
             textBefore = _textBefore;
-            for ( Iterator i=formatters.iterator(); i.hasNext(); )
-                ((MarkerListFormatter) i.next()).setTextBefore( _textBefore);
+            for (MarkerListFormatter formatter : formatters)
+            	formatter.setTextBefore( _textBefore);
         }
 
         public void setTextAfter( String _textAfter) {
             textAfter = _textAfter;
-            for ( Iterator i=formatters.iterator(); i.hasNext(); )
-                ((MarkerListFormatter) i.next()).setTextBefore( _textAfter);
+            for (MarkerListFormatter formatter : formatters)
+            	formatter.setTextBefore( _textAfter);
         }
 
         public String getMarkedText() { return markedText; }

@@ -27,7 +27,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -61,6 +60,8 @@ import jgloss.util.StringTools;
  */
 public class AutoSearchComboBox extends JComboBox implements LookupResultHandler,
                                                              DocumentListener {
+    private static final long serialVersionUID = 1L;
+
     protected LookupModel model;
     protected AsynchronousLookupEngine engine;
 
@@ -70,19 +71,20 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     protected DictionaryEntryFormatter currentFormatter;
 
     protected int limit;
-    protected List items;
+    protected List<Object[]> items;
     protected String searchText;
     protected StringBuilder tempBuffer = new StringBuilder( 1024);
 
     private boolean dontConfigureEditor;
     private boolean dontDoLookup;
 
-    private Highlighter matchHighlighter = new MatchHighlighter();
     private Highlighter partialHighlighter = new PartialHighlighter();
     private Highlighter highlighter = partialHighlighter;
 
     public class DefinitionRenderer extends JLabel  
         implements ListCellRenderer {
+
+        private static final long serialVersionUID = 1L;
 
         private Insets textInsets = new Insets(0, 0, 0, 0);
         private Rectangle textBounds = new Rectangle();
@@ -109,7 +111,6 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         @Override
 		public void paintComponent(Graphics g) { 
 
-            FontMetrics fm = g.getFontMetrics();
             Insets insets = this.getInsets(textInsets);
       
             int h = this.getHeight();
@@ -119,9 +120,6 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
             textBounds.y = insets.top;
             textBounds.width = w - (insets.left + insets.right);
             textBounds.height = h - (insets.top + insets.bottom);
-
-            int x = textBounds.x;
-            int y = textBounds.y + fm.getAscent();
         
             g.setColor(this.getBackground());
             g.fillRect(0, 0, w, h);
@@ -227,7 +225,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
             searchText = nextSearchText;
         }
 
-        LookupModel tempModel = (LookupModel) model.clone();
+        LookupModel tempModel = model.clone();
         if (tempModel.getSelectedSearchMode() == ExpressionSearchModes.EXACT) try {
             tempModel.selectSearchMode( ExpressionSearchModes.PREFIX);
         } catch (IllegalArgumentException ex) {}
@@ -254,7 +252,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     }
 
     protected void startLookup() {
-        items = new ArrayList( limit + 20);
+        items = new ArrayList<Object[]>( limit + 20);
     }
 
     @Override
@@ -281,7 +279,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
 
     @Override
 	public void endLookup() {
-        final List newItems = items;
+        final List<Object[]> newItems = items;
         items = null;
 
         Runnable updater = new Runnable() {

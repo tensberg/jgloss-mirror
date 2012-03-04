@@ -104,7 +104,7 @@ public class JGlossApp extends JGloss {
 
         if (args.length == 0) {
             if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-                getLookupFrame().show();
+                getLookupFrame().setVisible(true);
             else
                 new JGlossFrame();
         }

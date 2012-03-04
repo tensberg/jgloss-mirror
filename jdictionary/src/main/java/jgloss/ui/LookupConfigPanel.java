@@ -61,7 +61,9 @@ import jgloss.dictionary.SearchMode;
  */
 public class LookupConfigPanel extends JPanel implements LookupChangeListener,
                                                          ActionListener {
-    protected LookupModel model;
+    private static final long serialVersionUID = 1L;
+
+	protected LookupModel model;
 
     protected JRadioButton[] searchModes;
     protected final static String SEARCH_MODE_ACTION_COMMAND = "searchModes";
