@@ -46,7 +46,7 @@ class KanaInputMethod implements InputMethod {
     protected Locale locale;
     protected Character.Subset[] subsets;
 
-    protected static final Map SELECTED_RAW_TEXT = new TreeMap();
+    protected static final Map<TextAttribute, InputMethodHighlight> SELECTED_RAW_TEXT = new TreeMap<TextAttribute, InputMethodHighlight>();
     
     static {
         SELECTED_RAW_TEXT.put( TextAttribute.INPUT_METHOD_HIGHLIGHT,

@@ -28,8 +28,6 @@ import java.util.Map;
  * hiragana.
  */
 public class RomajiTranslator {
- 
-    private final static RomajiTranslator instance = new RomajiTranslator();
 
     public final static Conversion HIRAGANA = new Hiragana();
     public final static Conversion KATAKANA = new Katakana();
@@ -140,15 +138,15 @@ public class RomajiTranslator {
   
   
     public abstract static class Conversion {
-        protected Map translation;
+        protected Map<String, String> translation;
         //protected Set prefixes;
 
-        protected Map getMap() { return translation; }
+        protected Map<String, String> getMap() { return translation; }
 
         abstract public String getName();   
 
         public String get( String key) {
-            return (String) getMap().get(key);
+            return getMap().get(key);
         }
 
         /*        protected void initPrefixesFromTranslation() {
@@ -174,7 +172,7 @@ public class RomajiTranslator {
         private String name = "\u5e73\u4eee\u540d";
     
         private Hiragana() {
-            translation = new HashMap( 101);
+            translation = new HashMap<String, String>( 101);
             // Vowels
     
             translation.put("a", "\u3042");
@@ -349,7 +347,7 @@ public class RomajiTranslator {
         private String name = "\u7247\u4eee\u540d";
     
         private Katakana() {
-            translation = new HashMap( 101);
+            translation = new HashMap<String, String>( 101);
 
             // Vowels
     
