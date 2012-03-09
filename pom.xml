@@ -9,11 +9,16 @@
 
 	<name>jgloss-parent</name>
 	<url>http://jgloss.sf.net/</url>
+    <inceptionYear>2001</inceptionYear>
 	<scm>
 		<url>http://jgloss.git.sourceforge.net/</url>
 		<connection>scm:git:git://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss</connection>
 		<developerConnection>scm:git:ssh://username@jgloss.git.sourceforge.net/gitroot/jgloss/jgloss</developerConnection>
 	</scm>
+    <ciManagement>
+        <url>http://tensberg-ec2.dyndns.org:8080/</url>
+        <system>Jenkins</system>
+    </ciManagement>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -89,33 +94,6 @@
 				</configuration>
 			</plugin>
 			
-			<!-- generate JGloss docbook documentation from src/docbkx
-			     see http://docbkx-tools.sourceforge.net/docbkx-samples/manual.html 
-			-->
-			<plugin>
-				<groupId>com.agilejava.docbkx</groupId>
-				<artifactId>docbkx-maven-plugin</artifactId>
-				<version>2.0.11</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.docbook</groupId>
-						<artifactId>docbook-xml</artifactId>
-						<version>4.4</version>
-						<scope>runtime</scope>
-					</dependency>
-				</dependencies>
-			
-				<executions>
-					<execution>
-						<inherited>false</inherited>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>generate-html</goal>
-							<goal>generate-pdf</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>  
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -184,4 +162,39 @@
 			<url>scp://shell.sourceforge.net/home/project-web/jgloss/htdocs/maven</url>
 		</site>
 	</distributionManagement>
+	
+	<profiles>
+	   <profile>
+	       <id>include-docbook</id>
+	       <build>
+	           <plugins>
+					<!-- generate JGloss docbook documentation from src/docbkx see http://docbkx-tools.sourceforge.net/docbkx-samples/manual.html -->
+					<plugin>
+						<groupId>com.agilejava.docbkx</groupId>
+						<artifactId>docbkx-maven-plugin</artifactId>
+						<version>2.0.11</version>
+						<dependencies>
+							<dependency>
+								<groupId>org.docbook</groupId>
+								<artifactId>docbook-xml</artifactId>
+								<version>4.4</version>
+								<scope>runtime</scope>
+							</dependency>
+						</dependencies>
+				
+						<executions>
+							<execution>
+								<inherited>false</inherited>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>generate-html</goal>
+									<goal>generate-pdf</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+	           </plugins>
+	       </build>
+	   </profile>
+	</profiles>
 </project>
