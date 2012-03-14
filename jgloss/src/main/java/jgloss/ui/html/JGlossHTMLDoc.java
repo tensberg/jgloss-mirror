@@ -199,10 +199,11 @@ public class JGlossHTMLDoc extends HTMLDocument {
          *        be called from the AnnotationActiendon.
          */
         private void addCustomTags( boolean blockCompatible) {
-            if (blockCompatible)
-                registerTag( AnnotationTags.ANNOTATION, new BlockAction());
-            else
-                registerTag( AnnotationTags.ANNOTATION, new AnnotationAction( true));
+            if (blockCompatible) {
+	            registerTag( AnnotationTags.ANNOTATION, new BlockAction());
+            } else {
+	            registerTag( AnnotationTags.ANNOTATION, new AnnotationAction( true));
+            }
             registerTag( AnnotationTags.WORD, new AnnotationAction( false));
             registerTag( AnnotationTags.READING_BASETEXT, new AnnotationAction( false));
             registerTag( AnnotationTags.READING, new HTMLDocument.HTMLReader.CharacterAction());
@@ -333,10 +334,11 @@ public class JGlossHTMLDoc extends HTMLDocument {
      * @return The position in the document the current reader is at.
      */
     public int getParsePosition() {
-        if (reader != null)
-            return reader.getParsePosition();
-        else
-            return 0;
+        if (reader != null) {
+	        return reader.getParsePosition();
+        } else {
+	        return 0;
+        }
     }
 
     /**
@@ -350,15 +352,17 @@ public class JGlossHTMLDoc extends HTMLDocument {
      */
     public void setAttribute( MutableAttributeSet attr, Object key, Object value, boolean fireChanged) {
         writeLock();
-        if (value != null)
-            attr.addAttribute( key, value);
-        else
-            attr.removeAttribute( key);
+        if (value != null) {
+	        attr.addAttribute( key, value);
+        } else {
+	        attr.removeAttribute( key);
+        }
         writeUnlock();
 
-        if (fireChanged)
-            fireChangedUpdate( new DefaultDocumentEvent
+        if (fireChanged) {
+	        fireChangedUpdate( new DefaultDocumentEvent
                 ( 0, 0, javax.swing.event.DocumentEvent.EventType.CHANGE));
+        }
     }
 
     /**
@@ -393,8 +397,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
         }
         else {
             // recurse over children
-            for ( int i=0; i<elem.getElementCount(); i++)
-                findElements( elem.getElement( i), tag, elemList);
+            for ( int i=0; i<elem.getElementCount(); i++) {
+	            findElements( elem.getElement( i), tag, elemList);
+            }
         }
     }
 
@@ -463,10 +468,11 @@ public class JGlossHTMLDoc extends HTMLDocument {
             anno = anno.getElement(anno.getElementIndex(offset));
         }
 
-        if (anno.isLeaf())
-            return null;
-        else
-            return anno;
+        if (anno.isLeaf()) {
+	        return null;
+        } else {
+	        return anno;
+        }
     }
 
     /**
@@ -485,9 +491,10 @@ public class JGlossHTMLDoc extends HTMLDocument {
             // cross it.
             Element paragraph = getParagraphElement( start);
             end = Math.min( end, paragraph.getEndOffset()-1);
-            if (end == start)
-                // no annotation area left
+            if (end == start) {
+	            // no annotation area left
                 return;
+            }
 
             // The start and end offsets will move around while we change the document.
             // So wrap them in position objects, which adapt to changes.
@@ -608,12 +615,15 @@ public class JGlossHTMLDoc extends HTMLDocument {
 
             // remove the additional characters which were inserted above to work around
             // document construction quirks
-            if (eae != null)
-                remove( eae.getStartOffset()-1, 1);
-            if (sae != null)
-                remove( sae.getEndOffset(), 1);
-            if (paragraphSpaceInserted)
-                remove( paragraph.getStartOffset(), 1);
+            if (eae != null) {
+	            remove( eae.getStartOffset()-1, 1);
+            }
+            if (sae != null) {
+	            remove( sae.getEndOffset(), 1);
+            }
+            if (paragraphSpaceInserted) {
+	            remove( paragraph.getStartOffset(), 1);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -637,8 +647,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
      */
     private static void appendTag(StringBuilder buf, AnnotationTags tag, boolean endTag) {
         buf.append('<');
-        if (endTag)
-            buf.append('/');
+        if (endTag) {
+	        buf.append('/');
+        }
         buf.append(tag.getId());
         buf.append('>');
     }
@@ -661,8 +672,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
         StringBuilder unannotatedText = new StringBuilder(word.getEndOffset()-word.getStartOffset());
         for (int i=0; i<word.getElementCount(); i++) {
             Element basetext = word.getElement(i);
-            if (basetext.getName().equals(AnnotationTags.READING_BASETEXT.getId()))
-                basetext = basetext.getElement(1);
+            if (basetext.getName().equals(AnnotationTags.READING_BASETEXT.getId())) {
+	            basetext = basetext.getElement(1);
+            }
             try {
                 getText(basetext.getStartOffset(),
                         basetext.getEndOffset()-basetext.getStartOffset(),
@@ -711,28 +723,32 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 end = JGlossHTMLDoc.this.createPosition(_end);
             } catch (BadLocationException ex) { ex.printStackTrace(); }
 
-            if (writeLock)
-                JGlossHTMLDoc.this.writeLock();
-            else
-                JGlossHTMLDoc.this.readLock();
+            if (writeLock) {
+	            JGlossHTMLDoc.this.writeLock();
+            } else {
+	            JGlossHTMLDoc.this.readLock();
+            }
 
             try {
                 walk(JGlossHTMLDoc.this.getDefaultRootElement());
             } finally {
-                if (writeLock)
-                    JGlossHTMLDoc.this.writeUnlock();
-                else
-                    JGlossHTMLDoc.this.readUnlock();
+                if (writeLock) {
+	                JGlossHTMLDoc.this.writeUnlock();
+                } else {
+	                JGlossHTMLDoc.this.readUnlock();
+                }
             }
         }
 
         protected void walk(Element elem) {
-            if (elem.getStartOffset() >= end.getOffset() || elem.getEndOffset() <= start.getOffset())
-                return;
+            if (elem.getStartOffset() >= end.getOffset() || elem.getEndOffset() <= start.getOffset()) {
+	            return;
+            }
 
             boolean recurse = processElement(elem);
-            if (recurse)
-                recurse(elem);
+            if (recurse) {
+	            recurse(elem);
+            }
         }
 
         /**
@@ -741,8 +757,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
          * processElement} returns <code>true</code>.
          */
         protected void recurse(Element elem) {
-            for ( int i=0; i<elem.getElementCount(); i++)
-                walk(elem.getElement( i));
+            for ( int i=0; i<elem.getElementCount(); i++) {
+	            walk(elem.getElement( i));
+            }
         }
 
         /**
@@ -786,8 +803,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
          */
         @Override
 		protected void recurse(Element elem) {
-            for ( int i=elem.getElementCount()-1; i>=0; i--)
-                walk(elem.getElement( i));            
+            for ( int i=elem.getElementCount()-1; i>=0; i--) {
+	            walk(elem.getElement( i));
+            }            
         }
     } // class AnnotationRemover
 

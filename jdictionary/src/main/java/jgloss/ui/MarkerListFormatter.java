@@ -55,8 +55,9 @@ public class MarkerListFormatter implements ListFormatter {
         }
 
         public Group( String _markedText, String _textBefore, String _textAfter) {
-            if (markedText != null)
-                markedText = normalize( _markedText);
+            if (markedText != null) {
+	            markedText = normalize( _markedText);
+            }
             textBefore = _textBefore;
             textAfter = _textAfter;
         }
@@ -74,20 +75,23 @@ public class MarkerListFormatter implements ListFormatter {
 
         public void setMarkedText( String _markedText) {
             markedText = normalize( _markedText);
-            for (MarkerListFormatter formatter : formatters)
-                formatter.setMarkedText( _markedText);
+            for (MarkerListFormatter formatter : formatters) {
+	            formatter.setMarkedText( _markedText);
+            }
         }
 
         public void setTextBefore( String _textBefore) {
             textBefore = _textBefore;
-            for (MarkerListFormatter formatter : formatters)
-            	formatter.setTextBefore( _textBefore);
+            for (MarkerListFormatter formatter : formatters) {
+	            formatter.setTextBefore( _textBefore);
+            }
         }
 
         public void setTextAfter( String _textAfter) {
             textAfter = _textAfter;
-            for (MarkerListFormatter formatter : formatters)
-            	formatter.setTextBefore( _textAfter);
+            for (MarkerListFormatter formatter : formatters) {
+	            formatter.setTextBefore( _textAfter);
+            }
         }
 
         public String getMarkedText() { return markedText; }

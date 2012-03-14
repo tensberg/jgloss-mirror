@@ -85,8 +85,9 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
     }
 
     public void setTargetEditor(JEditorPane _editor) {
-        if (editor == _editor)
-            return;
+        if (editor == _editor) {
+	        return;
+        }
 
         if (editor != null) {
             editor.removePropertyChangeListener(this);
@@ -164,8 +165,9 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
     @Override
 	public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equalsIgnoreCase("document")) {
-            if (document != null)
-                document.removeDocumentListener(this);
+            if (document != null) {
+	            document.removeDocumentListener(this);
+            }
             try {
                 document = (HTMLDocument) editor.getDocument();
                 document.addDocumentListener(this);
@@ -180,24 +182,27 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
 	public void changedUpdate(DocumentEvent e) {
         if (currentElement == null ||
             currentElement.getStartOffset()<=e.getOffset()+e.getLength() &&
-            currentElement.getEndOffset()>=e.getOffset())
-            // changed area intersects current element
+            currentElement.getEndOffset()>=e.getOffset()) {
+	        // changed area intersects current element
             resetSelection();
+        }
     }
 
     @Override
 	public void insertUpdate(DocumentEvent e) {
-        if (currentElement == null)
-            resetSelection();
+        if (currentElement == null) {
+	        resetSelection();
+        }
     }
 
     @Override
 	public void removeUpdate(DocumentEvent e) {
         if (currentElement!=null &&
             currentElement.getStartOffset()<=e.getOffset()+e.getLength() &&
-            currentElement.getEndOffset()>=e.getOffset())
-            // changed area intersects current element
+            currentElement.getEndOffset()>=e.getOffset()) {
+	        // changed area intersects current element
             resetSelection();
+        }
     }
 
     protected void resetSelection() {
@@ -227,8 +232,9 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
                 Element child = elem.getElement(i);
                 if (child.getEndOffset() > position) {
                     Element out = getFirstLinkAfter(position, child);
-                    if (out != null) // Link element found, end recursion
-                        return out;
+                    if (out != null) {
+	                    return out;
+                    }
                 }
             }
         }
@@ -257,8 +263,9 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
                 Element child = elem.getElement(i);
                 if (child.getStartOffset() < position) {
                     Element out = getFirstLinkBefore(position, child);
-                    if (out != null) // Link element found, end recursion
-                        return out;
+                    if (out != null) {
+	                    return out;
+                    }
                 }
             }
         }
@@ -280,8 +287,9 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
 
         @Override
 		public void actionPerformed(ActionEvent event) {
-            if (event.getSource()==editor && document!=null)
-                moveLink(editor, document);
+            if (event.getSource()==editor && document!=null) {
+	            moveLink(editor, document);
+            }
         }
 
         public void moveLink(JEditorPane editor, HTMLDocument doc) {
@@ -289,24 +297,28 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
             doc.readLock();
             try {
                 if (backwards) {
-                    if (currentElement != null)
-                        nextHref = getFirstLinkBefore(currentElement.getStartOffset(), 
+                    if (currentElement != null) {
+	                    nextHref = getFirstLinkBefore(currentElement.getStartOffset(), 
                                                       doc.getDefaultRootElement());
-                    if (nextHref == null)
-                        // no current element, or no further link after current link element
+                    }
+                    if (nextHref == null) {
+	                    // no current element, or no further link after current link element
                         // finds the current link element again if it is the only link in the
                         // document
                         nextHref = getFirstLinkBefore(doc.getLength(), doc.getDefaultRootElement());
+                    }
                 }
                 else {
-                    if (currentElement != null)
-                        nextHref = getFirstLinkAfter(currentElement.getEndOffset(), 
+                    if (currentElement != null) {
+	                    nextHref = getFirstLinkAfter(currentElement.getEndOffset(), 
                                                      doc.getDefaultRootElement());
-                    if (nextHref == null)
-                        // no current element, or no further link after current link element
+                    }
+                    if (nextHref == null) {
+	                    // no current element, or no further link after current link element
                         // finds the current link element again if it is the only link in the
                         // document
                         nextHref = getFirstLinkAfter(0, doc.getDefaultRootElement());
+                    }
                 }
             } finally {
                 doc.readUnlock();
@@ -338,13 +350,15 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
 
         @Override
 		public void actionPerformed(ActionEvent event) {
-            if (event.getSource()==editor && document!=null)
-                activateLink();
+            if (event.getSource()==editor && document!=null) {
+	            activateLink();
+            }
         }
 
         public void activateLink() {
-            if (currentElement == null)
-                return;
+            if (currentElement == null) {
+	            return;
+            }
 
             String currentURL = (String) ((AttributeSet) currentElement.getAttributes().getAttribute
                                           (HTML.Tag.A)).getAttribute(HTML.Attribute.HREF);

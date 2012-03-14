@@ -134,8 +134,9 @@ abstract class BaseEntry implements DictionaryEntry {
 
     @Override
 	public String getReading( int alternative) {
-        if (alternative != 0)
-            throw new IllegalArgumentException();
+        if (alternative != 0) {
+	        throw new IllegalArgumentException();
+        }
         return reading;
     }
 
@@ -144,8 +145,9 @@ abstract class BaseEntry implements DictionaryEntry {
 
     @Override
 	public AttributeSet getReadingAttributes( int alternative) {
-        if (alternative != 0)
-            throw new IllegalArgumentException();
+        if (alternative != 0) {
+	        throw new IllegalArgumentException();
+        }
 
         return emptySet.setParent( generalA);
     }
@@ -157,8 +159,9 @@ abstract class BaseEntry implements DictionaryEntry {
 
     @Override
 	public String getTranslation( int rom, int crm, int synonym) {
-        if (synonym != 0)
-            throw new IllegalArgumentException();
+        if (synonym != 0) {
+	        throw new IllegalArgumentException();
+        }
         try {
             return translations[rom][crm]; // synonyms are not supported
         } catch (ArrayIndexOutOfBoundsException ex) {
@@ -183,20 +186,23 @@ abstract class BaseEntry implements DictionaryEntry {
 
     @Override
 	public AttributeSet getTranslationAttributes( int rom, int crm, int synonym) {
-        if (synonym != 0)
-            throw new IllegalArgumentException();
+        if (synonym != 0) {
+	        throw new IllegalArgumentException();
+        }
         return getTranslationAttributes( rom, crm);
     }
 
     @Override
 	public AttributeSet getTranslationAttributes( int rom, int crm) {
         try {
-            if (crm<0 || crm >= translations[rom].length)
-                throw new IllegalArgumentException();
-            if (translationRomA[rom] != null)
-                return emptySet.setParent( translationRomA[rom]);
-            else
-                return emptySet.setParent( translationA);
+            if (crm<0 || crm >= translations[rom].length) {
+	            throw new IllegalArgumentException();
+            }
+            if (translationRomA[rom] != null) {
+	            return emptySet.setParent( translationRomA[rom]);
+            } else {
+	            return emptySet.setParent( translationA);
+            }
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new IllegalArgumentException();
         }
@@ -205,10 +211,11 @@ abstract class BaseEntry implements DictionaryEntry {
     @Override
 	public AttributeSet getTranslationAttributes( int rom) {
         try {
-            if (translationRomA[rom] != null)
-                return translationRomA[rom];
-            else
-                return emptySet.setParent( translationA);
+            if (translationRomA[rom] != null) {
+	            return translationRomA[rom];
+            } else {
+	            return emptySet.setParent( translationA);
+            }
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new IllegalArgumentException();
         }
@@ -238,13 +245,14 @@ abstract class BaseEntry implements DictionaryEntry {
     @Override
 	public DictionaryEntryReference getReference() {
         if (reference == null) {
-            if (dictionary instanceof MarkerDictionary)
-                reference = new BaseEntryRef( this);
-            else 
-                reference = new DictionaryEntryReference() {
+            if (dictionary instanceof MarkerDictionary) {
+	            reference = new BaseEntryRef( this);
+            } else {
+	            reference = new DictionaryEntryReference() {
                         @Override
 						public DictionaryEntry getEntry() { return BaseEntry.this; }
                     };
+            }
         }
         return reference;
     }

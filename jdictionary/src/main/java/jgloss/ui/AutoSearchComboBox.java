@@ -141,19 +141,20 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
                                                            int index,
                                                            boolean isSelected,
                                                            boolean cellHasFocus) {
-                if (value instanceof String)
-                    return defaultRenderer.getListCellRendererComponent
+                if (value instanceof String) {
+	                return defaultRenderer.getListCellRendererComponent
                         ( list, value, index, isSelected, cellHasFocus);
+                }
 
                 Object[] data = (Object[]) value;
                 Component out;
                 if (data[0] == Dictionary.class) {
                     out = defaultRenderer.getListCellRendererComponent
                         ( list, data[1], index, false, false);
-                }
-                else
-                    out = highlightRenderer.getListCellRendererComponent
+                } else {
+	                out = highlightRenderer.getListCellRendererComponent
                         ( list, data[1], index, false, false);
+                }
 
                 if (plainFont == null) {
                     plainFont = out.getFont();
@@ -214,30 +215,35 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     public LookupModel getLookupModel() { return model; }
 
     protected void doLookup() {
-        if (dontDoLookup)
-            return;
+        if (dontDoLookup) {
+	        return;
+        }
 
         synchronized (this) {
             String nextSearchText = ((JTextComponent) getEditor().getEditorComponent()).getText();
-            if (nextSearchText.equals( searchText) || nextSearchText.length()==0)
-                return;
+            if (nextSearchText.equals( searchText) || nextSearchText.length()==0) {
+	            return;
+            }
             
             searchText = nextSearchText;
         }
 
         LookupModel tempModel = model.clone();
-        if (tempModel.getSelectedSearchMode() == ExpressionSearchModes.EXACT) try {
-            tempModel.selectSearchMode( ExpressionSearchModes.PREFIX);
-        } catch (IllegalArgumentException ex) {}
+        if (tempModel.getSelectedSearchMode() == ExpressionSearchModes.EXACT) {
+	        try {
+	            tempModel.selectSearchMode( ExpressionSearchModes.PREFIX);
+	        } catch (IllegalArgumentException ex) {}
+        }
 
         tempModel.setSearchExpression( searchText);
         if (StringTools.isHiragana( searchText.charAt( 0)) || 
-            StringTools.isKatakana( searchText.charAt( 0)))
-            currentFormatter = readingWordTranslation;
-        else if (StringTools.isKanji( searchText.charAt( 0)))
-            currentFormatter = wordReadingTranslation;
-        else
-            currentFormatter = translationWordReading;
+            StringTools.isKatakana( searchText.charAt( 0))) {
+	        currentFormatter = readingWordTranslation;
+        } else if (StringTools.isKanji( searchText.charAt( 0))) {
+	        currentFormatter = wordReadingTranslation;
+        } else {
+	        currentFormatter = translationWordReading;
+        }
         engine.doLookup( tempModel);
     }
 
@@ -341,8 +347,9 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         // Changing the combo box model in endLookup has the side effect of calling
         // configureEditor. Since this messes up the editor text and is unneccessary
         // anyway, it can be switched off by setting dontConfigureEditor
-        if (dontConfigureEditor)
-            return;
+        if (dontConfigureEditor) {
+	        return;
+        }
 
         super.configureEditor( editor, anObject);
     }

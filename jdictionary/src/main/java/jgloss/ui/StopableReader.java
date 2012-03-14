@@ -59,12 +59,13 @@ public class StopableReader extends FilterReader {
      */
     @Override
 	public int read() throws IOException {
-        if (stopped)
-            return -1;
-        else {
+        if (stopped) {
+	        return -1;
+        } else {
             int c = super.read();
-            if (c != -1)
-                charsRead++;
+            if (c != -1) {
+	            charsRead++;
+            }
             return c;
         }
     }
@@ -81,12 +82,13 @@ public class StopableReader extends FilterReader {
      */
     @Override
 	public int read( char[] cbuf, int off, int len) throws IOException {
-        if (stopped)
-            return -1;
-        else {
+        if (stopped) {
+	        return -1;
+        } else {
             int count = super.read( cbuf, off, len);
-            if (count != -1)
-                charsRead += count;
+            if (count != -1) {
+	            charsRead += count;
+            }
             return count;
         }
     }

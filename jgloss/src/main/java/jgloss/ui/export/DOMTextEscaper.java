@@ -74,7 +74,8 @@ class DOMTextEscaper {
 
         // recurse over children
         NodeList nl = node.getChildNodes();
-        for ( int i=0; i<nl.getLength(); i++)
-            escapeNode(nl.item(i));
+        for ( int i=0; i<nl.getLength(); i++) {
+	        escapeNode(nl.item(i));
+        }
     }
 } // class DOMTextEscaper

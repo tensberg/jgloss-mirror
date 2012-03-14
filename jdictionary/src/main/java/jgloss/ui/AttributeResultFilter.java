@@ -45,23 +45,27 @@ public class AttributeResultFilter implements LookupResultFilter {
 
     @Override
 	public boolean accept( DictionaryEntry de) { 
-        if (!enableFor( de.getDictionary()))
-            return true;
+        if (!enableFor( de.getDictionary())) {
+	        return true;
+        }
 
-        if (acceptIfSet)
-            return acceptIfSet( de);
-        else
-            return !acceptIfSet( de);
+        if (acceptIfSet) {
+	        return acceptIfSet( de);
+        } else {
+	        return !acceptIfSet( de);
+        }
     }
 
     protected boolean acceptIfSet( DictionaryEntry de) {
         if (attribute.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
-            de.getGeneralAttributes().containsKey( attribute, false))
-            return true;
+            de.getGeneralAttributes().containsKey( attribute, false)) {
+	        return true;
+        }
 
         if (attribute.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
-            if (de.getWordAttributes().containsKey( attribute, false))
-                return true;
+            if (de.getWordAttributes().containsKey( attribute, false)) {
+	            return true;
+            }
 
             for ( int i=0; i<de.getWordAlternativeCount(); i++) {
                 if (de.getWordAttributes( i).containsKey( attribute, false)) {
@@ -71,8 +75,9 @@ public class AttributeResultFilter implements LookupResultFilter {
         }
 
         if (attribute.appliesTo( DictionaryEntry.AttributeGroup.READING)) {
-            if (de.getReadingAttributes().containsKey( attribute, false))
-                return true;
+            if (de.getReadingAttributes().containsKey( attribute, false)) {
+	            return true;
+            }
 
             for ( int i=0; i<de.getReadingAlternativeCount(); i++) {
                 if (de.getReadingAttributes( i).containsKey( attribute, false)) {
@@ -82,20 +87,24 @@ public class AttributeResultFilter implements LookupResultFilter {
         }
 
         if (attribute.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
-            if (de.getTranslationAttributes().containsKey( attribute, false))
-                return true;
+            if (de.getTranslationAttributes().containsKey( attribute, false)) {
+	            return true;
+            }
 
             for ( int i=0; i<de.getTranslationRomCount(); i++) {
-                if (de.getTranslationAttributes( i).containsKey( attribute, false))
-                    return true;
+                if (de.getTranslationAttributes( i).containsKey( attribute, false)) {
+	                return true;
+                }
 
                 for ( int j=0; j<de.getTranslationCrmCount( i); j++) {
-                    if (de.getTranslationAttributes( i, j).containsKey( attribute, false))
-                        return true;
+                    if (de.getTranslationAttributes( i, j).containsKey( attribute, false)) {
+	                    return true;
+                    }
 
                     for ( int k=0; k<de.getTranslationSynonymCount( i, j); k++) {
-                        if (de.getTranslationAttributes( i, j, k).containsKey( attribute, false))
-                            return true;
+                        if (de.getTranslationAttributes( i, j, k).containsKey( attribute, false)) {
+	                        return true;
+                        }
                     }
                 }
             }

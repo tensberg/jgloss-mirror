@@ -98,8 +98,9 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      * @return The Dictionaries component.
      */
     public static ExclusionList getInstance() {
-        if (box == null)
-            box = new ExclusionList();
+        if (box == null) {
+	        box = new ExclusionList();
+        }
         return box;
     }
 
@@ -161,12 +162,13 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                     DefaultListModel m = (DefaultListModel) exclusionList.getModel();
                     m.remove( i);
                     changed = true;
-                    if (i < m.getSize())
-                        exclusionList.setSelectedIndex( i);
-                    else if (m.getSize() > 0)
-                        exclusionList.setSelectedIndex( m.getSize()-1);
-                    else
-                        this.setEnabled( false);
+                    if (i < m.getSize()) {
+	                    exclusionList.setSelectedIndex( i);
+                    } else if (m.getSize() > 0) {
+	                    exclusionList.setSelectedIndex( m.getSize()-1);
+                    } else {
+	                    this.setEnabled( false);
+                    }
                 }
             };
         remove.setEnabled( false);
@@ -233,8 +235,9 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         add( p, gc);
 
         String filename = getExclusionListFile();
-        if (new File( filename).exists())
-            loadExclusionList( filename);
+        if (new File( filename).exists()) {
+	        loadExclusionList( filename);
+        }
         changed = false;
     }
 
@@ -252,8 +255,9 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             DefaultListModel m = (DefaultListModel) exclusionList.getModel();
             synchronized (exclusions) {
                 exclusions.clear();
-                for ( int i=0; i<m.size(); i++)
-                    exclusions.add( (String) m.get( i));
+                for ( int i=0; i<m.size(); i++) {
+	                exclusions.add( (String) m.get( i));
+                }
             }
             saveExclusionList( getExclusionListFile());
             changed = false;
@@ -321,8 +325,9 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             Set<String> newExclusions = new HashSet<String>( 1001);
             String line;
             while ((line=r.readLine()) != null) {
-                if (line.length() > 0)
-                    newExclusions.add( line);
+                if (line.length() > 0) {
+	                newExclusions.add( line);
+                }
             }
             exclusions = newExclusions;
             r.close();
@@ -410,30 +415,33 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         f.setFileHidingEnabled( true);
         f.setFileView( CustomFileView.getFileView());
         int r = f.showOpenDialog( SwingUtilities.getRoot( box));
-        if (r == JFileChooser.APPROVE_OPTION) try {
-            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-            DefaultListModel m = new DefaultListModel();
-            BufferedReader reader = new BufferedReader
-                ( CharacterEncodingDetector.getReader
-                  ( new FileInputStream( f.getSelectedFile().getAbsolutePath())));
-            String line;
-            while ((line=reader.readLine()) != null) {
-                if (line.length() > 0)
-                    m.addElement( line);
-            }
-            reader.close();
+        if (r == JFileChooser.APPROVE_OPTION) {
+	        try {
+	            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
+	            DefaultListModel m = new DefaultListModel();
+	            BufferedReader reader = new BufferedReader
+	                ( CharacterEncodingDetector.getReader
+	                  ( new FileInputStream( f.getSelectedFile().getAbsolutePath())));
+	            String line;
+	            while ((line=reader.readLine()) != null) {
+	                if (line.length() > 0) {
+	                    m.addElement( line);
+	                }
+	            }
+	            reader.close();
 
-            exclusionList.setModel( m);
-            changed = true;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showConfirmDialog
-                ( SwingUtilities.getRoot( box), JGloss.messages.getString
-                  ( "error.import.exception", new Object[] 
-                      { f.getSelectedFile(), ex.getClass().getName(),
-                        ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.import.title"),
-                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+	            exclusionList.setModel( m);
+	            changed = true;
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showConfirmDialog
+	                ( SwingUtilities.getRoot( box), JGloss.messages.getString
+	                  ( "error.import.exception", new Object[] 
+	                      { f.getSelectedFile(), ex.getClass().getName(),
+	                        ex.getLocalizedMessage() }),
+	                  JGloss.messages.getString( "error.import.title"),
+	                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+	        }
         }
     }
 

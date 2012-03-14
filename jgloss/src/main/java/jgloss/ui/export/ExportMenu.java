@@ -69,11 +69,13 @@ public class ExportMenu extends JMenu implements ActionListener {
      */
     public static synchronized void registerStandardExporters() {
         String[] resources = JGloss.messages.getString( "exporters").split(":");
-        for ( int i=0; i<resources.length; i++) try {
-            registerExport( new InputSource( ExportMenu.class.getResource( resources[i])
-                                             .toExternalForm()));
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        for ( int i=0; i<resources.length; i++) {
+	        try {
+	            registerExport( new InputSource( ExportMenu.class.getResource( resources[i])
+	                                             .toExternalForm()));
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
         }
     }
 
@@ -105,8 +107,9 @@ public class ExportMenu extends JMenu implements ActionListener {
         context = _context;
         boolean enabled = (context != null && !context.isEmpty());
         setEnabled( enabled);
-        for ( int i=0; i<getItemCount(); i++)
-            getItem( i).setEnabled( enabled);
+        for ( int i=0; i<getItemCount(); i++) {
+	        getItem( i).setEnabled( enabled);
+        }
     }
 
     /**

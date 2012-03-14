@@ -80,21 +80,25 @@ public class CookieTools {
         }
 
         String host = url.getHost();
-        if (host==null || host.length()==0)
-            return;
+        if (host==null || host.length()==0) {
+	        return;
+        }
         // build effective host name
-        if (host.indexOf( '.') == -1) // this applies e.g. for "localhost"
-            host += ".local";
+        if (host.indexOf( '.') == -1) {
+	        host += ".local";
+        }
         String path = url.getPath();
-        if (path==null || path.length()==0)
-            path = "/";
+        if (path==null || path.length()==0) {
+	        path = "/";
+        }
         int porti = url.getPort();
         if (porti == -1) {
             // this method is only called for protocols http and https
-            if ("https".equals( url.getProtocol()))
-                porti = 443;
-            else
-                porti = 80;
+            if ("https".equals( url.getProtocol())) {
+	            porti = 443;
+            } else {
+	            porti = 80;
+            }
         }
         String port = String.valueOf( porti);
 
@@ -114,24 +118,30 @@ public class CookieTools {
             try {
                 String name = c.getName();
                 int i1 = name.indexOf( '|');
-                if (i1 == -1)
-                    continue;
+                if (i1 == -1) {
+	                continue;
+                }
                 int i2 = name.indexOf( '|', i1 + 1);
-                if (i2 == -1)
-                    continue;
+                if (i2 == -1) {
+	                continue;
+                }
                 int i3 = name.indexOf( '|', i2 + 1);
-                if (i3 == -1)
-                    continue;
+                if (i3 == -1) {
+	                continue;
+                }
 
                 String cdomain = unescape( name.substring( 0, i1));
                 String cpath = unescape( name.substring( i1+1, i2));
                 String cportlist = unescape( name.substring( i2+1, i3));
-                if (!domainMatch( host, cdomain))
-                    context.log(  "domainmatch failed");
-                if (!portMatch( port, cportlist))
-                    context.log(  "portmatch failed");
-                if (!path.startsWith( cpath))
-                    context.log(  "path/cpath failed");
+                if (!domainMatch( host, cdomain)) {
+	                context.log(  "domainmatch failed");
+                }
+                if (!portMatch( port, cportlist)) {
+	                context.log(  "portmatch failed");
+                }
+                if (!path.startsWith( cpath)) {
+	                context.log(  "path/cpath failed");
+                }
                 // match domain/path/port to target URL as described in RFC2965, sect. 3.3.4
                 if (domainMatch( host, cdomain) &&
                     portMatch( port, cportlist) &&
@@ -172,8 +182,9 @@ public class CookieTools {
             cookietext.insert( 0, "$Version=" + maxVersion);
             connection.setRequestProperty( "Cookie", cookietext.toString());
             context.log( "sending Cookie: " + cookietext.toString());
-            if (maxVersion > 1) // send highest understood version number
-                connection.setRequestProperty( "Cooke2", "1");
+            if (maxVersion > 1) {
+	            connection.setRequestProperty( "Cooke2", "1");
+            }
         }
     }
     
@@ -197,18 +208,21 @@ public class CookieTools {
         context.log( "parsing response cookies");
         URL url = connection.getURL();
         String host = url.getHost();
-        if (host==null || host.length()==0)
-            return;
+        if (host==null || host.length()==0) {
+	        return;
+        }
         String path = url.getPath();
-        if (path==null || path.length()==0)
-            path = "/";
+        if (path==null || path.length()==0) {
+	        path = "/";
+        }
         int porti = url.getPort();
         if (porti == -1) {
             // this method is only called for protocols http and https
-            if ("https".equals( url.getProtocol()))
-                porti = 443;
-            else
-                porti = 80;
+            if ("https".equals( url.getProtocol())) {
+	            porti = 443;
+            } else {
+	            porti = 80;
+            }
         }
         String port = String.valueOf( porti);
 
@@ -219,14 +233,16 @@ public class CookieTools {
         Map<String, String> cookie = new HashMap<String, String>( 10);
         while ((header = connection.getHeaderFieldKey( i++)) != null) {
             boolean version1 = false;
-            if (header.equalsIgnoreCase( "set-cookie2"))
-                version1 = true;
-            else if (!header.equalsIgnoreCase( "set-cookie"))
-                continue;
+            if (header.equalsIgnoreCase( "set-cookie2")) {
+	            version1 = true;
+            } else if (!header.equalsIgnoreCase( "set-cookie")) {
+	            continue;
+            }
 
             String cs = connection.getHeaderField( i-1); // i was incremented in while condition
-            if (cs == null)
-                continue;
+            if (cs == null) {
+	            continue;
+            }
             context.log( "header " + connection.getHeaderFieldKey( i-1) +  ": " +  cs);
             
             // iterate over list of cookies, separated by ','
@@ -236,25 +252,30 @@ public class CookieTools {
                 //context.log( parser.toString());
                 // skip this cookie if path servlet-client is not secure and the 
                 // secure attribute is set
-                if (cookie.containsKey( "secure") && !secure)
-                    continue;
+                if (cookie.containsKey( "secure") && !secure) {
+	                continue;
+                }
                     
                 String name = cookie.remove( " NAME");                   
                 String value = cookie.remove( " VALUE");
                 context.log( "name " + name + " value " + value);
-                if (value.length() == 0)
-                    continue;
+                if (value.length() == 0) {
+	                continue;
+                }
                 String cdomain = cookie.remove( "domain");
-                if (cdomain == null)
-                    cdomain = host;
+                if (cdomain == null) {
+	                cdomain = host;
+                }
                 String cpath = cookie.remove( "path");
-                if (cpath == null)
-                    cpath = path;
+                if (cpath == null) {
+	                cpath = path;
+                }
                 String cportlist = cookie.remove( "port");
-                if (cportlist == null)
-                    cportlist = "";
-                else if (cportlist.length() == 0)
-                    cportlist = "\"" + port + "\"";
+                if (cportlist == null) {
+	                cportlist = "";
+                } else if (cportlist.length() == 0) {
+	                cportlist = "\"" + port + "\"";
+                }
                 context.log( "cdomain: " + cdomain + " cpath: " + cpath + " cportlist: " + cportlist);
 
                 // Reject cookies as described in RFC2965, section 3.3.2.
@@ -286,8 +307,9 @@ public class CookieTools {
                 // The effective host name that derives from the request-host does
                 // not domain-match the Domain attribute.
                 String effectiveHost = host;
-                if (host.indexOf( '.') == -1)
-                    effectiveHost += ".local";
+                if (host.indexOf( '.') == -1) {
+	                effectiveHost += ".local";
+                }
                 if (!domainMatch( effectiveHost, cdomain)) {
                     context.log( "domain match test failed: " + effectiveHost + " / " + cdomain);
                     continue;
@@ -318,29 +340,34 @@ public class CookieTools {
                     ( escape( cdomain) + "|" + escape( cpath) + "|" + escape( cportlist) + "|" +
                       name, value);
                 String expires = cookie.get( "expires");
-                if (expires != null) try {
-                    Date d = expiresDateFormat1.parse( expires);
-                    c.setMaxAge( (int) ((d.getTime()-System.currentTimeMillis()) / 1000));
-                } catch (ParseException ex) {
-                    try {
-                        Date d = expiresDateFormat2.parse( expires);
-                        c.setMaxAge( (int) ((d.getTime()-System.currentTimeMillis()) / 1000));
-                    } catch (ParseException ex2) {
-                        context.log( "expires attribute: " + ex2.getMessage());
-                    }
+                if (expires != null) {
+	                try {
+	                    Date d = expiresDateFormat1.parse( expires);
+	                    c.setMaxAge( (int) ((d.getTime()-System.currentTimeMillis()) / 1000));
+	                } catch (ParseException ex) {
+	                    try {
+	                        Date d = expiresDateFormat2.parse( expires);
+	                        c.setMaxAge( (int) ((d.getTime()-System.currentTimeMillis()) / 1000));
+	                    } catch (ParseException ex2) {
+	                        context.log( "expires attribute: " + ex2.getMessage());
+	                    }
+	                }
                 }
 
                 c.setPath( servletPath);
                 c.setDomain( servletDomain);
-                if (cookie.containsKey( "secure"))
-                    c.setSecure( true);
+                if (cookie.containsKey( "secure")) {
+	                c.setSecure( true);
+                }
                 
                 if (version1) {
                     c.setVersion( Integer.parseInt( cookie.get( "version")));
-                    if (cookie.containsKey( "max-age"))
-                        c.setMaxAge( Integer.parseInt( cookie.get( "max-age")));
-                    if (cookie.containsKey( "comment"))
-                        c.setComment( cookie.get( "comment"));
+                    if (cookie.containsKey( "max-age")) {
+	                    c.setMaxAge( Integer.parseInt( cookie.get( "max-age")));
+                    }
+                    if (cookie.containsKey( "comment")) {
+	                    c.setComment( cookie.get( "comment"));
+                    }
                 }
 
                 resp.addCookie( c);
@@ -354,13 +381,16 @@ public class CookieTools {
     protected static boolean domainMatch( String a, String b) {
         a = a.toLowerCase();
         b = b.toLowerCase();
-        if (a.equals( b))
-            return true;
+        if (a.equals( b)) {
+	        return true;
+        }
 
-        if (a.length()==0 && b.length()>0)
-            return false;
-        if (b.length() == 0)
-            return true;
+        if (a.length()==0 && b.length()>0) {
+	        return false;
+        }
+        if (b.length() == 0) {
+	        return true;
+        }
 
         // if b starts with '.' it can't be an ip address
         return (!(a.charAt( 0)=='.') && b.charAt( 0)=='.' &&
@@ -373,8 +403,9 @@ public class CookieTools {
      * portlist and the characters before and after are not numeric.
      */
     protected static boolean portMatch( String port, String portlist) {
-        if (portlist.length() == 0)
-            return true;
+        if (portlist.length() == 0) {
+	        return true;
+        }
 
         int match = portlist.indexOf( port);
         while (match != -1) {
@@ -382,16 +413,19 @@ public class CookieTools {
             if (match > 0) {
                 char c = portlist.charAt( match-1);
                 // test if it is an exact match
-                if (c >= '0' && c <= '9')
-                    isMatch = false;
+                if (c >= '0' && c <= '9') {
+	                isMatch = false;
+                }
             }
             if (match + port.length() < portlist.length()) {
                 char c = portlist.charAt( match+port.length());
-                if (c >= '0' && c <= '9')
-                    isMatch = false;
+                if (c >= '0' && c <= '9') {
+	                isMatch = false;
+                }
             }
-            if (isMatch)
-                return true;
+            if (isMatch) {
+	            return true;
+            }
             
             match = portlist.indexOf( port, match+1);
         }
@@ -451,48 +485,51 @@ public class CookieTools {
             switch (state) {
             case BEFORE_NAME:
                 // skip whitespace
-                if (c==32 || c==9)
-                    continue;
+                if (c==32 || c==9) {
+	                continue;
+                }
                 state = IN_NAME;
                 // begin of name; fall through to IN_NAME
                 
             case IN_NAME:
-                if (c==32 || c==9)
-                    state = BEFORE_ASSIGN;
-                else if (c == '=')
-                    state = IN_VALUE;
-                else if (!version1 || isTokenChar( c))
-                    name.append( c);
-                else if (c==',' && version1 && name.length()==0 && firstPair) {
+                if (c==32 || c==9) {
+	                state = BEFORE_ASSIGN;
+                } else if (c == '=') {
+	                state = IN_VALUE;
+                } else if (!version1 || isTokenChar( c)) {
+	                name.append( c);
+                } else if (c==',' && version1 && name.length()==0 && firstPair) {
                     // cookie was empty except for whitespace. This does not define
                     // a cookie, but is allowed.
                     continue;
                 }
                 else {
                     // illegal character
-                    if (version1)
-                        state = SKIP_INVALID;
-                    else
-                        return -1;
+                    if (version1) {
+	                    state = SKIP_INVALID;
+                    } else {
+	                    return -1;
+                    }
                 }
                 break;
                 
             case BEFORE_ASSIGN:
-                if (c==32 || c==9)
-                    continue;
-                else if (c=='=')
-                    state = IN_VALUE;
-                else if (c==';' || version1 && c==',') {
+                if (c==32 || c==9) {
+	                continue;
+                } else if (c=='=') {
+	                state = IN_VALUE;
+                } else if (c==';' || version1 && c==',') {
                     // attribute without value
                     state = AFTER_VALUE;
                     i--; // re-examine character in new state
                     continue;
                 }
                 else { // illegal char
-                    if (version1)
-                        state = SKIP_INVALID;
-                    else
-                        return -1;
+                    if (version1) {
+	                    state = SKIP_INVALID;
+                    } else {
+	                    return -1;
+                    }
                 }
                 break;
 
@@ -504,20 +541,22 @@ public class CookieTools {
                         continue;
                     }
                     if (c<32 || c==127) {// control characters
-                        if (version1)
-                            state = SKIP_INVALID;
-                        else
-                            return -1;
+                        if (version1) {
+	                        state = SKIP_INVALID;
+                        } else {
+	                        return -1;
+                        }
                     }
                     if (c == '\\') { // quote char, examine next character
                         value.append( c);
                         i++;
                         c = cookie.charAt( i);
                         if (c > 127) { // not CHAR
-                            if (version1)
-                                state = SKIP_INVALID;
-                            else
-                                return -1;
+                            if (version1) {
+	                            state = SKIP_INVALID;
+                            } else {
+	                            return -1;
+                            }
                         }
                     }
                 }
@@ -536,11 +575,12 @@ public class CookieTools {
                     if (value.length() == 0) { // if there was a '=', there must be some chars before ';'
                         if (version1) {
                             state = SKIP_INVALID;
-                            if (c == ',') // re-examine in new state
-                                i--;
+                            if (c == ',') {
+	                            i--;
+                            }
+                        } else {
+	                        return -1;
                         }
-                        else
-                            return -1;
                     }
                     state = AFTER_VALUE;
                     i--; // re-examine char in new state
@@ -548,8 +588,9 @@ public class CookieTools {
                 }
                 else if (version1 && !isTokenChar( c)) {
                     state = SKIP_INVALID;
-                    if (c == ',')
-                        i--;
+                    if (c == ',') {
+	                    i--;
+                    }
                 }
                 value.append( c);
                 break;
@@ -560,11 +601,11 @@ public class CookieTools {
                         attributes.put( " NAME", name.toString());
                         attributes.put( " VALUE", value.toString().trim());
                         firstPair = false;
-                    }
-                    else
-                        // with version0 cookies, the parser does not distinguish between
+                    } else {
+	                    // with version0 cookies, the parser does not distinguish between
                         // whitespace in and whitespace after a value
                         attributes.put( name.toString().toLowerCase(), value.toString().trim());
+                    }
                     name.delete( 0, name.length());
                     value.delete( 0, value.length());
                     state = BEFORE_NAME;
@@ -572,14 +613,16 @@ public class CookieTools {
                     // end of valid cookie definition
                     // due to the appended character this will always be reached at the end
                     // of the cookie string
-                    if (!version1 && i==cookie.length()-1 || version1 && c==',')
-                        return i;
+                    if (!version1 && i==cookie.length()-1 || version1 && c==',') {
+	                    return i;
+                    }
                 }
                 else if (c!=32 && c!=9) { // illegal character
-                    if (version1)
-                        state = SKIP_INVALID;
-                    else
-                        return -1;
+                    if (version1) {
+	                    state = SKIP_INVALID;
+                    } else {
+	                    return -1;
+                    }
                 }
                 break;
 
@@ -589,8 +632,9 @@ public class CookieTools {
                 name.delete( 0, name.length());
                 value.delete( 0, value.length());
                 
-                if (c == ',')
-                    state = BEFORE_NAME;
+                if (c == ',') {
+	                state = BEFORE_NAME;
+                }
                 break;
             }
         }
@@ -604,8 +648,9 @@ public class CookieTools {
             char c = out.charAt( i);
             if (c=='|' || c=='%' || !isTokenChar( c)) {
                 String hex = Integer.toHexString( c);
-                if (hex.length() == 1)
-                    hex = "0" + hex;
+                if (hex.length() == 1) {
+	                hex = "0" + hex;
+                }
                 out.replace( i, i+1, "%" + hex);
             }
         }
@@ -615,13 +660,15 @@ public class CookieTools {
 
     protected static String unescape( String in) {
         StringBuilder out = new StringBuilder( in);
-        for ( int i=out.length()-3; i>=0; i--) try {
-            if (out.charAt( i) == '%') {
-                out.setCharAt( i, (char) Integer.parseInt( out.substring( i+1, i+3), 16));
-                out.delete( i+1, i+3);
-            }
-        } catch (NumberFormatException ex) {
-            // should not happen with strings generated by escape()
+        for ( int i=out.length()-3; i>=0; i--) {
+	        try {
+	            if (out.charAt( i) == '%') {
+	                out.setCharAt( i, (char) Integer.parseInt( out.substring( i+1, i+3), 16));
+	                out.delete( i+1, i+3);
+	            }
+	        } catch (NumberFormatException ex) {
+	            // should not happen with strings generated by escape()
+	        }
         }
         return out.toString();
     }
@@ -630,8 +677,9 @@ public class CookieTools {
      * Test if d is a token character as defined in RFC2616.
      */
     protected final static boolean isTokenChar( char c) {
-        if (c <= 32) // this includes SP and HT characters from separators rule
-            return false;
+        if (c <= 32) {
+	        return false;
+        }
 
         switch (c) {
         case 127: // DEL, from CTL rule

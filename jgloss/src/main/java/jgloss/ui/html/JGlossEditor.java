@@ -92,8 +92,9 @@ public class JGlossEditor extends JTextPane {
             boolean updated = false;
             while (!halt) {
                 try {
-                    if (!updated)
-                        sleep( 1000000000);
+                    if (!updated) {
+	                    sleep( 1000000000);
+                    }
                     
                     while (updated) {
                         try {
@@ -376,10 +377,12 @@ public class JGlossEditor extends JTextPane {
 			public void actionPerformed( ActionEvent e) {
                 try {
                     int where = find( lastFindText, lastFindPosition + 1);
-                    if (where != -1)
-                        lastFindPosition = where;
-                    else
-                        lastFindPosition = 0; // wrap search
+                    if (where != -1) {
+	                    lastFindPosition = where;
+                    }
+					else {
+	                    lastFindPosition = 0; // wrap search
+                    }
                 } catch (BadLocationException ex) {
                     lastFindPosition = 0;
                 }
@@ -409,8 +412,9 @@ public class JGlossEditor extends JTextPane {
      * @param end End offset in the document.
      */
     public void highlightText( int start, int end) {
-        if (highlightTag != null)
-            getHighlighter().removeHighlight( highlightTag);
+        if (highlightTag != null) {
+	        getHighlighter().removeHighlight( highlightTag);
+        }
         
         try {
             highlightTag = getHighlighter().addHighlight( start, end, highlightPainter);
@@ -423,8 +427,9 @@ public class JGlossEditor extends JTextPane {
      * Remove a previously set highlight.
      */
     public void removeHighlight() {
-        if (highlightTag != null)
-            getHighlighter().removeHighlight( highlightTag);
+        if (highlightTag != null) {
+	        getHighlighter().removeHighlight( highlightTag);
+        }
         highlightTag = null;
     }
     
@@ -439,8 +444,9 @@ public class JGlossEditor extends JTextPane {
     public void followMouse( boolean tooltips) {
         this.tooltips = tooltips;
         
-        if (!tooltips)
-            hideToolTip();
+        if (!tooltips) {
+	        hideToolTip();
+        }
     }
     
     /**
@@ -484,15 +490,17 @@ public class JGlossEditor extends JTextPane {
             if (where.x+windowsize.width > screensize.width) {
                 // move window left of mouse pointer
                 where.x -= 30 + windowsize.width;
-                if (where.x < 0)
-                    where.x = 0;
+                if (where.x < 0) {
+	                where.x = 0;
+                }
             }
             
             if (where.y+windowsize.height > screensize.height) {
                 // move window above mouse pointer
                 where.y -= 30 + windowsize.height;
-                if (where.y < 0)
-                    where.y = 0;
+                if (where.y < 0) {
+	                where.y = 0;
+                }
             }
             
             tooltipWindow.setSize( windowsize);
@@ -505,8 +513,9 @@ public class JGlossEditor extends JTextPane {
      * Hides the tooltip window. Does nothing if it is already hidden.
      */
     private void hideToolTip() {
-        if (tooltipWindow != null)
-            tooltipWindow.setVisible(false);
+        if (tooltipWindow != null) {
+	        tooltipWindow.setVisible(false);
+        }
     }
     
     /**

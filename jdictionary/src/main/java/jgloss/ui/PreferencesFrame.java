@@ -95,10 +95,12 @@ public class PreferencesFrame {
      */
     public static PreferencesFrame getFrame() {
         synchronized (PreferencesFrame.class) {
-            if (prefs == null) try {
-                // wait until frame is created
-                PreferencesFrame.class.wait();
-            } catch (InterruptedException ex) {}
+            if (prefs == null) {
+	            try {
+	                // wait until frame is created
+	                PreferencesFrame.class.wait();
+	            } catch (InterruptedException ex) {}
+            }
             return prefs;
         }
     }
@@ -194,23 +196,26 @@ public class PreferencesFrame {
      * Saves the current settings to the application <CODE>Preferences</CODE> instance.
      */
     public void savePreferences() {
-        for ( int i=0; i<panels.length; i++)
-            panels[i].savePreferences();
+        for ( int i=0; i<panels.length; i++) {
+	        panels[i].savePreferences();
+        }
     }
 
     /**
      * Loads the settings to the application <CODE>Preferences</CODE> instance.
      */
     public void loadPreferences() {
-        for ( int i=0; i<panels.length; i++)
-            panels[i].loadPreferences();
+        for ( int i=0; i<panels.length; i++) {
+	        panels[i].loadPreferences();
+        }
     }
 
     /**
      * Applies the settings from the <CODE>Preferences</CODE> to the application.
      */
     public void applyPreferences() {
-        for ( int i=0; i<panels.length; i++)
-            panels[i].applyPreferences();
+        for ( int i=0; i<panels.length; i++) {
+	        panels[i].applyPreferences();
+        }
     }
 } // class PreferencesFrame

@@ -58,8 +58,9 @@ public class ExtensionFileFilter extends FileFilter {
     public ExtensionFileFilter( String extension, String description,
                                 boolean acceptDirectories, boolean ignoreCase) {
         this.extension = "." + extension;
-        if (ignoreCase)
-            this.extension = this.extension.toLowerCase();
+        if (ignoreCase) {
+	        this.extension = this.extension.toLowerCase();
+        }
         this.description = description;
         this.acceptDirectories = acceptDirectories;
         this.ignoreCase = ignoreCase;
@@ -68,8 +69,9 @@ public class ExtensionFileFilter extends FileFilter {
     @Override
 	public boolean accept( File f) {
         String name = f.getName();
-        if (ignoreCase)
-            name = name.toLowerCase();
+        if (ignoreCase) {
+	        name = name.toLowerCase();
+        }
         return acceptDirectories && f.isDirectory() ||
             name.endsWith( extension);
     }
@@ -96,8 +98,9 @@ public class ExtensionFileFilter extends FileFilter {
      * already has an extension, it is returned unchanged.
      */
     public File addExtension( File f) {
-        if (f.getName().indexOf( '.') == -1)
-            f = new File( f.getPath() + extension);
+        if (f.getName().indexOf( '.') == -1) {
+	        f = new File( f.getPath() + extension);
+        }
 
         return f;
     }

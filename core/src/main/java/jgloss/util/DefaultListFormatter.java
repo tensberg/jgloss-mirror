@@ -81,10 +81,11 @@ public class DefaultListFormatter implements ListFormatter {
 
     private String[] parse( String in) {
         int i = in.indexOf( ITEMNO_MARKER);
-        if (i == -1)
-            return new String[] { in };
-        else
-            return new String[] { in.substring( 0, i), in.substring( i+1) };
+        if (i == -1) {
+	        return new String[] { in };
+        } else {
+	        return new String[] { in.substring( 0, i), in.substring( i+1) };
+        }
     }
 
     @Override
@@ -100,9 +101,10 @@ public class DefaultListFormatter implements ListFormatter {
         appendText( length==1 ? singleListBefore : 
                     (itemNo==0 ? multiListBefore : multiListBetween), itemNo);
         doAppendItem( item);
-        if (itemNo == length-1)
-            appendText( length==1 ? singleListAfter :
+        if (itemNo == length-1) {
+	        appendText( length==1 ? singleListAfter :
                         multiListAfter, itemNo);
+        }
         itemNo++;
 
         return this;
@@ -114,9 +116,9 @@ public class DefaultListFormatter implements ListFormatter {
         }
         else if (item instanceof StringBuilder) {
             buffer.append( (StringBuilder) item);
+        } else {
+	        buffer.append( String.valueOf( item));
         }
-        else
-            buffer.append( String.valueOf( item));
     }
 
     private void appendText( String[] text, int itemNo) {
@@ -129,8 +131,9 @@ public class DefaultListFormatter implements ListFormatter {
 
     @Override
 	public StringBuilder endList() {
-        if (length == 0)
-            buffer.append( emptyList);
+        if (length == 0) {
+	        buffer.append( emptyList);
+        }
 
         return buffer;
     }

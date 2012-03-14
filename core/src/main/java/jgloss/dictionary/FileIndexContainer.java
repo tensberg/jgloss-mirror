@@ -92,9 +92,9 @@ public class FileIndexContainer implements IndexContainer {
                                       getDataLength());
                 data.order( indexByteOrder);
                 return data;
+            } else {
+	            return data.duplicate();
             }
-            else
-                return data.duplicate();
         }
 
         @Override
@@ -143,9 +143,9 @@ public class FileIndexContainer implements IndexContainer {
 
         indexFile = new RandomAccessFile( _indexfile, editMode ? "rw" : "r");
 
-        if (editMode && !indexExists)
-            createIndexFile();
-        else {
+        if (editMode && !indexExists) {
+	        createIndexFile();
+        } else {
             readHeader();
             readIndexMetaData();
         }
@@ -159,12 +159,14 @@ public class FileIndexContainer implements IndexContainer {
     @Override
 	public ByteBuffer getIndexData( int indexType) throws IndexException,
                                                           IllegalStateException {
-        if (editMode)
-            throw new IllegalStateException();
+        if (editMode) {
+	        throw new IllegalStateException();
+        }
 
         IndexMetaData index = getIndexMetaData( indexType);
-        if (index == null)
-            throw new IndexException( "No index data of type " + indexType + " available");
+        if (index == null) {
+	        throw new IndexException( "No index data of type " + indexType + " available");
+        }
 
         try {
             return index.getIndexData( indexFile.getChannel());
@@ -181,11 +183,13 @@ public class FileIndexContainer implements IndexContainer {
     @Override
 	public void createIndex( int indexType, ByteBuffer data) throws IndexException,
                                                                     IllegalStateException {
-        if (!editMode)
-            throw new IllegalStateException();
+        if (!editMode) {
+	        throw new IllegalStateException();
+        }
 
-        if (hasIndex( indexType))
-            throw new IndexException( "Index data of type " + indexType + " already exists");
+        if (hasIndex( indexType)) {
+	        throw new IndexException( "Index data of type " + indexType + " already exists");
+        }
 
         // append the index data to the end of the index file
         try {
@@ -210,12 +214,14 @@ public class FileIndexContainer implements IndexContainer {
 
     @Override
 	public void deleteIndex( int indexType) throws IndexException, IllegalStateException {
-        if (!editMode)
-            throw new IllegalStateException();
+        if (!editMode) {
+	        throw new IllegalStateException();
+        }
 
         IndexMetaData index = getIndexMetaData( indexType);
-        if (index == null)
-            throw new IndexException( "No index data of type " + indexType + " available");
+        if (index == null) {
+	        throw new IndexException( "No index data of type " + indexType + " available");
+        }
 
         FileChannel indexChannel = indexFile.getChannel();
         // move all index data in the index file after the index data backwards, overwriting the data
@@ -236,8 +242,9 @@ public class FileIndexContainer implements IndexContainer {
 
     @Override
 	public void endEditing() throws IndexException, IllegalStateException {
-        if (!editMode)
-            throw new IllegalStateException();
+        if (!editMode) {
+	        throw new IllegalStateException();
+        }
 
         editMode = false;
     }
@@ -271,12 +278,14 @@ public class FileIndexContainer implements IndexContainer {
     protected void readHeader() throws IOException, IndexException {
         try {
             int data = indexFile.readInt();
-            if (data != MAGIC)
-                throw new IndexException( "Index file does not start with magic number");
+            if (data != MAGIC) {
+	            throw new IndexException( "Index file does not start with magic number");
+            }
             data = indexFile.readInt();
-            if (data != VERSION)
-                // later releases might replace this with a more sophisticated compatibility test
+            if (data != VERSION) {
+	            // later releases might replace this with a more sophisticated compatibility test
                 throw new IndexException( "Index version " + data + " not supported");
+            }
             indexFile.readInt(); // offset, must not generate an EOF exception
 
             // read byte order
@@ -309,8 +318,9 @@ public class FileIndexContainer implements IndexContainer {
 
     protected IndexMetaData getIndexMetaData( int indexType) {
         for (IndexMetaData data : indexes) {
-            if (data.getType() == indexType)
-                return data;
+            if (data.getType() == indexType) {
+	            return data;
+            }
         }
 
         return null;

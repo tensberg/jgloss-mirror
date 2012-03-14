@@ -128,8 +128,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
             // Get the real annotation tag. Unfortunately the creation of the HTML.UnknownTags
             // cannot be prevented, so we have to work around it.
             htmlTag = super.getHTMLTag();
-            if (htmlTag instanceof HTML.UnknownTag)
-                htmlTag = AnnotationTags.getAnnotationTagEqualTo( htmlTag);
+            if (htmlTag instanceof HTML.UnknownTag) {
+	            htmlTag = AnnotationTags.getAnnotationTagEqualTo( htmlTag);
+            }
         }
 
         @Override
@@ -269,26 +270,27 @@ public class JGlossEditorKit extends HTMLEditorKit {
 		public View create( Element elem) {
             Object name = elem.getAttributes().getAttribute( StyleConstants.NameAttribute);
             AttributeSet a = elem.getAttributes();
-            if (name.equals( AnnotationTags.ANNOTATION))
-                return new AnnotationView( elem);
-            else if (name.equals( AnnotationTags.WORD))
-                return new WordView( elem);
-            else if (name.equals( AnnotationTags.READING_BASETEXT))
-                return new ReadingBaseView( elem);
-            else if (a.isDefined( AnnotationTags.BASETEXT) ||
+            if (name.equals( AnnotationTags.ANNOTATION)) {
+	            return new AnnotationView( elem);
+            } else if (name.equals( AnnotationTags.WORD)) {
+	            return new WordView( elem);
+            } else if (name.equals( AnnotationTags.READING_BASETEXT)) {
+	            return new ReadingBaseView( elem);
+            } else if (a.isDefined( AnnotationTags.BASETEXT) ||
                      a.isDefined( AnnotationTags.BASETEXT.getId())) {
                 // If this is an annotated base, the parent is a READING_BASETEXT, otherwise it is
                 // a WORD. The two views must be aligned differently.
                 if (elem.getParentElement().getAttributes().getAttribute( StyleConstants.NameAttribute)
-                    .equals( AnnotationTags.WORD))
-                    return new BaseView( elem, VAdjustedView.ANNOTATED_TEXT_ALIGNMENT);
-                else
-                    return new BaseView( elem);
+                    .equals( AnnotationTags.WORD)) {
+	                return new BaseView( elem, VAdjustedView.ANNOTATED_TEXT_ALIGNMENT);
+                } else {
+	                return new BaseView( elem);
+                }
             }
             else if (a.isDefined( AnnotationTags.TRANSLATION) || 
-                     a.isDefined( AnnotationTags.TRANSLATION.getId()))
-                return new ReadingTranslationView( elem, AnnotationTags.TRANSLATION);
-            else if (a.isDefined( AnnotationTags.READING) || 
+                     a.isDefined( AnnotationTags.TRANSLATION.getId())) {
+	            return new ReadingTranslationView( elem, AnnotationTags.TRANSLATION);
+            } else if (a.isDefined( AnnotationTags.READING) || 
                      a.isDefined( AnnotationTags.READING.getId())) {
                 return new ReadingTranslationView( elem, AnnotationTags.READING);
             }
@@ -298,9 +300,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
                     // The inline views do not have the text aligned to work properly with the
                     // annotation view. Replace it with a vertically adjusted view.
                     return new VAdjustedView( elem, VAdjustedView.BASE_TEXT_ALIGNMENT);
+                } else {
+	                return v;
                 }
-                else
-                    return v;
             }
         }
     }
@@ -355,8 +357,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
             if (parent != null) {
                 // Save logical view parent. Since the class FlowView.LogicalView is package-private,
                 // the test has to be done via class name check.
-                if (parent.getClass().getName().equals( "javax.swing.text.FlowView$LogicalView"))
-                    logicalViewParent = parent;
+                if (parent.getClass().getName().equals( "javax.swing.text.FlowView$LogicalView")) {
+	                logicalViewParent = parent;
+                }
             }
 
             super.setParent( parent);
@@ -368,11 +371,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         @Override
 		public float getMinimumSpan( int axis) {
-            if (axis==View.X_AXIS && compactView)
-                // view 0 is the view for the WORD element
+            if (axis==View.X_AXIS && compactView) {
+	            // view 0 is the view for the WORD element
                 return getView( 0).getMinimumSpan( axis);
-            else
-                return super.getMinimumSpan( axis);
+            } else {
+	            return super.getMinimumSpan( axis);
+            }
         }
 
         /**
@@ -381,11 +385,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         @Override
 		public float getPreferredSpan( int axis) {
-            if (axis==View.X_AXIS && compactView)
-                // view 0 is the view for the WORD element
+            if (axis==View.X_AXIS && compactView) {
+	            // view 0 is the view for the WORD element
                 return getView( 0).getPreferredSpan( axis);
-            else
-                return super.getPreferredSpan( axis);
+            } else {
+	            return super.getPreferredSpan( axis);
+            }
         }
 
         /**
@@ -442,11 +447,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         @Override
 		public float getMinimumSpan( int axis) {
-            if (axis==View.X_AXIS && getView( 1)!=null)
-                // view 1 is the view for the BASETEXT element
+            if (axis==View.X_AXIS && getView( 1)!=null) {
+	            // view 1 is the view for the BASETEXT element
                 return getView( 1).getMinimumSpan( axis);
-            else
-                return super.getMinimumSpan( axis);
+            } else {
+	            return super.getMinimumSpan( axis);
+            }
         }
 
         /**
@@ -455,11 +461,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         @Override
 		public float getPreferredSpan( int axis) {
-            if (axis==View.X_AXIS && getView( 1)!=null)
-                // view 1 is the view for the BASETEXT element
+            if (axis==View.X_AXIS && getView( 1)!=null) {
+	            // view 1 is the view for the BASETEXT element
                 return getView( 1).getPreferredSpan( axis);
-            else
-                return super.getPreferredSpan( axis);
+            } else {
+	            return super.getPreferredSpan( axis);
+            }
         }
 
         /**
@@ -486,8 +493,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
         @Override
 		public float getAlignment( int axis) {
             if (axis == View.Y_AXIS) {
-                if (!showReading)
-                    return VAdjustedView.BASE_TEXT_ALIGNMENT;
+                if (!showReading) {
+	                return VAdjustedView.BASE_TEXT_ALIGNMENT;
+                }
             }
             
             return super.getAlignment( axis);
@@ -508,10 +516,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         @Override
 		public float getAlignment( int axis) {
-            if (axis == View.X_AXIS)
-                return 0.5f;
-            else
-                return super.getAlignment( axis);
+            if (axis == View.X_AXIS) {
+	            return 0.5f;
+            } else {
+	            return super.getAlignment( axis);
+            }
         }
 
         @Override
@@ -520,15 +529,16 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 float span = 0;
                 for ( int i=0; i<getViewCount(); i++) {
                     View v = getView( i);
-                    if (!compactView && v instanceof ReadingBaseView)
-                        span += ((ReadingBaseView) v).getRealXSpan();
-                    else
-                        span += v.getMinimumSpan( axis);
+                    if (!compactView && v instanceof ReadingBaseView) {
+	                    span += ((ReadingBaseView) v).getRealXSpan();
+                    } else {
+	                    span += v.getMinimumSpan( axis);
+                    }
                 }
                 return span;
+            } else {
+	            return super.getPreferredSpan( axis);
             }
-            else
-                return super.getPreferredSpan( axis);
         }
 
         /**
@@ -544,15 +554,16 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 float span = 0;
                 for ( int i=0; i<getViewCount(); i++) {
                     View v = getView( i);
-                    if (!compactView && v instanceof ReadingBaseView)
-                        span += ((ReadingBaseView) v).getRealXSpan();
-                    else
-                        span += v.getPreferredSpan( axis);
+                    if (!compactView && v instanceof ReadingBaseView) {
+	                    span += ((ReadingBaseView) v).getRealXSpan();
+                    } else {
+	                    span += v.getPreferredSpan( axis);
+                    }
                 }
                 return span;
+            } else {
+	            return super.getPreferredSpan( axis);
             }
-            else
-                return super.getPreferredSpan( axis);
         }
     } // class WordView
 
@@ -610,10 +621,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         @Override
 		public void paint( Graphics g, Shape allocation) {
-            if (isHidden())
-                return;
-            if (getParent() == null)
-                return;
+            if (isHidden()) {
+	            return;
+            }
+            if (getParent() == null) {
+	            return;
+            }
 
             if (allocation instanceof Rectangle) {
                 Rectangle a = (Rectangle) allocation;
@@ -641,8 +654,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         public boolean isHidden() {
             if ((type==AnnotationTags.READING)&&!showReading ||
-                (type==AnnotationTags.TRANSLATION)&&!showTranslation)
-                return true;
+                (type==AnnotationTags.TRANSLATION)&&!showTranslation) {
+	            return true;
+            }
             
             /*View parent = getParent();
             if (parent instanceof AnnotationView)
@@ -661,21 +675,23 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         @Override
 		public Segment getText( int p0, int p1) {
-            if (p1-p0 <= MAX_TRANSLATION_LENGTH)
-                return super.getText( p0, p1);
-            else try {
-                getDocument().getText( p0, MAX_TRANSLATION_LENGTH-3, segment);
-                // segment.count should not be larger than MAX_TRANSLATION_LENGTH
-                System.arraycopy( segment.array, segment.offset, segmentBuffer, 0, segment.count);
-                segmentBuffer[segment.count] = '.';
-                segmentBuffer[segment.count+1] = '.';
-                segmentBuffer[segment.count+2] = '.';
-                segment.array = segmentBuffer;
-                segment.offset = 0;
-                segment.count += 3;
-                return segment;
-            } catch (BadLocationException ex) {
-                return super.getText( p0, p1);
+            if (p1-p0 <= MAX_TRANSLATION_LENGTH) {
+	            return super.getText( p0, p1);
+            } else {
+	            try {
+	                getDocument().getText( p0, MAX_TRANSLATION_LENGTH-3, segment);
+	                // segment.count should not be larger than MAX_TRANSLATION_LENGTH
+	                System.arraycopy( segment.array, segment.offset, segmentBuffer, 0, segment.count);
+	                segmentBuffer[segment.count] = '.';
+	                segmentBuffer[segment.count+1] = '.';
+	                segmentBuffer[segment.count+2] = '.';
+	                segment.array = segmentBuffer;
+	                segment.offset = 0;
+	                segment.count += 3;
+	                return segment;
+	            } catch (BadLocationException ex) {
+	                return super.getText( p0, p1);
+	            }
             }
         }
     } // class ReadingTranslationView
@@ -711,10 +727,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
          */
         @Override
 		public float getAlignment( int axis) {
-            if (axis!=View.Y_AXIS || alignment == DEFAULT_ALIGNMENT)
-                return super.getAlignment( axis);
-            else
-                return alignment;
+            if (axis!=View.Y_AXIS || alignment == DEFAULT_ALIGNMENT) {
+	            return super.getAlignment( axis);
+            } else {
+	            return alignment;
+            }
         }
         
         /**
@@ -736,13 +753,14 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 checkPainter();
                 int p0 = getStartOffset();
                 int p1 = getGlyphPainter().getBoundedPosition( this, p0, pos, len);
-                if (p1 == p0)
-                    return View.BadBreakWeight;
-                else
-                    return View.GoodBreakWeight;
+                if (p1 == p0) {
+	                return View.BadBreakWeight;
+                } else {
+	                return View.GoodBreakWeight;
+                }
+            } else {
+	            return super.getBreakWeight(axis, pos, len);
             }
-            else
-                return super.getBreakWeight(axis, pos, len);
         }
     } // class VAdjustedView
 
@@ -882,79 +900,82 @@ public class JGlossEditorKit extends HTMLEditorKit {
         // The two alternatives are creating a completely new DTD or hacking the existing one,
         // which I am doing here.
 
-        if (dtd == null) try {
-            // make sure that the default DTD is initialized:
-            new ParserDelegator();
+        if (dtd == null) {
+	        try {
+	            // make sure that the default DTD is initialized:
+	            new ParserDelegator();
 
-            // As of JDK1.3, the name of the default DTD of the ParserDelegator is hardcoded
-            // in the source, and there is no way for other program to inquire it,
-            // so I put it in the preferences to make it easily changeable.
-            dtd = DTD.getDTD( JGloss.prefs.getString( Preferences.DTD_DEFAULT));
+	            // As of JDK1.3, the name of the default DTD of the ParserDelegator is hardcoded
+	            // in the source, and there is no way for other program to inquire it,
+	            // so I put it in the preferences to make it easily changeable.
+	            dtd = DTD.getDTD( JGloss.prefs.getString( Preferences.DTD_DEFAULT));
 
-            // there seems to be a bug in the parser where the REQUIRED content attribute is
-            // not recognized even if is there. This only leads to a call of handleError and
-            // otherwise has no effect, but I remove the REQUIRED modifier anyway
-            AttributeList al = dtd.getElement( "meta").getAttributes();
-            while (al != null) {
-                if (al.getName().equals( "content"))
-                    al.modifier = 0;
-                al = al.getNext();
-            }
-            
-            // add custom elements
-            // #pcdata*
-            ContentModel pcdata = new ContentModel( '*', 
-                                                    new ContentModel( dtd.pcdata),
-                                                    null);
-            javax.swing.text.html.parser.Element reading = 
-                dtd.defineElement( AnnotationTags.READING.getId(),
-                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
-            javax.swing.text.html.parser.Element base = 
-                dtd.defineElement( AnnotationTags.BASETEXT.getId(),
-                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
-            javax.swing.text.html.parser.Element translation = 
-                dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
-                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
-            
-            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE, DTDConstants.CDATA, 0, null, null, al);
-            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE_READING, DTDConstants.CDATA, 0, null, null, al);
+	            // there seems to be a bug in the parser where the REQUIRED content attribute is
+	            // not recognized even if is there. This only leads to a call of handleError and
+	            // otherwise has no effect, but I remove the REQUIRED modifier anyway
+	            AttributeList al = dtd.getElement( "meta").getAttributes();
+	            while (al != null) {
+	                if (al.getName().equals( "content")) {
+	                    al.modifier = 0;
+	                }
+	                al = al.getNext();
+	            }
+	            
+	            // add custom elements
+	            // #pcdata*
+	            ContentModel pcdata = new ContentModel( '*', 
+	                                                    new ContentModel( dtd.pcdata),
+	                                                    null);
+	            javax.swing.text.html.parser.Element reading = 
+	                dtd.defineElement( AnnotationTags.READING.getId(),
+	                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
+	            javax.swing.text.html.parser.Element base = 
+	                dtd.defineElement( AnnotationTags.BASETEXT.getId(),
+	                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
+	            javax.swing.text.html.parser.Element translation = 
+	                dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
+	                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
+	            
+	            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE, DTDConstants.CDATA, 0, null, null, al);
+	            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE_READING, DTDConstants.CDATA, 0, null, null, al);
 
-            // The content model of <anno> should really be (word & translation)*,
-            // but character level attributes created by a <font> or <a href> tag can be embedded
-            // in an annotation element when the document is written by the HTMLWriter,
-            // so we have to use DTD.ANY.
-            dtd.defineElement( AnnotationTags.ANNOTATION.getId(),
-                               DTDConstants.ANY, false, false, null, null, null, al);
-            dtd.defineElement( AnnotationTags.WORD.getId(),
-                               DTDConstants.ANY, false, false, null, null, null, null);
-            dtd.defineElement( AnnotationTags.READING_BASETEXT.getId(),
-                               DTDConstants.ANY, false, false, null, null, null, null);
-            
-            javax.swing.text.html.parser.Element annotation = dtd.getElement
-                ( AnnotationTags.ANNOTATION.getId());
-            javax.swing.text.html.parser.Element word = dtd.getElement
-                ( AnnotationTags.WORD.getId());
-            javax.swing.text.html.parser.Element reading_base = dtd.getElement
-                ( AnnotationTags.READING_BASETEXT.getId());            
+	            // The content model of <anno> should really be (word & translation)*,
+	            // but character level attributes created by a <font> or <a href> tag can be embedded
+	            // in an annotation element when the document is written by the HTMLWriter,
+	            // so we have to use DTD.ANY.
+	            dtd.defineElement( AnnotationTags.ANNOTATION.getId(),
+	                               DTDConstants.ANY, false, false, null, null, null, al);
+	            dtd.defineElement( AnnotationTags.WORD.getId(),
+	                               DTDConstants.ANY, false, false, null, null, null, null);
+	            dtd.defineElement( AnnotationTags.READING_BASETEXT.getId(),
+	                               DTDConstants.ANY, false, false, null, null, null, null);
+	            
+	            javax.swing.text.html.parser.Element annotation = dtd.getElement
+	                ( AnnotationTags.ANNOTATION.getId());
+	            javax.swing.text.html.parser.Element word = dtd.getElement
+	                ( AnnotationTags.WORD.getId());
+	            javax.swing.text.html.parser.Element reading_base = dtd.getElement
+	                ( AnnotationTags.READING_BASETEXT.getId());            
 
-            // (anno | word | reading_base | reading | base | translation | kanji | #pcdata*)
-            ContentModel annotationmodel = new ContentModel( '|', new ContentModel
-                ( 0, annotation, new ContentModel
-                    ( 0, word, new ContentModel
-                        ( 0, reading_base, new ContentModel
-                            ( 0, reading, new ContentModel
-                                ( 0, base, new ContentModel
-                                    ( 0, translation, new ContentModel
-                                      ( '*', new ContentModel( dtd.pcdata), null))))))));
-            // allow an annotation element or any of its subelements anywhere the DTD allows #pcdata
-            for (javax.swing.text.html.parser.Element e : dtd.elements) {
-                if (e!=annotation && e!=word && e!=reading_base && e!=reading && e!=base 
-                    && e!=translation) {
-                    updateContentModel( dtd, e.getContent(), annotationmodel);
-                }
-            }
-        } catch (java.io.IOException ex) {
-            ex.printStackTrace();
+	            // (anno | word | reading_base | reading | base | translation | kanji | #pcdata*)
+	            ContentModel annotationmodel = new ContentModel( '|', new ContentModel
+	                ( 0, annotation, new ContentModel
+	                    ( 0, word, new ContentModel
+	                        ( 0, reading_base, new ContentModel
+	                            ( 0, reading, new ContentModel
+	                                ( 0, base, new ContentModel
+	                                    ( 0, translation, new ContentModel
+	                                      ( '*', new ContentModel( dtd.pcdata), null))))))));
+	            // allow an annotation element or any of its subelements anywhere the DTD allows #pcdata
+	            for (javax.swing.text.html.parser.Element e : dtd.elements) {
+	                if (e!=annotation && e!=word && e!=reading_base && e!=reading && e!=base 
+	                    && e!=translation) {
+	                    updateContentModel( dtd, e.getContent(), annotationmodel);
+	                }
+	            }
+	        } catch (java.io.IOException ex) {
+	            ex.printStackTrace();
+	        }
         }
 
         return dtd;
@@ -972,8 +993,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
      */
     private static boolean updateContentModel( DTD dtd, ContentModel cm, 
                                                ContentModel annotationmodel) {
-        if (cm == null)
-            return false;
+        if (cm == null) {
+	        return false;
+        }
 
         boolean changed = false;
         do {
@@ -982,9 +1004,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 if (cm2.type==0 && cm2.content==dtd.pcdata) {
                     cm.content = annotationmodel;
                     changed = true;
+                } else {
+	                changed |= updateContentModel( dtd, (ContentModel) cm.content, annotationmodel);
                 }
-                else
-                    changed |= updateContentModel( dtd, (ContentModel) cm.content, annotationmodel);
             }
             cm = cm.next;
         } while (cm != null);

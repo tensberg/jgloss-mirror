@@ -38,8 +38,9 @@ public class FirstEntryCache implements LookupResultHandler {
 
     @Override
 	public void dictionaryEntry( DictionaryEntry de) {
-        if (firstEntry == null)
-            firstEntry = de;
+        if (firstEntry == null) {
+	        firstEntry = de;
+        }
     }
 
     @Override

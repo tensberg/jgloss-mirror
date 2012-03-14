@@ -197,11 +197,12 @@ public class JGlossServlet extends HttpServlet {
         // load the dictionaries
         List<Dictionary> diclist = new LinkedList<Dictionary>();
         String d = config.getInitParameter( DICTIONARIES);
-        if (d==null || d.length()==0)
-            throw new ServletException( MessageFormat.format
+        if (d==null || d.length()==0) {
+	        throw new ServletException( MessageFormat.format
                                         ( ResourceBundle.getBundle( MESSAGES)
                                           .getString( "error.nodictionary"),
                                           new Object[] { DICTIONARIES }));
+        }
         for (String dictionaryName : split( d, ' ')) {
             jgloss.dictionary.Dictionary dic = null;
             try {
@@ -234,37 +235,43 @@ public class JGlossServlet extends HttpServlet {
         // read allowed protocols
         allowedProtocols = new HashSet<String>( 5);
         String p = config.getInitParameter( ALLOWED_PROTOCOLS);
-        if (p==null || p.length()==0)
-            throw new ServletException( MessageFormat.format
+        if (p==null || p.length()==0) {
+	        throw new ServletException( MessageFormat.format
                                         ( ResourceBundle.getBundle( MESSAGES)
                                           .getString( "error.noprotocols"),
                                           new Object[] { ALLOWED_PROTOCOLS}));
+        }
         allowedProtocols.addAll( split( p, ','));
         // write log entry
         p = "";
         for (String protocol : allowedProtocols) {
-            if (p.length() > 0)
-                p += ", ";
+            if (p.length() > 0) {
+	            p += ", ";
+            }
             p += protocol;
         }
-        if (p.length() == 0)
-            p = "none";
+        if (p.length() == 0) {
+	        p = "none";
+        }
         getServletContext().log( "allowed protocols: " + p);
 
         // read secure allowed protocols
         secureAllowedProtocols = new HashSet<String>( 5);
         p = config.getInitParameter( SECURE_ALLOWED_PROTOCOLS);
-        if (p != null)
-            secureAllowedProtocols.addAll( split( p, ','));
+        if (p != null) {
+	        secureAllowedProtocols.addAll( split( p, ','));
+        }
         // write log entry
         p = "";
         for (String protocol : secureAllowedProtocols) {
-            if (p.length() > 0)
-                p += ", ";
+            if (p.length() > 0) {
+	            p += ", ";
+            }
             p += protocol;
         }
-        if (p.length() == 0)
-            p = "none";
+        if (p.length() == 0) {
+	        p = "none";
+        }
         getServletContext().log( "secure allowed protocols: " + p);
 
         // Set of all headers which are not forwarded in forwardRequestHeaders or
@@ -317,12 +324,14 @@ public class JGlossServlet extends HttpServlet {
         // write log entry
         p = "";
         for ( int i=0; i<rewrittenContentTypes.length; i++) {
-            if (p.length() > 0)
-                p += ", ";
+            if (p.length() > 0) {
+	            p += ", ";
+            }
             p += rewrittenContentTypes[i];
         }
-        if (p.length() == 0)
-            p = "none";
+        if (p.length() == 0) {
+	        p = "none";
+        }
         getServletContext().log( "rewritten content types: " + p);
 
         p = config.getInitParameter( ENABLE_COOKIE_FORWARDING);
@@ -356,8 +365,9 @@ public class JGlossServlet extends HttpServlet {
 	public void destroy() {
         super.destroy();
 
-        for ( int i=0; i<dictionaries.length; i++)
-            dictionaries[i].dispose();
+        for ( int i=0; i<dictionaries.length; i++) {
+	        dictionaries[i].dispose();
+        }
     }
 
     @Override
@@ -375,8 +385,9 @@ public class JGlossServlet extends HttpServlet {
     protected void doGetPost( HttpServletRequest req, HttpServletResponse resp,
                               boolean post)
         throws ServletException, IOException {
-        if (responseBufferSize > 0)
-            resp.setBufferSize( responseBufferSize);
+        if (responseBufferSize > 0) {
+	        resp.setBufferSize( responseBufferSize);
+        }
 
         String pathinfo = req.getPathInfo();
         if (pathinfo == null) {
@@ -401,10 +412,11 @@ public class JGlossServlet extends HttpServlet {
         }
 
         Set<String> connectionAllowedProtocols;
-        if (req.isSecure())
-            connectionAllowedProtocols = secureAllowedProtocols;
-        else
-            connectionAllowedProtocols = allowedProtocols;
+        if (req.isSecure()) {
+	        connectionAllowedProtocols = secureAllowedProtocols;
+        } else {
+	        connectionAllowedProtocols = allowedProtocols;
+        }
 
         Object[] oa = JGlossURLRewriter.parseEncodedPath( pathinfo);
         // pathinfo includes the leading '/'
@@ -435,12 +447,14 @@ public class JGlossServlet extends HttpServlet {
         // prepend protocol if neccessary
         if (urlstring.indexOf( ':') == -1) {
             if (req.isSecure()) {
-                if (secureAllowedProtocols.contains( "https"))
-                    urlstring = "https://" + urlstring;
+                if (secureAllowedProtocols.contains( "https")) {
+	                urlstring = "https://" + urlstring;
+                }
             }
             else {
-                if (allowedProtocols.contains( "http"))
-                    urlstring = "http://" + urlstring;
+                if (allowedProtocols.contains( "http")) {
+	                urlstring = "http://" + urlstring;
+                }
             }
         }
 
@@ -485,10 +499,11 @@ public class JGlossServlet extends HttpServlet {
         if (forwardFormData) {
             String query = req.getQueryString();
             if (query!=null && query.length()>0) {
-                if (url.getQuery()==null || url.getQuery().length()==0)
-                    url = new URL( url.toExternalForm() + "?" + query);
-                else
-                    url = new URL( url.toExternalForm() + "&" + query);
+                if (url.getQuery()==null || url.getQuery().length()==0) {
+	                url = new URL( url.toExternalForm() + "?" + query);
+                } else {
+	                url = new URL( url.toExternalForm() + "&" + query);
+                }
             }
         }
 
@@ -517,15 +532,17 @@ public class JGlossServlet extends HttpServlet {
 
         String acceptEncoding = buildAcceptEncoding( req.getHeader( "accept-encoding"));
         getServletContext().log( "accept-encoding: " + acceptEncoding);
-        if (acceptEncoding != null)
-            connection.setRequestProperty( "Accept-Encoding", acceptEncoding);
+        if (acceptEncoding != null) {
+	        connection.setRequestProperty( "Accept-Encoding", acceptEncoding);
+        }
 
         forwardRequestHeaders( connection, req);
 
         if (forwardCookies &&
             (enableCookieSecureInsecureForwarding ||
-             !req.isSecure() || url.getProtocol().equals( "https")))
-            CookieTools.addRequestCookies( connection, req.getCookies(), getServletContext());
+             !req.isSecure() || url.getProtocol().equals( "https"))) {
+	        CookieTools.addRequestCookies( connection, req.getCookies(), getServletContext());
+        }
 
         // open the connection to the remote server
         try {
@@ -553,8 +570,9 @@ public class JGlossServlet extends HttpServlet {
             OutputStream os = connection.getOutputStream();
             byte[] buf = new byte[512];
             int len;
-            while ((len=is.read( buf)) != -1)
-                os.write( buf, 0, len);
+            while ((len=is.read( buf)) != -1) {
+	            os.write( buf, 0, len);
+            }
             is.close();
             os.close();
         }
@@ -563,10 +581,11 @@ public class JGlossServlet extends HttpServlet {
         forwardResponseHeaders( connection, req, resp, rewriter);
         if (forwardCookies &&
             (enableCookieSecureInsecureForwarding ||
-             req.isSecure() || !url.getProtocol().equals( "https")))
-            CookieTools.addResponseCookies( connection, resp, req.getServerName(),
+             req.isSecure() || !url.getProtocol().equals( "https"))) {
+	        CookieTools.addResponseCookies( connection, resp, req.getServerName(),
                                             req.getContextPath() + req.getServletPath(),
                                             req.isSecure(), getServletContext());
+        }
 
         if (remoteIsHttp) {
             // forward the response code
@@ -574,8 +593,9 @@ public class JGlossServlet extends HttpServlet {
                 int response = ((HttpURLConnection) connection).getResponseCode();
                 getServletContext().log( "response code " + response);
                 resp.setStatus( response);
-                if (response == 304) // 304 Not Modified: empty response body
-                    return;
+                if (response == 304) {
+	                return;
+                }
             } catch (ClassCastException ex) {
                 // there is no guarantee that connection is really a subclass of HttpURLConnection
                 getServletContext().log( "failed to read response code: " + ex.getMessage());
@@ -588,11 +608,12 @@ public class JGlossServlet extends HttpServlet {
         // check if the response content type is supported
         boolean supported = false;
         if (type != null) {
-            for ( int i=0; i<rewrittenContentTypes.length; i++)
-                if (type.startsWith( rewrittenContentTypes[i])) {
+            for ( int i=0; i<rewrittenContentTypes.length; i++) {
+	            if (type.startsWith( rewrittenContentTypes[i])) {
                     supported = true;
                     break;
                 }
+            }
         }   
         if (supported) {
             // If the content encoding cannot be decoded by the servlet,
@@ -604,22 +625,26 @@ public class JGlossServlet extends HttpServlet {
                 encoding.endsWith( "deflate") || encoding.equals( "identity");
         }
 
-        if (supported)
-            rewrite( connection, req, resp, rewriter);
-        else
-            tunnel( connection, req, resp);
+        if (supported) {
+	        rewrite( connection, req, resp, rewriter);
+        } else {
+	        tunnel( connection, req, resp);
+        }
     }
 
     protected void tunnel( URLConnection connection, HttpServletRequest req, HttpServletResponse resp) 
         throws ServletException, IOException {
         byte[] buf = new byte[1024];
         
-        if (connection.getContentType() != null)
-            resp.setContentType( connection.getContentType());
-        if (connection.getContentLength() > 0)
-            resp.setContentLength( connection.getContentLength());
-        if (connection.getContentEncoding() != null)
-            resp.setHeader( "Content-Encoding", connection.getContentEncoding());
+        if (connection.getContentType() != null) {
+	        resp.setContentType( connection.getContentType());
+        }
+        if (connection.getContentLength() > 0) {
+	        resp.setContentLength( connection.getContentLength());
+        }
+        if (connection.getContentEncoding() != null) {
+	        resp.setHeader( "Content-Encoding", connection.getContentEncoding());
+        }
 
         InputStream in = connection.getInputStream();
         OutputStream out = resp.getOutputStream();
@@ -644,10 +669,11 @@ public class JGlossServlet extends HttpServlet {
         // behavior.
         String encoding = connection.getContentEncoding();
         if (encoding != null) {
-            if (encoding.endsWith( "gzip"))
-                in = new GZIPInputStream( in);
-            else if (encoding.endsWith( "deflate"))
-                in = new InflaterInputStream( in);
+            if (encoding.endsWith( "gzip")) {
+	            in = new GZIPInputStream( in);
+            } else if (encoding.endsWith( "deflate")) {
+	            in = new InflaterInputStream( in);
+            }
         }
         
         InputStreamReader reader = CharacterEncodingDetector.getReader( in, null, 5000);
@@ -667,10 +693,11 @@ public class JGlossServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     protected void forwardRequestHeaders( URLConnection connection, HttpServletRequest req) {
         String via = req.getHeader( "Via");
-        if (via == null)
-            via = "";
-        else
-            via += ", ";
+        if (via == null) {
+	        via = "";
+        } else {
+	        via += ", ";
+        }
         via += req.getProtocol() + " " +
             req.getServerName() + ":" + req.getServerPort();
         connection.setRequestProperty( "Via", via);
@@ -693,14 +720,15 @@ public class JGlossServlet extends HttpServlet {
                     // the '/' is not removed
                     Object[] out = JGlossURLRewriter.parseEncodedPath
                         ( referer.substring( index+req.getServletPath().length()));
-                    if (out != null)
-                        referer = (String) out[2];
+                    if (out != null) {
+	                    referer = (String) out[2];
+                    }
                 }
                 connection.setRequestProperty( "referer", referer);
                 getServletContext().log( "referer: " + referer + " (" + req.getHeader( "referer") + ")");
+            } else {
+	            getServletContext().log( "no referrer");
             }
-            else
-                getServletContext().log( "no referrer");
 
             // According to the documentation, some servet containers don't allow getHeaderNames,
             // which returns null in that case.
@@ -709,8 +737,9 @@ public class JGlossServlet extends HttpServlet {
                 if (!noForwardHeaders.contains( name.toLowerCase())) {
                     StringBuilder value = new StringBuilder();
                     for ( Enumeration<String> values=req.getHeaders( name); values.hasMoreElements(); ) {
-                        if (value.length() > 0)
-                            value.append( ',');
+                        if (value.length() > 0) {
+	                        value.append( ',');
+                        }
                     value.append( values.nextElement());
                     }
                     connection.setRequestProperty( name, value.toString());
@@ -723,10 +752,11 @@ public class JGlossServlet extends HttpServlet {
     protected void forwardResponseHeaders( URLConnection connection, HttpServletRequest req,
                                            HttpServletResponse resp, URLRewriter rewriter) {
         String via = connection.getHeaderField( "Via");
-        if (via == null)
-            via = "";
-        else
-            via += ", ";
+        if (via == null) {
+	        via = "";
+        } else {
+	        via += ", ";
+        }
         via += req.getProtocol() + " " +
             req.getServerName() + ":" + req.getServerPort();
         resp.setHeader( "Via", via);
@@ -738,8 +768,9 @@ public class JGlossServlet extends HttpServlet {
             getServletContext().log( "new refresh header: " + refresh);
             int urlstart = refresh.toLowerCase().indexOf( "URL=");
             int urlend = refresh.indexOf( ';', urlstart);
-            if (urlend == -1)
-                urlend = refresh.length();
+            if (urlend == -1) {
+	            urlend = refresh.length();
+            }
             try {
                 refresh = refresh.substring( 0, urlstart) + rewriter.rewrite
                     ( refresh.substring( urlstart, urlend)) + refresh.substring( urlend);
@@ -796,10 +827,12 @@ public class JGlossServlet extends HttpServlet {
         for ( int i=0; i<s.length(); i++) {
             char c = s.charAt( i);
             if (!inword) {
-                if (c <= 32) // skip whitespace before word start
-                    continue;
-                if (c == separator) // skip empty entries
-                    continue;
+                if (c <= 32) {
+	                continue;
+                }
+                if (c == separator) {
+	                continue;
+                }
                 inword = true;
             }
             else if (c==separator || 
@@ -809,11 +842,13 @@ public class JGlossServlet extends HttpServlet {
                 word.delete( 0, word.length());
             }
 
-            if (inword)
-                word.append( c);
+            if (inword) {
+	            word.append( c);
+            }
         }
-        if (inword)
-            out.add( word.toString().trim());
+        if (inword) {
+	        out.add( word.toString().trim());
+        }
 
         return out;
     }
@@ -824,11 +859,14 @@ public class JGlossServlet extends HttpServlet {
      * is not supported.
      */
     protected String buildAcceptEncoding( String acceptEncoding) {
-        if (!enableCompression)
-            return "identity";
+        if (!enableCompression) {
+	        return "identity";
+        }
 
         if (acceptEncoding == null)
-            return null; // don't set the header
+		 {
+	        return null; // don't set the header
+        }
 
         boolean usegzip;
         boolean usedeflate;
@@ -842,10 +880,12 @@ public class JGlossServlet extends HttpServlet {
         }
 
         StringBuilder out = new StringBuilder( 30);
-        if (usegzip)
-            out.append( "gzip,");
-        if (usedeflate)
-            out.append( "deflate,");
+        if (usegzip) {
+	        out.append( "gzip,");
+        }
+        if (usedeflate) {
+	        out.append( "deflate,");
+        }
         out.append( "identity");
 
         return out.toString();

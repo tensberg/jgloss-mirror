@@ -55,8 +55,9 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
     @Override
 	public String getString( String key, String d) {
         String defaultPref = defaults.getProperty( key);
-        if (defaultPref == null)
-            defaultPref = d;
+        if (defaultPref == null) {
+	        defaultPref = d;
+        }
         return prefs.get( key, defaultPref);
     }
     
@@ -68,10 +69,11 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
      */
     @Override
 	public void set( String key, String value) {
-        if (value != null)
-            prefs.put( key, value);
-        else
-            prefs.remove( key);
+        if (value != null) {
+	        prefs.put( key, value);
+        } else {
+	        prefs.remove( key);
+        }
     }
 
     /**
@@ -145,12 +147,13 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
 	public boolean getBoolean( String key, boolean d) {
         boolean def;
         String value = defaults.getProperty( key);
-        if ("true".equalsIgnoreCase( value))
-            def = true;
-        else if ("false".equalsIgnoreCase( value))
-            def = false;
-        else // unparseable as boolean; use default
-            def = d;
+        if ("true".equalsIgnoreCase( value)) {
+	        def = true;
+        } else if ("false".equalsIgnoreCase( value)) {
+	        def = false;
+        } else {
+	        def = d;
+        }
         return prefs.getBoolean( key, def);
     }
 

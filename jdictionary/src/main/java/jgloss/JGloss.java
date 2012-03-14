@@ -213,8 +213,9 @@ public abstract class JGloss {
      * @return Path to the current directory.
      */
     public static String getCurrentDir() {
-        if (currentDir == null)
-            currentDir = System.getProperty( "user.home");
+        if (currentDir == null) {
+	        currentDir = System.getProperty( "user.home");
+        }
 
         return currentDir;
     }
@@ -282,8 +283,9 @@ public abstract class JGloss {
                                             ( "main.format.unrecognized",
                                               new String[] { args[i] }));
                     } catch (Exception ex) {
-                        if (ex instanceof DictionaryFactory.InstantiationException)
-                            ex = (Exception) ex.getCause();
+                        if (ex instanceof DictionaryFactory.InstantiationException) {
+	                        ex = (Exception) ex.getCause();
+                        }
                         System.err.println( messages.getString
                                             ( "main.createindex.exception",
                                               new String[] { args[i],
@@ -344,15 +346,17 @@ public abstract class JGloss {
         for ( int i=0; i<msg.length(); i++) {
             if (msg.charAt( i) == '\n') {
                 rows++;
-                if (maxcols < cols)
-                    maxcols = cols;
+                if (maxcols < cols) {
+	                maxcols = cols;
+                }
                 cols = 0;
+            } else {
+	            cols++;
             }
-            else
-                cols++;
         }
-        if (maxcols < cols)
-            maxcols = cols;
+        if (maxcols < cols) {
+	        maxcols = cols;
+        }
         
         TextArea a = new TextArea
             ( msg, rows, maxcols,
@@ -424,8 +428,9 @@ public abstract class JGloss {
 
     protected void shutdownHook() {
         Dictionary[] dicts = Dictionaries.getDictionaries( true);
-        for ( int i=0; i<dicts.length; i++)
-            dicts[i].dispose();
+        for ( int i=0; i<dicts.length; i++) {
+	        dicts[i].dispose();
+        }
         if (mainLookupModel != null) {
             mainLookupModel.saveToPreferences( prefs, "wordlookup");
         }
@@ -474,16 +479,21 @@ public abstract class JGloss {
 
         // migrate export.encoding, which was used in JGloss 1.0.3 and earlier
         String encoding = prefs.getString( "export.encoding");
-        if (encoding == null) // encoding wasn't set, use old default value
-            encoding = "SHIFT_JIS";
-        if (prefs.getString( Preferences.EXPORT_PLAINTEXT_ENCODING).length() == 0)
-            prefs.set( Preferences.EXPORT_PLAINTEXT_ENCODING, encoding);
-        if (prefs.getString( Preferences.EXPORT_HTML_ENCODING).length() == 0)
-            prefs.set( Preferences.EXPORT_HTML_ENCODING, encoding);
-        if (prefs.getString( Preferences.EXPORT_ANNOTATIONLIST_ENCODING).length() == 0)
-            prefs.set( Preferences.EXPORT_ANNOTATIONLIST_ENCODING, encoding);
-        if (prefs.getString( Preferences.EXPORT_EXCLUSIONS_ENCODING).length() == 0)
-            prefs.set( Preferences.EXPORT_EXCLUSIONS_ENCODING, encoding);
+        if (encoding == null) {
+	        encoding = "SHIFT_JIS";
+        }
+        if (prefs.getString( Preferences.EXPORT_PLAINTEXT_ENCODING).length() == 0) {
+	        prefs.set( Preferences.EXPORT_PLAINTEXT_ENCODING, encoding);
+        }
+        if (prefs.getString( Preferences.EXPORT_HTML_ENCODING).length() == 0) {
+	        prefs.set( Preferences.EXPORT_HTML_ENCODING, encoding);
+        }
+        if (prefs.getString( Preferences.EXPORT_ANNOTATIONLIST_ENCODING).length() == 0) {
+	        prefs.set( Preferences.EXPORT_ANNOTATIONLIST_ENCODING, encoding);
+        }
+        if (prefs.getString( Preferences.EXPORT_EXCLUSIONS_ENCODING).length() == 0) {
+	        prefs.set( Preferences.EXPORT_EXCLUSIONS_ENCODING, encoding);
+        }
 
         return prefs;
     }

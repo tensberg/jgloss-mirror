@@ -119,10 +119,11 @@ public class Conjugation {
          */
         public Node( String edge, Conjugation conjugation, Node[] children) {
             this.edge = edge;
-            if (conjugation != null)
-                this.conjugations = new Conjugation[] { conjugation };
-            else
-                this.conjugations = null;
+            if (conjugation != null) {
+	            this.conjugations = new Conjugation[] { conjugation };
+            } else {
+	            this.conjugations = null;
+            }
             this.children = children;
         }
     }
@@ -176,8 +177,9 @@ public class Conjugation {
      *         appear once.
      */
     public static Conjugation[] findConjugations( String hiragana) {
-        if (root == null)
-            loadConjugations();
+        if (root == null) {
+	        loadConjugations();
+        }
 
         Node n = root;
         Conjugation c[] = null;
@@ -189,8 +191,9 @@ public class Conjugation {
                 if (hiragana.startsWith( n.children[i].edge)) {
                     n = n.children[i];
                     hiragana = hiragana.substring( n.edge.length());
-                    if (n.conjugations != null) // not every node contains a conjugation
-                        c = n.conjugations;
+                    if (n.conjugations != null) {
+	                    c = n.conjugations;
+                    }
                     stop = false;
                     break;
                 }
@@ -224,8 +227,9 @@ public class Conjugation {
      * Creates the tree of conjugations.
      */
     private static synchronized void loadConjugations() {
-        if (root != null) // make sure a different thread has not already called this routine
-            return;
+        if (root != null) {
+	        return;
+        }
 
         try {
             root = new Node( "", null, new Node[0]);
@@ -240,8 +244,9 @@ public class Conjugation {
 
             int mode = 0; // read labels
             while ((line=in.readLine()) != null) {
-                if (line.charAt( 0) == '#') // comment
-                    continue;
+                if (line.charAt( 0) == '#') {
+	                continue;
+                }
                 if (line.charAt( 0) == '$') { // start of conjugation part
                     mode = 1;
                     continue;
@@ -262,13 +267,15 @@ public class Conjugation {
                 }
                 else { // read conjugations
                     int i = line.indexOf( '\t');
-                    if (i == -1) // broken entry
-                        continue;
+                    if (i == -1) {
+	                    continue;
+                    }
                     String c = line.substring( 0, i); // conjugated form
                     line = line.substring( i+1);
                     i = line.indexOf( '\t');
-                    if (i == -1) // broken entry
-                        continue;
+                    if (i == -1) {
+	                    continue;
+                    }
                     String d = line.substring( 0, i); // dictionary form
                     String l = line.substring( i+1); // label
                     //System.out.println( "Conjugation " + c + " " + d + " " + l);
@@ -310,8 +317,9 @@ public class Conjugation {
                     // find longest match between inflected forms of new node and child not
                     // already on path from root
                     while (j<n.edge.length() && j+p<conjugatedForm.length() &&
-                           n.edge.charAt(j)==conjugatedForm.charAt(p+j))
-                        j++;
+                           n.edge.charAt(j)==conjugatedForm.charAt(p+j)) {
+	                    j++;
+                    }
 
                     if (j == n.edge.length()) {
                         if (p+j == conjugatedForm.length()) {
@@ -322,9 +330,9 @@ public class Conjugation {
                                                   n.conjugations.length);
                                 conjugations[conjugations.length-1] = c;
                                 n.conjugations = conjugations;
+                            } else {
+	                            n.conjugations = new Conjugation[] { c };
                             }
-                            else
-                                n.conjugations = new Conjugation[] { c };
                             stop = true;
                         }
                         else {
@@ -380,8 +388,9 @@ public class Conjugation {
             // build a list of conjugation in this node plus all conjugations in ancestor nodes
             // which have a different dictionary form
             List<Conjugation> conjugations = new ArrayList<Conjugation>( c.length + n.conjugations.length);
-            for ( int i=0; i<n.conjugations.length; i++)
-                conjugations.add( n.conjugations[i]);
+            for ( int i=0; i<n.conjugations.length; i++) {
+	            conjugations.add( n.conjugations[i]);
+            }
                 
             for ( int i=0; i<c.length; i++) {
                 boolean add = true;
@@ -393,18 +402,21 @@ public class Conjugation {
                         break;
                     }
                 }
-                if (add)
-                    conjugations.add( c[i]);
+                if (add) {
+	                conjugations.add( c[i]);
+                }
             }
 
             // store new list in this node
-            if (conjugations.size() != n.conjugations.length)
-                n.conjugations = conjugations.toArray( n.conjugations);
+            if (conjugations.size() != n.conjugations.length) {
+	            n.conjugations = conjugations.toArray( n.conjugations);
+            }
             c = n.conjugations; // propagate conjugations of this node
         }
         
-        for ( int i=0; i<n.children.length; i++)
-            propagateConjugations( n.children[i], c);
+        for ( int i=0; i<n.children.length; i++) {
+	        propagateConjugations( n.children[i], c);
+        }
     }
 
     /**
@@ -442,8 +454,9 @@ public class Conjugation {
                 // check if any of the descendants of this node have a dictionary form
                 // different from the ones in this node
                 for ( int j=0; j<n.conjugations.length; j++) {
-                    if (!s.contains( n.conjugations[j].getDictionaryForm()))
-                        System.err.println( "Warning: different dictionary forms");
+                    if (!s.contains( n.conjugations[j].getDictionaryForm())) {
+	                    System.err.println( "Warning: different dictionary forms");
+                    }
                     out.addAll( s);
                 }
             }

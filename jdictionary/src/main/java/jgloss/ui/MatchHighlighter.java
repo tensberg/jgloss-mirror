@@ -39,12 +39,14 @@ public class MatchHighlighter implements Highlighter {
 public void paintHighlight(Graphics g, String entryText, String searchText) {
     
     // Allocate a buffer for the entry text
-    if(text == null || text.length < entryText.length())
-      text = new char[entryText.length()*2];
+    if(text == null || text.length < entryText.length()) {
+	    text = new char[entryText.length()*2];
+    }
 
     // Allocate a buffer for the search text
-    if(match == null || match.length < searchText.length())
-      match = new char[searchText.length()*2];
+    if(match == null || match.length < searchText.length()) {
+	    match = new char[searchText.length()*2];
+    }
 
     entryText.getChars(0, entryText.length(), text, 0);
     searchText.getChars(0, searchText.length(), match, 0);
@@ -62,8 +64,9 @@ public void paintHighlight(Graphics g, String entryText, String searchText) {
     for(int begin = 0, end = begin; begin < max; begin = end) {
                
       // Find the start of a region that matches 
-      while(begin < max && text[begin] != match[begin])
-        begin++;
+      while(begin < max && text[begin] != match[begin]) {
+	    begin++;
+    }
       
       // Paint the text that isn't highlighted
       if(end < begin) {
@@ -76,7 +79,9 @@ public void paintHighlight(Graphics g, String entryText, String searchText) {
       }
 
       // Find the end of that region
-      for(end = begin; end < max && text[end] == match[end]; end++);
+      for(end = begin; end < max && text[end] == match[end]; end++) {
+	    ;
+    }
       
       // Paint the text that is highlighted
       g.setColor(highlight);

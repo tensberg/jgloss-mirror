@@ -42,8 +42,9 @@ public class BinarySearchIndex implements Index {
 		public boolean hasNext() { return currentEntry <= lastEntry; }
         @Override
 		public int next() {
-            if (!hasNext())
-                throw new java.util.NoSuchElementException();
+            if (!hasNext()) {
+	            throw new java.util.NoSuchElementException();
+            }
             return index.get( currentEntry++);
         }
     } // class BinarySearchIterator
@@ -80,8 +81,9 @@ public class BinarySearchIndex implements Index {
 	public Index.Iterator getEntryPositions( Indexable dictionary, ByteBuffer expression,
                                              Object[] parameters) throws IndexException {
         int match = findMatch( dictionary, expression);
-        if (match == -1)
-            return EMPTY_MATCH;
+        if (match == -1) {
+	        return EMPTY_MATCH;
+        }
         
         int firstMatch = findMatch( dictionary, expression, match, true);
         int lastMatch = findMatch( dictionary, expression, match, false);
@@ -105,12 +107,13 @@ public class BinarySearchIndex implements Index {
             curr = (to-from)/2 + from;
 
             int c = dictionary.compare( expression, index.get( curr));
-            if (c > 0)
-                from = curr+1;
-            else if (c < 0)
-                to = curr-1;
-            else
-                match = curr;
+            if (c > 0) {
+	            from = curr+1;
+            } else if (c < 0) {
+	            to = curr-1;
+            } else {
+	            match = curr;
+            }
         } while (from<=to && match==-1);
 
         return match;
@@ -131,8 +134,9 @@ public class BinarySearchIndex implements Index {
         int direction = first ? -1 : 1;
         
         try {
-            while (dictionary.compare( expression, index.get( match+direction)) == 0)
-                match += direction;
+            while (dictionary.compare( expression, index.get( match+direction)) == 0) {
+	            match += direction;
+            }
         } catch (IndexOutOfBoundsException ex) {
             // match is now either 0 or index.size - 1
         }

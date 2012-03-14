@@ -32,8 +32,9 @@ public class KeystrokeForwarder implements KeyListener {
      */
     public void addTarget(JComponent target) {
         KeyStroke[] keys = target.getInputMap().keys();
-        for (int i=0; i<keys.length; i++)
-            registerKeystroke(keys[i], target);
+        for (int i=0; i<keys.length; i++) {
+	        registerKeystroke(keys[i], target);
+        }
     }
 
     /**

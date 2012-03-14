@@ -88,16 +88,18 @@ public class JGlossURLRewriter implements URLRewriter {
      */
     protected String rewrite( String in, String tag, boolean forceServletRelative)
         throws MalformedURLException {
-        if (in.length() == 0)
-            // rewriting an empty URL makes no sense
+        if (in.length() == 0) {
+	        // rewriting an empty URL makes no sense
             return in;
+        }
 
         if (tag != null) {
             tag = tag.toLowerCase();
             
-            if (tag.equals( "base"))
-                // ignore BASE tags
+            if (tag.equals( "base")) {
+	            // ignore BASE tags
                 return in;
+            }
         }
 
         // make URL absolute using document base URL
@@ -109,10 +111,11 @@ public class JGlossURLRewriter implements URLRewriter {
               tag.equals( "area") ||
               tag.equals( "frame") ||
               forwardFormData && tag.equals( "form"))
-             && protocols.contains( target.getProtocol())))
-            return servletBase + escapeURL( target.toExternalForm());
-        else
-            return target.toExternalForm();
+             && protocols.contains( target.getProtocol()))) {
+	        return servletBase + escapeURL( target.toExternalForm());
+        } else {
+	        return target.toExternalForm();
+        }
     }
 
     @Override
@@ -163,9 +166,9 @@ public class JGlossURLRewriter implements URLRewriter {
             boolean escape = true;
             char c = in.charAt( i);
             // test alphanumerical
-            if (c>='a' && c<='z' || c>='A' && c<='Z' || c>='0' && c<='9')
-                escape = false;
-            else {
+            if (c>='a' && c<='z' || c>='A' && c<='Z' || c>='0' && c<='9') {
+	            escape = false;
+            } else {
                 // test unreserved mark
                 switch (c) {
                 case '-':
@@ -182,10 +185,11 @@ public class JGlossURLRewriter implements URLRewriter {
                 }
             }
 
-            if (escape)
-                out.append( "_" + Integer.toHexString( c));
-            else
-                out.append( c);
+            if (escape) {
+	            out.append( "_" + Integer.toHexString( c));
+            } else {
+	            out.append( c);
+            }
         }
 
         return out.toString();

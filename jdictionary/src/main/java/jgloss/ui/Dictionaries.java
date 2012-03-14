@@ -158,8 +158,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      */
     public static Dictionaries getInstance() {
         synchronized (componentLock) {
-            if (box == null)
-                box = new Dictionaries();
+            if (box == null) {
+	            box = new Dictionaries();
+            }
         }
 
         return box;
@@ -187,16 +188,18 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             // By synchronizing on component, guarantee mutual exclusivity with loadPreferences
             // and savePreferences
             synchronized (component) {
-                if (activeDictionaries.size() == 0)
-                    component.loadDictionariesFromPreferences();
+                if (activeDictionaries.size() == 0) {
+	                component.loadDictionariesFromPreferences();
+                }
             }
         }
 
         synchronized (activeDictionaries) {
             Dictionary[] out = new Dictionary[activeDictionaries.size()];
             int index = 0;
-            for ( DictionaryWrapper wrapper : activeDictionaries)
-                out[index++] = wrapper.dictionary;
+            for ( DictionaryWrapper wrapper : activeDictionaries) {
+	            out[index++] = wrapper.dictionary;
+            }
 
             return out;
         }
@@ -251,8 +254,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         public void loadDictionaries( File[] dictionaries) {
             this.dictionaries = dictionaries;
             dictionariesLoaded = false;
-            if (message == null)
-                message = new JLabel( "", SwingConstants.CENTER);
+            if (message == null) {
+	            message = new JLabel( "", SwingConstants.CENTER);
+            }
             currentCursor = getCursor();
 
             Thread worker = new Thread( this);
@@ -309,8 +313,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                         final Dictionary d = DictionaryFactory
                             .createDictionary( descriptor);
                         if (d instanceof IndexedDictionary) {
-                            if (!((IndexedDictionary) d).loadIndex())
-                                ((IndexedDictionary) d).buildIndex();
+                            if (!((IndexedDictionary) d).loadIndex()) {
+	                            ((IndexedDictionary) d).buildIndex();
+                            }
                         }
                         if (d != null) {
                             EventQueue.invokeLater( new Runnable() {
@@ -337,8 +342,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             }               
 
             // show error messages for dictionary load failures
-            for ( Iterator<Object> i=errors.iterator(); i.hasNext(); )
-                showDictionaryError( (Exception) i.next(), (String) i.next());
+            for ( Iterator<Object> i=errors.iterator(); i.hasNext(); ) {
+	            showDictionaryError( (Exception) i.next(), (String) i.next());
+            }
         }
     }
 
@@ -398,12 +404,13 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                     int i = dictionaries.getSelectedIndex();
                     DefaultListModel m = (DefaultListModel) dictionaries.getModel();
                     m.remove( i);
-                    if (i < m.getSize())
-                        dictionaries.setSelectedIndex( i);
-                    else if (m.getSize() > 0)
-                        dictionaries.setSelectedIndex( m.getSize()-1);
-                    else
-                        this.setEnabled( false);
+                    if (i < m.getSize()) {
+	                    dictionaries.setSelectedIndex( i);
+                    } else if (m.getSize() > 0) {
+	                    dictionaries.setSelectedIndex( m.getSize()-1);
+                    } else {
+	                    this.setEnabled( false);
+                    }
                 }
             };
         remove.setEnabled( false);
@@ -418,15 +425,17 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                         remove.setEnabled( false);
                     }
                     else {
-                        if (dictionaries.getSelectedIndex() > 0)
-                            up.setEnabled( true);
-                        else
-                            up.setEnabled( false);
+                        if (dictionaries.getSelectedIndex() > 0) {
+	                        up.setEnabled( true);
+                        } else {
+	                        up.setEnabled( false);
+                        }
                         if (dictionaries.getSelectedIndex() <
-                            dictionaries.getModel().getSize()-1)
-                            down.setEnabled( true);
-                        else
-                            down.setEnabled( false);
+                            dictionaries.getModel().getSize()-1) {
+	                        down.setEnabled( true);
+                        } else {
+	                        down.setEnabled( false);
+                        }
                         //if (((DictionaryWrapper) dictionaries.getSelectedValue()).dictionary !=
                         //    userDictionary)
                             remove.setEnabled( true);
@@ -574,16 +583,18 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             for ( int i=0; i<model.getSize(); i++) {
                 DictionaryWrapper dictionaryWrapper = (DictionaryWrapper) model.getElementAt( i);
 				newDictionaries.add( dictionaryWrapper);
-                if (paths.length() > 0)
-                    paths.append( File.pathSeparatorChar);
+                if (paths.length() > 0) {
+	                paths.append( File.pathSeparatorChar);
+                }
                 paths.append( dictionaryWrapper.descriptor);
             }
         }
         synchronized (activeDictionaries) {
             // dispose any dictionaries which are no longer active
             for (DictionaryWrapper d : activeDictionaries) {
-                if (!newDictionaries.contains( d))
-                    d.dictionary.dispose();
+                if (!newDictionaries.contains( d)) {
+	                d.dictionary.dispose();
+                }
             }
             activeDictionaries.clear();
             activeDictionaries.addAll( newDictionaries);
@@ -668,8 +679,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             synchronized (oldModel) {
                 for ( int i=0; i<oldModel.getSize(); i++) {
                     DictionaryWrapper d = (DictionaryWrapper) oldModel.getElementAt( i);
-                    if (!activeDictionaries.contains( d))
-                        d.dictionary.dispose();
+                    if (!activeDictionaries.contains( d)) {
+	                    d.dictionary.dispose();
+                    }
                 }
             }
             
@@ -683,14 +695,17 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                     dictionaries.setModel( model);
                 }
             };
-        if (!EventQueue.isDispatchThread())
-            EventQueue.invokeLater( worker);
-        else
-            worker.run();
+        if (!EventQueue.isDispatchThread()) {
+	        EventQueue.invokeLater( worker);
+        } else {
+	        worker.run();
+        }
 
         if (!prefsLoaded)
-            fireDictionaryListChanged();
+		 {
+	        fireDictionaryListChanged();
         // otherwise loadDictionariesFromPreferences has already fired the event
+        }
     }
 
     /**

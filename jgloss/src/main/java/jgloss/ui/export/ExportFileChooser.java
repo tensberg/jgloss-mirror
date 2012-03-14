@@ -92,8 +92,9 @@ class ExportFileChooser extends SaveFileChooser {
         }
 
         int result = super.showSaveDialog( parent);
-        if (result == JFileChooser.APPROVE_OPTION)
-            saveToPrefs();
+        if (result == JFileChooser.APPROVE_OPTION) {
+	        saveToPrefs();
+        }
 
         return result;
     }

@@ -113,16 +113,18 @@ class AnnotationGenerator extends DefaultHandler {
                               String qName, Attributes atts)
         throws SAXException {
         parent.startElement( namespaceURI, localName, qName, atts);
-        if (P_ELEMENT.equals( localName) || P_ELEMENT.equals( qName))
-            inP = true;
+        if (P_ELEMENT.equals( localName) || P_ELEMENT.equals( qName)) {
+	        inP = true;
+        }
     }
 
     @Override
 	public void endElement( String namespaceURI, String localName,
                             String qName) throws SAXException {
         parent.endElement( namespaceURI, localName, qName);
-        if (P_ELEMENT.equals( localName) || P_ELEMENT.equals( qName))
-            inP = false;
+        if (P_ELEMENT.equals( localName) || P_ELEMENT.equals( qName)) {
+	        inP = false;
+        }
     }
 
     /**
@@ -158,23 +160,27 @@ class AnnotationGenerator extends DefaultHandler {
             
             TextAnnotation completedAnnotation = taCompleter.complete(annotation);
             // handle text between annotations
-            if (completedAnnotation.getStart() > lastEnd)
-                parent.characters( c, lastEnd, completedAnnotation.getStart() - lastEnd);
+            if (completedAnnotation.getStart() > lastEnd) {
+	            parent.characters( c, lastEnd, completedAnnotation.getStart() - lastEnd);
+            }
             lastEnd = completedAnnotation.getStart() + completedAnnotation.getLength();
             
             String annotatedWord = new String( c, completedAnnotation.getStart(), completedAnnotation.getLength());
 
             // start annotation element
             AttributesImpl annoAtts = new AttributesImpl();
-            if (completedAnnotation.getTranslation() != null)
-                annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TRANSLATION,
+            if (completedAnnotation.getTranslation() != null) {
+	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TRANSLATION,
                                        CDATA, completedAnnotation.getTranslation());
-            if (completedAnnotation.getGrammaticalType() != null)
-                annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TYPE,
+            }
+            if (completedAnnotation.getGrammaticalType() != null) {
+	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TYPE,
                                        CDATA, completedAnnotation.getGrammaticalType());
-            if (!annotatedWord.equals( completedAnnotation.getDictionaryForm()))
-                annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE,
+            }
+            if (!annotatedWord.equals( completedAnnotation.getDictionaryForm())) {
+	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE,
                                        CDATA, completedAnnotation.getDictionaryForm());
+            }
 
             // generate reading elements for kanji substrings
             String[][] parts;
@@ -193,17 +199,19 @@ class AnnotationGenerator extends DefaultHandler {
                 // derive inflected reading from splitWordReading
                 StringBuilder inflectedReading = new StringBuilder( 64);
                 for ( int j=0; j<parts.length; j++) {
-                    if (parts[j].length == 1)
-                        inflectedReading.append( parts[j][0]);
-                    else
-                        inflectedReading.append( parts[j][1]);
+                    if (parts[j].length == 1) {
+	                    inflectedReading.append( parts[j][0]);
+                    } else {
+	                    inflectedReading.append( parts[j][1]);
+                    }
                 }
                 completedAnnotation.setReading( inflectedReading.toString());
             }
 
-            if (!completedAnnotation.getReading().equals( completedAnnotation.getDictionaryFormReading()))
-                annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE_READING,
+            if (!completedAnnotation.getReading().equals( completedAnnotation.getDictionaryFormReading())) {
+	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE_READING,
                                        CDATA, completedAnnotation.getDictionaryFormReading());
+            }
 
             parent.startElement( "", "", JGlossDocument.Elements.ANNOTATION, annoAtts);
             int partPosition = completedAnnotation.getStart(); // position of part substring in c array
@@ -235,8 +243,9 @@ class AnnotationGenerator extends DefaultHandler {
         }
 
         // handle remaining unannotated text
-        if (lastEnd < start+length)
-            parent.characters( c, lastEnd, start+length-lastEnd);
+        if (lastEnd < start+length) {
+	        parent.characters( c, lastEnd, start+length-lastEnd);
+        }
     }
 
     @Override

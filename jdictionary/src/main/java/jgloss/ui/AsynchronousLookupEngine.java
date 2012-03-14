@@ -46,29 +46,34 @@ public class AsynchronousLookupEngine extends LookupEngine {
         @Override
 		public void run() {
             synchronized (THREAD_LOCK) {
-                while (!terminateThread) try {
-                    if (model == null)
-                        THREAD_LOCK.wait();
+                while (!terminateThread) {
+	                try {
+	                    if (model == null) {
+	                        THREAD_LOCK.wait();
+	                    }
 
-                    if (terminateThread)
-                        break;
-                    
-                    synchronized (LOOKUP_LOCK) {
-                        inLookup = true;
-                        // clear lingering interrupted flag
-                        Thread.interrupted();
-                    }
-                    doLookupSuper( model);
-                    synchronized (LOOKUP_LOCK) {
-                        inLookup = false;
-                        model = null;
-                        // clear lingering interrupted flag
-                        Thread.interrupted();
-                    }
+	                    if (terminateThread) {
+	                        break;
+	                    }
+	                    
+	                    synchronized (LOOKUP_LOCK) {
+	                        inLookup = true;
+	                        // clear lingering interrupted flag
+	                        Thread.interrupted();
+	                    }
+	                    doLookupSuper( model);
+	                    synchronized (LOOKUP_LOCK) {
+	                        inLookup = false;
+	                        model = null;
+	                        // clear lingering interrupted flag
+	                        Thread.interrupted();
+	                    }
 
-                    if (runAfterLookup != null)
-                        runAfterLookup.run();
-                } catch (InterruptedException ex) {}
+	                    if (runAfterLookup != null) {
+	                        runAfterLookup.run();
+	                    }
+	                } catch (InterruptedException ex) {}
+                }
             }
         }
 
@@ -93,8 +98,9 @@ public class AsynchronousLookupEngine extends LookupEngine {
             try {
                 SearchThread.this.join( 3000);
             } catch (InterruptedException ex) {}
-            if (SearchThread.this.isAlive())
-                System.err.println( "WARNING: LookupFrame search thread still alive");
+            if (SearchThread.this.isAlive()) {
+	            System.err.println( "WARNING: LookupFrame search thread still alive");
+            }
             model = null;
             runAfterLookup = null;
         }
@@ -136,8 +142,9 @@ public class AsynchronousLookupEngine extends LookupEngine {
     }
     
     public void dispose() {
-        if (searchThread != null)
-            searchThread.dispose();
+        if (searchThread != null) {
+	        searchThread.dispose();
+        }
         searchThread = null;
     }
 

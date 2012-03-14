@@ -45,12 +45,14 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
         int c = NumberTools.byteToUnsignedByte( buffer.get());
         if (c > 127) { // 2/3-Byte Japanese
             boolean threebyte = false;
-            if (c == 0x8f) // JIS X 0212 3-Byte Kanji
-                threebyte = true;
+            if (c == 0x8f) {
+	            threebyte = true;
+            }
             // read second byte
             c = (c<<8) | NumberTools.byteToUnsignedByte( buffer.get());
-            if (threebyte) // read third byte
-                c = (c<<8) | NumberTools.byteToUnsignedByte( buffer.get());
+            if (threebyte) {
+	            c = (c<<8) | NumberTools.byteToUnsignedByte( buffer.get());
+            }
         }
 
         return c;
@@ -71,8 +73,9 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
         }
         else {
             byte b2 = buffer.get( --position);
-            if ((b2&0x80) == 0)
-                throw new CharacterCodingException();
+            if ((b2&0x80) == 0) {
+	            throw new CharacterCodingException();
+            }
 
             character = NumberTools.byteToUnsignedByte( b2)<<8 | 
                 NumberTools.byteToUnsignedByte( b);
@@ -84,32 +87,39 @@ public class EUCJPCharacterHandler implements EncodedCharacterHandler {
 
     @Override
 	public int convertCharacter( int c) {
-        if ((c >= 'A') && (c <= 'Z')) // uppercase -> lowercase conversion
-            c |= 0x20;
-        if ((c&0xff00) == 0xa500) // convert katakana to hiragana
-            c &= 0xfeff; // converts 0xa5 to 0xa4
+        if ((c >= 'A') && (c <= 'Z')) {
+	        c |= 0x20;
+        }
+        if ((c&0xff00) == 0xa500)
+		 {
+	        c &= 0xfeff; // converts 0xa5 to 0xa4
+        }
         return c;
     }
 
     @Override
 	public CharacterClass getCharacterClass( int c, boolean inWord) {
         if (c > 127) { // multibyte character in EUC-JP encoding
-            if (c >= 0xb000) // 2- or 3-byte kanji
-                return CharacterClass.KANJI;
-            if ((c&0xff00) == 0xa500)
-                return CharacterClass.HIRAGANA;
-            else
-                return CharacterClass.KATAKANA;
+            if (c >= 0xb000) {
+	            return CharacterClass.KANJI;
+            }
+            if ((c&0xff00) == 0xa500) {
+	            return CharacterClass.HIRAGANA;
+            } else {
+	            return CharacterClass.KATAKANA;
+            }
         }
         else { // ASCII character
             if (c>='a' && c<='z' ||
                 c>='A' && c<='Z' ||
                 c>='0' && c<='9' ||
                 c=='\\' || // possible start of unicode escape
-                (inWord && c=='-'))
-                return CharacterClass.ROMAN_WORD; // word character
-            else
-                return CharacterClass.OTHER; // not in index word
+                (inWord && c=='-')) {
+	            return CharacterClass.ROMAN_WORD; // word character
+            }
+			else {
+	            return CharacterClass.OTHER; // not in index word
+            }
         }
     }
 

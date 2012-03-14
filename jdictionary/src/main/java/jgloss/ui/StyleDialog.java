@@ -78,8 +78,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
      * @return The StyleDialog component.
      */
     public static StyleDialog getStyleDialog() {
-        if (box == null)
-            box = new StyleDialog();
+        if (box == null) {
+	        box = new StyleDialog();
+        }
         return box;
     }
 
@@ -291,10 +292,11 @@ public class StyleDialog extends Box implements PreferencesPanel {
      */
     @Override
 	public void loadPreferences() {
-        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true))
-            generalFontDefault.setSelected( true);
-        else
-            generalFontCustom.setSelected( true);
+        if (JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true)) {
+	        generalFontDefault.setSelected( true);
+        } else {
+	        generalFontCustom.setSelected( true);
+        }
         generalFont.setEnabled( !JGloss.prefs.getBoolean( Preferences.FONT_GENERAL_USEDEFAULT, true));
 
         insertAndSelect( generalFont, JGloss.prefs.getString( Preferences.FONT_GENERAL));
@@ -310,13 +312,15 @@ public class StyleDialog extends Box implements PreferencesPanel {
     @Override
 	public void savePreferences() {
         String font = (String) generalFont.getSelectedItem();
-        if (font != null)
-            JGloss.prefs.set( Preferences.FONT_GENERAL, font);
+        if (font != null) {
+	        JGloss.prefs.set( Preferences.FONT_GENERAL, font);
+        }
         JGloss.prefs.set( Preferences.FONT_GENERAL_USEDEFAULT, generalFontDefault.isSelected());
 
         font = (String) wordLookupFont.getSelectedItem();
-        if (font != null)
-            JGloss.prefs.set( Preferences.FONT_WORDLOOKUP, font);
+        if (font != null) {
+	        JGloss.prefs.set( Preferences.FONT_WORDLOOKUP, font);
+        }
 
         String size = (String) wordLookupFontSize.getSelectedItem();
         try {
@@ -388,8 +392,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
         if (canDisplayJapanese) {
             for ( int i=0; i<fonts.length; i++) {
                 canDisplayJapanese = canDisplayJapanese( (String) fonts[i].getSelectedItem());
-                if (!canDisplayJapanese)
-                    break;
+                if (!canDisplayJapanese) {
+	                break;
+                }
             }
         }
         
@@ -413,9 +418,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
         // the selected font may be of lower quality of one of the well-known fonts,
         // so do this step after the previous
         japaneseFont = null;
-        if (canDisplayJapanese( (String) generalFont.getSelectedItem()))
-            japaneseFont = (String) generalFont.getSelectedItem();
-        else {
+        if (canDisplayJapanese( (String) generalFont.getSelectedItem())) {
+	        japaneseFont = (String) generalFont.getSelectedItem();
+        } else {
             for ( int i=0; i<fonts.length; i++) {
                 if (canDisplayJapanese( (String) fonts[i].getSelectedItem())) {
                     japaneseFont = (String) wordLookupFont.getSelectedItem();
@@ -486,8 +491,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
      */
     protected void insertAndSelect( JComboBox box, Object object) {
         DefaultComboBoxModel model = (DefaultComboBoxModel) box.getModel();
-        if (model.getIndexOf( object) == -1)
-            model.insertElementAt( object, 0);
+        if (model.getIndexOf( object) == -1) {
+	        model.insertElementAt( object, 0);
+        }
         box.setSelectedItem( object);
     }
 
@@ -500,24 +506,30 @@ public class StyleDialog extends Box implements PreferencesPanel {
      */
     public static void autodetectFonts() {
         String defaultFont = getKnownJapaneseFont();
-        if (defaultFont == null)
-            // no font available, leave settings as is
+        if (defaultFont == null) {
+	        // no font available, leave settings as is
             return;
+        }
 
         // test general font
         if (!canDisplayJapanese( "Dialog") || !canDisplayJapanese( "DialogInput")) {
             JGloss.prefs.set( Preferences.FONT_GENERAL_USEDEFAULT, false);
         }
-        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_GENERAL)))
-            JGloss.prefs.set( Preferences.FONT_GENERAL, defaultFont);
-        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP)))
-            JGloss.prefs.set( Preferences.FONT_WORDLOOKUP, defaultFont);
-        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_TEXT)))
-            JGloss.prefs.set( Preferences.FONT_TEXT, defaultFont);
-        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_READING)))
-            JGloss.prefs.set( Preferences.FONT_READING, defaultFont);
-        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_TRANSLATION)))
-            JGloss.prefs.set( Preferences.FONT_TRANSLATION, defaultFont);
+        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_GENERAL))) {
+	        JGloss.prefs.set( Preferences.FONT_GENERAL, defaultFont);
+        }
+        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP))) {
+	        JGloss.prefs.set( Preferences.FONT_WORDLOOKUP, defaultFont);
+        }
+        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_TEXT))) {
+	        JGloss.prefs.set( Preferences.FONT_TEXT, defaultFont);
+        }
+        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_READING))) {
+	        JGloss.prefs.set( Preferences.FONT_READING, defaultFont);
+        }
+        if (!canDisplayJapanese( JGloss.prefs.getString( Preferences.FONT_TRANSLATION))) {
+	        JGloss.prefs.set( Preferences.FONT_TRANSLATION, defaultFont);
+        }
     }
 
     /**
@@ -526,8 +538,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
      * none of the fonts is available, <CODE>null</CODE> is returned.
      */
     public static String getKnownJapaneseFont() {
-        if (knownJapaneseFont != null)
-            return knownJapaneseFont;
+        if (knownJapaneseFont != null) {
+	        return knownJapaneseFont;
+        }
 
         String[] fonts = JGloss.prefs.getList( Preferences.FONT_DEFAULTFONTS, ',');
         for ( int i=0; i<fonts.length; i++) {
@@ -570,8 +583,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
 
         String font = null;
         for ( i[0]=0; i[0]<allFonts.length; i[0]++) {
-            if (monitor.isCanceled())
-                break;
+            if (monitor.isCanceled()) {
+	            break;
+            }
             currentFont[0] = allFonts[i[0]];
             int length = currentFont[0].canDisplayUpTo( JAPANESE_CHARS_TEST);
 

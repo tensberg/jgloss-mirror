@@ -33,25 +33,29 @@ public class AnnotationListSynchronizer implements DocumentListener {
         while (el!=null && el.getStartOffset() <= e.getOffset() &&
                el.getEndOffset() >= e.getOffset()+e.getLength()) {
             DocumentEvent.ElementChange change = e.getChange( el);
-            if (change != null)
-                handleInsert( change.getChildrenAdded());
+            if (change != null) {
+	            handleInsert( change.getChildrenAdded());
+            }
 
             el = el.getElement( el.getElementIndex( e.getOffset()));
         }
     }
 
     private void handleInsert( Element[] children) {
-        for ( int i=0; i<children.length; i++)
-            handleInsert( children[i]);
+        for ( int i=0; i<children.length; i++) {
+	        handleInsert( children[i]);
+        }
     }
 
     private void handleInsert( Element e) {
         if (e.getAttributes().getAttribute( StyleConstants.NameAttribute)
-            .equals( AnnotationTags.ANNOTATION))
-            annotationModel.addAnnotationFor( e);
-        else
-            for ( int i=0; i<e.getElementCount(); i++)
-                handleInsert( e.getElement( i));
+            .equals( AnnotationTags.ANNOTATION)) {
+	        annotationModel.addAnnotationFor( e);
+        } else {
+	        for ( int i=0; i<e.getElementCount(); i++) {
+	            handleInsert( e.getElement( i));
+            }
+        }
     }
 
     @Override
@@ -61,24 +65,28 @@ public class AnnotationListSynchronizer implements DocumentListener {
         Element el = e.getDocument().getDefaultRootElement();
         while (el != null) {
             DocumentEvent.ElementChange change = e.getChange( el);
-            if (change != null)
-                handleRemove( change.getChildrenRemoved());
+            if (change != null) {
+	            handleRemove( change.getChildrenRemoved());
+            }
             el = el.getElement( el.getElementIndex( e.getOffset()));
         }
     }
 
     private void handleRemove( Element[] children) {
-        for ( int i=0; i<children.length; i++)
-            handleRemove( children[i]);
+        for ( int i=0; i<children.length; i++) {
+	        handleRemove( children[i]);
+        }
     }
 
     private void handleRemove( Element e) {
         if (e.getAttributes().getAttribute( StyleConstants.NameAttribute)
-            .equals( AnnotationTags.ANNOTATION))
-            annotationModel.removeAnnotationFor( e);
-        else
-            for ( int i=0; i<e.getElementCount(); i++)
-                handleRemove( e.getElement( i));
+            .equals( AnnotationTags.ANNOTATION)) {
+	        annotationModel.removeAnnotationFor( e);
+        } else {
+	        for ( int i=0; i<e.getElementCount(); i++) {
+	            handleRemove( e.getElement( i));
+            }
+        }
     }
 
     @Override

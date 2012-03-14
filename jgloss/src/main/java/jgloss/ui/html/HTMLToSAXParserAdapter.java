@@ -110,10 +110,11 @@ public class HTMLToSAXParserAdapter {
             handler.handle(elem);
         }
         else {
-            if (elem.isLeaf())
-                handleText(elem);
-            else
-                copyElementHandler.handle(elem);
+            if (elem.isLeaf()) {
+	            handleText(elem);
+            } else {
+	            copyElementHandler.handle(elem);
+            }
         }
     }
 
@@ -149,8 +150,9 @@ public class HTMLToSAXParserAdapter {
         try {
             String text = htmlDoc.getText( elem.getStartOffset(), 
                                            elem.getEndOffset() - elem.getStartOffset());
-            if (handleEmptyPlaceholder && JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER.equals( text))
-                text = "";
+            if (handleEmptyPlaceholder && JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER.equals( text)) {
+	            text = "";
+            }
             
             return text;
         } catch (BadLocationException ex) {
@@ -223,8 +225,9 @@ public class HTMLToSAXParserAdapter {
             saxContentHandler.startElement( null, null, JGlossDocument.Elements.TITLE,
                                             EMPTY_ATTRIBUTES);
             String title = htmlDoc.getTitle();
-            if (title != null)
-                saxContentHandler.characters( title.toCharArray(), 0, title.length());
+            if (title != null) {
+	            saxContentHandler.characters( title.toCharArray(), 0, title.length());
+            }
             saxContentHandler.endElement( null, null, JGlossDocument.Elements.TITLE);
         
             saxContentHandler.startElement( null, null, JGlossDocument.Elements.GENERATOR,
@@ -245,21 +248,25 @@ public class HTMLToSAXParserAdapter {
 		public void handle(Element anno) throws SAXException {
             AttributesImpl a = new AttributesImpl();
             String translation = getText( anno.getElement( 1), true);
-            if (translation.length() > 0)
-                a.addAttribute( null, null, JGlossDocument.Attributes.TRANSLATION,
+            if (translation.length() > 0) {
+	            a.addAttribute( null, null, JGlossDocument.Attributes.TRANSLATION,
                                 CDATA, translation);
+            }
             String base = (String) anno.getAttributes()
                 .getAttribute( JGlossHTMLDoc.Attributes.BASE);
-            if (base != null && base.length() > 0)
-                a.addAttribute( null, null, JGlossDocument.Attributes.BASE, CDATA, base);
+            if (base != null && base.length() > 0) {
+	            a.addAttribute( null, null, JGlossDocument.Attributes.BASE, CDATA, base);
+            }
             String basere = (String) anno.getAttributes()
                 .getAttribute( JGlossHTMLDoc.Attributes.BASE_READING);
-            if (basere != null && basere.length() > 0)
-                a.addAttribute( null, null, JGlossDocument.Attributes.BASE_READING, CDATA, basere);
+            if (basere != null && basere.length() > 0) {
+	            a.addAttribute( null, null, JGlossDocument.Attributes.BASE_READING, CDATA, basere);
+            }
             String type = (String) anno.getAttributes()
                 .getAttribute( JGlossHTMLDoc.Attributes.TYPE);
-            if (type != null && type.length() > 0)
-                a.addAttribute( null, null, JGlossDocument.Attributes.TYPE, CDATA, type);
+            if (type != null && type.length() > 0) {
+	            a.addAttribute( null, null, JGlossDocument.Attributes.TYPE, CDATA, type);
+            }
 
             saxContentHandler.startElement( null, null, JGlossDocument.Elements.ANNOTATION,
                                             a);
@@ -314,12 +321,13 @@ public class HTMLToSAXParserAdapter {
                 // text node, check if last char is a line break
                 try {
                     String text = htmlDoc.getText(last.getEndOffset()-1,1);
-                    if (text.equals("\n"))
-                        // strip last char
+                    if (text.equals("\n")) {
+	                    // strip last char
                         handleText(last, last.getStartOffset(), last.getEndOffset()-1);
-                    else
-                        // print all element text
+                    } else {
+	                    // print all element text
                         handleText(last);
+                    }
                 } catch (BadLocationException ex) {
                     ex.printStackTrace();
                 }

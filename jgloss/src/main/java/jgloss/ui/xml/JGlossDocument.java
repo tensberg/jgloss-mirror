@@ -95,8 +95,9 @@ public class JGlossDocument {
     }
 
     public synchronized Document getDOMDocument() { 
-        if (doc == null)
-            validate();
+        if (doc == null) {
+	        validate();
+        }
 
         return doc;
     }

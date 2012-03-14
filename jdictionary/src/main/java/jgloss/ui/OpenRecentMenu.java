@@ -112,8 +112,9 @@ public class OpenRecentMenu {
         for (File document : documents) {
             menu.add( createDocumentMenu(document, listener));
         }
-        if (menu.getItemCount() == 0)
-            menu.setEnabled( false);
+        if (menu.getItemCount() == 0) {
+	        menu.setEnabled( false);
+        }
         menus.add(new MenuWithListener(menu, listener));
         return menu; 
     }
@@ -142,13 +143,15 @@ public class OpenRecentMenu {
      * @param doc Document to add.
      */
     public synchronized void addDocument( File doc) {
-        if (!doc.canRead()) // skip invalid entries
-            return;
+        if (!doc.canRead()) {
+	        return;
+        }
         
         int index = documents.indexOf( doc);
-        if (index == 0)
-            // already at first position
+        if (index == 0) {
+	        // already at first position
             return;
+        }
         if (index != -1) {
             // move entry to first position
             documents.remove( index);

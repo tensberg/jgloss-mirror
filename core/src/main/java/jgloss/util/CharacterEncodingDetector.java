@@ -158,8 +158,9 @@ public class CharacterEncodingDetector {
      */
     public static InputStreamReader getReader( InputStream in, String defaultencoding,
                                                int lookatlength) throws IOException {
-        if (defaultencoding == null)
-            defaultencoding = System.getProperty( "file.encoding");
+        if (defaultencoding == null) {
+	        defaultencoding = System.getProperty( "file.encoding");
+        }
 
         byte[] buf = new byte[lookatlength];
         PushbackInputStream pbin = new PushbackInputStream( new BufferedInputStream( in), buf.length);
@@ -169,17 +170,19 @@ public class CharacterEncodingDetector {
         int len = -1;
         do {
             len = in.read( buf, size, buf.length-size);
-            if (len > 0)
-                size += len;
+            if (len > 0) {
+	            size += len;
+            }
         } while (size<buf.length && len!=-1);
-        if (size == 0) // empty file
-            return new InputStreamReader( pbin);
+        if (size == 0) {
+	        return new InputStreamReader( pbin);
+        }
         if (size < buf.length) {
             data = new byte[size];
             System.arraycopy( buf, 0, data, 0, size);
+        } else {
+	        data = buf;
         }
-        else
-            data = buf;
         pbin.unread( data);
 
         enc = guessEncodingName( data);
@@ -196,10 +199,11 @@ public class CharacterEncodingDetector {
      */
     public static int guessLength( int dlength, String encoding) {
         encoding = encoding.toUpperCase();
-        if (encoding.startsWith( ENC_UTF_8))
-            return dlength/3; // Japanese characters take 3 bytes in UTF-8
-        else
-            return dlength/2;
+        if (encoding.startsWith( ENC_UTF_8)) {
+	        return dlength/3; // Japanese characters take 3 bytes in UTF-8
+        } else {
+	        return dlength/2;
+        }
     }
 
     /**
@@ -213,18 +217,19 @@ public class CharacterEncodingDetector {
         int code = guessEncoding( data);
 
         String enc;
-        if ((code&JIS) > 0)
-            enc = ENC_ISO_2022_JP;
-        else if ((code&EUC) > 0) // might be ambiguous with shift_jis, in this case prefer euc
-            enc = ENC_EUC_JP;
-        else if ((code&SJIS) > 0)
-            enc = ENC_SHIFT_JIS;
-        else if ((code&UTF8) > 0)
-            enc = ENC_UTF_8;
-        else if ((code&NONASCII) > 0) // assume ISO-8859-1
-            enc = ENC_ISO_8859_1;
-        else
-            enc = ENC_ASCII;
+        if ((code&JIS) > 0) {
+	        enc = ENC_ISO_2022_JP;
+        } else if ((code&EUC) > 0) {
+	        enc = ENC_EUC_JP;
+        } else if ((code&SJIS) > 0) {
+	        enc = ENC_SHIFT_JIS;
+        } else if ((code&UTF8) > 0) {
+	        enc = ENC_UTF_8;
+        } else if ((code&NONASCII) > 0) {
+	        enc = ENC_ISO_8859_1;
+        } else {
+	        enc = ENC_ASCII;
+        }
 
         return enc;
     }
@@ -253,8 +258,9 @@ public class CharacterEncodingDetector {
             i = 1;
             switch (c) {
             case ESC:
-                if (gsmode == M_SO)
-                    continue;
+                if (gsmode == M_SO) {
+	                continue;
+                }
                 oldmode = gsmode;
                 if (compare(DB, data, s + 1) || compare(DA, data, s + 1)) {
                     gsmode = M_KANJI; /* kanji */
@@ -272,11 +278,13 @@ public class CharacterEncodingDetector {
                 } else if (compare(DOBD, data, s + 1)) {
                     gsmode = M_GAIJI; /* gaiji */
                     i = DOBD.length + 1;
-                } else
-                    break;
+                } else {
+	                break;
+                }
                 code |= JIS;
-                if (oldmode != M_ASCII)
-                    continue;
+                if (oldmode != M_ASCII) {
+	                continue;
+                }
                 break;
 
             case SO:
@@ -295,13 +303,15 @@ public class CharacterEncodingDetector {
                 /* fall thru */
 
             default:
-                if (gsmode != M_ASCII)
-                    continue;
+                if (gsmode != M_ASCII) {
+	                continue;
+                }
                 break;
             }
 
-            if ((c&0x80) > 0)
-                code |= NONASCII;
+            if ((c&0x80) > 0) {
+	            code |= NONASCII;
+            }
 
             switch (euc) {
             case 1:
@@ -317,8 +327,9 @@ public class CharacterEncodingDetector {
                     if (c == SS3) {
                         euc = 2;
                         break;
-                    } else if (c < 0xa0)
-                        break;
+                    } else if (c < 0xa0) {
+	                    break;
+                    }
                     euc = 0;	/* not EUC */
                 }
                 break;
@@ -333,8 +344,9 @@ public class CharacterEncodingDetector {
                     }
                 } else
                     if (0xa0 < c && c < 0xff) {
-                        if (NumberTools.byteToUnsignedByte( data[s-1]) != SS3)
-                            euc = 1;/* zenkaku */
+                        if (NumberTools.byteToUnsignedByte( data[s-1]) != SS3) {
+	                        euc = 1;/* zenkaku */
+                        }
                         break;
                     }
                 euc = 0;		/* not EUC */
@@ -364,9 +376,9 @@ public class CharacterEncodingDetector {
                  * shift-JIS second byte.
                  */
                 if (0x40 <= c && c != 0x7f &&
-		    c <= 0xfc)
-                    sjis = 1;
-                else {
+		    c <= 0xfc) {
+	                sjis = 1;
+                } else {
                     sjis = 0;	/* not SJIS */
                 }
                 break;
@@ -375,36 +387,44 @@ public class CharacterEncodingDetector {
             if (utf8 > 0) {
                 if (utf8==1 && (c&0x80) > 0) {
                     // First byte of utf8 char. Figure out length.
-                    if ((c&0xe0) == 0xc0)
-                        utf8charlen = 2; // 2-byte char
-                    else if ((c&0xf0) == 0xe0)
-                        utf8charlen = 3;
-                    else if ((c&0xf8) == 0xf0)
-                        utf8charlen = 4;
-                    else if ((c&0xfc) == 0xf8)
-                        utf8charlen = 5;
-                    else if ((c&0xfe) == 0xfc)
-                        utf8charlen = 6;
-                    else
-                        utf8 = 0; // not UTF-8
+                    if ((c&0xe0) == 0xc0) {
+	                    utf8charlen = 2; // 2-byte char
+                    } else if ((c&0xf0) == 0xe0) {
+	                    utf8charlen = 3;
+                    } else if ((c&0xf8) == 0xf0) {
+	                    utf8charlen = 4;
+                    } else if ((c&0xfc) == 0xf8) {
+	                    utf8charlen = 5;
+                    } else if ((c&0xfe) == 0xfc) {
+	                    utf8charlen = 6;
+                    }
+					else {
+	                    utf8 = 0; // not UTF-8
+                    }
                     utf8++;
                 }
                 else if (utf8 > 1) {
-                    if ((c&0xc0) != 0x80) // invalid utf8 n-th byte
-                        utf8 = 0; // not UTF-8
-                    if (utf8 == utf8charlen)
-                        utf8 = 1;
-                    else
-                        utf8++;
+                    if ((c&0xc0) != 0x80)
+					 {
+	                    utf8 = 0; // not UTF-8
+                    }
+                    if (utf8 == utf8charlen) {
+	                    utf8 = 1;
+                    } else {
+	                    utf8++;
+                    }
                 }
             }
         }
-        if (euc != 0)
-            code |= EUC;
-        if (sjis != 0)
-            code |= !jis8 ? SJIS : SJIS | JIS8;
-        if (utf8 != 0)
-            code |= UTF8;
+        if (euc != 0) {
+	        code |= EUC;
+        }
+        if (sjis != 0) {
+	        code |= !jis8 ? SJIS : SJIS | JIS8;
+        }
+        if (utf8 != 0) {
+	        code |= UTF8;
+        }
 
         return code;
     }
@@ -420,10 +440,12 @@ public class CharacterEncodingDetector {
      */
     private final static boolean compare( byte[] d1, byte[] d2, int o) {
         for ( int i=0; i<d1.length; i++) {
-            if (i+o >= d2.length)
-                return false;
-            if (d1[i] != d2[o+i])
-                return false;
+            if (i+o >= d2.length) {
+	            return false;
+            }
+            if (d1[i] != d2[o+i]) {
+	            return false;
+            }
         }
 
         return true;

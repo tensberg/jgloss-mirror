@@ -71,8 +71,9 @@ public class DocumentStyleDialog extends StyleDialog {
      * @return The StyleDialog component.
      */
     public static DocumentStyleDialog getDocumentStyleDialog() {
-        if (box == null)
-            box = new DocumentStyleDialog();
+        if (box == null) {
+	        box = new DocumentStyleDialog();
+        }
         return box;
     }
 
@@ -323,14 +324,17 @@ public class DocumentStyleDialog extends StyleDialog {
         super.savePreferences();
 
         String font = (String) textFont.getSelectedItem();
-        if (font != null)
-            JGloss.prefs.set( Preferences.FONT_TEXT, font);
+        if (font != null) {
+	        JGloss.prefs.set( Preferences.FONT_TEXT, font);
+        }
         font = (String) readingFont.getSelectedItem();
-        if (font != null)
-            JGloss.prefs.set( Preferences.FONT_READING, font);
+        if (font != null) {
+	        JGloss.prefs.set( Preferences.FONT_READING, font);
+        }
         font = (String) translationFont.getSelectedItem();
-        if (font != null)
-            JGloss.prefs.set( Preferences.FONT_TRANSLATION, font);
+        if (font != null) {
+	        JGloss.prefs.set( Preferences.FONT_TRANSLATION, font);
+        }
 
         String size = (String) textFontSize.getSelectedItem();
         try {
@@ -376,8 +380,9 @@ public class DocumentStyleDialog extends StyleDialog {
 
         // apply document view styles
         synchronized (styleSheets) {
-            for (StyleSheet styleSheet : styleSheets)
-                applyPreferences(styleSheet);
+            for (StyleSheet styleSheet : styleSheets) {
+	            applyPreferences(styleSheet);
+            }
         }
     }
 
@@ -389,10 +394,11 @@ public class DocumentStyleDialog extends StyleDialog {
      */
     protected void doColorChooser( JButton b) {
         String title;
-        if (b == highlightColor)
-            title = "style.highlight.colorchooser.title";
-        else
-            title = "style.text.colorchooser.title";
+        if (b == highlightColor) {
+	        title = "style.highlight.colorchooser.title";
+        } else {
+	        title = "style.text.colorchooser.title";
+        }
 
         Color nc = JColorChooser.showDialog( SwingUtilities.getRoot( this),
                                              JGloss.messages.getString( title),
@@ -409,8 +415,9 @@ public class DocumentStyleDialog extends StyleDialog {
      * @param s The style sheet.
      */
     protected void applyPreferences( StyleSheet s) {
-        if (s == null)
-            return;
+        if (s == null) {
+	        return;
+        }
 
         String style = "body { background-color: " + BACKGROUND_COLOR + "; ";
         if (JGloss.prefs.getString( Preferences.FONT_TEXT).length()!=0) {

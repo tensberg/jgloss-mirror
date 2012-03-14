@@ -68,9 +68,10 @@ class SAXToHTMLParserAdapter extends DefaultHandler {
 
     private HTML.Tag getTag( String qName) {
         HTML.Tag tag = HTML.getTag( qName);
-        if (tag == null) 
-            // special JGloss tag
+        if (tag == null) {
+	        // special JGloss tag
             tag = AnnotationTags.getAnnotationTagEqualTo( qName);
+        }
         return tag;
     }
 
@@ -83,10 +84,11 @@ class SAXToHTMLParserAdapter extends DefaultHandler {
         }
         
         HTML.Tag tag = getTag( qName);
-        if (dtd.getElement( qName).isEmpty())
-            htmlHandler.handleSimpleTag( tag, htmlAtts, position);
-        else
-            htmlHandler.handleStartTag( tag, htmlAtts, position);
+        if (dtd.getElement( qName).isEmpty()) {
+	        htmlHandler.handleSimpleTag( tag, htmlAtts, position);
+        } else {
+	        htmlHandler.handleStartTag( tag, htmlAtts, position);
+        }
         position += qName.length();
     }
 
@@ -103,8 +105,9 @@ class SAXToHTMLParserAdapter extends DefaultHandler {
 	public void characters( char[] c, int start, int length) throws SAXException {
         // don't forward ignorable whitespace
         // TODO: implement real ignorable whitespace handling
-        if (length==1 && c[start]=='\n')
-            return;
+        if (length==1 && c[start]=='\n') {
+	        return;
+        }
         
         if (start>0 || start+length<c.length) {
             char[] ctemp = new char[length];

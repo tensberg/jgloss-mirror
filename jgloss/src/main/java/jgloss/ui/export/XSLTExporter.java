@@ -94,23 +94,25 @@ class XSLTExporter implements Exporter {
         List<Parameter> parameters = configuration.getParameters();
         List<UIParameter> uiparameters = new ArrayList<UIParameter>(parameters.size());
         for (Parameter parameter : parameters) {
-            if (parameter instanceof UIParameter)
-                uiparameters.add( (UIParameter) parameter);
+            if (parameter instanceof UIParameter) {
+	            uiparameters.add( (UIParameter) parameter);
+            }
         }
         ExportFileChooser filechooser = 
             new ExportFileChooser( JGloss.getCurrentDir(), configuration.getTitle(),
                                    uiparameters);
-        if (configuration.getFileFilter() != null)
-            filechooser.setFileFilter( configuration.getFileFilter());
+        if (configuration.getFileFilter() != null) {
+	        filechooser.setFileFilter( configuration.getFileFilter());
+        }
 
         filechooser.setCurrentDirectory( new File( JGloss.getCurrentDir()));
         int result = filechooser.showSaveDialog( parent);
 
         if (result == JFileChooser.APPROVE_OPTION) {
             return filechooser.getSelectedFile();
+        } else {
+	        return null;
         }
-        else
-            return null;
     }
 
     /**
@@ -133,10 +135,12 @@ class XSLTExporter implements Exporter {
                   JGloss.messages.getString( "error.export.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);    
         } finally {
-            if (out != null) try {
-                out.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            if (out != null) {
+	            try {
+	                out.close();
+	            } catch (IOException ex) {
+	                ex.printStackTrace();
+	            }
             }
         }
     }
@@ -153,8 +157,9 @@ class XSLTExporter implements Exporter {
                                               .getValue(source, configuration.getSystemId()))));
 
         String encoding = configuration.getEncoding();
-        if (encoding != null)
-            transformer.setOutputProperty( OutputKeys.ENCODING, encoding);
+        if (encoding != null) {
+	        transformer.setOutputProperty( OutputKeys.ENCODING, encoding);
+        }
         
         setParameters(configuration, source, transformer);
 

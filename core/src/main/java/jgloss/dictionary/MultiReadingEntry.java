@@ -53,8 +53,9 @@ class MultiReadingEntry implements DictionaryEntry {
         readings = new String[_readings.size()];
         readings = _readings.toArray(new String[_readings.size()]);
         translations = _translations;
-        if (translations == null)
-            translations = new String[0];
+        if (translations == null) {
+	        translations = new String[0];
+        }
         dictionary = _dictionary;
     }
 
@@ -63,8 +64,9 @@ class MultiReadingEntry implements DictionaryEntry {
  
     @Override
 	public String getWord( int alternative) {
-        if (alternative != 0)
-            throw new IllegalArgumentException();
+        if (alternative != 0) {
+	        throw new IllegalArgumentException();
+        }
         return word;
     }
 
@@ -73,8 +75,9 @@ class MultiReadingEntry implements DictionaryEntry {
 
     @Override
 	public AttributeSet getWordAttributes( int alternative) {
-        if (alternative != 0)
-            throw new IllegalArgumentException();
+        if (alternative != 0) {
+	        throw new IllegalArgumentException();
+        }
         return EMPTY_ATTRIBUTE_SET;
     }
 
@@ -97,8 +100,9 @@ class MultiReadingEntry implements DictionaryEntry {
 
     @Override
 	public AttributeSet getReadingAttributes( int alternative) {
-        if (alternative<0 || alternative>=readings.length)
-            throw new IllegalArgumentException();
+        if (alternative<0 || alternative>=readings.length) {
+	        throw new IllegalArgumentException();
+        }
         return EMPTY_ATTRIBUTE_SET;
     }
 
@@ -107,8 +111,9 @@ class MultiReadingEntry implements DictionaryEntry {
 
     @Override
 	public String getTranslation( int rom, int crm, int synonym) {
-        if (rom!=0 || synonym!=0 || crm<0 || crm>=translations.length)
-            throw new IllegalArgumentException();
+        if (rom!=0 || synonym!=0 || crm<0 || crm>=translations.length) {
+	        throw new IllegalArgumentException();
+        }
         return translations[crm];
     }
 
@@ -119,36 +124,41 @@ class MultiReadingEntry implements DictionaryEntry {
 
     @Override
 	public int getTranslationCrmCount( int rom) {
-        if (translations.length==0 || rom!=0)
-            throw new IllegalArgumentException();
+        if (translations.length==0 || rom!=0) {
+	        throw new IllegalArgumentException();
+        }
         return translations.length;
     }
 
     @Override
 	public int getTranslationSynonymCount( int rom, int crm) {
-        if (rom!=0 || crm<0 || crm>=translations.length)
-            throw new IllegalArgumentException();
+        if (rom!=0 || crm<0 || crm>=translations.length) {
+	        throw new IllegalArgumentException();
+        }
         return 1;
     }
 
     @Override
 	public AttributeSet getTranslationAttributes( int rom, int crm, int synonym) {
-        if (rom!=0 || synonym!=0 || crm<0 || crm>=translations.length)
-            throw new IllegalArgumentException();
+        if (rom!=0 || synonym!=0 || crm<0 || crm>=translations.length) {
+	        throw new IllegalArgumentException();
+        }
         return EMPTY_ATTRIBUTE_SET;
     }
 
     @Override
 	public AttributeSet getTranslationAttributes( int rom, int crm) {
-        if (rom!=0 || crm<0 || crm>=translations.length)
-            throw new IllegalArgumentException();
+        if (rom!=0 || crm<0 || crm>=translations.length) {
+	        throw new IllegalArgumentException();
+        }
         return EMPTY_ATTRIBUTE_SET;
     }
 
     @Override
 	public AttributeSet getTranslationAttributes( int rom) {
-        if (translations.length==0 || rom!=0)
-            throw new IllegalArgumentException();
+        if (translations.length==0 || rom!=0) {
+	        throw new IllegalArgumentException();
+        }
         return EMPTY_ATTRIBUTE_SET;
     }
 

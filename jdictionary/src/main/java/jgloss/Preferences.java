@@ -323,8 +323,9 @@ public abstract class Preferences {
      */
     public void addPropertyChangeListener( PropertyChangeListener cl) {
         synchronized (propertyChangeListeners) {
-            if (!propertyChangeListeners.contains( cl))
-                propertyChangeListeners.add( cl);
+            if (!propertyChangeListeners.contains( cl)) {
+	            propertyChangeListeners.add( cl);
+            }
         }
     }
 

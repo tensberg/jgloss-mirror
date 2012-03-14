@@ -61,14 +61,15 @@ public class LookupEngine {
         Object[] parameters = new Object[mode.getParameters().size()];
         for ( int i=0; i<parameters.length; i++) {
             SearchParameter param = mode.getParameters().get( i);
-            if (param == StandardSearchParameter.EXPRESSION)
-                parameters[i] = model.getSearchExpression();
-            else if (param == StandardSearchParameter.SEARCH_FIELDS)
-                parameters[i] = model.getSearchFields();
-            else if (param == StandardSearchParameter.DISTANCE)
-                parameters[i] = new Integer( model.getDistance());
-            else
-                throw new IllegalArgumentException( "Unimplemented search parameter " + param);
+            if (param == StandardSearchParameter.EXPRESSION) {
+	            parameters[i] = model.getSearchExpression();
+            } else if (param == StandardSearchParameter.SEARCH_FIELDS) {
+	            parameters[i] = model.getSearchFields();
+            } else if (param == StandardSearchParameter.DISTANCE) {
+	            parameters[i] = new Integer( model.getDistance());
+            } else {
+	            throw new IllegalArgumentException( "Unimplemented search parameter " + param);
+            }
         }
         LookupResultFilter[] filters = model.getSelectedFilters()
             .toArray( new LookupResultFilter[0]);
@@ -84,9 +85,11 @@ public class LookupEngine {
                     Iterator<DictionaryEntry> results = d.search( mode, parameters);
                     results:
                     while (dictionaryEntries<dictionaryEntryLimit &&
-                           results.hasNext()) try {
-                               if (Thread.interrupted())
-                                   throw new InterruptedException();
+                           results.hasNext()) {
+	                    try {
+                               if (Thread.interrupted()) {
+	                            throw new InterruptedException();
+                            }
                                
                                DictionaryEntry de = results.next();
                                for ( int f=0; f<filters.length; f++) {
@@ -99,6 +102,7 @@ public class LookupEngine {
                            } catch (SearchException ex) {
                                handler.exception( ex);
                            }
+                    }
                 } catch (SearchException ex) {
                     handler.exception( ex);
                     continue;

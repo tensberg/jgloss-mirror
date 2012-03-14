@@ -61,8 +61,9 @@ public abstract class AbstractParser implements Parser {
         this.exclusions = exclusions;
         this.ignoreNewlines = ignoreNewlines;
         this.firstOccurrenceOnly = firstOccurrenceOnly;
-        if (firstOccurrenceOnly)
-            annotatedWords = new HashSet<String>( 101);
+        if (firstOccurrenceOnly) {
+	        annotatedWords = new HashSet<String>( 101);
+        }
     }
 
     /**
@@ -98,8 +99,9 @@ public abstract class AbstractParser implements Parser {
      */
     @Override
 	public void reset() {
-        if (annotatedWords != null)
-            annotatedWords = new HashSet<String>( 101);
+        if (annotatedWords != null) {
+	        annotatedWords = new HashSet<String>( 101);
+        }
     }
 
     /**
@@ -126,11 +128,12 @@ public abstract class AbstractParser implements Parser {
 	public void setAnnotateFirstOccurrenceOnly( boolean firstOccurrenceOnly) {
         this.firstOccurrenceOnly = firstOccurrenceOnly;
         if (firstOccurrenceOnly) {
-            if (annotatedWords==null)
-                annotatedWords = new HashSet<String>( 101);
+            if (annotatedWords==null) {
+	            annotatedWords = new HashSet<String>( 101);
+            }
+        } else {
+	        annotatedWords = null;
         }
-        else
-            annotatedWords = null;
     }
 
     /**

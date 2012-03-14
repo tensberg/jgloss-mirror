@@ -55,29 +55,30 @@ public class SearchFieldSelection implements Cloneable {
      * Toggle the selection value of a field.
      */
     public void select( DictionaryEntryField field, boolean selected) {
-        if (field == DictionaryEntryField.WORD)
-            wordSelected = selected;
-        else if (field == DictionaryEntryField.READING)
-            readingSelected = selected;
-        else if (field == DictionaryEntryField.TRANSLATION) {
+        if (field == DictionaryEntryField.WORD) {
+	        wordSelected = selected;
+        } else if (field == DictionaryEntryField.READING) {
+	        readingSelected = selected;
+        } else if (field == DictionaryEntryField.TRANSLATION) {
             translationSelected = selected;
+        } else {
+	        throw new IllegalArgumentException();
         }
-        else
-            throw new IllegalArgumentException();
     }
 
     /**
      * Test if a field is selected.
      */
     public boolean isSelected( DictionaryEntryField field) {
-        if (field == DictionaryEntryField.WORD)
-            return wordSelected;
-        else if (field == DictionaryEntryField.READING)
-            return readingSelected;
-        else if (field == DictionaryEntryField.TRANSLATION)
-            return translationSelected;
-        else
-            throw new IllegalArgumentException();        
+        if (field == DictionaryEntryField.WORD) {
+	        return wordSelected;
+        } else if (field == DictionaryEntryField.READING) {
+	        return readingSelected;
+        } else if (field == DictionaryEntryField.TRANSLATION) {
+	        return translationSelected;
+        } else {
+	        throw new IllegalArgumentException();
+        }        
     }
 
     /**
@@ -91,21 +92,23 @@ public class SearchFieldSelection implements Cloneable {
     }
 
     public void select( MatchMode mode, boolean selected) {
-        if (mode == MatchMode.FIELD)
-            matchField = selected;
-        else if (mode == MatchMode.WORD)
-            matchWord = selected;
-        else
-            throw new IllegalArgumentException();
+        if (mode == MatchMode.FIELD) {
+	        matchField = selected;
+        } else if (mode == MatchMode.WORD) {
+	        matchWord = selected;
+        } else {
+	        throw new IllegalArgumentException();
+        }
     }
 
     public boolean isSelected( MatchMode mode) {
-        if (mode == MatchMode.FIELD)
-            return matchField;
-        else if (mode == MatchMode.WORD)
-            return matchWord;
-        else
-            throw new IllegalArgumentException();
+        if (mode == MatchMode.FIELD) {
+	        return matchField;
+        } else if (mode == MatchMode.WORD) {
+	        return matchWord;
+        } else {
+	        throw new IllegalArgumentException();
+        }
     }
 
     public SearchFieldSelection or( SearchFieldSelection sfs) {

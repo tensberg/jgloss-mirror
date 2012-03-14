@@ -117,10 +117,11 @@ public class LookupModel implements Cloneable {
 
     public SearchMode getSelectedSearchMode() {
         int selectedIndex = getSelectedSearchModeIndex();
-        if (selectedIndex != -1)
-            return getSearchMode( selectedIndex);
-        else
-            return null;
+        if (selectedIndex != -1) {
+	        return getSearchMode( selectedIndex);
+        } else {
+	        return null;
+        }
     }
 
     public int getSelectedSearchModeIndex() {
@@ -203,17 +204,18 @@ public class LookupModel implements Cloneable {
     }
 
     public void setMultiDictionarySelectionMode( boolean mode) {
-        if (mode == multiDictionaryMode)
-            return;
+        if (mode == multiDictionaryMode) {
+	        return;
+        }
 
         boolean dictionarySelectionChanged = false;
         if (multiDictionarySelection) {
             boolean firstDictionary = true;
             for (StateWrapper<Dictionary> wrapper : dictionaries) {
                 if (wrapper.isSelected()) {
-                    if (firstDictionary)
-                        firstDictionary = false;
-                    else {
+                    if (firstDictionary) {
+	                    firstDictionary = false;
+                    } else {
                         wrapper.setSelected( false);
                         dictionarySelectionChanged = true;
                     }
@@ -248,8 +250,9 @@ public class LookupModel implements Cloneable {
     }
 
     public void selectAllDictionaries( boolean select) {
-        if (allDictionariesSelected == select)
-            return;
+        if (allDictionariesSelected == select) {
+	        return;
+        }
 
         allDictionariesSelected = select;
 
@@ -284,9 +287,9 @@ public class LookupModel implements Cloneable {
         List<StateWrapper<Dictionary>> newDictionaryWrappers = new ArrayList<StateWrapper<Dictionary>>(newDictionaries.size());
         for (Dictionary d : newDictionaries) {
             StateWrapper<Dictionary> wrapper = oldDictionaries.get( d);
-            if (wrapper == null)
-                wrapper = new StateWrapper<Dictionary>( d, false, false);
-            else {
+            if (wrapper == null) {
+	            wrapper = new StateWrapper<Dictionary>( d, false, false);
+            } else {
                 if (wrapper.isSelected() && wrapper.isEnabled()) {
                     if (seenSelectedDictionary) {
                         multiDictionarySelection = true;
@@ -329,9 +332,12 @@ public class LookupModel implements Cloneable {
     public void selectDictionary( int index, boolean select) {
         StateWrapper<Dictionary> newDictionaryWrapper = dictionaries.get( index);
         if (newDictionaryWrapper.isSelected() == select)
-            return; // nothing to do
-        if (select && !newDictionaryWrapper.isEnabled())
-            throw new IllegalArgumentException( "selected dictionary not enabled");
+		 {
+	        return; // nothing to do
+        }
+        if (select && !newDictionaryWrapper.isEnabled()) {
+	        throw new IllegalArgumentException( "selected dictionary not enabled");
+        }
 
         if (!multiDictionaryMode && select) {
             // clear old selection
@@ -401,27 +407,32 @@ public class LookupModel implements Cloneable {
     public List<Dictionary> getSelectedDictionaries() {
         List<Dictionary> out = new ArrayList<Dictionary>( dictionaries.size());
         for (StateWrapper<Dictionary> wrapper : dictionaries) {
-            if ((allDictionariesSelected || wrapper.isSelected()) && wrapper.isEnabled())
-                out.add( wrapper.getObject());
+            if ((allDictionariesSelected || wrapper.isSelected()) && wrapper.isEnabled()) {
+	            out.add( wrapper.getObject());
+            }
         }
         return out;
     }
 
     public void selectSearchField( DictionaryEntryField field, boolean selected) {
-        if (searchFields.isSelected( field) == selected)
-            return;
-        if (!searchFieldsEnabled.isSelected( field))
-            throw new IllegalStateException( "selected field is not enabled");
+        if (searchFields.isSelected( field) == selected) {
+	        return;
+        }
+        if (!searchFieldsEnabled.isSelected( field)) {
+	        throw new IllegalStateException( "selected field is not enabled");
+        }
         searchFields.select( field, selected);
         
         fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_FIELDS_SELECTION));
     }
 
     public void selectMatchMode( MatchMode mode, boolean selected) {
-        if (searchFields.isSelected( mode) == selected)
-            return;
-        if (!searchFieldsEnabled.isSelected( mode))
-            throw new IllegalStateException( "selected field is not enabled");
+        if (searchFields.isSelected( mode) == selected) {
+	        return;
+        }
+        if (!searchFieldsEnabled.isSelected( mode)) {
+	        throw new IllegalStateException( "selected field is not enabled");
+        }
         searchFields.select( mode, selected);
         searchFields.select( mode==MatchMode.FIELD ? MatchMode.WORD : MatchMode.FIELD, !selected);
         
@@ -434,9 +445,12 @@ public class LookupModel implements Cloneable {
     public void selectFilter( int index, boolean select) {
         StateWrapper<LookupResultFilter> filterWrapper = filters.get( index);
         if (filterWrapper.isSelected() == select)
-            return; // nothing to do
-        if (select && !filterWrapper.isEnabled())
-            throw new IllegalArgumentException( "selected filter not enabled");
+		 {
+	        return; // nothing to do
+        }
+        if (select && !filterWrapper.isEnabled()) {
+	        throw new IllegalArgumentException( "selected filter not enabled");
+        }
 
         filterWrapper.setSelected( select);
         fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.FILTER_SELECTION));
@@ -462,8 +476,9 @@ public class LookupModel implements Cloneable {
     public List<LookupResultFilter> getSelectedFilters() {
         List<LookupResultFilter> out = new ArrayList<LookupResultFilter>( filters.size());
         for (StateWrapper<LookupResultFilter> filterWrapper : filters) {
-            if (filterWrapper.isSelected() && filterWrapper.isEnabled())
-                out.add( filterWrapper.getObject());
+            if (filterWrapper.isSelected() && filterWrapper.isEnabled()) {
+	            out.add( filterWrapper.getObject());
+            }
         }
 
         return out;
@@ -603,9 +618,9 @@ public class LookupModel implements Cloneable {
             }
         }
 
-        if (newEnabled.equals( searchFieldsEnabled))
-            return false;
-        else {
+        if (newEnabled.equals( searchFieldsEnabled)) {
+	        return false;
+        } else {
             searchFieldsEnabled = newEnabled;
             return true;
         }
@@ -707,7 +722,9 @@ public class LookupModel implements Cloneable {
     public void loadFromPreferences( Preferences prefs, String prefix) {
         int searchmode = prefs.getInt( prefix + PREF_SEARCHMODE, 0);
         if (searchmode<0 || searchmode>=searchModes.size())
-            searchmode = 0; // select first search mode
+		 {
+	        searchmode = 0; // select first search mode
+        }
         for ( int i=0; i<searchModes.size(); i++) {
             searchModes.get( i).setSelected( i==searchmode);
         }

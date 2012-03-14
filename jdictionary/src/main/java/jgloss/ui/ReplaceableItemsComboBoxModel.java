@@ -47,8 +47,9 @@ class ReplaceableItemsComboBoxModel extends AbstractListModel implements ComboBo
     }
 
     public ReplaceableItemsComboBoxModel( List<? extends Object> _items) {
-        if (!(_items instanceof RandomAccess))
-            _items = new ArrayList<Object>( _items);
+        if (!(_items instanceof RandomAccess)) {
+	        _items = new ArrayList<Object>( _items);
+        }
         items = _items;
     }
 
@@ -65,22 +66,26 @@ class ReplaceableItemsComboBoxModel extends AbstractListModel implements ComboBo
     }
 
     public void replaceItems( List<? extends Object> newItems) {
-        if (!(newItems instanceof RandomAccess))
-            newItems = new ArrayList<Object>( newItems);
+        if (!(newItems instanceof RandomAccess)) {
+	        newItems = new ArrayList<Object>( newItems);
+        }
 
         List<? extends Object> oldItems = items;
         items = newItems;
         
         if ((newItems.size() - oldItems.size()) < 0) {
-            if (newItems.size() > 0)
-                fireContentsChanged( this, 0, newItems.size()-1);
+            if (newItems.size() > 0) {
+	            fireContentsChanged( this, 0, newItems.size()-1);
+            }
             fireIntervalRemoved( this, newItems.size(), oldItems.size()-1);
         }
         else {
-            if (oldItems.size() > 0)
-                fireContentsChanged( this, 0, oldItems.size()-1);
-            if (oldItems.size() < newItems.size()) // as opposed to ==
-                fireIntervalAdded( this, oldItems.size(), newItems.size()-1);
+            if (oldItems.size() > 0) {
+	            fireContentsChanged( this, 0, oldItems.size()-1);
+            }
+            if (oldItems.size() < newItems.size()) {
+	            fireIntervalAdded( this, oldItems.size(), newItems.size()-1);
+            }
         }
     }
 

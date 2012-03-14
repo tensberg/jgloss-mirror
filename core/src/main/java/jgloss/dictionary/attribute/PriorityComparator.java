@@ -39,12 +39,14 @@ public class PriorityComparator implements Comparator<Priority> {
 	public int compare( Priority o1, Priority o2) {
         DictionaryEntry de1 = (DictionaryEntry) o1;
         DictionaryEntry de2 = (DictionaryEntry) o2;
-        if (de1.getDictionary() != de2.getDictionary())
-            throw new IllegalArgumentException();
+        if (de1.getDictionary() != de2.getDictionary()) {
+	        throw new IllegalArgumentException();
+        }
 
         if (de1.getGeneralAttributes().containsKey( Attributes.PRIORITY, false)) {
-            if (!de2.getGeneralAttributes().containsKey( Attributes.PRIORITY, false))
-                return 1;
+            if (!de2.getGeneralAttributes().containsKey( Attributes.PRIORITY, false)) {
+	            return 1;
+            }
             
             Priority p1 = de1.getGeneralAttributes()
                 .getAttribute( Attributes.PRIORITY, false).get( 0);
@@ -52,9 +54,10 @@ public class PriorityComparator implements Comparator<Priority> {
                 .getAttribute( Attributes.PRIORITY, false).get( 0);
             return p1.compareTo( p2);
         }
-        else if (de2.getGeneralAttributes().containsKey( Attributes.PRIORITY, false))
-            return -1;
-        else
-            return 0;
+        else if (de2.getGeneralAttributes().containsKey( Attributes.PRIORITY, false)) {
+	        return -1;
+        } else {
+	        return 0;
+        }
     }
 } // class PriorityComparator

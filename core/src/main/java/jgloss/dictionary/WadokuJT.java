@@ -164,8 +164,9 @@ public class WadokuJT extends FileBasedDictionary {
             String line;
             while ((line=r.readLine()) != null) {
                 line = line.trim();
-                if (line.length()==0 || line.charAt( 0)=='#')
-                    continue;
+                if (line.length()==0 || line.charAt( 0)=='#') {
+	                continue;
+                }
 
                 matcher.reset( line);
                 if (matcher.find()) {
@@ -297,21 +298,24 @@ public class WadokuJT extends FileBasedDictionary {
 
     @Override
 	protected boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field) {
-        if (location == 0)
-            return true;
+        if (location == 0) {
+	        return true;
+        }
 
         try {
             byte b = entry.get( location-1);
-            if (b==';' || b=='|' || b==10 || b==13)
-                return true;
+            if (b==';' || b=='|' || b==10 || b==13) {
+	            return true;
+            }
             if (b == ' ') {
                 byte b2 = entry.get( location-2);
                 return (b2 == ';' || b2 == ']');
             }
-            if (b=='(' && field==DictionaryEntryField.WORD)
-                // ( followed by a 3-byte encoded character is assumed to be an alternative
+            if (b=='(' && field==DictionaryEntryField.WORD) {
+	            // ( followed by a 3-byte encoded character is assumed to be an alternative
                 // spelling in the word field
                 return true;
+            }
 
             return false;
         } catch (IndexOutOfBoundsException ex) {
@@ -323,19 +327,22 @@ public class WadokuJT extends FileBasedDictionary {
 	protected boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
             byte b = entry.get( location);
-            if (b==';' || b=='|' || b==10 || b==13)
-                return true;
+            if (b==';' || b=='|' || b==10 || b==13) {
+	            return true;
+            }
             if (b == '.') {
                 // end of translation if followed by field end marker '|' or new range of meaning " [..."
                 byte b2 = entry.get( location+1);
-                if (b2 == '|')
-                    return true;
-                else if (b2 == ' ') 
-                    return (entry.get( location+2) == '[');
+                if (b2 == '|') {
+	                return true;
+                } else if (b2 == ' ') {
+	                return (entry.get( location+2) == '[');
+                }
             }
             else if ((b==' ' || b==')') && 
-                     field==DictionaryEntryField.WORD)
-                return true;
+                     field==DictionaryEntryField.WORD) {
+	            return true;
+            }
             return false;
         } catch (IndexOutOfBoundsException ex) {
             return true;
@@ -349,7 +356,9 @@ public class WadokuJT extends FileBasedDictionary {
             // first call to moveToNextField
             // skip first (comment) line
             while (!isEntrySeparator( buf.get()))
-                ; // buf.get() advances the loop
+			 {
+	            ; // buf.get() advances the loop
+            }
             return DictionaryEntryField.WORD;
         }
 
@@ -372,11 +381,13 @@ public class WadokuJT extends FileBasedDictionary {
             else if (field==DictionaryEntryField.TRANSLATION) {
                 // skip fields to next entry
                 while (!isEntrySeparator( buf.get()))
-                    ; // buf.get() advances the loop
+				 {
+	                ; // buf.get() advances the loop
+                }
                 field = DictionaryEntryField.WORD;
+            } else {
+	            throw new IllegalArgumentException();
             }
-            else
-                throw new IllegalArgumentException();
         } else if (character==10 || character==13) {
             // broken dictionary entry; reset for error recovery
             field = DictionaryEntryField.WORD;
@@ -395,8 +406,9 @@ public class WadokuJT extends FileBasedDictionary {
             // read from start to location
             buf.position( entryStart);
             while (buf.position() <= position) {
-                if (buf.get() == '|')
-                    fields++;
+                if (buf.get() == '|') {
+	                fields++;
+                }
             }
             switch (fields) {
             case 0:
@@ -413,8 +425,9 @@ public class WadokuJT extends FileBasedDictionary {
             // read from location to end
             buf.position( position);
             while (buf.position() < entryEnd) {
-                if (buf.get() == '|')
-                    fields++;
+                if (buf.get() == '|') {
+	                fields++;
+                }
             }
             switch (fields) {
             case 2:
@@ -467,11 +480,13 @@ public class WadokuJT extends FileBasedDictionary {
             reading = entry.substring( start, end);
             // cut off [n] marker
             int bracket = reading.lastIndexOf( '[');
-            if (bracket != -1)
-                // the [ must always be preceeded by a single space, therefore bracket-1
+            if (bracket != -1) {
+	            // the [ must always be preceeded by a single space, therefore bracket-1
                 reading = unescape( reading.substring( 0, bracket-1));
-            if (reading.length() == 0)
-                reading = null;
+            }
+            if (reading.length() == 0) {
+	            reading = null;
+            }
 
             // parse part of speech
             start = end+1;
@@ -512,171 +527,182 @@ public class WadokuJT extends FileBasedDictionary {
                 DefaultAttributeSet thisRomA = new DefaultAttributeSet( translationA);
 
                 // handle abbreviation/gairaigo/explanation (always in () brackets at end of rom)
-                if (crm.charAt( crm.length()-1) == ')') try {
-                    int openb = crm.lastIndexOf( '(');
-                    String ex = crm.substring( openb+1, crm.length()-1);
-                    // cut off comment (last char before ( is a space)
-                    crm = crm.substring( 0, openb-1);
+                if (crm.charAt( crm.length()-1) == ')') {
+	                try {
+	                    int openb = crm.lastIndexOf( '(');
+	                    String ex = crm.substring( openb+1, crm.length()-1);
+	                    // cut off comment (last char before ( is a space)
+	                    crm = crm.substring( 0, openb-1);
 
-                    ABBR_MATCHER.reset( ex);
-                    if (ABBR_MATCHER.find()) {
-                        String lang = ABBR_MATCHER.group( 1);
-                        String code = null;
-                        if (lang != null) {
-                            code = gairaigoMap.get( lang.toLowerCase());
-                            if (code == null) {
-                                System.err.println( "WadokuJT warning: unrecognized language " +
-                                                    lang + " (" + ex + ")");
-                                code = lang;
-                            } 
-                        }
-                        String word = ABBR_MATCHER.group( 2);
-                        Abbreviation abbr = null;
-                        if (word != null)
-                            abbr = new Abbreviation( word, code);
-                        if (allTranslations)
-                            generalA.addAttribute( Attributes.ABBREVIATION, abbr);
-                        else
-                            thisRomA.addAttribute( Attributes.ABBREVIATION, abbr);
+	                    ABBR_MATCHER.reset( ex);
+	                    if (ABBR_MATCHER.find()) {
+	                        String lang = ABBR_MATCHER.group( 1);
+	                        String code = null;
+	                        if (lang != null) {
+	                            code = gairaigoMap.get( lang.toLowerCase());
+	                            if (code == null) {
+	                                System.err.println( "WadokuJT warning: unrecognized language " +
+	                                                    lang + " (" + ex + ")");
+	                                code = lang;
+	                            } 
+	                        }
+	                        String word = ABBR_MATCHER.group( 2);
+	                        Abbreviation abbr = null;
+	                        if (word != null) {
+	                            abbr = new Abbreviation( word, code);
+	                        }
+	                        if (allTranslations) {
+	                            generalA.addAttribute( Attributes.ABBREVIATION, abbr);
+	                        } else {
+	                            thisRomA.addAttribute( Attributes.ABBREVIATION, abbr);
+	                        }
 
-                        // strip abbr comment from crm
-                        if (ABBR_MATCHER.start() > 0) {
-                            if (ABBR_MATCHER.end() < ex.length()) {
-                                ex = ex.substring( 0, ABBR_MATCHER.start()) + "; " +
-                                    ex.substring( ABBR_MATCHER.end());
-                            }
-                            else {
-                                ex = ex.substring( 0, ABBR_MATCHER.start());
-                            }
-                        }
-                        else
-                            ex = ex.substring( ABBR_MATCHER.end());
-                    }
+	                        // strip abbr comment from crm
+	                        if (ABBR_MATCHER.start() > 0) {
+	                            if (ABBR_MATCHER.end() < ex.length()) {
+	                                ex = ex.substring( 0, ABBR_MATCHER.start()) + "; " +
+	                                    ex.substring( ABBR_MATCHER.end());
+	                            }
+	                            else {
+	                                ex = ex.substring( 0, ABBR_MATCHER.start());
+	                            }
+	                        } else {
+	                            ex = ex.substring( ABBR_MATCHER.end());
+	                        }
+	                    }
 
-                    GAIRAIGO_MATCHER.reset( ex);
-                    if (GAIRAIGO_MATCHER.find()) {
-                        String lang;
-                        String word = null;
-                        if (GAIRAIGO_MATCHER.group( 1) != null) {
-                            // gairaigo with original word
-                            lang = GAIRAIGO_MATCHER.group( 1);
-                            word = GAIRAIGO_MATCHER.group( 2);
-                        }
-                        else {
-                            // gairaigo without original word
-                            lang = GAIRAIGO_MATCHER.group( 3);
-                        }
-			    
-                        String code = gairaigoMap.get( lang.toLowerCase());
-                        if (code != null) {
-                            Gairaigo gairaigo = new Gairaigo( word, code);
-                            if (allTranslations)
-                                generalA.addAttribute( Attributes.GAIRAIGO, gairaigo);
-                            else
-                                thisRomA.addAttribute( Attributes.GAIRAIGO, gairaigo);
+	                    GAIRAIGO_MATCHER.reset( ex);
+	                    if (GAIRAIGO_MATCHER.find()) {
+	                        String lang;
+	                        String word = null;
+	                        if (GAIRAIGO_MATCHER.group( 1) != null) {
+	                            // gairaigo with original word
+	                            lang = GAIRAIGO_MATCHER.group( 1);
+	                            word = GAIRAIGO_MATCHER.group( 2);
+	                        }
+	                        else {
+	                            // gairaigo without original word
+	                            lang = GAIRAIGO_MATCHER.group( 3);
+	                        }
+	                
+	                        String code = gairaigoMap.get( lang.toLowerCase());
+	                        if (code != null) {
+	                            Gairaigo gairaigo = new Gairaigo( word, code);
+	                            if (allTranslations) {
+	                                generalA.addAttribute( Attributes.GAIRAIGO, gairaigo);
+	                            } else {
+	                                thisRomA.addAttribute( Attributes.GAIRAIGO, gairaigo);
+	                            }
 
-                            // strip gairaigo comment from crm
-                            if (GAIRAIGO_MATCHER.start() > 0) {
-                                if (GAIRAIGO_MATCHER.end() < ex.length()) {
-                                    ex = ex.substring( 0, GAIRAIGO_MATCHER.start()) + "; " +
-                                        ex.substring( GAIRAIGO_MATCHER.end());
-                                }
-                                else {
-                                    ex = ex.substring( 0, GAIRAIGO_MATCHER.start());
-                                }
-                            }
-                            else
-                                ex = ex.substring( GAIRAIGO_MATCHER.end());
-                        }
-                        else {
-                            System.err.println( "WadokuJT warning: unrecognized language " +
-                                                lang + " (" + ex + ")");
-                        }
-                    }
+	                            // strip gairaigo comment from crm
+	                            if (GAIRAIGO_MATCHER.start() > 0) {
+	                                if (GAIRAIGO_MATCHER.end() < ex.length()) {
+	                                    ex = ex.substring( 0, GAIRAIGO_MATCHER.start()) + "; " +
+	                                        ex.substring( GAIRAIGO_MATCHER.end());
+	                                }
+	                                else {
+	                                    ex = ex.substring( 0, GAIRAIGO_MATCHER.start());
+	                                }
+	                            } else {
+	                                ex = ex.substring( GAIRAIGO_MATCHER.end());
+	                            }
+	                        }
+	                        else {
+	                            System.err.println( "WadokuJT warning: unrecognized language " +
+	                                                lang + " (" + ex + ")");
+	                        }
+	                    }
 
-                    if (ex.length() > EXPLANATION_MIN_LENGTH) {
-                        thisRomA.addAttribute( Attributes.EXPLANATION,
-                                               new InformationAttributeValue( ex));
-                        ex = "";
-                    }
+	                    if (ex.length() > EXPLANATION_MIN_LENGTH) {
+	                        thisRomA.addAttribute( Attributes.EXPLANATION,
+	                                               new InformationAttributeValue( ex));
+	                        ex = "";
+	                    }
 
-                    // append remainder of ex to crm
-                    if (ex.length() > 0)
-                        crm += " (" + ex + ")";
-                } catch (StringIndexOutOfBoundsException ex) {
-                    System.err.println
-                        ( "WadokuJT warning: missing opening bracket in translation " + crm);
-                    // can be safely ignored
+	                    // append remainder of ex to crm
+	                    if (ex.length() > 0) {
+	                        crm += " (" + ex + ")";
+	                    }
+	                } catch (StringIndexOutOfBoundsException ex) {
+	                    System.err.println
+	                        ( "WadokuJT warning: missing opening bracket in translation " + crm);
+	                    // can be safely ignored
+	                }
                 }
 
                 // handle categories (marked at beginning of translation enclosed in {})
-                if (crm.charAt( 0) == '{') try {
-                    int endb = crm.indexOf( '}');
-                    // attribute strings unrecognized by mapping
-                    StringBuilder unrecognized = null;
+                if (crm.charAt( 0) == '{') {
+	                try {
+	                    int endb = crm.indexOf( '}');
+	                    // attribute strings unrecognized by mapping
+	                    StringBuilder unrecognized = null;
 
-                    CATEGORY_MATCHER.reset( crm.substring( 1, endb));
-                    while (CATEGORY_MATCHER.find()) {
-                        String cat = CATEGORY_MATCHER.group( 1);
-                        AttributeMapper.Mapping<?> mapping = mapper.getMapping( cat);
-                        if (mapping != null) {
-                            Attribute<?> att = mapping.getAttribute();
-                            if (allTranslations) {
-                                if (att.appliesTo
-                                    ( DictionaryEntry.AttributeGroup.GENERAL))
-                                    generalA.addAttribute(mapping);
-                                else if (att.appliesTo
-                                         ( DictionaryEntry.AttributeGroup.TRANSLATION))
-                                    translationA.addAttribute(mapping);
-                                else // program error, should not happen
-                                    throw new SearchException
-                                        ( "wrong attribute type for " + cat);
-                            }
-                            else {
-                                if (att.appliesTo
-                                    ( DictionaryEntry.AttributeGroup.TRANSLATION)) {
-                                    thisRomA.addAttribute(mapping);
-                                }
-                                else if (att.appliesTo
-                                         ( DictionaryEntry.AttributeGroup.GENERAL))
-                                    generalA.addAttribute(mapping);
-                                else // program error, should not happen
-                                    throw new SearchException
-                                        ( "wrong attribute type for " + cat);
-                            }
-                        }
-                        else {
-                            // unrecognized category
-                            if (unrecognized == null) {
-                                unrecognized = new StringBuilder( cat.length() + 128);
-                                unrecognized.append( '{');
-                                unrecognized.append( cat);
-                            }
-                            else {
-                                unrecognized.append( "; ");
-                                unrecognized.append( cat);
-                            }
-                        }
-                    }
+	                    CATEGORY_MATCHER.reset( crm.substring( 1, endb));
+	                    while (CATEGORY_MATCHER.find()) {
+	                        String cat = CATEGORY_MATCHER.group( 1);
+	                        AttributeMapper.Mapping<?> mapping = mapper.getMapping( cat);
+	                        if (mapping != null) {
+	                            Attribute<?> att = mapping.getAttribute();
+	                            if (allTranslations) {
+	                                if (att.appliesTo
+	                                    ( DictionaryEntry.AttributeGroup.GENERAL)) {
+	                                    generalA.addAttribute(mapping);
+	                                } else if (att.appliesTo
+	                                         ( DictionaryEntry.AttributeGroup.TRANSLATION)) {
+	                                    translationA.addAttribute(mapping);
+	                                } else {
+	                                    throw new SearchException
+	                                        ( "wrong attribute type for " + cat);
+	                                }
+	                            }
+	                            else {
+	                                if (att.appliesTo
+	                                    ( DictionaryEntry.AttributeGroup.TRANSLATION)) {
+	                                    thisRomA.addAttribute(mapping);
+	                                }
+	                                else if (att.appliesTo
+	                                         ( DictionaryEntry.AttributeGroup.GENERAL)) {
+	                                    generalA.addAttribute(mapping);
+	                                } else {
+	                                    throw new SearchException
+	                                        ( "wrong attribute type for " + cat);
+	                                }
+	                            }
+	                        }
+	                        else {
+	                            // unrecognized category
+	                            if (unrecognized == null) {
+	                                unrecognized = new StringBuilder( cat.length() + 128);
+	                                unrecognized.append( '{');
+	                                unrecognized.append( cat);
+	                            }
+	                            else {
+	                                unrecognized.append( "; ");
+	                                unrecognized.append( cat);
+	                            }
+	                        }
+	                    }
 
-                    // cut off categories
-                    if (crm.length()>endb+1 && crm.charAt( endb + 1) == ' ')
-                        endb++;
-                    crm = crm.substring( endb + 1);
-                    if (crm.length() == 0) {
-                        // just attributes, no translations
-                        continue;
-                    }
-                    if (unrecognized != null) {
-                        // restore unrecognized categories
-                        unrecognized.append( "} ");
-                        unrecognized.append( crm);
-                        crm = unrecognized.toString();
-                    }
-                } catch (StringIndexOutOfBoundsException ex) {
-                    System.err.println
-                        ( "WadokuJT warning: missing closing bracket in translation " + crm);
-                    // can be safely ignored
+	                    // cut off categories
+	                    if (crm.length()>endb+1 && crm.charAt( endb + 1) == ' ') {
+	                        endb++;
+	                    }
+	                    crm = crm.substring( endb + 1);
+	                    if (crm.length() == 0) {
+	                        // just attributes, no translations
+	                        continue;
+	                    }
+	                    if (unrecognized != null) {
+	                        // restore unrecognized categories
+	                        unrecognized.append( "} ");
+	                        unrecognized.append( crm);
+	                        crm = unrecognized.toString();
+	                    }
+	                } catch (StringIndexOutOfBoundsException ex) {
+	                    System.err.println
+	                        ( "WadokuJT warning: missing closing bracket in translation " + crm);
+	                    // can be safely ignored
+	                }
                 }
 
                 List<String> crml = new ArrayList<String>( 10);
@@ -686,10 +712,11 @@ public class WadokuJT extends FileBasedDictionary {
                     crml.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
                 }
 
-                if (thisRomA.isEmpty())
-                    romA.add( null);
-                else
-                    romA.add( thisRomA);
+                if (thisRomA.isEmpty()) {
+	                romA.add( null);
+                } else {
+	                romA.add( thisRomA);
+                }
             }
 
             // parse comment/reference field
@@ -701,12 +728,13 @@ public class WadokuJT extends FileBasedDictionary {
                 while (REFERENCE_MATCHER.find()) {
                     char tc = REFERENCE_MATCHER.group( 1).charAt( 0);
                     Attribute<ReferenceAttributeValue> type;
-                    if (tc == '\u2192')
-                        type = ALT_READING;
-                    else if (tc == '\u21d2')
-                        type = Attributes.REFERENCE;
-                    else
-                        type = Attributes.ANTONYM;
+                    if (tc == '\u2192') {
+	                    type = ALT_READING;
+                    } else if (tc == '\u21d2') {
+	                    type = Attributes.REFERENCE;
+                    } else {
+	                    type = Attributes.ANTONYM;
+                    }
                     generalA.addAttribute( type, new SearchReference
                                            ( REFERENCE_MATCHER.group( 2), this,
                                              ExpressionSearchModes.EXACT,
@@ -719,10 +747,11 @@ public class WadokuJT extends FileBasedDictionary {
             String mainEntry = entry.substring( end+1);
             if (mainEntry.startsWith( "HE")) {
                 generalA.addAttribute( MAIN_ENTRY, null);
-                if (mainEntry.length() <= 4)
-                    mainEntry = "";
-                else // cut off "HE; " part of mainEntry
-                    mainEntry = mainEntry.substring( 4);
+                if (mainEntry.length() <= 4) {
+	                mainEntry = "";
+                } else {
+	                mainEntry = mainEntry.substring( 4);
+                }
             }
             if (mainEntry.length() > 0) {
                 // reference to main entry

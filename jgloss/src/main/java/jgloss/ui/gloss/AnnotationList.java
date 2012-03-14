@@ -74,8 +74,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 
         public KeyEventDelegator( KeyListener delegatee) {
             this.delegatee = delegatee;
-            if (delegators == null)
-                delegators = new LinkedList<KeyEventDelegator>();
+            if (delegators == null) {
+	            delegators = new LinkedList<KeyEventDelegator>();
+            }
             delegators.add( this);
         }
         
@@ -202,8 +203,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     Annotation selection = (Annotation) getSelectedValue();
-                    if (selection != null)
-                        selection.setTranslation( null);
+                    if (selection != null) {
+	                    selection.setTranslation( null);
+                    }
                 }
             };
         UIUtilities.initAction( clearTranslationAction, "annotationeditor.action.cleartranslation");
@@ -215,8 +217,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     int selection = getSelectedIndex();
-                    if (selection>-1 && selection<annotationList.getAnnotationCount()-1)
-                        setSelectedIndex( selection+1);
+                    if (selection>-1 && selection<annotationList.getAnnotationCount()-1) {
+	                    setSelectedIndex( selection+1);
+                    }
                 }
             };
         UIUtilities.initAction( nextAnnotationAction, "annotationeditor.action.next");
@@ -227,8 +230,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     int selection = getSelectedIndex();
-                    if (selection > 0)
-                        setSelectedIndex( selection-1);
+                    if (selection > 0) {
+	                    setSelectedIndex( selection-1);
+                    }
                 }
             };
         UIUtilities.initAction( previousAnnotationAction, "annotationeditor.action.previous");
@@ -368,9 +372,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 	public void addKeyListener( KeyListener handler) {
         if (handler.getClass().getName().equals( "javax.swing.plaf.basic.BasicListUI$KeyHandler")) {
             super.addKeyListener( new KeyEventDelegator( handler));
+        } else {
+	        super.addKeyListener( handler);
         }
-        else
-            super.addKeyListener( handler);
     }
 
     /**
@@ -380,10 +384,11 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 	public void removeKeyListener( KeyListener handler) {
         if (handler.getClass().getName().equals( "javax.swing.plaf.basic.BasicListUI$KeyHandler")) {
             KeyListener delegator = releaseDelegator( handler);
-            if (delegator != null)
-                super.removeKeyListener( delegator);
-            else
-                super.removeKeyListener( handler);
+            if (delegator != null) {
+	            super.removeKeyListener( delegator);
+            } else {
+	            super.removeKeyListener( handler);
+            }
         }
     }
 
@@ -420,8 +425,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 
         // select the next annotation (or previous, if this was the last annotation)
         selection = Math.min(selection, getModel().getSize()-1);
-        if (selection >= 0)
-            setSelectedIndex(selection);
+        if (selection >= 0) {
+	        setSelectedIndex(selection);
+        }
     }
 
     /**
@@ -429,8 +435,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
      */
     private void addSelectionToExclusions() {
         Annotation selection = (Annotation) getSelectedValue();
-        if (selection == null)
-            return;
+        if (selection == null) {
+	        return;
+        }
 
         String word = selection.getAnnotatedText();
         String dictionaryWord = selection.getDictionaryForm();
@@ -442,8 +449,9 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
             if (StringTools.isHiragana( word.charAt( 0)) &&
                 StringTools.isKatakana( dictionaryWord.charAt( 0)) ||
                 StringTools.isKatakana( word.charAt( 0)) &&
-                StringTools.isHiragana( dictionaryWord.charAt( 0)))
-                ExclusionList.addWord( word);
+                StringTools.isHiragana( dictionaryWord.charAt( 0))) {
+	            ExclusionList.addWord( word);
+            }
         }
 
         // if the annotated word is all kana, add the dictionary reading,
@@ -457,10 +465,11 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
             }
         }
 
-        if (!isKana || selection.getDictionaryFormReading().length()==0)
-            ExclusionList.addWord( dictionaryWord);
-        else
-            ExclusionList.addWord( selection.getDictionaryFormReading());
+        if (!isKana || selection.getDictionaryFormReading().length()==0) {
+	        ExclusionList.addWord( dictionaryWord);
+        } else {
+	        ExclusionList.addWord( selection.getDictionaryFormReading());
+        }
     }
 
     /**
@@ -468,19 +477,23 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
      */
     private void addSelectionToDictionary() {
         Annotation selection = (Annotation) getSelectedValue();
-        if (selection == null)
-            return;
+        if (selection == null) {
+	        return;
+        }
         String translation = selection.getTranslation();
-        if (translation==null || translation.length()==0)
-            return;
+        if (translation==null || translation.length()==0) {
+	        return;
+        }
         String word = selection.getDictionaryForm();
-        if (word==null || word.length()==0)
-            return;
+        if (word==null || word.length()==0) {
+	        return;
+        }
         String reading = selection.getDictionaryFormReading();
-        if (reading!=null && (reading.length()==0 || reading.equals( word)))
-            reading = null;
+        if (reading!=null && (reading.length()==0 || reading.equals( word))) {
+	        reading = null;
         /*try {
           Dictionaries.getUserDictionary().addEntry( word, reading, translation);
           } catch (NullPointerException ex) {}*/
+        }
     }
 } // class AnnotationList

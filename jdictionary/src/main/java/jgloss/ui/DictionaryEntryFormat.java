@@ -128,51 +128,45 @@ class DictionaryEntryFormat {
 
         AttributeFormatter format = null;
 
-        if (nameOnly || att==Attributes.EXAMPLE)
-            format = new AttributeNameFormatter( " {", "}");
-
-        else if (att == Attributes.PART_OF_SPEECH ||
+        if (nameOnly || att==Attributes.EXAMPLE) {
+	        format = new AttributeNameFormatter( " {", "}");
+        } else if (att == Attributes.PART_OF_SPEECH ||
                  att == Attributes.USAGE ||
-                 att == Attributes.CATEGORY)
-            format = new DefaultAttributeFormatter
+                 att == Attributes.CATEGORY) {
+	        format = new DefaultAttributeFormatter
                 ( " (", ")", "", false, commaList);
-
-        else if (att == Attributes.ABBREVIATION)
-            format = new WordFormatter( JGloss.messages.getString( "abbr.word"),
+        } else if (att == Attributes.ABBREVIATION) {
+	        format = new WordFormatter( JGloss.messages.getString( "abbr.word"),
                                         "", JGloss.messages.getString( "abbr.lang_and_word"),
                                         decorator.decorateList( new DefaultListFormatter( " (", ",", ")"),
                                                                 att, position));
-
-        else if (att == Attributes.GAIRAIGO)
-            format = new WordFormatter( "", JGloss.messages.getString( "gairaigo.lang"),
+        } else if (att == Attributes.GAIRAIGO) {
+	        format = new WordFormatter( "", JGloss.messages.getString( "gairaigo.lang"),
                                         JGloss.messages.getString( "gairaigo.lang_and_word"),
                                         decorator.decorateList( new DefaultListFormatter( " (", ",", ")"),
                                                                 att, position));
-
-        else if (att == Attributes.REFERENCE)
-            format = new ReferenceAttributeFormatter
+        } else if (att == Attributes.REFERENCE) {
+	        format = new ReferenceAttributeFormatter
                 ( " \u21d2", "", commaList);
-
-        else if (att == Attributes.SYNONYM)
-            format = new ReferenceAttributeFormatter
+        } else if (att == Attributes.SYNONYM) {
+	        format = new ReferenceAttributeFormatter
                 ( " \u21d2", "", commaList);
-
-        else if (att == Attributes.ANTONYM)
-            format = new ReferenceAttributeFormatter
+        } else if (att == Attributes.ANTONYM) {
+	        format = new ReferenceAttributeFormatter
                 ( " \u21d4", "", commaList);
-
-        else if (att == WadokuJT.ALT_READING)
-            format = new ReferenceAttributeFormatter
+        } else if (att == WadokuJT.ALT_READING) {
+	        format = new ReferenceAttributeFormatter
                 ( " \u2192", "", commaList);
-
-        else if (att == Attributes.EXPLANATION)
-            format = new InformationAttributeFormatter
+        } else if (att == Attributes.EXPLANATION) {
+	        format = new InformationAttributeFormatter
                 ( " (", ")", "", false, commaList);
+        }
 
         // else: attribute not supported
 
-        if (format != null)
-            format = decorator.decorateAttribute( format, att, position);
+        if (format != null) {
+	        format = decorator.decorateAttribute( format, att, position);
+        }
 
         return format;
     }
@@ -184,8 +178,9 @@ class DictionaryEntryFormat {
     public static DictionaryEntryFormatter createFormatter( Decorator decorator) {
         DictionaryEntryFormatter out = new DictionaryEntryFormatter();
 
-        if (decorator == null)
-            decorator = new IdentityDecorator();
+        if (decorator == null) {
+	        decorator = new IdentityDecorator();
+        }
 
         out.addWordFormat( decorator.decorateList( new DefaultListFormatter( word),
         				DecorationType.WORD));

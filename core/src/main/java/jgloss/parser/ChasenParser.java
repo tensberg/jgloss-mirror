@@ -95,10 +95,11 @@ public class ChasenParser extends AbstractParser {
         try {
             if (chasen == null) {
                 // start chasen process
-                if (chasenExecutable != null)
-                    chasen = new Chasen( chasenExecutable, CHASEN_ARGS, '\t');
-                else // use default executable
-                    chasen = new Chasen( CHASEN_ARGS, '\t');
+                if (chasenExecutable != null) {
+	                chasen = new Chasen( chasenExecutable, CHASEN_ARGS, '\t');
+                } else {
+	                chasen = new Chasen( CHASEN_ARGS, '\t');
+                }
             }
 
             Chasen.Result result = chasen.parse( text, start, length);
@@ -110,8 +111,9 @@ public class ChasenParser extends AbstractParser {
                 }
                 
                 // chasen skips spaces, so we have to adjust parsePosition here
-                while (parsePosition<end && text[parsePosition]==' ')
-                    parsePosition++;
+                while (parsePosition<end && text[parsePosition]==' ') {
+	                parsePosition++;
+                }
                 
                 Object resultLine = result.next();
                 // System.err.println( resultLine);
@@ -146,8 +148,9 @@ public class ChasenParser extends AbstractParser {
                                                                             inflectionType,
                                                                             inflectedForm)));
                         
-                        if (firstOccurrenceOnly)
-                            annotatedWords.add( surfaceBase);
+                        if (firstOccurrenceOnly) {
+	                        annotatedWords.add( surfaceBase);
+                        }
                     }
 
                     parsePosition += surfaceInflected.length();
@@ -177,8 +180,9 @@ public class ChasenParser extends AbstractParser {
                                                String inflectedForm) {
         boolean noInflectionType = "n".equals( inflectionType);
         boolean noInflectedForm = "n".equals( inflectedForm);
-        if (noInflectionType && noInflectedForm)
-            return partOfSpeech;
+        if (noInflectionType && noInflectedForm) {
+	        return partOfSpeech;
+        }
 
         StringBuilder out = new StringBuilder( partOfSpeech);
         if (!noInflectionType) {
@@ -198,11 +202,13 @@ public class ChasenParser extends AbstractParser {
      */
     @Override
 	public void reset() {
-        if (chasen != null)
-            chasen.dispose();
+        if (chasen != null) {
+	        chasen.dispose();
+        }
 
-        if (lookupCache != null)
-            lookupCache.clear();
+        if (lookupCache != null) {
+	        lookupCache.clear();
+        }
 
         super.reset();
     }

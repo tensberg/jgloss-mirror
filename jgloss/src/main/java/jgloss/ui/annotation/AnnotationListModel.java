@@ -44,8 +44,9 @@ public class AnnotationListModel {
 
     public AnnotationListModel( List<Element> _annoElements) {
         annotations = new ArrayList<Annotation>( _annoElements.size()+10);
-        for (Element element : _annoElements)
-            annotations.add( new Annotation( this, element));
+        for (Element element : _annoElements) {
+	        annotations.add( new Annotation( this, element));
+        }
     }
 
     public int getAnnotationCount() { return annotations.size(); }
@@ -74,8 +75,9 @@ public class AnnotationListModel {
         // the finishing index of the previous search is remembered. This will make the
         // search faster if the method is called for close locations. Since this method
         // is often called after mouse movement events, this is likely to be the case.
-        if (searchindex<0 || searchindex>=annotations.size())
-            searchindex = annotations.size() / 2;
+        if (searchindex<0 || searchindex>=annotations.size()) {
+	        searchindex = annotations.size() / 2;
+        }
 
         // do a binary search
         Annotation anno;
@@ -123,9 +125,9 @@ public class AnnotationListModel {
                     min = searchindex + 1;
                     searchindex = searchindex + (max-searchindex)/2 + 1;
                 }
+            } else {
+	            found = true;
             }
-            else
-                found = true;
         } while (!found);
 
         return searchindex;
@@ -175,8 +177,9 @@ public class AnnotationListModel {
             while (annoOffset >= 0 &&
                    annoElement != annotations.get(annoOffset).getAnnotationElement() &&
                    annoElement.getStartOffset() == 
-                   annotations.get(annoOffset).getAnnotationElement().getStartOffset())
-                annoOffset--;
+                   annotations.get(annoOffset).getAnnotationElement().getStartOffset()) {
+	            annoOffset--;
+            }
             
             // if not found, search forward
             if (annoOffset < 0 ||
@@ -186,8 +189,9 @@ public class AnnotationListModel {
                 while (annoOffset < annotations.size() &&
                        annoElement != annotations.get(annoOffset).getAnnotationElement() &&
                        annoElement.getStartOffset() == 
-                       annotations.get(annoOffset).getAnnotationElement().getStartOffset())
-                    annoOffset++;
+                       annotations.get(annoOffset).getAnnotationElement().getStartOffset()) {
+	                annoOffset++;
+                }
             }
 
             if (annoOffset < annotations.size() &&

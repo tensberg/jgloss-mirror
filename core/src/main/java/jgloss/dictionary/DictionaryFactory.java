@@ -131,13 +131,15 @@ public abstract class DictionaryFactory {
                 conf = result.getConfidence();
             }
             
-            if (reasons.length() > 0)
-            	reasons += '\n';
+            if (reasons.length() > 0) {
+	            reasons += '\n';
+            }
             reasons += ic.getName() + ":" + result.getReason();
         }
 
-        if (imp == null) // zero confidence for all implementations
-            throw new NotSupportedException( reasons);
+        if (imp == null) {
+	        throw new NotSupportedException( reasons);
+        }
 
         return imp;
     }

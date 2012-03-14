@@ -160,12 +160,14 @@ public class ParserSelector extends JPanel {
             Vector<String> v = new Vector<String>();
             v.add( JGloss.messages.getString( "parserselector.noreadings"));
             String s = JGloss.prefs.getString( Preferences.READING_BRACKET_CHARS);
-            for ( i=0; i<s.length()-1; i+=2)
-                v.add( s.substring( i, i+2));
+            for ( i=0; i<s.length()-1; i+=2) {
+	            v.add( s.substring( i, i+2));
+            }
             readingBrackets = new JComboBox( v);
             readingBrackets.setEditable( true);
-            if (readingStart!='\0' && readingEnd!='\0')
-                setReadingBrackets( readingStart, readingEnd);
+            if (readingStart!='\0' && readingEnd!='\0') {
+	            setReadingBrackets( readingStart, readingEnd);
+            }
             UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                     @Override
 					public void propertyChange( java.beans.PropertyChangeEvent e) { 
@@ -205,15 +207,17 @@ public class ParserSelector extends JPanel {
                             { Set.class }, {} };
 
         // loop over the sets of parameters until a matching constructor is found.
-        for ( int i=0; i<parameters.length; i++) try {
-            Constructor<? extends Parser> c = parserClass.getConstructor( paramClasses[i]);
-            Parser p = c.newInstance( parameters[i]);
-            p.setAnnotateFirstOccurrenceOnly( firstOccurrenceOnly);
-            return p;
-        } catch (NoSuchMethodException ex) {
-            // try to find a constructor with a different set of parameters
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        for ( int i=0; i<parameters.length; i++) {
+	        try {
+	            Constructor<? extends Parser> c = parserClass.getConstructor( paramClasses[i]);
+	            Parser p = c.newInstance( parameters[i]);
+	            p.setAnnotateFirstOccurrenceOnly( firstOccurrenceOnly);
+	            return p;
+	        } catch (NoSuchMethodException ex) {
+	            // try to find a constructor with a different set of parameters
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
         }
 
         throw new IllegalArgumentException( "no suitable constructor in parser class " +
@@ -226,11 +230,12 @@ public class ParserSelector extends JPanel {
      */
     public static ReadingAnnotationFilter createReadingAnnotationFilter( char readingStart, 
                                                                          char readingEnd) {
-        if (readingStart!='\0' && readingEnd!='\0')
-            // FIXME: kanji separator '\uff5c' should be user-configurable
+        if (readingStart!='\0' && readingEnd!='\0') {
+	        // FIXME: kanji separator '\uff5c' should be user-configurable
             return new ReadingAnnotationFilter( readingStart, readingEnd, '\uff5c');
-        else
-            return null;
+        } else {
+	        return null;
+        }
     }
 
     /**
@@ -238,9 +243,11 @@ public class ParserSelector extends JPanel {
      */
     @SuppressWarnings("unchecked")
     public Class<? extends Parser> getSelectedParser() {
-        for ( int i=0; i<parserButtons.length; i++)
-            if (parserButtons[i].isSelected())
-                return (Class<? extends Parser>) parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY);
+        for ( int i=0; i<parserButtons.length; i++) {
+	        if (parserButtons[i].isSelected()) {
+	            return (Class<? extends Parser>) parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY);
+            }
+        }
         return null;
     }
 
@@ -315,8 +322,9 @@ public class ParserSelector extends JPanel {
     public void setSelected( Class<? extends Parser> parserClass) {
         for ( int i=0; i<parserButtons.length; i++) {
             if (parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY).equals( parserClass)) {
-                if (parserButtons[i].isEnabled())
-                    parserButtons[i].setSelected( true);
+                if (parserButtons[i].isEnabled()) {
+	                parserButtons[i].setSelected( true);
+                }
                 break;
             }
         }
@@ -329,8 +337,9 @@ public class ParserSelector extends JPanel {
     public void setSelected( String displayName) {
         for ( int i=0; i<parserButtons.length; i++) {
             if (parserButtons[i].getText().equals( displayName)) {
-                if (parserButtons[i].isEnabled())
-                    parserButtons[i].setSelected( true);
+                if (parserButtons[i].isEnabled()) {
+	                parserButtons[i].setSelected( true);
+                }
                 break;
             }
         }
@@ -338,15 +347,17 @@ public class ParserSelector extends JPanel {
 
     public char getReadingStart() {
         String s = (String) readingBrackets.getSelectedItem();
-        if (s==null || s.equals( readingBrackets.getItemAt( 0)) || s.length()<2)
-            return '\0';
+        if (s==null || s.equals( readingBrackets.getItemAt( 0)) || s.length()<2) {
+	        return '\0';
+        }
         return s.charAt( 0);
     }
 
     public char getReadingEnd() {
         String s = (String) readingBrackets.getSelectedItem();
-        if (s==null || s.equals( readingBrackets.getItemAt( 0)) || s.length()<2)
-            return '\0';
+        if (s==null || s.equals( readingBrackets.getItemAt( 0)) || s.length()<2) {
+	        return '\0';
+        }
         return s.charAt( 1);
     }
 

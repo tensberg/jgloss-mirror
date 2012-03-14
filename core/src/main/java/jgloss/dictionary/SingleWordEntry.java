@@ -41,8 +41,9 @@ public class SingleWordEntry extends BaseEntry {
 
     @Override
 	public String getWord( int alternative) {
-        if (alternative != 0)
-            throw new IllegalArgumentException();
+        if (alternative != 0) {
+	        throw new IllegalArgumentException();
+        }
         return word;
     }
 
@@ -51,8 +52,9 @@ public class SingleWordEntry extends BaseEntry {
 
     @Override
 	public AttributeSet getWordAttributes( int alternative) {
-        if (alternative != 0)
-            throw new IllegalArgumentException();
+        if (alternative != 0) {
+	        throw new IllegalArgumentException();
+        }
 
         return emptySet.setParent( wordA);
     }
@@ -79,8 +81,9 @@ public class SingleWordEntry extends BaseEntry {
             out.append( translationRomA[i]);
             out.append( ' ');
             for ( int j=0; j<translations[i].length; j++) {
-                if (j > 0)
-                    out.append( "; ");
+                if (j > 0) {
+	                out.append( "; ");
+                }
                 out.append( translations[i][j]);
             }
         }

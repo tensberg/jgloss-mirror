@@ -82,8 +82,9 @@ public class AnnotationTags extends HTML.Tag {
      */
     @Override
 	public boolean equals( Object o) {
-        if (o instanceof HTML.Tag)
-            return toString().equals( o.toString());
+        if (o instanceof HTML.Tag) {
+	        return toString().equals( o.toString());
+        }
         return false;
     }
 
@@ -101,34 +102,46 @@ public class AnnotationTags extends HTML.Tag {
      * <CODE>htmlTag</CODE> itself if it is not an annotation tag.
      */
     public static HTML.Tag getAnnotationTagEqualTo( HTML.Tag htmlTag) {
-        if (ANNOTATION.equals( htmlTag))
-            return ANNOTATION;
-        if (WORD.equals( htmlTag))
-            return WORD;
-        if (READING_BASETEXT.equals( htmlTag))
-            return READING_BASETEXT;
-        if (READING.equals( htmlTag))
-            return READING;
-        if (BASETEXT.equals( htmlTag))
-            return BASETEXT;
-        if (TRANSLATION.equals( htmlTag))
-            return TRANSLATION;
+        if (ANNOTATION.equals( htmlTag)) {
+	        return ANNOTATION;
+        }
+        if (WORD.equals( htmlTag)) {
+	        return WORD;
+        }
+        if (READING_BASETEXT.equals( htmlTag)) {
+	        return READING_BASETEXT;
+        }
+        if (READING.equals( htmlTag)) {
+	        return READING;
+        }
+        if (BASETEXT.equals( htmlTag)) {
+	        return BASETEXT;
+        }
+        if (TRANSLATION.equals( htmlTag)) {
+	        return TRANSLATION;
+        }
         return htmlTag;
     }
 
     public static HTML.Tag getAnnotationTagEqualTo( String htmlTag) {
-        if (ANNOTATION.id.equals( htmlTag))
-            return ANNOTATION;
-        if (WORD.id.equals( htmlTag))
-            return WORD;
-        if (READING_BASETEXT.id.equals( htmlTag))
-            return READING_BASETEXT;
-        if (READING.id.equals( htmlTag))
-            return READING;
-        if (BASETEXT.id.equals( htmlTag))
-            return BASETEXT;
-        if (TRANSLATION.id.equals( htmlTag))
-            return TRANSLATION;
+        if (ANNOTATION.id.equals( htmlTag)) {
+	        return ANNOTATION;
+        }
+        if (WORD.id.equals( htmlTag)) {
+	        return WORD;
+        }
+        if (READING_BASETEXT.id.equals( htmlTag)) {
+	        return READING_BASETEXT;
+        }
+        if (READING.id.equals( htmlTag)) {
+	        return READING;
+        }
+        if (BASETEXT.id.equals( htmlTag)) {
+	        return BASETEXT;
+        }
+        if (TRANSLATION.id.equals( htmlTag)) {
+	        return TRANSLATION;
+        }
         return new HTML.UnknownTag( htmlTag);
     }
 } // class AnnotationTags

@@ -44,11 +44,13 @@ public class AttributeNameFormatter extends AttributeFormatter {
     }
 
     protected StringBuilder format( Attribute<?> att, StringBuilder buf) {
-        if (before != null)
-            buf.append( before);
+        if (before != null) {
+	        buf.append( before);
+        }
         buf.append( att.getName());
-        if (after != null)
-            buf.append( after);
+        if (after != null) {
+	        buf.append( after);
+        }
         return buf;
     }
 

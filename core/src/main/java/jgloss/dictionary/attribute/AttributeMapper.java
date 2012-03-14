@@ -119,8 +119,9 @@ public class AttributeMapper {
                     // 4 and 5 are null
                     String attValueName = lineMatcher.group( 3);
                     if (attValueName != null) {
-                        if (attValueName.indexOf( '.') == -1)
-                            attValueName = "jgloss.dictionary.attribute." + attValueName;
+                        if (attValueName.indexOf( '.') == -1) {
+	                        attValueName = "jgloss.dictionary.attribute." + attValueName;
+                        }
                         Class<?> attValueClass;
                         try {
                             attValueClass = Class.forName( attValueName);
@@ -156,9 +157,9 @@ public class AttributeMapper {
                         allAttributes.put( attribute, attValues);
                     }
                     attValues.add( attValue);
+                } else {
+	                throw new IOException( "Invalid line " + mapping.getLineNumber());
                 }
-                else
-                    throw new IOException( "Invalid line " + mapping.getLineNumber());
             }
         }
     }

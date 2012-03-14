@@ -38,17 +38,19 @@ public class StringTools {
      * for other scripts.
      */
     public static Character.UnicodeBlock unicodeBlockOf( char c) {
-        if (c>=0x4e00 && c<0xa000)
-            return Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS;
-        else if (c>=0x30a0 && c<0x3100)
-            return Character.UnicodeBlock.KATAKANA;
-        else if (c>=0x3040) // upper bound is 0x30a0
-            return Character.UnicodeBlock.HIRAGANA;
-        else if (c>=0x3000) // upper bound is 0x3040
-            return Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION;
-        else if (c < 0x80)
-            return Character.UnicodeBlock.BASIC_LATIN;
-        else return Character.UnicodeBlock.of( c);
+        if (c>=0x4e00 && c<0xa000) {
+	        return Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS;
+        } else if (c>=0x30a0 && c<0x3100) {
+	        return Character.UnicodeBlock.KATAKANA;
+        } else if (c>=0x3040) {
+	        return Character.UnicodeBlock.HIRAGANA;
+        } else if (c>=0x3000) {
+	        return Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION;
+        } else if (c < 0x80) {
+	        return Character.UnicodeBlock.BASIC_LATIN;
+        } else {
+	        return Character.UnicodeBlock.of( c);
+        }
     }
 
     public static boolean isKatakana( char c) {
@@ -92,15 +94,17 @@ public class StringTools {
         for ( int i=0; i<s.length(); i++) {
             char c = s.charAt( i);
             if (isKatakana( c) && (!ignoreSpecialChars || !isKatakanaSpecialChar( c))) {
-                if (out == null)
-                    out = new StringBuilder( s);
+                if (out == null) {
+	                out = new StringBuilder( s);
+                }
                 out.setCharAt( i, (char) (c-96));
             }
         }
-        if (out == null) // no changes to original string
-            return s;
-        else // some katakana characters were converted
-            return out.toString();
+        if (out == null) {
+	        return s;
+        } else {
+	        return out.toString();
+        }
     }
     
     /**
@@ -129,15 +133,17 @@ public class StringTools {
         for ( int i=0; i<s.length(); i++) {
             char c = s.charAt( i);
             if (isHiragana( c) && (!ignoreSpecialChars || !isHiraganaSpecialChar( c))) {
-                if (out == null)
-                    out = new StringBuilder( s);
+                if (out == null) {
+	                out = new StringBuilder( s);
+                }
                 out.setCharAt( i, (char) (c+96));
             }
         }
-        if (out == null) // no changes to original string
-            return s;
-        else // some katakana characters were converted
-            return out.toString();
+        if (out == null) {
+	        return s;
+        } else {
+	        return out.toString();
+        }
     }
 
     /**
@@ -155,8 +161,9 @@ public class StringTools {
      */
     public static boolean containsKanji( String word) {
         for ( int i=0; i<word.length(); i++) {
-            if (isKanji( word.charAt( i)))
-                return true;
+            if (isKanji( word.charAt( i))) {
+	            return true;
+            }
         }
 
         return false;
@@ -200,12 +207,14 @@ public class StringTools {
             // search start of hiragana substring
             // use isKana instead of isHiragana to correctly handle katakana dash, which is not
             // converted by isHiragana
-            while (hStart<baseWord.length() && needsReading( baseWordH, hStart))
-                hStart++;
+            while (hStart<baseWord.length() && needsReading( baseWordH, hStart)) {
+	            hStart++;
+            }
             hEnd = hStart + 1;
             // search end of hiragana substring
-            while (hEnd<baseWord.length() && !needsReading( baseWordH, hEnd))
-                hEnd++;
+            while (hEnd<baseWord.length() && !needsReading( baseWordH, hEnd)) {
+	            hEnd++;
+            }
 
             String kanji = inflectedWord.substring( kStart, hStart);
             if (kanji.length() > 0) {
@@ -322,13 +331,13 @@ public class StringTools {
                 for ( int j=i+2; j<i+6; j++) {
                     char c = str.charAt( j);
                     int v = 0;
-                    if (c>='0' && c<='9')
-                        v = c - '0';
-                    else if (c>='a' && c<='f')
-                        v = c - 'a' + 10;
-                    else if (c>='A' && c<='F')
-                        v = c - 'A' + 10;
-                    else { // no hexadecimal value
+                    if (c>='0' && c<='9') {
+	                    v = c - '0';
+                    } else if (c>='a' && c<='f') {
+	                    v = c - 'a' + 10;
+                    } else if (c>='A' && c<='F') {
+	                    v = c - 'A' + 10;
+                    } else { // no hexadecimal value
                         replacement = -1;
                         break;
                     }
@@ -336,18 +345,20 @@ public class StringTools {
                 }
                 if (replacement >= 0) {
                     // valid escape sequence
-                    if (buf == null)
-                        buf = new StringBuilder( str);
+                    if (buf == null) {
+	                    buf = new StringBuilder( str);
+                    }
                     buf.delete( i, i+5);
                     buf.setCharAt( i, (char) replacement);
                 }
             }
         }
 
-        if (buf == null) // no changes to string
-            return str;
-        else
-            return buf.toString();
+        if (buf == null) {
+	        return str;
+        } else {
+	        return buf.toString();
+        }
     }
 
     /**
@@ -357,8 +368,9 @@ public class StringTools {
         // A \ escape char may be prepended to every non-aphabetical character,
         // even if it does not need escaping.
         // Do this to err on the safe side.
-        if (!(c>='a' && c<='z' || c>='A' && c<='Z'))
-            regex.append( '\\');
+        if (!(c>='a' && c<='z' || c>='A' && c<='Z')) {
+	        regex.append( '\\');
+        }
 
         regex.append( c);
         return regex;
@@ -369,8 +381,9 @@ public class StringTools {
      * special characters.
      */
     public static StringBuilder addToRegex( CharSequence text, StringBuilder regex) {
-        for ( int i=0; i<text.length(); i++)
-            addToRegex( text.charAt( i), regex);
+        for ( int i=0; i<text.length(); i++) {
+	        addToRegex( text.charAt( i), regex);
+        }
         return regex;
     }
 

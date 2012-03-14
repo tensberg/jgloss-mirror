@@ -126,12 +126,13 @@ public class ImportDialog extends JDialog implements TextListener {
                                           parserSelector.isFirstOccurrenceOnly());
                         JGloss.prefs.set( Preferences.IMPORT_DETECTPARAGRAPHS,
                                           parserSelector.isDetectParagraphs());
-                        if (parserSelector.isNoReadingBrackets())
-                            JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS, "");
-                        else
-                            JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS,
+                        if (parserSelector.isNoReadingBrackets()) {
+	                        JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS, "");
+                        } else {
+	                        JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS,
                                               new String( new char[] { parserSelector.getReadingStart(),
                                                                        parserSelector.getReadingEnd() }));
+                        }
                     }
                 }
             };
@@ -210,8 +211,9 @@ public class ImportDialog extends JDialog implements TextListener {
         Vector<String> v = new Vector<String>();
         v.add( JGloss.messages.getString( "encodings.default"));
         String[] enc = JGloss.prefs.getList( Preferences.ENCODINGS, ',');
-        for ( int i=0; i<enc.length; i++)
-            v.add( enc[i]);
+        for ( int i=0; i<enc.length; i++) {
+	        v.add( enc[i]);
+        }
         encodings = new JComboBox( v);
         encodings.setEditable( true);
 
@@ -265,18 +267,20 @@ public class ImportDialog extends JDialog implements TextListener {
         parserSelector.setDetectParagraphs( JGloss.prefs.getBoolean
                                             ( Preferences.IMPORT_DETECTPARAGRAPHS, true));
         String brackets = JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS);
-        if (brackets.length() == 2)
-            parserSelector.setReadingBrackets( brackets.charAt( 0), brackets.charAt( 1));
-        else
-            parserSelector.setNoReadingBrackets();
+        if (brackets.length() == 2) {
+	        parserSelector.setReadingBrackets( brackets.charAt( 0), brackets.charAt( 1));
+        } else {
+	        parserSelector.setNoReadingBrackets();
+        }
         parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
                                    ( Chasen.getDefaultExecutable()));
         JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {
                 @Override
 				public void propertyChange( PropertyChangeEvent e) {
-                    if (e.getPropertyName().equals( Preferences.CHASEN_LOCATION))
-                        parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
+                    if (e.getPropertyName().equals( Preferences.CHASEN_LOCATION)) {
+	                    parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
                                                    ( (String) e.getNewValue()));
+                    }
                 }
             });
 
@@ -312,10 +316,11 @@ public class ImportDialog extends JDialog implements TextListener {
      * @return The filename or url.
      */
     public String getSelection() {
-        if (selectionIsFilename())
-            return filename.getText();
-        else
-            return pastearea.getText();
+        if (selectionIsFilename()) {
+	        return filename.getText();
+        } else {
+	        return pastearea.getText();
+        }
     }
 
     /**
@@ -361,8 +366,9 @@ public class ImportDialog extends JDialog implements TextListener {
             pasteareaWasEmpty = text.length() == 0;
             return;
         }
-        if (text.length() == 0)
-            return;
+        if (text.length() == 0) {
+	        return;
+        }
 
         pasteareaWasEmpty = false;
         pastearea.setEditable( false);

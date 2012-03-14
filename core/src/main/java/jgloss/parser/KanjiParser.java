@@ -112,8 +112,9 @@ public class KanjiParser extends AbstractParser {
                         boolean cacheLookups, boolean ignoreNewlines, boolean firstOccurrenceOnly) {
         super( exclusions, ignoreNewlines, firstOccurrenceOnly);
         this.dictionaries = dictionaries;
-        if (cacheLookups)
-            lookupCache = new HashMap<String, Boolean>( 5000);
+        if (cacheLookups) {
+	        lookupCache = new HashMap<String, Boolean>( 5000);
+        }
     }
 
     /**
@@ -141,12 +142,14 @@ public class KanjiParser extends AbstractParser {
         boolean compverb = false;
         for ( int i=start; i<end; i++) {
             parsePosition = i; // tell the world where we are in parsing (see getParsePosition())
-            if (Thread.interrupted())
-                throw new ParsingInterruptedException();
+            if (Thread.interrupted()) {
+	            throw new ParsingInterruptedException();
+            }
             
             if (ignoreNewlines && 
-                (text[i]==0x0a || text[i]==0x0d))
-                continue;
+                (text[i]==0x0a || text[i]==0x0d)) {
+	            continue;
+            }
 
             ub = StringTools.unicodeBlockOf( text[i]);
             switch (mode) {
@@ -164,10 +167,11 @@ public class KanjiParser extends AbstractParser {
                 if (ub != Character.UnicodeBlock.KATAKANA) {
                     createAnnotations( wordStart, word.toString(),
                                        true, true, out);
-                    if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
-                        mode = IN_KANJI;
-                    else
-                        mode = OUTSIDE;
+                    if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
+	                    mode = IN_KANJI;
+                    } else {
+	                    mode = OUTSIDE;
+                    }
                     word.setLength( 0);
                     wordStart = i;
                 }
@@ -195,10 +199,11 @@ public class KanjiParser extends AbstractParser {
                     else {
                         createAnnotations( wordStart, word.toString(),
                                            true, true, out);
-                        if (ub == Character.UnicodeBlock.KATAKANA)
-                            mode = IN_KATAKANA;
-                        else
-                            mode = OUTSIDE;
+                        if (ub == Character.UnicodeBlock.KATAKANA) {
+	                        mode = IN_KATAKANA;
+                        } else {
+	                        mode = OUTSIDE;
+                        }
                         word.setLength( 0);
                         wordStart = i;
                     }
@@ -226,17 +231,18 @@ public class KanjiParser extends AbstractParser {
                         }
                     }
 
-                    if (ub == Character.UnicodeBlock.KATAKANA)
-                        mode = IN_KATAKANA;
-                    else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
-                        mode = IN_KANJI;
-                    else
-                        mode = OUTSIDE;
+                    if (ub == Character.UnicodeBlock.KATAKANA) {
+	                    mode = IN_KATAKANA;
+                    } else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
+	                    mode = IN_KANJI;
+                    } else {
+	                    mode = OUTSIDE;
+                    }
                     wordStart = i;
                     word.setLength( 0);
+                } else {
+	                inflection.append( text[i]);
                 }
-                else
-                    inflection.append( text[i]);
                 break;
             }
             
@@ -246,9 +252,9 @@ public class KanjiParser extends AbstractParser {
         }
         
         // look up last word in buffer
-        if (mode==IN_KATAKANA || mode==IN_KANJI)
-            createAnnotations( wordStart, word.toString(), true, true, out);
-        else if (mode == IN_INFLECTION) {
+        if (mode==IN_KATAKANA || mode==IN_KANJI) {
+	        createAnnotations( wordStart, word.toString(), true, true, out);
+        } else if (mode == IN_INFLECTION) {
             boolean result = createAnnotations( wordStart, word.toString(),
                                                 inflection.toString(), !compverb, !compverb, out);
             if (compverb) {
@@ -307,8 +313,9 @@ public class KanjiParser extends AbstractParser {
         boolean result = false;
 
         Conjugation[] conjugations = null;
-        if (inflection != null)
-            conjugations = Conjugation.findConjugations( inflection);
+        if (inflection != null) {
+	        conjugations = Conjugation.findConjugations( inflection);
+        }
 
         boolean stop = false;
         while (!stop) {
@@ -334,8 +341,9 @@ public class KanjiParser extends AbstractParser {
                                              ( wordStart, word.length() + 
                                                conjugatedForm.length(),
                                                null, dictionaryWord, null, conjugations[i].getType()));
-                            if (firstOccurrenceOnly)
-                                annotatedWords.add( dictionaryWord);
+                            if (firstOccurrenceOnly) {
+	                            annotatedWords.add( dictionaryWord);
+                            }
                             return true;
                         }
                     }
@@ -351,8 +359,9 @@ public class KanjiParser extends AbstractParser {
                     if (hasMatch( dictionaries[i], word)) {
                         annotations.add( new TextAnnotation
                                          ( wordStart, word.length(), word));
-                        if (firstOccurrenceOnly)
-                            annotatedWords.add( word);
+                        if (firstOccurrenceOnly) {
+	                        annotatedWords.add( word);
+                        }
                         return true;
                     }
                 }
@@ -366,26 +375,30 @@ public class KanjiParser extends AbstractParser {
 
                 for ( matchlength=word.length()-1; matchlength>0; matchlength--) {
                     subword = word.substring( 0, matchlength);
-                    if (ignoreWord( subword))
-                        break;
+                    if (ignoreWord( subword)) {
+	                    break;
+                    }
 
                     for ( int j=0; j<dictionaries.length; j++) {
-                        if (hasMatch( dictionaries[j], subword))
-                            break;
+                        if (hasMatch( dictionaries[j], subword)) {
+	                        break;
+                        }
                     }
                 }
 
                 if (matchlength > 0) { // match found
                     if (!ignoreWord( subword)) {
-                        if (firstOccurrenceOnly)
-                            annotatedWords.add( subword);
+                        if (firstOccurrenceOnly) {
+	                        annotatedWords.add( subword);
+                        }
                         annotations.add( new TextAnnotation
                                          ( wordStart, matchlength, subword));
                     }
                     result = true;
                 }
-                else
-                    matchlength = 1; // skip first char and look up remainder
+				else {
+	                matchlength = 1; // skip first char and look up remainder
+                }
                     
                 // continue search with suffix of word
                 if (trySuffixes) {
@@ -404,8 +417,9 @@ public class KanjiParser extends AbstractParser {
      */
     private boolean hasMatch( Dictionary d, String word) throws SearchException {
         lookups++;
-        if (searchKey == null)
-            searchKey = new StringBuilder( 128);
+        if (searchKey == null) {
+	        searchKey = new StringBuilder( 128);
+        }
         searchKey.setLength( 0);
         searchKey.append( word);
         searchKey.append( ':');
@@ -444,8 +458,9 @@ public class KanjiParser extends AbstractParser {
      */
     @Override
 	public void reset() {
-        if (lookupCache != null)
-            lookupCache.clear();
+        if (lookupCache != null) {
+	        lookupCache.clear();
+        }
 
         lookups = 0;
         cacheHits = 0;

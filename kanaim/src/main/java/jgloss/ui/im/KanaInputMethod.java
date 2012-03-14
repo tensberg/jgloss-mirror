@@ -105,16 +105,19 @@ class KanaInputMethod implements InputMethod {
 
     @Override
 	public void dispatchEvent( AWTEvent _event) {
-        if (!(active && compositionEnabled))
-            return;
+        if (!(active && compositionEnabled)) {
+	        return;
+        }
 
-        if (!(_event instanceof KeyEvent))
-            return;
+        if (!(_event instanceof KeyEvent)) {
+	        return;
+        }
 
         KeyEvent event = (KeyEvent) _event;
         if (event.getID() != KeyEvent.KEY_TYPED ||
-            event.getModifiers() != 0)
-            return;
+            event.getModifiers() != 0) {
+	        return;
+        }
 
         char c = event.getKeyChar();
 
@@ -123,22 +126,24 @@ class KanaInputMethod implements InputMethod {
                 conversionBuffer.deleteCharAt( conversionBuffer.length()-1);
                 dispatchString( conversionBuffer.toString(), false);
                 event.consume();
+            } else {
+	            return;
             }
-            else
-                return;
         }
 
-        if (!RomajiTranslator.isApplicableChar( c))
-            return;
+        if (!RomajiTranslator.isApplicableChar( c)) {
+	        return;
+        }
 
         conversionBuffer.append( c);
         String out = RomajiTranslator.translate( conversionBuffer,
                                                  RomajiTranslator.HIRAGANA);
 
-        if (out!=null && out.length()!=0)
-            dispatchString( out, true);
-        else
-            dispatchString( conversionBuffer.toString(), false);
+        if (out!=null && out.length()!=0) {
+	        dispatchString( out, true);
+        } else {
+	        dispatchString( conversionBuffer.toString(), false);
+        }
 
         event.consume();
     }

@@ -108,10 +108,12 @@ public class AboutFrame extends JFrame {
      */
     public static AboutFrame getFrame() {
         synchronized (dialogLock) {
-            if (dialog == null) try {
-                // wait until frame is created
-                dialogLock.wait();
-            } catch (InterruptedException ex) {}
+            if (dialog == null) {
+	            try {
+	                // wait until frame is created
+	                dialogLock.wait();
+	            } catch (InterruptedException ex) {}
+            }
             return dialog;
         }
     }
@@ -122,10 +124,12 @@ public class AboutFrame extends JFrame {
      */
     public static Action getShowAction() {
         synchronized (showActionLock) {
-            if (showAction == null) try {
-                // wait until frame is created
-                showActionLock.wait();
-            } catch (InterruptedException ex) {}
+            if (showAction == null) {
+	            try {
+	                // wait until frame is created
+	                showActionLock.wait();
+	            } catch (InterruptedException ex) {}
+            }
             return showAction;
         }
     }
@@ -165,8 +169,9 @@ public class AboutFrame extends JFrame {
 
 				@Override
 				public void actionPerformed( ActionEvent e) {
-                    if (license == null)
-                        createLicenseFrame();
+                    if (license == null) {
+	                    createLicenseFrame();
+                    }
                     license.setVisible( true);
                 }
             }));
@@ -199,8 +204,9 @@ public class AboutFrame extends JFrame {
                 ( AboutFrame.class.getResourceAsStream( "/data/COPYING"), "ASCII"));
             StringBuilder gpl = new StringBuilder();
             String line;
-            while ((line=r.readLine()) != null)
-                gpl.append( line + "\n");
+            while ((line=r.readLine()) != null) {
+	            gpl.append( line + "\n");
+            }
             r.close();
 
             license = new JFrame( JGloss.messages.getString( "about.license.title"));

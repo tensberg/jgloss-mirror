@@ -131,8 +131,9 @@ public class DictionaryEntryFormatter {
     public void addAttributeFormat( Attribute<?> att, AttributeFormatter format,
                                     Position generalAttributePosition, boolean before) {
         if (att.appliesTo( DictionaryEntry.AttributeGroup.GENERAL)) {
-            if (generalAttributePosition == null)
-                generalAttributePosition = before ? Position.BEFORE_ENTRY : Position.AFTER_ENTRY;
+            if (generalAttributePosition == null) {
+	            generalAttributePosition = before ? Position.BEFORE_ENTRY : Position.AFTER_ENTRY;
+            }
             addAttributeFormat( att, format, generalAttributePosition);
         }
 
@@ -175,20 +176,22 @@ public class DictionaryEntryFormatter {
         formatAttributes( de, buf, Position.BEFORE_ENTRY, de.getGeneralAttributes());
 
         for ( int i=0; i<formats.size(); i++) {
-            if (i == 1)
-                formatAttributes( de, buf, Position.BEFORE_FIELD2, de.getGeneralAttributes());
-            else if (i > 1)
-                formatAttributes( de, buf, Position.BEFORE_FIELD3, de.getGeneralAttributes());
+            if (i == 1) {
+	            formatAttributes( de, buf, Position.BEFORE_FIELD2, de.getGeneralAttributes());
+            } else if (i > 1) {
+	            formatAttributes( de, buf, Position.BEFORE_FIELD3, de.getGeneralAttributes());
+            }
 
             Object[] format = formats.get( i);
-            if (format[0] == DictionaryEntryField.WORD)
-                formatWords( de, buf, (ListFormatter) format[1]);
-            else if (format[0] == DictionaryEntryField.READING)
-                formatReadings( de, buf, (ListFormatter) format[1]);
-            else // translations
-                formatTranslations( de, buf, (ListFormatter) format[1],
+            if (format[0] == DictionaryEntryField.WORD) {
+	            formatWords( de, buf, (ListFormatter) format[1]);
+            } else if (format[0] == DictionaryEntryField.READING) {
+	            formatReadings( de, buf, (ListFormatter) format[1]);
+            } else {
+	            formatTranslations( de, buf, (ListFormatter) format[1],
                                     (ListFormatter) format[2],
                                     (ListFormatter) format[3]);
+            }
         }
 
         formatAttributes( de, buf, Position.AFTER_ENTRY, de.getGeneralAttributes());
@@ -284,11 +287,15 @@ public class DictionaryEntryFormatter {
     protected StringBuilder formatAttributes( DictionaryEntry de, StringBuilder buf,
                                              Position pos, AttributeSet atts) {
         if (atts.isEmpty())
-            return buf; // nothing to do
+		 {
+	        return buf; // nothing to do
+        }
         
         List<Object[]> formats = attributeFormats.get( pos);
         if (formats == null)
-            return buf; // nothing to do
+		 {
+	        return buf; // nothing to do
+        }
 
         for ( int i=0; i<formats.size(); i++) {
             Object[] o = formats.get( i);

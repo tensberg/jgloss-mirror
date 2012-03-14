@@ -208,9 +208,11 @@ public class Attributes<T extends AttributeValue> implements Attribute<T> {
 
     @Override
 	public boolean appliesTo( DictionaryEntry.AttributeGroup _group) {
-        for ( int i=0; i<groups.length; i++)
-            if (groups[i] == _group)
-                return true;
+        for ( int i=0; i<groups.length; i++) {
+	        if (groups[i] == _group) {
+	            return true;
+            }
+        }
 
         return false;
     }

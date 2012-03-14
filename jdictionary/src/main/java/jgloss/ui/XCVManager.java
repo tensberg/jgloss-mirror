@@ -149,8 +149,9 @@ public class XCVManager {
 
                 @Override
 				public void focusLost( FocusEvent e) {
-                    if (!e.isTemporary())
-                        setActiveSource( null);
+                    if (!e.isTemporary()) {
+	                    setActiveSource( null);
+                    }
                 }
             };
     }
@@ -204,17 +205,20 @@ public class XCVManager {
         Action[] actions = new Action[3]; // cut/copy/paste
         for ( int i=0; i<allActions.length; i++) {
             String name = (String) allActions[i].getValue( Action.NAME);
-            if (name.equals( DefaultEditorKit.cutAction))
-                actions[0] = allActions[i];
-            else if (name.equals( DefaultEditorKit.copyAction))
-                actions[1] = allActions[i];
-            else if (name.equals( DefaultEditorKit.pasteAction))
-                actions[2] = allActions[i];
+            if (name.equals( DefaultEditorKit.cutAction)) {
+	            actions[0] = allActions[i];
+            } else if (name.equals( DefaultEditorKit.copyAction)) {
+	            actions[1] = allActions[i];
+            } else if (name.equals( DefaultEditorKit.pasteAction)) {
+	            actions[2] = allActions[i];
+            }
         }
         sourceActions.put( source, actions);
 
         if (source == activeSource)
-            setActiveSource( source); // update current actions
+		 {
+	        setActiveSource( source); // update current actions
+        }
     }
 
     /**
@@ -247,9 +251,10 @@ public class XCVManager {
                                delegateeCopyAction != null &&
                                delegateeCopyAction.isEnabled());
         Transferable t = null;
-        if (isEnabled) 
-            java.awt.Toolkit.getDefaultToolkit().
+        if (isEnabled) {
+	        java.awt.Toolkit.getDefaultToolkit().
                 getSystemClipboard().getContents( null);
+        }
         boolean hasContent = (t != null &&
                               (t.isDataFlavorSupported( DataFlavor.getTextPlainUnicodeFlavor()) ||
                                t.isDataFlavorSupported( DataFlavor.stringFlavor)));

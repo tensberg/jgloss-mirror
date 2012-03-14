@@ -52,8 +52,9 @@ public class SaveFileChooser extends JFileChooser {
 	public File getSelectedFile() {
         File f = super.getSelectedFile();
         if (f != null && 
-            getFileFilter() instanceof ExtensionFileFilter)
-            f = ((ExtensionFileFilter) getFileFilter()).addExtension( f);
+            getFileFilter() instanceof ExtensionFileFilter) {
+	        f = ((ExtensionFileFilter) getFileFilter()).addExtension( f);
+        }
 
         return f;
     }
@@ -75,8 +76,9 @@ public class SaveFileChooser extends JFileChooser {
                   JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                   new Object[] { overwrite, cancel }, cancel);
 
-            if (choice != JOptionPane.YES_OPTION)
-                return;
+            if (choice != JOptionPane.YES_OPTION) {
+	            return;
+            }
         }
 
         super.approveSelection();

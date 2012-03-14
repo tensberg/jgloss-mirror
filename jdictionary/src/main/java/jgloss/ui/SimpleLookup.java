@@ -76,9 +76,10 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
                     @Override
 					public boolean enqueue() {
                         boolean enqueued = super.enqueue();
-                        if (enqueued)
-                            Dictionaries.removeDictionaryListChangeListener
+                        if (enqueued) {
+	                        Dictionaries.removeDictionaryListChangeListener
                                 ( WeakDictionaryChangeListener.this);
+                        }
                         return enqueued;
                     }
                 };
@@ -87,9 +88,10 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         @Override
 		public void dictionaryListChanged() {
             LookupModel model = modelRef.get();
-            if (model != null)
-                model.setDictionaries
+            if (model != null) {
+	            model.setDictionaries
                     ( Arrays.asList( Dictionaries.getDictionaries( false)));
+            }
         }
     } // class WeakDictionaryChangeListener
 
@@ -137,8 +139,9 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         controls.add( search, fixedC);
 
         if (additionalControls != null) {
-            for ( int i=0; i<additionalControls.length; i++)
-                controls.add( additionalControls[i], fixedC);
+            for ( int i=0; i<additionalControls.length; i++) {
+	            controls.add( additionalControls[i], fixedC);
+            }
         }
 
         this.add( controls, BorderLayout.NORTH);
@@ -161,8 +164,9 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
     }
 
     public void search( String text) {
-        if (text == null || text.length()==0)
-            return;
+        if (text == null || text.length()==0) {
+	        return;
+        }
 
         expression.setSelectedItem( text);
 
@@ -177,11 +181,13 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         engine.doLookup( modelClone, new Runnable() {
                 @Override
 				public void run() {
-                    if (list.getEntryCount() == 0) try {
-                        model.selectSearchMode( model.getSelectedSearchModeIndex() + 1);
-                        engine.doLookup( modelClone, this);
-                    } catch (IndexOutOfBoundsException ex) {
-                        // All search modes tried. End search.
+                    if (list.getEntryCount() == 0) {
+	                    try {
+	                        model.selectSearchMode( model.getSelectedSearchModeIndex() + 1);
+	                        engine.doLookup( modelClone, this);
+	                    } catch (IndexOutOfBoundsException ex) {
+	                        // All search modes tried. End search.
+	                    }
                     }
                 }
             });
@@ -226,13 +232,15 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         if (LookupResultList.Hyperlinker.REFERENCE_PROTOCOL.equals( type)) {
             ReferenceAttributeValue ref = (ReferenceAttributeValue) 
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
-            if (ref != null) try {
-                new LookupResultCache
-                    ( JGloss.messages.getString( "wordlookup.reference", 
-                                                 new Object[] { ref.getReferenceTitle() }),
-                      ref.getReferencedEntries()).replay( lookupResultProxy);
-            } catch (SearchException ex) {
-                ex.printStackTrace();
+            if (ref != null) {
+	            try {
+	                new LookupResultCache
+	                    ( JGloss.messages.getString( "wordlookup.reference", 
+	                                                 new Object[] { ref.getReferenceTitle() }),
+	                      ref.getReferencedEntries()).replay( lookupResultProxy);
+	            } catch (SearchException ex) {
+	                ex.printStackTrace();
+	            }
             }
         }
     }

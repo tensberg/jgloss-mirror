@@ -245,8 +245,9 @@ public class KanjiDic implements Dictionary {
                 // iterate over all fields (delimited by a ' ')
                 int from = 7; // skip kanji and ASCII kanji code
                 int to = dicline.indexOf( ' ', from + 1);
-                if (to == -1) // last field
-                    to = dicline.length();
+                if (to == -1) {
+	                to = dicline.length();
+                }
                 while (to > from) {
                     char c = dicline.charAt( from); // first char in field determines type
                     if (c < 128) { // ASCII character: reading only if c=='-'
@@ -263,55 +264,59 @@ public class KanjiDic implements Dictionary {
                             break;
                             
                         case 'T': // type change for following readings
-                            if (dicline.charAt( from+1) == '1') // nanori readings
-                                currentl = nanoril;
-                            else if (dicline.charAt( from+1) == '2') // radical name
-                                currentl = null;
+                            if (dicline.charAt( from+1) == '1') {
+	                            currentl = nanoril;
+                            } else if (dicline.charAt( from+1) == '2') {
+	                            currentl = null;
+                            }
                             break;
                         }
 
                         // only parse other fields if extended information is wanted by caller
-                        if (extendedInformation) try {
-                            switch (c) {
-                            case 'B': // bushu number
-                                bnum = Short.parseShort( dicline.substring( from+1, to));
-                                break;
-                                
-                            case 'C': // classical radical number
-                                cnum = Short.parseShort( dicline.substring( from+1, to));
-                                break;
-                                
-                            case 'F': // frequency of use
-                                frequency = Short.parseShort( dicline.substring( from+1, to));
-                                break;
-                                
-                            case 'S': // stroke count
-                                // If there is more than one stroke count, all but the first
-                                // are common miscounts. These entries are currently not used.
-                                if (strokecount == NOT_AVAILABLE) {
-                                    strokecount = Byte.parseByte( dicline.substring( from+1, to));
-                                }
-                                break;
-                                
-                                // all other entry types are currently not used
-                            }
-                        } catch (NumberFormatException ex) {
-                            System.err.println( "WARNING: malformed dictionary entry " + dicline);
+                        if (extendedInformation) {
+	                        try {
+	                            switch (c) {
+	                            case 'B': // bushu number
+	                                bnum = Short.parseShort( dicline.substring( from+1, to));
+	                                break;
+	                                
+	                            case 'C': // classical radical number
+	                                cnum = Short.parseShort( dicline.substring( from+1, to));
+	                                break;
+	                                
+	                            case 'F': // frequency of use
+	                                frequency = Short.parseShort( dicline.substring( from+1, to));
+	                                break;
+	                                
+	                            case 'S': // stroke count
+	                                // If there is more than one stroke count, all but the first
+	                                // are common miscounts. These entries are currently not used.
+	                                if (strokecount == NOT_AVAILABLE) {
+	                                    strokecount = Byte.parseByte( dicline.substring( from+1, to));
+	                                }
+	                                break;
+	                                
+	                                // all other entry types are currently not used
+	                            }
+	                        } catch (NumberFormatException ex) {
+	                            System.err.println( "WARNING: malformed dictionary entry " + dicline);
+	                        }
                         }
                     }
                     else {
                         if (currentl != null) {
                             currentl.add( dicline.substring( from, to));
+                        } else {
+	                        radicalname = dicline.substring( from, to);
                         }
-                        else
-                            radicalname = dicline.substring( from, to);
                     }
                     
                     // move to the next entry
                     from = to + 1;
                     to = dicline.indexOf( ' ', from + 1);
-                    if (to == -1) // last field
-                        to = dicline.length();
+                    if (to == -1) {
+	                    to = dicline.length();
+                    }
                 }
                 
                 if (readingsl.size() > 0) {
@@ -394,8 +399,9 @@ public class KanjiDic implements Dictionary {
                 
                 addReadings( line, e, e.getReadings());
                 addReadings( line, e, e.getNanoriReadings());
-                if (e.getRadicalName() != null)
-                    addEntry( e.getRadicalName(), line);
+                if (e.getRadicalName() != null) {
+	                addEntry( e.getRadicalName(), line);
+                }
                 String[] translations = e.getTranslations();
                 if (translations != null) {
                     for ( int i=0; i<translations.length; i++) {
@@ -407,8 +413,9 @@ public class KanjiDic implements Dictionary {
 
         // compact all stored array lists to minimize memory usage
         for (Object value : entries.values()) {
-            if (value instanceof ArrayList)
-                ((ArrayList<?>) value).trimToSize();
+            if (value instanceof ArrayList) {
+	            ((ArrayList<?>) value).trimToSize();
+            }
         }
     }
 
@@ -447,9 +454,9 @@ public class KanjiDic implements Dictionary {
         if (readings != null) {
             for ( int i=0; i<readings.length; i++) {
                 int dot = readings[i].indexOf( '.');
-                if (dot == -1)
-                    addEntry( readings[i], line);
-                else {
+                if (dot == -1) {
+	                addEntry( readings[i], line);
+                } else {
                     String end = readings[i].substring( dot+1);
                     addEntry( readings[i].substring( 0, dot) + end, line);
                     addEntry( e.getKanji() + end, line);
@@ -473,13 +480,14 @@ public class KanjiDic implements Dictionary {
     public List<Entry> lookup( String key) {
         List<Entry> r = null;
         List<String> original = entries.get( key);
-        if (original == null)
-            return Collections.emptyList();
-        else {
+        if (original == null) {
+	        return Collections.emptyList();
+        } else {
             // create list of entries from list of strings
             r = new ArrayList<Entry>( original.size());
-            for (String entry : original)
-                r.add( new Entry( entry, true));
+            for (String entry : original) {
+	            r.add( new Entry( entry, true));
+            }
         }
         
         return r;
@@ -492,11 +500,12 @@ public class KanjiDic implements Dictionary {
      */
     @Override
 	public Iterator<DictionaryEntry> search( SearchMode mode, Object[] parameters) throws SearchException {
-        if (mode instanceof ExpressionSearchModes)
-            return searchExpression( (ExpressionSearchModes) mode, (String) parameters[0], 
+        if (mode instanceof ExpressionSearchModes) {
+	        return searchExpression( (ExpressionSearchModes) mode, (String) parameters[0], 
                                      (SearchFieldSelection) parameters[1]);
-        else
-            throw new UnsupportedSearchModeException( mode);
+        } else {
+	        throw new UnsupportedSearchModeException( mode);
+        }
     }
 
     public Iterator<DictionaryEntry> searchExpression( ExpressionSearchModes mode, String expression, 
@@ -514,12 +523,13 @@ public class KanjiDic implements Dictionary {
 
     @Override
 	public boolean supports( SearchMode searchmode, boolean fully) {
-        if (fully && searchmode==ExpressionSearchModes.EXACT)
-            return true;
-        else if (searchmode instanceof ExpressionSearchModes)
-            return true;
-        else
-            return false;
+        if (fully && searchmode==ExpressionSearchModes.EXACT) {
+	        return true;
+        } else if (searchmode instanceof ExpressionSearchModes) {
+	        return true;
+        } else {
+	        return false;
+        }
     }
 
     @Override
@@ -604,13 +614,15 @@ public class KanjiDic implements Dictionary {
 
         @Override
 		public DictionaryEntry next() throws NoSuchElementException {
-            if (!hasNext())
-                throw new NoSuchElementException();
+            if (!hasNext()) {
+	            throw new NoSuchElementException();
+            }
 
             DictionaryEntry out = entryCache.removeFirst();
 
-            if (entryCache.isEmpty())
-                fillEntryCache();
+            if (entryCache.isEmpty()) {
+	            fillEntryCache();
+            }
 
             return out;
         }
@@ -625,7 +637,9 @@ public class KanjiDic implements Dictionary {
 
             while (entryCache.isEmpty()) {
                 if (!entries.hasNext())
-                    return; // no next entry
+				 {
+	                return; // no next entry
+                }
 
                 KanjiDic.Entry entry = new KanjiDic.Entry( entries.next(), false);
                 

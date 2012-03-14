@@ -73,27 +73,31 @@ public class UIUtilities {
         try {
             s = JGloss.messages.getString( key + ".ak");
         } catch (MissingResourceException ex) {}
-        if (s!=null && s.length()>0)
-            a.putValue( Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( s));
+        if (s!=null && s.length()>0) {
+	        a.putValue( Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( s));
+        }
 
         // mnemonic key
         try {
             s = JGloss.messages.getString( key + ".mk");
         } catch (MissingResourceException ex) {}
-        if (s!=null && s.length()>0) try {
-            a.putValue( Action.MNEMONIC_KEY, KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
-                        .get( null));
-        } catch (Exception ex) {
-            System.out.println( "Error while initializing Mnemonic Key " + s);
-            ex.printStackTrace();
+        if (s!=null && s.length()>0) {
+	        try {
+	            a.putValue( Action.MNEMONIC_KEY, KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
+	                        .get( null));
+	        } catch (Exception ex) {
+	            System.out.println( "Error while initializing Mnemonic Key " + s);
+	            ex.printStackTrace();
+	        }
         }
         
         // tooltip
         try {
             s = JGloss.messages.getString( key + ".tt");
         } catch (MissingResourceException ex) {}
-        if (s!=null && s.length()>0)
-            a.putValue( Action.SHORT_DESCRIPTION, s);
+        if (s!=null && s.length()>0) {
+	        a.putValue( Action.SHORT_DESCRIPTION, s);
+        }
     }
 
     /**
@@ -115,20 +119,23 @@ public class UIUtilities {
         try {
             s = JGloss.messages.getString( key + ".mk");
         } catch (MissingResourceException ex) {}
-        if (s!=null && s.length()>0) try {
-            b.setMnemonic( ((Integer) KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
-                           .get( null)).intValue());
-        } catch (Exception ex) {
-            System.out.println( "Error while initializing Mnemonic Key " + s);
-            ex.printStackTrace();
+        if (s!=null && s.length()>0) {
+	        try {
+	            b.setMnemonic( ((Integer) KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
+	                           .get( null)).intValue());
+	        } catch (Exception ex) {
+	            System.out.println( "Error while initializing Mnemonic Key " + s);
+	            ex.printStackTrace();
+	        }
         }
         
         // tooltip
         try {
             s = JGloss.messages.getString( key + ".tt");
         } catch (MissingResourceException ex) {}
-        if (s!=null && s.length()>0)
-            b.setToolTipText( s);
+        if (s!=null && s.length()>0) {
+	        b.setToolTipText( s);
+        }
 
         return b;
     }
@@ -147,8 +154,9 @@ public class UIUtilities {
         JMenuItem item = new JMenuItem();
         item.setAction( a);
         KeyStroke stroke = (KeyStroke) a.getValue( Action.ACCELERATOR_KEY);
-        if (stroke != null)
-            item.setAccelerator( stroke);
+        if (stroke != null) {
+	        item.setAccelerator( stroke);
+        }
 
         return item;
     }
@@ -194,8 +202,9 @@ public class UIUtilities {
     public static void dismantleHierarchy( Container c) {
         while (c.getComponentCount() > 0) {
             Component child = c.getComponent( c.getComponentCount()-1);
-            if (child instanceof Container)
-                dismantleHierarchy( (Container) child);
+            if (child instanceof Container) {
+	            dismantleHierarchy( (Container) child);
+            }
             c.remove( c.getComponentCount()-1);
         }
     }
@@ -225,15 +234,17 @@ public class UIUtilities {
             .getContents( null);
         boolean containsString = false;
         if (t != null) {
-            if (t.isDataFlavorSupported( DataFlavor.stringFlavor))
-                containsString = true;
-            else if (t.getClass().getName().equals( "sun.awt.motif.X11Selection")) try {
-                // With the X11 implementation of Java, getting the transfer data
-                // succeeds even if isDataFlavorSupported returns false.
-                t.getTransferData( DataFlavor.stringFlavor);
-                containsString = true;
-            } catch (UnsupportedFlavorException ex) {
-            } catch (IOException ex) {}
+            if (t.isDataFlavorSupported( DataFlavor.stringFlavor)) {
+	            containsString = true;
+            } else if (t.getClass().getName().equals( "sun.awt.motif.X11Selection")) {
+	            try {
+	                // With the X11 implementation of Java, getting the transfer data
+	                // succeeds even if isDataFlavorSupported returns false.
+	                t.getTransferData( DataFlavor.stringFlavor);
+	                containsString = true;
+	            } catch (UnsupportedFlavorException ex) {
+	            } catch (IOException ex) {}
+            }
         }
 
         return containsString;
@@ -253,8 +264,9 @@ public class UIUtilities {
             // end-1 selects the last character of the annotation element
             Rectangle r2 = textPane.modelToView( end-1);
             if (r1 != null) {
-                if (r2 != null)
-                    r1 = r1.createUnion( r2).getBounds();
+                if (r2 != null) {
+	                r1 = r1.createUnion( r2).getBounds();
+                }
 
                 if (!textPane.getVisibleRect().contains( r1)) {
                     textPane.scrollRectToVisible( r1);

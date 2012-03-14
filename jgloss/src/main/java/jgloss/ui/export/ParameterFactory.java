@@ -74,21 +74,22 @@ class ParameterFactory {
      */
     public static Parameter createParameter( Element elem) {
         String name = elem.getTagName();
-        if (name.equals( Elements.DOCNAME))
-            return new DocnameParameter( elem);
-        else if (name.equals( Elements.DATETIME))
-            return new DateTimeParameter( elem);
-        else if (name.equals( Elements.ENCODING))
-            return new EncodingParameter( elem);
-        else if (name.equals( Elements.STRING))
-            return new StringParameter( elem);
-        else if (name.equals( Elements.BOOLEAN))
-            return new BooleanParameter( elem);
-        else if (name.equals( Elements.LIST))
-            return new ListParameter( elem);
-        else if (name.equals( Elements.LONGEST_ANNOTATION))
-            return new LongestAnnotationParameter( elem);
-        else
-            throw new IllegalArgumentException( elem.getTagName());
+        if (name.equals( Elements.DOCNAME)) {
+	        return new DocnameParameter( elem);
+        } else if (name.equals( Elements.DATETIME)) {
+	        return new DateTimeParameter( elem);
+        } else if (name.equals( Elements.ENCODING)) {
+	        return new EncodingParameter( elem);
+        } else if (name.equals( Elements.STRING)) {
+	        return new StringParameter( elem);
+        } else if (name.equals( Elements.BOOLEAN)) {
+	        return new BooleanParameter( elem);
+        } else if (name.equals( Elements.LIST)) {
+	        return new ListParameter( elem);
+        } else if (name.equals( Elements.LONGEST_ANNOTATION)) {
+	        return new LongestAnnotationParameter( elem);
+        } else {
+	        throw new IllegalArgumentException( elem.getTagName());
+        }
     }
 } // class ParameterFactory

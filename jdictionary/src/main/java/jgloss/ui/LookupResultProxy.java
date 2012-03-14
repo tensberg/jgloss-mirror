@@ -81,44 +81,51 @@ public class LookupResultProxy implements LookupResultHandler, Cloneable {
 
     @Override
 	public void startLookup( String description) {
-        for (LookupResultHandler handler : handlers)
-            handler.startLookup( description);
+        for (LookupResultHandler handler : handlers) {
+	        handler.startLookup( description);
+        }
     }
 
     @Override
 	public void startLookup( LookupModel model) {
-        for (LookupResultHandler handler : handlers)
-        	handler.startLookup( model);
+        for (LookupResultHandler handler : handlers) {
+	        handler.startLookup( model);
+        }
     }
 
     @Override
 	public void dictionary( Dictionary dictionary) {
-        for (LookupResultHandler handler : handlers)
-        	handler.dictionary( dictionary);
+        for (LookupResultHandler handler : handlers) {
+	        handler.dictionary( dictionary);
+        }
     }
 
     @Override
 	public void dictionaryEntry( DictionaryEntry entry) {
-        for (LookupResultHandler handler : handlers)
-        	handler.dictionaryEntry( entry);
+        for (LookupResultHandler handler : handlers) {
+	        handler.dictionaryEntry( entry);
+        }
     }
 
     @Override
 	public void exception( SearchException ex) {
-        for (LookupResultHandler handler : handlers)
-        	handler.exception( ex);
+        for (LookupResultHandler handler : handlers) {
+	        handler.exception( ex);
+        }
     }
 
     @Override
 	public void note( String note) {
-        for (LookupResultHandler handler : handlers)
-        	handler.note( note);
+        for (LookupResultHandler handler : handlers) {
+	        handler.note( note);
+        }
     }
 
     @Override
 	public void endLookup() {
-        for (LookupResultHandler handler : handlers)
-        	handler.endLookup();
+        for (LookupResultHandler handler : handlers) {
+	        handler.endLookup();
+        }
     }
 
     @Override

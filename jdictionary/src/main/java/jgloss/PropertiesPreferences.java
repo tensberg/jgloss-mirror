@@ -72,8 +72,9 @@ class PropertiesPreferences extends Preferences {
     @Override
 	public synchronized String getString( String key, String d) {
         String out = prefs.getProperty( key);
-        if (out == null)
-            out = d;
+        if (out == null) {
+	        out = d;
+        }
 
         return out;
     }
@@ -167,12 +168,13 @@ class PropertiesPreferences extends Preferences {
     @Override
 	public synchronized boolean getBoolean( String key, boolean d) {
         String value = getString( key);
-        if ("true".equalsIgnoreCase( value))
-            return true;
-        else if ("false".equalsIgnoreCase( value))
-            return false;
-        else // unparseable as boolean; return default
-            return d;
+        if ("true".equalsIgnoreCase( value)) {
+	        return true;
+        } else if ("false".equalsIgnoreCase( value)) {
+	        return false;
+        } else {
+	        return d;
+        }
     }
 
     /**
@@ -194,8 +196,9 @@ class PropertiesPreferences extends Preferences {
      */
     private synchronized void load() throws IOException {
         File f = new File( PREFS_FILE);
-        if (!f.exists()) // no preferences
-            return;
+        if (!f.exists()) {
+	        return;
+        }
 
         FileInputStream in = new FileInputStream( PREFS_FILE);
         prefs.load( in);
@@ -243,12 +246,13 @@ class PropertiesPreferences extends Preferences {
                 try {
                     newPrefs.set( key, Double.parseDouble( value));
                 } catch (NumberFormatException ex2) {
-                    if ("true".equalsIgnoreCase( value))
-                        newPrefs.set( key, true);
-                    else if ("false".equalsIgnoreCase( value))
-                        newPrefs.set( key, false);
-                    else // set prefs value as string
-                        newPrefs.set( key, value);
+                    if ("true".equalsIgnoreCase( value)) {
+	                    newPrefs.set( key, true);
+                    } else if ("false".equalsIgnoreCase( value)) {
+	                    newPrefs.set( key, false);
+                    } else {
+	                    newPrefs.set( key, value);
+                    }
                 }
             }
         }

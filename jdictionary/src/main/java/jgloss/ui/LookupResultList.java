@@ -86,8 +86,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                 formatter = new MarkerListFormatter( markerGroup, formatter);
             }
 
-            if (child != null)
-                formatter = child.decorateList( formatter, type);
+            if (child != null) {
+	            formatter = child.decorateList( formatter, type);
+            }
 
             return formatter;
         }
@@ -95,11 +96,13 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         @Override
 		public ListFormatter decorateList( ListFormatter formatter, Attribute<?> type,
 						DecorationPosition position) {
-            if (type == Attributes.EXPLANATION)
-                formatter = new MarkerListFormatter( markerGroup, formatter);
+            if (type == Attributes.EXPLANATION) {
+	            formatter = new MarkerListFormatter( markerGroup, formatter);
+            }
 
-            if (child != null)
-                formatter = child.decorateList( formatter, type, position);
+            if (child != null) {
+	            formatter = child.decorateList( formatter, type, position);
+            }
             
             return formatter;
         }
@@ -107,8 +110,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         @Override
 		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute<?> type,
 						DecorationPosition position) {
-            if (child != null)
-                formatter = child.decorateAttribute( formatter, type, position);
+            if (child != null) {
+	            formatter = child.decorateAttribute( formatter, type, position);
+            }
 
             return formatter;
         }
@@ -151,12 +155,13 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
         @Override
 		public ListFormatter decorateList( ListFormatter formatter, DecorationType type) {
-            if (words && type==WORD)
-                formatter = new HyperlinkListFormatter( WORD_PROTOCOL, hyperrefs, formatter);
-            else if (readings && type==READING)
-                formatter = new HyperlinkListFormatter( READING_PROTOCOL, hyperrefs, formatter);
-            else if (translations && type==TRANSLATION_SYN)
-                formatter = new HyperlinkListFormatter( TRANSLATION_PROTOCOL, hyperrefs, formatter);
+            if (words && type==WORD) {
+	            formatter = new HyperlinkListFormatter( WORD_PROTOCOL, hyperrefs, formatter);
+            } else if (readings && type==READING) {
+	            formatter = new HyperlinkListFormatter( READING_PROTOCOL, hyperrefs, formatter);
+            } else if (translations && type==TRANSLATION_SYN) {
+	            formatter = new HyperlinkListFormatter( TRANSLATION_PROTOCOL, hyperrefs, formatter);
+            }
 
             return formatter;
         }
@@ -237,8 +242,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
         fancyLimit = _fancyLimit;
         showAllDictionaries = _showAllDictionaries;
-        if (_styleSheet == null)
-            _styleSheet = LookupResultList.class.getResource( DEFAULT_STYLE_SHEET);
+        if (_styleSheet == null) {
+	        _styleSheet = LookupResultList.class.getResource( DEFAULT_STYLE_SHEET);
+        }
         hyperlinker = _hyperlinker;
 
         resultFancy = new JEditorPane();
@@ -349,51 +355,59 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
     @Override
 	public void dictionary( Dictionary d) {
-        if (!addToResultBuffer( d))
-            formatNow( d);
+        if (!addToResultBuffer( d)) {
+	        formatNow( d);
+        }
     }
 
     @Override
 	public void dictionaryEntry( DictionaryEntry de) {
-        if (!addToResultBuffer( de))
-            formatNow( de);
+        if (!addToResultBuffer( de)) {
+	        formatNow( de);
+        }
 
         entryCount++;
     }
 
     @Override
 	public void exception( SearchException ex) {
-        if (!addToResultBuffer( ex))
-            formatNow( ex);
+        if (!addToResultBuffer( ex)) {
+	        formatNow( ex);
+        }
     }
 
     @Override
 	public void note( String note) {
-        if (!addToResultBuffer( note))
-            formatNow( note);
+        if (!addToResultBuffer( note)) {
+	        formatNow( note);
+        }
     }
 
     protected boolean addToResultBuffer( Object o) {
-        if (resultBuffer == null)
-            return false;
+        if (resultBuffer == null) {
+	        return false;
+        }
 
         resultBuffer.add( o);
-        if (resultBuffer.size() == fancyLimit)
-            flushBuffer( false);
+        if (resultBuffer.size() == fancyLimit) {
+	        flushBuffer( false);
+        }
         return true;
     }
 
     protected void formatNow( Object o) {
-        if (o instanceof Dictionary)
-            format( (Dictionary) o, false);
-        else if (o instanceof DictionaryEntry)
-            format( (DictionaryEntry) o, false);
-        else if (o instanceof SearchException)
-            format( (SearchException) o, false);
-        else
-            format( String.valueOf( o), false);
-        if (++entriesInTextBuffer > BUFFER_LIMIT)
-            flushTextBuffer();
+        if (o instanceof Dictionary) {
+	        format( (Dictionary) o, false);
+        } else if (o instanceof DictionaryEntry) {
+	        format( (DictionaryEntry) o, false);
+        } else if (o instanceof SearchException) {
+	        format( (SearchException) o, false);
+        } else {
+	        format( String.valueOf( o), false);
+        }
+        if (++entriesInTextBuffer > BUFFER_LIMIT) {
+	        flushTextBuffer();
+        }
     }   
 
     protected void format( Dictionary d, boolean fancy) {
@@ -402,11 +416,13 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             // and a comment.
 
             formatDictionaryName( previousDictionaryName, fancy);
-            if (fancy)
-                resultTextBuffer.append( "<p>");
+            if (fancy) {
+	            resultTextBuffer.append( "<p>");
+            }
             resultTextBuffer.append( JGloss.messages.getString( "wordlookup.nomatches_dictionary"));
-            if (fancy)
-                resultTextBuffer.append( "</p>");
+            if (fancy) {
+	            resultTextBuffer.append( "</p>");
+            }
             resultTextBuffer.append( "\n\n");
         }
 
@@ -434,8 +450,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         if (previousDictionaryName != null) {
             // First entry for this dictionary. Print the dictionary name
             // if multi-dictionary mode is active.
-            if (multipleDictionaries)
-                formatDictionaryName( previousDictionaryName, fancy);
+            if (multipleDictionaries) {
+	            formatDictionaryName( previousDictionaryName, fancy);
+            }
             previousDictionaryName = null;
         }
 
@@ -444,9 +461,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             resultTextBuffer.append( "<p>");
             htmlFormatter.format( de, resultTextBuffer);
             resultTextBuffer.append( "</p>");
+        } else {
+	        plainFormatter.format( de, resultTextBuffer);
         }
-        else
-            plainFormatter.format( de, resultTextBuffer);
 
         resultTextBuffer.append( "\n\n");
         dictionaryEntries++;
@@ -455,8 +472,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     protected void format( SearchException ex, boolean fancy) {
         ex.printStackTrace();
         
-        if (fancy)
-            resultTextBuffer.append( "<p><font color=\"red\">");
+        if (fancy) {
+	        resultTextBuffer.append( "<p><font color=\"red\">");
+        }
         if (ex instanceof UnsupportedSearchModeException) {
             resultTextBuffer.append( JGloss.messages.getString( "wordlookup.unsupportedsearchmode"));
         }
@@ -466,40 +484,45 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                                              new Object[] { ex.getClass().getName(),
                                                             ex.getLocalizedMessage() }));
         }
-        if (fancy)
-            resultTextBuffer.append( "</font></p>");
+        if (fancy) {
+	        resultTextBuffer.append( "</font></p>");
+        }
         resultTextBuffer.append( "\n\n");
     }
 
     protected void format( String note, boolean fancy) {
-        if (fancy)
-            resultTextBuffer.append( "<p><i>");
+        if (fancy) {
+	        resultTextBuffer.append( "<p><i>");
+        }
         resultTextBuffer.append( note);
-        if (fancy)
-            resultTextBuffer.append( "</i></p>");
+        if (fancy) {
+	        resultTextBuffer.append( "</i></p>");
+        }
         resultTextBuffer.append( "\n\n");
     }
 
     @Override
 	public void endLookup() {
-        if (resultBuffer != null)
-            flushBuffer( true);
-        else
-            flushTextBuffer();
+        if (resultBuffer != null) {
+	        flushBuffer( true);
+        } else {
+	        flushTextBuffer();
+        }
         updateStatusText( JGloss.messages.getString( "wordlookup.status.matches",
                                                      new Object[] { new Integer( dictionaryEntries) }));
     }
 
     protected void flushBuffer( final boolean fancy) {
         for (Object o : resultBuffer) {
-            if (o instanceof Dictionary)
-                format( (Dictionary) o, fancy);
-            else if (o instanceof DictionaryEntry)
-                format( (DictionaryEntry) o, fancy);
-            else if (o instanceof SearchException)
-                format( (SearchException) o, fancy);
-            else
-                format( String.valueOf( o), fancy);
+            if (o instanceof Dictionary) {
+	            format( (Dictionary) o, fancy);
+            } else if (o instanceof DictionaryEntry) {
+	            format( (DictionaryEntry) o, fancy);
+            } else if (o instanceof SearchException) {
+	            format( (SearchException) o, fancy);
+            } else {
+	            format( String.valueOf( o), fancy);
+            }
         }
         resultBuffer = null;
 
@@ -520,18 +543,21 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                     }
                 };
             
-            if (EventQueue.isDispatchThread())
-                updater.run();
-            else try {
-                EventQueue.invokeAndWait( updater);
-            } catch (Exception ex) {}
+            if (EventQueue.isDispatchThread()) {
+	            updater.run();
+            } else {
+	            try {
+	                EventQueue.invokeAndWait( updater);
+	            } catch (Exception ex) {}
+            }
 
             // preserve memory by deleting the old text from the unused view
             // setText is thread-safe
-            if (fancy)
-                resultPlain.setText( "");
-            else
-                resultFancy.setText( "");
+            if (fancy) {
+	            resultPlain.setText( "");
+            } else {
+	            resultFancy.setText( "");
+            }
         }
 
         target.setText( resultTextBuffer.toString());
@@ -553,10 +579,11 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                     status.setText( text);
                 }
             };
-        if (EventQueue.isDispatchThread())
-            updater.run();
-        else 
-            EventQueue.invokeLater( updater);
+        if (EventQueue.isDispatchThread()) {
+	        updater.run();
+        } else {
+	        EventQueue.invokeLater( updater);
+        }
     }
 
     public static class ViewState {

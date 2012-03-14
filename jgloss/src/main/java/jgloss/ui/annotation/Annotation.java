@@ -97,19 +97,23 @@ public class Annotation {
 
     public String getDictionaryForm() {
         String base = (String) anno.getAttributes().getAttribute( JGlossDocument.Attributes.BASE);
-        if (base != null)
-            return base;
-        else
-            return annotatedText; // equal to dictionary form per definition
+        if (base != null) {
+	        return base;
+        }
+		else {
+	        return annotatedText; // equal to dictionary form per definition
+        }
     }
 
     public String getDictionaryFormReading() {
         String basere = (String) anno.getAttributes()
             .getAttribute( JGlossDocument.Attributes.BASE_READING);
-        if (basere != null)
-            return basere;
-        else
-            return annotatedTextReading; // equal to dictionary form reading per definition
+        if (basere != null) {
+	        return basere;
+        }
+		else {
+	        return annotatedTextReading; // equal to dictionary form reading per definition
+        }
     }
 
     public String getGrammaticalType() {
@@ -139,28 +143,30 @@ public class Annotation {
     }
 
     public void setReading( String _reading) {
-        if (readings.length == 0) // no reading; TODO: create reading?
-            return;
-        else {
+        if (readings.length == 0) {
+	        return;
+        } else {
             try {
                 String[][] wordReading = StringTools.splitWordReading( getDictionaryForm(), _reading);
                 int targetReading = 0;
                 for ( int i=0; i<wordReading.length; i++) {
                     if (wordReading[i].length == 2) { // word substring with a reading
-                        if (targetReading < readings.length)
-                            readings[targetReading++].setText( wordReading[i][1]);
-                        else
-                            // More reading substrings in wordReading than there are readings
+                        if (targetReading < readings.length) {
+	                        readings[targetReading++].setText( wordReading[i][1]);
+                        } else {
+	                        // More reading substrings in wordReading than there are readings
                             // in the annotated text. Add the additional readings to the last
                             // reading element.
                             readings[targetReading-1].setText
                                 ( readings[targetReading-1].getText() + wordReading[i][1]);
+                        }
                     }
                 }
                 // If there were less readings in wordReading than there are in the annotated
                 // element, set the remaining reading elements to the empty string.
-                while (targetReading < readings.length)
-                    readings[targetReading++].setText( "");
+                while (targetReading < readings.length) {
+	                readings[targetReading++].setText( "");
+                }
 
                 updateAnnotatedTextReading();
                 owner.fireReadingChanged( this, -1);
@@ -178,8 +184,9 @@ public class Annotation {
     }
 
     public void setDictionaryForm( String _dictionaryForm) {
-        if (annotatedText.equals( _dictionaryForm))
-            _dictionaryForm = null;
+        if (annotatedText.equals( _dictionaryForm)) {
+	        _dictionaryForm = null;
+        }
 
         setAttribute( JGlossDocument.Attributes.BASE, _dictionaryForm);
 
@@ -187,8 +194,9 @@ public class Annotation {
     }
 
     public void setDictionaryFormReading( String _dictionaryFormReading) {
-        if (annotatedTextReading.equals( _dictionaryFormReading))
-            _dictionaryFormReading = null;
+        if (annotatedTextReading.equals( _dictionaryFormReading)) {
+	        _dictionaryFormReading = null;
+        }
 
         setAttribute( JGlossDocument.Attributes.BASE_READING, _dictionaryFormReading);
 
@@ -219,12 +227,13 @@ public class Annotation {
                 // rb element, get re child
                 child = child.getElement( 0);
                 String text = getText( child);
-                if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER))
-                    text = "";
+                if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER)) {
+	                text = "";
+                }
                 reading.append( text);
+            } else {
+	            reading.append( getText( child));
             }
-            else // child is bt
-                reading.append( getText( child));
         }
         annotatedTextReading = reading.toString();
     }

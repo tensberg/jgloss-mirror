@@ -357,24 +357,27 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
     @Override
 	public <T extends AttributeValue> Set<T> getAttributeValues( Attribute<T> att) {
-        if (!supportedAttributes.containsKey( att))
-            return null;
+        if (!supportedAttributes.containsKey( att)) {
+	        return null;
+        }
 
         @SuppressWarnings("unchecked")
         Set<T> out = (Set<T>) supportedAttributes.get( att);
-        if (out == null)
-            return Collections.emptySet();
-        else
-            return out;
+        if (out == null) {
+	        return Collections.emptySet();
+        } else {
+	        return out;
+        }
     }
     
     @Override
 	public SearchFieldSelection getSupportedFields( SearchMode mode) {
         SearchFieldSelection fields = supportedSearchModes.get( mode);
-        if (fields != null)
-            return fields;
-        else
-            throw new IllegalArgumentException();
+        if (fields != null) {
+	        return fields;
+        } else {
+	        throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -388,8 +391,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         try {
             indexContainer = new FileIndexContainer( indexFile, false);
             // insert tests for existence of additional index types here
-            if (!indexContainer.hasIndex( binarySearchIndex.getType()))
-                return false;
+            if (!indexContainer.hasIndex( binarySearchIndex.getType())) {
+	            return false;
+            }
 
             initIndexes();
 
@@ -426,8 +430,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         } catch (IOException ex) {
             throw new IndexException( ex);
         } finally {
-            if (indexContainer != null)
-                indexContainer.endEditing();
+            if (indexContainer != null) {
+	            indexContainer.endEditing();
+            }
         }
 
         initIndexes();
@@ -445,12 +450,13 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Subclasses may override this method to create custom character handlers.
      */
     protected EncodedCharacterHandler createCharacterHandler(String encoding) {
-        if ("EUC-JP".equals(encoding))
-            return new EUCJPCharacterHandler();
-        else if ("UTF-8".equals(encoding))
-            return new UTF8CharacterHandler();
-        else
-            throw new IllegalArgumentException(encoding);
+        if ("EUC-JP".equals(encoding)) {
+	        return new EUCJPCharacterHandler();
+        } else if ("UTF-8".equals(encoding)) {
+	        return new UTF8CharacterHandler();
+        } else {
+	        throw new IllegalArgumentException(encoding);
+        }
     }
 
     /**
@@ -516,8 +522,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      */
     protected ByteBuffer copyEntry( int matchstart, byte[] entrybuf, Set<Integer> seenEntries,
                                     int[] outOffsets) {
-        if (entrybuf == null)
-            entrybuf = new byte[8192];
+        if (entrybuf == null) {
+	        entrybuf = new byte[8192];
+        }
 
         int start = matchstart; // start of entry (inclusive)
         int end = matchstart+1; // end of entry (exclusive)
@@ -567,14 +574,16 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         // find end of entry line
         int entrylength = matchstart - start + 1;
         try {
-            while (!isEntrySeparator( b=dictionary.get( end))) try {
-                entrybuf[entrylength++] = b;
-                end++;
-            } catch (ArrayIndexOutOfBoundsException ex) {
-                // array too small for entry; grow it
-                byte[] entrybuf2 = new byte[entrybuf.length*2];
-                System.arraycopy( entrybuf, 0, entrybuf2, 0, entrylength);
-                entrybuf = entrybuf2;
+            while (!isEntrySeparator( b=dictionary.get( end))) {
+	            try {
+	                entrybuf[entrylength++] = b;
+	                end++;
+	            } catch (ArrayIndexOutOfBoundsException ex) {
+	                // array too small for entry; grow it
+	                byte[] entrybuf2 = new byte[entrybuf.length*2];
+	                System.arraycopy( entrybuf, 0, entrybuf2, 0, entrylength);
+	                entrybuf = entrybuf2;
+	            }
             }
         } catch (BufferUnderflowException ex) {
             // end of dictionary->end of entry
@@ -600,7 +609,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         dictionary.position( marker);
         ByteBuffer entry = dictionary.slice();
         while (!isEntrySeparator( entry.get()))
-            ; // entry.get() advances the loop
+		 {
+	        ; // entry.get() advances the loop
+        }
         entry.limit( entry.position()-1);
         return createEntryFrom( entry, marker);
     }
@@ -672,8 +683,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * @param field Field which the location is in.
      */
     protected boolean isWordStart( ByteBuffer entry, int location, DictionaryEntryField field) {
-        if (isFieldStart( entry, location, field))
-            return true;
+        if (isFieldStart( entry, location, field)) {
+	        return true;
+        }
         
         return isWordBoundary( entry, location, field);
     }
@@ -690,8 +702,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * @param field Field which the location is in.
      */
     protected boolean isWordEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
-        if (isFieldEnd( entry, location, field))
-            return true;
+        if (isFieldEnd( entry, location, field)) {
+	        return true;
+        }
 
         return isWordBoundary( entry, location, field);
     }
@@ -745,16 +758,18 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         StringBuilder buf = null; // initialize only if needed
         for ( int i=str.length()-1; i>=0; i--) {
             if (escapeChar( str.charAt( i))) {
-                if (buf == null)
-                    buf = new StringBuilder( str);
+                if (buf == null) {
+	                buf = new StringBuilder( str);
+                }
                 buf.replace( i, i+1, StringTools.unicodeEscape( str.charAt( i)));
             }
         }
 
-        if (buf == null) // no changes
-            return str;
-        else
-            return buf.toString();
+        if (buf == null) {
+	        return str;
+        } else {
+	        return buf.toString();
+        }
     }
 
     /**
@@ -787,8 +802,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 	public void dispose() {
         try {
             dicchannel.close();
-            if (indexContainer != null)
-                indexContainer.close();
+            if (indexContainer != null) {
+	            indexContainer.close();
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -842,8 +858,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         		termStarts.clear();
         		termStarts.add( new Integer( termStart));
         		termField = field;
-        		if (clazz == CharacterClass.ROMAN_WORD)
-        			inWord = true;
+        		if (clazz == CharacterClass.ROMAN_WORD) {
+	                inWord = true;
+                }
 
         		int termLength = 1; // term length in number of characters
         		// find end of term
@@ -856,8 +873,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         			clazz2 = characterHandler.getCharacterClass( c, inWord);
 
         			// for kanji terms, each kanji in the term is indexed
-        			if (clazz == CharacterClass.KANJI && clazz2==clazz)
-        				termStarts.add( new Integer( termEnd));
+        			if (clazz == CharacterClass.KANJI && clazz2==clazz) {
+	                    termStarts.add( new Integer( termEnd));
+                    }
         		} while (clazz2 == clazz);
 
         		// add the term to the index
@@ -869,13 +887,15 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         				termStart = termStarts.get( i).intValue();
 
         				// debug index creation
-        				if (termStart <= previousTerm)
-        					System.err.println( "Warning: possible duplicate index entry");
+        				if (termStart <= previousTerm) {
+	                        System.err.println( "Warning: possible duplicate index entry");
+                        }
         				previousTerm = termStart;
         				// debug index creation
 
-        				if (builder.addEntry( termStart, termEnd-termStart, termField))
-        					indexsize++;
+        				if (builder.addEntry( termStart, termEnd-termStart, termField)) {
+	                        indexsize++;
+                        }
         			}
         		}
 
@@ -965,17 +985,20 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                     ( characterHandler.readCharacter( buf1));
                 int b2 = characterHandler.convertCharacter
                     ( characterHandler.readCharacter( buf2));
-                if (b1 < b2)
-                    return -1;
-                else if (b1 > b2)
-                    return 1;
+                if (b1 < b2) {
+	                return -1;
+                } else if (b1 > b2) {
+	                return 1;
+                }
             }
         } catch (BufferUnderflowException ex) {
-            if (buf1.hasRemaining()) // buf2 is prefix of buf1
-                return 1;
-            else if (buf2.hasRemaining()) // buf1 is prefix of buf2
-                return -1;
+            if (buf1.hasRemaining()) {
+	            return 1;
+            } else if (buf2.hasRemaining())
+			 {
+	            return -1;
             // else equality
+            }
         }
 
         return 0; // equality
@@ -983,8 +1006,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
     @Override
 	public Indexable.CharData getChar( int position, CharData result) throws IndexException {
-        if (result == null)
-            result = new Indexable.CharData();
+        if (result == null) {
+	        result = new Indexable.CharData();
+        }
         dictionary.position( position);
         try {
             result.character = characterHandler.readCharacter( dictionary);
@@ -1025,8 +1049,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         @Override
 		public DictionaryEntry next() {
-            if (!hasNext())
-                throw new NoSuchElementException();
+            if (!hasNext()) {
+	            throw new NoSuchElementException();
+            }
 
             if (deferredException == null) {
                 DictionaryEntry current = nextEntry;
@@ -1062,14 +1087,17 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                     int match = matchingIndexEntries.next();
                     
                     ByteBuffer entry = copyEntry( match, entrybuf, seenEntries, entryOffsets);
-                    if (entry == null) // this entry has already been found
-                        continue;
+                    if (entry == null) {
+	                    continue;
+                    }
                     
                     match = entry.position(); // location of match in entry buffer
                     DictionaryEntryField field = getFieldType( entry, 0, entry.limit(), match);
                     try {
                         if (!fields.isSelected( field))
-                            continue; // field is not selected by the user
+						 {
+	                        continue; // field is not selected by the user
+                        }
                     } catch (IllegalArgumentException ex) {
                         // field not WORD, READING or TRANSLATION
                         continue;
@@ -1087,8 +1115,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                         if (match>0 &&
                             !(fields.isSelected( MatchMode.WORD) ? 
                               isWordStart( entry, match, field) :
-                              isFieldStart( entry, match, field)))
-                            continue;
+                              isFieldStart( entry, match, field))) {
+	                        continue;
+                        }
                     }
                     if (searchmode == ExpressionSearchModes.EXACT ||
                         searchmode == ExpressionSearchModes.SUFFIX) {
@@ -1096,8 +1125,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                         if (matchend<entry.limit() &&
                             !(fields.isSelected( MatchMode.WORD) ? 
                               isWordEnd( entry, matchend, field) :
-                              isFieldEnd( entry, matchend, field)))
-                            continue;
+                              isFieldEnd( entry, matchend, field))) {
+	                        continue;
+                        }
                     }
                     
                     nextEntry = createEntryFrom( entry, entryOffsets[0]);

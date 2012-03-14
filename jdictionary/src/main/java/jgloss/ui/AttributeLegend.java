@@ -136,9 +136,10 @@ public class AttributeLegend extends JPanel {
 
         for (Attribute<?> att : attributes) {
             AttributeFormatter formatter = DictionaryEntryFormat.getAttributeFormatter( att);
-            if (formatter == null)
-                // attribute not displayed by UI, ignore
+            if (formatter == null) {
+	            // attribute not displayed by UI, ignore
                 continue;
+            }
             noAttributes = false;
 
             buf.append( "<p><b>");
@@ -155,9 +156,9 @@ public class AttributeLegend extends JPanel {
                 }
                 formatter.format( att, Collections.singletonList( att.getExampleValue()), buf);
                 createLegendForValueIfSupported(dic, buf, att);
+            } else {
+	            formatter.format( att, (List<AttributeValue>) null, buf);
             }
-            else
-                formatter.format( att, (List<AttributeValue>) null, buf);
             buf.append( "</p>\n");
         }
 
@@ -178,13 +179,15 @@ public class AttributeLegend extends JPanel {
 
     protected void createLegendForValue( Dictionary dic, Attribute<? extends CategoryAttributeValue> att, StringBuilder buf) {
         // currently only CategoryAttributeValues are supported
-        if (!CategoryAttributeValue.class.isAssignableFrom( att.getAttributeValueClass()))
-            return;
+        if (!CategoryAttributeValue.class.isAssignableFrom( att.getAttributeValueClass())) {
+	        return;
+        }
 
         SortedSet<CategoryAttributeValue> values = new TreeSet<CategoryAttributeValue>( categoryComparator);
         values.addAll( dic.getAttributeValues( att));
-        if (values.isEmpty())
-            return;
+        if (values.isEmpty()) {
+	        return;
+        }
 
         buf.append( "<br>\n");
         buf.append( JGloss.messages.getString( "legend.values"));
@@ -201,8 +204,9 @@ public class AttributeLegend extends JPanel {
 
     protected void showSelectedDictionary() {
         DictionaryItem item = (DictionaryItem) dictionaryChoice.getSelectedItem();
-        if (item == null)
-            return;
+        if (item == null) {
+	        return;
+        }
 
         legend.setText( item.getText());
         legend.setCaretPosition( 0);

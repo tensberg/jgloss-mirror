@@ -67,12 +67,14 @@ public class DefaultAttributeFormatter extends AttributeFormatter {
                                 List<? extends AttributeValue> val, StringBuilder out) {
         out.append( printBefore);
 
-        if (printAttributeName)
-            out.append( att.getName());
+        if (printAttributeName) {
+	        out.append( att.getName());
+        }
 
         if (val != null) {
-            if (printAttributeName)
-                out.append( printBeforeValue);
+            if (printAttributeName) {
+	            out.append( printBeforeValue);
+            }
 
             valueFormat.newList( out, val.size());
             for ( int i=0; i<val.size(); i++) {

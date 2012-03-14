@@ -48,12 +48,13 @@ public class DefaultAttributeSet implements AttributeSet {
 
     @Override
 	public boolean containsKey( Attribute<?> key, boolean resolveInherited) {
-        if (attributes!=null && attributes.containsKey( key))
-            return true;
-        else if (resolveInherited && parent!=null)
-            return parent.containsKey( key, true);
-        else
-            return false;
+        if (attributes!=null && attributes.containsKey( key)) {
+	        return true;
+        } else if (resolveInherited && parent!=null) {
+	        return parent.containsKey( key, true);
+        } else {
+	        return false;
+        }
     }
 
     @Override
@@ -74,8 +75,9 @@ public class DefaultAttributeSet implements AttributeSet {
         List<T> base = null;
         List<T> parentv = null;
 
-        if (resolveInherited && parent!=null)
-            parentv = parent.getAttribute( key, true);
+        if (resolveInherited && parent!=null) {
+	        parentv = parent.getAttribute( key, true);
+        }
 
         if (attributes!=null && attributes.containsKey( key)) {
             List<? extends AttributeValue> v = attributes.get( key);
@@ -98,22 +100,24 @@ public class DefaultAttributeSet implements AttributeSet {
 
     @Override
 	public boolean isInherited( Attribute<?> key) throws AttributeNotSetException {
-        if (attributes!=null && attributes.containsKey( key))
-            return false;
-        else if (parent.containsKey( key, true))
-            return true;
-        else
-            throw new AttributeNotSetException( key);
+        if (attributes!=null && attributes.containsKey( key)) {
+	        return false;
+        } else if (parent.containsKey( key, true)) {
+	        return true;
+        } else {
+	        throw new AttributeNotSetException( key);
+        }
     }
 
     @Override
 	public Iterator<Attribute<?>> getAttributeKeys( boolean resolveInherited) {
-        if (resolveInherited)
-            return new AttributeSetChainIterator( this);
-        else if (attributes != null)
-            return attributes.keySet().iterator();
-        else
-            return NullIterator.instance();
+        if (resolveInherited) {
+	        return new AttributeSetChainIterator( this);
+        } else if (attributes != null) {
+	        return attributes.keySet().iterator();
+        } else {
+	        return NullIterator.instance();
+        }
     }
 
     /**
@@ -122,8 +126,9 @@ public class DefaultAttributeSet implements AttributeSet {
      * @return This attribute set.
      */
     public DefaultAttributeSet setParent( AttributeSet _parent) {
-        if (_parent == this)
-            throw new IllegalArgumentException();
+        if (_parent == this) {
+	        throw new IllegalArgumentException();
+        }
 
         this.parent = _parent;
         return this;
@@ -138,16 +143,17 @@ public class DefaultAttributeSet implements AttributeSet {
     
     @SuppressWarnings("unchecked")
     public <T extends AttributeValue> void addAttribute( Attribute<T> key, T value) {
-        if (attributes == null)
-            attributes = new HashMap<Attribute<?>, List<? extends AttributeValue>>();
+        if (attributes == null) {
+	        attributes = new HashMap<Attribute<?>, List<? extends AttributeValue>>();
+        }
         List<? extends AttributeValue> v = attributes.get( key);
 
-        if (v == null)
-            attributes.put( key, value!=null ? checkedList(new ArrayList<T>(3), key.getAttributeValueClass()) : null);
-        else if (value == null)
-            // nothing to be done, since attibute already set
+        if (v == null) {
+	        attributes.put( key, value!=null ? checkedList(new ArrayList<T>(3), key.getAttributeValueClass()) : null);
+        } else if (value == null) {
+	        // nothing to be done, since attibute already set
             return;
-        else {
+        } else {
             ((List<T>) v).add( value);
         }
     }
@@ -159,8 +165,9 @@ public class DefaultAttributeSet implements AttributeSet {
 
     @Override
 	public String toString() {
-        if (attributes == null)
-            return "()";
+        if (attributes == null) {
+	        return "()";
+        }
 
         StringBuilder out = new StringBuilder( 128);
         out.append( '(');

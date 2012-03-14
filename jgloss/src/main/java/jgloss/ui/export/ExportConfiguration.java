@@ -208,8 +208,9 @@ class ExportConfiguration {
         while (parameterNode != null) {
             if (parameterNode.getNodeType() == Node.ELEMENT_NODE) {
                 Parameter parameter = ParameterFactory.createParameter( (Element) parameterNode);
-                if (parameter instanceof EncodingParameter)
-                    encoding = (EncodingParameter) parameter;
+                if (parameter instanceof EncodingParameter) {
+	                encoding = (EncodingParameter) parameter;
+                }
                 parameters.add( parameter);
             }
             parameterNode = parameterNode.getNextSibling();

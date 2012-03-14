@@ -77,18 +77,19 @@ class LongestAnnotationParameter extends AbstractParameter {
     }
     
     private void initTypeSelector(String type) {
-        if (type.equals(ParameterFactory.AttributeValues.WORD))
-            selector = new TypeSelector("getAnnotatedText");
-        else if (type.equals(ParameterFactory.AttributeValues.READING))
-            selector = new TypeSelector("getAnnotatedTextReading");
-        else if (type.equals(ParameterFactory.AttributeValues.DICTIONARY_WORD))
-            selector = new TypeSelector("getDictionaryForm");
-        else if (type.equals(ParameterFactory.AttributeValues.DICTIONARY_READING))
-            selector = new TypeSelector("getDictionaryFormReading");
-        else if (type.equals(ParameterFactory.AttributeValues.TRANSLATION))
-            selector = new TypeSelector("getTranslation");
-        else // should be prevented by validation against DTD
-            throw new IllegalArgumentException(type);
+        if (type.equals(ParameterFactory.AttributeValues.WORD)) {
+	        selector = new TypeSelector("getAnnotatedText");
+        } else if (type.equals(ParameterFactory.AttributeValues.READING)) {
+	        selector = new TypeSelector("getAnnotatedTextReading");
+        } else if (type.equals(ParameterFactory.AttributeValues.DICTIONARY_WORD)) {
+	        selector = new TypeSelector("getDictionaryForm");
+        } else if (type.equals(ParameterFactory.AttributeValues.DICTIONARY_READING)) {
+	        selector = new TypeSelector("getDictionaryFormReading");
+        } else if (type.equals(ParameterFactory.AttributeValues.TRANSLATION)) {
+	        selector = new TypeSelector("getTranslation");
+        } else {
+	        throw new IllegalArgumentException(type);
+        }
     }
 
     @Override
@@ -98,8 +99,9 @@ class LongestAnnotationParameter extends AbstractParameter {
         AnnotationListModel model = source.getAnnotationListModel();
         for ( int i=0; i<model.getAnnotationCount(); i++) {
             String annotation = selector.getAnnotationText(model.getAnnotation(i));
-            if (annotation.length() > longestAnnotation.length())
-                longestAnnotation = annotation;
+            if (annotation.length() > longestAnnotation.length()) {
+	            longestAnnotation = annotation;
+            }
         }
 
         return longestAnnotation;

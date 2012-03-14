@@ -72,8 +72,9 @@ public class EDict extends FileBasedDictionary {
         Iterator<DictionaryEntry> r = d.search( ExpressionSearchModes.ANY,
                                      new Object[] { args[1], f });
         System.err.println( "Matches:");
-        while (r.hasNext())
-            System.err.println( r.next().toString());
+        while (r.hasNext()) {
+	        System.err.println( r.next().toString());
+        }
         //r.next();
         d.dispose();
     }
@@ -156,10 +157,11 @@ public class EDict extends FileBasedDictionary {
 			public String getPriority() { return "_P_"; }
             @Override
 			public int compareTo( Priority p) {
-                if (p == PRIORITY_VALUE)
-                    return 0;
-                else
-                    throw new IllegalArgumentException();
+                if (p == PRIORITY_VALUE) {
+	                return 0;
+                } else {
+	                throw new IllegalArgumentException();
+                }
             }
             @Override
 			public String toString() { return "_P_"; }
@@ -183,8 +185,9 @@ public class EDict extends FileBasedDictionary {
             byte b = entry.get( --location);
             if (field==DictionaryEntryField.READING && b=='['
                 || field==DictionaryEntryField.TRANSLATION && b=='/'
-                || b==10 || b==13)
-                return true;
+                || b==10 || b==13) {
+	            return true;
+            }
 
             if (field == DictionaryEntryField.TRANSLATION) {
                 // EDICT translation fields support multiple senses, which are marked 
@@ -198,9 +201,11 @@ public class EDict extends FileBasedDictionary {
                     } while (b!='/' && b!='(');
                     if (b=='/' || 
                         b=='(' && (b=entry.get( --location))=='/')
-                        return true;
+					 {
+	                    return true;
                     // if b is now anything other than a space, in which case there could be
                     // another marker, the while loop will terminate and false will be returned
+                    }
                 }
             }
 
@@ -217,10 +222,11 @@ public class EDict extends FileBasedDictionary {
             if (field==DictionaryEntryField.WORD && b==' ' ||
                 field==DictionaryEntryField.READING && b==']' ||
                 field==DictionaryEntryField.TRANSLATION && b=='/' 
-                || b==10 || b==13)
-                return true;
-            else
-                return false;
+                || b==10 || b==13) {
+	            return true;
+            } else {
+	            return false;
+            }
         } catch (IndexOutOfBoundsException ex) {
             return true; // end of entry buffer
         }
@@ -236,10 +242,11 @@ public class EDict extends FileBasedDictionary {
 
         if (field==DictionaryEntryField.WORD && character==' ') {
             byte b = buf.get();
-            if (b == '[')
-                field = DictionaryEntryField.READING;
-            else
-                field = DictionaryEntryField.TRANSLATION;
+            if (b == '[') {
+	            field = DictionaryEntryField.READING;
+            } else {
+	            field = DictionaryEntryField.TRANSLATION;
+            }
         } else if (field==DictionaryEntryField.READING && character==']') {
             buf.get(); // skip the ' '
             field = DictionaryEntryField.TRANSLATION;
@@ -259,17 +266,18 @@ public class EDict extends FileBasedDictionary {
             do {
                 b = buf.get();
             } while (b!=' ' && b!='/' && b!=']');
-            if (b == '/')
-                return DictionaryEntryField.TRANSLATION;
-            else if (b == ']')
-                return DictionaryEntryField.READING;
-            else {
+            if (b == '/') {
+	            return DictionaryEntryField.TRANSLATION;
+            } else if (b == ']') {
+	            return DictionaryEntryField.READING;
+            } else {
                 // word or translation
                 b = buf.get();
-                if (b=='/' || b=='[')
-                    return DictionaryEntryField.WORD;
-                else
-                    return DictionaryEntryField.TRANSLATION;
+                if (b=='/' || b=='[') {
+	                return DictionaryEntryField.WORD;
+                } else {
+	                return DictionaryEntryField.TRANSLATION;
+                }
             }
         } catch (BufferUnderflowException ex) {
             // reached end of entry, must be translation
@@ -286,13 +294,15 @@ public class EDict extends FileBasedDictionary {
 	protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
         //System.err.println( entry);
         ENTRY_MATCHER.reset( entry);
-        if (!ENTRY_MATCHER.matches())
-            throw new MalformedEntryException( this, entry);
+        if (!ENTRY_MATCHER.matches()) {
+	        throw new MalformedEntryException( this, entry);
+        }
 
         String word = ENTRY_MATCHER.group( 1);
         String reading = ENTRY_MATCHER.group( 2);
-        if (reading == null) // no reading in entry string
-            reading = word;
+        if (reading == null) {
+	        reading = word;
+        }
         String translations = ENTRY_MATCHER.group( 3);
         List<List<String>> rom = new ArrayList<List<String>>( 10);
         List<String> crm = new ArrayList<String>( 10);
@@ -312,8 +322,9 @@ public class EDict extends FileBasedDictionary {
         int start = 0;
         do {
             int end = translations.indexOf( '/', start);
-            if (end == -1)
-                end = translations.length();
+            if (end == -1) {
+	            end = translations.length();
+            }
 
             String translation = translations.substring( start, end);
             if (translation.equals( PRIORITY_MARKER)) {
@@ -353,8 +364,9 @@ public class EDict extends FileBasedDictionary {
                         boolean hasUnrecognized = false;
                         do {
                             int endc = att.indexOf( ',', startc);
-                            if (endc == -1)
-                                endc = att.length();
+                            if (endc == -1) {
+	                            endc = att.length();
+                            }
                             String attsub = att.substring( startc, endc);
                             AttributeMapper.Mapping<?> mapping = mapper.getMapping( attsub);
                             if (mapping != null) {
@@ -368,10 +380,11 @@ public class EDict extends FileBasedDictionary {
                                     wordA.addAttribute(mapping);
                                 }
                                 else if (a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
-                                    if (seenROM)
-                                        translationromA.addAttribute(mapping);
-                                    else
-                                        translationA.addAttribute(mapping);
+                                    if (seenROM) {
+	                                    translationromA.addAttribute(mapping);
+                                    } else {
+	                                    translationA.addAttribute(mapping);
+                                    }
                                 }
                                 else {
                                     // should not happen, edict does not support READING attributes
@@ -382,8 +395,9 @@ public class EDict extends FileBasedDictionary {
                                 // Not a recognized attribute. Since the whole bracket expression
                                 // will be cut off from the translation, store it seperately and
                                 // prepend it.
-                                if (unrecognized == null)
-                                    unrecognized = new StringBuilder();
+                                if (unrecognized == null) {
+	                                unrecognized = new StringBuilder();
+                                }
                                 if (!hasUnrecognized) {
                                     unrecognized.append( '(');
                                     hasUnrecognized = true;
@@ -393,13 +407,15 @@ public class EDict extends FileBasedDictionary {
                             
                             startc = endc + 1;
                         } while (startc < att.length());
-                        if (hasUnrecognized)
-                            unrecognized.append( ") ");
+                        if (hasUnrecognized) {
+	                        unrecognized.append( ") ");
+                        }
                     }
                 }
 
-                if (matchend > 0)
-                    translation = translation.substring( matchend, translation.length());
+                if (matchend > 0) {
+	                translation = translation.substring( matchend, translation.length());
+                }
                 if (unrecognized != null) {
                     unrecognized.append( translation);
                     translation = unrecognized.toString();
@@ -426,8 +442,9 @@ public class EDict extends FileBasedDictionary {
     @Override
 	protected boolean escapeChar( char c) {
         // some special characters need escaping
-        if (c==10 || c==13 || c=='/')
-            return true;
+        if (c==10 || c==13 || c=='/') {
+	        return true;
+        }
 
         return !characterHandler.canEncode(c);
     }

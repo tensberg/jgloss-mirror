@@ -70,8 +70,9 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
         }
         for ( int i=1; i<length; i++) {
             b = buffer.get();
-            if ((b&0xc0) != 0x80)
-                throw new CharacterCodingException();
+            if ((b&0xc0) != 0x80) {
+	            throw new CharacterCodingException();
+            }
             charData[i] = b & 0x3f;
         }
 
@@ -87,32 +88,35 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
             buffer.position( position);
             return b; // single byte character
         }
-        if ((b&0xc0) != 0x80)
-            throw new CharacterCodingException();
+        if ((b&0xc0) != 0x80) {
+	        throw new CharacterCodingException();
+        }
         
         charData[5] = b & 0x3f;
         int length = 2;
         
         do {
             b = buffer.get( --position);
-            if ((b&0xc0) != 0x80)
-                break;
+            if ((b&0xc0) != 0x80) {
+	            break;
+            }
             charData[6-length] = b & 0x3f;
             length++;
         } while (length <= 6);
         
-        if (length==2 && (b&0xe0)==0xc0)
-            charData[4] = b&0x1f;
-        else if (length==3 && (b&0xf0)==0xe0)
-            charData[3] = b&0x0f;
-        else if (length==4 && (b&0xf8)==0xf0)
-            charData[2] = b&0x07;
-        else if (length==5 && (b&0xfc)==0xf8)
-            charData[1] = b&0x03;
-        else if (length==6 && (b&0xfe)==0xfc)
-            charData[0] = b&0x01;
-        else // invalid length or wrong length marker in byte b
-            throw new CharacterCodingException();
+        if (length==2 && (b&0xe0)==0xc0) {
+	        charData[4] = b&0x1f;
+        } else if (length==3 && (b&0xf0)==0xe0) {
+	        charData[3] = b&0x0f;
+        } else if (length==4 && (b&0xf8)==0xf0) {
+	        charData[2] = b&0x07;
+        } else if (length==5 && (b&0xfc)==0xf8) {
+	        charData[1] = b&0x03;
+        } else if (length==6 && (b&0xfe)==0xfc) {
+	        charData[0] = b&0x01;
+        } else {
+	        throw new CharacterCodingException();
+        }
         
         buffer.position( position);
         return decode( charData, 6-length, length);
@@ -126,17 +130,20 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
             (length==3 && (charData[offset+1]&0x20)==0 ||
              length==4 && (charData[offset+1]&0x30)==0 ||
              length==5 && (charData[offset+1]&0x38)==0 ||
-             length==6 && (charData[offset+1]&0x3c)==0))
-            throw new CharacterCodingException();
+             length==6 && (charData[offset+1]&0x3c)==0)) {
+	        throw new CharacterCodingException();
+        }
 
         int c = charData[offset];
-        for ( int i=1; i<length; i++)
-            c = c<<6 | charData[offset+i];
+        for ( int i=1; i<length; i++) {
+	        c = c<<6 | charData[offset+i];
+        }
 
         // catch illegal data ranges
         if (c>=0xd800 && c<=0xdfff ||
-            c==0xfffe || c==0xffff)
-            throw new CharacterCodingException();
+            c==0xfffe || c==0xffff) {
+	        throw new CharacterCodingException();
+        }
 
         return c;
     }
@@ -144,30 +151,34 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
     @Override
 	public int convertCharacter( int c) {
         // convert katakana->hiragana
-        if (StringTools.isKatakana( (char) c))
-            c -= 96; // katakana-hiragana difference is 96 code points
-        else if ((c >= 'A') && (c <= 'Z')) // lowercase for ASCII letters
-            c |= 0x20;
-        else if (c>127 && c<256) // lowercase for latin umlauts
-            c = Character.toLowerCase( (char) c); // this method is slow, only use it for the special case
+        if (StringTools.isKatakana( (char) c)) {
+	        c -= 96; // katakana-hiragana difference is 96 code points
+        } else if ((c >= 'A') && (c <= 'Z')) {
+	        c |= 0x20;
+        } else if (c>127 && c<256)
+		 {
+	        c = Character.toLowerCase( (char) c); // this method is slow, only use it for the special case
+        }
 
         return c;
     }
 
     @Override
 	public CharacterClass getCharacterClass( int c, boolean inWord) {
-        if (c>=0x4e00 && c<0xa000)
-            return CharacterClass.KANJI;
-        else if (c>=0x3040 && c<0x30a0)
-            return CharacterClass.HIRAGANA;
-        else if (c>=0x30a0 && c<0x3100)
-            return CharacterClass.KATAKANA;
-        else if (c == '-')
-            return (inWord ? CharacterClass.ROMAN_WORD : CharacterClass.OTHER);
-        else if (Character.isLetterOrDigit( (char) c)) // any other characters
-            return CharacterClass.ROMAN_WORD;
-        else
-            return CharacterClass.OTHER; // not in word
+        if (c>=0x4e00 && c<0xa000) {
+	        return CharacterClass.KANJI;
+        } else if (c>=0x3040 && c<0x30a0) {
+	        return CharacterClass.HIRAGANA;
+        } else if (c>=0x30a0 && c<0x3100) {
+	        return CharacterClass.KATAKANA;
+        } else if (c == '-') {
+	        return (inWord ? CharacterClass.ROMAN_WORD : CharacterClass.OTHER);
+        } else if (Character.isLetterOrDigit( (char) c)) {
+	        return CharacterClass.ROMAN_WORD;
+        }
+		else {
+	        return CharacterClass.OTHER; // not in word
+        }
     }
     
     @Override

@@ -92,9 +92,9 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
                 tempIndexInt.put( location);
             }
             return true;
+        } else {
+	        return false;
         }
-        else
-            return false;
     }
 
     @Override
@@ -129,8 +129,9 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
      */
     protected void quicksortIndex( int left, int right, IntBuffer index) throws IOException,
                                                                                 IndexException {
-        if (left >= right)
-            return;
+        if (left >= right) {
+	        return;
+        }
 
         int middle = left + random.nextInt( right-left+1);
         int mv = index.get( middle);

@@ -36,8 +36,9 @@ class TextElement {
     TextElement( Element _element) {
         element = _element;
 
-        if (element.getElementCount() > 0)
-            throw new IllegalArgumentException( "elements must not have children");
+        if (element.getElementCount() > 0) {
+	        throw new IllegalArgumentException( "elements must not have children");
+        }
     }
 
     /**
@@ -75,13 +76,16 @@ class TextElement {
      * @see #setText(String)
      */
     public String getText() {
-        if (text == null) try {
-            text = element.getDocument().getText( element.getStartOffset(),
-                                                  element.getEndOffset()-element.getStartOffset());
-            if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER))
-                text = "";
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
+        if (text == null) {
+	        try {
+	            text = element.getDocument().getText( element.getStartOffset(),
+	                                                  element.getEndOffset()-element.getStartOffset());
+	            if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER)) {
+	                text = "";
+	            }
+	        } catch (BadLocationException ex) {
+	            ex.printStackTrace();
+	        }
         }
 
         return text;

@@ -61,8 +61,9 @@ public class JGlossApp extends JGloss {
     }
 
     public static synchronized LookupFrame getLookupFrame() {
-        if (lookupFrame == null)
-            lookupFrame = new JGlossLookupFrame( application.createLookupModel());
+        if (lookupFrame == null) {
+	        lookupFrame = new JGlossLookupFrame( application.createLookupModel());
+        }
 
         return lookupFrame;
     }
@@ -82,11 +83,12 @@ public class JGlossApp extends JGloss {
 
         // set default location of the chasen executable if this is the first start of JGloss
         String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
-        if (chasen==null || chasen.length()==0)
-            prefs.set( Preferences.CHASEN_LOCATION, messages.getString
+        if (chasen==null || chasen.length()==0) {
+	        prefs.set( Preferences.CHASEN_LOCATION, messages.getString
                        ( File.separatorChar=='\\' ? 
                          "chasen.location.windows" :
                          "chasen.location.unix"));
+        }
         Chasen.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
     }
 
@@ -103,10 +105,11 @@ public class JGlossApp extends JGloss {
         ExportMenu.registerStandardExporters();
 
         if (args.length == 0) {
-            if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-                getLookupFrame().setVisible(true);
-            else
-                new JGlossFrame();
+            if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false)) {
+	            getLookupFrame().setVisible(true);
+            } else {
+	            new JGlossFrame();
+            }
         }
         else {
             for ( int i=0; i<args.length; i++) {
@@ -132,8 +135,9 @@ public class JGlossApp extends JGloss {
      */
     @Override
 	protected boolean doExit() {
-        if (JGlossFrame.getFrameCount()>0 || getLookupFrame().isVisible())
-            return false;
+        if (JGlossFrame.getFrameCount()>0 || getLookupFrame().isVisible()) {
+	        return false;
+        }
 
         /*
         // debug memory:

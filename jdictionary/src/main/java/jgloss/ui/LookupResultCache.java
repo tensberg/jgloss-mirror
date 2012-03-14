@@ -60,10 +60,12 @@ public class LookupResultCache extends LookupResultProxy implements Cloneable {
         throws SearchException {
         cache.clear();
         cache.add( description);
-        while (dictionaryEntries.hasNext()) try {
-            cache.add( dictionaryEntries.next().getReference());
-        } catch (SearchException ex) {
-            cache.add( ex);
+        while (dictionaryEntries.hasNext()) {
+	        try {
+	            cache.add( dictionaryEntries.next().getReference());
+	        } catch (SearchException ex) {
+	            cache.add( ex);
+	        }
         }        
     }
 
@@ -77,34 +79,38 @@ public class LookupResultCache extends LookupResultProxy implements Cloneable {
      * Replays the recorded search result events on all registered handlers.
      */
     public void replay() {
-        if (cache.size() == 0)
-            throw new IllegalStateException( "cache is empty");
+        if (cache.size() == 0) {
+	        throw new IllegalStateException( "cache is empty");
+        }
 
         // to prevent the events from being re-recorded, all events are forwarded directly
         // to the proxy superclass
         Iterator<Object> i = cache.iterator();
         Object o = i.next();
-        if (o instanceof String)
-            super.startLookup( (String) o);
-        else
-            super.startLookup( (LookupModel) o);
+        if (o instanceof String) {
+	        super.startLookup( (String) o);
+        } else {
+	        super.startLookup( (LookupModel) o);
+        }
 
         while (i.hasNext()) {
             o = i.next();
 
-            if (o instanceof Dictionary)
-                super.dictionary( (Dictionary) o);
-            else if (o instanceof DictionaryEntry)
-                super.dictionaryEntry( (DictionaryEntry) o);
-            else if (o instanceof DictionaryEntryReference) try {
-                super.dictionaryEntry( ((DictionaryEntryReference) o).getEntry());
-            } catch (SearchException ex) {
-                super.exception( ex);
+            if (o instanceof Dictionary) {
+	            super.dictionary( (Dictionary) o);
+            } else if (o instanceof DictionaryEntry) {
+	            super.dictionaryEntry( (DictionaryEntry) o);
+            } else if (o instanceof DictionaryEntryReference) {
+	            try {
+	                super.dictionaryEntry( ((DictionaryEntryReference) o).getEntry());
+	            } catch (SearchException ex) {
+	                super.exception( ex);
+	            }
+            } else if (o instanceof SearchException) {
+	            super.exception( (SearchException) o);
+            } else {
+	            super.note( o.toString());
             }
-            else if (o instanceof SearchException)
-                super.exception( (SearchException) o);
-            else
-                super.note( o.toString());
         }
 
         super.endLookup();

@@ -57,10 +57,11 @@ public class MultiWordEntry extends BaseEntry {
     @Override
 	public AttributeSet getWordAttributes( int alternative) {
         try {
-            if (wordsA[alternative] == null)
-                return emptySet.setParent( wordA);
-            else
-                return wordsA[alternative];
+            if (wordsA[alternative] == null) {
+	            return emptySet.setParent( wordA);
+            } else {
+	            return wordsA[alternative];
+            }
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new IllegalArgumentException();
         }
@@ -74,8 +75,9 @@ public class MultiWordEntry extends BaseEntry {
         out.append( wordA.toString());
         out.append( ' ');
         for ( int i=0; i<words.length; i++) {
-            if (i > 0)
-                out.append( "; ");
+            if (i > 0) {
+	            out.append( "; ");
+            }
             if (wordsA[i] != null) {
                 out.append( '(');
                 out.append( wordsA.toString());
@@ -97,8 +99,9 @@ public class MultiWordEntry extends BaseEntry {
             out.append( translationRomA[i]);
             out.append( ' ');
             for ( int j=0; j<translations[i].length; j++) {
-                if (j > 0)
-                    out.append( "; ");
+                if (j > 0) {
+	                out.append( "; ");
+                }
                 out.append( translations[i][j]);
             }
         }

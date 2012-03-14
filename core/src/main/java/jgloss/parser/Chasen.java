@@ -116,8 +116,9 @@ public class Chasen {
          * @exception NoSuchElementException if there is no next result line.
          */
         public Object next() throws NoSuchElementException {
-            if (nextLine == null)
-                throw new NoSuchElementException();
+            if (nextLine == null) {
+	            throw new NoSuchElementException();
+            }
 
             String currentLine = nextLine; // line returned by this call to next()
             // read line for next call to next() now
@@ -128,18 +129,20 @@ public class Chasen {
             nextBuffer.clear();
 
             // handle special markers
-            if (currentLine.equals( EOS))
-                return EOS;
-            else if (currentLine.equals( EOP))
-                return EOP;
+            if (currentLine.equals( EOS)) {
+	            return EOS;
+            } else if (currentLine.equals( EOP)) {
+	            return EOP;
+            }
 
             if (separator != '\0') {
                 int from = 0;
                 do {
                     // split result line at user-defined separator
                     int to = currentLine.indexOf( separator, from);
-                    if (to == -1) // last sub-segment of result line
-                        to = currentLine.length();
+                    if (to == -1) {
+	                    to = currentLine.length();
+                    }
                     nextBuffer.add( currentLine.substring( from, to));
                     from = to + 1;
                 } while (from < currentLine.length());
@@ -148,9 +151,9 @@ public class Chasen {
                    // last field of output is the empty string
                    nextBuffer.add("");
                }
-           }
-            else
-                nextBuffer.add( currentLine);
+           } else {
+	            nextBuffer.add( currentLine);
+            }
 
             return nextBuffer;
         }
@@ -174,8 +177,9 @@ public class Chasen {
             else { 
                 try {
                     nextLine = chasenOut.readLine();
-                    if (EOS.equals( nextLine))
-                        expectedEOS--;
+                    if (EOS.equals( nextLine)) {
+	                    expectedEOS--;
+                    }
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     nextLine = null;
@@ -191,8 +195,9 @@ public class Chasen {
             char[] discardBuf = new char[4096];
             try {
                 // read all available output from chasen process and discard it
-                while (chasenOut.read( discardBuf) > 0)
-                    ;
+                while (chasenOut.read( discardBuf) > 0) {
+	                ;
+                }
             } catch (IOException ex) {
                 // ignore errors when discarding
                 ex.printStackTrace();
@@ -268,8 +273,9 @@ public class Chasen {
         // If the last call to isChasenExecutable was successful, the name of the
         // executable is stored in "lastChasenExecutable".
         if (lastChasenExecutable != null &&
-            lastChasenExecutable.equals( chasenExecutable))
-            return true;
+            lastChasenExecutable.equals( chasenExecutable)) {
+	        return true;
+        }
 
         // The test is done by
         // calling the program with the "-V" (for version) option.
@@ -301,14 +307,16 @@ public class Chasen {
             waitForProcess( p, 3000l);
 
             // analyze process output
-            if (p.exitValue() != 0)
-                return false;
+            if (p.exitValue() != 0) {
+	            return false;
+            }
             BufferedReader out = new BufferedReader
                 ( new InputStreamReader( p.getInputStream()));
             String line = out.readLine();
             out.close();
-            if (line==null || !line.startsWith( "ChaSen"))
-                return false;
+            if (line==null || !line.startsWith( "ChaSen")) {
+	            return false;
+            }
 
             lastChasenExecutable = chasenExecutable;
             return true;
@@ -383,12 +391,14 @@ public class Chasen {
      * @exception IOException if communication with the chasen process failed.
      */
     public Chasen.Result parse( char[] text, int start, int length) throws IOException {
-        if (result == null)
-            result = new Result();
+        if (result == null) {
+	        result = new Result();
+        }
 
         // clear previous chasen output
-        if (result.hasNext())
-            result.discard();
+        if (result.hasNext()) {
+	        result.discard();
+        }
 
         // Chasen sends an EOS for every 0x0a encountered in the input. In order to determine when
         // all data is parsed, the EOS we expect to see are counted.
@@ -397,11 +407,13 @@ public class Chasen {
         for ( int i=start; i<start+length; i++) {
             // replace Dos or Mac line ends with unix line ends to make sure EOS is
             // treated correctly
-            if (text[i] == 0x0d)
-                text[i] = 0x0a;
+            if (text[i] == 0x0d) {
+	            text[i] = 0x0a;
+            }
             // Chasen will return a EOS for every 0x0a
-            if (text[i] == 0x0a)
-                expectedEOS++;
+            if (text[i] == 0x0a) {
+	            expectedEOS++;
+            }
         }
 
         chasenIn.write( text, start, length);
@@ -425,10 +437,12 @@ public class Chasen {
                 chasen.getOutputStream().close(); // this should terminate the executable
                 // read remaining input
                 byte[] buf = new byte[512];
-                while (chasen.getInputStream().available() > 0)
-                    chasen.getInputStream().read( buf);
-                while (chasen.getErrorStream().available() > 0)
-                    chasen.getErrorStream().read( buf);
+                while (chasen.getInputStream().available() > 0) {
+	                chasen.getInputStream().read( buf);
+                }
+                while (chasen.getErrorStream().available() > 0) {
+	                chasen.getErrorStream().read( buf);
+                }
 
                 try {
                     // TODO: Progess Bar: this step takes long
@@ -455,9 +469,10 @@ public class Chasen {
      * @return Canonical name of the encoding, or <CODE>null</CODE> if the test failed.
      */
     protected String getChasenPlatformEncoding( String chasenExecutable) {
-        if (platformEncoding != null)
-            // return cached result
+        if (platformEncoding != null) {
+	        // return cached result
             return platformEncoding;
+        }
 
         // The test is done by running
         // chasen with the -lf option, which makes it list the conjugation forms,
@@ -470,8 +485,9 @@ public class Chasen {
 
             // skip all input lines
             char[] buf = new char[512];
-            while (reader.ready())
-                reader.read(buf);
+            while (reader.ready()) {
+	            reader.read(buf);
+            }
             try {
                 waitForProcess( chasen, 5000l);
             } catch (InterruptedException ex) {

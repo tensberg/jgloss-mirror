@@ -123,8 +123,9 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
     }
 
     public void setAnnotation( Annotation _annotation) {
-        if (annotation == _annotation)
-            return;
+        if (annotation == _annotation) {
+	        return;
+        }
 
         annotation = _annotation;
         updateDisplay();
@@ -133,22 +134,26 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
 
     @Override
 	public void actionPerformed( ActionEvent e) {
-        if (annotation == null)
-            return;
+        if (annotation == null) {
+	        return;
+        }
 
         JTextField source = (JTextField) e.getSource();
         String text = source.getText();
         if (source == translation) {
-            if (!text.equals( annotation.getTranslation()))
-                annotation.setTranslation( text);
+            if (!text.equals( annotation.getTranslation())) {
+	            annotation.setTranslation( text);
+            }
         }
         else if (source == dictionaryForm) {
-            if (!text.equals( annotation.getDictionaryForm()))
-                annotation.setDictionaryForm( text);
+            if (!text.equals( annotation.getDictionaryForm())) {
+	            annotation.setDictionaryForm( text);
+            }
         }
         else if (source == dictionaryFormReading) {
-            if (!text.equals( annotation.getDictionaryFormReading()))
-                annotation.setDictionaryFormReading( text);
+            if (!text.equals( annotation.getDictionaryFormReading())) {
+	            annotation.setDictionaryFormReading( text);
+            }
         }
         title.setText( annotation.toString());
     }
@@ -246,16 +251,18 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
         }
         
         public void setAnnotation( Annotation _annotation) {
-            if (annotation == _annotation)
-                return;
+            if (annotation == _annotation) {
+	            return;
+            }
 
             if (annotation==null || _annotation==null ||
                 annotation.getReadingCount()!=_annotation.getReadingCount()) {
                 removeAll();
                 if (_annotation != null) {
 
-                    while (readingLabels.size() < _annotation.getReadingCount())
-                        readingLabels.add( new JLabel());
+                    while (readingLabels.size() < _annotation.getReadingCount()) {
+	                    readingLabels.add( new JLabel());
+                    }
                     while (readings.size() < _annotation.getReadingCount()) {
                         JTextField reading = new JTextField( "");
                         reading.addActionListener( this);
@@ -277,8 +284,9 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
         }
 
         private void updateDisplay() {
-            if (annotation == null)
-                return;
+            if (annotation == null) {
+	            return;
+            }
 
             String[] base = new String[1];
             for ( int i=0; i<annotation.getReadingCount(); i++) {
@@ -292,14 +300,16 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
 
         @Override
 		public void actionPerformed( ActionEvent e) {
-            if (annotation == null)
-                return;
+            if (annotation == null) {
+	            return;
+            }
 
             JTextField source = (JTextField) e.getSource();
             String reading = source.getText();
             int index = readings.indexOf( source);
-            if (!reading.equals( annotation.getReading( index)))
-                annotation.setReading( index, reading);
+            if (!reading.equals( annotation.getReading( index))) {
+	            annotation.setReading( index, reading);
+            }
             title.setText( annotation.toString());
         }
     } // class ReadingEditor

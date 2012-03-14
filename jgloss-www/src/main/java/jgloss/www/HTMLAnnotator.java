@@ -136,20 +136,23 @@ public class HTMLAnnotator {
                 text.append( c);
                 switch (commentchar) {
                 case 1:
-                    if (c == '!')
-                        commentchar++;
-                    else
-                        commentchar = 0;
+                    if (c == '!') {
+	                    commentchar++;
+                    } else {
+	                    commentchar = 0;
+                    }
                     break;
                 case 2:
-                    if (c == '-')
-                        commentchar++;
-                    else
-                        commentchar = 0;
+                    if (c == '-') {
+	                    commentchar++;
+                    } else {
+	                    commentchar = 0;
+                    }
                     break;
                 case 3:
-                    if (c == '-')
-                        inComment = true;
+                    if (c == '-') {
+	                    inComment = true;
+                    }
                     commentchar = 0;
                     break;
                 }
@@ -167,21 +170,22 @@ public class HTMLAnnotator {
                         out.write( script);
                         scriptWritten = true;
                     }
-                    if (tag.equals( "body"))
-                        inBody = true;
-                    else if (tag.equals( "form"))
-                        inForm = true;
-                    else if (tag.equals( "/html"))
-                        inBody = false;
-                    else if (tag.equals( "/body")) {
+                    if (tag.equals( "body")) {
+	                    inBody = true;
+                    } else if (tag.equals( "form")) {
+	                    inForm = true;
+                    } else if (tag.equals( "/html")) {
+	                    inBody = false;
+                    } else if (tag.equals( "/body")) {
                         inBody = false;
                         // Konqueror 2.1 needs an inline style definition for the element.style
                         // attribute to work. Stupid Konqueror.
                         out.write( "\n<div id=\"popup\" class=\"popup\" style=\"position: absolute;\">" + 
                                    "<pre id=\"annotation\"></pre></div>\n");
                     }
-                    else if (tag.equals( "/form"))
-                        inForm = false;
+                    else if (tag.equals( "/form")) {
+	                    inForm = false;
+                    }
                     rewriteURL( tag, text, rewriter);
 
                     out.write( text.toString());
@@ -192,9 +196,9 @@ public class HTMLAnnotator {
                 if (c=='<' || c=='\n') {
                     if (inBody && !inForm) {
                         annotateText( out, text);
+                    } else {
+	                    out.write( text.toString());
                     }
-                    else
-                        out.write( text.toString());
                     text.delete( 0, text.length());
                     if (c=='<') {
                         inTag = true;
@@ -207,8 +211,9 @@ public class HTMLAnnotator {
             i = in.read();
         }
         // write remainder
-        if (inBody && !inTag)
-            annotateText( out, text);
+        if (inBody && !inTag) {
+	        annotateText( out, text);
+        }
         out.write( text.toString());
     }
 
@@ -217,8 +222,9 @@ public class HTMLAnnotator {
      */
     protected void annotateText( Writer out, StringBuilder text)
         throws IOException {
-        if (text.length() == 0)
-            return;
+        if (text.length() == 0) {
+	        return;
+        }
 
         char[] chars = new char[text.length()];
         text.getChars( 0, text.length(), chars, 0);
@@ -239,8 +245,9 @@ public class HTMLAnnotator {
                     }
                         
                     // write unannotated text
-                    if (a.getStart() > end)
-                        out.write( chars, end, a.getStart()-end);
+                    if (a.getStart() > end) {
+	                    out.write( chars, end, a.getStart()-end);
+                    }
 
                     start = a.getStart();
                     end = start + a.getLength();
@@ -251,12 +258,14 @@ public class HTMLAnnotator {
                 addAnnotationText( anno, a, prevannotation);
             }
             // write the last annotation
-            if (anno.length() > 0) // == 0 for first annotation in list
-                out.write( generateAnnotatedWord( anno.toString(), chars, start, end-start));
+            if (anno.length() > 0) {
+	            out.write( generateAnnotatedWord( anno.toString(), chars, start, end-start));
+            }
 
             // write the remaining text
-            if (end < chars.length)
-                out.write( chars, end, chars.length-end);
+            if (end < chars.length) {
+	            out.write( chars, end, chars.length-end);
+            }
 
         } catch (SearchException ex) {
             out.write( "<!-- JGloss parser error: " + ex.getMessage() + " -->)");
@@ -354,8 +363,9 @@ public class HTMLAnnotator {
 
     protected String getTagName( StringBuilder text) {
         int end = 2;
-        while (end<text.length()-1 && text.charAt( end)>0x20)
-            end++;
+        while (end<text.length()-1 && text.charAt( end)>0x20) {
+	        end++;
+        }
         
         return text.substring( 1, end);
     }
@@ -381,12 +391,13 @@ public class HTMLAnnotator {
     protected StringBuilder rewriteURL( String name, StringBuilder tag, URLRewriter rewriter) {
         String target = null;
         
-        if (name.equals( "a") || name.equals( "area") || name.equals( "base"))
-            target = "href";
-        else if (name.equals( "img") || name.equals( "frame"))
-            target = "src";
-        else if (name.equals( "form"))
-            target = "action";
+        if (name.equals( "a") || name.equals( "area") || name.equals( "base")) {
+	        target = "href";
+        } else if (name.equals( "img") || name.equals( "frame")) {
+	        target = "src";
+        } else if (name.equals( "form")) {
+	        target = "action";
+        }
 
         if (target != null) {
             String ts = tag.toString();
@@ -394,29 +405,35 @@ public class HTMLAnnotator {
             if (start != -1) {
                 start += target.length();
                 // tag is guaranteed to end with a '>'
-                while (ts.charAt( start) == ' ')
-                    start++;
+                while (ts.charAt( start) == ' ') {
+	                start++;
+                }
                 if (ts.charAt( start) == '=') {
                     int eq = start;
                     start++;
-                    while (ts.charAt( start) <= 0x20)
-                        start++;
+                    while (ts.charAt( start) <= 0x20) {
+	                    start++;
+                    }
                     char quote = ts.charAt( start);
-                    if (quote=='"' || quote=='\'')
-                        start++;
-                    else
-                        quote = '\0';
+                    if (quote=='"' || quote=='\'') {
+	                    start++;
+                    } else {
+	                    quote = '\0';
+                    }
                     int end = start;
                     while (end<ts.length()-1 && 
                            ts.charAt( end)!=quote &&
-                           ts.charAt( end)>0x20)
-                        end++;
+                           ts.charAt( end)>0x20) {
+	                    end++;
+                    }
                     
                     try {
-                        if (ts.charAt( end) == quote)
-                            tag.deleteCharAt( end);
-                        if (quote == '\0')
-                            quote = '"';
+                        if (ts.charAt( end) == quote) {
+	                        tag.deleteCharAt( end);
+                        }
+                        if (quote == '\0') {
+	                        quote = '"';
+                        }
 
                         if (name.equals( "base")) {
                             // change the document base of the URL rewriter to the value of

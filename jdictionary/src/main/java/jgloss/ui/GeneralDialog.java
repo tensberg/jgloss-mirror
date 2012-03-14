@@ -75,8 +75,9 @@ public class GeneralDialog extends Box implements PreferencesPanel {
      * @return The GeneralDialog component.
      */
     public static synchronized GeneralDialog getInstance() {
-        if (box == null)
-            box = new GeneralDialog();
+        if (box == null) {
+	        box = new GeneralDialog();
+        }
         return box;
     }
 
@@ -198,17 +199,20 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     @SuppressWarnings("unchecked")
     @Override
 	public void loadPreferences() {
-        if (JGloss.prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false))
-            startWordLookup.setSelected( true);
-        else
-            startFrame.setSelected( true);
-        if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false))
-            clickTooltip.setSelected( true);
-        else
-            clickSelect.setSelected( true);
+        if (JGloss.prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false)) {
+	        startWordLookup.setSelected( true);
+        } else {
+	        startFrame.setSelected( true);
+        }
+        if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) {
+	        clickTooltip.setSelected( true);
+        } else {
+	        clickSelect.setSelected( true);
+        }
 
-        if (enableEditing != null)
-            enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
+        if (enableEditing != null) {
+	        enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
+        }
         chasenLocation.setText( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
         importClipboardParserSelector.setEnabled( ChasenParser.class,
                                                   Chasen.isChasenExecutable
@@ -227,11 +231,12 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         importClipboardParserSelector.setDetectParagraphs
             ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true));
         String brackets = JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS);
-        if (brackets.length() == 2)
-            importClipboardParserSelector.setReadingBrackets
+        if (brackets.length() == 2) {
+	        importClipboardParserSelector.setReadingBrackets
                 ( brackets.charAt( 0), brackets.charAt( 1));
-        else
-            importClipboardParserSelector.setNoReadingBrackets();
+        } else {
+	        importClipboardParserSelector.setNoReadingBrackets();
+        }
     }
 
     /**
@@ -241,8 +246,9 @@ public class GeneralDialog extends Box implements PreferencesPanel {
 	public void savePreferences() {
         JGloss.prefs.set( Preferences.STARTUP_WORDLOOKUP, startWordLookup.isSelected());
         JGloss.prefs.set( Preferences.LEFTCLICK_TOOLTIP, clickTooltip.isSelected());
-        if (enableEditing != null)
-            JGloss.prefs.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
+        if (enableEditing != null) {
+	        JGloss.prefs.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
+        }
         JGloss.prefs.set( Preferences.CHASEN_LOCATION, chasenLocation.getText());
         JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_PARSER,
                           importClipboardParserSelector.getSelectedParser().getName());
@@ -250,12 +256,13 @@ public class GeneralDialog extends Box implements PreferencesPanel {
                           importClipboardParserSelector.isFirstOccurrenceOnly());
         JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS,
                           importClipboardParserSelector.isDetectParagraphs());
-        if (importClipboardParserSelector.isNoReadingBrackets())
-            JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS, "");
-        else
-            JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS,
+        if (importClipboardParserSelector.isNoReadingBrackets()) {
+	        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS, "");
+        } else {
+	        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS,
                               new String( new char[] { importClipboardParserSelector.getReadingStart(),
                                                        importClipboardParserSelector.getReadingEnd() }));
+        }
     }
 
     @Override
@@ -274,11 +281,12 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     }
 
     public ReadingAnnotationFilter createReadingAnnotationFilter() {
-        if (readingStart!='\0' && readingEnd!='\0')
-            // FIXME: kanji separator '\uff5c' should be user-configurable
+        if (readingStart!='\0' && readingEnd!='\0') {
+	        // FIXME: kanji separator '\uff5c' should be user-configurable
             return new ReadingAnnotationFilter( readingStart, readingEnd, '\uff5c');
-        else
-            return null;
+        } else {
+	        return null;
+        }
     }
 
     private void chooseChasenLocation() {
@@ -294,8 +302,9 @@ public class GeneralDialog extends Box implements PreferencesPanel {
 				public Icon getIcon( java.io.File f) {
                     String name = f.getName().toLowerCase();
                     if ((name.equals( "chasen") || name.equals( "chasen.exe")) &&
-                        f.isFile())
-                        return CHASEN_ICON;
+                        f.isFile()) {
+	                    return CHASEN_ICON;
+                    }
                     
                     return super.getIcon( f);
                 }
@@ -314,8 +323,8 @@ public class GeneralDialog extends Box implements PreferencesPanel {
                                            ( "warning.chasen.title"),
                                            JOptionPane.WARNING_MESSAGE);
             importClipboardParserSelector.setEnabled( ChasenParser.class, false);
+        } else {
+	        importClipboardParserSelector.setEnabled( ChasenParser.class, true);
         }
-        else
-            importClipboardParserSelector.setEnabled( ChasenParser.class, true);
     }
 } // class GeneralDialog

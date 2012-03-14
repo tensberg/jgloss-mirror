@@ -100,8 +100,8 @@ class DocumentGenerator extends DefaultHandler {
                                                ( JGlossDocument.DTD_RESOURCE).toExternalForm());
             dtd.setPublicId( publicId);
             return dtd;
+        } else {
+	        return super.resolveEntity( publicId, systemId);
         }
-        else
-            return super.resolveEntity( publicId, systemId);
     }
 } // class DocumentGenerator

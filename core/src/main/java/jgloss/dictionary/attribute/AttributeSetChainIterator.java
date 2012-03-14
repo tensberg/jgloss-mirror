@@ -42,8 +42,9 @@ class AttributeSetChainIterator implements Iterator<Attribute<?>> {
 
     @Override
 	public Attribute<?> next() throws NoSuchElementException {
-        if (!hasNext())
-            throw new NoSuchElementException();
+        if (!hasNext()) {
+	        throw new NoSuchElementException();
+        }
         Attribute<?> currentKey = nextKey;
         getNextKey();
         return currentKey;
@@ -57,13 +58,15 @@ class AttributeSetChainIterator implements Iterator<Attribute<?>> {
     protected void getNextKey() {
         while (currentSet!=null && !currentIterator.hasNext()) {
             currentSet = currentSet.getParent();
-            if (currentSet != null)
-                currentIterator = currentSet.getAttributeKeys( false);
+            if (currentSet != null) {
+	            currentIterator = currentSet.getAttributeKeys( false);
+            }
         }
 
-        if (currentIterator.hasNext())
-            nextKey = currentIterator.next();
-        else
-            nextKey = null;
+        if (currentIterator.hasNext()) {
+	        nextKey = currentIterator.next();
+        } else {
+	        nextKey = null;
+        }
     }
 } // class AttributeSetChainIterator

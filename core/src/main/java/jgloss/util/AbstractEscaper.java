@@ -81,10 +81,11 @@ public abstract class AbstractEscaper implements Escaper {
             String replacement = escapeChar(text.charAt( i));
             if (replacement != null) {
                 if (out == null) {
-                    if (text instanceof StringBuilder)
-                        out = (StringBuilder) text; // in-place escaping for string buffers
-                    else
-                        out = new StringBuilder(text.toString());
+                    if (text instanceof StringBuilder) {
+	                    out = (StringBuilder) text; // in-place escaping for string buffers
+                    } else {
+	                    out = new StringBuilder(text.toString());
+                    }
                 }
 
                 out.replace(i, i+1, replacement);

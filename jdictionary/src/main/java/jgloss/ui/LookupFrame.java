@@ -114,8 +114,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
                 @Override
 				public void windowClosing( WindowEvent e) {
                     setVisible(false);
-                    if (JGloss.exit())
-                        dispose();
+                    if (JGloss.exit()) {
+	                    dispose();
+                    }
                 }
             });
 
@@ -192,8 +193,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
 				@Override
 				public void actionPerformed( ActionEvent e) {
-                    if (legendFrame == null)
-                        createLegendFrame();
+                    if (legendFrame == null) {
+	                    createLegendFrame();
+                    }
                     legendFrame.setVisible(true);
                 }
             };
@@ -210,8 +212,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
     }
 
     public void search( String text) {
-        if (text == null || text.length()==0)
-            return;
+        if (text == null || text.length()==0) {
+	        return;
+        }
 
         model.setSearchExpression( text);
         actionPerformed( null);
@@ -224,8 +227,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     setVisible(false);
-                    if (JGloss.exit())
-                        dispose();
+                    if (JGloss.exit()) {
+	                    dispose();
+                    }
                 }
             };
         UIUtilities.initAction( closeAction, "main.menu.close");
@@ -234,10 +238,10 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     @Override
 	public void actionPerformed( ActionEvent event) {
-        if (currentResults.isEmpty())
-            // first lookup
+        if (currentResults.isEmpty()) {
+	        // first lookup
             engine.doLookup( model.clone());
-        else {
+        } else {
             // save current state in history
             HistoryItem hi = createHistoryItem();
             addToHistory( hi);
@@ -250,16 +254,18 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         super.dispose();
         engine.dispose();
         Dictionaries.removeDictionaryListChangeListener( this);
-        if (legendFrame != null)
-            legendFrame.dispose();
+        if (legendFrame != null) {
+	        legendFrame.dispose();
+        }
     }
 
     @Override
 	public Dimension getPreferredSize() {
-        if (preferredSize == null)
-            return super.getPreferredSize();
-        else
-            return preferredSize;
+        if (preferredSize == null) {
+	        return super.getPreferredSize();
+        } else {
+	        return preferredSize;
+        }
     }
 
     @Override
@@ -276,22 +282,25 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         if (LookupResultList.Hyperlinker.REFERENCE_PROTOCOL.equals( type)) {
             ReferenceAttributeValue ref = (ReferenceAttributeValue) 
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
-            if (ref != null) try {
-                addToHistory( createHistoryItem());
-                currentResults.setData
-                ( JGloss.messages.getString( "wordlookup.reference", 
-                                             new Object[] { ref.getReferenceTitle() }),
-                  ref.getReferencedEntries());
-                currentResults.replay();
-            } catch (SearchException ex) {
-                ex.printStackTrace();
+            if (ref != null) {
+	            try {
+	                addToHistory( createHistoryItem());
+	                currentResults.setData
+	                ( JGloss.messages.getString( "wordlookup.reference", 
+	                                             new Object[] { ref.getReferenceTitle() }),
+	                  ref.getReferencedEntries());
+	                currentResults.replay();
+	            } catch (SearchException ex) {
+	                ex.printStackTrace();
+	            }
             }
         }
     }
 
     protected synchronized void createLegendFrame() {
-        if (legend != null)
-            return;
+        if (legend != null) {
+	        return;
+        }
 
         legendFrame = new JFrame( JGloss.messages.getString( "wordlookup.legendframe.title"));
         legend = new AttributeLegend();
@@ -317,8 +326,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
         history.set( historyPosition, createHistoryItem());
 
-        if (historyPosition == 0)
-            historyBackAction.setEnabled( false);
+        if (historyPosition == 0) {
+	        historyBackAction.setEnabled( false);
+        }
         historyForwardAction.setEnabled( true);
         showHistoryItem( hi);
     }
@@ -329,8 +339,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
         history.set( historyPosition-1, createHistoryItem());
 
-        if (historyPosition == history.size())
-            historyForwardAction.setEnabled( false);
+        if (historyPosition == history.size()) {
+	        historyForwardAction.setEnabled( false);
+        }
         historyBackAction.setEnabled( true);
         showHistoryItem( hi);
     }
@@ -343,9 +354,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
             if (historyPosition*2>MAX_HISTORY_SIZE) {
                 history.remove( 0);
                 historyPosition--;
+            } else {
+	            history.remove( history.size()-1);
             }
-            else
-                history.remove( history.size()-1);
         }
         historyBackAction.setEnabled( true);
         historyForwardAction.setEnabled( false);

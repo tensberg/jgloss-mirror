@@ -215,9 +215,9 @@ class JGlossifyReader extends FilterReader {
                                         // no paragraph break; skip newline
                                         line = escape( c);
                                         closeParagraph = false;
+                                    } else {
+	                                    ((PushbackReader) in).unread( c);
                                     }
-                                    else
-                                        ((PushbackReader) in).unread( c);
                                 }
                             }
                         }
@@ -266,13 +266,15 @@ class JGlossifyReader extends FilterReader {
 
     @Override
 	public int read( char[] buf, int off, int len) throws IOException {
-        if (eof)
-            return -1;
+        if (eof) {
+	        return -1;
+        }
 
         for ( int i=0; i<len; i++) {
             int c = read();
-            if (c == -1) // end of stream
-                return i;
+            if (c == -1) {
+	            return i;
+            }
 
             buf[off+i] = (char) c;
         }
@@ -292,14 +294,16 @@ class JGlossifyReader extends FilterReader {
      * @return The converted string.
      */
     private String replaceFunnyChars( String in) {
-        if (in == null)
-            return null;
+        if (in == null) {
+	        return null;
+        }
 
         StringBuilder line = new StringBuilder( in);
         for ( int i=line.length()-1; i>=0; i--) {
             Character c = new Character( line.charAt( i));
-            if (funnyChars.containsKey( c))
-                line.replace( i, i+1, new String(funnyChars.get( c)));
+            if (funnyChars.containsKey( c)) {
+	            line.replace( i, i+1, new String(funnyChars.get( c)));
+            }
         }
 
         return line.toString();
@@ -325,9 +329,9 @@ class JGlossifyReader extends FilterReader {
             }
 
             return true;
+        } else {
+	        return false;
         }
-        else
-            return false;
     }
 
     /**
@@ -335,11 +339,13 @@ class JGlossifyReader extends FilterReader {
      * beginning of a line.
      */
     private boolean startsParagraph( char c) {
-        if (contains( NO_PARAGRAPH_START, c))
-            return false;
+        if (contains( NO_PARAGRAPH_START, c)) {
+	        return false;
+        }
 
-        if (Character.isLetterOrDigit( c))
-            return false;
+        if (Character.isLetterOrDigit( c)) {
+	        return false;
+        }
 
         return true;
     }
@@ -349,11 +355,13 @@ class JGlossifyReader extends FilterReader {
      * beginning of a line.
      */
     private boolean endsParagraph( char c) {
-        if (contains( NO_PARAGRAPH_END, c))
-            return false;
+        if (contains( NO_PARAGRAPH_END, c)) {
+	        return false;
+        }
 
-        if (Character.isLetterOrDigit( c))
-            return false;
+        if (Character.isLetterOrDigit( c)) {
+	        return false;
+        }
 
         return true;
     }
@@ -376,9 +384,9 @@ class JGlossifyReader extends FilterReader {
      */
     private char[] escape( char c) {
         Character co = new Character( c);
-        if (funnyChars.containsKey( co))
-            return funnyChars.get( co);
-        else {
+        if (funnyChars.containsKey( co)) {
+	        return funnyChars.get( co);
+        } else {
             singleChar[0] = c;
             return singleChar;
         }

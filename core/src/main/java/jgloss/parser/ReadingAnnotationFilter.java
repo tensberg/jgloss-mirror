@@ -118,9 +118,9 @@ public class ReadingAnnotationFilter {
                         kanjiStart = textIndex;
                         kanjiOutStart = outtextIndex;
                     }
+                } else {
+	                kanjiStart = -1;
                 }
-                else
-                    kanjiStart = -1;
                 
                 // copy all non-annotation chars to outtext
                 outtext[outtextIndex++] = text[textIndex];

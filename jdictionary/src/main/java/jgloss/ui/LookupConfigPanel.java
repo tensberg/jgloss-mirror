@@ -319,8 +319,9 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         c.gridheight = 1;
         this.add( modesPanel, c);
         this.add( dictionaryPanel, c);
-        if (filters.length > 0)
-            this.add( filterPanel, c);
+        if (filters.length > 0) {
+	        this.add( filterPanel, c);
+        }
         this.add( fieldsPanel, c);
         this.add( matchPanel, c);
         
@@ -371,11 +372,13 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
     public LookupModel getModel() { return model; }
 
     public void setModel( LookupModel _model) {
-        if (model == _model)
-            return;
+        if (model == _model) {
+	        return;
+        }
 
-        if (model != null)
-            model.removeLookupChangeListener( this);
+        if (model != null) {
+	        model.removeLookupChangeListener( this);
+        }
 
         model = _model;
         model.setMultiDictionarySelectionMode( false);
@@ -421,8 +424,9 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
     protected void updateSearchModeSelection() {
         int selectedIndex = model.getSelectedSearchModeIndex();
-        if (selectedIndex != -1)
-            searchModes[selectedIndex].setSelected( true);
+        if (selectedIndex != -1) {
+	        searchModes[selectedIndex].setSelected( true);
+        }
     }
 
     protected void updateSearchModeAvailability() {
@@ -478,37 +482,47 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 	public void stateChanged( LookupChangeEvent event) {
         enableActionEvents = false;
 
-        if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_AVAILABILITY))
-            updateSearchModeAvailability();
-        if (event.hasChanged( LookupChangeEvent.DICTIONARY_AVAILABILITY))
-            updateDictionaryAvailability();
-        if (event.hasChanged( LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY))
-            updateSearchFieldAvailability();
+        if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_AVAILABILITY)) {
+	        updateSearchModeAvailability();
+        }
+        if (event.hasChanged( LookupChangeEvent.DICTIONARY_AVAILABILITY)) {
+	        updateDictionaryAvailability();
+        }
+        if (event.hasChanged( LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY)) {
+	        updateSearchFieldAvailability();
+        }
         if (event.hasChanged( LookupChangeEvent.FILTER_AVAILABILITY)) {
             updateFilterAvailability();
             // the selection state of the JCheckBoxes also depends on the availability
             updateFilterSelection();
         }
-        if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY))
-            updateInputAvailability();
+        if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY)) {
+	        updateInputAvailability();
+        }
         if (event.hasChanged( LookupChangeEvent.DICTIONARY_LIST_CHANGED)) {
             updateDictionaryChoice();
             updateDictionarySelection();
         }
 
         if (enableSelectionEvents) {
-            if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_SELECTION))
-                updateSearchModeSelection();
-            if (event.hasChanged( LookupChangeEvent.DICTIONARY_SELECTION))
-                updateDictionarySelection();
-            if (event.hasChanged( LookupChangeEvent.MULTI_DICTIONARY_MODE))
-                updateDictionarySelection();
-            if (event.hasChanged( LookupChangeEvent.FILTER_SELECTION))
-                updateFilterSelection();
-            if (event.hasChanged( LookupChangeEvent.SEARCH_FIELDS_SELECTION))
-                updateSearchFieldSelection();
-            if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS))
-                updateInputSelection();
+            if (event.hasChanged( LookupChangeEvent.SEARCH_MODE_SELECTION)) {
+	            updateSearchModeSelection();
+            }
+            if (event.hasChanged( LookupChangeEvent.DICTIONARY_SELECTION)) {
+	            updateDictionarySelection();
+            }
+            if (event.hasChanged( LookupChangeEvent.MULTI_DICTIONARY_MODE)) {
+	            updateDictionarySelection();
+            }
+            if (event.hasChanged( LookupChangeEvent.FILTER_SELECTION)) {
+	            updateFilterSelection();
+            }
+            if (event.hasChanged( LookupChangeEvent.SEARCH_FIELDS_SELECTION)) {
+	            updateSearchFieldSelection();
+            }
+            if (event.hasChanged( LookupChangeEvent.SEARCH_PARAMETERS)) {
+	            updateInputSelection();
+            }
         }
 
         enableActionEvents = true;
@@ -524,9 +538,10 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
     @Override
 	public void actionPerformed( ActionEvent action) {
-        if (!enableActionEvents)
-            // ignore action events during panel setup phase
+        if (!enableActionEvents) {
+	        // ignore action events during panel setup phase
             return;
+        }
 
         // ignore state changes in the model triggered through
         // the action
@@ -572,14 +587,15 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         }
         else if (action.getActionCommand().equals( DICTIONARY_CHOICE_ACTION_COMMAND)) {
             int choice = dictionaryChoice.getSelectedIndex();
-            if (!model.isDictionaryEnabled( choice))
-                try {
+            if (!model.isDictionaryEnabled( choice)) {
+	            try {
                     dictionaryChoice.setSelectedItem( model.getSelectedDictionaries().get( 0));
                 } catch (IndexOutOfBoundsException ex) {
                     // no dictionary in model, ignore
                 }
-            else
-                model.selectDictionary( dictionaryChoice.getSelectedIndex(), true);
+            } else {
+	            model.selectDictionary( dictionaryChoice.getSelectedIndex(), true);
+            }
         }
 
         enableSelectionEvents = true;

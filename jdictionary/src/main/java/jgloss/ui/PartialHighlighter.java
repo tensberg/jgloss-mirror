@@ -41,8 +41,9 @@ public class PartialHighlighter implements Highlighter {
 	public void paintHighlight(Graphics g, String entryText, String searchText) {
     
         // Allocate a buffer for the entry text
-        if(text == null || text.length < entryText.length())
-            text = new char[entryText.length()*2];
+        if(text == null || text.length < entryText.length()) {
+	        text = new char[entryText.length()*2];
+        }
 
         entryText.getChars(0, entryText.length(), text, 0);
 
@@ -62,8 +63,9 @@ public class PartialHighlighter implements Highlighter {
             // Get the extent of the non higlighted text
             String entryTextN = StringTools.toHiragana( entryText.toLowerCase());
             String searchTextN = StringTools.toHiragana( searchText.toLowerCase());
-            if((j = entryTextN.indexOf(searchTextN, i)) == -1)
-                j = max;
+            if((j = entryTextN.indexOf(searchTextN, i)) == -1) {
+	            j = max;
+            }
 
             // Paint the text that isn't highlighted
             g.setColor(normal);

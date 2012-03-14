@@ -90,10 +90,11 @@ class ListParameter extends UIParameter {
     
     public String getValue() {
         Object item = combobox.getSelectedItem();
-        if (item instanceof Value)
-            return ((Value) item).getValue();
-        else
-            return item.toString();
+        if (item instanceof Value) {
+	        return ((Value) item).getValue();
+        } else {
+	        return item.toString();
+        }
     }
 
     @Override
@@ -129,8 +130,9 @@ class ListParameter extends UIParameter {
             Node labelElem = item.getFirstChild();
             buf.setLength( 0);
             String label = XMLTools.getText( labelElem, buf).toString();
-            if (labelElem.getNodeName().equals( ExportConfiguration.Elements.LABEL_KEY))
-                label = JGloss.messages.getString( label);
+            if (labelElem.getNodeName().equals( ExportConfiguration.Elements.LABEL_KEY)) {
+	            label = JGloss.messages.getString( label);
+            }
 
             String value = label;
             Node valueElem = labelElem.getNextSibling();

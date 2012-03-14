@@ -46,8 +46,9 @@ public class SplitPaneManager implements PropertyChangeListener {
 
     public SplitPaneManager( String _prefsPrefix) {
         prefsPrefix = _prefsPrefix;
-        if (prefsPrefix.length() > 0 && prefsPrefix.charAt( prefsPrefix.length()-1)!='.')
-            prefsPrefix += '.';
+        if (prefsPrefix.length() > 0 && prefsPrefix.charAt( prefsPrefix.length()-1)!='.') {
+	        prefsPrefix += '.';
+        }
     }
     
     public void add( JSplitPane splitPane, double defaultLocation) {
@@ -72,11 +73,12 @@ public class SplitPaneManager implements PropertyChangeListener {
             String prefsKey = (String) splitPane.getClientProperty( PROPERTY_KEY_LOCATION);
             int newValue = ((Integer) e.getNewValue()).intValue();
 
-            if (newValue <= splitPane.getMinimumDividerLocation())
-                newValue = 0;
-            else if (newValue >= splitPane.getMaximumDividerLocation())
-                newValue = splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT ?
+            if (newValue <= splitPane.getMinimumDividerLocation()) {
+	            newValue = 0;
+            } else if (newValue >= splitPane.getMaximumDividerLocation()) {
+	            newValue = splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT ?
                     splitPane.getWidth() : splitPane.getHeight();
+            }
             
             double newLocation = ((double) newValue)/
                 (splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT ?
