@@ -35,7 +35,7 @@ import jgloss.util.StringTools;
  * @author Michael Koch
  */
 public class UTF8CharacterHandler implements EncodedCharacterHandler {
-    private int[] charData = new int[6];
+    private final int[] charData = new int[6];
 
     public UTF8CharacterHandler() {}
 

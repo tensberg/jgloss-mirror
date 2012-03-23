@@ -47,12 +47,12 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
 
 	private Annotation annotation;
 
-    private JLabel title;
-    private JTextField translation;
-    private JTextField dictionaryForm;
-    private JTextField dictionaryFormReading;
-    private JLabel grammaticalType;
-    private ReadingEditor readingEditor;
+    private final JLabel title;
+    private final JTextField translation;
+    private final JTextField dictionaryForm;
+    private final JTextField dictionaryFormReading;
+    private final JLabel grammaticalType;
+    private final ReadingEditor readingEditor;
 
     private boolean enabled = true;
 
@@ -217,14 +217,14 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
         private static final long serialVersionUID = 1L;
 
 		private Annotation annotation;
-        private JLabel multiReadingLabel = new JLabel
+        private final JLabel multiReadingLabel = new JLabel
             ( JGloss.messages.getString( "annotationeditor.readings"));
-        private List<JLabel> readingLabels = new ArrayList<JLabel>( 5);
-        private List<JTextField> readings = new ArrayList<JTextField>( 5);
-        private GridBagConstraints multiReadingLabelC;
-        private GridBagConstraints multiReadingBaseC;
-        private GridBagConstraints multiReadingTextC;
-        private JLabel title;
+        private final List<JLabel> readingLabels = new ArrayList<JLabel>( 5);
+        private final List<JTextField> readings = new ArrayList<JTextField>( 5);
+        private final GridBagConstraints multiReadingLabelC;
+        private final GridBagConstraints multiReadingBaseC;
+        private final GridBagConstraints multiReadingTextC;
+        private final JLabel title;
 
         ReadingEditor( JLabel _title) {
             title = _title;

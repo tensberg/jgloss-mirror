@@ -30,8 +30,8 @@ package jgloss.ui;
  */
 public class AsynchronousLookupEngine extends LookupEngine {
     private class SearchThread extends Thread {
-        private Object THREAD_LOCK = new Object();
-        private Object LOOKUP_LOCK = new Object();
+        private final Object THREAD_LOCK = new Object();
+        private final Object LOOKUP_LOCK = new Object();
         private boolean terminateThread = false;
         private boolean inLookup = false;
         

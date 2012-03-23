@@ -54,12 +54,12 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 
 	private static final String STYLE_SHEET = "/data/lookup-minimal.css";
 
-    private AutoSearchComboBox expression;
-    private LookupModel model;
+    private final AutoSearchComboBox expression;
+    private final LookupModel model;
 
-    private AsynchronousLookupEngine engine;
-    private LookupResultProxy lookupResultProxy;
-    private LookupResultList list;
+    private final AsynchronousLookupEngine engine;
+    private final LookupResultProxy lookupResultProxy;
+    private final LookupResultList list;
 
     /**
      * A dictionary change listener which will update a lookup model if the dictionary list

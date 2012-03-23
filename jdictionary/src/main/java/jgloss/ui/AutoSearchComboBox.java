@@ -78,16 +78,16 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     private boolean dontConfigureEditor;
     private boolean dontDoLookup;
 
-    private Highlighter partialHighlighter = new PartialHighlighter();
-    private Highlighter highlighter = partialHighlighter;
+    private final Highlighter partialHighlighter = new PartialHighlighter();
+    private final Highlighter highlighter = partialHighlighter;
 
     public class DefinitionRenderer extends JLabel  
         implements ListCellRenderer {
 
         private static final long serialVersionUID = 1L;
 
-        private Insets textInsets = new Insets(0, 0, 0, 0);
-        private Rectangle textBounds = new Rectangle();
+        private final Insets textInsets = new Insets(0, 0, 0, 0);
+        private final Rectangle textBounds = new Rectangle();
 
         @Override
 		public Component getListCellRendererComponent(JList list, Object value, 
@@ -132,8 +132,8 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     }
 
     protected ListCellRenderer cellRenderer = new ListCellRenderer() {
-            private ListCellRenderer defaultRenderer = new DefaultListCellRenderer();
-            private DefinitionRenderer highlightRenderer = new DefinitionRenderer();
+            private final ListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+            private final DefinitionRenderer highlightRenderer = new DefinitionRenderer();
             private Font plainFont = null;
             private Font boldFont = null;
             @Override

@@ -36,8 +36,8 @@ import jgloss.ui.gloss.JGlossFrameModel;
 import org.w3c.dom.Element;
 
 class StringParameter extends UIParameter {
-    private Box box;
-    private JTextField text;
+    private final Box box;
+    private final JTextField text;
 
     StringParameter( Element elem) {
         super( elem);

@@ -58,18 +58,18 @@ public class XCVManager {
      * Action which cuts out the selected part of the document. Delegates to the HTMLDocuments
      * cut action.
      */
-    private Action cutAction;
+    private final Action cutAction;
     /**
      * Action which copies the selected part of the document. Delegates to the HTMLDocuments
      * copy action.
      */
-    private Action copyAction;
+    private final Action copyAction;
     /**
      * Action which pastes the clipboard content. Delegates to the HTMLDocuments
      * paste action.
      */
-    private Action pasteAction;
-    private MenuListener editMenuListener;
+    private final Action pasteAction;
+    private final MenuListener editMenuListener;
     /**
      * Cut action of the <CODE>JTextComponent</CODE>.
      */
@@ -86,7 +86,7 @@ public class XCVManager {
     /**
      * Map from source text components to an array of the delegatee cut/copy/paste actions.
      */
-    private Map<JTextComponent, Action[]> sourceActions;
+    private final Map<JTextComponent, Action[]> sourceActions;
 
     /**
      * The currently active text component. The action state will be updated based on the state
@@ -94,7 +94,7 @@ public class XCVManager {
      */
     private JTextComponent activeSource;
 
-    private FocusListener setActiveActionListener;
+    private final FocusListener setActiveActionListener;
 
     public XCVManager() {
         sourceActions = new HashMap<JTextComponent, Action[]>( 5);

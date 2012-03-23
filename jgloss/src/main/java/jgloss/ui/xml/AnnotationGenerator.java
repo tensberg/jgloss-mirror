@@ -55,15 +55,15 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Michael Koch
  */
 class AnnotationGenerator extends DefaultHandler {
-    private DefaultHandler parent;
-    private ReadingAnnotationFilter readingFilter;
-    private Parser parser;
-    private TextAnnotationCompleter taCompleter;
+    private final DefaultHandler parent;
+    private final ReadingAnnotationFilter readingFilter;
+    private final Parser parser;
+    private final TextAnnotationCompleter taCompleter;
 
     private final List<ReadingAnnotation> readingsList = new ArrayList<ReadingAnnotation>( 5);
     private boolean annotateText;
     private boolean inP;
-    private AttributesImpl readingAtts = new AttributesImpl(); 
+    private final AttributesImpl readingAtts = new AttributesImpl(); 
 
     private final static String CDATA = "CDATA";
     private final static String P_ELEMENT = "p";

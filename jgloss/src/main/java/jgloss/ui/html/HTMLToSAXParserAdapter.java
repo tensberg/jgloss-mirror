@@ -46,7 +46,7 @@ public class HTMLToSAXParserAdapter {
     private ContentHandler saxContentHandler;
     private JGlossHTMLDoc htmlDoc;
     private ElementHandler copyElementHandler;
-    private Segment segment;
+    private final Segment segment;
 
     private Map<String, ElementHandler> elementHandlers;
 
@@ -198,7 +198,7 @@ public class HTMLToSAXParserAdapter {
      * {@link HTMLToSAXParserAdapter#handleChildren(Element) handleChildren}.
      */
     private class NameMapperHandler implements ElementHandler {
-        private String elementName;
+        private final String elementName;
 
         NameMapperHandler(String _elementName) {
             elementName = _elementName;

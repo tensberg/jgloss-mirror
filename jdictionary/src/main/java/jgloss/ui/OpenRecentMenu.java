@@ -70,15 +70,15 @@ public class OpenRecentMenu {
     /**
      * List of Files with documents shown in the menu.
      */
-    private List<File> documents;
+    private final List<File> documents;
     /**
      * Maximum number of entries in the document menu.
      */
-    private int size;
+    private final int size;
     /**
      * List of managed open recent menus with associated FileSelectedListener.
      */
-    private List<MenuWithListener> menus;
+    private final List<MenuWithListener> menus;
 
     /**
      * Create a new open recent menu.

@@ -28,8 +28,8 @@ import java.nio.IntBuffer;
 
 public class BinarySearchIndex implements Index {
     private class BinarySearchIterator implements Index.Iterator {
-        private int firstEntry;
-        private int lastEntry;
+        private final int firstEntry;
+        private final int lastEntry;
         private int currentEntry;
 
         public BinarySearchIterator( int _firstEntry, int _lastEntry) {
@@ -57,7 +57,7 @@ public class BinarySearchIndex implements Index {
     public static final int TYPE = 0x42695365; // BiSe in ASCII
 
     private IntBuffer index = null;
-    private int type;
+    private final int type;
 
     public BinarySearchIndex() {
         this( TYPE);

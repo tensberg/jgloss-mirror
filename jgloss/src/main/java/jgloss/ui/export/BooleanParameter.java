@@ -34,7 +34,7 @@ import jgloss.ui.gloss.JGlossFrameModel;
 import org.w3c.dom.Element;
 
 class BooleanParameter extends UIParameter {
-    private JCheckBox box;
+    private final JCheckBox box;
 
     BooleanParameter( Element elem) {
         super( elem);

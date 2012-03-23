@@ -35,7 +35,7 @@ class JavaPreferences extends Preferences implements PreferenceChangeListener {
     /**
      * Underlying Preferences object which holds the user preferences.
      */
-    private java.util.prefs.Preferences prefs;
+    private final java.util.prefs.Preferences prefs;
     
     /**
      * Initialize the preferences by getting a <CODE>Preferences<CODE> object for the user node

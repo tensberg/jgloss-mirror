@@ -43,7 +43,7 @@ class LookupChangeEvent extends EventObject {
     public static final int DICTIONARY_REMOVED = 0x1000;
     public static final int DICTIONARY_LIST_CHANGED = 0x2000;
 
-    private int changes;
+    private final int changes;
 
     public LookupChangeEvent( Object _source, int _changes) {
         super( _source);

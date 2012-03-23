@@ -41,7 +41,7 @@ import org.w3c.dom.NodeList;
  * @author Michael Koch.
  */
 class DOMTextEscaper {
-    private Escaper escaper;
+    private final Escaper escaper;
 
     DOMTextEscaper(Escaper _escaper) {
         this.escaper = _escaper;

@@ -38,9 +38,9 @@ public class ExtensionFileFilter extends FileFilter {
      * constructor and the string is changed to lower case if ignoreCase is enabled.
      */
     private String extension;
-    private String description;
-    private boolean acceptDirectories;
-    private boolean ignoreCase;
+    private final String description;
+    private final boolean acceptDirectories;
+    private final boolean ignoreCase;
 
     public ExtensionFileFilter( String extension, String description) {
         this( extension, description, true, true);

@@ -31,8 +31,8 @@ import jgloss.ui.gloss.JGlossFrameModel;
  * Export parameter with a constant value.
  */
 class ConstantParameter implements Parameter {
-    private String name;
-    private Object value;
+    private final String name;
+    private final Object value;
 
     ConstantParameter(String _name, String _value) {
         this.name = _name;

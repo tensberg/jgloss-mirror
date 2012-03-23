@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
 
 public class JGlossDocumentBuilder {
     private SAXParser xmlParser;
-    private DocumentGenerator docGen;
+    private final DocumentGenerator docGen;
 
     public JGlossDocumentBuilder() {
         try {

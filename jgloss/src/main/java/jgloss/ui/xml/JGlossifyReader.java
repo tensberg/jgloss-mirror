@@ -78,7 +78,7 @@ class JGlossifyReader extends FilterReader {
      * If <code>true</code>, try to detect paragraph breaks. Otherwise, each line from the
      * underlying stream is made to a single paragraph.
      */
-    private boolean detectParagraphs;
+    private final boolean detectParagraphs;
 
     private final static String HEADER =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +

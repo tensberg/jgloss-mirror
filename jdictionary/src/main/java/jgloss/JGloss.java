@@ -84,7 +84,7 @@ public abstract class JGloss {
      * customizable messages.
      */
     public static class Messages {
-        private ResourceBundle messages;
+        private final ResourceBundle messages;
 
         /**
          * Creates a new Messages object which accesses the given resource bundle.

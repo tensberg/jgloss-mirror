@@ -88,7 +88,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * The widget which displays the current selection of dictionaries.
      */
-    private JList dictionaries;
+    private final JList dictionaries;
     /**
      * List of {@link Dictionaries.DictionaryWrapper DictionaryWrapper } instances with
      * dictionaries currently used in the application. This is the list of dictionaries

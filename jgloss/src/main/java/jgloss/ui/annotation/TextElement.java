@@ -30,7 +30,7 @@ import javax.swing.text.Element;
 import jgloss.ui.html.JGlossHTMLDoc;
 
 class TextElement {
-    private Element element;
+    private final Element element;
     private String text = null;
 
     TextElement( Element _element) {

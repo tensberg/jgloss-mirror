@@ -50,8 +50,8 @@ public class AttributeMapper {
      * @author Michael Koch <tensberg@gmx.net>
      */
     public static class Mapping<T extends AttributeValue> {
-        private Attribute<T> attribute;
-        private T value;
+        private final Attribute<T> attribute;
+        private final T value;
 
         private Mapping( Attribute<T> _attribute, T _value) {
             this.attribute = _attribute;

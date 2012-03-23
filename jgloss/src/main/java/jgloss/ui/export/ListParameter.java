@@ -66,7 +66,7 @@ class ListParameter extends UIParameter {
 		public String toString() { return label; }
     } // class Value
 
-    private Box box;
+    private final Box box;
     protected JComboBox combobox;
 
     ListParameter( Element elem) {

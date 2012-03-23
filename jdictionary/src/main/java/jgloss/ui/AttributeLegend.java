@@ -71,8 +71,8 @@ public class AttributeLegend extends JPanel {
         };
 
     private static final class DictionaryItem {
-        private String dictionaryName;
-        private String text;
+        private final String dictionaryName;
+        private final String text;
 
         public DictionaryItem( String _dictionaryName, String _text) { 
             dictionaryName = _dictionaryName;
@@ -84,9 +84,9 @@ public class AttributeLegend extends JPanel {
         public String getText() { return text; }
     } // class DictionaryItem
 
-    private JComboBox dictionaryChoice;
-    private JEditorPane legend;
-    private JScrollPane legendScroller;
+    private final JComboBox dictionaryChoice;
+    private final JEditorPane legend;
+    private final JScrollPane legendScroller;
 
     public AttributeLegend() {
         setLayout( new BorderLayout());

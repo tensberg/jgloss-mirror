@@ -377,9 +377,9 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
     }
 
     protected static class HistoryItem {
-        private LookupModel lookupModel;
-        private LookupResultCache resultCache;
-        private LookupResultList.ViewState resultState;
+        private final LookupModel lookupModel;
+        private final LookupResultCache resultCache;
+        private final LookupResultList.ViewState resultState;
 
         private HistoryItem( LookupModel _lookupModel, LookupResultCache _resultCache,
                              LookupResultList.ViewState _resultState) {

@@ -37,10 +37,10 @@ import jgloss.dictionary.SearchMode;
  * @author Michael Koch
  */
 public class SearchReference implements ReferenceAttributeValue {
-    private String title;
-    private Dictionary dictionary;
-    private SearchMode searchMode;
-    private Object[] searchParameters;
+    private final String title;
+    private final Dictionary dictionary;
+    private final SearchMode searchMode;
+    private final Object[] searchParameters;
 
     public SearchReference( String _title, Dictionary _dictionary, SearchMode _searchMode,
                             Object[] _searchParameters) {

@@ -82,7 +82,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
     /**
      * The factory used to create views for document elements.
      */
-    private JGlossFactory viewFactory = new JGlossFactory();
+    private final JGlossFactory viewFactory = new JGlossFactory();
 
     /**
      * Flag if the view should be in compact mode.
@@ -159,7 +159,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
         /**
          * The parser to which parse requests will be forwarded.
          */
-        private JGlossParser parser;
+        private final JGlossParser parser;
 
         /**
          * Creates a new wrapper with an associated <CODE>JGlossParser</CODE>.
@@ -580,12 +580,12 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * Shared segment used by instances of <code>ReadingTranslationView</code> used to retrieve
      * text from the document.
      */
-    private Segment segment = new Segment();
+    private final Segment segment = new Segment();
 
     /**
      * Segment character buffer used by instances of <code>ReadingTranslationView</code>.
      */
-    private char[] segmentBuffer = new char[MAX_TRANSLATION_LENGTH];
+    private final char[] segmentBuffer = new char[MAX_TRANSLATION_LENGTH];
 
     /**
      * A view which renders a reading or a translation element. These views are placed
@@ -597,7 +597,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * Type of this view. Either {@link AnnotationTags#READING READING} or
          * {@link AnnotationTags#TRANSLATION TRANSLATION}.
          */
-        private AnnotationTags type;
+        private final AnnotationTags type;
 
         /**
          * Creates a new view for the specified element with the given type.
@@ -705,7 +705,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
         public static final float ANNOTATED_TEXT_ALIGNMENT = 1f;
         public static final float DEFAULT_ALIGNMENT = Float.MAX_VALUE;
 
-        private float alignment;
+        private final float alignment;
 
         /**
          * Creates a new view for the element.

@@ -18,7 +18,7 @@ import jgloss.ui.annotation.AnnotationListModel;
  * @author Michael Koch
  */
 public class AnnotationListSynchronizer implements DocumentListener {
-    private AnnotationListModel annotationModel;
+    private final AnnotationListModel annotationModel;
 
     public AnnotationListSynchronizer(JGlossHTMLDoc _doc, AnnotationListModel _annotationModel) {
         _doc.addDocumentListener(this);

@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public abstract class IDAttributeValueFactory {
-    private Map<String, CategoryAttributeValue> values;
+    private final Map<String, CategoryAttributeValue> values;
 
     public IDAttributeValueFactory() {
         values = new HashMap<String, CategoryAttributeValue>();
