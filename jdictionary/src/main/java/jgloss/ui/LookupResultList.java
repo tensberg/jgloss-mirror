@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -69,7 +71,9 @@ import jgloss.ui.DictionaryEntryFormat.DecorationType;
 import jgloss.util.ListFormatter;
 
 public class LookupResultList extends JPanel implements LookupResultHandler {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(LookupResultList.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	private static class Marker implements DictionaryEntryFormat.Decorator {
         private MarkerListFormatter.Group markerGroup = 
@@ -470,7 +474,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }
 
     protected void format( SearchException ex, boolean fancy) {
-        ex.printStackTrace();
+        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         
         if (fancy) {
 	        resultTextBuffer.append( "<p><font color=\"red\">");

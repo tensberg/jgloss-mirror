@@ -24,6 +24,8 @@
 package jgloss.ui.xml;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,6 +40,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 class DocumentGenerator extends DefaultHandler {
+	private static final Logger LOGGER = Logger.getLogger(DocumentGenerator.class.getPackage().getName());
+	
     private DocumentBuilder builder;
     private Document document;
     private Node currentParent;
@@ -46,7 +50,7 @@ class DocumentGenerator extends DefaultHandler {
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

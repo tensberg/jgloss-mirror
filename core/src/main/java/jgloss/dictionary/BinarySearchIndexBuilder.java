@@ -28,6 +28,7 @@ import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * Builder class for a {@link BinarySearchIndex BinarySearchIndex}.
@@ -35,6 +36,8 @@ import java.util.Random;
  * @author Michael Koch
  */
 public class BinarySearchIndexBuilder implements IndexBuilder {
+	private static final Logger LOGGER = Logger.getLogger(BinarySearchIndexBuilder.class.getPackage().getName());
+	
     private static final int INITIAL_INDEX_SIZE = 500000;
 
     protected IndexContainer indexContainer;
@@ -105,8 +108,8 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
                 tempIndex.limit( tempIndexInt.position()*4);
                 tempIndex.rewind();
 
-                System.err.println( tempIndexInt.position() + " entries");
-                System.err.println( "sorting index");
+                LOGGER.info( tempIndexInt.position() + " entries");
+                LOGGER.info( "sorting index");
                 quicksortIndex( 0, tempIndexInt.position()-1, tempIndexInt);
 
                 // copy index data from temp file to index container

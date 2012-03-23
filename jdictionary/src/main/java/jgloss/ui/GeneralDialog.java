@@ -28,6 +28,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -62,7 +64,9 @@ import jgloss.parser.ReadingAnnotationFilter;
  * @author Michael Koch
  */
 public class GeneralDialog extends Box implements PreferencesPanel {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(GeneralDialog.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	/**
      * The single application-wide instance.
@@ -224,7 +228,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
             }
 			importClipboardParserSelector.setSelected( (Class<? extends Parser>) selectedParser);
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
         importClipboardParserSelector.setFirstOccurrenceOnly
             ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE, true));

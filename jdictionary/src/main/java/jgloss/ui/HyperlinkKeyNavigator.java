@@ -30,6 +30,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -59,6 +61,8 @@ import javax.swing.text.html.HTMLDocument;
  * @author Michael Koch
  */
 public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeListener {
+	private static final Logger LOGGER = Logger.getLogger(HyperlinkKeyNavigator.class.getPackage().getName());
+	
     protected Element currentElement;
     protected Object highlightTag;
 
@@ -151,7 +155,7 @@ public class HyperlinkKeyNavigator implements DocumentListener, PropertyChangeLi
                                                                     highlightPainter);
             }
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

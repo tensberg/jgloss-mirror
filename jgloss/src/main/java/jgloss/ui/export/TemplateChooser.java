@@ -25,6 +25,8 @@ package jgloss.ui.export;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jgloss.ui.gloss.JGlossFrameModel;
 
@@ -36,6 +38,8 @@ import org.w3c.dom.Element;
  * can thus be used as superclass.
  */
 class TemplateChooser extends ListParameter {
+	private static final Logger LOGGER = Logger.getLogger(TemplateChooser.class.getPackage().getName());
+	
     TemplateChooser( Element elem) {
         super( elem);
     }
@@ -48,7 +52,7 @@ class TemplateChooser extends ListParameter {
             try {
                 value = new URL( systemId, value).toExternalForm();
             } catch (MalformedURLException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
 

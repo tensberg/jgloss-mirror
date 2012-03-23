@@ -33,6 +33,8 @@ import java.awt.event.ActionListener;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -50,17 +52,6 @@ import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
 
 public class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
-    private static final long serialVersionUID = 1L;
-
-	private static final String STYLE_SHEET = "/data/lookup-minimal.css";
-
-    private AutoSearchComboBox expression;
-    private LookupModel model;
-
-    private AsynchronousLookupEngine engine;
-    private LookupResultProxy lookupResultProxy;
-    private LookupResultList list;
-
     /**
      * A dictionary change listener which will update a lookup model if the dictionary list
      * changes, but will not prevent the model from being garbage collected. The model is
@@ -95,6 +86,19 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         }
     } // class WeakDictionaryChangeListener
 
+    private static final Logger LOGGER = Logger.getLogger(SimpleLookup.class.getPackage().getName());
+    
+    private static final long serialVersionUID = 1L;
+    
+    private static final String STYLE_SHEET = "/data/lookup-minimal.css";
+    
+    private final AutoSearchComboBox expression;
+    private final LookupModel model;
+    
+    private final AsynchronousLookupEngine engine;
+    private final LookupResultProxy lookupResultProxy;
+    private final LookupResultList list;
+    
     public SimpleLookup( Component[] additionalControls, LookupResultList.Hyperlinker hyperlinker) {
         model = new LookupModel
             ( Arrays.asList( new SearchMode[] { ExpressionSearchModes.EXACT,
@@ -239,7 +243,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 	                                                 new Object[] { ref.getReferenceTitle() }),
 	                      ref.getReferencedEntries()).replay( lookupResultProxy);
 	            } catch (SearchException ex) {
-	                ex.printStackTrace();
+	                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	            }
             }
         }

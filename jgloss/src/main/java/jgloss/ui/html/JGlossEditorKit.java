@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -75,7 +77,9 @@ import jgloss.ui.xml.JGlossDocument;
  * @author Michael Koch
  */
 public class JGlossEditorKit extends HTMLEditorKit {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(JGlossEditorKit.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	private static final String JGLOSS_STYLE_SHEET = "/data/jgloss.css";
 
@@ -974,7 +978,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	                }
 	            }
 	        } catch (java.io.IOException ex) {
-	            ex.printStackTrace();
+	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	        }
         }
 
@@ -1028,7 +1032,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
         jglossStyleSheet.loadRules(r, null);
         r.close();
         } catch (IOException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

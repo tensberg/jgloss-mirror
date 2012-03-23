@@ -25,6 +25,8 @@ package jgloss.ui.xml;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -37,15 +39,17 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class JGlossDocumentBuilder {
-    private SAXParser xmlParser;
-    private DocumentGenerator docGen;
+	private static final Logger LOGGER = Logger.getLogger(JGlossDocumentBuilder.class.getPackage().getName());
+	
+	private SAXParser xmlParser;
+    private final DocumentGenerator docGen;
 
     public JGlossDocumentBuilder() {
         try {
             xmlParser = SAXParserFactory.newInstance().newSAXParser();
         } catch (Exception ex) {
             // SAXException or ParserConfigurationException
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
         docGen = new DocumentGenerator();
     }

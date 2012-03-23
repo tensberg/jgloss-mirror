@@ -25,6 +25,8 @@ package jgloss.ui.export;
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
@@ -38,7 +40,7 @@ import org.w3c.dom.Element;
  * @author Michael Koch
  */
 class LongestAnnotationParameter extends AbstractParameter {
-    /**
+	/**
      * Return some annotation text based on the type of the annotation.
      * The class uses reflection to choose the appropriate member function of
      * the annotation instance.
@@ -58,12 +60,14 @@ class LongestAnnotationParameter extends AbstractParameter {
             try {
                 return (String) annotationMethod.invoke(anno);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 return null;
             }
         }
     }
-
+	
+    private static final Logger LOGGER = Logger.getLogger(LongestAnnotationParameter.class.getPackage().getName());
+	
     private TypeSelector selector;
 
     LongestAnnotationParameter(Element elem) {

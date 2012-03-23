@@ -34,6 +34,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -65,7 +67,9 @@ import jgloss.Preferences;
  * @author Michael Koch
  */
 public class StyleDialog extends Box implements PreferencesPanel {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(StyleDialog.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	/**
      * The single application-wide instance.
@@ -327,7 +331,7 @@ public class StyleDialog extends Box implements PreferencesPanel {
             int s = Integer.parseInt( size);
             JGloss.prefs.set( Preferences.FONT_WORDLOOKUP_SIZE, s);
         } catch (Exception ex) { 
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             wordLookupFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP_SIZE));
         }
     }

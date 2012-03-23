@@ -40,6 +40,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -78,6 +80,8 @@ import jgloss.dictionary.IndexedDictionary;
  * @author Michael Koch
  */
 public class Dictionaries extends JComponent implements PreferencesPanel {
+	private static final Logger LOGGER = Logger.getLogger(Dictionaries.class.getPackage().getName());
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -560,7 +564,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                                          ex.getClass().getName() };
             }
     
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( SwingUtilities.getRoot( this), JGloss.messages.getString
                   ( msgid, objects),
@@ -619,7 +623,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 Dictionary d = DictionaryFactory.createDictionary( fs[i]);
                 if (d instanceof IndexedDictionary) {
                     if (!((IndexedDictionary) d).loadIndex()) {
-                        System.err.println( "building index for dictionary " + d.getName());
+                        LOGGER.severe( "building index for dictionary " + d.getName());
                         ((IndexedDictionary) d).buildIndex();
                     }
                 }

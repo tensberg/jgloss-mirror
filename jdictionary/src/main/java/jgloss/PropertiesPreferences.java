@@ -29,6 +29,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implementation of the application preferences using a <CODE>Properties</CODE> object
@@ -37,7 +39,9 @@ import java.util.Properties;
  * @author Michael Koch
  */
 class PropertiesPreferences extends Preferences {
-    /**
+	private static final Logger LOGGER = Logger.getLogger(PropertiesPreferences.class.getPackage().getName());
+	
+	/**
      * Path to the user preferences file.
      */
     public final static String PREFS_FILE = 
@@ -54,7 +58,7 @@ class PropertiesPreferences extends Preferences {
         try {
             load();
         } catch (IOException ex) {
-            System.err.println( JGloss.messages.getString( "error.loadPreferences"));
+            LOGGER.severe( JGloss.messages.getString( "error.loadPreferences"));
         }
         // store the preferences at shutdown
         Runtime.getRuntime().addShutdownHook( new Thread() {
@@ -63,7 +67,7 @@ class PropertiesPreferences extends Preferences {
                     try {
                         store();
                     } catch (IOException ex) {
-                        System.err.println( JGloss.messages.getString( "error.storePreferences"));
+                        LOGGER.severe( JGloss.messages.getString( "error.storePreferences"));
                     }
                 }
             });
@@ -110,7 +114,7 @@ class PropertiesPreferences extends Preferences {
         try {
             out = Integer.parseInt( getString( key));
         } catch (NumberFormatException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         return out;
@@ -141,7 +145,7 @@ class PropertiesPreferences extends Preferences {
         try {
             out = Double.parseDouble( getString( key));
         } catch (NumberFormatException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         return out;

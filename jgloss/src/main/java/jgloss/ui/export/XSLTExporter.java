@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -57,7 +59,9 @@ import org.xml.sax.InputSource;
  * @author Michael Koch
  */
 class XSLTExporter implements Exporter {
-    private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	private static final Logger LOGGER = Logger.getLogger(XSLTExporter.class.getPackage().getName());
+	
+	private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
     XSLTExporter() {}
 
@@ -126,7 +130,7 @@ class XSLTExporter implements Exporter {
             out = new BufferedOutputStream(new FileOutputStream(outfile));
             transform(new StreamResult(out), configuration, source, doc);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( parent, JGloss.messages.getString
                   ( "error.export.exception", new Object[] 
@@ -139,7 +143,7 @@ class XSLTExporter implements Exporter {
 	            try {
 	                out.close();
 	            } catch (IOException ex) {
-	                ex.printStackTrace();
+	                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	            }
             }
         }

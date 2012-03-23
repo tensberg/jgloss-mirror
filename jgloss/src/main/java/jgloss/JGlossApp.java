@@ -142,7 +142,7 @@ public class JGlossApp extends JGloss {
         /*
         // debug memory:
         // clear all soft references to get a clean heap dump
-        System.err.println( "clearing heap");
+        LOGGER.severe( "clearing heap");
         java.util.List l = new java.util.LinkedList();
         try {
             while (true) {
@@ -156,9 +156,9 @@ public class JGlossApp extends JGloss {
         // debug memory:
         // Flush events. Sometimes, not all pending events have been processed yet, and
         // these events keep references to UI objects. Remove these events to clear the memory.
-        System.err.println( "flushing all events");
+        LOGGER.severe( "flushing all events");
         while (Toolkit.getDefaultToolkit().getSystemEventQueue().peekEvent() != null) try {
-            System.err.println( Toolkit.getDefaultToolkit().getSystemEventQueue().getNextEvent());
+            LOGGER.severe( Toolkit.getDefaultToolkit().getSystemEventQueue().getNextEvent());
         } catch (InterruptedException ex) {}
         System.gc();
         */

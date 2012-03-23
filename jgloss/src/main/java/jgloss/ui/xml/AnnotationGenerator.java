@@ -26,6 +26,7 @@ package jgloss.ui.xml;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.SearchException;
@@ -55,15 +56,17 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Michael Koch
  */
 class AnnotationGenerator extends DefaultHandler {
-    private DefaultHandler parent;
-    private ReadingAnnotationFilter readingFilter;
-    private Parser parser;
-    private TextAnnotationCompleter taCompleter;
+	private static final Logger LOGGER = Logger.getLogger(AnnotationGenerator.class.getPackage().getName());
+	
+	private final DefaultHandler parent;
+    private final ReadingAnnotationFilter readingFilter;
+    private final Parser parser;
+    private final TextAnnotationCompleter taCompleter;
 
     private final List<ReadingAnnotation> readingsList = new ArrayList<ReadingAnnotation>( 5);
     private boolean annotateText;
     private boolean inP;
-    private AttributesImpl readingAtts = new AttributesImpl(); 
+    private final AttributesImpl readingAtts = new AttributesImpl(); 
 
     private final static String CDATA = "CDATA";
     private final static String P_ELEMENT = "p";
@@ -189,7 +192,7 @@ class AnnotationGenerator extends DefaultHandler {
                                                       completedAnnotation.getDictionaryForm(),
                                                       completedAnnotation.getDictionaryFormReading());
             } catch (StringIndexOutOfBoundsException ex) {
-                System.err.println( "Warning: unparseable word/reading: " +
+                LOGGER.severe( "Warning: unparseable word/reading: " +
                                     annotatedWord + "/" + completedAnnotation.getDictionaryForm() + "/" +
                                     completedAnnotation.getDictionaryFormReading());
                 parts = new String[][] { { annotatedWord } };

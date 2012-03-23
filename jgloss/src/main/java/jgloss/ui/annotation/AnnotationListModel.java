@@ -30,11 +30,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.text.Element;
 
 public class AnnotationListModel {
-    public static final int BIAS_NONE = 0;
+	private static final Logger LOGGER = Logger.getLogger(AnnotationListModel.class.getPackage().getName());
+	
+	public static final int BIAS_NONE = 0;
     public static final int BIAS_LEFT = 1;
     public static final int BIAS_RIGHT = 2;
 
@@ -200,11 +204,11 @@ public class AnnotationListModel {
                 fireAnnotationRemoved(annotation, annoOffset);
             }
             else {
-                System.err.println( "WARNING: assertion failed, removed annotation element not found");
+                LOGGER.severe( "WARNING: assertion failed, removed annotation element not found");
             }
         } catch (IndexOutOfBoundsException ex) {
             // element was not found, programming error
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

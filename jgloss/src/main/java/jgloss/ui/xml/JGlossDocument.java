@@ -24,6 +24,8 @@
 package jgloss.ui.xml;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -38,7 +40,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class JGlossDocument {
-    public interface Elements {
+    public interface Elements { // TODO: replace by enum
         String JGLOSS = "jgloss";
         String HEAD = "head";
         String TITLE = "title";
@@ -51,7 +53,7 @@ public class JGlossDocument {
         String BR = "br";
     } // class Elements
 
-    public interface Attributes {
+    public interface Attributes { // TODO: replace by enum
         String TRANSLATION = "tr";
         String BASE = "base";
         String BASE_READING = "basere";
@@ -60,6 +62,8 @@ public class JGlossDocument {
         String DOCREADING = "docre";
     } // class Attributes
 
+    private static final Logger LOGGER = Logger.getLogger(JGlossDocument.class.getPackage().getName());
+    
     public static final String DTD_PUBLIC = "JGloss/0.9.9/JGloss document/EN";
     public static final String DTD_SYSTEM = "http://jgloss.sourceforge.net/jgloss-0.9.9.dtd";
     public static final String DTD_RESOURCE = "/data/jgloss.dtd";
@@ -85,7 +89,7 @@ public class JGlossDocument {
         try {
             return docFactory.newDocumentBuilder().parse( _in);
         } catch (ParserConfigurationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }
@@ -135,7 +139,7 @@ public class JGlossDocument {
             new HTMLToSAXParserAdapter().transform( htmlDoc, generator);
             setDocument( generator.getGeneratedDocument());
         } catch (SAXException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 } // class JGlossDocument

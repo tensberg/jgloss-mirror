@@ -36,7 +36,7 @@ import jgloss.JGloss;
  * @author Michael Koch
  */
 public class SplitPaneManager implements PropertyChangeListener {
-    private static final String PREFS_KEY = "splitpane.";
+	private static final String PREFS_KEY = "splitpane.";
     private static final String PREFS_KEY_LOCATION = ".location";
 
     private static final String PROPERTY_KEY_LOCATION = "location prefs key property";
@@ -84,7 +84,6 @@ public class SplitPaneManager implements PropertyChangeListener {
                 (splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT ?
                  splitPane.getWidth() : splitPane.getHeight());
                               
-            System.err.println(newLocation);
             JGloss.prefs.set(prefsKey, newLocation);
         }
     }

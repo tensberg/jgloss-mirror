@@ -30,6 +30,8 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -55,7 +57,7 @@ import jgloss.parser.ReadingAnnotationFilter;
  * @author Michael Koch
  */
 public class ParserSelector extends JPanel {
-
+	
 	private static class ParserSelection {
 		private final Class<? extends Parser> parserClass;
 		private final String displayName;
@@ -73,6 +75,8 @@ public class ParserSelector extends JPanel {
 	        return displayName;
         }
 	}
+	
+	private static final Logger LOGGER = Logger.getLogger(ParserSelector.class.getPackage().getName());
 
 	private static final long serialVersionUID = 1L;
 	
@@ -216,7 +220,7 @@ public class ParserSelector extends JPanel {
 	        } catch (NoSuchMethodException ex) {
 	            // try to find a constructor with a different set of parameters
 	        } catch (Exception ex) {
-	            ex.printStackTrace();
+	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	        }
         }
 

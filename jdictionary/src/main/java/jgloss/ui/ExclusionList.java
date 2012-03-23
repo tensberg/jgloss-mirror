@@ -41,6 +41,8 @@ import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -70,7 +72,9 @@ import jgloss.util.CharacterEncodingDetector;
  * @author Michael Koch
  */
 public class ExclusionList extends JPanel implements PreferencesPanel {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(ExclusionList.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	/**
      * The single application-wide instance.
@@ -357,7 +361,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             }
             w.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( SwingUtilities.getRoot( box), JGloss.messages.getString
                   ( "error.exclusions.save", new String[] 
@@ -388,7 +392,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                     out.newLine();
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showConfirmDialog
                     ( SwingUtilities.getRoot( box), JGloss.messages.getString
                       ( "error.export.exception", new Object[] 
@@ -400,7 +404,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                 if (out != null) try {
                     out.close();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
             }*/
@@ -433,7 +437,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
 	            exclusionList.setModel( m);
 	            changed = true;
 	        } catch (Exception ex) {
-	            ex.printStackTrace();
+	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	            JOptionPane.showConfirmDialog
 	                ( SwingUtilities.getRoot( box), JGloss.messages.getString
 	                  ( "error.import.exception", new Object[] 

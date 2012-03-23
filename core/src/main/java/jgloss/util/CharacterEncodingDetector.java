@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Logger;
 
 /**
  * Try to detect the character encoding of an input stream reading Japanese
@@ -42,12 +43,14 @@ import java.io.UnsupportedEncodingException;
  * The test works by checking the validity of each byte from the input array
  * in each character encoding and eliminating the encodings where the byte combinations
  * are illegal.<br>
- * The encoding detection routine is taken from Yasuhiro Tonooka's
+ * The encoding detection routine is adapted from Yasuhiro Tonooka's
  * "Kanji Code Converter" (kcc) unix program.
  * 
  * @author Michael Koch, Yasuhiro Tonooka
  */
 public class CharacterEncodingDetector {
+	private static final Logger LOGGER = Logger.getLogger(CharacterEncodingDetector.class.getPackage().getName());
+	
     /**
      * Number of bytes which are read from the stream and looked at for detection.
      */
@@ -186,7 +189,7 @@ public class CharacterEncodingDetector {
         pbin.unread( data);
 
         enc = guessEncodingName( data);
-        System.err.println( "CharacterEncodingDetector: using " + enc);
+        LOGGER.info( "CharacterEncodingDetector: using " + enc);
         return new InputStreamReader( pbin, enc);
     }
 

@@ -27,6 +27,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -65,7 +67,9 @@ import jgloss.util.StringTools;
  * @author Michael Koch
  */
 public class JGlossHTMLDoc extends HTMLDocument {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(JGlossHTMLDoc.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	public interface Attributes {
         /**
@@ -115,7 +119,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 ( new StreamSource( JGlossHTMLDoc.class.getResourceAsStream
                                     ( "/data/JGlossToHTML.xslt")));
         } catch (TransformerConfigurationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -251,7 +255,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
          */
         @Override
 		public void handleError( String errorMsg, int pos) {
-            System.err.println( "HTML Parser: " + errorMsg + " at " + pos);
+            LOGGER.severe( "HTML Parser: " + errorMsg + " at " + pos);
         }
 
         /**
@@ -280,7 +284,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         try {
             jglossDocTransformer = jglossToHTMLTemplate.newTransformer();
         } catch (TransformerConfigurationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
         docTransformTarget = new SAXResult( new SAXToHTMLParserAdapter( getReader( 0),
                                                                         JGlossEditorKit.getDTD()));
@@ -288,7 +292,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
             jglossDocTransformer.transform( new DOMSource( baseDoc.getDOMDocument()),
                                             docTransformTarget);
         } catch (TransformerException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         baseDoc.linkWithHTMLDoc( this);
@@ -625,7 +629,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
 	            remove( paragraph.getStartOffset(), 1);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -679,18 +683,18 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 getText(basetext.getStartOffset(),
                         basetext.getEndOffset()-basetext.getStartOffset(),
                         textSegment);
-            } catch (BadLocationException ex) { ex.printStackTrace(); }
+            } catch (BadLocationException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
             unannotatedText.append(textSegment.array, textSegment.offset, textSegment.count);
         }
 
         // remove annotation element
         try {
             setOuterHTML(annotation, unannotatedText.toString());
-        } catch (Exception ex) { ex.printStackTrace(); }
+        } catch (Exception ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
         // remove the newline which the stupid HTMLDocument.insertHTML insists on adding
         try {
             remove(annotation.getEndOffset()-1, 1);
-        } catch (BadLocationException ex) { ex.printStackTrace(); }
+        } catch (BadLocationException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
     }
 
     /**
@@ -721,7 +725,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
             try {
                 start = JGlossHTMLDoc.this.createPosition(_start);
                 end = JGlossHTMLDoc.this.createPosition(_end);
-            } catch (BadLocationException ex) { ex.printStackTrace(); }
+            } catch (BadLocationException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
 
             if (writeLock) {
 	            JGlossHTMLDoc.this.writeLock();
@@ -852,7 +856,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
                             length -= textSegment.count;
                         }
                     } catch (BadLocationException ex) {
-                        ex.printStackTrace();
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
                 return false;

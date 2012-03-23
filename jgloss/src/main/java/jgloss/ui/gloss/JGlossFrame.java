@@ -62,6 +62,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -150,7 +152,9 @@ import org.xml.sax.SAXException;
  */
 public class JGlossFrame extends JPanel implements ActionListener, ListSelectionListener,
                                                    HyperlinkListener, CaretListener {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(JGlossFrame.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	/**
      * Collection of publically available actions.
@@ -970,7 +974,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                       len);
                 which.model.setDocumentChanged( true);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showConfirmDialog
                     ( this, JGloss.messages.getString
                       ( "error.import.exception", new Object[] 
@@ -1041,7 +1045,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             importFromReader( in, detectParagraphs, path, title, filter, parser,
                               CharacterEncodingDetector.guessLength( contentlength, encoding));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( this, JGloss.messages.getString
                   ( "error.import.exception", new Object[] 
@@ -1080,7 +1084,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 	            this.model.setDocumentPath( path);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( this, JGloss.messages.getString
                   ( "error.import.exception", new Object[] 
@@ -1137,7 +1141,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( this, JGloss.messages.getString
                   ( "error.load.exception", new Object[] 
@@ -1204,7 +1208,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             model.setDocument( new JGlossDocumentBuilder().build( stin, 
                 detectParagraphs, filter, parser, Dictionaries.getDictionaries( true)) );
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( JGlossFrame.this, JGloss.messages.getString
                   ( "error.import.exception", new Object[] 
@@ -1393,7 +1397,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             } catch (InterruptedException ex) {
                 // What? Should not happen.
                 // Andreas Winter: happens every time to me (truell)
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (InvocationTargetException ex2) {
                 if (ex2.getCause() instanceof IOException) {
 	                throw (IOException) ex2.getCause();
@@ -1691,7 +1695,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             saveAction.setEnabled( false);
             return true;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( this, JGloss.messages.getString
                   ( "error.save.exception", new Object[] 

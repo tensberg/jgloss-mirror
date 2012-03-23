@@ -23,6 +23,9 @@
 
 package jgloss.ui.export;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jgloss.util.Escaper;
 
 import org.w3c.dom.Attr;
@@ -41,7 +44,9 @@ import org.w3c.dom.NodeList;
  * @author Michael Koch.
  */
 class DOMTextEscaper {
-    private Escaper escaper;
+	private static final Logger LOGGER = Logger.getLogger(DOMTextEscaper.class.getPackage().getName());
+	
+    private final Escaper escaper;
 
     DOMTextEscaper(Escaper _escaper) {
         this.escaper = _escaper;
@@ -51,7 +56,7 @@ class DOMTextEscaper {
         try {
             escapeNode( doc.getDocumentElement());
         } catch (DOMException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
         return doc;
     }

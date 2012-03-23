@@ -31,6 +31,8 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -55,6 +57,8 @@ import jgloss.JGloss;
  * @author Michael Koch
  */
 public class AboutFrame extends JFrame {
+	private static final Logger LOGGER = Logger.getLogger(AboutFrame.class.getPackage().getName());
+	
     private static final long serialVersionUID = 1L;
 
     /**
@@ -221,7 +225,7 @@ public class AboutFrame extends JFrame {
             license.setSize( 600, 400);
             license.setDefaultCloseOperation( WindowConstants.HIDE_ON_CLOSE);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 } // class AboutFrame

@@ -23,6 +23,8 @@
 
 package jgloss.ui;
 
+import java.util.logging.Logger;
+
 /**
  * Lookup engine which performs lookups in its own thread.
  *
@@ -99,12 +101,14 @@ public class AsynchronousLookupEngine extends LookupEngine {
                 SearchThread.this.join( 3000);
             } catch (InterruptedException ex) {}
             if (SearchThread.this.isAlive()) {
-	            System.err.println( "WARNING: LookupFrame search thread still alive");
+	            LOGGER.warning( "WARNING: LookupFrame search thread still alive");
             }
             model = null;
             runAfterLookup = null;
         }
     } // class SearchThread
+
+    private static final Logger LOGGER = Logger.getLogger(AsynchronousLookupEngine.class.getPackage().getName());
     
     private SearchThread searchThread;
 

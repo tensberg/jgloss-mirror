@@ -28,6 +28,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -46,7 +48,9 @@ import org.xml.sax.SAXException;
  * @author Michael Koch
  */
 public class ExportMenu extends JMenu implements ActionListener {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(ExportMenu.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	private static List<ExportConfiguration> exporters = new ArrayList<ExportConfiguration>();
 
@@ -74,7 +78,7 @@ public class ExportMenu extends JMenu implements ActionListener {
 	            registerExport( new InputSource( ExportMenu.class.getResource( resources[i])
 	                                             .toExternalForm()));
 	        } catch (Exception ex) {
-	            ex.printStackTrace();
+	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	        }
         }
     }

@@ -56,7 +56,7 @@ import jgloss.util.UTF8ResourceBundleControl;
  * @author Michael Koch
  */
 public class KanjiParser extends AbstractParser {
-    private Dictionary[] dictionaries;
+    private final Dictionary[] dictionaries;
     /**
      * Cache which stores previously looked-up words.
      */
@@ -319,7 +319,6 @@ public class KanjiParser extends AbstractParser {
 
         boolean stop = false;
         while (!stop) {
-            //System.out.println( "Looking up " + word + ":" + reading + ":" + inflection);
             stop = true;
 
             // try to find exact match with conjugation
@@ -425,7 +424,6 @@ public class KanjiParser extends AbstractParser {
         searchKey.append( ':');
         searchKey.append( d.getName());
         String key = searchKey.toString();
-        //System.out.println( "searching " + key);
 
         if (lookupCache!=null &&
             lookupCache.containsKey( key)) {

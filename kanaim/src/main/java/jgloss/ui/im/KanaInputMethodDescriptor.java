@@ -27,23 +27,26 @@ import java.awt.Image;
 import java.awt.im.spi.InputMethod;
 import java.awt.im.spi.InputMethodDescriptor;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 public class KanaInputMethodDescriptor implements InputMethodDescriptor {
+	private static final Logger LOGGER = Logger.getLogger(KanaInputMethodDescriptor.class.getPackage().getName());
+	
     private static final Locale[] LOCALES = new Locale[] { new Locale( "ja", "JA", "KanaIM") };
 
     public KanaInputMethodDescriptor() {
-        System.err.println( "instantiation");
+        LOGGER.info( "instantiation");
     }
 
     @Override
 	public InputMethod createInputMethod() {
-        System.err.println( "creating kana input");
+        LOGGER.info( "creating kana input");
         return new KanaInputMethod();
     }
 
     @Override
 	public Locale[] getAvailableLocales() {
-        System.err.println( "getting locales");
+        LOGGER.fine( "getting locales");
         return LOCALES;
     }
 

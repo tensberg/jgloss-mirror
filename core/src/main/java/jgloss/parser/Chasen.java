@@ -21,6 +21,9 @@
  */
 
 package jgloss.parser;
+
+import static java.util.logging.Level.SEVERE;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -31,6 +34,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jgloss.util.CharacterEncodingDetector;
 
@@ -43,19 +48,8 @@ import jgloss.util.CharacterEncodingDetector;
  * @author Michael Koch
  */
 public class Chasen {
-    public static void main( String args[]) throws Exception {
-        System.err.println( jgloss.util.StringTools.unicodeEscape( args[0].charAt( 0)));
-        System.err.println( Character.UnicodeBlock.of( args[0].charAt( 0)));
-        System.exit( 0);
-
-        Chasen c = new Chasen( "/usr/local/bin/chasen", "", '\t');
-        Result r = c.parse( args[0].toCharArray(), 0, args[0].length());
-        while (r.hasNext()) {
-            System.err.println( r.next());
-        }
-        c.dispose();
-    }
-
+	private static final Logger LOGGER = Logger.getLogger(Chasen.class.getPackage().getName());
+	
     /**
      * End of input line marker.
      */
@@ -79,7 +73,7 @@ public class Chasen {
          * Contains the parsed result of a line of output of chasen. Returned by a call to 
          * {@link #next() next}.
          */
-        private List<String> nextBuffer = new ArrayList<String>( 10);
+        private final List<String> nextBuffer = new ArrayList<String>( 10);
         /**
          * EOS lines expected from Chasen process for this iteration. The last EOS signals the end
          * of the Chasen result for the current parse.
@@ -167,11 +161,11 @@ public class Chasen {
                 nextLine = null;
                 try {
                     if (chasenOut.ready()) {
-                        System.err.println( "Chasen.java WARNING: unexpected chasen process output");
+                        LOGGER.warning( "unexpected chasen process output");
                         discard();
                     }
                 } catch (IOException ex) {
-                	ex.printStackTrace();
+                	LOGGER.log(SEVERE, ex.getMessage(), ex);
                 }
             }
             else { 
@@ -181,7 +175,7 @@ public class Chasen {
 	                    expectedEOS--;
                     }
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    LOGGER.log(SEVERE, ex.getMessage(), ex);
                     nextLine = null;
                     expectedEOS = 0;
                 }
@@ -200,7 +194,7 @@ public class Chasen {
                 }
             } catch (IOException ex) {
                 // ignore errors when discarding
-                ex.printStackTrace();
+                LOGGER.log(SEVERE, ex.getMessage(), ex);
             }
             expectedEOS = 0;
             nextLine = null;
@@ -227,19 +221,19 @@ public class Chasen {
     /**
      * Separator for fields in the chasen output.
      */
-    private char separator;
+    private final char separator;
     /**
      * Chasen process used to parse the text.
      */
-    private Process chasen;
+    private final Process chasen;
     /**
      * Reader for stdout of chasen process.
      */
-    private BufferedReader chasenOut;
+    private final BufferedReader chasenOut;
     /**
      * Reader for stdin of chasen process.
      */
-    private BufferedWriter chasenIn;
+    private final BufferedWriter chasenIn;
     /**
      * Result iterator for parsing of some text.
      */
@@ -286,19 +280,8 @@ public class Chasen {
             p = Runtime.getRuntime().exec( chasenExecutable + " -V");
         } catch (IOException ex) {
             // specified program probably doesn't exist
-            // This is due to the fact that 
-            System.err.println( "Error: Cannot start ChaSen now: " + ex );
-            
-            /*if ( !mToldUserThatChasenCantRun )
-            {
-                mToldUserThatChasenCantRun = true;
-                
-                Object[] options = { "OK" };
-                JOptionPane.showOptionDialog(null, "Cannot start ChaSen due to Java Bug. May work after restart of JGloss.", "Warning",
-                    JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                    null, options, options[0]);
-            }*/
-            
+            LOGGER.log(SEVERE, "Error: Cannot start ChaSen now", ex );
+
             return false;
         }
 
@@ -322,7 +305,7 @@ public class Chasen {
             return true;
         } catch (InterruptedException ex) {
             // process didn't terminate normally in time, abort
-            System.err.println( "isChasenExecutable: abnormal process termination");
+            LOGGER.severe( "isChasenExecutable: abnormal process termination");
             p.destroy();
             return false;
         } catch (IOException ex) {
@@ -446,16 +429,16 @@ public class Chasen {
 
                 try {
                     // TODO: Progess Bar: this step takes long
-                    System.out.println( "Waiting for ChaSen to shut down" );
+                    LOGGER.info( "Waiting for ChaSen to shut down" );
                     waitForProcess( chasen, 1000l);
                 } catch (InterruptedException ex) {
                     // chasen process did not terminate automatically
                     // chasen NEVER terminates automatically
-                    System.err.println( "Chasen.dispose: abnormal termination of chasen");
+                    LOGGER.warning( "Chasen.dispose: abnormal termination of chasen");
                     chasen.destroy();
                 }
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -492,7 +475,7 @@ public class Chasen {
                 waitForProcess( chasen, 5000l);
             } catch (InterruptedException ex) {
                 // chasen process did not terminate automatically
-                System.err.println( "Chasen.dispose: abnormal termination of chasen");
+                LOGGER.warning( "Chasen.dispose: abnormal termination of chasen");
                 chasen.destroy();
             }
             reader.close();
@@ -500,7 +483,7 @@ public class Chasen {
             chasen.getErrorStream().close();
             return platformEncoding;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }

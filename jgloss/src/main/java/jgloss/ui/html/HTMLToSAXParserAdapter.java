@@ -25,6 +25,8 @@ package jgloss.ui.html;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
@@ -43,7 +45,9 @@ import org.xml.sax.helpers.AttributesImpl;
  * Create the JGloss XML document structure from a {@link JGlossHTMLDoc JGlossHTMLDoc}.
  */
 public class HTMLToSAXParserAdapter {
-    private ContentHandler saxContentHandler;
+	private static final Logger LOGGER = Logger.getLogger(HTMLToSAXParserAdapter.class.getPackage().getName());
+	
+	private ContentHandler saxContentHandler;
     private JGlossHTMLDoc htmlDoc;
     private ElementHandler copyElementHandler;
     private Segment segment;
@@ -134,7 +138,7 @@ public class HTMLToSAXParserAdapter {
                 length -= segment.count;
             }
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -156,7 +160,7 @@ public class HTMLToSAXParserAdapter {
             
             return text;
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return "";
         }
     }
@@ -329,7 +333,7 @@ public class HTMLToSAXParserAdapter {
                         handleText(last);
                     }
                 } catch (BadLocationException ex) {
-                    ex.printStackTrace();
+                    LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
             else {

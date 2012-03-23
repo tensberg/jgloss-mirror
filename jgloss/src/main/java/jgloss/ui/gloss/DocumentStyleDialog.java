@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -58,7 +60,9 @@ import jgloss.ui.html.JGlossEditor;
  * @author Michael Koch
  */
 public class DocumentStyleDialog extends StyleDialog {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(DocumentStyleDialog.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
 
 	/**
      * The single application-wide instance.
@@ -341,7 +345,7 @@ public class DocumentStyleDialog extends StyleDialog {
             int s = Integer.parseInt( size);
             JGloss.prefs.set( Preferences.FONT_TEXT_SIZE, s);
         } catch (Exception ex) { 
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
         }
         size = (String) readingFontSize.getSelectedItem();
@@ -349,7 +353,7 @@ public class DocumentStyleDialog extends StyleDialog {
             int s = Integer.parseInt( size);
             JGloss.prefs.set( Preferences.FONT_READING_SIZE, s);
         } catch (Exception ex) { 
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
         }
         size = (String) translationFontSize.getSelectedItem();
@@ -357,7 +361,7 @@ public class DocumentStyleDialog extends StyleDialog {
             int s = Integer.parseInt( size);
             JGloss.prefs.set( Preferences.FONT_TRANSLATION_SIZE, s);
         } catch (Exception ex) { 
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
         }
 
@@ -426,7 +430,7 @@ public class DocumentStyleDialog extends StyleDialog {
         try {
             int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
             style += "font-size: " + size + "pt; ";
-        } catch (NumberFormatException ex) { ex.printStackTrace(); }
+        } catch (NumberFormatException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
         style += "}\n";
         
         style += AnnotationTags.BASETEXT.getId() + " { ";
@@ -447,7 +451,7 @@ public class DocumentStyleDialog extends StyleDialog {
         try {
             int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
             style += "font-size: " + size + "pt; ";
-        } catch (NumberFormatException ex) { ex.printStackTrace(); }
+        } catch (NumberFormatException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
         if (JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR, true)) {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff)) + "; ";
@@ -464,7 +468,7 @@ public class DocumentStyleDialog extends StyleDialog {
         try {
             int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
             style += "font-size: " + size + "pt; ";
-        } catch (NumberFormatException ex) { ex.printStackTrace(); }
+        } catch (NumberFormatException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
         if (JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, true)) {
             style += "background-color: #" + Integer.toHexString
                 ( JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff)) + "; ";

@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import static java.util.logging.Level.SEVERE;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,6 +40,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeValue;
@@ -52,7 +56,9 @@ import jgloss.util.UTF8ResourceBundleControl;
  * http://ftp.cc.monash.edu.au/pub/nihongo/kanjidic_doc.html</a>.
  */
 public class KanjiDic implements Dictionary {
-    /**
+	private static final Logger LOGGER = Logger.getLogger(KanjiDic.class.getPackage().getName());
+	
+	/**
      * Localizable message resource.
      */
     private final static ResourceBundle messages = 
@@ -108,10 +114,10 @@ public class KanjiDic implements Dictionary {
                             reason = messages.getString("dictionary.reason.pattern");
                         }
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                         reason = messages.getString("dictionary.reason.read");
                     } catch (NumberFormatException ex) {
-                    	ex.printStackTrace();
+                    	LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                         reason = messages.getString("dictionary.reason.read");
                     }
                     
@@ -299,7 +305,7 @@ public class KanjiDic implements Dictionary {
 	                                // all other entry types are currently not used
 	                            }
 	                        } catch (NumberFormatException ex) {
-	                            System.err.println( "WARNING: malformed dictionary entry " + dicline);
+	                            LOGGER.log(SEVERE, "WARNING: malformed dictionary entry " + dicline, ex);
 	                        }
                         }
                     }

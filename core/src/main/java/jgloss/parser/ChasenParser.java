@@ -57,7 +57,7 @@ public class ChasenParser extends AbstractParser {
     /**
      * Path to the chasen executable, or <code>null</code> if the default executable is to be used.
      */
-    private String chasenExecutable;
+    private final String chasenExecutable;
     /**
      * Cache of words looked up in the dictionaries.
      */
@@ -116,7 +116,6 @@ public class ChasenParser extends AbstractParser {
                 }
                 
                 Object resultLine = result.next();
-                // System.err.println( resultLine);
                 if (resultLine.equals( Chasen.EOS)) { // end of line in input text
                     parsePosition++;
                 }

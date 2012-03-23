@@ -23,6 +23,9 @@
 
 package jgloss.ui.annotation;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -30,7 +33,9 @@ import javax.swing.text.Element;
 import jgloss.ui.html.JGlossHTMLDoc;
 
 class TextElement {
-    private Element element;
+	private static final Logger LOGGER = Logger.getLogger(TextElement.class.getPackage().getName());
+	
+	private final Element element;
     private String text = null;
 
     TextElement( Element _element) {
@@ -64,7 +69,7 @@ class TextElement {
 
             doc.remove( start, end-start);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -84,7 +89,7 @@ class TextElement {
 	                text = "";
 	            }
 	        } catch (BadLocationException ex) {
-	            ex.printStackTrace();
+	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	        }
         }
 

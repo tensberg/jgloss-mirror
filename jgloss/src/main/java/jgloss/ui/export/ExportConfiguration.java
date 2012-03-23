@@ -28,6 +28,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
@@ -52,7 +54,9 @@ import org.xml.sax.SAXException;
  * @author Michael Koch
  */
 class ExportConfiguration {
-    /**
+	private static final Logger LOGGER = Logger.getLogger(ExportConfiguration.class.getPackage().getName());
+	
+	/**
      * Element names of an export descriptor XML file.
      */
     interface Elements {
@@ -182,7 +186,7 @@ class ExportConfiguration {
         try {
             return (Exporter) Class.forName(exportClass).newInstance();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }
@@ -224,7 +228,7 @@ class ExportConfiguration {
         try {
             systemId = new URL( _systemId);
         } catch (MalformedURLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         if (_template.getTagName().equals( Elements.TEMPLATES)) { 
@@ -237,7 +241,7 @@ class ExportConfiguration {
             try {
                 value = new URL( systemId, value).toExternalForm();
             } catch (MalformedURLException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
             template = new ConstantParameter("template", value);
         }

@@ -26,6 +26,8 @@ package jgloss.ui.annotation;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
@@ -46,6 +48,7 @@ public class Annotation {
         }
     };
 
+    private static final Logger LOGGER = Logger.getLogger(Annotation.class.getPackage().getName());
 	
     protected AnnotationListModel owner;
     protected Element anno;
@@ -171,7 +174,7 @@ public class Annotation {
                 updateAnnotatedTextReading();
                 owner.fireReadingChanged( this, -1);
             } catch (StringIndexOutOfBoundsException ex) {
-                System.err.println( "Warning: Unparseable Word/Reading");
+                LOGGER.severe( "Warning: Unparseable Word/Reading");
                 setReading( 0, _reading);
             }
         }
@@ -213,7 +216,7 @@ public class Annotation {
             return elem.getDocument().getText( elem.getStartOffset(), 
                                                elem.getEndOffset()-elem.getStartOffset());
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return "";
         }
     }

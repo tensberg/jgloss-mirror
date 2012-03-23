@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 
@@ -69,7 +70,9 @@ import jgloss.util.UTF8ResourceBundleControl;
  * @author Michael Koch
  */
 public abstract class JGloss {
-    /**
+	private static final Logger LOGGER = Logger.getLogger(JGloss.class.getPackage().getName());
+	
+	/**
      * Path to the file with message strings.
      */
     private static final String MESSAGES = "messages";
@@ -255,7 +258,7 @@ public abstract class JGloss {
         if (args.length > 0) {
             if (args[0].equals( "-h") || args[0].equals( "--help") ||
                 args[0].equals( "/?")) {
-                System.err.println( messages.getString( "main.usage", 
+                System.out.println( messages.getString( "main.usage", 
                                                         new String[] { getApplicationName() }));
                 System.exit( 0);
             }
@@ -267,26 +270,26 @@ public abstract class JGloss {
                         Dictionary d = DictionaryFactory.createDictionary( args[i]);
                         if (d instanceof IndexedDictionary &&
                             !((IndexedDictionary) d).loadIndex()) {
-                            System.err.println( messages.getString
+                            LOGGER.severe( messages.getString
                                                 ( "main.createindex",
                                                   new String[] { d.getName() }));
                             ((IndexedDictionary) d).buildIndex();
                         }
                         else {
-                            System.err.println( messages.getString
+                            LOGGER.severe( messages.getString
                                                 ( "main.createindex.noindex", 
                                                   new String[] { d.getName() }));
                         }
                         d.dispose();
                     } catch (DictionaryFactory.NotSupportedException ex) {
-                        System.err.println( messages.getString
+                        LOGGER.severe( messages.getString
                                             ( "main.format.unrecognized",
                                               new String[] { args[i] }));
                     } catch (Exception ex) {
                         if (ex instanceof DictionaryFactory.InstantiationException) {
 	                        ex = (Exception) ex.getCause();
                         }
-                        System.err.println( messages.getString
+                        LOGGER.severe( messages.getString
                                             ( "main.createindex.exception",
                                               new String[] { args[i],
                                                              ex.getClass().getName(),
@@ -300,11 +303,11 @@ public abstract class JGloss {
                     try {
                         DictionaryFactory.Implementation<?> imp =
                             DictionaryFactory.getImplementation( args[i]);
-                        System.out.println( messages.getString
+                        LOGGER.severe( messages.getString
                                             ( "main.format",
                                               new String[] { args[i], imp.getName() }));
                     } catch (DictionaryFactory.NotSupportedException ex) {
-                        System.out.println( messages.getString
+                        LOGGER.severe( messages.getString
                                             ( "error.dictionary.reason",
                                               new String[] { args[i], ex.getMessage() }));
                     }
@@ -313,9 +316,9 @@ public abstract class JGloss {
             }
             else if (args[0].startsWith( "-") || 
                      File.separatorChar != '/' && args[0].startsWith( "/")) {
-                System.err.println( messages.getString( "main.unknownoption",
+                LOGGER.severe( messages.getString( "main.unknownoption",
                                                         new String[] { args[0] }));
-                System.err.println( messages.getString( "main.usage"));
+                LOGGER.severe( messages.getString( "main.usage"));
                 System.exit( 1);
             }
         }
@@ -329,7 +332,7 @@ public abstract class JGloss {
      * @param fatal <code>true</code> if the application cannot be started because of the error.
      */
     protected static void displayError( String message, Throwable t, boolean fatal) {
-        System.err.println( message);
+        LOGGER.severe( message);
         t.printStackTrace();
 
         // Display error message in a frame. Note that this needs at least Java 1.1

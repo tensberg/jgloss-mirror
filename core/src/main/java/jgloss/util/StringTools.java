@@ -193,8 +193,7 @@ public class StringTools {
      * @exception StringIndexOutOfBoundsException if the word/base/reading tuple is not parseable.
      */
     public static String[][] splitWordReading( String inflectedWord, String baseWord, String baseReading) {
-        //System.err.println( "splitting " + inflectedWord + "/" + baseWord + "/" + baseReading);
-        // to treat katakana and hiragana equal, translate katakana to hiragana in base word
+         // to treat katakana and hiragana equal, translate katakana to hiragana in base word
         String baseWordH = toHiragana( baseWord);
         baseReading = toHiragana( baseReading);
         List<String[]> result = new ArrayList<String[]>( baseWord.length()/2);

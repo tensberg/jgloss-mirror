@@ -35,6 +35,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.MissingResourceException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -54,7 +56,9 @@ import jgloss.JGloss;
  * @author Michael Koch
  */
 public class UIUtilities {
-    /**
+	private static final Logger LOGGER = Logger.getLogger(UIUtilities.class.getPackage().getName());
+	
+	/**
      * Initializes an action with values taken from the messages resource bundle.
      * The name of the action, keyboard shortcuts and the action tool tip will be
      * initialized if they are available in the resource bundle. The key is taken as key to
@@ -86,8 +90,8 @@ public class UIUtilities {
 	            a.putValue( Action.MNEMONIC_KEY, KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
 	                        .get( null));
 	        } catch (Exception ex) {
-	            System.out.println( "Error while initializing Mnemonic Key " + s);
-	            ex.printStackTrace();
+	            LOGGER.severe( "Error while initializing Mnemonic Key " + s);
+	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	        }
         }
         
@@ -124,8 +128,8 @@ public class UIUtilities {
 	            b.setMnemonic( ((Integer) KeyEvent.class.getField( "VK_" + s.toUpperCase().charAt( 0))
 	                           .get( null)).intValue());
 	        } catch (Exception ex) {
-	            System.out.println( "Error while initializing Mnemonic Key " + s);
-	            ex.printStackTrace();
+	            LOGGER.severe( "Error while initializing Mnemonic Key " + s);
+	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	        }
         }
         

@@ -26,6 +26,7 @@ package jgloss.dictionary.attribute;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import jgloss.util.ListFormatter;
 import jgloss.util.UTF8ResourceBundleControl;
@@ -36,6 +37,8 @@ import jgloss.util.UTF8ResourceBundleControl;
  * @author Michael Koch
  */
 public class WordFormatter extends DefaultAttributeFormatter {
+	private static final Logger LOGGER = Logger.getLogger(WordFormatter.class.getPackage().getName());
+	
     protected static final ResourceBundle languages =
         ResourceBundle.getBundle( "languages", new UTF8ResourceBundleControl());
 
@@ -62,7 +65,7 @@ public class WordFormatter extends DefaultAttributeFormatter {
             try {
                 lang = languages.getString( w.getLanguageCode());
             } catch (MissingResourceException ex) {
-                System.err.println( "Debug: WordFormatter, missing language string for code " +
+                LOGGER.severe( "Debug: WordFormatter, missing language string for code " +
                                     w.getLanguageCode());
                 lang = w.getLanguageCode();
             }

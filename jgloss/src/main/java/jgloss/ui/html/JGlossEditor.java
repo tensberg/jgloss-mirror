@@ -34,6 +34,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -63,6 +65,8 @@ import jgloss.ui.gloss.AnnotationList;
  * @author Michael Koch
  */
 public class JGlossEditor extends JTextPane {
+	private static final Logger LOGGER = Logger.getLogger(JGlossEditor.class.getPackage().getName());
+	
     private static final long serialVersionUID = 1L;
 
 	private static DefaultHighlighter.DefaultHighlightPainter highlightPainter = 
@@ -419,7 +423,7 @@ public class JGlossEditor extends JTextPane {
         try {
             highlightTag = getHighlighter().addHighlight( start, end, highlightPainter);
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
     

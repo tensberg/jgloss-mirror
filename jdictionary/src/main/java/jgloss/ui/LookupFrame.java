@@ -33,6 +33,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -58,7 +60,9 @@ import jgloss.dictionary.attribute.ReferenceAttributeValue;
  */
 public class LookupFrame extends JFrame implements ActionListener, HyperlinkListener,
                                                    Dictionaries.DictionaryListChangeListener {
-    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(LookupFrame.class.getPackage().getName());
+	
+	private static final long serialVersionUID = 1L;
     
 	protected LookupConfigPanel config;
     protected LookupModel model;
@@ -291,7 +295,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 	                  ref.getReferencedEntries());
 	                currentResults.replay();
 	            } catch (SearchException ex) {
-	                ex.printStackTrace();
+	                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	            }
             }
         }
