@@ -24,6 +24,8 @@
 package jgloss.parser;
 
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
@@ -32,8 +34,10 @@ import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchFieldSelection;
 
 public class TextAnnotationCompleter {
-    private Dictionary[] dictionaries;
-    private Object[] searchParameters;
+	private static final Logger LOGGER = Logger.getLogger(TextAnnotationCompleter.class.getPackage().getName());
+	
+    private final Dictionary[] dictionaries;
+    private final Object[] searchParameters;
 
     public TextAnnotationCompleter( Dictionary[] _dictionaries) {
         dictionaries = _dictionaries;
@@ -101,9 +105,9 @@ public class TextAnnotationCompleter {
 	                    }
 	                    anno.setDictionaryFormReading( de.getReading( 0));
 	                    return anno;
-	                } catch (SearchException ex) { ex.printStackTrace(); }
+	                } catch (SearchException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
 	            }
-	        } catch (SearchException ex) { ex.printStackTrace(); }
+	        } catch (SearchException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
         }
 
         // no dictionary entry found, return anno unchanged.

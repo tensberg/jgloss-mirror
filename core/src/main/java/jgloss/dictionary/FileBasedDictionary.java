@@ -50,6 +50,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeValue;
@@ -74,6 +76,8 @@ import jgloss.util.UTF8ResourceBundleControl;
  */
 public abstract class FileBasedDictionary implements IndexedDictionary, Indexable,
                                                      BaseEntry.MarkerDictionary {
+	private static final Logger LOGGER = Logger.getLogger(FileBasedDictionary.class.getPackage().getName());
+	
     /**
      * Localized messages and strings for the dictionary implementations. Stored in
      * <code>resources/messages-dictionary</code>
@@ -89,11 +93,11 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     public static class Implementation<T extends FileBasedDictionary> implements DictionaryFactory.Implementation<T> {
         protected String name;
         protected String encoding;
-        private boolean doEncodingTest;
-        private java.util.regex.Pattern pattern;
-        private float maxConfidence;
-        private int lookAtLength;
-        private Constructor<T> dictionaryConstructor;
+        private final boolean doEncodingTest;
+        private final java.util.regex.Pattern pattern;
+        private final float maxConfidence;
+        private final int lookAtLength;
+        private final Constructor<T> dictionaryConstructor;
 
         /**
          * Creates a new implementation instance for some file based dictionary format.
@@ -171,7 +175,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             } catch (IOException ex) {
             	confidence = ZERO_CONFIDENCE;
             	reason = NAMES.getString("dictionary.reason.read");
-            	ex.printStackTrace();
+            	LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
             
             return new DictionaryFactory.TestResult(confidence, reason);
@@ -725,7 +729,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         } catch (BufferOverflowException ex) {
             return true;
         } catch (CharacterCodingException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return false;
         }
     }
@@ -806,7 +810,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 	            indexContainer.close();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -888,7 +892,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         				// debug index creation
         				if (termStart <= previousTerm) {
-	                        System.err.println( "Warning: possible duplicate index entry");
+	                        LOGGER.warning( "Warning: possible duplicate index entry");
                         }
         				previousTerm = termStart;
         				// debug index creation
@@ -1103,10 +1107,6 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                         continue;
                     }
                     
-                    /*System.err.println( isFieldStart( entry, match, field));
-                      System.err.println( isFieldEnd( entry, match+expressionLength, field));
-                      System.err.println( isWordStart( entry, match, field));
-                      System.err.println( isWordEnd( entry, match+expressionLength, field));*/
                     // test if entry matches search mode
                     if (searchmode == ExpressionSearchModes.EXACT ||
                         searchmode == ExpressionSearchModes.PREFIX) {

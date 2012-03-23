@@ -31,9 +31,10 @@ import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,14 +43,12 @@ import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeMapper;
 import jgloss.dictionary.attribute.AttributeSet;
 import jgloss.dictionary.attribute.Attributes;
-import jgloss.dictionary.attribute.DefaultAttributeFormatter;
 import jgloss.dictionary.attribute.DefaultAttributeSet;
 import jgloss.dictionary.attribute.Gairaigo;
 import jgloss.dictionary.attribute.InformationAttributeValue;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
 import jgloss.dictionary.attribute.SearchReference;
 import jgloss.dictionary.attribute.WithoutValue;
-import jgloss.util.DefaultListFormatter;
 
 /**
  * Implementation for dictionaries in WadokuJT.txt format. 
@@ -61,51 +60,9 @@ import jgloss.util.DefaultListFormatter;
  * @author Michael Koch
  */
 public class WadokuJT extends FileBasedDictionary {
-    public static void main( String[] args) throws Exception {
-        System.err.println( "Creating WadokuJT");
-        IndexedDictionary d = new WadokuJT( new java.io.File( args[0]));
-        System.err.println( "Loading index");
-        if (!d.loadIndex()) {
-            System.err.println( "Building index");
-            d.buildIndex();
-        }
-        System.err.println( "Successfully loaded index");
-        SearchFieldSelection f = new SearchFieldSelection();
-        f.select( DictionaryEntryField.WORD, true);
-        f.select( DictionaryEntryField.READING, true);
-        f.select( DictionaryEntryField.TRANSLATION, true);
-        f.select( MatchMode.WORD, true);
 
-        DictionaryEntryFormatter formatter = new DictionaryEntryFormatter
-            ( new DefaultListFormatter( "", "; ", ""),
-              new DefaultListFormatter( " [", ": ", "]"),
-              new DefaultListFormatter( "", " ", ".", " (n) ", ". (n) ", "."),
-              new DefaultListFormatter( "", "; ", ""),
-              new DefaultListFormatter( "", "/", ""));
-        formatter.addAttributeFormat( Attributes.PART_OF_SPEECH,
-                                      new DefaultAttributeFormatter
-                                      ( " (", ")", "", false, new DefaultListFormatter( ",")),
-                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3);
-        formatter.addAttributeFormat( Attributes.EXAMPLE,
-                                      new DefaultAttributeFormatter( " {", "}", "", true, null),
-                                      DictionaryEntryFormatter.Position.BEFORE_FIELD3);
-        formatter.addAttributeFormat( Attributes.EXPLANATION, new DefaultAttributeFormatter
-                                      ( " (", ")", "", false, new DefaultListFormatter( ",")), false);
-
-        Iterator<DictionaryEntry> r = d.search( ExpressionSearchModes.ANY,
-                                     new Object[] { args[1], f });
-        System.err.println( "Matches:");
-        StringBuilder out = new StringBuilder( 128);
-        while (r.hasNext()) {
-            out.setLength( 0);
-            DictionaryEntry de = r.next();
-            System.err.println( de);
-            System.err.println( formatter.format( de, out).toString());
-        }
-        //r.next();
-        d.dispose();
-    }
-
+	private static final Logger LOGGER = Logger.getLogger(WadokuJT.class.getPackage().getName());
+	
     public static final Attribute<WithoutValue> MAIN_ENTRY = new Attributes<WithoutValue>
         ( NAMES.getString( "wadoku.att.main_entry.name"),
           NAMES.getString( "wadoku.att.main_entry.desc"),
@@ -144,7 +101,7 @@ public class WadokuJT extends FileBasedDictionary {
             r.close();
             return mapper;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }
@@ -180,7 +137,7 @@ public class WadokuJT extends FileBasedDictionary {
             r.close();
             return map;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }
@@ -217,7 +174,7 @@ public class WadokuJT extends FileBasedDictionary {
                   ( "\\A(.*?\\|){3}.*$", Pattern.MULTILINE),
                   1.0f, 4096, WadokuJT.class.getConstructor( new Class[] { File.class }));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }
@@ -541,7 +498,7 @@ public class WadokuJT extends FileBasedDictionary {
 	                        if (lang != null) {
 	                            code = gairaigoMap.get( lang.toLowerCase());
 	                            if (code == null) {
-	                                System.err.println( "WadokuJT warning: unrecognized language " +
+	                            	LOGGER.warning( "WadokuJT warning: unrecognized language " +
 	                                                    lang + " (" + ex + ")");
 	                                code = lang;
 	                            } 
@@ -608,7 +565,7 @@ public class WadokuJT extends FileBasedDictionary {
 	                            }
 	                        }
 	                        else {
-	                            System.err.println( "WadokuJT warning: unrecognized language " +
+	                            LOGGER.warning( "WadokuJT warning: unrecognized language " +
 	                                                lang + " (" + ex + ")");
 	                        }
 	                    }
@@ -624,7 +581,7 @@ public class WadokuJT extends FileBasedDictionary {
 	                        crm += " (" + ex + ")";
 	                    }
 	                } catch (StringIndexOutOfBoundsException ex) {
-	                    System.err.println
+	                	LOGGER.warning
 	                        ( "WadokuJT warning: missing opening bracket in translation " + crm);
 	                    // can be safely ignored
 	                }
@@ -699,7 +656,7 @@ public class WadokuJT extends FileBasedDictionary {
 	                        crm = unrecognized.toString();
 	                    }
 	                } catch (StringIndexOutOfBoundsException ex) {
-	                    System.err.println
+	                	LOGGER.warning
 	                        ( "WadokuJT warning: missing closing bracket in translation " + crm);
 	                    // can be safely ignored
 	                }

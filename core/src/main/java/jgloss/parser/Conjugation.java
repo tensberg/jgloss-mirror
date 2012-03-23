@@ -23,6 +23,8 @@
 
 package jgloss.parser;
 
+import static java.util.logging.Level.SEVERE;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -34,6 +36,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import jgloss.util.UTF8ResourceBundleControl;
 
@@ -46,6 +49,8 @@ import jgloss.util.UTF8ResourceBundleControl;
  * @author Michael Koch
  */
 public class Conjugation {
+	private static final Logger LOGGER = Logger.getLogger(Conjugation.class.getPackage().getName());
+	
     /**
      * Location of the file with the conjugation definition.
      */
@@ -65,15 +70,15 @@ public class Conjugation {
     /**
      * Ending of the conjugated verb/adjective.
      */
-    private String conjugatedForm;
+    private final String conjugatedForm;
     /**
      * Dictionary form of the verb/adjective ending.
      */
-    private String dictionaryForm;
+    private final String dictionaryForm;
     /**
      * A description of the grammatical type of the conjugation.
      */
-    private String type;
+    private final String type;
 
     /**
      * Dumps the generated tree to System.out.
@@ -259,7 +264,7 @@ public class Conjugation {
                         try {
                             labels.put( label, messages.getString( RESOURCE_PREFIX + label));
                         } catch (MissingResourceException ex) {
-                            System.err.println( "vconj: missing resource for description " + 
+                            LOGGER.warning( "vconj: missing resource for description " + 
                                                 RESOURCE_PREFIX + label);
                             labels.put( label, line.substring( i+1).trim());
                         }
@@ -278,14 +283,13 @@ public class Conjugation {
                     }
                     String d = line.substring( 0, i); // dictionary form
                     String l = line.substring( i+1); // label
-                    //System.out.println( "Conjugation " + c + " " + d + " " + l);
                     addConjugation( c, d, labels.get( l.trim()));
                 }
             }
             
             propagateConjugations( root, new Conjugation[0]);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -420,17 +424,17 @@ public class Conjugation {
     }
 
     /**
-     * Dumps the generated tree on System.out.
+     * Dumps the generated tree on the logger.
      */
     public static void dump() {
         loadConjugations();
         
-        System.out.println( "Printing conjugations");
+        LOGGER.info( "Printing conjugations");
         dump( root, "");
     }
     
     /**
-     * Dumps the node and all of its descendants on System.out.
+     * Dumps the node and all of its descendants on the logger.
      *
      * @param n The node to dump.
      * @param path Edge labels from root to this child.
@@ -441,12 +445,11 @@ public class Conjugation {
         if (n.conjugations != null) {
             System.out.print( path + " ");
             for ( int i=0; i<n.conjugations.length; i++) {
-                System.out.print( "/" + n.conjugations[i].getConjugatedForm() + " " +
+                LOGGER.info( "/" + n.conjugations[i].getConjugatedForm() + " " +
                                   n.conjugations[i].getDictionaryForm() + " " +
                                   n.conjugations[i].getType());
                 out.add( n.conjugations[i].getDictionaryForm());
             }
-            System.out.println();
         }
         for ( int i=0; i<n.children.length; i++) {
             Set<String> s = dump( n.children[i], path + n.children[i].edge);
@@ -455,7 +458,7 @@ public class Conjugation {
                 // different from the ones in this node
                 for ( int j=0; j<n.conjugations.length; j++) {
                     if (!s.contains( n.conjugations[j].getDictionaryForm())) {
-	                    System.err.println( "Warning: different dictionary forms");
+	                    LOGGER.warning( "different dictionary forms");
                     }
                     out.addAll( s);
                 }

@@ -34,6 +34,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Index container which stores index data in a file.
@@ -41,12 +43,8 @@ import java.util.List;
  * @author Michael Koch
  */
 public class FileIndexContainer implements IndexContainer {
-    public static void main( String[] args) throws Exception {
-        FileIndexContainer f = new FileIndexContainer( new File( args[0]), false);
-        System.err.println( f.indexes);
-        f.close();
-    }
-
+	private static final Logger LOGGER = Logger.getLogger(FileIndexContainer.class.getPackage().getName());
+	
     /**
      * Meta data for indexes stored in the container.
      */
@@ -254,7 +252,7 @@ public class FileIndexContainer implements IndexContainer {
         try {
             indexFile.close();
         } catch (IOException ex) {
-        	ex.printStackTrace();
+        	LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
         indexes.clear(); // free index meta data for garbage collection, which clears the file mappings
     }

@@ -23,6 +23,8 @@
 
 package jgloss.dictionary;
 
+import static java.util.logging.Level.SEVERE;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,8 +34,9 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,30 +57,7 @@ import jgloss.dictionary.attribute.Priority;
  * @author Michael Koch
  */
 public class EDict extends FileBasedDictionary {
-    public static void main( String[] args) throws Exception {
-        System.err.println( "Creating edict");
-        IndexedDictionary d = new EDict( new java.io.File( args[0]), "EUC-JP");
-        System.err.println( "Loading index");
-        if (!d.loadIndex()) {
-            System.err.println( "Building index");
-            d.buildIndex();
-        }
-        System.err.println( "Successfully loaded index");
-        SearchFieldSelection f = new SearchFieldSelection();
-        f.select( DictionaryEntryField.WORD, true);
-        f.select( DictionaryEntryField.READING, true);
-        f.select( DictionaryEntryField.TRANSLATION, true);
-        f.select( MatchMode.WORD, true);
-
-        Iterator<DictionaryEntry> r = d.search( ExpressionSearchModes.ANY,
-                                     new Object[] { args[1], f });
-        System.err.println( "Matches:");
-        while (r.hasNext()) {
-	        System.err.println( r.next().toString());
-        }
-        //r.next();
-        d.dispose();
-    }
+	private static final Logger LOGGER = Logger.getLogger(EDict.class.getPackage().getName());
 
     /**
      * Object describing this implementation of the <CODE>Dictionary</CODE> interface. The
@@ -117,7 +97,7 @@ public class EDict extends FileBasedDictionary {
                         }
                   };
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(SEVERE, ex.getMessage(), ex);
             return null;
         }
     }
@@ -131,7 +111,7 @@ public class EDict extends FileBasedDictionary {
             r.close();
             return mapper;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }
@@ -292,7 +272,6 @@ public class EDict extends FileBasedDictionary {
      */
     @Override
 	protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
-        //System.err.println( entry);
         ENTRY_MATCHER.reset( entry);
         if (!ENTRY_MATCHER.matches()) {
 	        throw new MalformedEntryException( this, entry);
@@ -388,7 +367,7 @@ public class EDict extends FileBasedDictionary {
                                 }
                                 else {
                                     // should not happen, edict does not support READING attributes
-                                    System.err.println( "EDICT warning: illegal attribute type");
+                                    LOGGER.warning( "EDICT warning: illegal attribute type");
                                 }
                             }
                             else {
