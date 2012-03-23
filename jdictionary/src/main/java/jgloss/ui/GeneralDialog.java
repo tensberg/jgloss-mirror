@@ -300,7 +300,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         chooser.setMultiSelectionEnabled( false);
         chooser.setFileSelectionMode( JFileChooser.FILES_ONLY);
         chooser.setFileView( new CustomFileView() {
-                private Icon CHASEN_ICON = 
+                private final Icon CHASEN_ICON = 
                     new ImageIcon( CustomFileView.class.getResource( "/icons/chasen.png"));
                 @Override
 				public Icon getIcon( java.io.File f) {

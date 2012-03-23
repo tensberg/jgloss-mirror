@@ -107,7 +107,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
     /**
      * Manages the property change listeners, which are notified of document title changes.
      */
-    private PropertyChangeSupport listeners = new PropertyChangeSupport( this);
+    private final PropertyChangeSupport listeners = new PropertyChangeSupport( this);
 
     private static TransformerFactory transformerFactory;
     private static Templates jglossToHTMLTemplate;
@@ -140,7 +140,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
          */
         private int pos;
 
-        private char[] EMPTY_CHAR_ARRAY = new char[0];
+        private final char[] EMPTY_CHAR_ARRAY = new char[0];
         
         /**
          * Handle Annotation tags in the document. Annotation elements need special
@@ -149,7 +149,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
          * but explicit or implied paragraphs are not interrupted.
          */
         private class AnnotationAction extends HTMLDocument.HTMLReader.TagAction {
-            private boolean forceParagraph;
+            private final boolean forceParagraph;
             
             public AnnotationAction( boolean forceParagraph) {
                 this.forceParagraph = forceParagraph;
@@ -818,7 +818,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
      */
     private class UnannotatedTextFetcher extends TreeWalker {
         private StringBuilder text;
-        private Segment textSegment;
+        private final Segment textSegment;
 
         UnannotatedTextFetcher() {
             super(false);

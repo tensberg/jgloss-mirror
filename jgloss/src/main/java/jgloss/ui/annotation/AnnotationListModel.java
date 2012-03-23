@@ -42,7 +42,7 @@ public class AnnotationListModel {
     public static final int BIAS_LEFT = 1;
     public static final int BIAS_RIGHT = 2;
 
-    private List<Annotation> annotations;
+    private final List<Annotation> annotations;
     private final List<AnnotationListener> annotationListeners = new CopyOnWriteArrayList<AnnotationListener>();
     private int searchindex;
 

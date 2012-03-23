@@ -45,7 +45,7 @@ public class DictionaryEntryField {
      */
     public static final DictionaryEntryField OTHER = new DictionaryEntryField( "OTHER");
 
-    private String type;
+    private final String type;
 
     protected DictionaryEntryField( String _type) {
         this.type = _type;

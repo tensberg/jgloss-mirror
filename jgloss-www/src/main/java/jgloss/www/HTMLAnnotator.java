@@ -53,7 +53,7 @@ public class HTMLAnnotator {
     /**
      * Parser used for the document.
      */
-    private Parser parser;
+    private final Parser parser;
     /**
      * JavaScript segment inserted in the generated document.
      */

@@ -39,12 +39,12 @@ public class DefaultListFormatter implements ListFormatter {
     protected int length;
     protected int itemNo;
 
-    private String emptyList;
-    private String[] singleListBefore;
-    private String[] singleListAfter;
-    private String[] multiListBefore;
-    private String[] multiListBetween;
-    private String[] multiListAfter;
+    private final String emptyList;
+    private final String[] singleListBefore;
+    private final String[] singleListAfter;
+    private final String[] multiListBefore;
+    private final String[] multiListBetween;
+    private final String[] multiListAfter;
 
     public DefaultListFormatter( DefaultListFormatter _formatter) {
         emptyList = _formatter.emptyList;

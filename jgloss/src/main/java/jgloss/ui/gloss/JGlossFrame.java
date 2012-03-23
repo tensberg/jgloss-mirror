@@ -331,7 +331,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * listener is attached to is expanded.
      */
     private static class ImportClipboardListener extends WindowAdapter implements MenuListener {
-        private Action importClipboard;
+        private final Action importClipboard;
 
         public ImportClipboardListener( Action _importClipboard) {
             this.importClipboard = _importClipboard;
@@ -371,15 +371,15 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * JGloss document frame object. The frame keeps the <code>JGlossFrame</code> as sole component
      * in its content pane.
      */
-    private JFrame frame;
+    private final JFrame frame;
     /**
      * Reacts to the document closed events.
      */
-    private WindowListener windowListener;
+    private final WindowListener windowListener;
     /**
      * Saves changes in window size to the preferences.
      */
-    private ComponentListener componentListener;
+    private final ComponentListener componentListener;
     /**
      * The document editor.
      */
@@ -396,13 +396,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     private AnnotationEditorPanel annotationEditor;
     private SimpleLookup lookupPanel;
     private JSplitPane[] splitPanes;
-    private LookupResultList.Hyperlinker hyperlinker;
+    private final LookupResultList.Hyperlinker hyperlinker;
     /**
      * Remembers the first dictionary entry shown in the result list of the lookup panel.
      * This is used when a new annotation is created to automatically set the reading and
      * translation.
      */
-    private FirstEntryCache firstEntryCache;
+    private final FirstEntryCache firstEntryCache;
 
     private Position lastSelectionStart;
     private Position lastSelectionEnd;
@@ -418,7 +418,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * Manager for the cut/copy/past actions;
      */
-    private XCVManager xcvManager;
+    private final XCVManager xcvManager;
 
     /**
      * Saves the document.

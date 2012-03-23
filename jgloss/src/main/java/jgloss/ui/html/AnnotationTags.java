@@ -61,7 +61,7 @@ public class AnnotationTags extends HTML.Tag {
     /**
      * Name of the tag.
      */
-    private String id;
+    private final String id;
 
     protected AnnotationTags( String id, boolean causesBreak, boolean isBlock) {
         super( id, causesBreak, isBlock);

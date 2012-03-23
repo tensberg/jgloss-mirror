@@ -37,8 +37,8 @@ import jgloss.ui.gloss.JGlossFrameModel;
 import org.w3c.dom.Element;
 
 class EncodingParameter extends UIParameter {
-    private Box box;
-    private JComboBox encodings;
+    private final Box box;
+    private final JComboBox encodings;
 
     EncodingParameter( Element elem) {
         super( elem);

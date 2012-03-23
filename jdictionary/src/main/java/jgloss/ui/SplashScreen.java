@@ -46,20 +46,20 @@ public class SplashScreen {
     /**
      * The splash screen window.
      */
-    private JWindow splash;
+    private final JWindow splash;
 
     /**
      * Title of the application.
      */
-    private JLabel title;
+    private final JLabel title;
     /**
      * Application version.
      */
-    private JLabel version;
+    private final JLabel version;
     /**
      * Informational text on what the application is currently doing.
      */
-    private JLabel info;
+    private final JLabel info;
 
     /**
      * Creates a new splash screen for display at application startup. The splash screen

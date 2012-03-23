@@ -31,8 +31,8 @@ import java.util.List;
  * @author Michael Koch
  */
 public class AttributeNameFormatter extends AttributeFormatter {
-    private String before;
-    private String after;
+    private final String before;
+    private final String after;
 
     public AttributeNameFormatter() {
         this( null, null);

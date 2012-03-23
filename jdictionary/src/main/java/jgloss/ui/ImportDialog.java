@@ -73,11 +73,11 @@ public class ImportDialog extends JDialog implements TextListener {
 	/**
      * Path to the selected file or a URL.
      */
-    private JTextField filename;
+    private final JTextField filename;
     /**
      * Area in which the user can enter some text, which should be imported if no filename is specified.
      */
-    private TextArea pastearea;
+    private final TextArea pastearea;
     /**
      * Remember if the text area was empty prior to a text changed event.
      */
@@ -85,15 +85,15 @@ public class ImportDialog extends JDialog implements TextListener {
     /**
      * Pane which lets the user choose between entering a file name and the text itself.
      */
-    private JTabbedPane selectionPane;
+    private final JTabbedPane selectionPane;
     /**
      * Widget to select the character encoding of the file.
      */
-    private JComboBox encodings;
+    private final JComboBox encodings;
     /**
      * Used for choosing the parser for this import.
      */
-    private ParserSelector parserSelector;
+    private final ParserSelector parserSelector;
     /**
      * Result of the dialog run. <CODE>true</CODE> if the user hit OK.
      */

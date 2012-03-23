@@ -77,9 +77,9 @@ public class PreferencesFrame {
     /**
      * The frame which holds the preferences settings dialog.
      */
-    private JFrame frame;
+    private final JFrame frame;
 
-    private PreferencesPanel[] panels;
+    private final PreferencesPanel[] panels;
     
     public static void createFrame( PreferencesPanel[] panels) {
         synchronized (PreferencesFrame.class) {

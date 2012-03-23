@@ -169,7 +169,7 @@ public class RomajiTranslator {
 
     public static class Hiragana extends Conversion {
   
-        private String name = "\u5e73\u4eee\u540d";
+        private final String name = "\u5e73\u4eee\u540d";
     
         private Hiragana() {
             translation = new HashMap<String, String>( 101);
@@ -344,7 +344,7 @@ public class RomajiTranslator {
   
     public static class Katakana extends Conversion {
   
-        private String name = "\u7247\u4eee\u540d";
+        private final String name = "\u7247\u4eee\u540d";
     
         private Katakana() {
             translation = new HashMap<String, String>( 101);

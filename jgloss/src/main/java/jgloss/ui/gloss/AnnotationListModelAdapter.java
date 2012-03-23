@@ -35,7 +35,7 @@ import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.annotation.AnnotationListener;
 
 public class AnnotationListModelAdapter implements ListModel, AnnotationListener {
-    private AnnotationListModel annotations;
+    private final AnnotationListModel annotations;
     private final List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 
     public AnnotationListModelAdapter( AnnotationListModel _annotations) {

@@ -47,7 +47,7 @@ class PropertiesPreferences extends Preferences {
     public final static String PREFS_FILE = 
         System.getProperty( "user.home") + File.separator + ".jgloss";
 
-    private Properties prefs;
+    private final Properties prefs;
     private boolean changed = false;
 
     /**

@@ -29,7 +29,7 @@ package jgloss.dictionary;
  * @author Michael Koch
  */
 public class MatchMode {
-    private String name;
+    private final String name;
 
     /**
      * Match against the whole entry field.

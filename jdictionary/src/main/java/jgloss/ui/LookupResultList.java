@@ -76,9 +76,9 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 	private static final long serialVersionUID = 1L;
 
 	private static class Marker implements DictionaryEntryFormat.Decorator {
-        private MarkerListFormatter.Group markerGroup = 
+        private final MarkerListFormatter.Group markerGroup = 
             new MarkerListFormatter.Group( "<font color=\"blue\">", "</font>");
-        private DictionaryEntryFormat.Decorator child;
+        private final DictionaryEntryFormat.Decorator child;
 
         private Marker( DictionaryEntryFormat.Decorator _child) {
             child = _child;
@@ -134,13 +134,13 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         public static final String ATTRIBUTE_BEFORE_PROTOCOL = "atb";
         public static final String ATTRIBUTE_AFTER_PROTOCOL = "ata";
 
-        private boolean words;
-        private boolean readings;
-        private boolean translations;
-        private boolean references;
-        private boolean allAttributes;
+        private final boolean words;
+        private final boolean readings;
+        private final boolean translations;
+        private final boolean references;
+        private final boolean allAttributes;
 
-        private Map<String, Object> hyperrefs;
+        private final Map<String, Object> hyperrefs;
 
         public Hyperlinker() {
             this( false, false, false, true, false);
@@ -591,7 +591,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }
 
     public static class ViewState {
-        private Point resultScrollerPosition;
+        private final Point resultScrollerPosition;
 
         private ViewState( Point _resultScrollerPosition) {
             resultScrollerPosition = _resultScrollerPosition;

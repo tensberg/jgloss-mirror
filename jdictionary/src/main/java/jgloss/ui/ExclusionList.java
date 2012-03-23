@@ -90,7 +90,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     /**
      * The widget which displays the excluded words.
      */
-    private JList exclusionList;
+    private final JList exclusionList;
     /**
      * Flag if the content of the JList was changed.
      */

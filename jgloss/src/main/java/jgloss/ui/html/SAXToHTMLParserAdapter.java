@@ -41,8 +41,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Michael Koch
  */
 class SAXToHTMLParserAdapter extends DefaultHandler {
-    private HTMLEditorKit.ParserCallback htmlHandler;
-    private DTD dtd;
+    private final HTMLEditorKit.ParserCallback htmlHandler;
+    private final DTD dtd;
     private int position;
     
     public SAXToHTMLParserAdapter( HTMLEditorKit.ParserCallback _htmlHandler,

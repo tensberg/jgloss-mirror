@@ -41,7 +41,7 @@ public class MarkerListFormatter implements ListFormatter {
      * Group of marker list formatters which share a common configuration.
      */
     public static class Group {
-        private List<MarkerListFormatter> formatters = new ArrayList<MarkerListFormatter>( 5);
+        private final List<MarkerListFormatter> formatters = new ArrayList<MarkerListFormatter>( 5);
         private String markedText;
         private String textBefore;
         private String textAfter;

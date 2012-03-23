@@ -103,8 +103,8 @@ public class ParserSelector extends JPanel {
     private final static String PARSER_CLASS_PROPERTY = "parser class";
 
     JRadioButton[] parserButtons;
-    private JCheckBox firstOccurrenceOnly;
-    private JCheckBox detectParagraphs;
+    private final JCheckBox firstOccurrenceOnly;
+    private final JCheckBox detectParagraphs;
     /**
      * Widget to select the reading annotation delimiters.
      */

@@ -225,8 +225,8 @@ public abstract class DictionaryFactory {
      * @author Michael Koch
      */
     public static class TestResult {
-    	private float confidence;
-    	private String reason;
+    	private final float confidence;
+    	private final String reason;
     	
     	public TestResult(float _confidence, String _reason) {
     		this.confidence = _confidence;

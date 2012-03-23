@@ -70,7 +70,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
          * Fetch the delegator created for the given delegatee. This will remove the delegator
          * from the map of created delegators.
          */
-        private KeyListener delegatee;
+        private final KeyListener delegatee;
 
         public KeyEventDelegator( KeyListener delegatee) {
             this.delegatee = delegatee;
@@ -123,28 +123,28 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
     /**
      * Menu which contains the annotation-specific actions.
      */
-    private JMenu menu;
+    private final JMenu menu;
     /**
      * Popup menu which contains annotation-specific actions.
      */
-    private JPopupMenu pmenu;
+    private final JPopupMenu pmenu;
 
     /**
      * Action which removes the currently selected annotation.
      */
-    private Action removeAction;
+    private final Action removeAction;
     /**
      * Action which adds the word of the selected annotation to the list of excluded words.
      */
-    private Action addToExclusionsAction;
+    private final Action addToExclusionsAction;
     /**
      * Action which adds the selected annotation to the user dictionary.
      */
-    private Action addToDictionaryAction;
+    private final Action addToDictionaryAction;
     /**
      * Action which will set the current reading/translation text to the empty string.
      */
-    private Action clearTranslationAction;
+    private final Action clearTranslationAction;
 
     public AnnotationList() {
         setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
