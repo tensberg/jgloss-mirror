@@ -161,10 +161,6 @@ public class CharacterEncodingDetector {
      */
     public static InputStreamReader getReader( InputStream in, String defaultencoding,
                                                int lookatlength) throws IOException {
-        if (defaultencoding == null) {
-	        defaultencoding = System.getProperty( "file.encoding");
-        }
-
         byte[] buf = new byte[lookatlength];
         PushbackInputStream pbin = new PushbackInputStream( new BufferedInputStream( in), buf.length);
         String enc = null;
