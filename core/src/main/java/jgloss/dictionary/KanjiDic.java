@@ -443,7 +443,7 @@ public class KanjiDic implements Dictionary {
         // Entries are stored one after the other, so in the case of duplicate keys
         // only the last item of the entry list has to be tested for equality to prevent
         // duplicate insertions
-        if (l.isEmpty() || l.get( l.size()-1) != entry) {
+        if (l.isEmpty() || !l.get( l.size()-1).equals(entry)) {
         	l.add( entry);
         }
     }

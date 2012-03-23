@@ -102,7 +102,7 @@ public class EDict extends FileBasedDictionary {
         }
     }
 
-    protected final static AttributeMapper mapper = initMapper();
+    protected static final AttributeMapper MAPPER = initMapper();
 
     private static AttributeMapper initMapper() {
         try {
@@ -120,19 +120,19 @@ public class EDict extends FileBasedDictionary {
      * Match an EDICT entry. Group 1 is the word, group 2 the (optional) reading and group 3
      * the translations.
      */
-    protected final Pattern ENTRY_PATTERN = Pattern.compile
+    protected static final Pattern ENTRY_PATTERN = Pattern.compile
         ( "(\\S+)(?:\\s\\[(.+?)\\])?\\s/(.+)/");
-    protected final Matcher ENTRY_MATCHER = ENTRY_PATTERN.matcher( "");
+    protected static final Matcher ENTRY_MATCHER = ENTRY_PATTERN.matcher( "");
 
     /**
      * Match a string in brackets at the beginning of a string.
      */
-    protected final Pattern BRACKET_PATTERN = Pattern.compile( "\\G\\((.+?)\\)\\s");
-    protected final Matcher BRACKET_MATCHER = BRACKET_PATTERN.matcher( "");
+    protected static final Pattern BRACKET_PATTERN = Pattern.compile( "\\G\\((.+?)\\)\\s");
+    protected static final Matcher BRACKET_MATCHER = BRACKET_PATTERN.matcher( "");
 
-    protected final static String PRIORITY_MARKER = "(P)";
+    protected static final String PRIORITY_MARKER = "(P)";
 
-    protected final Priority PRIORITY_VALUE = new Priority() {
+    protected static final Priority PRIORITY_VALUE = new Priority() {
             @Override
 			public String getPriority() { return "_P_"; }
             @Override
@@ -155,7 +155,7 @@ public class EDict extends FileBasedDictionary {
 	protected void initSupportedAttributes() {
         super.initSupportedAttributes();
         
-        supportedAttributes.putAll( mapper.getAttributes());
+        supportedAttributes.putAll( MAPPER.getAttributes());
         supportedAttributes.put( Attributes.PRIORITY, Collections.<AttributeValue> singleton( PRIORITY_VALUE));
     }
 
@@ -347,7 +347,7 @@ public class EDict extends FileBasedDictionary {
 	                            endc = att.length();
                             }
                             String attsub = att.substring( startc, endc);
-                            AttributeMapper.Mapping<?> mapping = mapper.getMapping( attsub);
+                            AttributeMapper.Mapping<?> mapping = MAPPER.getMapping( attsub);
                             if (mapping != null) {
                                 Attribute<?> a = mapping.getAttribute();
                                 if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
