@@ -59,7 +59,7 @@
 				<artifactId>maven-site-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<locales>en,de</locales>
+					<locales>en</locales>
 					<reportPlugins>
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
@@ -94,9 +94,6 @@
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>findbugs-maven-plugin</artifactId>
                             <version>2.4.0</version>
-                            <configuration>
-                                <effort>max</effort>
-                            </configuration>
                         </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
@@ -208,6 +205,21 @@
 								</goals>
 							</execution>
 						</executions>
+					</plugin>
+	           </plugins>
+	       </build>
+	   </profile>
+	   
+	   <profile>
+	       <id>include-all-site-locales</id>
+	       <build>
+	           <plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-site-plugin</artifactId>
+						<configuration>
+							<locales>en,de</locales>
+						</configuration>
 					</plugin>
 	           </plugins>
 	       </build>
