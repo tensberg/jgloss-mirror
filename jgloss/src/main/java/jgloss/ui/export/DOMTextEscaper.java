@@ -45,7 +45,8 @@ import org.w3c.dom.NodeList;
  */
 class DOMTextEscaper {
 	private static final Logger LOGGER = Logger.getLogger(DOMTextEscaper.class.getPackage().getName());
-    private final Escaper escaper;
+
+	private final Escaper escaper;
 
     DOMTextEscaper(Escaper _escaper) {
         this.escaper = _escaper;
