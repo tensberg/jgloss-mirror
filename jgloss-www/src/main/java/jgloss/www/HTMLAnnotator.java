@@ -38,13 +38,18 @@ import jgloss.dictionary.SearchException;
 import jgloss.parser.Parser;
 import jgloss.parser.TextAnnotation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Look up words in a Japanese HTML page and add a tag with the dictionary entries.
  * A CSS Style Sheet and JavaScript fragment will be added which displays the entries
  * when the mouse is over a word.
  */
 public class HTMLAnnotator {
-    /**
+	private static final Logger LOGGER = LoggerFactory.getLogger(HTMLAnnotator.class);
+	
+	/**
      * Path to the script fragment resource which will be embedded in the
      * HEAD part of the HTML file.
      */
@@ -321,7 +326,7 @@ public class HTMLAnnotator {
                 // insert new reading
                 int pos = text.length() - lasttranslation.length() - 3;
                 if (pos < 0)
-                    System.out.println( text + "\n" + lasttranslation);
+                    LOGGER.severe( text + "\n" + lasttranslation);
                 if (reading != null) {
                     if (text.charAt( pos) != ']')
                         // last word had no reading
@@ -445,7 +450,7 @@ public class HTMLAnnotator {
                         tag.replace( eq+1, end, quote + 
                                      rewriter.rewrite( ts.substring( start, end), name) + quote);
                     } catch (MalformedURLException ex) {
-                        ex.printStackTrace();
+                        LOGGER.error(ex.getMessage(), ex);
                     }
                 }
             }
