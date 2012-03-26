@@ -48,9 +48,9 @@ public interface Index {
      * Iterator over index entries. Since index entry locations are stored as integers,
      * the {@link #next next} method returns <code>ints</code>.
      */
-    public interface Iterator {
-        public boolean hasNext();
-        public int next() throws NoSuchElementException;
+    interface Iterator {
+        boolean hasNext();
+        int next() throws NoSuchElementException;
     } // interface Iterator
 
     /**

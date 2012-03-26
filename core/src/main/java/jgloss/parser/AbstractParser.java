@@ -117,7 +117,7 @@ public abstract class AbstractParser implements Parser {
      * Test if the parser skips newlines in the imported text.
      */
     @Override
-	public boolean getIgnoreNewlines() { return ignoreNewlines; }
+	public boolean isIgnoreNewlines() { return ignoreNewlines; }
 
     /**
      * Set if only the first occurrence of a word should be annotated. If this is set to
@@ -140,7 +140,7 @@ public abstract class AbstractParser implements Parser {
      * Test if only the first occurrence of a word should be annotated.
      */
     @Override
-	public boolean getAnnotateFirstOccurrenceOnly() {
+	public boolean isAnnotateFirstOccurrenceOnly() {
         return firstOccurrenceOnly;
     }
 

@@ -443,7 +443,6 @@ public class Conjugation {
     private static Set<String> dump( Node n, String path) {
         Set<String> out = new HashSet<String>();
         if (n.conjugations != null) {
-            System.out.print( path + " ");
             for ( int i=0; i<n.conjugations.length; i++) {
                 LOGGER.info( "/" + n.conjugations[i].getConjugatedForm() + " " +
                                   n.conjugations[i].getDictionaryForm() + " " +

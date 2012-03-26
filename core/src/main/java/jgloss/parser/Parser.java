@@ -67,7 +67,7 @@ public interface Parser {
     /**
      * Return if the parser skips newlines in the imported text.
      */
-    boolean getIgnoreNewlines();
+    boolean isIgnoreNewlines();
 
     /**
      * Set if only the first occurrence of a word should be annotated. If this is set to
@@ -79,7 +79,7 @@ public interface Parser {
     /**
      * Return if only the first occurrence of a word should be annotated.
      */
-    boolean getAnnotateFirstOccurrenceOnly();
+    boolean isAnnotateFirstOccurrenceOnly();
 
     /**
      * Returns the name of the parser in a user-presentable form.

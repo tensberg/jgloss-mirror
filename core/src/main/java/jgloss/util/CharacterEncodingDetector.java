@@ -99,7 +99,7 @@ public class CharacterEncodingDetector {
     private final static byte M_GAIJI = 2;
     private final static byte M_SO    = 3; /* hankaku kana with SO */
 
-    private static byte[] DB;
+	private static byte[] DB;
     private static byte[] DA;
     private static byte[] OBB;
     private static byte[] OBI;

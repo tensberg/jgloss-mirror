@@ -45,8 +45,6 @@ public interface Indexable {
     public class CharData {
         public int character = 0;
         public int position = 0;
-
-        public CharData() {}
     } // class CharData
 
     /**

@@ -32,8 +32,8 @@ public abstract class AbstractSearchMode implements SearchMode {
         ResourceBundle.getBundle( "messages-dictionary", new UTF8ResourceBundleControl());
     protected static final String RESOURCE_PREFIX = "searchmode.";
 
-    protected String name;
-    protected String description;
+    private final String name;
+    private final String description;
     
     protected AbstractSearchMode( String id) {
         name = MESSAGES.getString( RESOURCE_PREFIX + id + ".name");

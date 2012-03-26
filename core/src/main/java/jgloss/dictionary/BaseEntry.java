@@ -165,7 +165,7 @@ abstract class BaseEntry implements DictionaryEntry {
         try {
             return translations[rom][crm]; // synonyms are not supported
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ex);
         }
     }
 
@@ -177,7 +177,7 @@ abstract class BaseEntry implements DictionaryEntry {
         try {
             return translations[rom].length;
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ex);
         }
     }
 
@@ -217,7 +217,7 @@ abstract class BaseEntry implements DictionaryEntry {
 	            return emptySet.setParent( translationA);
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ex);
         }
     }
 

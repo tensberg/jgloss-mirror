@@ -39,7 +39,7 @@ public interface IndexedDictionary extends Dictionary {
      *           In this case, calling {@link #buildIndex() buildIndex} will likely also fail
      *           and the dictionary object can't be used.
      */
-    public boolean loadIndex() throws IndexException;
+    boolean loadIndex() throws IndexException;
 
     /**
      * Rebuild the index or add missing index data to an already existing index file.
@@ -51,5 +51,5 @@ public interface IndexedDictionary extends Dictionary {
      *
      * @exception IndexException if the index creation failed.
      */
-    public void buildIndex() throws IndexException;
+    void buildIndex() throws IndexException;
 } // interface IndexedDictionary

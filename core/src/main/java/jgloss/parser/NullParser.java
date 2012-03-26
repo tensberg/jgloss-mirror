@@ -63,7 +63,7 @@ public class NullParser implements Parser {
 	public void setIgnoreNewlines(boolean ignoreNewlines) {}
 
     @Override
-	public boolean getIgnoreNewlines() {
+	public boolean isIgnoreNewlines() {
         return false;
     }
 
@@ -71,7 +71,7 @@ public class NullParser implements Parser {
 	public void setAnnotateFirstOccurrenceOnly(boolean firstOccurrence) {}
 
     @Override
-	public boolean getAnnotateFirstOccurrenceOnly() {
+	public boolean isAnnotateFirstOccurrenceOnly() {
         return false;
     }
 
