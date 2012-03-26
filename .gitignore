@@ -2,4 +2,6 @@ bin
 .project
 .classpath
 .settings
+.pmd
+.ruleset
 target
