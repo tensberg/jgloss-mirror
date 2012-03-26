@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.sf.jgloss</groupId>
+	<artifactId>codequality</artifactId>
+	<version>1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>codequality</name>
+	<url>http://jgloss.sf.net/</url>
+    <inceptionYear>2012</inceptionYear>
+	<scm>
+		<url>http://jgloss.git.sourceforge.net/</url>
+		<connection>scm:git:git://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss/codequality</connection>
+		<developerConnection>scm:git:ssh://username@jgloss.git.sourceforge.net/gitroot/jgloss/jgloss/codequality</developerConnection>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+</project>

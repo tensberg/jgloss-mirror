@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<ruleset name="JGloss PMD ruleset" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd"
+	xsi:noNamespaceSchemaLocation="http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+	<description>
+		PMD ruleset applied to JGloss Java files.
+	</description>
+	
+	<rule ref="rulesets/basic.xml" />
+    <rule ref="rulesets/braces.xml" />
+    <rule ref="rulesets/clone.xml" />
+    <rule ref="rulesets/codesize.xml">
+        <exclude name="ExcessiveParameterList" />
+    </rule>
+    <rule ref="rulesets/controversial.xml">
+        <exclude name="NullAssignment" />
+        <exclude name="DefaultPackage" />
+        <exclude name="CallSuperInConstructor" />
+        <exclude name="OnlyOneReturn" />
+        <exclude name="AvoidUsingShortType" />
+    </rule>
+    <rule ref="rulesets/coupling.xml">
+        <exclude name="ExcessiveImports" />
+    </rule>
+    <rule ref="rulesets/design.xml">
+        <exclude name="ConfusingTernary" />
+        <exclude name="UncommentedEmptyConstructor" />
+        <exclude name="AvoidReassigningParameters" />
+        <exclude name="UncommentedEmptyMethod" />
+        <exclude name="ClassWithOnlyPrivateConstructorsShouldBeFinal" />
+        <exclude name="TooFewBranchesForASwitchStatement" />
+    </rule>
+    <rule ref="rulesets/finalizers.xml" />
+    <rule ref="rulesets/imports.xml" />
+    <rule ref="rulesets/javabeans.xml">
+        <exclude name="BeanMembersShouldSerialize" />
+    </rule>
+    <rule ref="rulesets/junit.xml" />
+    <rule ref="rulesets/logging-java.xml" />
+    <rule ref="rulesets/migrating_to_15.xml" />
+    <rule ref="rulesets/naming.xml">
+        <exclude name="ShortVariable" />
+        <exclude name="LongVariable" />
+        <exclude name="AbstractNaming" />
+    </rule>
+    <rule ref="rulesets/optimizations.xml">
+        <exclude name="MethodArgumentCouldBeFinal" />
+        <exclude name="LocalVariableCouldBeFinal" />
+        <exclude name="AvoidInstantiatingObjectsInLoops" />
+    </rule>
+    <rule ref="rulesets/strictexception.xml" />
+    <rule ref="rulesets/strings.xml" />
+    <rule ref="rulesets/sunsecure.xml" />
+    <rule ref="rulesets/typeresolution.xml" />
+    <rule ref="rulesets/unusedcode.xml" />
+</ruleset>
