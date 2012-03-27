@@ -1,42 +1,44 @@
-Working notes on JGloss design, Michael Koch
-
-Redesign of the Dictionary subsystem:
--------------------------------------
-
-Separation of Word and Kanji dictionaries:
-------------------------------------------
-A kanji dictionary is different from a word dictionary in that the kanji
-dictionary is ordered by ideographs and provides information about
-different words and meanings represented by a ideograph, while a word dictionary
-has words as atomic entries and contains information about their spelling
-and meaning. Thus the data models of the dictionary types cannot be
-unified (I think).
+  ------------------------------
+  Working notes on JGloss design
+  ------------------------------
 
 
-Word Dictionary:
-----------------
+Design of the Dictionary subsystem
 
-Goals:
-1. Abstract data model so that different dictionary formats can map to the 
-   same model.
-2. Allow dictionary entries to have arbitraryly detailed information.
-3. Enable dictionary implementations to extend the data model with data
-   specific to the dictionary.
-4. Presentation: concise and complete presentation modes for dictionary entries.
-5. Backwards compatible with Parser requirements.
-6. Efficient implementation (space requirement) for dictionaries which only
-   support a minimum of information (e.g. EDICT: 1 word/1 reading/translations)
+* Separation of Word and Kanji dictionaries
 
-New Word Dictionary Entry Model:
---------------------------------
-Each dictionary consists of a list of dictionary entries. Each dictionary
-entry has several fields, depending on the dictionary format;
-e. g. word, reading, translations, notes, ...
+  A kanji dictionary is different from a word dictionary in that the kanji
+  dictionary is ordered by ideographs and provides information about
+  different words and meanings represented by a ideograph, while a word dictionary
+  has words as atomic entries and contains information about their spelling
+  and meaning. Thus the data models of the dictionary types cannot be
+  unified (I think).
 
-Only word/reading and translations are hardcoded as methods in interface
-DictionaryEntry. All other entry data which a dictionary might supply is
-stored as attributes. Different dictionary formats may support different
-attributes.
+
+* Word Dictionary
+
+** Goals
+
+  [[1]] Abstract data model so that different dictionary formats can map to the 
+        same model.
+  [[2]] Allow dictionary entries to have arbitrarily detailed information.
+  [[3]] Enable dictionary implementations to extend the data model with data
+        specific to the dictionary.
+  [[4]] Presentation: concise and complete presentation modes for dictionary entries.
+  [[5]] Backwards compatible with Parser requirements.
+  [[6]] Efficient implementation (space requirement) for dictionaries which only
+        support a minimum of information (e.g. EDICT: 1 word/1 reading/translations)
+
+** New Word Dictionary Entry Model
+
+  Each dictionary consists of a list of dictionary entries. Each dictionary
+  entry has several fields, depending on the dictionary format;
+  e. g. word, reading, translations, notes, ...
+
+  Only word/reading and translations are hardcoded as methods in interface
+  DictionaryEntry. All other entry data which a dictionary might supply is
+  stored as attributes. Different dictionary formats may support different
+  attributes.
 
 elements of a dictionary entry:
 
