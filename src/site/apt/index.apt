@@ -194,7 +194,7 @@ JGloss-WWW
   JGloss-WWW is a Java servlet which adds dictionary lookup results to Japanese HTML pages
   on the fly. It is currently experimental and only available in the 
   {{{http://sourceforge.net/project/showfiles.php?group_id=29259}source release}} of JGloss
-  (and from the {{{http://sourceforge.net/scm/?type=svn&group_id=29259}SVN repository}}). If you
+  and from the {{{http://sourceforge.net/scm/?type=git&group_id=29259}GIT repository}}. If you
   are running a web server with servlet engine installed you might want to try it out. The
   {{{jgloss-www.html}documentation is here}}.
 	

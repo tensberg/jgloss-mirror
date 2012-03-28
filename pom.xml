@@ -7,7 +7,7 @@
 	<version>2.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>jgloss-parent</name>
+	<name>JGloss</name>
 	<url>http://jgloss.sf.net/</url>
     <inceptionYear>2001</inceptionYear>
 	<scm>
@@ -19,6 +19,23 @@
         <url>http://tensberg-ec2.dyndns.org:8080/</url>
         <system>Jenkins</system>
     </ciManagement>
+    <developers>
+        <developer>
+            <name>Michael Koch</name>
+            <email>tensberg@gmx.net</email>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <name>Eric Crahen</name>
+        </contributor>
+    </contributors>
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 2 or later</name>
+            <url>http://www.gnu.org/licenses/gpl-2.0.html</url>
+        </license>
+    </licenses>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -69,6 +86,26 @@
 				<configuration>
 					<locales>en</locales>
 					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-project-info-reports-plugin</artifactId>
+							<version>2.4</version>
+							<reportSets>
+								<reportSet>
+									<reports>
+									    <report>index</report>
+										<report>dependencies</report>
+										<report>dependency-convergence</report>
+										<report>dependency-management</report>
+										<report>project-team</report>
+										<report>cim</report>
+										<report>license</report>
+										<report>scm</report>
+										<report>summary</report>
+									</reports>
+								</reportSet>
+							</reportSets>
+						</plugin>
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-javadoc-plugin</artifactId>

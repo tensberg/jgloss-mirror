@@ -12,6 +12,9 @@
 	<packaging>jar</packaging>
 
 	<name>jdictionary</name>
+	<description>
+	   GUI application for looking up entries in Japanese dictionaries.
+	</description>
 
 	<properties>
 		<mainClass>jgloss.JDictionaryApp</mainClass>
@@ -71,7 +74,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.jgloss</groupId>
-			<artifactId>jgloss-core</artifactId>
+			<artifactId>core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

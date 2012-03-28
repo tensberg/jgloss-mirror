@@ -12,6 +12,9 @@
 	<packaging>jar</packaging>
 
 	<name>kanaim</name>
+	<description>
+	   Java input method for entering kana by typing romaji.
+	</description>
 
 	<build>
 		<plugins>

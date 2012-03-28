@@ -8,10 +8,13 @@
 		<version>2.1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>jgloss-core</artifactId>
+	<artifactId>core</artifactId>
 	<packaging>jar</packaging>
 
 	<name>jgloss-core</name>
+	<description>
+	   Library containing interfaces and implementations for lookup in Japanese dictionaries and annotating Japanese text.
+	</description>
 
 	<dependencies>
 		<dependency>

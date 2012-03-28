@@ -21,9 +21,21 @@
 	</skin>
 
 	<body>
-		<menu name="JGloss Information">
-			<item name="About JGloss" href="index.html" />
+	    <breadcrumbs>
+	       <item name="${project.name}" href="index.html" />
+	    </breadcrumbs>
+		<menu name="Information for Users">
+			<item name="Home" href="index.html">
+			   <item name="About JGloss" href="index.html#About_JGloss" />
+			   <item name="Download" href="index.html#Download" />
+			   <item name="Links" href="index.html#Links" />
+			   <item name="Examples" href="index.html#Examples" />
+			</item>
+		</menu>
+		<menu name="Information for Developers">
+            <item name="Design Notes" href="designnotes.html" />
 		</menu>
 		<menu ref="reports" />
+		<menu ref="modules" />
 	</body>
 </project>

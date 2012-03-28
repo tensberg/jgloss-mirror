@@ -12,11 +12,14 @@
 	<packaging>war</packaging>
 
 	<name>jgloss-www</name>
+    <description>
+        Servlet which adds translation annotations to web pages on the fly.
+    </description>
 
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.jgloss</groupId>
-			<artifactId>jgloss-core</artifactId>
+			<artifactId>jgloss</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
