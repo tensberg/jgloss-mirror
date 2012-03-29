@@ -1,0 +1,33 @@
+    -----------------------------
+    JGloss LaTeX export templates
+    -----------------------------
+
+
+  The LaTeX export of JGloss can be customized through the use of template files. JGloss has
+  six templates built in, and if they don't suit your need, you can add your own templates.
+  The JGloss User's Guide has an explanation of the export format.
+  The built-in templates are also available in the folder <latex/templates> of the
+  {{{http://prdownloads.sourceforge.net/jgloss/}JGloss application
+  archive}}. You can use these templates as basis for your own formats.
+
+  This page should eventually become a collection of custom export templates made by JGloss
+  users. If you have created or customized a template and want to share it, 
+  {{{mailto:tensberg@gmx.net}mail it to me}} to have it added to this page.
+
+
+  * {{{./templates/platex-top-wide.tex.tmpl}pLaTeX - translations on page/wide}}
+
+    Added: 2002/05/12
+
+    By: Michael Koch
+
+    Like the normal translations on page template, except that page margins are narrowed such that
+    the text covers the whole page.
+
+  * {{{./templates/plaintext.tmpl}Plain Text w. anno. list}}
+
+    Added: 2002/05/12
+
+    By: Michael Koch
+
+    A demo template which generates a plain text file instead of a LaTeX input file.

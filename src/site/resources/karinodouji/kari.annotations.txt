@@ -1,0 +1,781 @@
+# annotation list for kari.jgloss
+# Encoding: EUC-JP
+雁 [かり] /wild goose/
+童子 [どうじ] /boy/
+宮沢 [みやざわ] /Miyazawa (p,s)/
+賢治 [けんじ] /Kenji (m)/
+表記 [ひょうき] /(vs) declare/
+底本 [ていほん] /original text/
+従う [したがう] /to follow/
+小学校 [しょうがっこう] /primary school/
+年 [ねん] /year/
+学習 [がくしゅう] /(vs) study/
+配当 [はいとう] /share/
+漢字 [かんじ] /Chinese characters/
+除く [のぞく] /to except/
+ルビ /ruby/
+ただし /however/
+同一 [どういつ] /identical/
+語句 [ごく] /words/
+初出 [しょしゅつ] /first appearance/
+のみ /(suf) only/
+漢字 [ルビ]
+形式 [けいしき] /form/
+処理 [しょり] /(vs) processing/
+番号 [ばんごう] /number/
+入力 [にゅうりょく] /(vs) input/
+者 [シャ] /person/
+補 [ホ] /supplement/
+注 [ちゅう] /(vs) annotation/
+示す [しめす] /to denote/
+ファイル /file/
+末尾 [まつび] /end/
+置く [おく] /to place/
+流沙 [るさ] /Rusa (loc)/
+南 [みなみ] /south/
+楊 [やなぎ] /willow/
+囲む [かこむ] /to surround/
+小さい [ちいさい] /small/
+泉 [いずみ] /spring/
+私 [わたくし] /myself/
+煎る [いる] /to roast/
+麦粉 [むぎこ] /wheat flour/
+水 [みず] /water/
+昼 [ひる] /noon/
+食事 [しょくじ] /(vs) meal/
+一人 [ひとり] /one person/
+巡礼 [じゅんれい] /pilgrimage/
+お爺さん [おじいさん] /male senior-citizen/
+やっぱり /(id) (uk) also/
+来る [くる] /to come/
+黙る [だまる] /to be silent/
+軽い [かるい] /light/
+礼 [れい] /bow/
+けれども /however/
+半日 [はんにち] /half day/
+まるっきり /completely/
+人 [ひと] /person/
+出会う [であう] /to come across/
+旅 [たび] /(vs) travel/
+済む [すむ] /to finish/
+すぐに /instantly/
+年老る [としとる] /to age/
+別れる [わかれる] /to part from/
+しばらく /little while/
+老人 [ろうじん] /the aged/
+高い [たかい] /tall/
+咽喉仏 [のどぼとけ] /adam's apple/
+動く [うごく] /(vi) to move/
+見る [みる] /to see/
+なしに /without/
+何か [なにか] /something/
+話し掛ける [はなしかける] /to talk (to someone)/
+思う [おもう] /to think/
+向こう [むこう] /the other party/
+静か [しずか] /(an) quiet/
+きゅうくつ /uneasy/
+ふと /suddenly/
+後ろ [うしろ] /behind/
+祠 [ほこら] /small shrine/
+見付ける [みつける] /to discover/
+大変 [たいへん] /very/
+地理学 [ちりがく] /geography/
+探険家 [たんけんか] /explorer/
+ちょっと /somewhat/
+標本 [ひょうほん] /example/
+持って行く [もっていく] /to take/
+まだ /yet/
+全く [まったく] /indeed/
+新しい [あたらしい] /new/
+黄色 [きいろ] /yellow/
+赤 [あか] /red/
+ペンキ /(nl:) paint (nl: pek)/
+さえ /even/
+塗る [ぬる] /to paint/
+如何にも [いかにも] /really/
+異様 [いよう] /odd/
+前に [まえに] /before/
+粗末 [そまつ] /(an) crude/
+一本 [いっぽん] /one long thing/
+幡 [はた] /flag/
+立つ [たつ] /to stand/
+終り [おわり] /the end/
+失礼 [しつれい] /(an) (vs) (id) discourtesy/
+堂 [どう] /hall/
+どなた /(uk) who?/
+祭 [まつり] /worship/
+確かに [たしかに] /certainly/
+度 [ど] /times (three times, etc.)/
+頷く [うなずく] /(uk) to nod/
+飲み下す [のみくだす] /to swallow/
+低く [ひくく] /(vs) lowering/
+言う [いう] /to say/
+どう云う [どういう] /(uk) what kind of/
+方 [かた] /person/
+仰っしゃる [おっしゃる] /(IV) (hon) to say/
+食器 [しょっき] /tableware/
+屈む [かがむ] /to lean over/
+きれい /clean/
+口 [くち] /mouth/
+注ぐ [そそぐ] /to pour (into)/
+まるで /so to speak/
+この頃 [このごろ] /recently/
+昔話 [むかしばなし] /legend/
+地方 [ちほう] /area/
+降りる [おりる] /to descend/
+天童子 [てんどうじ]
+向う側 [むこうがわ] /opposite side/
+あちこち /here and there/
+建つ [たつ] /to be built/
+天 [てん] /heaven/
+子供 [こども] /child/
+罪 [つみ] /crime/
+流す [ながす] /to float/
+辺 [へん] /vicinity/
+申す [もうす] /to say/
+多分 [たぶん] /perhaps/
+聞かせる [きかせる] /to tell/
+下さい [ください] /please/
+急ぎ [いそぎ] /urgency/
+聴く [きく] /to hear/
+だけ /just/
+話 [はなし] /(io) talk/
+沙車 [さしゃ] /Sasha (loc)/
+須利耶 [すりや] /Suria (s)/
+圭 [けい] /Kei/
+名門 [めいもん] /noted family/
+落ちぶれる [おちぶれる] /to come to ruin/
+奥さん [おくさん] /his wife/
+二人 [ふたり] /couple/
+自分 [じぶん] /oneself/
+写経 [しゃきょう] /copying sutras/
+為さる [なさる] /(IV) (hon) to do/
+機 [はた] /loom/
+織る [おる] /to weave/
+静か [しずか] /peaceful/
+暮らす [くらす] /to live/
+明方 [あけがた] /dawn/
+鉄砲 [てっぽう] /gun/
+従弟 [いとこ] /cousin (male, younger than the writer)/
+一緒に [いっしょに] /together (with)/
+野原 [のはら] /field/
+歩く [あるく] /to walk/
+地面 [じめん] /ground/
+極 [ごく] /very/
+麗しい [うるわしい] /beautiful/
+青い [あおい] /blue/
+石 [いし] /stone/
+空 [そら] /sky/
+ぼうっと /faintly/
+白い [しろい] /white/
+見え [みえ] /appearance/
+雪 [ゆき] /snow/
+間近 [まぢか] /soon/
+お前 [おまえ] /(fam) you (sing)/
+さよう /(an) such/
+慰み [なぐさみ] /comfort/
+殺生 [せっしょう] /killing/
+いい加減 [いいかげん] /right/
+止める [やめる] /to stop/
+どう /how about/
+斯 [こう] /thus/
+ところが /however/
+まるで /as though/
+すげなく /gruff/
+返事 [へんじ] /(vs) reply/
+ずいぶん /extremely/
+むごい /cruel/
+やつ /(vulg) fellow/
+傷める [いためる] /to damage/
+殺す [ころす] /to kill/
+一体 [いったい] /what on earth?/
+どんな /what kind of/
+命 [いのち] /(mortal) life/
+悲しい [かなしい] /sorrowful/
+重ねて [かさねて] /once more/
+おさとし /admonition/
+俺 [おれ] /I (boastful first-person pronoun)/
+一層 [いっそう] /much more/
+面白い [おもしろい] /amusing/
+下る [くだる] /to get down/
+坊主 [ぼうず] /Buddhist priest/
+仕留める [しとめる] /to bring down (a bird)/
+見せる [みせる] /to show/
+構える [かまえる] /to set up/
+走る [はしる] /(I) to run/
+黒い [くろい] /black/
+列 [れつ] /queue/
+じっと /steadily/
+眺める [ながめる] /to gaze at/
+俄に [にわかに] /suddenly/
+尖った [とがった] /pointed/
+弾丸 [だんがん] /bullet/
+昇る [のぼる] /to ascend/
+真っ先 [まっさき] /the foremost/
+胸 [むね] /breast/
+射る [いる] /to shoot/
+揺らぐ [ゆらぐ] /to tremble/
+見る見る [みるみる] /very fast/
+体 [からだ] /body/
+火 [ひ] /fire/
+燃え出す [もえだす] /break out in flames/
+世 [よ] /world/
+悲しい [かなしい] /sad/
+叫ぶ [さけぶ] /to cry/
+参る [まいる] /(hum) to go/
+また /again/
+次 [つぎ] /next/
+貫く [つらぬく] /to go through/
+遁げる [にげる] /to escape/
+却って [かえって] /rather/
+泣き叫ぶ [なきさけぶ] /to cry and shout/
+随う [したがう] /to follow/
+第三 [だいさん] /the third/
+傷つく [きずつく] /to be wounded/
+一番 [いちばん] /first/
+しまい /end/
+一疋 [いっぴき] /one (small) animal/
+残る [のこる] /to remain/
+悶える [もだえる] /to be in agony/
+沈む [しずむ] /to sink/
+泣く [なく] /to cry/
+正しい [ただしい] /right/
+決して [けっして] /never/
+乱れる [みだれる] /to be disordered/
+愕ろき [おどろき] /surprise/
+いつか /(uk) sometime/
+皆 [みな] /all/
+飛ぶ [とぶ] /to fly/
+形 [かたち] /form/
+変わる [かわる] /(vi) to change/
+赤い [あかい] /red/
+焔 [ほのお] /flame/
+包む [つつむ] /to be engulfed in/
+歎く [なげく] /grief/
+手足 [てあし] /one's hands & feet/
+只 [ただ] /only/
+完い [まったい] /safe/
+可愛らしい [かわいらしい] /lovely/
+そして /(conj) (uk) and/
+確かに [たしかに] /surely/
+見覚え [みおぼえ] /recognition/
+最初 [さいしょ] /(a-no) beginning/
+もはや /already/
+達する [たっする] /to reach/
+鬚 [ひげ] /beard/
+倒れる [たおれる] /(vi) to collapse/
+骨立つ [ほねだつ] /osseous/
+両手 [りょうて] /both hands/
+合せる [あわせる] /to fold hands/
+拝む [おがむ] /to beg/
+切ない [せつない] /painful/
+どうか /somehow/
+孫 [まご] /grandchild/
+お連れ [おつれ] /take along/
+勿論 [もちろん] /of course/
+馳せ寄って [はせよって]
+引き取る [ひきとる] /to take charge of/
+しかし /(uk) however/
+どうした /What's wrong?/
+次々 [つぎつぎ] /one by one/
+燃える [もえる] /to burn/
+大人 [おとな] /adult/
+美しい [うつくしい] /beautiful/
+瓔珞 [ようらく] /jewelled necklace/
+女子 [おなご] /girl/
+真っ赤 [まっか] /(an) deep red/
+手 [て] /hand/
+延ばす [のばす] /to reach out/
+周り [まわり] /surroundings/
+共 [とも] /all/
+眷属 [けんぞく] /clan/
+ただいま /just now/
+受ける [うける] /to undergo/
+只今 [ただいま] /right now/
+報いる [むくいる] /to recompense/
+果す [はたす] /complete/
+帰る [かえる] /(I) to go back/
+縁 [えん] /destiny/
+育てる [そだてる] /raise/
+願う [ねがう] /request/
+すっかり /thoroughly/
+判る [わかる] /to understand/
+引き受ける [ひきうける] /to guarantee/
+安心 [あんしん] /(vs) relief/
+擦る [こする] /to rub/
+頭 [あたま] /head/
+垂れる [たれる] /to lower/
+影 [かげ] /shade/
+ぼんやり /(vs) absent-minded/
+夢を見る [ゆめをみる] /to dream/
+熱い [あつい] /hot (thing)/
+減る [へる] /(vi) to decrease (in size or number)/
+皆 [みんな] /everyone/
+跪く [ひざまずく] /to kneel/
+所 [ところ] /place/
+草 [くさ] /grass/
+我 [われ] /oneself/
+帰る [かえる] /to go home/
+今日 [きょう] /this day/
+お母さん [おかあさん] /(hon) mother/
+兄さん [にいさん] /older brother/
+立派 [りっぱ] /(an) splendid/
+国 [くに] /country/
+おいで /to come here (from old Japanese)/
+戻る [もどる] /to return/
+途中 [とちゅう] /on the way/
+しんとして /dead silent/
+相談 [そうだん] /discussion/
+名前 [なまえ] /name/
+考え [かんがえ] /thinking/
+その内 [そのうち] /eventually/
+全体に [ぜんたいに] /generally/
+広がる [ひろがる] /to get around/
+仕方なく [しかたなく] /reluctantly/
+息 [いき] /breath/
+切る [きる] /be through/
+足 [あし] /foot/
+苔 [こけ] /moss/
+怪しい [あやしい] /dubious/
+姿 [すがた] /figure/
+はっきり /clearly/
+思い浮かぶ [おもいうかぶ] /to remind of/
+語る [かたる] /to tell/
+続ける [つづける] /(vt) to continue/
+春 [はる] /spring/
+一面 [いちめん] /the whole surface/
+花 [はな] /flower/
+光る [ひかる] /to shine/
+遠く [とおく] /(a-no) far away/
+氷 [こおり] /ice/
+山 [やま] /mountain/
+瞳 [ひとみ] /pupil (of eye)/
+痛い [いたい] /painful/
+光 [ひかり] /light/
+日光 [にっこう] /sunlight/
+中 [なか] /inside/
+這う [はう] /to crawl/
+それから /(uk) and then/
+果樹 [かじゅ] /fruit tree/
+ちらちら /fluttering/
+揺る [ゆする] /to swing/
+告天子 [ひばり] /skylark/
+透き通る [すきとおる] /to be transparent/
+波 [なみ] /wave/
+早く [はやく] /fast/
+夕方 [ゆうがた] /evening/
+町 [まち] /town/
+通る [とおる] /to pass (by)/
+葡萄 [ぶどう] /grapes/
+色 [いろ] /colour/
+重い [おもい] /massive/
+雲 [くも] /cloud/
+下 [した] /under/
+影法師 [かげぼうし] /silhouette/
+蝙蝠 [こうもり] /bat/
+ひらひら /flutter/
+過ぎる [すぎる] /(vi) to pass/
+長い [ながい] /long/
+棒 [ぼう] /pole/
+紐 [ひも] /string/
+追う [おう] /to chase/
+棄て手 [すてて] /extended hands/
+つなぎ合う [つなぎあう] /hold by the hands/
+環 [わ] /ring/
+親子 [おやこ] /parent and child/
+囲む [かこむ] /to encircle/
+笑う [わらう] /to laugh/
+声 [こえ] /voice/
+揃える [そろえる] /uniform/
+いつも /always/
+囃す [はやす] /to jeer at/
+冗談 [じょうだん] /jest/
+捨て子 [すてご] /abandoned child/
+居る [おる] /(hum) (uk) to be/
+どっと /suddenly/
+一つ [ひとつ] /one/
+頬 [ほお] /cheek (of face)/
+打つ [うつ] /to hit/
+庇う [かばう] /to protect someone/
+悪い [わるい] /bad/
+投げる [なげる] /to throw/
+ばらばら /disperse/
+詫びる [わびる] /to apologize/
+慰める [なぐさめる] /to console/
+或る [ある] /some.../
+前掛け [まえかけ] /apron/
+衣嚢 [かくし] /pocket/
+干す [ほす] /to dry/
+無花果 [いちじく] /fig/
+遣る [やる] /give/
+初め [はじめ] /beginning/
+了い [しまい] /end/
+ニコニコ /(vs) smile/
+笑う [わらう] /to smile/
+許す [ゆるす] /to forgive/
+連れる [つれる] /take along/
+其処 [そこ] /there/
+放れる [はなれる] /to leave/
+浅黄 [あさぎ] /light blue/
+瑪瑙 [めのう] /agate/
+夕 [ゆう] /evening/
+さっき /some time ago/
+時 [とき] /time/
+お父さん [おとうさん] /(hon) father/
+縋る [すがる] /to cling to/
+弾丸 [たま] /bullet/
+七つ [ななつ] /seven/
+伝える [つたえる] /to tell/
+顔 [かお] /face (person)/
+眼 [まなこ] /eye/
+晩 [ばん] /evening/
+寝付く [ねつく] /to go to bed/
+いつまでも /indefinitely/
+床 [とこ] /bed/
+上 [うえ] /(suf) (a-no) above/
+藻掻く [もがく] /to struggle/
+眠る [ねむる] /to sleep/
+撫でる [なでる] /to brush gently/
+脳 [のう] /brain/
+すっかり /all/
+疲れる [つかれる] /to get tired/
+網 [あみ] /net/
+ぶるぶる /trembling/
+揺れる [ゆれる] /to sway/
+三日月 [みかづき] /new moon/
+浮かぶ [うかぶ] /to rise to surface/
+一杯 [いっぱい] /full/
+薇 [ぜんまい] /royal fern/
+芽 [め] /sprout/
+見える [みえる] /to appear/
+四角 [しかく] /square/
+変に [へんに] /strangely/
+柔らか [やわらか] /subdued (colour or light)/
+だんだん /gradually/
+拡がる [ひろがる] /to spread (out)/
+恐ろしい [おそろしい] /terrible/
+箱 [はこ] /box/
+額 [ひたい] /forehead/
+余り [あまり] /excess/
+心配 [しんぱい] /(vs) worry/
+写す [うつす] /to transcribe/
+経文 [きょうもん] /sutras/
+掌 [て] /the palm/
+紅革 [べにがわ] /crimson leather/
+帯 [おび] /obi (kimono sash)/
+結ぶ [むすぶ] /to tie/
+表 [おもて] /outside/
+駅 [えき] /station/
+戸 [と] /door (Japanese style)/
+閉める [しめる] /(vt) to close/
+星 [ほし] /star/
+棟々 [むねむね] /roofs/
+列ぶ [ならぶ] /to stand in line/
+流れる [ながれる] /to stream/
+音 [おと] /sound/
+考える [かんがえる] /to consider/
+夜 [よる] /evening/
+尋ねる [たずねる] /to ask/
+沙漠 [さばく] /desert/
+答える [こたえる] /to answer/
+平ら [たいら] /level/
+急 [きゅう] /sudden/
+すっかり /completely/
+静まる [しずまる] /to calm down/
+今度 [こんど] /now/
+袂 [たもと] /sleeve/
+引っ張る [ひっぱる] /to pull/
+入る [はいる] /to enter/
+迎える [むかえる] /to go out to meet/
+環 [カン] /link/
+嵌める [はめる] /go into/
+登る [のぼる] /to climb/
+着換える [きかえる] /to change clothes/
+せずに /without (doing)/
+ぐっすり /sound asleep/
+日 [ひ] /day/
+食卓 [しょくたく] /dining table/
+座る [すわる] /to sit/
+食品 [しょくひん] /commodity/
+蜜 [みつ] /honey/
+煮る [にる] /to cook/
+二つ [ふたつ] /two/
+鮒 [ふな] /crucian carp/
+与える [あたえる] /to give/
+食べる [たべる] /to eat/
+美味しい [おいしい] /delicious/
+箸 [はし] /chopsticks/
+貸す [かす] /to lend/
+魚 [さかな] /fish/
+砕く [くだく] /(vt) to break/
+勧める [すすめる] /to advise/
+間 [あいだ] /interval/
+じっと /quietly/
+横顔 [よこがお] /face in profile/
+工合 [ぐあい] /condition/
+迫る [せまる] /to press/
+気 [き] /spirit/
+毒 [どく] /poison/
+堪らない [たまらない] /unbearable/
+鉄砲玉 [てっぽうだま] /bullet/
+外 [そと] /outside/
+出る [でる] /to leave/
+真っ白 [まっしろ] /pure white/
+一杯 [いっぱい] /a lot of/
+充ちる [みちる] /(oK) to be full/
+気づく [きづく] /to become aware of/
+戸口 [とぐち] /door/
+馬市 [うまいち] /horse market/
+仔馬 [こうま] /foal/
+乳 [ちち] /milk/
+呑む [のむ] /drink/
+粗布 [あらぬの] /blemish cloth/
+着る [きる] /to wear/
+馬商人 [うましょうにん] /horse merchant/
+結び付く [むすびつく] /to join together/
+引く [ひく] /to pull/
+致す [いたす] /(hum) to do/
+母親 [ははおや] /mother/
+びっくり /be frightened/
+鳴く [なく] /to make sound (animal)/
+ぐんぐん /steadily/
+角 [かど] /corner/
+曲がる [まがる] /to turn/
+後肢 [あとあし] /hind legs/
+一方 [いっぽう] /in turn/
+腹 [はら] /belly/
+蝿 [はえ] /fly/
+叩く [たたく] /to clap/
+茶色 [ちゃいろ] /light brown/
+ちらっと /at a glance/
+横眼 [よこめ] /sidelong glance/
+叱る [しかる] /to scold/
+袖 [そで] /sleeve/
+包む [つつむ] /to conceal/
+通り過ぎる [とおりすぎる] /to pass through/
+河岸 [かわぎし] /riverside/
+杏 [あんず] /apricot/
+実 [み] /fruit/
+むり /overdoing/
+仕方がない [しかたがない] /it's inevitable/
+独り [ひとり] /alone/
+働く [はたらく] /to work/
+まだ /still/
+甘える [あまえる] /to fawn on/
+荷物 [にもつ] /luggage/
+ひどい /cruel/
+食べ物 [たべもの] /food/
+何気ない [なにげない] /casual/
+風 [ふう] /way/
+成人 [おとな] /adult/
+本統 [ほんとう] /truth/
+離れる [はなれる] /to be separated from/
+首都 [しゅと] /capital city/
+外道 [げどう] /heretical doctrine/
+塾 [じゅく] /coaching school/
+入る [いる] /to enroll/
+一生懸命 [いっしょうけんめい] /very hard/
+塾料 [じゅくりょう] /school fee/
+小遣 [こづか] /allowance/
+拵える [こしらえる] /to make/
+送る [おくる] /to send/
+冬 [ふゆ] /winter/
+近く [ちかく] /near/
+天山 [てんざん] /Tenzan (loc)/
+桑 [くわ] /mulberry (tree)/
+葉 [は] /leaf/
+枯れる [かれる] /to die (plant)/
+カサカサ /rustle/
+窓 [まど] /window/
+目敏く [めざとく] /watchful/
+知らない [しらない] /strange/
+今ごろ [いまごろ] /about this time/
+勉強 [べんきょう] /(vs) study/
+暇 [ひま] /(an) free time/
+気兼ね [きがね] /(vs) hesitance/
+為 [ため] /for/
+がさがさ /rustling/
+誰でも [だれでも] /anyone/
+老ける [ふける] /to age/
+荒れる [あれる] /to be rough/
+ばかり /only/
+楽しみ [たのしみ] /pleasure/
+しょんぼり /(vs) being downhearted/
+庭 [にわ] /garden/
+停まる [とまる] /to stop/
+沼地 [ぬまち] /marsh land/
+振り返る [ふりかえる] /to look back/
+蘆 [あし] /reed/
+抜く [ぬく] /to draw out/
+笛 [ふえ] /flute/
+作る [つくる] /to make/
+やっと /at last/
+遥かに [はるかに] /in the distance/
+冷たい [つめたい] /cold (to the touch)/
+縞 [しま] /stripe/
+こちら /this direction/
+軈て [やがて] /soon/
+羽音 [はおと] /buzz/
+一列 [いちれつ] /a row/
+思わず [おもわず] /spontaneous/
+どきっと /(vs) feeling a shock/
+そうして /(conj) and/
+厳しい [きびしい] /intense (cold)/
+温和しく [おとなしく] /mild/
+砂糖水 [さとうみず] /sugar water/
+陽炎 [かげろう] /heat haze/
+徘徊 [はいかい] /wandering about/
+李 [すもも] /(Japanese) plum/
+咲く [さく] /to bloom/
+次いで [ついで] /subsequently/
+木立 [こだち] /grove of trees/
+真っ青 [まっさお] /deep green/
+もはや /now/
+玉髄 [ぎょくずい]
+峯 [みね] /summit/
+四方 [しほう] /every direction/
+繞る [めぐる] /surround/
+ずれ /slippage/
+砂 [すな] /sand/
+古い [ふるい] /old (not person)/
+大寺 [だいじ] /Temple/
+掘り出す [ほりだす] /to dig out/
+壁 [かべ] /wall/
+見附る [みつける] /to locate/
+三人 [さんにん] /three people/
+描く [えがく] /to paint/
+まるで /as if/
+生きる [いきる] /to exist/
+評判 [ひょうばん] /(a-no) fame/
+晴れる [はれる] /to be sunny/
+都 [みやこ] /capital/
+師匠 [ししょう] /teacher/
+訪ねる [たずねる] /to visit/
+色々 [いろいろ] /(an) various/
+述べる [のべる] /to express/
+三巻 [みまき]
+贈る [おくる] /to give to/
+雑沓 [ざっとう] /congestion/
+蒼い [あおい] /blue/
+丁度 [ちょうど] /just/
+羽 [はね] /feather/
+バタバタ /(vs) clattering noise/
+沈む [しずむ] /to feel depressed/
+飛び去る [とびさる] /to flee away/
+不思議 [ふしぎ] /(an) wonder/
+広場 [ひろば] /plaza/
+通り抜ける [とおりぬける] /to cut through/
+段々 [だんだん] /gradually/
+郊外 [こうがい] /suburb/
+沙 [すな] /sand/
+深い [ふかい] /deep/
+掘る [ほる] /to dig/
+沢山 [たくさん] /many/
+褪せる [あせる] /to fade/
+重い [おもい] /heavy/
+ばったり /suddenly/
+被る [かぶる] /cover/
+なるほど /(id) I see/
+出来る [できる] /to be able to/
+恐い [こわい] /frightening/
+天童 [てんどう]
+どこか /in some respects/
+似る [にる] /to resemble/
+なんだか /somehow/
+倒れる [たおれる] /to fall/
+急いで [いそいで] /hurriedly/
+抱き留める [だきとめる] /to catch in one's arms/
+腕 [うで] /arm/
+夢 [ゆめ] /dream/
+呟く [つぶやく] /to mutter/
+微か [かすか] /(an) faint/
+許し [ゆるし] /pardon/
+書く [かく] /to write/
+王 [おう] /king/
+絵 [え] /picture/
+出家 [しゅっけ] /entering the priesthood/
+敵王 [てきおう] /enemy king/
+寺 [てら] /temple/
+焼く [やく] /to burn/
+二日 [ふつか] /two days/
+俗服 [ぞくふく] /vulgar clothes/
+恋人 [こいびと] /lover/
+人々 [ひとびと] /people/
+集まる [あつまる] /to assemble/
+口々に [くちぐちに] /unanimously/
+一度 [いちど] /once/
+唇 [くちびる] /lips/
+動かす [うごかす] /(vt) to move/
+ただ /mere/
+だけ /(uk) only/
+本当に [ほんとうに] /truly/
+名残惜しい [なごりおしい] /regret/
+まっすぐ /upright/
+合掌 [がっしょう] /(vs) pressing one's hands together in prayer/
+尊い [とうとい] /precious/
+物語 [ものがたり] /tale/
+まことに /really/
+互い [たがい] /mutual/
+縁 [へり] /border/
+一時 [ひととき] /short time/
+かりそめ /trifle/
+存じる [ぞんじる] /(hum) to know/
+ほんの /just/
+通りかかる [とおりかかる] /to happen to pass by/
+旅人 [たびびと] /traveller/
+孰 [いずれ] /where/
+善逝 [スガタ]
+示す [しめす] /to indicate/
+道 [みち] /road/
+進む [すすむ] /to advance/
+無上菩提 [むじょうぼだい]
+至る [いたる] /to come/
+別れ [わかれ] /farewell/
+さようなら /(uk) good-bye/
+返す [かえす] /(vt) to return something/
+荒地 [あれち] /fallow (land)/
+とぼとぼ /trudgingly/
+反対 [はんたい] /opposition/
+寂しい [さびしい] /desolate/
+石原 [いさ] /stone field/
+中国 [ちゅうごく] /China/
+砂漠 [さばく] /desert/
+指す [さす] /to point/
+古代 [こだい] /ancient times/
+都市 [とし] /town/
+一族 [いちぞく] /a family/
+意味 [いみ] /(vs) meaning/
+他 [ほか] /other/
+教 [おさむ] /Osamu (g)/
+信者 [しんじゃ] /believer/
+仏教徒 [ぶっきょうと] /Buddhists/
+際に [さいに] /in case of/
+使う [つかう] /to use/
+国境 [くにざかい] /boundary (nation, state, etc.)/
+山脈 [さんみゃく] /mountain range/
+梵語 [ぼんご] /Sanskrit/
+悟り [さとり] /Buddhist enlightenment/
+到達 [とうたつ] /(vs) reaching/
+上る [のぼる] /to rise/
+角川 [かどがわ] /Kadogawa (s)/
+文庫 [ぶんこ] /library/
+書店 [しょてん] /bookshop/
+平成 [へいせい] /Heisei (reign of Emperor)/
+再版 [さいはん] /reprint(ing)/
+親 [おや] /parents/
+新 [しん] /(pref) new/
+校 [こう] /(suf) -school/
+全集 [ぜんしゅう] /complete works/
+筑摩 [つかま] /Tsukama (loc)/
+書房 [しょぼう] /library/
+発行 [はっこう] /issue (publications)/
+校正 [こうせい] /(vs) proofreading/
+公開 [こうかい] /(vs) presenting to the public/
+修正 [しゅうせい] /(vs) amendment/
+青空 [あおぞら] /blue sky/
+作成 [さくせい] /producing/
+インターネット /the Internet/
+図書館 [としょかん] /library/
+制作 [せいさく] /(vs) work (film, book)/
+ボランティア /volunteer/
+皆 [みんな] /everybody/

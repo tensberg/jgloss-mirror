@@ -1,0 +1,23 @@
+%encoding: UTF-8
+%short-description: Plain Text w. anno. list
+%description
+% Generates a plain text file.
+% Readings are written in brackets
+% after the word. A list of translations
+% is written after the text.
+%end description
+%document-title%
+------------------
+Generated from %document-filename% on %generation-time%.
+
+%document-text
+%reading: %word%[%reading%]
+%line-break: \n
+%paragraph-end: \n\n
+%end document-text
+
+%annotation-list
+%paragraph-start: Paragraph %paragraph-number%\n--------------------\n
+%paragraph-end: \n\n
+%translation: %dictionary-word% [%dictionary-reading%] %translation%\n
+%end

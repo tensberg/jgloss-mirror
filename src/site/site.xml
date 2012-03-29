@@ -31,9 +31,11 @@
 			   <item name="Links" href="index.html#Links" />
 			   <item name="Examples" href="index.html#Examples" />
 			</item>
+			<item name="Export templates" href="templates.html" />
 		</menu>
 		<menu name="Information for Developers">
             <item name="Design Notes" href="designnotes.html" />
+            <item name="JGloss-WWW" href="jgloss-www.html" />
 		</menu>
 		<menu ref="reports" />
 		<menu ref="modules" />
