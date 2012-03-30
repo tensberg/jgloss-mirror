@@ -19,7 +19,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.jgloss</groupId>
-			<artifactId>jgloss</artifactId>
+			<artifactId>jgloss-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -47,7 +47,7 @@
 	</properties>
 
 	<modules>
-		<module>core</module>
+		<module>jgloss-core</module>
 		<module>jdictionary</module>
 		<module>jgloss</module>
 		<module>kanaim</module>

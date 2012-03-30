@@ -74,7 +74,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.jgloss</groupId>
-			<artifactId>core</artifactId>
+			<artifactId>jgloss-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
