@@ -66,7 +66,7 @@ public class LookupEngine {
             } else if (param == StandardSearchParameter.SEARCH_FIELDS) {
 	            parameters[i] = model.getSearchFields();
             } else if (param == StandardSearchParameter.DISTANCE) {
-	            parameters[i] = new Integer( model.getDistance());
+	            parameters[i] = Integer.valueOf( model.getDistance());
             } else {
 	            throw new IllegalArgumentException( "Unimplemented search parameter " + param);
             }

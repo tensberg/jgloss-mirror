@@ -152,16 +152,16 @@ public class Annotation {
             try {
                 String[][] wordReading = StringTools.splitWordReading( getDictionaryForm(), _reading);
                 int targetReading = 0;
-                for ( int i=0; i<wordReading.length; i++) {
-                    if (wordReading[i].length == 2) { // word substring with a reading
+                for (String[] element : wordReading) {
+                    if (element.length == 2) { // word substring with a reading
                         if (targetReading < readings.length) {
-	                        readings[targetReading++].setText( wordReading[i][1]);
+	                        readings[targetReading++].setText( element[1]);
                         } else {
 	                        // More reading substrings in wordReading than there are readings
                             // in the annotated text. Add the additional readings to the last
                             // reading element.
                             readings[targetReading-1].setText
-                                ( readings[targetReading-1].getText() + wordReading[i][1]);
+                                ( readings[targetReading-1].getText() + element[1]);
                         }
                     }
                 }

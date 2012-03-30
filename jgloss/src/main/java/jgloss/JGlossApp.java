@@ -112,9 +112,9 @@ public class JGlossApp extends JGloss {
             }
         }
         else {
-            for ( int i=0; i<args.length; i++) {
+            for (String arg : args) {
                 JGlossFrame f = new JGlossFrame();
-                f.loadDocument( new File( args[i]));
+                f.loadDocument( new File( arg));
             }
         }   
     }

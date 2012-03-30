@@ -39,5 +39,5 @@ public interface DictionaryEntryReference {
      *
      * @exception SearchException if the construction of the dictionary entry fails.
      */
-    public DictionaryEntry getEntry() throws SearchException;
+    DictionaryEntry getEntry() throws SearchException;
 } // interface DictionaryEntryReference

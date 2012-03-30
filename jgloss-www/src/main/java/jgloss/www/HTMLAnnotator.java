@@ -476,7 +476,7 @@ public class HTMLAnnotator {
         id = generatedAnnotations.get( annotation);
         if (id == null) {
             // new annotation text, insert annotation in document
-            id = new Integer( antid);
+            id = Integer.valueOf( antid);
             out.append( "<script language=\"JavaScript\">ra(");
             out.append( antid);
             out.append( ", \"");

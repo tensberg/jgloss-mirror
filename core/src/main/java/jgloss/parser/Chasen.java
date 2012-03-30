@@ -514,7 +514,8 @@ public class Chasen {
      * Terminate Chasen process if still running.
      */
     @Override
-	protected void finalize() {
+	protected void finalize() throws Throwable {
         dispose();
+        super.finalize();
     }
 } // class Chasen

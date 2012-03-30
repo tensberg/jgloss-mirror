@@ -115,12 +115,12 @@ public class AttributeLegend extends JPanel {
     public void setDictionaries( Dictionary[] dictionaries) {
         dictionaryChoice.removeAllItems();
         StringBuilder text = new StringBuilder();
-        for ( int i=0; i<dictionaries.length; i++) {
+        for (Dictionary dictionarie : dictionaries) {
             text.setLength( 0);
             text.append( "<html><head></head><body>");
-            createLegend( dictionaries[i], text);
+            createLegend( dictionarie, text);
             text.append( "</body></html>");
-            dictionaryChoice.addItem( new DictionaryItem( dictionaries[i].getName(),
+            dictionaryChoice.addItem( new DictionaryItem( dictionarie.getName(),
                                                           text.toString()));
         }
     }

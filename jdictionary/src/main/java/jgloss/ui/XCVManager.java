@@ -203,14 +203,14 @@ public class XCVManager {
     public synchronized void updateActions( JTextComponent source) {
         Action[] allActions = source.getActions();
         Action[] actions = new Action[3]; // cut/copy/paste
-        for ( int i=0; i<allActions.length; i++) {
-            String name = (String) allActions[i].getValue( Action.NAME);
+        for (Action allAction : allActions) {
+            String name = (String) allAction.getValue( Action.NAME);
             if (name.equals( DefaultEditorKit.cutAction)) {
-	            actions[0] = allActions[i];
+	            actions[0] = allAction;
             } else if (name.equals( DefaultEditorKit.copyAction)) {
-	            actions[1] = allActions[i];
+	            actions[1] = allAction;
             } else if (name.equals( DefaultEditorKit.pasteAction)) {
-	            actions[2] = allActions[i];
+	            actions[2] = allAction;
             }
         }
         sourceActions.put( source, actions);

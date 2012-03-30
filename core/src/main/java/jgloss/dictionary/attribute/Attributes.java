@@ -28,6 +28,7 @@ import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 
 import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.DictionaryEntry.AttributeGroup;
 import jgloss.util.UTF8ResourceBundleControl;
 
 /**
@@ -208,8 +209,8 @@ public class Attributes<T extends AttributeValue> implements Attribute<T> {
 
     @Override
 	public boolean appliesTo( DictionaryEntry.AttributeGroup _group) {
-        for ( int i=0; i<groups.length; i++) {
-	        if (groups[i] == _group) {
+        for (AttributeGroup group : groups) {
+	        if (group == _group) {
 	            return true;
             }
         }

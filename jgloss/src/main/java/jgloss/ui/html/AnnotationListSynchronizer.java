@@ -42,8 +42,8 @@ public class AnnotationListSynchronizer implements DocumentListener {
     }
 
     private void handleInsert( Element[] children) {
-        for ( int i=0; i<children.length; i++) {
-	        handleInsert( children[i]);
+        for (Element element : children) {
+	        handleInsert( element);
         }
     }
 
@@ -73,8 +73,8 @@ public class AnnotationListSynchronizer implements DocumentListener {
     }
 
     private void handleRemove( Element[] children) {
-        for ( int i=0; i<children.length; i++) {
-	        handleRemove( children[i]);
+        for (Element element : children) {
+	        handleRemove( element);
         }
     }
 

@@ -410,8 +410,8 @@ public class KanjiDic implements Dictionary {
                 }
                 String[] translations = e.getTranslations();
                 if (translations != null) {
-                    for ( int i=0; i<translations.length; i++) {
-                        addEntry( translations[i], line);
+                    for (String translation : translations) {
+                        addEntry( translation, line);
                     }
                 }
             }
@@ -458,13 +458,13 @@ public class KanjiDic implements Dictionary {
      */
     protected void addReadings( String line, Entry e, String[] readings) {
         if (readings != null) {
-            for ( int i=0; i<readings.length; i++) {
-                int dot = readings[i].indexOf( '.');
+            for (String reading : readings) {
+                int dot = reading.indexOf( '.');
                 if (dot == -1) {
-	                addEntry( readings[i], line);
+	                addEntry( reading, line);
                 } else {
-                    String end = readings[i].substring( dot+1);
-                    addEntry( readings[i].substring( 0, dot) + end, line);
+                    String end = reading.substring( dot+1);
+                    addEntry( reading.substring( 0, dot) + end, line);
                     addEntry( e.getKanji() + end, line);
                 }
             }
@@ -698,9 +698,9 @@ public class KanjiDic implements Dictionary {
                 if (searchfields.isSelected( DictionaryEntryField.TRANSLATION)) {
                     String[] translations = entry.getTranslations();
                     if (translations != null) {
-                        for ( int i=0; i<translations.length; i++) {
+                        for (String translation : translations) {
                             if (expressionMatches( StringTools.toHiragana
-                                                   ( translations[i].toLowerCase()))) {
+                                                   ( translation.toLowerCase()))) {
                                 entryCache.add( new MultiReadingEntry( kanji, readings, translations,
                                                                        KanjiDic.this));
                                 for (String[] reading : readingsOkuri) {
@@ -730,14 +730,14 @@ public class KanjiDic implements Dictionary {
         protected void fillReadingsList( String[] allReadings) {
             readings.clear();
             readingsOkuri.clear();
-            for ( int i=0; i<allReadings.length; i++) {
+            for (String allReading : allReadings) {
                 int dot;
-                if ((dot=allReadings[i].indexOf( '.')) == -1) {
-                    readings.add( allReadings[i]);
+                if ((dot=allReading.indexOf( '.')) == -1) {
+                    readings.add( allReading);
                 }
                 else {
-                    String pre = allReadings[i].substring( 0, dot);
-                    String post = allReadings[i].substring( dot+1);
+                    String pre = allReading.substring( 0, dot);
+                    String post = allReading.substring( dot+1);
                     readingsOkuri.add( new String[] { pre, post, pre+post });
                 }
             }

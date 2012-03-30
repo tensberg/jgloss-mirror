@@ -143,8 +143,8 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         controls.add( search, fixedC);
 
         if (additionalControls != null) {
-            for ( int i=0; i<additionalControls.length; i++) {
-	            controls.add( additionalControls[i], fixedC);
+            for (Component additionalControl : additionalControls) {
+	            controls.add( additionalControl, fixedC);
             }
         }
 

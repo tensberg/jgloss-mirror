@@ -394,8 +394,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
              generalFontCustom.isSelected());
         
         if (canDisplayJapanese) {
-            for ( int i=0; i<fonts.length; i++) {
-                canDisplayJapanese = canDisplayJapanese( (String) fonts[i].getSelectedItem());
+            for (JComboBox font2 : fonts) {
+                canDisplayJapanese = canDisplayJapanese( (String) font2.getSelectedItem());
                 if (!canDisplayJapanese) {
 	                break;
                 }
@@ -425,8 +425,8 @@ public class StyleDialog extends Box implements PreferencesPanel {
         if (canDisplayJapanese( (String) generalFont.getSelectedItem())) {
 	        japaneseFont = (String) generalFont.getSelectedItem();
         } else {
-            for ( int i=0; i<fonts.length; i++) {
-                if (canDisplayJapanese( (String) fonts[i].getSelectedItem())) {
+            for (JComboBox font2 : fonts) {
+                if (canDisplayJapanese( (String) font2.getSelectedItem())) {
                     japaneseFont = (String) wordLookupFont.getSelectedItem();
                     break;
                 }
@@ -547,9 +547,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
         }
 
         String[] fonts = JGloss.prefs.getList( Preferences.FONT_DEFAULTFONTS, ',');
-        for ( int i=0; i<fonts.length; i++) {
-            if (canDisplayJapanese( fonts[i])) {
-                knownJapaneseFont = fonts[i];
+        for (String font2 : fonts) {
+            if (canDisplayJapanese( font2)) {
+                knownJapaneseFont = font2;
                 return knownJapaneseFont;
             }
         }

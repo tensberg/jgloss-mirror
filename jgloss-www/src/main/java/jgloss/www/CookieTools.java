@@ -104,8 +104,7 @@ public class CookieTools {
 
         StringBuilder cookietext = new StringBuilder( 10000);
         int maxVersion = 0;
-        for ( int i=0; i<cookies.length; i++) {
-            Cookie c = cookies[i];
+        for (Cookie c : cookies) {
             context.log( "adding cookie " + c.getName());
 
             // don't send secure cookies over an insecure connection

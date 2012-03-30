@@ -293,8 +293,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 		public void run() {
             final DefaultListModel model = (DefaultListModel) Dictionaries.this.dictionaries.getModel();
             List<Object> errors = new ArrayList<Object>( dictionaries.length*2);
-            for ( int i=0; i<dictionaries.length; i++) {
-                final String descriptor = dictionaries[i].getAbsolutePath();
+            for (File dictionarie : dictionaries) {
+                final String descriptor = dictionarie.getAbsolutePath();
                 // check if the dictionary is already added
                 boolean alreadyAdded = false;
                 for ( Enumeration<?> e=model.elements(); e.hasMoreElements(); ) {
@@ -618,9 +618,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         // exceptions occurring during dictionary loading
         final List<Object> exceptions = new ArrayList<Object>( 5);
 
-        for ( int i=0; i<fs.length; i++) {
+        for (String element : fs) {
             try {
-                Dictionary d = DictionaryFactory.createDictionary( fs[i]);
+                Dictionary d = DictionaryFactory.createDictionary( element);
                 if (d instanceof IndexedDictionary) {
                     if (!((IndexedDictionary) d).loadIndex()) {
                         LOGGER.severe( "building index for dictionary " + d.getName());
@@ -628,14 +628,14 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                     }
                 }
                 synchronized (activeDictionaries) {
-                    activeDictionaries.add( new DictionaryWrapper( fs[i], d));
+                    activeDictionaries.add( new DictionaryWrapper( element, d));
                 }
                 fireDictionaryListChanged(); // fire for every loaded dictionary
                 /*if (d instanceof UserDictionary)
                   userDictionary = (UserDictionary) d;*/
             } catch (Exception ex) {
                 exceptions.add( ex);
-                exceptions.add( fs[i]);
+                exceptions.add( element);
             }
         }
         // insert the user dictionary if not already in the dictionary list

@@ -192,9 +192,9 @@ public class Conjugation {
        
         while (!stop) {
             stop = true; // will be set false if matching child is found
-            for ( int i=0; i<n.children.length; i++) {
-                if (hiragana.startsWith( n.children[i].edge)) {
-                    n = n.children[i];
+            for (Node element : n.children) {
+                if (hiragana.startsWith( element.edge)) {
+                    n = element;
                     hiragana = hiragana.substring( n.edge.length());
                     if (n.conjugations != null) {
 	                    c = n.conjugations;
@@ -392,22 +392,22 @@ public class Conjugation {
             // build a list of conjugation in this node plus all conjugations in ancestor nodes
             // which have a different dictionary form
             List<Conjugation> conjugations = new ArrayList<Conjugation>( c.length + n.conjugations.length);
-            for ( int i=0; i<n.conjugations.length; i++) {
-	            conjugations.add( n.conjugations[i]);
+            for (Conjugation conjugation : n.conjugations) {
+	            conjugations.add( conjugation);
             }
                 
-            for ( int i=0; i<c.length; i++) {
+            for (Conjugation element : c) {
                 boolean add = true;
-                for ( int j=0; j<n.conjugations.length; j++) {
+                for (Conjugation conjugation : n.conjugations) {
                     // conjugation of parents is only added if there is not already a child with
                     // same dictionary form and longer inflected form
-                    if (n.conjugations[j].dictionaryForm.equals( c[i].dictionaryForm)) {
+                    if (conjugation.dictionaryForm.equals( element.dictionaryForm)) {
                         add = false;
                         break;
                     }
                 }
                 if (add) {
-	                conjugations.add( c[i]);
+	                conjugations.add( element);
                 }
             }
 
@@ -418,8 +418,8 @@ public class Conjugation {
             c = n.conjugations; // propagate conjugations of this node
         }
         
-        for ( int i=0; i<n.children.length; i++) {
-	        propagateConjugations( n.children[i], c);
+        for (Node element : n.children) {
+	        propagateConjugations( element, c);
         }
     }
 
@@ -443,15 +443,15 @@ public class Conjugation {
     private static Set<String> dump( Node n, String path) {
         Set<String> out = new HashSet<String>();
         if (n.conjugations != null) {
-            for ( int i=0; i<n.conjugations.length; i++) {
-                LOGGER.info( "/" + n.conjugations[i].getConjugatedForm() + " " +
-                                  n.conjugations[i].getDictionaryForm() + " " +
-                                  n.conjugations[i].getType());
-                out.add( n.conjugations[i].getDictionaryForm());
+            for (Conjugation conjugation : n.conjugations) {
+                LOGGER.info( "/" + conjugation.getConjugatedForm() + " " +
+                                  conjugation.getDictionaryForm() + " " +
+                                  conjugation.getType());
+                out.add( conjugation.getDictionaryForm());
             }
         }
-        for ( int i=0; i<n.children.length; i++) {
-            Set<String> s = dump( n.children[i], path + n.children[i].edge);
+        for (Node element : n.children) {
+            Set<String> s = dump( element, path + element.edge);
             if (n.conjugations != null) {
                 // check if any of the descendants of this node have a dictionary form
                 // different from the ones in this node

@@ -323,11 +323,11 @@ public class JGlossServlet extends HttpServlet {
         }
         // write log entry
         p = "";
-        for ( int i=0; i<rewrittenContentTypes.length; i++) {
+        for (String rewrittenContentType : rewrittenContentTypes) {
             if (p.length() > 0) {
 	            p += ", ";
             }
-            p += rewrittenContentTypes[i];
+            p += rewrittenContentType;
         }
         if (p.length() == 0) {
 	        p = "none";
@@ -365,8 +365,8 @@ public class JGlossServlet extends HttpServlet {
 	public void destroy() {
         super.destroy();
 
-        for ( int i=0; i<dictionaries.length; i++) {
-	        dictionaries[i].dispose();
+        for (Dictionary dictionarie : dictionaries) {
+	        dictionarie.dispose();
         }
     }
 
@@ -608,8 +608,8 @@ public class JGlossServlet extends HttpServlet {
         // check if the response content type is supported
         boolean supported = false;
         if (type != null) {
-            for ( int i=0; i<rewrittenContentTypes.length; i++) {
-	            if (type.startsWith( rewrittenContentTypes[i])) {
+            for (String rewrittenContentType : rewrittenContentTypes) {
+	            if (type.startsWith( rewrittenContentType)) {
                     supported = true;
                     break;
                 }

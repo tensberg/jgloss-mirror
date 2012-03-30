@@ -177,8 +177,8 @@ public class PreferencesFrame {
 
         JTabbedPane tab = new JTabbedPane();
         tab.setBorder( BorderFactory.createEmptyBorder( 0, 0, 10, 0));
-        for ( int i=0; i<panels.length; i++) {
-            tab.addTab( panels[i].getTitle(), panels[i].getComponent());
+        for (PreferencesPanel panel : panels) {
+            tab.addTab( panel.getTitle(), panel.getComponent());
         }
         main.add( tab, BorderLayout.CENTER);
 
@@ -196,8 +196,8 @@ public class PreferencesFrame {
      * Saves the current settings to the application <CODE>Preferences</CODE> instance.
      */
     public void savePreferences() {
-        for ( int i=0; i<panels.length; i++) {
-	        panels[i].savePreferences();
+        for (PreferencesPanel panel : panels) {
+	        panel.savePreferences();
         }
     }
 
@@ -205,8 +205,8 @@ public class PreferencesFrame {
      * Loads the settings to the application <CODE>Preferences</CODE> instance.
      */
     public void loadPreferences() {
-        for ( int i=0; i<panels.length; i++) {
-	        panels[i].loadPreferences();
+        for (PreferencesPanel panel : panels) {
+	        panel.loadPreferences();
         }
     }
 
@@ -214,8 +214,8 @@ public class PreferencesFrame {
      * Applies the settings from the <CODE>Preferences</CODE> to the application.
      */
     public void applyPreferences() {
-        for ( int i=0; i<panels.length; i++) {
-	        panels[i].applyPreferences();
+        for (PreferencesPanel panel : panels) {
+	        panel.applyPreferences();
         }
     }
 } // class PreferencesFrame

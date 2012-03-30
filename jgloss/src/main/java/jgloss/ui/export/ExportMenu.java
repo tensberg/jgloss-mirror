@@ -73,9 +73,9 @@ public class ExportMenu extends JMenu implements ActionListener {
      */
     public static synchronized void registerStandardExporters() {
         String[] resources = JGloss.messages.getString( "exporters").split(":");
-        for ( int i=0; i<resources.length; i++) {
+        for (String resource : resources) {
 	        try {
-	            registerExport( new InputSource( ExportMenu.class.getResource( resources[i])
+	            registerExport( new InputSource( ExportMenu.class.getResource( resource)
 	                                             .toExternalForm()));
 	        } catch (Exception ex) {
 	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

@@ -323,23 +323,23 @@ public class KanjiParser extends AbstractParser {
 
             // try to find exact match with conjugation
             if (conjugations != null) {
-                for ( int i=0; i<conjugations.length; i++) {
-                    if (ignoreWord( word + conjugations[i].getDictionaryForm())) {
+                for (Conjugation conjugation : conjugations) {
+                    if (ignoreWord( word + conjugation.getDictionaryForm())) {
                         return true;
                     }
                 }
                 
-                for ( int j=0; j<dictionaries.length; j++) {
-                    for ( int i=0; i<conjugations.length; i++) {
+                for (Dictionary dictionarie : dictionaries) {
+                    for (Conjugation conjugation : conjugations) {
                         String dictionaryWord = word +
-                            conjugations[i].getDictionaryForm();
-                        if (hasMatch( dictionaries[j], dictionaryWord)) {
+                            conjugation.getDictionaryForm();
+                        if (hasMatch( dictionarie, dictionaryWord)) {
                             String conjugatedForm = word +
-                                conjugations[i].getConjugatedForm();
+                                conjugation.getConjugatedForm();
                             annotations.add( new TextAnnotation
                                              ( wordStart, word.length() + 
                                                conjugatedForm.length(),
-                                               null, dictionaryWord, null, conjugations[i].getType()));
+                                               null, dictionaryWord, null, conjugation.getType()));
                             if (firstOccurrenceOnly) {
 	                            annotatedWords.add( dictionaryWord);
                             }
@@ -354,8 +354,8 @@ public class KanjiParser extends AbstractParser {
                 return true;
             }
             else {
-                for ( int i=0; i<dictionaries.length; i++) {
-                    if (hasMatch( dictionaries[i], word)) {
+                for (Dictionary dictionarie : dictionaries) {
+                    if (hasMatch( dictionarie, word)) {
                         annotations.add( new TextAnnotation
                                          ( wordStart, word.length(), word));
                         if (firstOccurrenceOnly) {
@@ -378,8 +378,8 @@ public class KanjiParser extends AbstractParser {
 	                    break;
                     }
 
-                    for ( int j=0; j<dictionaries.length; j++) {
-                        if (hasMatch( dictionaries[j], subword)) {
+                    for (Dictionary dictionarie : dictionaries) {
+                        if (hasMatch( dictionarie, subword)) {
 	                        break;
                         }
                     }

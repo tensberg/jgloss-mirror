@@ -211,8 +211,8 @@ public class ImportDialog extends JDialog implements TextListener {
         Vector<String> v = new Vector<String>();
         v.add( JGloss.messages.getString( "encodings.default"));
         String[] enc = JGloss.prefs.getList( Preferences.ENCODINGS, ',');
-        for ( int i=0; i<enc.length; i++) {
-	        v.add( enc[i]);
+        for (String element : enc) {
+	        v.add( element);
         }
         encodings = new JComboBox( v);
         encodings.setEditable( true);

@@ -201,11 +201,11 @@ class AnnotationGenerator extends DefaultHandler {
             if (completedAnnotation.getReading() == null) {
                 // derive inflected reading from splitWordReading
                 StringBuilder inflectedReading = new StringBuilder( 64);
-                for ( int j=0; j<parts.length; j++) {
-                    if (parts[j].length == 1) {
-	                    inflectedReading.append( parts[j][0]);
+                for (String[] part : parts) {
+                    if (part.length == 1) {
+	                    inflectedReading.append( part[0]);
                     } else {
-	                    inflectedReading.append( parts[j][1]);
+	                    inflectedReading.append( part[1]);
                     }
                 }
                 completedAnnotation.setReading( inflectedReading.toString());
@@ -218,24 +218,24 @@ class AnnotationGenerator extends DefaultHandler {
 
             parent.startElement( "", "", JGlossDocument.Elements.ANNOTATION, annoAtts);
             int partPosition = completedAnnotation.getStart(); // position of part substring in c array
-            for ( int j=0; j<parts.length; j++) {
-                if (parts[j].length == 2) {
+            for (String[] part : parts) {
+                if (part.length == 2) {
                     // reading annotation
 
                     // if the reading of a kanji substring is not known, it is set
                     // to the kanji substring itself
-                    String thisReading = parts[j][1].equals( parts[j][0]) ?
-                        "" : parts[j][1];
+                    String thisReading = part[1].equals( part[0]) ?
+                        "" : part[1];
                     readingAtts.setValue( 0, thisReading);
 
                     parent.startElement( "", "", JGlossDocument.Elements.RBASE, readingAtts);
                 }
 
                 // add the reading base, or part without reading
-                parent.characters( c, partPosition, parts[j][0].length());
-                partPosition += parts[j][0].length();
+                parent.characters( c, partPosition, part[0].length());
+                partPosition += part[0].length();
 
-                if (parts[j].length == 2) {
+                if (part.length == 2) {
                     // end reading element
                     parent.endElement( "", "", JGlossDocument.Elements.RBASE);
                 }

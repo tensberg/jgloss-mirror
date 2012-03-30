@@ -37,13 +37,9 @@ import jgloss.util.UTF8ResourceBundleControl;
  * @author Michael Koch
  */
 public class NullParser implements Parser {
-    private final static String PARSER_NAME = 
+    private static final String PARSER_NAME = 
         ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl())
         .getString( "parser.null.name");
-
-    public NullParser() {
-        super();
-    }
 
     @Override
 	public List<TextAnnotation> parse(char[] text, int start, int length)

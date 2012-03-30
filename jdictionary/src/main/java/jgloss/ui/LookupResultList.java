@@ -513,7 +513,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 	        flushTextBuffer();
         }
         updateStatusText( JGloss.messages.getString( "wordlookup.status.matches",
-                                                     new Object[] { new Integer( dictionaryEntries) }));
+                                                     new Object[] { Integer.valueOf( dictionaryEntries) }));
     }
 
     protected void flushBuffer( final boolean fancy) {
@@ -573,7 +573,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         resultTextBuffer.setLength( 0);
         entriesInTextBuffer = 0;
         updateStatusText( JGloss.messages.getString( "wordlookup.status.searching",
-                                                     new Object[] { new Integer( dictionaryEntries) }));
+                                                     new Object[] { Integer.valueOf( dictionaryEntries) }));
     }
 
     protected void updateStatusText( final String text) {

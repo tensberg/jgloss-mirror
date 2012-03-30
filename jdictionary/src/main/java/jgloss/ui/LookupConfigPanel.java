@@ -363,8 +363,8 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         }
         else {
             dictionaryChoice.setEnabled( true);
-            for ( int i=0; i<d.length; i++) {
-                dictionaryChoice.addItem( d[i]);
+            for (Dictionary element : d) {
+                dictionaryChoice.addItem( element);
             }
         }
     }

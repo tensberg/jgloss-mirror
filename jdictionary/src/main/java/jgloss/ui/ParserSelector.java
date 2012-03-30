@@ -247,9 +247,9 @@ public class ParserSelector extends JPanel {
      */
     @SuppressWarnings("unchecked")
     public Class<? extends Parser> getSelectedParser() {
-        for ( int i=0; i<parserButtons.length; i++) {
-	        if (parserButtons[i].isSelected()) {
-	            return (Class<? extends Parser>) parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY);
+        for (JRadioButton parserButton : parserButtons) {
+	        if (parserButton.isSelected()) {
+	            return (Class<? extends Parser>) parserButton.getClientProperty( PARSER_CLASS_PROPERTY);
             }
         }
         return null;
@@ -310,9 +310,9 @@ public class ParserSelector extends JPanel {
         parserButtons[i].setEnabled( enabled);
         if (!enabled && parserButtons[i].isSelected()) {
             // select different, enabled parser
-            for ( int j=0; j<parserButtons.length; j++) {
-                if (parserButtons[j].isEnabled()) {
-                    parserButtons[j].setSelected( true);
+            for (JRadioButton parserButton : parserButtons) {
+                if (parserButton.isEnabled()) {
+                    parserButton.setSelected( true);
                     break;
                 }
             }
@@ -324,10 +324,10 @@ public class ParserSelector extends JPanel {
      * will not be changed.
      */
     public void setSelected( Class<? extends Parser> parserClass) {
-        for ( int i=0; i<parserButtons.length; i++) {
-            if (parserButtons[i].getClientProperty( PARSER_CLASS_PROPERTY).equals( parserClass)) {
-                if (parserButtons[i].isEnabled()) {
-	                parserButtons[i].setSelected( true);
+        for (JRadioButton parserButton : parserButtons) {
+            if (parserButton.getClientProperty( PARSER_CLASS_PROPERTY).equals( parserClass)) {
+                if (parserButton.isEnabled()) {
+	                parserButton.setSelected( true);
                 }
                 break;
             }
@@ -339,10 +339,10 @@ public class ParserSelector extends JPanel {
      * will not be changed.
      */
     public void setSelected( String displayName) {
-        for ( int i=0; i<parserButtons.length; i++) {
-            if (parserButtons[i].getText().equals( displayName)) {
-                if (parserButtons[i].isEnabled()) {
-	                parserButtons[i].setSelected( true);
+        for (JRadioButton parserButton : parserButtons) {
+            if (parserButton.getText().equals( displayName)) {
+                if (parserButton.isEnabled()) {
+	                parserButton.setSelected( true);
                 }
                 break;
             }

@@ -431,8 +431,8 @@ public abstract class JGloss {
 
     protected void shutdownHook() {
         Dictionary[] dicts = Dictionaries.getDictionaries( true);
-        for ( int i=0; i<dicts.length; i++) {
-	        dicts[i].dispose();
+        for (Dictionary dict : dicts) {
+	        dict.dispose();
         }
         if (mainLookupModel != null) {
             mainLookupModel.saveToPreferences( prefs, "wordlookup");

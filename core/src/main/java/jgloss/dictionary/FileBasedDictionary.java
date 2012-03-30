@@ -860,7 +860,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         			field = moveToNextField( dictionary, c, field);
         		} while (clazz == CharacterClass.OTHER);
         		termStarts.clear();
-        		termStarts.add( new Integer( termStart));
+        		termStarts.add( Integer.valueOf( termStart));
         		termField = field;
         		if (clazz == CharacterClass.ROMAN_WORD) {
 	                inWord = true;
@@ -878,7 +878,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         			// for kanji terms, each kanji in the term is indexed
         			if (clazz == CharacterClass.KANJI && clazz2==clazz) {
-	                    termStarts.add( new Integer( termEnd));
+	                    termStarts.add( Integer.valueOf( termEnd));
                     }
         		} while (clazz2 == clazz);
 

@@ -52,9 +52,9 @@ public class TextAnnotationCompleter {
         }
 
         searchParameters[0] = anno.getDictionaryForm();
-        for ( int i=0; i<dictionaries.length; i++) {
+        for (Dictionary dictionarie : dictionaries) {
 	        try {
-	            Iterator<DictionaryEntry> r = dictionaries[i].search( ExpressionSearchModes.EXACT,
+	            Iterator<DictionaryEntry> r = dictionarie.search( ExpressionSearchModes.EXACT,
 	                                                       searchParameters);
 	            while (r.hasNext()) {
 	                try {

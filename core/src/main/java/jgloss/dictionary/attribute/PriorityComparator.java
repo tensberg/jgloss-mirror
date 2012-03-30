@@ -33,8 +33,6 @@ import jgloss.dictionary.DictionaryEntry;
  * @author Michael Koch
  */
 public class PriorityComparator implements Comparator<Priority> {
-    public PriorityComparator() {}
-
     @Override
 	public int compare( Priority o1, Priority o2) {
         DictionaryEntry de1 = (DictionaryEntry) o1;

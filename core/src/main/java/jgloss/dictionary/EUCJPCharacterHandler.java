@@ -36,7 +36,6 @@ import jgloss.util.NumberTools;
  * @author Michael Koch
  */
 public class EUCJPCharacterHandler implements EncodedCharacterHandler {
-    public EUCJPCharacterHandler() {}
 
     @Override
 	public int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,

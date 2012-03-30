@@ -53,7 +53,7 @@ public class AttributeMapper {
         private final Attribute<T> attribute;
         private final T value;
 
-        private Mapping( Attribute<T> _attribute, T _value) {
+        Mapping( Attribute<T> _attribute, T _value) {
             this.attribute = _attribute;
             this.value = _value;
         }
