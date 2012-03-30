@@ -142,8 +142,9 @@
 			                <configuration>
 			                    <excludeFilterFile>jgloss-findbugs-excludes.xml</excludeFilterFile>
 			                    <failOnError>false</failOnError>
-			                    <fork>false</fork>
+			                    <fork>true</fork>
 			                    <effort>default</effort>
+			                    <timeout>3600000</timeout><!-- 1 hour, since the EC2 Jenkins is so slow -->
 			                </configuration>
                         </plugin>
                         <plugin>
@@ -199,8 +200,9 @@
                 <configuration>
                     <excludeFilterFile>jgloss-findbugs-excludes.xml</excludeFilterFile>
                     <failOnError>false</failOnError>
-                    <fork>false</fork>
+                    <fork>true</fork>
                     <effort>default</effort>
+                    <timeout>3600000</timeout><!-- 1 hour, since the EC2 Jenkins is so slow -->
                 </configuration>
             </plugin>
 
