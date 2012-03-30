@@ -29,6 +29,10 @@
         <contributor>
             <name>Eric Crahen</name>
         </contributor>
+        <contributor>
+            <name>Andreas Winter</name>
+            <email>truell@web.de</email>
+        </contributor>
     </contributors>
     <licenses>
         <license>
@@ -159,6 +163,18 @@
 			                    <failOnViolation>false</failOnViolation>
 			                </configuration>
                         </plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-changes-plugin</artifactId>
+							<version>2.6</version>
+							<reportSets>
+								<reportSet>
+									<reports>
+										<report>changes-report</report>
+									</reports>
+								</reportSet>
+							</reportSets>
+						</plugin>
 					</reportPlugins>
 				</configuration>
 			</plugin>
