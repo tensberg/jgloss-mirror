@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="JGloss">
-	<version position="right" />
+	<version position="none" />
 	<bannerLeft>
 		<name>JGloss</name>
 		<src>images/jgloss-logo.png</src>
