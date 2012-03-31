@@ -37,8 +37,6 @@ import jgloss.util.StringTools;
 public class UTF8CharacterHandler implements EncodedCharacterHandler {
     private final int[] charData = new int[6];
 
-    public UTF8CharacterHandler() {}
-
     @Override
 	public int readCharacter( ByteBuffer buffer) throws BufferUnderflowException,
                                                         IndexOutOfBoundsException,

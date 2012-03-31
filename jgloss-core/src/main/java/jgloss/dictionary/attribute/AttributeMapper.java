@@ -23,6 +23,8 @@
 
 package jgloss.dictionary.attribute;
 
+import static java.util.Locale.ENGLISH;
+
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.lang.reflect.Method;
@@ -89,7 +91,7 @@ public class AttributeMapper {
                 lineMatcher.reset( line);
                 if (lineMatcher.matches()) {
                     String name = lineMatcher.group( 1);
-                    name = name.toLowerCase().replace( '~', ' ');
+                    name = name.toLowerCase(ENGLISH).replace( '~', ' ');
 
                     String attributeS = lineMatcher.group( 2);
                     Class<?> attClass = Attributes.class;
@@ -128,7 +130,7 @@ public class AttributeMapper {
                         } catch (ClassNotFoundException ex) {
                             throw new IOException( "Unknown attribute value class " + 
                                                    attValueName + "; line " + 
-                                                   mapping.getLineNumber());
+                                                   mapping.getLineNumber(), ex);
                         }
 
                         if (!attribute.getAttributeValueClass().isAssignableFrom(attValueClass)) {
@@ -145,7 +147,7 @@ public class AttributeMapper {
                             throw new IOException( "Unknown attribute value " +
                                                    lineMatcher.group( 4) + "; class " +
                                                    lineMatcher.group( 3) + "; line " + 
-                                                   mapping.getLineNumber());
+                                                   mapping.getLineNumber(), ex);
                         }
                     }
                     

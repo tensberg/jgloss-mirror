@@ -66,9 +66,9 @@ public class EDict extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-	public final static DictionaryFactory.Implementation<EDict> implementationEUC = 
+	public static final DictionaryFactory.Implementation<EDict> IMPLEMENTATION_EUC = 
 		initImplementation("EDICT", "EUC-JP");
-	public final static DictionaryFactory.Implementation<EDict> implementationUTF8 = 
+	public static final DictionaryFactory.Implementation<EDict> IMPLEMENTATION_UTF8 = 
 		initImplementation("EDICT (Unicode)", "UTF-8");
 
     /**
@@ -329,7 +329,7 @@ public class EDict extends FileBasedDictionary {
                     }
                     if (isNumber) {
                         // ROM marker, start new ROM unless this is the first ROM
-                        if (crm.size() > 0) {
+                        if (!crm.isEmpty()) {
                             crm = new ArrayList<String>( 10);
                             rom.add( crm);
                             translationromA = new DefaultAttributeSet( translationA);

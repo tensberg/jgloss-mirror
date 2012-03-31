@@ -183,13 +183,13 @@ public class WadokuJT extends FileBasedDictionary {
      * Matches each word entry with alternatives. The word match is stored in group 1, the
      * alternatives are stores as single string in group 2.
      */
-    protected final static Pattern WORD_PATTERN = Pattern.compile
+    protected static final Pattern WORD_PATTERN = Pattern.compile
         ( "(\\S+)" + // word text
           "(?:(?:\\s\\[\\w+\\])|(?:\\s\\{.+?\\}))*" + // remarks, cross references
           "(?:\\s\\((.+?)\\))?" + // alternative spellings
           "(?:(?:\\s\\[\\w+\\])|(?:\\s\\{.+?\\}))*" + // remarks, cross references
           "(?:;\\s|$)"); // end of word
-    protected Matcher WORD_MATCHER = WORD_PATTERN.matcher( "");
+    protected final Matcher wordMatcher = WORD_PATTERN.matcher( "");
     /**
      * Matches semicolon-separated alternatives. The separator is a semicolon followed by a single
      * whitespace. The matched alternative is stored in group 1. Semicolons in brackets are ignored.
@@ -203,7 +203,7 @@ public class WadokuJT extends FileBasedDictionary {
           "(?:\\s\\[\\w+\\])?" + // optional comment (ignored)
           "(?:\\s\\{.+?\\})?" + // optional comment (ignored)
           "(?:;\\s|$)"); // separation marker
-    protected Matcher ALTERNATIVES_MATCHER = ALTERNATIVES_PATTERN.matcher( "");
+    protected final Matcher alternativesMatcher = ALTERNATIVES_PATTERN.matcher( "");
     /**
      * Matches translation ranges of meaning. Group 1 contains the number of the range written in 
      * brackets at the beginning of the entry (or <code>null</code> if there is no such number), 
@@ -211,23 +211,23 @@ public class WadokuJT extends FileBasedDictionary {
      */
     protected final static Pattern TRANSLATIONS_PATTERN = Pattern.compile
         ( "(?:\\[(\\d+)\\]\\s|//\\s)?(.+?)\\.?\\s?(?=\\[\\d+\\]|//|$)");
-    protected Matcher TRANSLATIONS_MATCHER = TRANSLATIONS_PATTERN.matcher( "");
+    protected final Matcher translationsMatcher = TRANSLATIONS_PATTERN.matcher( "");
 
     protected final static Pattern CATEGORY_PATTERN = Pattern.compile
         ( "(.+?)(?:[,;]\\s?|\\z)");
-    protected final Matcher CATEGORY_MATCHER = CATEGORY_PATTERN.matcher( "");
+    protected final Matcher categoryMatcher = CATEGORY_PATTERN.matcher( "");
 
     protected final static Pattern REFERENCE_PATTERN = Pattern.compile
         ( "(\u21d2|\u2192|\u21d4)\\s(\\S+)(?:\\s\\(.*?\\))(?:;\\s|\\z)");
-    protected final Matcher REFERENCE_MATCHER = REFERENCE_PATTERN.matcher( "");
+    protected final Matcher referenceMatcher = REFERENCE_PATTERN.matcher( "");
 
     protected final static Pattern GAIRAIGO_PATTERN = Pattern.compile
         ( "(?:\\A|; )(?:(?:von (\\S+?)\\.? \"([^\"]+)\")|(?:aus d(?:em|\\.) (\\S+?)\\.?))(?:; |\\Z)");
-    protected final static Matcher GAIRAIGO_MATCHER = GAIRAIGO_PATTERN.matcher( "");
+    protected final static Matcher gairaigoMatcher = GAIRAIGO_PATTERN.matcher( "");
 
     protected final static Pattern ABBR_PATTERN = Pattern.compile
         ( "(?:\\A|; )Abk\\.?(?: (?:f\u00fcr |v(?:on|\\.) )?(?:(\\S+?)\\.?)? ?\"([^\"]+)\")?(?:; |\\Z)");
-    protected final static Matcher ABBR_MATCHER = ABBR_PATTERN.matcher( "");
+    protected final static Matcher abbrMatcher = ABBR_PATTERN.matcher( "");
 
     public WadokuJT( File dicfile) throws IOException {
         super( dicfile, "UTF-8");
@@ -418,15 +418,15 @@ public class WadokuJT extends FileBasedDictionary {
             // parse word field
             String words = entry.substring( start, end);
             // split words
-            WORD_MATCHER.reset( words);
-            while (WORD_MATCHER.find()) {
-                wordlist.add( unescape( WORD_MATCHER.group( 1)));
+            wordMatcher.reset( words);
+            while (wordMatcher.find()) {
+                wordlist.add( unescape( wordMatcher.group( 1)));
                 wordsA.add( null);
-                if (WORD_MATCHER.group( 2) != null) {
+                if (wordMatcher.group( 2) != null) {
                     // word with alternatives
-                    ALTERNATIVES_MATCHER.reset( WORD_MATCHER.group( 2));
-                    while (ALTERNATIVES_MATCHER.find()) {
-                        wordlist.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
+                    alternativesMatcher.reset( wordMatcher.group( 2));
+                    while (alternativesMatcher.find()) {
+                        wordlist.add( unescape( alternativesMatcher.group( 1)));
                         wordsA.add( null);
                     }
                 }
@@ -491,9 +491,9 @@ public class WadokuJT extends FileBasedDictionary {
 	                    // cut off comment (last char before ( is a space)
 	                    crm = crm.substring( 0, openb-1);
 
-	                    ABBR_MATCHER.reset( ex);
-	                    if (ABBR_MATCHER.find()) {
-	                        String lang = ABBR_MATCHER.group( 1);
+	                    abbrMatcher.reset( ex);
+	                    if (abbrMatcher.find()) {
+	                        String lang = abbrMatcher.group( 1);
 	                        String code = null;
 	                        if (lang != null) {
 	                            code = gairaigoMap.get( lang.toLowerCase());
@@ -503,7 +503,7 @@ public class WadokuJT extends FileBasedDictionary {
 	                                code = lang;
 	                            } 
 	                        }
-	                        String word = ABBR_MATCHER.group( 2);
+	                        String word = abbrMatcher.group( 2);
 	                        Abbreviation abbr = null;
 	                        if (word != null) {
 	                            abbr = new Abbreviation( word, code);
@@ -515,31 +515,31 @@ public class WadokuJT extends FileBasedDictionary {
 	                        }
 
 	                        // strip abbr comment from crm
-	                        if (ABBR_MATCHER.start() > 0) {
-	                            if (ABBR_MATCHER.end() < ex.length()) {
-	                                ex = ex.substring( 0, ABBR_MATCHER.start()) + "; " +
-	                                    ex.substring( ABBR_MATCHER.end());
+	                        if (abbrMatcher.start() > 0) {
+	                            if (abbrMatcher.end() < ex.length()) {
+	                                ex = ex.substring( 0, abbrMatcher.start()) + "; " +
+	                                    ex.substring( abbrMatcher.end());
 	                            }
 	                            else {
-	                                ex = ex.substring( 0, ABBR_MATCHER.start());
+	                                ex = ex.substring( 0, abbrMatcher.start());
 	                            }
 	                        } else {
-	                            ex = ex.substring( ABBR_MATCHER.end());
+	                            ex = ex.substring( abbrMatcher.end());
 	                        }
 	                    }
 
-	                    GAIRAIGO_MATCHER.reset( ex);
-	                    if (GAIRAIGO_MATCHER.find()) {
+	                    gairaigoMatcher.reset( ex);
+	                    if (gairaigoMatcher.find()) {
 	                        String lang;
 	                        String word = null;
-	                        if (GAIRAIGO_MATCHER.group( 1) != null) {
+	                        if (gairaigoMatcher.group( 1) != null) {
 	                            // gairaigo with original word
-	                            lang = GAIRAIGO_MATCHER.group( 1);
-	                            word = GAIRAIGO_MATCHER.group( 2);
+	                            lang = gairaigoMatcher.group( 1);
+	                            word = gairaigoMatcher.group( 2);
 	                        }
 	                        else {
 	                            // gairaigo without original word
-	                            lang = GAIRAIGO_MATCHER.group( 3);
+	                            lang = gairaigoMatcher.group( 3);
 	                        }
 	                
 	                        String code = gairaigoMap.get( lang.toLowerCase());
@@ -552,16 +552,16 @@ public class WadokuJT extends FileBasedDictionary {
 	                            }
 
 	                            // strip gairaigo comment from crm
-	                            if (GAIRAIGO_MATCHER.start() > 0) {
-	                                if (GAIRAIGO_MATCHER.end() < ex.length()) {
-	                                    ex = ex.substring( 0, GAIRAIGO_MATCHER.start()) + "; " +
-	                                        ex.substring( GAIRAIGO_MATCHER.end());
+	                            if (gairaigoMatcher.start() > 0) {
+	                                if (gairaigoMatcher.end() < ex.length()) {
+	                                    ex = ex.substring( 0, gairaigoMatcher.start()) + "; " +
+	                                        ex.substring( gairaigoMatcher.end());
 	                                }
 	                                else {
-	                                    ex = ex.substring( 0, GAIRAIGO_MATCHER.start());
+	                                    ex = ex.substring( 0, gairaigoMatcher.start());
 	                                }
 	                            } else {
-	                                ex = ex.substring( GAIRAIGO_MATCHER.end());
+	                                ex = ex.substring( gairaigoMatcher.end());
 	                            }
 	                        }
 	                        else {
@@ -594,9 +594,9 @@ public class WadokuJT extends FileBasedDictionary {
 	                    // attribute strings unrecognized by mapping
 	                    StringBuilder unrecognized = null;
 
-	                    CATEGORY_MATCHER.reset( crm.substring( 1, endb));
-	                    while (CATEGORY_MATCHER.find()) {
-	                        String cat = CATEGORY_MATCHER.group( 1);
+	                    categoryMatcher.reset( crm.substring( 1, endb));
+	                    while (categoryMatcher.find()) {
+	                        String cat = categoryMatcher.group( 1);
 	                        AttributeMapper.Mapping<?> mapping = mapper.getMapping( cat);
 	                        if (mapping != null) {
 	                            Attribute<?> att = mapping.getAttribute();
@@ -664,9 +664,9 @@ public class WadokuJT extends FileBasedDictionary {
 
                 List<String> crml = new ArrayList<String>( 10);
                 rom.add( crml);
-                ALTERNATIVES_MATCHER.reset( crm);
-                while (ALTERNATIVES_MATCHER.find()) {
-                    crml.add( unescape( ALTERNATIVES_MATCHER.group( 1)));
+                alternativesMatcher.reset( crm);
+                while (alternativesMatcher.find()) {
+                    crml.add( unescape( alternativesMatcher.group( 1)));
                 }
 
                 if (thisRomA.isEmpty()) {
@@ -681,9 +681,9 @@ public class WadokuJT extends FileBasedDictionary {
             end = entry.indexOf( '|', start);
             if (end > start+1) {
                 String comment = entry.substring( start, end);
-                REFERENCE_MATCHER.reset( comment);
-                while (REFERENCE_MATCHER.find()) {
-                    char tc = REFERENCE_MATCHER.group( 1).charAt( 0);
+                referenceMatcher.reset( comment);
+                while (referenceMatcher.find()) {
+                    char tc = referenceMatcher.group( 1).charAt( 0);
                     Attribute<ReferenceAttributeValue> type;
                     if (tc == '\u2192') {
 	                    type = ALT_READING;
@@ -693,9 +693,9 @@ public class WadokuJT extends FileBasedDictionary {
 	                    type = Attributes.ANTONYM;
                     }
                     generalA.addAttribute( type, new SearchReference
-                                           ( REFERENCE_MATCHER.group( 2), this,
+                                           ( referenceMatcher.group( 2), this,
                                              ExpressionSearchModes.EXACT,
-                                             new Object[] { REFERENCE_MATCHER.group( 2),
+                                             new Object[] { referenceMatcher.group( 2),
                                                             MATCH_WORD_FIELD }));
                 }
             }

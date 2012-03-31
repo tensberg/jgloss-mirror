@@ -234,8 +234,8 @@ public abstract class JGloss {
     }
 
     protected void registerDictionaries() {
-        DictionaryFactory.registerImplementation(EDict.implementationEUC);
-        DictionaryFactory.registerImplementation(EDict.implementationUTF8);
+        DictionaryFactory.registerImplementation(EDict.IMPLEMENTATION_EUC);
+        DictionaryFactory.registerImplementation(EDict.IMPLEMENTATION_UTF8);
         DictionaryFactory.registerImplementation(WadokuJT.implementation);
         DictionaryFactory.registerImplementation(KanjiDic.IMPLEMENTATION);
     }

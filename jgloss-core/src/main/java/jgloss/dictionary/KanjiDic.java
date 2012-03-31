@@ -61,7 +61,7 @@ public class KanjiDic implements Dictionary {
 	/**
      * Localizable message resource.
      */
-    private final static ResourceBundle messages = 
+    private final static ResourceBundle MESSAGES = 
         ResourceBundle.getBundle( "messages-dictionary", new UTF8ResourceBundleControl());
 
     /**
@@ -108,17 +108,17 @@ public class KanjiDic implements Dictionary {
                         if (lines<100 && l!=null && l.length()>7 && l.charAt( 1)==' ' &&
                             Integer.parseInt( l.substring( 2, 6), 16)>0) {
                             confidence = getMaxConfidence();
-                            reason = messages.getString("dictionary.reason.ok");
+                            reason = MESSAGES.getString("dictionary.reason.ok");
                         }
                         else {
-                            reason = messages.getString("dictionary.reason.pattern");
+                            reason = MESSAGES.getString("dictionary.reason.pattern");
                         }
                     } catch (IOException ex) {
                         LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                        reason = messages.getString("dictionary.reason.read");
+                        reason = MESSAGES.getString("dictionary.reason.read");
                     } catch (NumberFormatException ex) {
                     	LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                        reason = messages.getString("dictionary.reason.read");
+                        reason = MESSAGES.getString("dictionary.reason.read");
                     }
                     
                     return new DictionaryFactory.TestResult(confidence, reason);
@@ -147,15 +147,15 @@ public class KanjiDic implements Dictionary {
     /**
      * Used during entry parsing in constructor.
      */
-    private final static List<String> readingsl = new ArrayList<String>( 10);
+    private final static List<String> READINGSL = new ArrayList<String>( 10);
     /**
      * Used during entry parsing in constructor.
      */
-    private final static List<String> nanoril = new ArrayList<String>( 10);
+    private final static List<String> NANORIL = new ArrayList<String>( 10);
     /**
      * Used during entry parsing in constructor.
      */
-    private final static List<String> translationsl = new ArrayList<String>( 10);
+    private final static List<String> TRANSLATIONSL = new ArrayList<String>( 10);
 
     /**
      * Represents a single entry in the kanji dictionary file. Only a subset of the fields
@@ -235,11 +235,11 @@ public class KanjiDic implements Dictionary {
          *        frequency of use and stroke count should be parsed.
          */
         protected Entry( String dicline, boolean extendedInformation) {
-            synchronized (readingsl) {
-                readingsl.clear();
-                nanoril.clear();
-                translationsl.clear();
-                List<String> currentl = readingsl;
+            synchronized (READINGSL) {
+                READINGSL.clear();
+                NANORIL.clear();
+                TRANSLATIONSL.clear();
+                List<String> currentl = READINGSL;
 
                 kanji = dicline.charAt( 0);
                 
@@ -260,18 +260,18 @@ public class KanjiDic implements Dictionary {
                         switch (c) {
                         case '-': // reading (for kanji used as suffix)
                                 // radicalname never starts with -
-                            readingsl.add( dicline.substring( from, to));
+                            READINGSL.add( dicline.substring( from, to));
                             break;
                             
                         case '{': // translation, enclosed in {}
                                 // translations can contain spaces
                             to = dicline.indexOf( '}', from+1) + 1;
-                            translationsl.add( dicline.substring( from+1, to-1));
+                            TRANSLATIONSL.add( dicline.substring( from+1, to-1));
                             break;
                             
                         case 'T': // type change for following readings
                             if (dicline.charAt( from+1) == '1') {
-	                            currentl = nanoril;
+	                            currentl = NANORIL;
                             } else if (dicline.charAt( from+1) == '2') {
 	                            currentl = null;
                             }
@@ -325,17 +325,17 @@ public class KanjiDic implements Dictionary {
                     }
                 }
                 
-                if (readingsl.size() > 0) {
-                    readings = new String[readingsl.size()];
-                    readingsl.toArray( readings);
+                if (!READINGSL.isEmpty()) {
+                    readings = new String[READINGSL.size()];
+                    READINGSL.toArray( readings);
                 }
-                if (nanoril.size() > 0) {
-                    nanoriReadings = new String[nanoril.size()];
-                    nanoril.toArray( nanoriReadings);
+                if (!NANORIL.isEmpty()) {
+                    nanoriReadings = new String[NANORIL.size()];
+                    NANORIL.toArray( nanoriReadings);
                 }
-                if (translationsl.size() > 0) {
-                    translations = new String[translationsl.size()];
-                    translationsl.toArray( translations);
+                if (!TRANSLATIONSL.isEmpty()) {
+                    translations = new String[TRANSLATIONSL.size()];
+                    TRANSLATIONSL.toArray( translations);
                 }
             }
         }
@@ -610,7 +610,7 @@ public class KanjiDic implements Dictionary {
                                   String _expression, SearchFieldSelection _searchfields) {
             entries = _entries;
             searchmode = _searchmode;
-            expression = StringTools.toHiragana( _expression.toLowerCase());;
+            expression = StringTools.toHiragana( _expression.toLowerCase());
             searchfields = _searchfields;
             fillEntryCache();
         }
