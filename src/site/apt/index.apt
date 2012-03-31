@@ -77,15 +77,11 @@ Links
 
 * JGloss Information
 
-    * {{{doc/index.html}The JGloss User's Guide}} ({{{jgloss.pdf}PDF}}).
+    * {{{./doc/index.html}The JGloss User's Guide}} ({{{./jgloss.pdf}PDF}}).
 
-    * {{{japanesejava.html}More on Java and Japanese fonts}}.
-
-    * More {{{templates.html}LaTeX export templates}}.
+    * More {{{./templates.html}LaTeX export templates}}.
 
     * The {{{http://sourceforge.net/projects/jgloss/}JGloss project page}} at {{{http://sourceforge.net/}SourceForge}}.
-
-* JGloss mailing list/Newsgroup
 
     * {{{http://lists.sourceforge.net/lists/listinfo/jgloss-discussion}Mailing list}} ({{{http://news.gmane.org/gmane.comp.java.jgloss}message archive}})
 
@@ -160,10 +156,10 @@ Examples
   Kenji Miyazawa and his stories is here}}. An
   {{{http://www.kenji-world.net/english/download/works/goose.html}
   English translation of "Kari no Douji"}} is available there.
-  {{{karinodouji/kari.jgloss.zip}Here}} is the JGloss file from which the following
+  {{{./karinodouji/kari.jgloss.zip}Here}} is the JGloss file from which the following
   documents where generated. 
 
-  First an {{{karinodouji/kari.html}example of the HTML export function}}. The generated
+  First an {{{./karinodouji/kari.html}example of the HTML export function}}. The generated
   document uses a subset of the {{{http://www.w3.org/TR/ruby/}Ruby Annotation}} 
   XHTML specification to display the readings in browsers which support it (currently only
   recent versions of the Microsoft Internet Explorer). In other browsers, if the neccessary JavaScript
@@ -172,20 +168,20 @@ Examples
 
   JGloss also supports exporting in LaTeX and plain text format:
 
-    * {{{karinodouji/kari.pdf}Here}} is a LaTeX
-      example, TeXed from {{{karinodouji/kari.tex}this source file}} and converted to PDF with the
+    * {{{./karinodouji/kari.pdf}Here}} is a LaTeX
+      example, TeXed from {{{./karinodouji/kari.tex}this source file}} and converted to PDF with the
       Ghostscript ps2pdf tool. This is my favorite export format. 
-      {{{karinodouji/kari_end.pdf}Here}}
+      {{{./karinodouji/kari_end.pdf}Here}}
       is an alternative version with the translation list at the end of the document
-      ({{{karinodouji/kari_end.tex}source}}).
+      ({{{./karinodouji/kari_end.tex}source}}).
 
     * Plain text output can also be generated. 
-      {{{karinodouji/kari.txt}Here}} is the text with reading and translation annotations
-      and {{{karinodouji/kari.readings.txt}here}} the text with readings only.
+      {{{./karinodouji/kari.txt}Here}} is the text with reading and translation annotations
+      and {{{./karinodouji/kari.readings.txt}here}} the text with readings only.
 
-    * The {{{karinodouji/kari.annotations.txt}list of annotations}} can be exported to a file.
+    * The {{{./karinodouji/kari.annotations.txt}list of annotations}} can be exported to a file.
 
-    * Finally, {{{karinodouji/kari.jgloss.pdf}here}} is a printout of the document, generated
+    * Finally, {{{./karinodouji/kari.jgloss.pdf}here}} is a printout of the document, generated
       via print to file and converted to PDF using Ghostscript's ps2pdf tool.
 
 
@@ -196,5 +192,5 @@ JGloss-WWW
   {{{http://sourceforge.net/project/showfiles.php?group_id=29259}source release}} of JGloss
   and from the {{{http://sourceforge.net/scm/?type=git&group_id=29259}GIT repository}}. If you
   are running a web server with servlet engine installed you might want to try it out. The
-  {{{jgloss-www.html}documentation is here}}.
+  {{{./jgloss-www.html}documentation is here}}.
 	
