@@ -44,6 +44,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codequality.version>1-SNAPSHOT</codequality.version>
+        
+        <!-- 
+            The Japanese font is used when generating JGloss docbook PDF.
+            The following font works in Ubuntu 11.10 with package ttf-takao-mincho installed. 
+        -->
+        <japanesefont.name>TakaoMincho</japanesefont.name><!-- Name of a Japanese TrueType font without the .ttf ending. -->
+        <japanesefont.dir>/usr/share/fonts/truetype/takao/</japanesefont.dir><!-- Directory where the name is stored. -->
 	</properties>
 
 	<modules>
@@ -290,18 +297,41 @@
 	       <id>include-docbook</id>
 	       <build>
 	           <plugins>
-					<!-- generate JGloss docbook documentation from src/docbkx see http://docbkx-tools.sourceforge.net/docbkx-samples/manual.html -->
+                    <!-- Generate the font metrics file for the Japanese font which will be used
+                         in the docbook PDF. See http://docbkx-tools.sourceforge.net/docbkx-samples/manual.html. -->
+                    <plugin>
+                        <groupId>com.agilejava.docbkx</groupId>
+                        <artifactId>docbkx-fop-support</artifactId>
+                        <version>2.0.14</version>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <ansi>false</ansi>
+                                    <sourceDirectory>${japanesefont.dir}</sourceDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- generate JGloss docbook documentation from src/docbkx 
+                         see http://docbkx-tools.sourceforge.net/docbkx-samples/manual.html -->
 					<plugin>
 						<groupId>com.agilejava.docbkx</groupId>
 						<artifactId>docbkx-maven-plugin</artifactId>
-						<version>2.0.11</version>
+						<version>2.0.14</version>
 						<dependencies>
-							<dependency>
-								<groupId>org.docbook</groupId>
-								<artifactId>docbook-xml</artifactId>
-								<version>4.4</version>
-								<scope>runtime</scope>
-							</dependency>
+                            <dependency>
+                                <groupId>net.sf.docbook</groupId>
+                                <artifactId>docbook-xml</artifactId>
+                                <version>5.0-all</version>
+                                <classifier>resources</classifier>
+                                <type>zip</type>
+                                <scope>runtime</scope>
+                            </dependency>
 						</dependencies>
 				
 						<executions>
@@ -314,6 +344,25 @@
 								</goals>
 							</execution>
 						</executions>
+
+                        <configuration>
+                            <chunkedOutput>true</chunkedOutput>
+                            <tocSectionDepth>2</tocSectionDepth>
+                            <chunkSectionDepth>1</chunkSectionDepth>
+                            <paperType>A4</paperType>
+                            <alignment>left</alignment>
+                            <draftMode>no</draftMode>
+                            <foCustomization>src/docbkx/stylesheet.pdf.xsl</foCustomization>
+                            <fonts>
+                                <font>
+                                    <name>JapaneseFont</name>
+                                    <style>normal</style>
+                                    <weight>normal</weight>
+                                    <embedFile>${japanesefont.dir}/${japanesefont.name}.ttf</embedFile>
+                                    <metricsFile>${basedir}/target/fonts/${japanesefont.name}-metrics.xml</metricsFile>
+                                </font>
+                            </fonts>
+                        </configuration>
 					</plugin>
 	           </plugins>
 	       </build>
