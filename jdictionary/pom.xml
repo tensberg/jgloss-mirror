@@ -84,6 +84,11 @@
 			<type>zip</type>
 			<classifier>doc</classifier>
 		</dependency>
+
+        <dependency>
+            <groupId>com.miglayout</groupId>
+            <artifactId>miglayout-swing</artifactId>
+        </dependency>
 	
 		<dependency>
 			<groupId>junit</groupId>

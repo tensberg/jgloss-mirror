@@ -23,18 +23,20 @@
 
 package jgloss.ui;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
-import javax.swing.SwingConstants;
 
 import jgloss.JGloss;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Displays a splash screen at startup to keep the user entertained while the application
@@ -43,15 +45,13 @@ import jgloss.JGloss;
  * @author Michael Koch
  */
 public class SplashScreen {
+	private static final Icon JGLOSS_LOGO = new ImageIcon(SplashScreen.class.getResource("/images/jgloss-logo.png")); 
+	
     /**
      * The splash screen window.
      */
     private final JWindow splash;
 
-    /**
-     * Title of the application.
-     */
-    private final JLabel title;
     /**
      * Application version.
      */
@@ -70,29 +70,25 @@ public class SplashScreen {
         splash = new JWindow();
         splash.getContentPane().setLayout( new GridLayout( 1, 1));
 
-        JPanel c = new JPanel( new GridLayout( 1, 1));
-        c.setBorder( BorderFactory.createEtchedBorder());
-        Box b = Box.createVerticalBox();
+        JPanel content = new JPanel(new MigLayout(new LC().wrapAfter(1).fillX()));
+        content.setBorder( BorderFactory.createEtchedBorder());
+        content.setBackground(Color.WHITE);
 
-        Box b2 = Box.createHorizontalBox();
-        b2.add( Box.createHorizontalGlue());
-        title = new JLabel( JGloss.messages.getString( applicationKey + ".title"), SwingConstants.CENTER);
-        title.setFont( new Font( "SansSerif", Font.PLAIN, 18));
-        title.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10));
-        b2.add( title);
-        b2.add( Box.createHorizontalGlue());
-        b.add( b2);
-        version = new JLabel( JGloss.messages.getString( applicationKey + ".version"));
-        b.add( UIUtilities.createFlexiblePanel( version, true));
-        b2 = Box.createHorizontalBox();
+        JLabel logo = new JLabel(JGLOSS_LOGO);
+		content.add(logo, "center, growx");
+
+		version = new JLabel( JGloss.messages.getString( applicationKey + ".version"));
+        version.setOpaque(false);
+        content.add(version);
+
         info = new JLabel( JGloss.messages.getString( "splashscreen.dummyinfo"));
-        b2.add( UIUtilities.createFlexiblePanel( info, true));
-        b.add( b2);
-        c.add( b);
-        splash.getContentPane().add( c);
+        info.setOpaque(false);
+        content.add(info);
+        
+        splash.getContentPane().add( content);
         
         splash.validate();
-        Dimension d = c.getPreferredSize();
+        Dimension d = content.getPreferredSize();
         splash.setSize( d.width+10, d.height);
 
         Dimension s = splash.getToolkit().getScreenSize();

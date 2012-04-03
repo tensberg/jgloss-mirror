@@ -281,6 +281,11 @@
 				<version>4.9</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+			    <groupId>com.miglayout</groupId>
+			    <artifactId>miglayout-swing</artifactId>
+			    <version>4.2</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	
