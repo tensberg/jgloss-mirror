@@ -60,89 +60,35 @@ public class AboutFrame extends JFrame {
 	private static final Logger LOGGER = Logger.getLogger(AboutFrame.class.getPackage().getName());
 	
     private static final long serialVersionUID = 1L;
-
-    /**
-     * The application-wide instance used to display the about information.
-     */
-    private static AboutFrame dialog;
-    private static final Object dialogLock = new Object();
-    /**
-     * Action which displays the about dialog. The action is initialized when calling
-     * {@link #createFrame(String) createFrame}.
-     */
+    
     private static Action showAction;
-    private static final Object showActionLock = new Object();
-    /**
-     * The application-wide instance used to display the GNU GPL.
-     */
-    private static JFrame license;
 
-    /**
-     * Creates the standard about frame instance and the {@link #showAction showAction}.
-     *
-     * @param prefix Prefix to the resource key strings. Used to differentiate between JGloss and
-     *       JDictionary about dialog.
-     */
-    public static void createFrame( String prefix) {
-        synchronized (dialogLock) {
-            dialog = new AboutFrame( prefix);
-            dialogLock.notifyAll();
-        }
+    public static void createShowAction(final String prefix) {
+    	Action showAction = new AbstractAction() {
+    		private static final long serialVersionUID = 1L;
+    		
+    		@Override
+    		public void actionPerformed( ActionEvent e) {
+    			new AboutFrame(prefix).setVisible(true);
+    		}
+    	};
+    	UIUtilities.initAction( showAction, prefix + ".main.menu.about");
+
+    	AboutFrame.showAction = showAction;
     }
-
-    public static void createShowAction( String prefix) {
-        synchronized (showActionLock) {
-            showAction = new AbstractAction() {
-                private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed( ActionEvent e) {
-                        getFrame().setVisible(true);
-                    }
-                };
-            UIUtilities.initAction( showAction, prefix + ".main.menu.about");
-            
-            showActionLock.notifyAll();
-        }        
-    }
-
-    /**
-     * Returns the standard about frame instance. The method will block until the about frame
-     * instance is initialized by calling {@link #createFrame(String) createFrame]}.
-     */
-    public static AboutFrame getFrame() {
-        synchronized (dialogLock) {
-            if (dialog == null) {
-	            try {
-	                // wait until frame is created
-	                dialogLock.wait();
-	            } catch (InterruptedException ex) {}
-            }
-            return dialog;
-        }
-    }
-
-    /**
-     * Returns the show action which shows the about dialog. The method will block until the 
-     * action is initialized by calling {@link #createFrame(String) createFrame]}.
-     */
+    
     public static Action getShowAction() {
-        synchronized (showActionLock) {
-            if (showAction == null) {
-	            try {
-	                // wait until frame is created
-	                showActionLock.wait();
-	            } catch (InterruptedException ex) {}
-            }
-            return showAction;
+        if (showAction == null) {
+            throw new IllegalStateException("not yet initialized");
         }
+        
+        return showAction;
     }
 
     /**
      * Creates the about dialog.
      */
     private AboutFrame( String prefix) {
-        super();
         setTitle( JGloss.messages.getString( prefix + ".about.frame.title"));
         
         JLabel label = new JLabel( JGloss.messages.getString( prefix + ".about.title"));
@@ -173,10 +119,7 @@ public class AboutFrame extends JFrame {
 
 				@Override
 				public void actionPerformed( ActionEvent e) {
-                    if (license == null) {
-	                    createLicenseFrame();
-                    }
-                    license.setVisible( true);
+					createLicenseFrame().setVisible( true);
                 }
             }));
         b.add( Box.createHorizontalStrut( 5));
@@ -197,35 +140,47 @@ public class AboutFrame extends JFrame {
         setDefaultCloseOperation( WindowConstants.HIDE_ON_CLOSE);
         pack();
         setResizable( false);
+        setLocationRelativeTo(null);
     }
 
     /**
      * Creates the frame which is used to display the GNU GPL.
+     * @return 
      */
-    private void createLicenseFrame() {
+    private JFrame createLicenseFrame() {
+    	StringBuilder gpl = new StringBuilder();
+    	BufferedReader r = null;
         try {
-            BufferedReader r = new BufferedReader( new InputStreamReader
+			r = new BufferedReader( new InputStreamReader
                 ( AboutFrame.class.getResourceAsStream( "/data/COPYING"), "ASCII"));
-            StringBuilder gpl = new StringBuilder();
             String line;
             while ((line=r.readLine()) != null) {
 	            gpl.append( line + "\n");
             }
-            r.close();
-
-            license = new JFrame( JGloss.messages.getString( "about.license.title"));
-            JTextArea ta = new JTextArea( gpl.toString());
-            ta.setEditable( false);
-            ta.setCaretPosition( 0);
-            ta.setFont( new Font( "Monospaced", Font.PLAIN, 11));
-            JScrollPane p = new JScrollPane( ta, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            license.getContentPane().setLayout( new GridLayout( 1, 1));
-            license.getContentPane().add( p);
-            license.setSize( 600, 400);
-            license.setDefaultCloseOperation( WindowConstants.HIDE_ON_CLOSE);
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+        	LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+        } finally {
+        	if (r != null) {
+        	    try {
+                    r.close();
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "failed to close input stream", ex);
+                }
+        	}
         }
+
+        JFrame license = new JFrame( JGloss.messages.getString( "about.license.title"));
+        JTextArea ta = new JTextArea( gpl.toString());
+        ta.setEditable( false);
+        ta.setCaretPosition( 0);
+        ta.setFont( new Font( "Monospaced", Font.PLAIN, 11));
+        JScrollPane p = new JScrollPane( ta, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+        		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        license.getContentPane().setLayout( new GridLayout( 1, 1));
+        license.getContentPane().add( p);
+        license.setSize( 600, 400);
+        license.setDefaultCloseOperation( WindowConstants.HIDE_ON_CLOSE);
+        
+        return license;
     }
 } // class AboutFrame

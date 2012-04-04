@@ -455,7 +455,6 @@ public abstract class JGloss {
     protected void backgroundCreateDialogs() {
         PreferencesFrame.createFrame
             ( getPreferencesPanels());
-        AboutFrame.createFrame( getApplicationName());
     }
     
     /**
