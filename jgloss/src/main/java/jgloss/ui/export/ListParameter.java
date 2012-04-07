@@ -101,7 +101,7 @@ class ListParameter extends UIParameter {
 	public void loadFromPrefs() {
         // saveToPrefs stores the selected value, not the label
         // Find the Value object corresponding to the stored preference
-        String selection = JGloss.prefs.getString( prefsKey, defaultValue);
+        String selection = JGloss.PREFS.getString( prefsKey, defaultValue);
 
         ComboBoxModel model = combobox.getModel();
         int selectedIndex = -1;
@@ -131,7 +131,7 @@ class ListParameter extends UIParameter {
             buf.setLength( 0);
             String label = XMLTools.getText( labelElem, buf).toString();
             if (labelElem.getNodeName().equals( ExportConfiguration.Elements.LABEL_KEY)) {
-	            label = JGloss.messages.getString( label);
+	            label = JGloss.MESSAGES.getString( label);
             }
 
             String value = label;

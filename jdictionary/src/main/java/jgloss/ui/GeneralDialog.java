@@ -110,26 +110,26 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         Box all = Box.createVerticalBox();
 
         JPanel p = new JPanel( new GridLayout( 2, 1));
-        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
+        p.setBorder( BorderFactory.createTitledBorder( JGloss.MESSAGES.getString
                                                        ( "general.startup")));
         ButtonGroup bg = new ButtonGroup();
-        startFrame = new JRadioButton( JGloss.messages.getString( "general.startup.jglossframe"));
+        startFrame = new JRadioButton( JGloss.MESSAGES.getString( "general.startup.jglossframe"));
         bg.add( startFrame);
         p.add( startFrame);
-        startWordLookup = new JRadioButton( JGloss.messages.getString( "general.startup.wordlookup"));
+        startWordLookup = new JRadioButton( JGloss.MESSAGES.getString( "general.startup.wordlookup"));
         bg.add( startWordLookup);
         p.add( startWordLookup);
         all.add( p);
         all.add( Box.createVerticalStrut( 2));
 
         p = new JPanel( new GridLayout( 2, 1));
-        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
+        p.setBorder( BorderFactory.createTitledBorder( JGloss.MESSAGES.getString
                                                        ( "general.leftclick")));
         bg = new ButtonGroup();
-        clickSelect = new JRadioButton( JGloss.messages.getString( "general.leftclick.select"));
+        clickSelect = new JRadioButton( JGloss.MESSAGES.getString( "general.leftclick.select"));
         bg.add( clickSelect);
         p.add( clickSelect);
-        clickTooltip = new JRadioButton( JGloss.messages.getString( "general.leftclick.tooltip"));
+        clickTooltip = new JRadioButton( JGloss.MESSAGES.getString( "general.leftclick.tooltip"));
         bg.add( clickTooltip);
         p.add( clickTooltip);
         all.add( p);
@@ -137,15 +137,15 @@ public class GeneralDialog extends Box implements PreferencesPanel {
 
         importClipboardParserSelector = new ParserSelector( true);
         importClipboardParserSelector.setBorder( BorderFactory.createTitledBorder 
-                                                 ( JGloss.messages.getString( "general.parserselector")));
+                                                 ( JGloss.MESSAGES.getString( "general.parserselector")));
         all.add( importClipboardParserSelector);
         all.add( Box.createVerticalStrut( 2));
 
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalStrut( 3));
-        b.add( new JLabel( JGloss.messages.getString( "general.chasen.label")));
+        b.add( new JLabel( JGloss.MESSAGES.getString( "general.chasen.label")));
         b.add( Box.createHorizontalStrut( 2));
-        chasenLocation = new JTextField( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+        chasenLocation = new JTextField( JGloss.PREFS.getString( Preferences.CHASEN_LOCATION));
         chasenLocation.setInputVerifier( new InputVerifier() {
                 private String lastInput = chasenLocation.getText();
                 @Override
@@ -161,7 +161,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
             });
         b.add( chasenLocation);
         b.add( Box.createHorizontalStrut( 2));
-        JButton chasenLocationChoice = new JButton( JGloss.messages.getString( "button.choose"));
+        JButton chasenLocationChoice = new JButton( JGloss.MESSAGES.getString( "button.choose"));
         chasenLocationChoice.addActionListener( new ActionListener() {
                 @Override
 				public void actionPerformed( ActionEvent e) {
@@ -174,12 +174,12 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         all.add( Box.createVerticalStrut( 2));
 
         // enable editing
-        if ( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITINGCHECKBOX, false)) {
+        if ( JGloss.PREFS.getBoolean( Preferences.EDITOR_ENABLEEDITINGCHECKBOX, false)) {
             // this is a "hidden" control because the direct editing feature is buggy and can
             // break the current document if not used with care.
             b = Box.createHorizontalBox();
             b.add( Box.createHorizontalStrut( 3));
-            enableEditing = new JCheckBox( JGloss.messages.getString( "general.editor.enableediting"));
+            enableEditing = new JCheckBox( JGloss.MESSAGES.getString( "general.editor.enableediting"));
             b.add( enableEditing);
             b.add( Box.createHorizontalGlue());
             all.add( b);
@@ -193,7 +193,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     }
 
     @Override
-	public String getTitle() { return JGloss.messages.getString( "general.title"); }
+	public String getTitle() { return JGloss.MESSAGES.getString( "general.title"); }
     @Override
 	public Component getComponent() { return this; }
 
@@ -203,26 +203,26 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     @SuppressWarnings("unchecked")
     @Override
 	public void loadPreferences() {
-        if (JGloss.prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false)) {
+        if (JGloss.PREFS.getBoolean( Preferences.STARTUP_WORDLOOKUP, false)) {
 	        startWordLookup.setSelected( true);
         } else {
 	        startFrame.setSelected( true);
         }
-        if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) {
+        if (JGloss.PREFS.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) {
 	        clickTooltip.setSelected( true);
         } else {
 	        clickSelect.setSelected( true);
         }
 
         if (enableEditing != null) {
-	        enableEditing.setSelected( JGloss.prefs.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
+	        enableEditing.setSelected( JGloss.PREFS.getBoolean( Preferences.EDITOR_ENABLEEDITING, false));
         }
-        chasenLocation.setText( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+        chasenLocation.setText( JGloss.PREFS.getString( Preferences.CHASEN_LOCATION));
         importClipboardParserSelector.setEnabled( ChasenParser.class,
                                                   Chasen.isChasenExecutable
                                                   ( chasenLocation.getText()));
         try {
-            Class<?> selectedParser = Class.forName( JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_PARSER));
+            Class<?> selectedParser = Class.forName( JGloss.PREFS.getString( Preferences.IMPORTCLIPBOARD_PARSER));
             if (!Parser.class.isAssignableFrom(selectedParser)) {
             	throw new IllegalArgumentException(selectedParser + " must be a parser class");
             }
@@ -231,10 +231,10 @@ public class GeneralDialog extends Box implements PreferencesPanel {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
         importClipboardParserSelector.setFirstOccurrenceOnly
-            ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE, true));
+            ( JGloss.PREFS.getBoolean( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE, true));
         importClipboardParserSelector.setDetectParagraphs
-            ( JGloss.prefs.getBoolean( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true));
-        String brackets = JGloss.prefs.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS);
+            ( JGloss.PREFS.getBoolean( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true));
+        String brackets = JGloss.PREFS.getString( Preferences.IMPORTCLIPBOARD_READINGBRACKETS);
         if (brackets.length() == 2) {
 	        importClipboardParserSelector.setReadingBrackets
                 ( brackets.charAt( 0), brackets.charAt( 1));
@@ -248,22 +248,22 @@ public class GeneralDialog extends Box implements PreferencesPanel {
      */
     @Override
 	public void savePreferences() {
-        JGloss.prefs.set( Preferences.STARTUP_WORDLOOKUP, startWordLookup.isSelected());
-        JGloss.prefs.set( Preferences.LEFTCLICK_TOOLTIP, clickTooltip.isSelected());
+        JGloss.PREFS.set( Preferences.STARTUP_WORDLOOKUP, startWordLookup.isSelected());
+        JGloss.PREFS.set( Preferences.LEFTCLICK_TOOLTIP, clickTooltip.isSelected());
         if (enableEditing != null) {
-	        JGloss.prefs.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
+	        JGloss.PREFS.set( Preferences.EDITOR_ENABLEEDITING, enableEditing.isSelected());
         }
-        JGloss.prefs.set( Preferences.CHASEN_LOCATION, chasenLocation.getText());
-        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_PARSER,
+        JGloss.PREFS.set( Preferences.CHASEN_LOCATION, chasenLocation.getText());
+        JGloss.PREFS.set( Preferences.IMPORTCLIPBOARD_PARSER,
                           importClipboardParserSelector.getSelectedParser().getName());
-        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE,
+        JGloss.PREFS.set( Preferences.IMPORTCLIPBOARD_FIRSTOCCURRENCE,
                           importClipboardParserSelector.isFirstOccurrenceOnly());
-        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS,
+        JGloss.PREFS.set( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS,
                           importClipboardParserSelector.isDetectParagraphs());
         if (importClipboardParserSelector.isNoReadingBrackets()) {
-	        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS, "");
+	        JGloss.PREFS.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS, "");
         } else {
-	        JGloss.prefs.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS,
+	        JGloss.PREFS.set( Preferences.IMPORTCLIPBOARD_READINGBRACKETS,
                               new String( new char[] { importClipboardParserSelector.getReadingStart(),
                                                        importClipboardParserSelector.getReadingEnd() }));
         }
@@ -295,7 +295,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
 
     private void chooseChasenLocation() {
         JFileChooser chooser = new JFileChooser( JGloss.getCurrentDir());
-        chooser.setDialogTitle( JGloss.messages.getString( "general.chasen.chooser.title"));
+        chooser.setDialogTitle( JGloss.MESSAGES.getString( "general.chasen.chooser.title"));
         chooser.setFileHidingEnabled( true);
         chooser.setMultiSelectionEnabled( false);
         chooser.setFileSelectionMode( JFileChooser.FILES_ONLY);
@@ -313,7 +313,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
                     return super.getIcon( f);
                 }
             });
-        int r = chooser.showDialog( this, JGloss.messages.getString( "button.select"));
+        int r = chooser.showDialog( this, JGloss.MESSAGES.getString( "button.select"));
         if (r == JFileChooser.APPROVE_OPTION) {
             chasenLocation.setText( chooser.getSelectedFile().getAbsolutePath());
             testChasenLocation();
@@ -322,8 +322,8 @@ public class GeneralDialog extends Box implements PreferencesPanel {
 
     private void testChasenLocation() {
         if (!Chasen.isChasenExecutable( chasenLocation.getText())) {
-            JOptionPane.showMessageDialog( this, JGloss.messages.getString
-                                           ( "warning.chasen"), JGloss.messages.getString
+            JOptionPane.showMessageDialog( this, JGloss.MESSAGES.getString
+                                           ( "warning.chasen"), JGloss.MESSAGES.getString
                                            ( "warning.chasen.title"),
                                            JOptionPane.WARNING_MESSAGE);
             importClipboardParserSelector.setEnabled( ChasenParser.class, false);

@@ -67,12 +67,12 @@ public class SaveFileChooser extends JFileChooser {
 	public void approveSelection() {
         File f = getSelectedFile();
         if (f!=null && f.exists()) {
-            String overwrite = JGloss.messages.getString( "button.overwrite");
-            String cancel = JGloss.messages.getString( "button.cancel");
+            String overwrite = JGloss.MESSAGES.getString( "button.overwrite");
+            String cancel = JGloss.MESSAGES.getString( "button.cancel");
             int choice = JOptionPane.showOptionDialog
-                ( this, JGloss.messages.getString
+                ( this, JGloss.MESSAGES.getString
                   ( "filechooser.overwrite", new String[] { f.getName() } ),
-                  JGloss.messages.getString( "filechooser.overwrite.title"),
+                  JGloss.MESSAGES.getString( "filechooser.overwrite.title"),
                   JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                   new Object[] { overwrite, cancel }, cancel);
 

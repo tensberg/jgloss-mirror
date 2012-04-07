@@ -131,11 +131,11 @@ public class DocumentStyleDialog extends StyleDialog {
         translationFont = new JComboBox( allFonts);
         translationFont.setEditable( false);
 
-        textFontSize = new JComboBox( JGloss.prefs.getList( Preferences.FONTSIZES_KANJI, ','));
+        textFontSize = new JComboBox( JGloss.PREFS.getList( Preferences.FONTSIZES_KANJI, ','));
         textFontSize.setEditable( true);
-        readingFontSize = new JComboBox( JGloss.prefs.getList( Preferences.FONTSIZES_READING, ','));
+        readingFontSize = new JComboBox( JGloss.PREFS.getList( Preferences.FONTSIZES_READING, ','));
         readingFontSize.setEditable( true);
-        translationFontSize = new JComboBox( JGloss.prefs.getList
+        translationFontSize = new JComboBox( JGloss.PREFS.getList
                                              ( Preferences.FONTSIZES_TRANSLATION, ','));
         translationFontSize.setEditable( true);
 
@@ -152,21 +152,21 @@ public class DocumentStyleDialog extends StyleDialog {
         translationColor = new JButton( new ColorIcon());
         translationColor.addActionListener( colorActionListener);
 
-        textUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
+        textUseColor = new JCheckBox( JGloss.MESSAGES.getString( "style.text.usecolor"), true);
         textUseColor.addChangeListener( new ChangeListener() {
                 @Override
 				public void stateChanged( ChangeEvent e) {
                     textColor.setEnabled( textUseColor.isSelected());
                 }
             });
-        readingUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
+        readingUseColor = new JCheckBox( JGloss.MESSAGES.getString( "style.text.usecolor"), true);
         readingUseColor.addChangeListener( new ChangeListener() {
                 @Override
 				public void stateChanged( ChangeEvent e) {
                     readingColor.setEnabled( readingUseColor.isSelected());
                 }
             });
-        translationUseColor = new JCheckBox( JGloss.messages.getString( "style.text.usecolor"), true);
+        translationUseColor = new JCheckBox( JGloss.MESSAGES.getString( "style.text.usecolor"), true);
         translationUseColor.addChangeListener( new ChangeListener() {
                 @Override
 				public void stateChanged( ChangeEvent e) {
@@ -180,15 +180,15 @@ public class DocumentStyleDialog extends StyleDialog {
 
         // text
         p = new JPanel( new GridLayout( 1, 1));
-        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
+        p.setBorder( BorderFactory.createTitledBorder( JGloss.MESSAGES.getString
                                                        ( "style.text")));
         b = Box.createVerticalBox();
         b2 = Box.createHorizontalBox();
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.font")));
+        b2.add( new JLabel( JGloss.MESSAGES.getString( "style.text.font")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( textFont);
         b2.add( Box.createHorizontalStrut( 5));
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
+        b2.add( new JLabel( JGloss.MESSAGES.getString( "style.text.size")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( textFontSize);
         b.add( UIUtilities.createFlexiblePanel( b2, true));
@@ -204,15 +204,15 @@ public class DocumentStyleDialog extends StyleDialog {
 
         // reading
         p = new JPanel( new GridLayout( 1, 1));
-        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
+        p.setBorder( BorderFactory.createTitledBorder( JGloss.MESSAGES.getString
                                                        ( "style.reading")));
         b = Box.createVerticalBox();
         b2 = Box.createHorizontalBox();
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.font")));
+        b2.add( new JLabel( JGloss.MESSAGES.getString( "style.text.font")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( readingFont);
         b2.add( Box.createHorizontalStrut( 5));
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
+        b2.add( new JLabel( JGloss.MESSAGES.getString( "style.text.size")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( readingFontSize);
         b.add( UIUtilities.createFlexiblePanel( b2, true));
@@ -228,15 +228,15 @@ public class DocumentStyleDialog extends StyleDialog {
 
         // translation
         p = new JPanel( new GridLayout( 1, 1));
-        p.setBorder( BorderFactory.createTitledBorder( JGloss.messages.getString
+        p.setBorder( BorderFactory.createTitledBorder( JGloss.MESSAGES.getString
                                                        ( "style.translation")));
         b = Box.createVerticalBox();
         b2 = Box.createHorizontalBox();
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.font")));
+        b2.add( new JLabel( JGloss.MESSAGES.getString( "style.text.font")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( translationFont);
         b2.add( Box.createHorizontalStrut( 5));
-        b2.add( new JLabel( JGloss.messages.getString( "style.text.size")));
+        b2.add( new JLabel( JGloss.MESSAGES.getString( "style.text.size")));
         b2.add( Box.createHorizontalStrut( 3));
         b2.add( translationFontSize);
         b.add( UIUtilities.createFlexiblePanel( b2, true));
@@ -253,7 +253,7 @@ public class DocumentStyleDialog extends StyleDialog {
         // highlight color
         b = Box.createHorizontalBox();
         b.add( Box.createHorizontalStrut( 3));
-        b.add( new JLabel( JGloss.messages.getString( "style.highlight.color")));
+        b.add( new JLabel( JGloss.MESSAGES.getString( "style.highlight.color")));
         b.add( Box.createHorizontalStrut( 3));
         highlightColor = new JButton( new ColorIcon());
         highlightColor.addActionListener( colorActionListener);
@@ -297,30 +297,30 @@ public class DocumentStyleDialog extends StyleDialog {
 	public void loadPreferences() {
         super.loadPreferences();
         
-        insertAndSelect( textFont, JGloss.prefs.getString( Preferences.FONT_TEXT));
-        insertAndSelect( readingFont, JGloss.prefs.getString( Preferences.FONT_READING));
-        insertAndSelect( translationFont, JGloss.prefs.getString( Preferences.FONT_TRANSLATION));
+        insertAndSelect( textFont, JGloss.PREFS.getString( Preferences.FONT_TEXT));
+        insertAndSelect( readingFont, JGloss.PREFS.getString( Preferences.FONT_READING));
+        insertAndSelect( translationFont, JGloss.PREFS.getString( Preferences.FONT_TRANSLATION));
 
         textFontSize.setSelectedItem
-            ( Integer.toString( JGloss.prefs.getInt( Preferences.FONT_TEXT_SIZE, 12)));
+            ( Integer.toString( JGloss.PREFS.getInt( Preferences.FONT_TEXT_SIZE, 12)));
         readingFontSize.setSelectedItem
-            ( Integer.toString( JGloss.prefs.getInt( Preferences.FONT_READING_SIZE, 12)));
+            ( Integer.toString( JGloss.PREFS.getInt( Preferences.FONT_READING_SIZE, 12)));
         translationFontSize.setSelectedItem
-            ( Integer.toString( JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_SIZE, 12)));
+            ( Integer.toString( JGloss.PREFS.getInt( Preferences.FONT_TRANSLATION_SIZE, 12)));
 
-        textUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR, true));
-        readingUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR, true));
-        translationUseColor.setSelected( JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, 
+        textUseColor.setSelected( JGloss.PREFS.getBoolean( Preferences.FONT_TEXT_USECOLOR, true));
+        readingUseColor.setSelected( JGloss.PREFS.getBoolean( Preferences.FONT_READING_USECOLOR, true));
+        translationUseColor.setSelected( JGloss.PREFS.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, 
                                                                   true));
 
         ((ColorIcon) textColor.getIcon()).setColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff))));
+            ( Math.max( 0, JGloss.PREFS.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff))));
         ((ColorIcon) readingColor.getIcon()).setColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff))));
+            ( Math.max( 0, JGloss.PREFS.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff))));
         ((ColorIcon) translationColor.getIcon()).setColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff))));
+            ( Math.max( 0, JGloss.PREFS.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff))));
         ((ColorIcon) highlightColor.getIcon()).setColor( new Color
-            ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xffffff))));
+            ( Math.max( 0, JGloss.PREFS.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xffffff))));
     }
 
     @Override
@@ -329,53 +329,53 @@ public class DocumentStyleDialog extends StyleDialog {
 
         String font = (String) textFont.getSelectedItem();
         if (font != null) {
-	        JGloss.prefs.set( Preferences.FONT_TEXT, font);
+	        JGloss.PREFS.set( Preferences.FONT_TEXT, font);
         }
         font = (String) readingFont.getSelectedItem();
         if (font != null) {
-	        JGloss.prefs.set( Preferences.FONT_READING, font);
+	        JGloss.PREFS.set( Preferences.FONT_READING, font);
         }
         font = (String) translationFont.getSelectedItem();
         if (font != null) {
-	        JGloss.prefs.set( Preferences.FONT_TRANSLATION, font);
+	        JGloss.PREFS.set( Preferences.FONT_TRANSLATION, font);
         }
 
         String size = (String) textFontSize.getSelectedItem();
         try {
             int s = Integer.parseInt( size);
-            JGloss.prefs.set( Preferences.FONT_TEXT_SIZE, s);
+            JGloss.PREFS.set( Preferences.FONT_TEXT_SIZE, s);
         } catch (Exception ex) { 
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
+            textFontSize.setSelectedItem( JGloss.PREFS.getString( Preferences.FONT_TEXT_SIZE));
         }
         size = (String) readingFontSize.getSelectedItem();
         try {
             int s = Integer.parseInt( size);
-            JGloss.prefs.set( Preferences.FONT_READING_SIZE, s);
+            JGloss.PREFS.set( Preferences.FONT_READING_SIZE, s);
         } catch (Exception ex) { 
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
+            textFontSize.setSelectedItem( JGloss.PREFS.getString( Preferences.FONT_READING_SIZE));
         }
         size = (String) translationFontSize.getSelectedItem();
         try {
             int s = Integer.parseInt( size);
-            JGloss.prefs.set( Preferences.FONT_TRANSLATION_SIZE, s);
+            JGloss.PREFS.set( Preferences.FONT_TRANSLATION_SIZE, s);
         } catch (Exception ex) { 
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            textFontSize.setSelectedItem( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
+            textFontSize.setSelectedItem( JGloss.PREFS.getString( Preferences.FONT_TRANSLATION_SIZE));
         }
 
-        JGloss.prefs.set( Preferences.FONT_TEXT_USECOLOR, textUseColor.isSelected());
+        JGloss.PREFS.set( Preferences.FONT_TEXT_USECOLOR, textUseColor.isSelected());
         Color color = ((ColorIcon) textColor.getIcon()).getColor();
-        JGloss.prefs.set( Preferences.FONT_TEXT_BGCOLOR, color.getRGB() & 0xffffff);
-        JGloss.prefs.set( Preferences.FONT_READING_USECOLOR, readingUseColor.isSelected());
+        JGloss.PREFS.set( Preferences.FONT_TEXT_BGCOLOR, color.getRGB() & 0xffffff);
+        JGloss.PREFS.set( Preferences.FONT_READING_USECOLOR, readingUseColor.isSelected());
         color = ((ColorIcon) readingColor.getIcon()).getColor();
-        JGloss.prefs.set( Preferences.FONT_READING_BGCOLOR, color.getRGB() & 0xffffff);
-        JGloss.prefs.set( Preferences.FONT_TRANSLATION_USECOLOR, translationUseColor.isSelected());
+        JGloss.PREFS.set( Preferences.FONT_READING_BGCOLOR, color.getRGB() & 0xffffff);
+        JGloss.PREFS.set( Preferences.FONT_TRANSLATION_USECOLOR, translationUseColor.isSelected());
         color = ((ColorIcon) translationColor.getIcon()).getColor();
-        JGloss.prefs.set( Preferences.FONT_TRANSLATION_BGCOLOR, color.getRGB() & 0xffffff);
+        JGloss.PREFS.set( Preferences.FONT_TRANSLATION_BGCOLOR, color.getRGB() & 0xffffff);
         color = ((ColorIcon) highlightColor.getIcon()).getColor();
-        JGloss.prefs.set( Preferences.ANNOTATION_HIGHLIGHT_COLOR, color.getRGB() & 0xffffff);
+        JGloss.PREFS.set( Preferences.ANNOTATION_HIGHLIGHT_COLOR, color.getRGB() & 0xffffff);
     }
 
     @Override
@@ -405,7 +405,7 @@ public class DocumentStyleDialog extends StyleDialog {
         }
 
         Color nc = JColorChooser.showDialog( SwingUtilities.getRoot( this),
-                                             JGloss.messages.getString( title),
+                                             JGloss.MESSAGES.getString( title),
                                              ((ColorIcon) b.getIcon()).getColor());
         if (nc != null) {
             ((ColorIcon) b.getIcon()).setColor( nc);
@@ -424,19 +424,19 @@ public class DocumentStyleDialog extends StyleDialog {
         }
 
         String style = "body { background-color: " + BACKGROUND_COLOR + "; ";
-        if (JGloss.prefs.getString( Preferences.FONT_TEXT).length()!=0) {
-            style += "font-family: " + JGloss.prefs.getString( Preferences.FONT_TEXT) + "; ";
+        if (JGloss.PREFS.getString( Preferences.FONT_TEXT).length()!=0) {
+            style += "font-family: " + JGloss.PREFS.getString( Preferences.FONT_TEXT) + "; ";
         }
         try {
-            int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_TEXT_SIZE));
+            int size = Integer.parseInt( JGloss.PREFS.getString( Preferences.FONT_TEXT_SIZE));
             style += "font-size: " + size + "pt; ";
         } catch (NumberFormatException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
         style += "}\n";
         
         style += AnnotationTags.BASETEXT.getId() + " { ";
-        if (JGloss.prefs.getBoolean( Preferences.FONT_TEXT_USECOLOR, true)) {
+        if (JGloss.PREFS.getBoolean( Preferences.FONT_TEXT_USECOLOR, true)) {
             style += "background-color: #" + Integer.toHexString
-                ( JGloss.prefs.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff)) + "; ";
+                ( JGloss.PREFS.getInt( Preferences.FONT_TEXT_BGCOLOR, 0xffffff)) + "; ";
         }
         else {
             // this removes, among other settings, the current background color settings
@@ -445,16 +445,16 @@ public class DocumentStyleDialog extends StyleDialog {
         style += "}\n";
 
         style += AnnotationTags.READING.getId() + " { ";
-        if (JGloss.prefs.getString( Preferences.FONT_READING).length()!=0) {
-            style += "font-family: " + JGloss.prefs.getString( Preferences.FONT_READING) + "; ";
+        if (JGloss.PREFS.getString( Preferences.FONT_READING).length()!=0) {
+            style += "font-family: " + JGloss.PREFS.getString( Preferences.FONT_READING) + "; ";
         }
         try {
-            int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_READING_SIZE));
+            int size = Integer.parseInt( JGloss.PREFS.getString( Preferences.FONT_READING_SIZE));
             style += "font-size: " + size + "pt; ";
         } catch (NumberFormatException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
-        if (JGloss.prefs.getBoolean( Preferences.FONT_READING_USECOLOR, true)) {
+        if (JGloss.PREFS.getBoolean( Preferences.FONT_READING_USECOLOR, true)) {
             style += "background-color: #" + Integer.toHexString
-                ( JGloss.prefs.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff)) + "; ";
+                ( JGloss.PREFS.getInt( Preferences.FONT_READING_BGCOLOR, 0xffffff)) + "; ";
         }
         else {
             style += "background-color: " + BACKGROUND_COLOR + "; ";
@@ -462,16 +462,16 @@ public class DocumentStyleDialog extends StyleDialog {
         style += "}\n";
 
         style += AnnotationTags.TRANSLATION.getId() + " { ";
-        if (JGloss.prefs.getString( Preferences.FONT_TRANSLATION).length()!=0) {
-            style += "font-family: " + JGloss.prefs.getString( Preferences.FONT_TRANSLATION) + "; ";
+        if (JGloss.PREFS.getString( Preferences.FONT_TRANSLATION).length()!=0) {
+            style += "font-family: " + JGloss.PREFS.getString( Preferences.FONT_TRANSLATION) + "; ";
         }
         try {
-            int size = Integer.parseInt( JGloss.prefs.getString( Preferences.FONT_TRANSLATION_SIZE));
+            int size = Integer.parseInt( JGloss.PREFS.getString( Preferences.FONT_TRANSLATION_SIZE));
             style += "font-size: " + size + "pt; ";
         } catch (NumberFormatException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
-        if (JGloss.prefs.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, true)) {
+        if (JGloss.PREFS.getBoolean( Preferences.FONT_TRANSLATION_USECOLOR, true)) {
             style += "background-color: #" + Integer.toHexString
-                ( JGloss.prefs.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff)) + "; ";
+                ( JGloss.PREFS.getInt( Preferences.FONT_TRANSLATION_BGCOLOR, 0xffffff)) + "; ";
         }
         else {
             style += "background-color: " + BACKGROUND_COLOR + "; ";
@@ -485,7 +485,7 @@ public class DocumentStyleDialog extends StyleDialog {
         }
 
         JGlossEditor.setHighlightColor
-            ( new Color( Math.max( 0, JGloss.prefs.getInt
+            ( new Color( Math.max( 0, JGloss.PREFS.getInt
                                    ( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
     }
 

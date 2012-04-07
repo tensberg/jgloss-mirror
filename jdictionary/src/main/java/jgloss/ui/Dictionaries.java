@@ -275,7 +275,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 if (messageDialog == null) {
                     Frame parent = (Frame) SwingUtilities.getRoot( Dictionaries.this);
                     messageDialog = new JDialog( parent, true);
-                    messageDialog.setTitle( JGloss.messages.getString( "dictionaries.loading.title"));
+                    messageDialog.setTitle( JGloss.MESSAGES.getString( "dictionaries.loading.title"));
                     messageDialog.getContentPane().add( message);
                     messageDialog.setSize( 450, 50);
                     messageDialog.setLocation( Math.max( (int) (parent.getLocation().getX() + 
@@ -307,7 +307,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                     EventQueue.invokeLater( new Runnable() {
                             @Override
 							public void run() {
-                                message.setText( JGloss.messages.getString
+                                message.setText( JGloss.MESSAGES.getString
                                                  ( "dictionaries.loading",
                                                    new String[] { new File( descriptor)
                                                        .getName() }));
@@ -485,7 +485,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     }
 
     @Override
-	public String getTitle() { return JGloss.messages.getString( "dictionaries.title"); }
+	public String getTitle() { return JGloss.MESSAGES.getString( "dictionaries.title"); }
     @Override
 	public Component getComponent() { return this; }
 
@@ -493,7 +493,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * Runs the dialog to add a new dictionary to the list.
      */
     private void addDictionary() {
-        String dir = JGloss.prefs.getString( Preferences.DICTIONARIES_DIR);
+        String dir = JGloss.PREFS.getString( Preferences.DICTIONARIES_DIR);
         if (dir==null || dir.trim().length()==0) {
             dir = System.getProperty( "user.home");
         }
@@ -501,13 +501,13 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         final JFileChooser chooser = new JFileChooser( dir);
         chooser.setFileHidingEnabled( true);
         chooser.setMultiSelectionEnabled( true);
-        chooser.setDialogTitle( JGloss.messages.getString( "dictionaries.chooser.title"));
+        chooser.setDialogTitle( JGloss.MESSAGES.getString( "dictionaries.chooser.title"));
         chooser.setFileView( CustomFileView.getFileView());
-        int result = chooser.showDialog( SwingUtilities.getRoot( box), JGloss.messages.getString
+        int result = chooser.showDialog( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
             new DictionaryLoader().loadDictionaries( chooser.getSelectedFiles());
-            JGloss.prefs.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
+            JGloss.PREFS.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
                               .getAbsolutePath());
         }
     }
@@ -525,20 +525,20 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         if (ex instanceof DictionaryFactory.NotSupportedException) {
             int choice = JOptionPane.showOptionDialog(
                 SwingUtilities.getRoot(this),
-                JGloss.messages.getString("error.dictionary.format", new String[] { path }),
-                JGloss.messages.getString("error.dictionary.title"),
+                JGloss.MESSAGES.getString("error.dictionary.format", new String[] { path }),
+                JGloss.MESSAGES.getString("error.dictionary.title"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null,
-                new String[] { JGloss.messages.getString("button.ok"), JGloss.messages.getString("button.why") }, null);     
+                new String[] { JGloss.MESSAGES.getString("button.ok"), JGloss.MESSAGES.getString("button.why") }, null);     
  
             if (choice == JOptionPane.NO_OPTION) { // this is really the Why? option
-                JTextArea text = new JTextArea(JGloss.messages.getString( "error.dictionary.reason", new String[] { path, ex.getMessage() }), 25, 55);
+                JTextArea text = new JTextArea(JGloss.MESSAGES.getString( "error.dictionary.reason", new String[] { path, ex.getMessage() }), 25, 55);
                 text.setEditable(false);
                 text.setLineWrap(true);
                 text.setWrapStyleWord(true);
             
                 JOptionPane.showConfirmDialog
                     ( SwingUtilities.getRoot( this), new JScrollPane(text),
-                      JGloss.messages.getString( "error.dictionary.title"),
+                      JGloss.MESSAGES.getString( "error.dictionary.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -566,9 +566,9 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
-                ( SwingUtilities.getRoot( this), JGloss.messages.getString
+                ( SwingUtilities.getRoot( this), JGloss.MESSAGES.getString
                   ( msgid, objects),
-                  JGloss.messages.getString( "error.dictionary.title"),
+                  JGloss.MESSAGES.getString( "error.dictionary.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -604,7 +604,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             activeDictionaries.addAll( newDictionaries);
         }
 
-        JGloss.prefs.set( Preferences.DICTIONARIES, paths.toString());
+        JGloss.PREFS.set( Preferences.DICTIONARIES, paths.toString());
         fireDictionaryListChanged();
     }
 
@@ -614,7 +614,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * it is inserted at the first position.
      */
     private synchronized void loadDictionariesFromPreferences() {
-        String[] fs = JGloss.prefs.getPaths( Preferences.DICTIONARIES);
+        String[] fs = JGloss.PREFS.getPaths( Preferences.DICTIONARIES);
         // exceptions occurring during dictionary loading
         final List<Object> exceptions = new ArrayList<Object>( 5);
 

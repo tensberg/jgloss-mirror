@@ -219,8 +219,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                         } else {
 	                                        which.importString
                                                 ( d.getSelection(), d.isDetectParagraphs(), 
-                                                  JGloss.messages.getString( "import.textarea"),
-                                                  JGloss.messages.getString( "import.textarea"),
+                                                  JGloss.MESSAGES.getString( "import.textarea"),
+                                                  JGloss.MESSAGES.getString( "import.textarea"),
                                                   d.createParser( Dictionaries.getDictionaries( true),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
@@ -503,7 +503,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      */
     public static final javax.swing.filechooser.FileFilter jglossFileFilter = 
         new ExtensionFileFilter( "jgloss", 
-                                 JGloss.messages.getString( "filefilter.description.jgloss"));
+                                 JGloss.MESSAGES.getString( "filefilter.description.jgloss"));
 
     /**
      * Creates a new JGlossFrame which does not contain a document. The user can add a document
@@ -521,24 +521,24 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
          * to a minimum, they are kept separate from the JGlossFrame state.
          * See also JGlossFrame.dispose().
          */
-        frame = new JFrame( JGloss.messages.getString( "main.title"));
+        frame = new JFrame( JGloss.MESSAGES.getString( "main.title"));
         frame.getContentPane().setBackground( Color.white);
         frame.getContentPane().setLayout( new GridLayout( 1, 1));
-        frame.setLocation( JGloss.prefs.getInt( Preferences.FRAME_X, 0),
-                           JGloss.prefs.getInt( Preferences.FRAME_Y, 0));
-        frame.setSize( JGloss.prefs.getInt( Preferences.FRAME_WIDTH, frame.getPreferredSize().width),
-                       JGloss.prefs.getInt( Preferences.FRAME_HEIGHT, frame.getPreferredSize().height));
+        frame.setLocation( JGloss.PREFS.getInt( Preferences.FRAME_X, 0),
+                           JGloss.PREFS.getInt( Preferences.FRAME_Y, 0));
+        frame.setSize( JGloss.PREFS.getInt( Preferences.FRAME_WIDTH, frame.getPreferredSize().width),
+                       JGloss.PREFS.getInt( Preferences.FRAME_HEIGHT, frame.getPreferredSize().height));
         
         componentListener = new ComponentAdapter() {
                 @Override
 				public void componentMoved( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.FRAME_X, frame.getX());
-                    JGloss.prefs.set( Preferences.FRAME_Y, frame.getY());
+                    JGloss.PREFS.set( Preferences.FRAME_X, frame.getX());
+                    JGloss.PREFS.set( Preferences.FRAME_Y, frame.getY());
                 }
                 @Override
 				public void componentResized( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.FRAME_WIDTH, frame.getWidth());
-                    JGloss.prefs.set( Preferences.FRAME_HEIGHT, frame.getHeight());
+                    JGloss.PREFS.set( Preferences.FRAME_WIDTH, frame.getWidth());
+                    JGloss.PREFS.set( Preferences.FRAME_HEIGHT, frame.getHeight());
                 }
             };
         frame.addComponentListener( componentListener);
@@ -602,7 +602,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        JLabel rendering = new JLabel( JGloss.messages.getString( "main.renderingdocument"),
+        JLabel rendering = new JLabel( JGloss.MESSAGES.getString( "main.renderingdocument"),
                                        SwingConstants.CENTER);
         rendering.setBackground( Color.white);
         rendering.setOpaque( true);
@@ -721,8 +721,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                     }
                     Object result = JOptionPane.showInputDialog
                         ( frame, 
-                          JGloss.messages.getString( "main.dialog.doctitle"),
-                          JGloss.messages.getString( "main.dialog.doctitle.title"),
+                          JGloss.MESSAGES.getString( "main.dialog.doctitle"),
+                          JGloss.MESSAGES.getString( "main.dialog.doctitle.title"),
                           JOptionPane.PLAIN_MESSAGE, null, null, 
                           title);
                     if (result != null) {
@@ -760,7 +760,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         // set up the menu bar
         JMenuBar bar = new JMenuBar();
 
-        JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.file"));
+        JMenu menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.file"));
         menu.add( UIUtilities.createMenuItem( actions.importDocument));
         menu.add( UIUtilities.createMenuItem( actions.importClipboard));
         menu.addMenuListener( actions.importClipboardListener);
@@ -772,7 +772,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         menu.add( UIUtilities.createMenuItem( saveAction));
         menu.add( UIUtilities.createMenuItem( saveAsAction));
         exportMenu = new ExportMenu();
-        exportMenu.setMnemonic( JGloss.messages.getString( "main.menu.export.mk").charAt( 0));
+        exportMenu.setMnemonic( JGloss.MESSAGES.getString( "main.menu.export.mk").charAt( 0));
         menu.add( exportMenu);
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( printAction));
@@ -780,7 +780,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         menu.add( UIUtilities.createMenuItem( closeAction));
         bar.add( menu);
 
-        menu = new JMenu( JGloss.messages.getString( "main.menu.edit"));
+        menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.edit"));
         menu.add( UIUtilities.createMenuItem( xcvManager.getCutAction()));
         menu.add( UIUtilities.createMenuItem( xcvManager.getCopyAction()));
         menu.add( UIUtilities.createMenuItem( xcvManager.getPasteAction()));
@@ -795,28 +795,28 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         menu.add( preferencesItem);
         bar.add( menu);
 
-        compactViewItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.compactview"));
-        compactViewItem.setSelected( JGloss.prefs.getBoolean( Preferences.VIEW_COMPACTVIEW, false));
-        compactViewItem.setToolTipText( JGloss.messages.getString( "main.menu.compactview.tt"));
+        compactViewItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString( "main.menu.compactview"));
+        compactViewItem.setSelected( JGloss.PREFS.getBoolean( Preferences.VIEW_COMPACTVIEW, false));
+        compactViewItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.compactview.tt"));
         compactViewItem.addActionListener( this);
-        showReadingItem = new JCheckBoxMenuItem( JGloss.messages.getString( "main.menu.showreading"));
-        showReadingItem.setSelected( JGloss.prefs.getBoolean( Preferences.VIEW_SHOWREADING, true));
-        showReadingItem.setToolTipText( JGloss.messages.getString( "main.menu.showreading.tt"));
+        showReadingItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString( "main.menu.showreading"));
+        showReadingItem.setSelected( JGloss.PREFS.getBoolean( Preferences.VIEW_SHOWREADING, true));
+        showReadingItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showreading.tt"));
         showReadingItem.addActionListener( this);
-        showTranslationItem = new JCheckBoxMenuItem( JGloss.messages.getString
+        showTranslationItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString
                                                      ( "main.menu.showtranslation"));
-        showTranslationItem.setSelected( JGloss.prefs.getBoolean
+        showTranslationItem.setSelected( JGloss.PREFS.getBoolean
                                          ( Preferences.VIEW_SHOWTRANSLATION, true));
-        showTranslationItem.setToolTipText( JGloss.messages.getString( "main.menu.showtranslation.tt"));
+        showTranslationItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showtranslation.tt"));
         showTranslationItem.addActionListener( this);
-        showAnnotationItem = new JCheckBoxMenuItem( JGloss.messages.getString
+        showAnnotationItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString
                                                     ( "main.menu.showannotation"));
-        showAnnotationItem.setSelected( JGloss.prefs.getBoolean
+        showAnnotationItem.setSelected( JGloss.PREFS.getBoolean
                                         ( Preferences.VIEW_SHOWANNOTATION, false));
-        showAnnotationItem.setToolTipText( JGloss.messages.getString( "main.menu.showannotation.tt"));
+        showAnnotationItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showannotation.tt"));
         showAnnotationItem.addActionListener( this);
 
-        menu = new JMenu( JGloss.messages.getString( "main.menu.view"));
+        menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.view"));
         menu.add( compactViewItem);
         menu.add( showReadingItem);
         menu.add( showTranslationItem);
@@ -825,7 +825,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         bar.add( annotationList.getMenu());
         
-        menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
+        menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.help"));
         aboutItem = UIUtilities.createMenuItem( AboutFrame.getShowAction());
         menu.add( aboutItem);
         bar.add( menu);
@@ -846,14 +846,14 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     private boolean askCloseDocument() {
         if (!model.isEmpty() && model.isDocumentChanged()) {
             int r = JOptionPane.showOptionDialog
-                ( this, JGloss.messages.getString( "main.dialog.close.message",
+                ( this, JGloss.MESSAGES.getString( "main.dialog.close.message",
                                                    new Object[] { model.getDocumentName() }),
-                  JGloss.messages.getString( "main.dialog.close.title"),
+                  JGloss.MESSAGES.getString( "main.dialog.close.title"),
                   JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                  new Object[] { JGloss.messages.getString( "button.save"),
-                                 JGloss.messages.getString( "button.discard"),
-                                 JGloss.messages.getString( "button.cancel") },
-                  JGloss.messages.getString( "button.save"));
+                  new Object[] { JGloss.MESSAGES.getString( "button.save"),
+                                 JGloss.MESSAGES.getString( "button.discard"),
+                                 JGloss.MESSAGES.getString( "button.cancel") },
+                  JGloss.MESSAGES.getString( "button.save"));
             switch (r) {
             case 0: // save
                 if (model.getDocumentPath() == null) {
@@ -886,12 +886,12 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             int index = annotationList.getSelectedIndex();
             if (index != -1) {
                 StringBuilder history = new StringBuilder();
-                String[] oldHistory = JGloss.prefs.getList( Preferences.HISTORY_SELECTION, 
+                String[] oldHistory = JGloss.PREFS.getList( Preferences.HISTORY_SELECTION, 
                                                             File.pathSeparatorChar);
                 // Copy from the old history all files which are not the current file.
                 // Limit the size of the copied history to HISTORY_SIZE-1 by leaving out the
                 // last entry to ensure that there is room for the new entry.
-                int maxsize = JGloss.prefs.getInt( Preferences.HISTORY_SIZE, 20);
+                int maxsize = JGloss.PREFS.getInt( Preferences.HISTORY_SIZE, 20);
                 for ( int i=0; i<oldHistory.length && i<(maxsize-1)*2; i+=2) {
 	                try {
 	                    if (!oldHistory[i].equals( model.getDocumentPath())) {
@@ -912,7 +912,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 history.insert( 0, index);
                 history.insert( 0, File.pathSeparatorChar);
                 history.insert( 0, model.getDocumentPath());
-                JGloss.prefs.set( Preferences.HISTORY_SELECTION, history.toString());
+                JGloss.PREFS.set( Preferences.HISTORY_SELECTION, history.toString());
             }
         }
 
@@ -964,10 +964,10 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 }
                 
                 which.importFromReader
-                    ( in, JGloss.prefs.getBoolean
+                    ( in, JGloss.PREFS.getBoolean
                       ( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true),
-                      JGloss.messages.getString( "import.clipboard"),
-                      JGloss.messages.getString( "import.clipboard"),
+                      JGloss.MESSAGES.getString( "import.clipboard"),
+                      JGloss.MESSAGES.getString( "import.clipboard"),
                       GeneralDialog.getInstance().createReadingAnnotationFilter(),
                       GeneralDialog.getInstance().createImportClipboardParser
                       ( Dictionaries.getDictionaries( true), ExclusionList.getExclusions()),
@@ -976,11 +976,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             } catch (Exception ex) {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showConfirmDialog
-                    ( this, JGloss.messages.getString
+                    ( this, JGloss.MESSAGES.getString
                       ( "error.import.exception", new Object[] 
-                          { JGloss.messages.getString( "import.clipboard"), ex.getClass().getName(),
+                          { JGloss.MESSAGES.getString( "import.clipboard"), ex.getClass().getName(),
                             ex.getLocalizedMessage() }),
-                      JGloss.messages.getString( "error.import.title"),
+                      JGloss.MESSAGES.getString( "error.import.title"),
                       JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -1005,7 +1005,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         try {
             Reader in = null;
             int contentlength = 0;
-            if (JGloss.messages.getString( "encodings.default").equals( encoding))
+            if (JGloss.MESSAGES.getString( "encodings.default").equals( encoding))
 			 {
 	            encoding = null; // autodetect the encoding
             }
@@ -1047,11 +1047,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
-                ( this, JGloss.messages.getString
+                ( this, JGloss.MESSAGES.getString
                   ( "error.import.exception", new Object[] 
                       { path, ex.getClass().getName(),
                         ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.import.title"),
+                  JGloss.MESSAGES.getString( "error.import.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             if (model.getDocumentName() == null) {
 	            // error before document was opened, close window
@@ -1086,11 +1086,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
-                ( this, JGloss.messages.getString
+                ( this, JGloss.MESSAGES.getString
                   ( "error.import.exception", new Object[] 
                       { path, ex.getClass().getName(),
                         ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.import.title"),
+                  JGloss.MESSAGES.getString( "error.import.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -1114,7 +1114,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 OPEN_RECENT.addDocument( f);
 
                 // re-select the selection at the time the document was closed
-                String[] history = JGloss.prefs.getList( Preferences.HISTORY_SELECTION, 
+                String[] history = JGloss.PREFS.getList( Preferences.HISTORY_SELECTION, 
                                                          File.pathSeparatorChar);
                 for ( int i=0; i<history.length; i+=2) {
 	                try {
@@ -1143,10 +1143,10 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
-                ( this, JGloss.messages.getString
+                ( this, JGloss.MESSAGES.getString
                   ( "error.load.exception", new Object[] 
                       { model.getDocumentPath(), ex.getClass().getName(), ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.load.title"),
+                  JGloss.MESSAGES.getString( "error.load.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -1173,7 +1173,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         final StopableReader stin = new StopableReader( in);
 
         final ProgressMonitor pm = new ProgressMonitor( this, 
-            JGloss.messages.getString( "load.progress", new Object[] { path }), null, 0, 100);
+            JGloss.MESSAGES.getString( "load.progress", new Object[] { path }), null, 0, 100);
         final Thread currentThread = Thread.currentThread(); // needed to interrupt parsing if user cancels
         ((AbstractParser)parser).initTick();
         
@@ -1210,10 +1210,10 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
-                ( JGlossFrame.this, JGloss.messages.getString
+                ( JGlossFrame.this, JGloss.MESSAGES.getString
                   ( "error.import.exception", new Object[] 
                       { path, ex.getClass().getName(), ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.import.title"),
+                  JGloss.MESSAGES.getString( "error.import.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
 
@@ -1425,27 +1425,27 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 	public void actionPerformed( ActionEvent e) {
         if (kit != null) {
             if (e.getSource() == compactViewItem) {
-                JGloss.prefs.set( Preferences.VIEW_COMPACTVIEW, compactViewItem.isSelected());
+                JGloss.PREFS.set( Preferences.VIEW_COMPACTVIEW, compactViewItem.isSelected());
                 kit.setCompactView( compactViewItem.isSelected());
                 // force docpane to be re-layouted.
                 model.getHTMLDocument().getStyleSheet().addRule
                     ( AnnotationTags.ANNOTATION.getId() + " {}");
             }
             else if (e.getSource()==showReadingItem) {
-                JGloss.prefs.set( Preferences.VIEW_SHOWREADING, showReadingItem.isSelected());
+                JGloss.PREFS.set( Preferences.VIEW_SHOWREADING, showReadingItem.isSelected());
                 kit.showReading( showReadingItem.isSelected());
                 // force docpane to be re-layouted.
                 model.getHTMLDocument().getStyleSheet().addRule( AnnotationTags.READING.getId() + " {}");
             }
             else if (e.getSource()==showTranslationItem) {
-                JGloss.prefs.set( Preferences.VIEW_SHOWTRANSLATION, showTranslationItem.isSelected());
+                JGloss.PREFS.set( Preferences.VIEW_SHOWTRANSLATION, showTranslationItem.isSelected());
                 kit.showTranslation( showTranslationItem.isSelected());
                 // force docpane to be re-layouted.
                 model.getHTMLDocument().getStyleSheet().addRule
                     ( AnnotationTags.TRANSLATION.getId() + " {}");
             }
             else if (e.getSource()==showAnnotationItem) {
-                JGloss.prefs.set( Preferences.VIEW_SHOWANNOTATION, showAnnotationItem.isSelected());
+                JGloss.PREFS.set( Preferences.VIEW_SHOWANNOTATION, showAnnotationItem.isSelected());
                 docpane.followMouse( showAnnotationItem.isSelected());
             }
         }
@@ -1697,10 +1697,10 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
-                ( this, JGloss.messages.getString
+                ( this, JGloss.MESSAGES.getString
                   ( "error.save.exception", new Object[] 
                       { model.getDocumentPath(), ex.getClass().getName(), ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.save.title"),
+                  JGloss.MESSAGES.getString( "error.save.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -1749,7 +1749,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * Update the document window title.
      */
     protected void updateTitle() {
-        frame.setTitle( model.getDocumentName() + ":" + JGloss.messages.getString( "main.title"));
+        frame.setTitle( model.getDocumentName() + ":" + JGloss.MESSAGES.getString( "main.title"));
     }
 
     protected void annotateDocumentSelection() {
@@ -1780,7 +1780,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     public synchronized void dispose() {
         jglossFrames.remove( this);
 
-        JGloss.prefs.removePropertyChangeListener( prefsListener);
+        JGloss.PREFS.removePropertyChangeListener( prefsListener);
         if (model.getDocument() != null) {
 	        DocumentStyleDialog.getDocumentStyleDialog().removeStyleSheet
                 ( model.getHTMLDocument().getStyleSheet());

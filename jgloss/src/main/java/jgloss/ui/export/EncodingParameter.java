@@ -46,7 +46,7 @@ class EncodingParameter extends UIParameter {
         box = Box.createHorizontalBox();
         box.add( new JLabel( label));
         box.add( Box.createHorizontalStrut( 3));
-        encodings = new JComboBox( JGloss.prefs.getList( Preferences.ENCODINGS, ','));
+        encodings = new JComboBox( JGloss.PREFS.getList( Preferences.ENCODINGS, ','));
         encodings.setEditable( true);
         box.add( encodings);
     }
@@ -65,6 +65,6 @@ class EncodingParameter extends UIParameter {
 
     @Override
 	public void loadFromPrefs() {
-        encodings.setSelectedItem( JGloss.prefs.getString( prefsKey, defaultValue));
+        encodings.setSelectedItem( JGloss.PREFS.getString( prefsKey, defaultValue));
     }
 } // class EncodingParameter

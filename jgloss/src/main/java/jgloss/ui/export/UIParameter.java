@@ -66,7 +66,7 @@ abstract class UIParameter extends AbstractParameter {
      * Saves the value of the parameter to the user preferences.
      */
     public void saveToPrefs() {
-        JGloss.prefs.set( prefsKey, String.valueOf(getValue( null, null)));
+        JGloss.PREFS.set( prefsKey, String.valueOf(getValue( null, null)));
     }
 
     /**
@@ -76,7 +76,7 @@ abstract class UIParameter extends AbstractParameter {
     @Override
 	protected void initFromElement( Element elem) {
         super.initFromElement( elem);
-        label = JGloss.messages.getString( elem.getAttribute( ExportConfiguration.Attributes.LABEL_KEY));
+        label = JGloss.MESSAGES.getString( elem.getAttribute( ExportConfiguration.Attributes.LABEL_KEY));
         prefsKey = elem.getAttribute( ExportConfiguration.Attributes.PREFS_KEY);
     }
 } // class UIParameter

@@ -82,7 +82,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
     protected AttributeLegend legend;
 
     public LookupFrame( LookupModel _model) {
-        super( JGloss.messages.getString( "wordlookup.title"));
+        super( JGloss.MESSAGES.getString( "wordlookup.title"));
 
         getContentPane().setLayout( new BorderLayout());
         JPanel center = new JPanel();
@@ -99,7 +99,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         center.add( config, BorderLayout.NORTH);
 
         list.setBorder( BorderFactory.createCompoundBorder
-                     ( BorderFactory.createTitledBorder( JGloss.messages.getString( "wordlookup.result")),
+                     ( BorderFactory.createTitledBorder( JGloss.MESSAGES.getString( "wordlookup.result")),
                        BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
         list.addHyperlinkListener( this);
         center.add( list, BorderLayout.CENTER);
@@ -126,13 +126,13 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
         // setup menu bar
         JMenuBar bar = new JMenuBar();
-        JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.file"));
+        JMenu menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.file"));
         createFileMenuItems( menu);
         /*menu.add( UIUtilities.createMenuItem( printAction));
           menu.addSeparator();*/
         bar.add( menu);
 
-        final JMenu editMenu = new JMenu( JGloss.messages.getString( "main.menu.edit"));
+        final JMenu editMenu = new JMenu( JGloss.MESSAGES.getString( "main.menu.edit"));
         XCVManager xcv = new XCVManager();
         xcv.addManagedComponent( config.getSearchExpressionField());
         xcv.addManagedComponent( config.getDistanceField());
@@ -146,7 +146,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         editMenu.add( UIUtilities.createMenuItem( PreferencesFrame.showAction));
         bar.add( editMenu);           
 
-        menu = new JMenu( JGloss.messages.getString( "main.menu.help"));
+        menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.help"));
         menu.add(UIUtilities.createMenuItem(AboutFrame.getShowAction()));
         bar.add( menu);
 
@@ -158,15 +158,15 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
         preferredSize = new Dimension
             ( Math.max( super.getPreferredSize().width,
-                        JGloss.prefs.getInt( Preferences.WORDLOOKUP_WIDTH, 0)),
+                        JGloss.PREFS.getInt( Preferences.WORDLOOKUP_WIDTH, 0)),
               Math.max( super.getPreferredSize().height + 150,
-                        JGloss.prefs.getInt( Preferences.WORDLOOKUP_HEIGHT, 0)));
+                        JGloss.PREFS.getInt( Preferences.WORDLOOKUP_HEIGHT, 0)));
         
         addComponentListener( new ComponentAdapter() {
                 @Override
 				public void componentResized( ComponentEvent e) {
-                    JGloss.prefs.set( Preferences.WORDLOOKUP_WIDTH, getWidth());
-                    JGloss.prefs.set( Preferences.WORDLOOKUP_HEIGHT, getHeight());
+                    JGloss.PREFS.set( Preferences.WORDLOOKUP_WIDTH, getWidth());
+                    JGloss.PREFS.set( Preferences.WORDLOOKUP_HEIGHT, getHeight());
                 }
             });
 
@@ -290,7 +290,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 	            try {
 	                addToHistory( createHistoryItem());
 	                currentResults.setData
-	                ( JGloss.messages.getString( "wordlookup.reference", 
+	                ( JGloss.MESSAGES.getString( "wordlookup.reference", 
 	                                             new Object[] { ref.getReferenceTitle() }),
 	                  ref.getReferencedEntries());
 	                currentResults.replay();
@@ -306,7 +306,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 	        return;
         }
 
-        legendFrame = new JFrame( JGloss.messages.getString( "wordlookup.legendframe.title"));
+        legendFrame = new JFrame( JGloss.MESSAGES.getString( "wordlookup.legendframe.title"));
         legend = new AttributeLegend();
         legend.setDictionaries( Dictionaries.getDictionaries( false));
         Dictionaries.addDictionaryListChangeListener( this);

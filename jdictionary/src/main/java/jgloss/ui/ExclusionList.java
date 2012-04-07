@@ -246,7 +246,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     }
 
     @Override
-	public String getTitle() { return JGloss.messages.getString( "exclusions.title"); }
+	public String getTitle() { return JGloss.MESSAGES.getString( "exclusions.title"); }
     @Override
 	public Component getComponent() { return this; }
 
@@ -291,8 +291,8 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      */
     private void inputExclusion() {
         String word = JOptionPane.showInputDialog
-            ( SwingUtilities.getRoot( box), JGloss.messages.getString
-              ( "exclusions.add"), JGloss.messages.getString
+            ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
+              ( "exclusions.add"), JGloss.MESSAGES.getString
               ( "exclusions.add.title"), JOptionPane.PLAIN_MESSAGE);
         if (word!=null && word.length()>0) {
             DefaultListModel m = (DefaultListModel) exclusionList.getModel();
@@ -309,7 +309,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      * directory is prepended.
      */
     private String getExclusionListFile() {
-        String filename = JGloss.prefs.getString( Preferences.EXCLUSIONS_FILE);
+        String filename = JGloss.PREFS.getString( Preferences.EXCLUSIONS_FILE);
         if (!new File( filename).isAbsolute()) {
             filename = System.getProperty( "user.home") + File.separator + filename;
         }
@@ -325,7 +325,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         try {
             BufferedReader r = new BufferedReader( new InputStreamReader
                 ( new FileInputStream( filename), 
-                  JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
+                  JGloss.PREFS.getString( Preferences.EXCLUSIONS_ENCODING)));
             Set<String> newExclusions = new HashSet<String>( 1001);
             String line;
             while ((line=r.readLine()) != null) {
@@ -337,10 +337,10 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             r.close();
         } catch (IOException ex) {
             JOptionPane.showConfirmDialog
-                ( SwingUtilities.getRoot( box), JGloss.messages.getString
+                ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
                   ( "error.exclusions.load", new String[] 
                       { filename, ex.getClass().getName(), ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.exclusions.load.title"),
+                  JGloss.MESSAGES.getString( "error.exclusions.load.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -354,7 +354,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         try {
             BufferedWriter w = new BufferedWriter( new OutputStreamWriter
                 ( new FileOutputStream( filename), 
-                  JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
+                  JGloss.PREFS.getString( Preferences.EXCLUSIONS_ENCODING)));
             for (String exclusion : exclusions) {
                 w.write( exclusion, 0, exclusion.length());
                 w.newLine();
@@ -363,10 +363,10 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
-                ( SwingUtilities.getRoot( box), JGloss.messages.getString
+                ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
                   ( "error.exclusions.save", new String[] 
                       { filename, ex.getClass().getName(), ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.exclusions.save.title"),
+                  JGloss.MESSAGES.getString( "error.exclusions.save.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -415,7 +415,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      */
     private void importList() {
         JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
-        f.setDialogTitle( JGloss.messages.getString( "exclusions.import.title"));
+        f.setDialogTitle( JGloss.MESSAGES.getString( "exclusions.import.title"));
         f.setFileHidingEnabled( true);
         f.setFileView( CustomFileView.getFileView());
         int r = f.showOpenDialog( SwingUtilities.getRoot( box));
@@ -439,11 +439,11 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
 	        } catch (Exception ex) {
 	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	            JOptionPane.showConfirmDialog
-	                ( SwingUtilities.getRoot( box), JGloss.messages.getString
+	                ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
 	                  ( "error.import.exception", new Object[] 
 	                      { f.getSelectedFile(), ex.getClass().getName(),
 	                        ex.getLocalizedMessage() }),
-	                  JGloss.messages.getString( "error.import.title"),
+	                  JGloss.MESSAGES.getString( "error.import.title"),
 	                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
 	        }
         }
@@ -462,16 +462,16 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                 try {
                     BufferedWriter w = new BufferedWriter( new OutputStreamWriter
                         ( new FileOutputStream( filename, true), 
-                          JGloss.prefs.getString( Preferences.EXCLUSIONS_ENCODING)));
+                          JGloss.PREFS.getString( Preferences.EXCLUSIONS_ENCODING)));
                     w.write( word, 0, word.length());
                     w.newLine();
                     w.close();
                 } catch (Exception ex) {
                     JOptionPane.showConfirmDialog
-                        ( SwingUtilities.getRoot( box), JGloss.messages.getString
+                        ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
                           ( "error.exclusions.save", new String[] 
                               { filename, ex.getClass().getName(), ex.getLocalizedMessage() }),
-                          JGloss.messages.getString( "error.exclusions.save.title"),
+                          JGloss.MESSAGES.getString( "error.exclusions.save.title"),
                           JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
                 }
                 ((DefaultListModel) exclusionList.getModel()).addElement( word);

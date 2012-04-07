@@ -196,13 +196,13 @@ class ExportConfiguration {
         menuKey = child.getAttribute( Attributes.KEY);
 
         child = (Element) child.getNextSibling();
-        title = JGloss.messages.getString( child.getAttribute( Attributes.KEY));
+        title = JGloss.MESSAGES.getString( child.getAttribute( Attributes.KEY));
 
         child = (Element) child.getNextSibling();
         if (child != null) {
             fileFilter = new ExtensionFileFilter
                 ( XMLTools.getText( child),
-                  JGloss.messages.getString( child.getAttribute( Attributes.DESCRIPTION_KEY)));
+                  JGloss.MESSAGES.getString( child.getAttribute( Attributes.DESCRIPTION_KEY)));
         }
     }
 

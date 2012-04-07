@@ -75,7 +75,7 @@ public abstract class JGloss {
 	/**
      * Path to the file with message strings.
      */
-    private static final String MESSAGES = "messages";
+    private static final String MESSAGES_BUNDLE = "messages";
 
     /**
      * Path to the directory last used.
@@ -96,7 +96,7 @@ public abstract class JGloss {
          * @param bundle Base name of the bundle.
          */
         public Messages( String bundle) {
-            messages = ResourceBundle.getBundle( MESSAGES, new UTF8ResourceBundleControl());
+            messages = ResourceBundle.getBundle( MESSAGES_BUNDLE, new UTF8ResourceBundleControl());
         }
 
         /**
@@ -128,12 +128,12 @@ public abstract class JGloss {
     /**
      * The application-wide preferences. Use this to store and retrieve preferences.
      */
-    public static final Preferences prefs = initPreferences();
+    public static final Preferences PREFS = initPreferences();
 
     /**
      * The application-wide messages. Use this to retrieve localizable string messages.
      */
-    public static final Messages messages = new Messages( MESSAGES);
+    public static final Messages MESSAGES = new Messages( MESSAGES_BUNDLE);
 
     protected static JGloss application;
 
@@ -159,7 +159,7 @@ public abstract class JGloss {
 
             SplashScreen splash = new SplashScreen( getApplicationName());
 
-            splash.setInfo( messages.getString( "splashscreen.initMain"));
+            splash.setInfo( MESSAGES.getString( "splashscreen.initMain"));
 
             Runtime.getRuntime().addShutdownHook
                 ( new Thread() {
@@ -186,16 +186,16 @@ public abstract class JGloss {
                 }
             }.start();
         } catch (NoClassDefFoundError ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
+            displayError( MESSAGES.getString( "error.noclassdef"), ex, true);
             System.exit( 1);
         } catch (NoSuchMethodError ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
+            displayError( MESSAGES.getString( "error.noclassdef"), ex, true);
             System.exit( 1);
         } catch (ClassNotFoundException ex) {
-            displayError( messages.getString( "error.noclassdef"), ex, true);
+            displayError( MESSAGES.getString( "error.noclassdef"), ex, true);
             System.exit( 1);
         } catch (Exception ex) {
-            displayError( messages.getString( "error.initialization.generic"), ex, true);
+            displayError( MESSAGES.getString( "error.initialization.generic"), ex, true);
             System.exit( 1);
         }
     }
@@ -244,9 +244,9 @@ public abstract class JGloss {
         UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
             
         // automatically set the fonts the first time JGloss is run
-        if (!JGloss.prefs.getBoolean( Preferences.FONT_AUTODETECTED, false)) {
+        if (!JGloss.PREFS.getBoolean( Preferences.FONT_AUTODETECTED, false)) {
             StyleDialog.autodetectFonts();
-            JGloss.prefs.set( Preferences.FONT_AUTODETECTED, true);
+            JGloss.PREFS.set( Preferences.FONT_AUTODETECTED, true);
         }
         
         // make sure the UI font is initialized before any UI elements are created
@@ -258,7 +258,7 @@ public abstract class JGloss {
         if (args.length > 0) {
             if (args[0].equals( "-h") || args[0].equals( "--help") ||
                 args[0].equals( "/?")) {
-                System.out.println( messages.getString( "main.usage", 
+                System.out.println( MESSAGES.getString( "main.usage", 
                                                         new String[] { getApplicationName() }));
                 System.exit( 0);
             }
@@ -270,26 +270,26 @@ public abstract class JGloss {
                         Dictionary d = DictionaryFactory.createDictionary( args[i]);
                         if (d instanceof IndexedDictionary &&
                             !((IndexedDictionary) d).loadIndex()) {
-                            LOGGER.severe( messages.getString
+                            LOGGER.severe( MESSAGES.getString
                                                 ( "main.createindex",
                                                   new String[] { d.getName() }));
                             ((IndexedDictionary) d).buildIndex();
                         }
                         else {
-                            LOGGER.severe( messages.getString
+                            LOGGER.severe( MESSAGES.getString
                                                 ( "main.createindex.noindex", 
                                                   new String[] { d.getName() }));
                         }
                         d.dispose();
                     } catch (DictionaryFactory.NotSupportedException ex) {
-                        LOGGER.severe( messages.getString
+                        LOGGER.severe( MESSAGES.getString
                                             ( "main.format.unrecognized",
                                               new String[] { args[i] }));
                     } catch (Exception ex) {
                         if (ex instanceof DictionaryFactory.InstantiationException) {
 	                        ex = (Exception) ex.getCause();
                         }
-                        LOGGER.severe( messages.getString
+                        LOGGER.severe( MESSAGES.getString
                                             ( "main.createindex.exception",
                                               new String[] { args[i],
                                                              ex.getClass().getName(),
@@ -303,11 +303,11 @@ public abstract class JGloss {
                     try {
                         DictionaryFactory.Implementation<?> imp =
                             DictionaryFactory.getImplementation( args[i]);
-                        LOGGER.severe( messages.getString
+                        LOGGER.severe( MESSAGES.getString
                                             ( "main.format",
                                               new String[] { args[i], imp.getName() }));
                     } catch (DictionaryFactory.NotSupportedException ex) {
-                        LOGGER.severe( messages.getString
+                        LOGGER.severe( MESSAGES.getString
                                             ( "error.dictionary.reason",
                                               new String[] { args[i], ex.getMessage() }));
                     }
@@ -316,9 +316,9 @@ public abstract class JGloss {
             }
             else if (args[0].startsWith( "-") || 
                      File.separatorChar != '/' && args[0].startsWith( "/")) {
-                LOGGER.severe( messages.getString( "main.unknownoption",
+                LOGGER.severe( MESSAGES.getString( "main.unknownoption",
                                                         new String[] { args[0] }));
-                LOGGER.severe( messages.getString( "main.usage"));
+                LOGGER.severe( MESSAGES.getString( "main.usage"));
                 System.exit( 1);
             }
         }
@@ -336,11 +336,11 @@ public abstract class JGloss {
         t.printStackTrace();
 
         // Display error message in a frame. Note that this needs at least Java 1.1
-        final Frame f = new Frame( messages.getString( "error.initialization.title"));
+        final Frame f = new Frame( MESSAGES.getString( "error.initialization.title"));
         f.setLayout( new BorderLayout());
         
-        String msg = messages.getString( "error.initialization", new String[] {
-            fatal ? messages.getString( "error.initialization.fatal") : "",
+        String msg = MESSAGES.getString( "error.initialization", new String[] {
+            fatal ? MESSAGES.getString( "error.initialization.fatal") : "",
             message, t.getClass().getName(), t.getLocalizedMessage() });
         
         int rows = 1;
@@ -368,7 +368,7 @@ public abstract class JGloss {
         a.setEditable( false);
         f.add( a, BorderLayout.CENTER);
         
-        Button ok = new Button( messages.getString( "button.ok"));
+        Button ok = new Button( MESSAGES.getString( "button.ok"));
         ok.addActionListener( new ActionListener() {
                 @Override
 				public void actionPerformed( ActionEvent e) {
@@ -406,14 +406,14 @@ public abstract class JGloss {
               Arrays.asList( Dictionaries.getDictionaries( false)),
               Arrays.asList( new LookupResultFilter[] 
                   { 
-                      new AttributeResultFilter( messages.getString( "filter.mainentry.name"),
-                                                 messages.getString( "filter.mainentry.desc"),
+                      new AttributeResultFilter( MESSAGES.getString( "filter.mainentry.name"),
+                                                 MESSAGES.getString( "filter.mainentry.desc"),
                                                  WadokuJT.MAIN_ENTRY, true), 
-                      new AttributeResultFilter( messages.getString( "filter.example.name"),
-                                                 messages.getString( "filter.example.desc"),
+                      new AttributeResultFilter( MESSAGES.getString( "filter.example.name"),
+                                                 MESSAGES.getString( "filter.example.desc"),
                                                  Attributes.EXAMPLE, true),
-                      new AttributeResultFilter( messages.getString( "filter.priority.name"),
-                                                 messages.getString( "filter.priority.desc"),
+                      new AttributeResultFilter( MESSAGES.getString( "filter.priority.name"),
+                                                 MESSAGES.getString( "filter.priority.desc"),
                                                  Attributes.PRIORITY, true)
                   }));
         Dictionaries.addDictionaryListChangeListener
@@ -424,7 +424,7 @@ public abstract class JGloss {
                             ( Arrays.asList( Dictionaries.getDictionaries( false)));
                     }
                 });
-        mainLookupModel.loadFromPreferences( prefs, "wordlookup");
+        mainLookupModel.loadFromPreferences( PREFS, "wordlookup");
 
         return mainLookupModel;
     }
@@ -435,7 +435,7 @@ public abstract class JGloss {
 	        dict.dispose();
         }
         if (mainLookupModel != null) {
-            mainLookupModel.saveToPreferences( prefs, "wordlookup");
+            mainLookupModel.saveToPreferences( PREFS, "wordlookup");
         }
     }
 
@@ -473,7 +473,7 @@ public abstract class JGloss {
             prop.copyPreferences( prefs);
             // write note about migration in old prefs file
             try {
-                prop.store( ResourceBundle.getBundle( MESSAGES)
+                prop.store( ResourceBundle.getBundle( MESSAGES_BUNDLE)
                             .getString( "preferences.header.obsolete"));
             } catch (IOException ex) {}
             prefs.set( Preferences.PREFERENCES_MIGRATED, true);

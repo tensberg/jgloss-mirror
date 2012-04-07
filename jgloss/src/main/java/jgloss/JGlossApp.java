@@ -82,14 +82,14 @@ public class JGlossApp extends JGloss {
         ParserSelector.registerParser( NullParser.class, new NullParser().getName());
 
         // set default location of the chasen executable if this is the first start of JGloss
-        String chasen = prefs.getString( Preferences.CHASEN_LOCATION);
+        String chasen = PREFS.getString( Preferences.CHASEN_LOCATION);
         if (chasen==null || chasen.length()==0) {
-	        prefs.set( Preferences.CHASEN_LOCATION, messages.getString
+	        PREFS.set( Preferences.CHASEN_LOCATION, MESSAGES.getString
                        ( File.separatorChar=='\\' ? 
                          "chasen.location.windows" :
                          "chasen.location.unix"));
         }
-        Chasen.setDefaultExecutable( JGloss.prefs.getString( Preferences.CHASEN_LOCATION));
+        Chasen.setDefaultExecutable( JGloss.PREFS.getString( Preferences.CHASEN_LOCATION));
     }
 
     @Override
@@ -105,7 +105,7 @@ public class JGlossApp extends JGloss {
         ExportMenu.registerStandardExporters();
 
         if (args.length == 0) {
-            if (prefs.getBoolean( Preferences.STARTUP_WORDLOOKUP, false)) {
+            if (PREFS.getBoolean( Preferences.STARTUP_WORDLOOKUP, false)) {
 	            getLookupFrame().setVisible(true);
             } else {
 	            new JGlossFrame();

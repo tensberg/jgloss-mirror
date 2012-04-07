@@ -132,11 +132,11 @@ class XSLTExporter implements Exporter {
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
-                ( parent, JGloss.messages.getString
+                ( parent, JGloss.MESSAGES.getString
                   ( "error.export.exception", new Object[] 
                       { outfile.getPath(), ex.getClass().getName(),
                         ex.getLocalizedMessage() }),
-                  JGloss.messages.getString( "error.export.title"),
+                  JGloss.MESSAGES.getString( "error.export.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);    
         } finally {
             if (out != null) {

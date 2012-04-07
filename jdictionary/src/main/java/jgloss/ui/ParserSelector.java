@@ -162,8 +162,8 @@ public class ParserSelector extends JPanel {
 
         if (showReadingAnnotationSelector) {
             Vector<String> v = new Vector<String>();
-            v.add( JGloss.messages.getString( "parserselector.noreadings"));
-            String s = JGloss.prefs.getString( Preferences.READING_BRACKET_CHARS);
+            v.add( JGloss.MESSAGES.getString( "parserselector.noreadings"));
+            String s = JGloss.PREFS.getString( Preferences.READING_BRACKET_CHARS);
             for ( i=0; i<s.length()-1; i+=2) {
 	            v.add( s.substring( i, i+2));
             }
@@ -182,7 +182,7 @@ public class ParserSelector extends JPanel {
                 });
 
             b = Box.createHorizontalBox();
-            b.add( new JLabel( JGloss.messages.getString( "parserselector.readingbrackets")));
+            b.add( new JLabel( JGloss.MESSAGES.getString( "parserselector.readingbrackets")));
             b.add( Box.createHorizontalStrut( 3));
             b.add( readingBrackets);
             JPanel p = UIUtilities.createFlexiblePanel( b, true);

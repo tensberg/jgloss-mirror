@@ -58,7 +58,7 @@ class PropertiesPreferences extends Preferences {
         try {
             load();
         } catch (IOException ex) {
-            LOGGER.severe( JGloss.messages.getString( "error.loadPreferences"));
+            LOGGER.severe( JGloss.MESSAGES.getString( "error.loadPreferences"));
         }
         // store the preferences at shutdown
         Runtime.getRuntime().addShutdownHook( new Thread() {
@@ -67,7 +67,7 @@ class PropertiesPreferences extends Preferences {
                     try {
                         store();
                     } catch (IOException ex) {
-                        LOGGER.severe( JGloss.messages.getString( "error.storePreferences"));
+                        LOGGER.severe( JGloss.MESSAGES.getString( "error.storePreferences"));
                     }
                 }
             });
@@ -231,7 +231,7 @@ class PropertiesPreferences extends Preferences {
      */
     private synchronized void store() throws IOException {
         if (changed) {
-            store( JGloss.messages.getString( "preferences.header"));
+            store( JGloss.MESSAGES.getString( "preferences.header"));
         }
     }
 

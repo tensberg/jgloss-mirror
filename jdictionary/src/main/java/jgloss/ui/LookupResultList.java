@@ -258,14 +258,14 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         StyleSheet styleSheet = ((HTMLDocument) resultFancy.getDocument()).getStyleSheet();
         styleSheet.importStyleSheet( _styleSheet);
         styleSheet.addRule
-            ( "body { font-family: '" + JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP) +
-              "'; font-size: " + JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12) + 
+            ( "body { font-family: '" + JGloss.PREFS.getString( Preferences.FONT_WORDLOOKUP) +
+              "'; font-size: " + JGloss.PREFS.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12) + 
               "pt; }\n");
 
         resultPlain = new JTextArea();
-        resultPlain.setFont( new Font( JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP),
+        resultPlain.setFont( new Font( JGloss.PREFS.getString( Preferences.FONT_WORDLOOKUP),
                                        Font.PLAIN, 
-                                       JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12)));
+                                       JGloss.PREFS.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12)));
         resultPlain.setEditable( false);
         resultPlain.setLineWrap( true);
         resultPlain.setWrapStyleWord( true);
@@ -284,13 +284,13 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             ( KeyStroke.getKeyStroke( "pressed TAB"), transferFocus);
 
         // update display if user changed font
-        JGloss.prefs.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
+        JGloss.PREFS.addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                 @Override
 				public void propertyChange( java.beans.PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( Preferences.FONT_WORDLOOKUP) ||
                         e.getPropertyName().equals( Preferences.FONT_WORDLOOKUP_SIZE)) {
-                        String fontname = JGloss.prefs.getString( Preferences.FONT_WORDLOOKUP);
-                        int size = JGloss.prefs.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12);
+                        String fontname = JGloss.PREFS.getString( Preferences.FONT_WORDLOOKUP);
+                        int size = JGloss.PREFS.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12);
                         Font font = new Font( fontname, Font.PLAIN, size);
                         ((HTMLDocument) resultFancy.getDocument()).getStyleSheet().addRule
                             ( "body { font-family: '" + fontname +
@@ -423,7 +423,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
             if (fancy) {
 	            resultTextBuffer.append( "<p>");
             }
-            resultTextBuffer.append( JGloss.messages.getString( "wordlookup.nomatches_dictionary"));
+            resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.nomatches_dictionary"));
             if (fancy) {
 	            resultTextBuffer.append( "</p>");
             }
@@ -438,13 +438,13 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         if (fancy) {
             resultTextBuffer.append( "<h4>");
             resultTextBuffer.append
-                ( JGloss.messages.getString( "wordlookup.matches",
+                ( JGloss.MESSAGES.getString( "wordlookup.matches",
                                              new String[] { "<font color=\"green\">" +
                                                             name + "</font>" }));
             resultTextBuffer.append( "</h4>");
         }
         else {
-            resultTextBuffer.append( JGloss.messages.getString( "wordlookup.matches",
+            resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.matches",
                                                                 new String[] { name }));
         }
         resultTextBuffer.append( "\n\n");
@@ -480,11 +480,11 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 	        resultTextBuffer.append( "<p><font color=\"red\">");
         }
         if (ex instanceof UnsupportedSearchModeException) {
-            resultTextBuffer.append( JGloss.messages.getString( "wordlookup.unsupportedsearchmode"));
+            resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.unsupportedsearchmode"));
         }
         else {
             resultTextBuffer.append
-                ( JGloss.messages.getString( "wordlookup.exception",
+                ( JGloss.MESSAGES.getString( "wordlookup.exception",
                                              new Object[] { ex.getClass().getName(),
                                                             ex.getLocalizedMessage() }));
         }
@@ -512,7 +512,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         } else {
 	        flushTextBuffer();
         }
-        updateStatusText( JGloss.messages.getString( "wordlookup.status.matches",
+        updateStatusText( JGloss.MESSAGES.getString( "wordlookup.status.matches",
                                                      new Object[] { Integer.valueOf( dictionaryEntries) }));
     }
 
@@ -572,7 +572,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         resultPlain.append( resultTextBuffer.toString());
         resultTextBuffer.setLength( 0);
         entriesInTextBuffer = 0;
-        updateStatusText( JGloss.messages.getString( "wordlookup.status.searching",
+        updateStatusText( JGloss.MESSAGES.getString( "wordlookup.status.searching",
                                                      new Object[] { Integer.valueOf( dictionaryEntries) }));
     }
 

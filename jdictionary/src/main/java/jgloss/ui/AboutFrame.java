@@ -89,13 +89,13 @@ public class AboutFrame extends JFrame {
      * Creates the about dialog.
      */
     private AboutFrame( String prefix) {
-        setTitle( JGloss.messages.getString( prefix + ".about.frame.title"));
+        setTitle( JGloss.MESSAGES.getString( prefix + ".about.frame.title"));
         
-        JLabel label = new JLabel( JGloss.messages.getString( prefix + ".about.title"));
+        JLabel label = new JLabel( JGloss.MESSAGES.getString( prefix + ".about.title"));
         label.setHorizontalAlignment( SwingConstants.CENTER);
         label.setFont( new Font( "SansSerif", Font.BOLD, label.getFont().getSize()+3));
         label.setForeground( Color.black);
-        JTextArea area = new JTextArea( JGloss.messages.getString( prefix + ".about.text"));
+        JTextArea area = new JTextArea( JGloss.MESSAGES.getString( prefix + ".about.text"));
         area.setEditable( false);
         area.setOpaque( false);
 
@@ -114,7 +114,7 @@ public class AboutFrame extends JFrame {
 
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
-        b.add( new JButton( new AbstractAction( JGloss.messages.getString( "about.showlicense")) {
+        b.add( new JButton( new AbstractAction( JGloss.MESSAGES.getString( "about.showlicense")) {
             private static final long serialVersionUID = 1L;
 
 				@Override
@@ -123,7 +123,7 @@ public class AboutFrame extends JFrame {
                 }
             }));
         b.add( Box.createHorizontalStrut( 5));
-        b.add( new JButton( new AbstractAction( JGloss.messages.getString( "button.close")) {
+        b.add( new JButton( new AbstractAction( JGloss.MESSAGES.getString( "button.close")) {
             private static final long serialVersionUID = 1L;
 
 				@Override
@@ -169,7 +169,7 @@ public class AboutFrame extends JFrame {
         	}
         }
 
-        JFrame license = new JFrame( JGloss.messages.getString( "about.license.title"));
+        JFrame license = new JFrame( JGloss.MESSAGES.getString( "about.license.title"));
         JTextArea ta = new JTextArea( gpl.toString());
         ta.setEditable( false);
         ta.setCaretPosition( 0);

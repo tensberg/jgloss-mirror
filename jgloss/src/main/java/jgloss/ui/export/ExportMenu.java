@@ -72,7 +72,7 @@ public class ExportMenu extends JMenu implements ActionListener {
      * <code>data/exporters</code>.
      */
     public static synchronized void registerStandardExporters() {
-        String[] resources = JGloss.messages.getString( "exporters").split(":");
+        String[] resources = JGloss.MESSAGES.getString( "exporters").split(":");
         for (String resource : resources) {
 	        try {
 	            registerExport( new InputSource( ExportMenu.class.getResource( resource)
@@ -89,7 +89,7 @@ public class ExportMenu extends JMenu implements ActionListener {
      * Creates a new export menu. For each registered export configuration a menu item is created.
      */
     public ExportMenu() {
-        super( JGloss.messages.getString( "main.menu.export"));
+        super( JGloss.MESSAGES.getString( "main.menu.export"));
 
         for (ExportConfiguration export : exporters) {
             JMenuItem item = new JMenuItem();

@@ -236,7 +236,7 @@ public class HTMLToSAXParserAdapter {
         
             saxContentHandler.startElement( null, null, JGlossDocument.Elements.GENERATOR,
                                             EMPTY_ATTRIBUTES);
-            String generator = JGloss.messages.getString( "jgloss.generator");
+            String generator = JGloss.MESSAGES.getString( "jgloss.generator");
             saxContentHandler.characters( generator.toCharArray(), 0, generator.length());
             saxContentHandler.endElement( null, null, JGlossDocument.Elements.GENERATOR);
 

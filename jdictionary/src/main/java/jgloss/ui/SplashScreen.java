@@ -77,11 +77,11 @@ public class SplashScreen {
         JLabel logo = new JLabel(JGLOSS_LOGO);
 		content.add(logo, "center, growx");
 
-		version = new JLabel( JGloss.messages.getString( applicationKey + ".version"));
+		version = new JLabel( JGloss.MESSAGES.getString( applicationKey + ".version"));
         version.setOpaque(false);
         content.add(version);
 
-        info = new JLabel( JGloss.messages.getString( "splashscreen.dummyinfo"));
+        info = new JLabel( JGloss.MESSAGES.getString( "splashscreen.dummyinfo"));
         info.setOpaque(false);
         content.add(info);
         

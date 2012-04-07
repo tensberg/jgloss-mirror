@@ -100,7 +100,7 @@ public class AttributeLegend extends JPanel {
             });
 
         JPanel p = new JPanel();
-        p.add( new JLabel( JGloss.messages.getString( "legend.dictionarychoice")));
+        p.add( new JLabel( JGloss.MESSAGES.getString( "legend.dictionarychoice")));
         p.add( dictionaryChoice);
         this.add( UIUtilities.createFlexiblePanel( p, true), BorderLayout.NORTH);
         
@@ -127,7 +127,7 @@ public class AttributeLegend extends JPanel {
 
 	protected void createLegend( Dictionary dic, StringBuilder buf) {
         buf.append( "<h2>");
-        buf.append( JGloss.messages.getString( "legend.dictionary", new String[] { dic.getName() }));
+        buf.append( JGloss.MESSAGES.getString( "legend.dictionary", new String[] { dic.getName() }));
         buf.append( "</h2>\n");
 
         SortedSet<Attribute<?>> attributes = new TreeSet<Attribute<?>>( attributeComparator);
@@ -143,11 +143,11 @@ public class AttributeLegend extends JPanel {
             noAttributes = false;
 
             buf.append( "<p><b>");
-            buf.append( JGloss.messages.getString( "legend.attribute",
+            buf.append( JGloss.MESSAGES.getString( "legend.attribute",
                                                    new String[] { att.getName(), 
                                                                   att.getDescription() }));
             buf.append( "</b><br>\n");
-            buf.append( JGloss.messages.getString( "legend.attributeexample"));
+            buf.append( JGloss.MESSAGES.getString( "legend.attributeexample"));
             if (att.canHaveValue()) {
                 if (!att.alwaysHasValue()) {
                     DictionaryEntryFormat.getAttributeFormatter( att, true).format
@@ -164,7 +164,7 @@ public class AttributeLegend extends JPanel {
 
         if (noAttributes) {
             buf.append( "<p><i>");
-            buf.append( JGloss.messages.getString( "legend.noattributes"));
+            buf.append( JGloss.MESSAGES.getString( "legend.noattributes"));
             buf.append( "</i></p>");
         }
     }
@@ -190,7 +190,7 @@ public class AttributeLegend extends JPanel {
         }
 
         buf.append( "<br>\n");
-        buf.append( JGloss.messages.getString( "legend.values"));
+        buf.append( JGloss.MESSAGES.getString( "legend.values"));
         buf.append( "\n<table border=\"0\">");
         for (CategoryAttributeValue value : values) {
             buf.append( "<tr><td>");

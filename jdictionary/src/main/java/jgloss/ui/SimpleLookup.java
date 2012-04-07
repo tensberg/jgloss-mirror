@@ -130,9 +130,9 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 
         expression = new AutoSearchComboBox( model, 50);
         JLabel expressionDescription = 
-            new JLabel( JGloss.messages.getString( "wordlookup.enterexpression"));
+            new JLabel( JGloss.MESSAGES.getString( "wordlookup.enterexpression"));
         expressionDescription.setDisplayedMnemonic
-            ( JGloss.messages.getString( "wordlookup.enterexpression.mk").charAt( 0));
+            ( JGloss.MESSAGES.getString( "wordlookup.enterexpression.mk").charAt( 0));
         expressionDescription.setLabelFor( expression);
         controls.add( expressionDescription, fixedC);
         controls.add( expression, expandableC);
@@ -154,7 +154,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
                                      hyperlinker);
         list.addHyperlinkListener( this);
         new HyperlinkKeyNavigator(new Color
-                                  (Math.max(0, JGloss.prefs.getInt
+                                  (Math.max(0, JGloss.PREFS.getInt
                                             (Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))))
             .setTargetEditor(list.getFancyResultPane());
 
@@ -239,7 +239,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
             if (ref != null) {
 	            try {
 	                new LookupResultCache
-	                    ( JGloss.messages.getString( "wordlookup.reference", 
+	                    ( JGloss.MESSAGES.getString( "wordlookup.reference", 
 	                                                 new Object[] { ref.getReferenceTitle() }),
 	                      ref.getReferencedEntries()).replay( lookupResultProxy);
 	            } catch (SearchException ex) {

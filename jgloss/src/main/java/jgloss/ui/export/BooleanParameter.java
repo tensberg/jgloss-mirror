@@ -51,6 +51,6 @@ class BooleanParameter extends UIParameter {
 
     @Override
 	public void loadFromPrefs() {
-        box.setSelected( JGloss.prefs.getBoolean( prefsKey, "true".equalsIgnoreCase( defaultValue)));
+        box.setSelected( JGloss.PREFS.getBoolean( prefsKey, "true".equalsIgnoreCase( defaultValue)));
     }
 } // class BooleanParameter

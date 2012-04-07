@@ -89,7 +89,7 @@ public class OpenRecentMenu {
     public OpenRecentMenu( int size) {
         this.size = size;
         documents = new ArrayList<File>( size);
-        String[] files = JGloss.prefs.getList( Preferences.OPENRECENT_FILES, File.pathSeparatorChar);
+        String[] files = JGloss.PREFS.getList( Preferences.OPENRECENT_FILES, File.pathSeparatorChar);
         for ( int i=0; i<files.length&&documents.size()<size; i++) {
             final File doc = new File( files[i]);
             if (doc.canRead()) { // only add documents which exist
@@ -108,7 +108,7 @@ public class OpenRecentMenu {
      * @return A newly created popup menu with the recent documents.
      */
     public synchronized JMenu createMenu( FileSelectedListener listener) { 
-        JMenu menu = new JMenu( JGloss.messages.getString( "main.menu.openrecent"));
+        JMenu menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.openrecent"));
         for (File document : documents) {
             menu.add( createDocumentMenu(document, listener));
         }
@@ -190,7 +190,7 @@ public class OpenRecentMenu {
         	}
             docs.append( document.getAbsolutePath());
         }
-        JGloss.prefs.set( Preferences.OPENRECENT_FILES, docs.toString());
+        JGloss.PREFS.set( Preferences.OPENRECENT_FILES, docs.toString());
     }
     
     private JMenuItem createDocumentMenu( final File doc, final FileSelectedListener listener) {

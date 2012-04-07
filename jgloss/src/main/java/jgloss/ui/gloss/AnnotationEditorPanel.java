@@ -88,20 +88,20 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
         c3.fill = GridBagConstraints.HORIZONTAL;
         c3.weightx = 1;
 
-        add( new JLabel( JGloss.messages.getString( "annotationeditor.grammaticaltype")), c2);
+        add( new JLabel( JGloss.MESSAGES.getString( "annotationeditor.grammaticaltype")), c2);
         add( grammaticalType, c3);
         
-        add( new JLabel( JGloss.messages.getString( "annotationeditor.dictionaryform")), c);
+        add( new JLabel( JGloss.MESSAGES.getString( "annotationeditor.dictionaryform")), c);
         GridBagConstraints c4 = (GridBagConstraints) c2.clone();
         c4.anchor = GridBagConstraints.NORTHWEST;
         c4.insets = new Insets( 0, 10, 0, 0);
-        add( new JLabel( JGloss.messages.getString( "annotationeditor.dictionaryform.word")), c4);
+        add( new JLabel( JGloss.MESSAGES.getString( "annotationeditor.dictionaryform.word")), c4);
         add( dictionaryForm, c3);
-        add( new JLabel( JGloss.messages.getString( "annotationeditor.dictionaryform.reading")),
+        add( new JLabel( JGloss.MESSAGES.getString( "annotationeditor.dictionaryform.reading")),
              c4);
         add( dictionaryFormReading, c3);
 
-        add( new JLabel( JGloss.messages.getString( "annotationeditor.translation")), c2);
+        add( new JLabel( JGloss.MESSAGES.getString( "annotationeditor.translation")), c2);
         add( translation, c3);
 
         add( readingEditor, c);
@@ -218,7 +218,7 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
 
 		private Annotation annotation;
         private final JLabel multiReadingLabel = new JLabel
-            ( JGloss.messages.getString( "annotationeditor.readings"));
+            ( JGloss.MESSAGES.getString( "annotationeditor.readings"));
         private final List<JLabel> readingLabels = new ArrayList<JLabel>( 5);
         private final List<JTextField> readings = new ArrayList<JTextField>( 5);
         private final GridBagConstraints multiReadingLabelC;
@@ -292,7 +292,7 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
             for ( int i=0; i<annotation.getReadingCount(); i++) {
                 base[0] = annotation.getReadingBase( i);
                 readingLabels.get( i).setText
-                    ( JGloss.messages.getString( "annotationeditor.reading.base", base));
+                    ( JGloss.MESSAGES.getString( "annotationeditor.reading.base", base));
                 readings.get( i).setText
                     ( annotation.getReading( i));
             }

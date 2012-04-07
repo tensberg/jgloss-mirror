@@ -57,6 +57,6 @@ class StringParameter extends UIParameter {
 
     @Override
 	public void loadFromPrefs() {
-        text.setText( JGloss.prefs.getString( prefsKey, defaultValue));
+        text.setText( JGloss.PREFS.getString( prefsKey, defaultValue));
     }
 } // class StringParameter

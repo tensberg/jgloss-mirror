@@ -106,7 +106,7 @@ public class ImportDialog extends JDialog implements TextListener {
      */
     @SuppressWarnings("unchecked")
     public ImportDialog( Frame parent) {
-        super( parent, JGloss.messages.getString( "import.title"));
+        super( parent, JGloss.MESSAGES.getString( "import.title"));
         setModal( true);
 
         JPanel main = new JPanel( new BorderLayout());
@@ -120,16 +120,16 @@ public class ImportDialog extends JDialog implements TextListener {
                     if (getSelection().length() > 0) {
                         result = true;
                         ImportDialog.this.setVisible(false);
-                        JGloss.prefs.set( Preferences.IMPORT_PARSER, 
+                        JGloss.PREFS.set( Preferences.IMPORT_PARSER, 
                                           parserSelector.getSelectedParser().getName());
-                        JGloss.prefs.set( Preferences.IMPORT_FIRSTOCCURRENCE,
+                        JGloss.PREFS.set( Preferences.IMPORT_FIRSTOCCURRENCE,
                                           parserSelector.isFirstOccurrenceOnly());
-                        JGloss.prefs.set( Preferences.IMPORT_DETECTPARAGRAPHS,
+                        JGloss.PREFS.set( Preferences.IMPORT_DETECTPARAGRAPHS,
                                           parserSelector.isDetectParagraphs());
                         if (parserSelector.isNoReadingBrackets()) {
-	                        JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS, "");
+	                        JGloss.PREFS.set( Preferences.IMPORT_READINGBRACKETS, "");
                         } else {
-	                        JGloss.prefs.set( Preferences.IMPORT_READINGBRACKETS,
+	                        JGloss.PREFS.set( Preferences.IMPORT_READINGBRACKETS,
                                               new String( new char[] { parserSelector.getReadingStart(),
                                                                        parserSelector.getReadingEnd() }));
                         }
@@ -175,7 +175,7 @@ public class ImportDialog extends JDialog implements TextListener {
         selectionPane = new JTabbedPane( SwingConstants.TOP);
         Box b2 = Box.createVerticalBox();
         Box b3 = Box.createHorizontalBox();
-        JLabel l = new JLabel( JGloss.messages.getString( "import.urlorfile"));
+        JLabel l = new JLabel( JGloss.MESSAGES.getString( "import.urlorfile"));
         b3.add( l);
         b3.add( Box.createHorizontalGlue());
         b2.add( b3);
@@ -209,8 +209,8 @@ public class ImportDialog extends JDialog implements TextListener {
         b2.add( Box.createVerticalStrut( 10));
 
         Vector<String> v = new Vector<String>();
-        v.add( JGloss.messages.getString( "encodings.default"));
-        String[] enc = JGloss.prefs.getList( Preferences.ENCODINGS, ',');
+        v.add( JGloss.MESSAGES.getString( "encodings.default"));
+        String[] enc = JGloss.PREFS.getList( Preferences.ENCODINGS, ',');
         for (String element : enc) {
 	        v.add( element);
         }
@@ -218,16 +218,16 @@ public class ImportDialog extends JDialog implements TextListener {
         encodings.setEditable( true);
 
         b3 = Box.createHorizontalBox();
-        b3.add( new JLabel( JGloss.messages.getString( "import.encodings")));
+        b3.add( new JLabel( JGloss.MESSAGES.getString( "import.encodings")));
         b3.add( Box.createHorizontalStrut( 3));
         b3.add( encodings);
         b3.add( Box.createHorizontalGlue());
         b2.add( b3);
-        selectionPane.add( JGloss.messages.getString( "import.file"), b2);
+        selectionPane.add( JGloss.MESSAGES.getString( "import.file"), b2);
 
         final Box b4 = Box.createVerticalBox();
         b3 = Box.createHorizontalBox();
-        l = new JLabel( JGloss.messages.getString( "import.pastetext"));
+        l = new JLabel( JGloss.MESSAGES.getString( "import.pastetext"));
         b3.add( l);
         b3.add( Box.createHorizontalGlue());
         b4.add( b3);
@@ -242,7 +242,7 @@ public class ImportDialog extends JDialog implements TextListener {
         b4.add( pastearea);
         pastearea.addTextListener( this);
         b4.add( Box.createVerticalStrut( 5));
-        selectionPane.addTab( JGloss.messages.getString( "import.text"), b4);
+        selectionPane.addTab( JGloss.MESSAGES.getString( "import.text"), b4);
 
         // Mixing AWT "heavyweight" and Swing "lightweight" components is nasty.
         // To get the layering in the tabbed pane correct, I have to remove the paste area
@@ -258,15 +258,15 @@ public class ImportDialog extends JDialog implements TextListener {
 
         parserSelector = new ParserSelector( true);
         parserSelector.setBorder( BorderFactory.createTitledBorder 
-                                  ( JGloss.messages.getString( "import.parserselector")));
+                                  ( JGloss.MESSAGES.getString( "import.parserselector")));
         try {
-            parserSelector.setSelected( (Class<? extends Parser>) Class.forName( JGloss.prefs.getString( Preferences.IMPORT_PARSER)));
+            parserSelector.setSelected( (Class<? extends Parser>) Class.forName( JGloss.PREFS.getString( Preferences.IMPORT_PARSER)));
         } catch (ClassNotFoundException ex) {}
-        parserSelector.setFirstOccurrenceOnly( JGloss.prefs.getBoolean
+        parserSelector.setFirstOccurrenceOnly( JGloss.PREFS.getBoolean
                                                ( Preferences.IMPORT_FIRSTOCCURRENCE, true));
-        parserSelector.setDetectParagraphs( JGloss.prefs.getBoolean
+        parserSelector.setDetectParagraphs( JGloss.PREFS.getBoolean
                                             ( Preferences.IMPORT_DETECTPARAGRAPHS, true));
-        String brackets = JGloss.prefs.getString( Preferences.IMPORT_READINGBRACKETS);
+        String brackets = JGloss.PREFS.getString( Preferences.IMPORT_READINGBRACKETS);
         if (brackets.length() == 2) {
 	        parserSelector.setReadingBrackets( brackets.charAt( 0), brackets.charAt( 1));
         } else {
@@ -274,7 +274,7 @@ public class ImportDialog extends JDialog implements TextListener {
         }
         parserSelector.setEnabled( ChasenParser.class, Chasen.isChasenExecutable
                                    ( Chasen.getDefaultExecutable()));
-        JGloss.prefs.addPropertyChangeListener( new PropertyChangeListener() {
+        JGloss.PREFS.addPropertyChangeListener( new PropertyChangeListener() {
                 @Override
 				public void propertyChange( PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( Preferences.CHASEN_LOCATION)) {

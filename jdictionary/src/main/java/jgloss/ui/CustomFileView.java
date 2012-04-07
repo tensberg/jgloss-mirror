@@ -67,12 +67,12 @@ public class CustomFileView extends FileView {
     protected CustomFileView() {
         if (JGLOSS_DESCRIPTION == null) {
             // initialize static members
-            JGLOSS_DESCRIPTION = JGloss.messages.getString( "fileview.description.jgloss");
-            XML_DESCRIPTION = JGloss.messages.getString( "fileview.description.xml");
-            HTML_DESCRIPTION = JGloss.messages.getString( "fileview.description.html");
-            TEX_DESCRIPTION = JGloss.messages.getString( "fileview.description.tex");
-            TEXT_DESCRIPTION = JGloss.messages.getString( "fileview.description.text");
-            TEMPLATE_DESCRIPTION = JGloss.messages.getString( "fileview.description.template");
+            JGLOSS_DESCRIPTION = JGloss.MESSAGES.getString( "fileview.description.jgloss");
+            XML_DESCRIPTION = JGloss.MESSAGES.getString( "fileview.description.xml");
+            HTML_DESCRIPTION = JGloss.MESSAGES.getString( "fileview.description.html");
+            TEX_DESCRIPTION = JGloss.MESSAGES.getString( "fileview.description.tex");
+            TEXT_DESCRIPTION = JGloss.MESSAGES.getString( "fileview.description.text");
+            TEMPLATE_DESCRIPTION = JGloss.MESSAGES.getString( "fileview.description.template");
 
             JGLOSS_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/jgloss.png"));
             HTML_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/html.png"));

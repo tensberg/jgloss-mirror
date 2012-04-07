@@ -71,7 +71,7 @@ public class JGlossEditor extends JTextPane {
 
 	private static DefaultHighlighter.DefaultHighlightPainter highlightPainter = 
     new DefaultHighlighter.DefaultHighlightPainter( new Color
-        ( Math.max( 0, JGloss.prefs.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
+        ( Math.max( 0, JGloss.PREFS.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
     
     /**
      * Manages the automatic display of anntotation tooltips and annotation editor scrolling
@@ -259,7 +259,7 @@ public class JGlossEditor extends JTextPane {
                 {
                     int tooltipButtonMask;
                     int selectButtonMask;
-                    if (JGloss.prefs.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) 
+                    if (JGloss.PREFS.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) 
                     {
                         // left mouse button shows annotation tooltip, 
                         // all other select the annotation
@@ -354,8 +354,8 @@ public class JGlossEditor extends JTextPane {
 			public void actionPerformed( ActionEvent e) {
                 Object result = JOptionPane.showInputDialog
                 ( SwingUtilities.getRoot( JGlossEditor.this), 
-                    JGloss.messages.getString( "editor.dialog.find"),
-                    JGloss.messages.getString( "editor.dialog.find.title"),
+                    JGloss.MESSAGES.getString( "editor.dialog.find"),
+                    JGloss.MESSAGES.getString( "editor.dialog.find.title"),
                     JOptionPane.PLAIN_MESSAGE, null, null, getSelectedText());
                 if (result != null) {
                     String text = result.toString();
@@ -540,14 +540,14 @@ public class JGlossEditor extends JTextPane {
                 // search in whole document
                 JOptionPane.showMessageDialog
                 ( SwingUtilities.getRoot( this), 
-                    JGloss.messages.getString( "editor.dialog.find.notfound",
+                    JGloss.MESSAGES.getString( "editor.dialog.find.notfound",
                         new Object[] { text }));
             }
             else {
                 // search in part of the document
                 JOptionPane.showMessageDialog
                 ( SwingUtilities.getRoot( this),
-                    JGloss.messages.getString( "editor.dialog.findagain.notfound",
+                    JGloss.MESSAGES.getString( "editor.dialog.findagain.notfound",
                         new Object[] { text }));
             }
             return -1;

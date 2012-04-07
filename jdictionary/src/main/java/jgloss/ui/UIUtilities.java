@@ -70,12 +70,12 @@ public class UIUtilities {
      * @see javax.swing.Action
      */
     public static void initAction( Action a, String key) {
-        a.putValue( Action.NAME, JGloss.messages.getString( key));
+        a.putValue( Action.NAME, JGloss.MESSAGES.getString( key));
 
         // accelerator key
         String s = null;
         try {
-            s = JGloss.messages.getString( key + ".ak");
+            s = JGloss.MESSAGES.getString( key + ".ak");
         } catch (MissingResourceException ex) {}
         if (s!=null && s.length()>0) {
 	        a.putValue( Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke( s));
@@ -83,7 +83,7 @@ public class UIUtilities {
 
         // mnemonic key
         try {
-            s = JGloss.messages.getString( key + ".mk");
+            s = JGloss.MESSAGES.getString( key + ".mk");
         } catch (MissingResourceException ex) {}
         if (s!=null && s.length()>0) {
 	        try {
@@ -97,7 +97,7 @@ public class UIUtilities {
         
         // tooltip
         try {
-            s = JGloss.messages.getString( key + ".tt");
+            s = JGloss.MESSAGES.getString( key + ".tt");
         } catch (MissingResourceException ex) {}
         if (s!=null && s.length()>0) {
 	        a.putValue( Action.SHORT_DESCRIPTION, s);
@@ -116,12 +116,12 @@ public class UIUtilities {
      * @see javax.swing.Action
      */
     public static AbstractButton initButton( AbstractButton b, String key) {
-        b.setText( JGloss.messages.getString( key));
+        b.setText( JGloss.MESSAGES.getString( key));
 
         String s = null;
         // mnemonic key
         try {
-            s = JGloss.messages.getString( key + ".mk");
+            s = JGloss.MESSAGES.getString( key + ".mk");
         } catch (MissingResourceException ex) {}
         if (s!=null && s.length()>0) {
 	        try {
@@ -135,7 +135,7 @@ public class UIUtilities {
         
         // tooltip
         try {
-            s = JGloss.messages.getString( key + ".tt");
+            s = JGloss.MESSAGES.getString( key + ".tt");
         } catch (MissingResourceException ex) {}
         if (s!=null && s.length()>0) {
 	        b.setToolTipText( s);

@@ -184,7 +184,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
         UIUtilities.initAction( addToDictionaryAction, "annotationeditor.menu.addtodictionary");
         addToDictionaryAction.setEnabled( false);
 
-        menu = new JMenu( JGloss.messages.getString( "annotationeditor.menu.title"));
+        menu = new JMenu( JGloss.MESSAGES.getString( "annotationeditor.menu.title"));
         pmenu = new JPopupMenu();
         menu.add( UIUtilities.createMenuItem( removeAction));
         pmenu.add( removeAction);
@@ -252,18 +252,18 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
                 previousAnnotationAction.getValue( Action.NAME));
         am.put( previousAnnotationAction.getValue( Action.NAME), previousAnnotationAction);
 
-        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
+        im.put( KeyStroke.getKeyStroke( JGloss.MESSAGES.getString
                                         ( "annotationeditor.action.cleartranslation.ak")),
                 clearTranslationAction.getValue( Action.NAME));
         am.put( clearTranslationAction.getValue( Action.NAME), clearTranslationAction);
-        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString( "annotationeditor.action.remove.ak")),
+        im.put( KeyStroke.getKeyStroke( JGloss.MESSAGES.getString( "annotationeditor.action.remove.ak")),
                 removeAction.getValue( Action.NAME));
         am.put( removeAction.getValue( Action.NAME), removeAction);
-        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
+        im.put( KeyStroke.getKeyStroke( JGloss.MESSAGES.getString
                                         ( "annotationeditor.action.addtoexclusions.ak")),
                 addToExclusionsAction.getValue( Action.NAME));
         am.put( addToExclusionsAction.getValue( Action.NAME), addToExclusionsAction);
-        im.put( KeyStroke.getKeyStroke( JGloss.messages.getString
+        im.put( KeyStroke.getKeyStroke( JGloss.MESSAGES.getString
                                         ( "annotationeditor.action.addtodictionary.ak")),
                 addToDictionaryAction.getValue( Action.NAME));
         am.put( addToDictionaryAction.getValue( Action.NAME), addToDictionaryAction);

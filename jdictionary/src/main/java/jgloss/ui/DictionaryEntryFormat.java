@@ -136,13 +136,13 @@ class DictionaryEntryFormat {
 	        format = new DefaultAttributeFormatter
                 ( " (", ")", "", false, commaList);
         } else if (att == Attributes.ABBREVIATION) {
-	        format = new WordFormatter( JGloss.messages.getString( "abbr.word"),
-                                        "", JGloss.messages.getString( "abbr.lang_and_word"),
+	        format = new WordFormatter( JGloss.MESSAGES.getString( "abbr.word"),
+                                        "", JGloss.MESSAGES.getString( "abbr.lang_and_word"),
                                         decorator.decorateList( new DefaultListFormatter( " (", ",", ")"),
                                                                 att, position));
         } else if (att == Attributes.GAIRAIGO) {
-	        format = new WordFormatter( "", JGloss.messages.getString( "gairaigo.lang"),
-                                        JGloss.messages.getString( "gairaigo.lang_and_word"),
+	        format = new WordFormatter( "", JGloss.MESSAGES.getString( "gairaigo.lang"),
+                                        JGloss.MESSAGES.getString( "gairaigo.lang_and_word"),
                                         decorator.decorateList( new DefaultListFormatter( " (", ",", ")"),
                                                                 att, position));
         } else if (att == Attributes.REFERENCE) {

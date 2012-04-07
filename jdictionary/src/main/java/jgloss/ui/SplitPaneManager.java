@@ -59,7 +59,7 @@ public class SplitPaneManager implements PropertyChangeListener {
         splitPane.putClientProperty( PROPERTY_KEY_LOCATION,
                                      locationKey);
 
-        double location = JGloss.prefs.getDouble( locationKey, defaultLocation);
+        double location = JGloss.PREFS.getDouble( locationKey, defaultLocation);
         splitPane.setDividerLocation( location);
         splitPane.setResizeWeight( location);
 
@@ -84,7 +84,7 @@ public class SplitPaneManager implements PropertyChangeListener {
                 (splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT ?
                  splitPane.getWidth() : splitPane.getHeight());
                               
-            JGloss.prefs.set(prefsKey, newLocation);
+            JGloss.PREFS.set(prefsKey, newLocation);
         }
     }
 } // class SplitPaneManager

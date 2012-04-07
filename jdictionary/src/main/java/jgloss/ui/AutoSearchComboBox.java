@@ -263,7 +263,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
 
     @Override
 	public void dictionary( Dictionary d) {
-        items.add( new Object[] { Dictionary.class, JGloss.messages.getString
+        items.add( new Object[] { Dictionary.class, JGloss.MESSAGES.getString
                                   ( "wordlookup.matches",
                                     new String[] { d.getName() }) });
     }

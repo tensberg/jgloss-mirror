@@ -577,7 +577,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * If the content of the reading/translation is longer than <code>MAX_TRANSLATION_LENGTH</code>,
      * only <code>MAX_TRANSLATION_LENGTH-3</code> chars, followed by "..." will be rendered.
      */
-    private final static int MAX_TRANSLATION_LENGTH = JGloss.prefs.getInt
+    private final static int MAX_TRANSLATION_LENGTH = JGloss.PREFS.getInt
         ( Preferences.VIEW_MAXTRANSLATIONLENGTH, 50);
 
     /**
@@ -853,7 +853,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      */
     @Override
 	public String getContentType() {
-        return JGloss.messages.getString( "jgloss.mimetype");
+        return JGloss.MESSAGES.getString( "jgloss.mimetype");
     }
 
     /**
@@ -912,7 +912,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	            // As of JDK1.3, the name of the default DTD of the ParserDelegator is hardcoded
 	            // in the source, and there is no way for other program to inquire it,
 	            // so I put it in the preferences to make it easily changeable.
-	            dtd = DTD.getDTD( JGloss.prefs.getString( Preferences.DTD_DEFAULT));
+	            dtd = DTD.getDTD( JGloss.PREFS.getString( Preferences.DTD_DEFAULT));
 
 	            // there seems to be a bug in the parser where the REQUIRED content attribute is
 	            // not recognized even if is there. This only leads to a call of handleError and

@@ -140,7 +140,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         modesPanel = UIUtilities.createFlexiblePanel( modesPanel, false);
         modesPanel.setBorder( BorderFactory.createCompoundBorder 
                               ( BorderFactory.createTitledBorder
-                                ( JGloss.messages.getString( "wordlookup.searchoptions")),
+                                ( JGloss.MESSAGES.getString( "wordlookup.searchoptions")),
                                 BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
 
         // search fields setup
@@ -167,7 +167,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         fieldsPanel = UIUtilities.createFlexiblePanel( fieldsPanel, false);
         fieldsPanel.setBorder( BorderFactory.createCompoundBorder
                                ( BorderFactory.createTitledBorder
-                                 ( JGloss.messages.getString
+                                 ( JGloss.MESSAGES.getString
                                    ( "wordlookup.searchfield")),
                                  BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
 
@@ -192,7 +192,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         matchPanel = UIUtilities.createFlexiblePanel( matchPanel, false);
         matchPanel.setBorder( BorderFactory.createCompoundBorder
                               ( BorderFactory.createTitledBorder
-                                ( JGloss.messages.getString
+                                ( JGloss.MESSAGES.getString
                                   ( "wordlookup.matchmode")),
                                 BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
 
@@ -243,7 +243,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         dictionaryPanel = UIUtilities.createFlexiblePanel( dictionaryPanel, false);
         dictionaryPanel.setBorder( BorderFactory.createCompoundBorder
                                    ( BorderFactory.createTitledBorder
-                                     ( JGloss.messages.getString
+                                     ( JGloss.MESSAGES.getString
                                        ( "wordlookup.dictionaryselection")),
                                      BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
 
@@ -262,7 +262,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         filterPanel = UIUtilities.createFlexiblePanel( filterPanel, false);
         filterPanel.setBorder( BorderFactory.createCompoundBorder
                                ( BorderFactory.createTitledBorder
-                                 ( JGloss.messages.getString
+                                 ( JGloss.MESSAGES.getString
                                    ( "wordlookup.filter")),
                                  BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
 
@@ -282,9 +282,9 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
 
         expression = new AutoSearchComboBox( _model, 50);
         JLabel expressionDescription = 
-            new JLabel( JGloss.messages.getString( "wordlookup.enterexpression"));
+            new JLabel( JGloss.MESSAGES.getString( "wordlookup.enterexpression"));
         expressionDescription.setDisplayedMnemonic
-            ( JGloss.messages.getString( "wordlookup.enterexpression.mk").charAt( 0));
+            ( JGloss.MESSAGES.getString( "wordlookup.enterexpression.mk").charAt( 0));
         expressionDescription.setLabelFor( expression);
         inputPanel.add( expressionDescription, c3);
         inputPanel.add( expression, c);
@@ -292,9 +292,9 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         inputPanel.add( Box.createHorizontalStrut( 4), c3);
         distance = new JTextField();
         JLabel distanceDescription = 
-            new JLabel( JGloss.messages.getString( "wordlookup.enterdistance"));
+            new JLabel( JGloss.MESSAGES.getString( "wordlookup.enterdistance"));
         distanceDescription.setDisplayedMnemonic
-            ( JGloss.messages.getString( "wordlookup.enterdistance.mk").charAt( 0));
+            ( JGloss.MESSAGES.getString( "wordlookup.enterdistance.mk").charAt( 0));
         distanceDescription.setLabelFor( expression);
         inputPanel.add( distanceDescription, c3);
         inputPanel.add( distance, c2);
@@ -358,7 +358,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener,
         Dictionary[] d = model.getDictionaries();
         dictionaryChoice.removeAllItems();
         if (d.length == 0) {
-            dictionaryChoice.addItem( JGloss.messages.getString( "wordlookup.nodictionary"));
+            dictionaryChoice.addItem( JGloss.MESSAGES.getString( "wordlookup.nodictionary"));
             dictionaryChoice.setEnabled( false);
         }
         else {

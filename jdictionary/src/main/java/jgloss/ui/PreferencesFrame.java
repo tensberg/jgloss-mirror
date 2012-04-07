@@ -117,7 +117,7 @@ public class PreferencesFrame {
      */
     private PreferencesFrame( PreferencesPanel[] _panels) {
         panels = _panels;
-        frame = new JFrame( JGloss.messages.getString( "prefs.title"));
+        frame = new JFrame( JGloss.MESSAGES.getString( "prefs.title"));
 
         JPanel main = new JPanel( new BorderLayout());
         Box b = Box.createHorizontalBox();
