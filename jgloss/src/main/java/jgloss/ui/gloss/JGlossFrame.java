@@ -791,7 +791,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         menu.add( UIUtilities.createMenuItem( addAnnotationAction));
         menu.add( UIUtilities.createMenuItem( documentTitleAction));
         menu.addSeparator();
-        preferencesItem = UIUtilities.createMenuItem( PreferencesFrame.showAction);
+        preferencesItem = UIUtilities.createMenuItem( PreferencesFrame.SHOW_ACTION);
         menu.add( preferencesItem);
         bar.add( menu);
 

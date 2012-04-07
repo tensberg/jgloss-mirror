@@ -143,7 +143,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         editMenu.addMenuListener( xcv.getEditMenuListener());
 
         editMenu.addSeparator();
-        editMenu.add( UIUtilities.createMenuItem( PreferencesFrame.showAction));
+        editMenu.add( UIUtilities.createMenuItem( PreferencesFrame.SHOW_ACTION));
         bar.add( editMenu);           
 
         menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.help"));

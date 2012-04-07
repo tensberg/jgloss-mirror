@@ -174,17 +174,6 @@ public abstract class JGloss {
             showMainWindow( args);
 
             splash.close();
-
-            new Thread() {
-                @Override
-				public void run() {
-                    try {
-                        setPriority( Thread.MIN_PRIORITY);
-                    } catch (IllegalArgumentException ex) {}
-
-                    backgroundCreateDialogs();
-                }
-            }.start();
         } catch (NoClassDefFoundError ex) {
             displayError( MESSAGES.getString( "error.noclassdef"), ex, true);
             System.exit( 1);
@@ -444,17 +433,7 @@ public abstract class JGloss {
      */
     protected void createDialogs() {
         AboutFrame.createShowAction( getApplicationName());
-    }
-
-    /**
-     * Prepare dialogs in a background thread. This method is called from a low-priority thread
-     * after the main window is shown. It should be used to create all dialogs which are not
-     * needed immediately. Creating the dialogs here decreases the response time when the user
-     * selects a dialog for the first time.
-     */
-    protected void backgroundCreateDialogs() {
-        PreferencesFrame.createFrame
-            ( getPreferencesPanels());
+        PreferencesFrame.createFrame( getPreferencesPanels());
     }
     
     /**

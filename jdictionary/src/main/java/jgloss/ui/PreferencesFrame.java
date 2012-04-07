@@ -24,6 +24,7 @@
 package jgloss.ui;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -55,18 +56,20 @@ public class PreferencesFrame {
     /**
      * Action which displays the preferences dialog.
      */
-    public final static Action showAction;
+    public static final Action SHOW_ACTION = createShowAction();
 
-    static {
-        showAction = new AbstractAction() {
+    private static Action createShowAction() {
+        Action showAction = new AbstractAction() {
                 private static final long serialVersionUID = 1L;
 
 				@Override
 				public void actionPerformed( ActionEvent e) {
-                    getFrame().setVisible(true);
+                    prefs.setVisible(true);
                 }
             };
         UIUtilities.initAction( showAction, "main.menu.preferences");
+
+        return showAction;
     }
 
     /**
@@ -82,27 +85,10 @@ public class PreferencesFrame {
     private final PreferencesPanel[] panels;
     
     public static void createFrame( PreferencesPanel[] panels) {
-        synchronized (PreferencesFrame.class) {
-            prefs = new PreferencesFrame( panels);
-            PreferencesFrame.class.notifyAll();
-        }
-    }
-
-    /**
-     * Returns the single application-wide preferences frame.
-     *
-     * @return The application-wide <CODE>PreferencesFrame</CODE> instance.
-     */
-    public static PreferencesFrame getFrame() {
-        synchronized (PreferencesFrame.class) {
-            if (prefs == null) {
-	            try {
-	                // wait until frame is created
-	                PreferencesFrame.class.wait();
-	            } catch (InterruptedException ex) {}
-            }
-            return prefs;
-        }
+        assert EventQueue.isDispatchThread();
+        assert prefs == null;
+        
+        prefs = new PreferencesFrame( panels);
     }
 
     /**

@@ -23,6 +23,7 @@
 
 package jgloss;
 
+import java.awt.EventQueue;
 import java.io.File;
 
 import jgloss.parser.Chasen;
@@ -60,7 +61,9 @@ public class JGlossApp extends JGloss {
         new JGlossApp().init( args);
     }
 
-    public static synchronized LookupFrame getLookupFrame() {
+    public static LookupFrame getLookupFrame() {
+        assert EventQueue.isDispatchThread();
+        
         if (lookupFrame == null) {
 	        lookupFrame = new JGlossLookupFrame( application.createLookupModel());
         }
@@ -117,12 +120,6 @@ public class JGlossApp extends JGloss {
                 f.loadDocument( new File( arg));
             }
         }   
-    }
-
-    @Override
-	protected void backgroundCreateDialogs() {
-        getLookupFrame();
-        super.backgroundCreateDialogs();
     }
 
     /**
