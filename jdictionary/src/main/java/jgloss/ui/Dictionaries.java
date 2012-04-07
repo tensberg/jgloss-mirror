@@ -75,7 +75,7 @@ import jgloss.dictionary.IndexedDictionary;
  * Panel which allows the user to add and manipulate dictionaries used for document parsing.
  * The object can be queried for a list of currently selected dictionaries. There exists
  * a single application-wide instance which can be accessed through the
- * {@link #getComponent() getComponent()} method.
+ * {@link #getInstance()} method.
  *
  * @author Michael Koch
  */
@@ -87,7 +87,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 	/**
      * The single application-wide instance.
      */
-    private static Dictionaries box;
+    private static Dictionaries instance;
 
     /**
      * The widget which displays the current selection of dictionaries.
@@ -96,12 +96,12 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * List of {@link Dictionaries.DictionaryWrapper DictionaryWrapper } instances with
      * dictionaries currently used in the application. This is the list of dictionaries
-     * returned by {@link #getDictionaries(boolean) getDictionaries}.
+     * returned by {@link #getDictionaries() getDictionaries}.
      * If the user has edited
      * the dictionary list in the preference dialog, but not yet applied the changes,
      * this list is different from the dictionary list displayed.
      */
-    private static List<DictionaryWrapper> activeDictionaries = new ArrayList<DictionaryWrapper>( 10);
+    private List<DictionaryWrapper> activeDictionaries = new ArrayList<DictionaryWrapper>( 10);
     /**
      * An EDICT editable by the user.
      */
@@ -122,7 +122,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * Wrapper for a dictionary and its descriptor. Used as elements in the list model.
      */
-    private class DictionaryWrapper {
+    private static class DictionaryWrapper {
         /**
          * Descriptor used to create the dictionary. Usually the path to the dictionary file.
          *
@@ -145,13 +145,34 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         }
 
         @Override
-		public boolean equals( Object o) {
-            try {
-                DictionaryWrapper d = (DictionaryWrapper) o;
-                return (d.descriptor.equals( descriptor) && d.dictionary.equals( dictionary));
-            } catch (ClassCastException ex) {
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((descriptor == null) ? 0 : descriptor.hashCode());
+            result = prime * result + ((dictionary == null) ? 0 : dictionary.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
                 return false;
-            }
+            if (getClass() != obj.getClass())
+                return false;
+            DictionaryWrapper other = (DictionaryWrapper) obj;
+            if (descriptor == null) {
+                if (other.descriptor != null)
+                    return false;
+            } else if (!descriptor.equals(other.descriptor))
+                return false;
+            if (dictionary == null) {
+                if (other.dictionary != null)
+                    return false;
+            } else if (!dictionary.equals(other.dictionary))
+                return false;
+            return true;
         }
     }
 
@@ -161,52 +182,32 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * @return The Dictionaries component.
      */
     public static Dictionaries getInstance() {
-        synchronized (componentLock) {
-            if (box == null) {
-	            box = new Dictionaries();
-            }
+        assert EventQueue.isDispatchThread();
+
+        if (instance == null) {
+            instance = new Dictionaries();
         }
 
-        return box;
+        return instance;
     }
-
-    /**
-     * Lock synchronized on in {@link #getComponent() getComponent}.
-     */
-    private static final Object componentLock = "component lock";
 
     /**
      * Returns the array of currently active dictionaries in the order in which they are
      * displayed. This can be different from the currently shown list if the user has not
      * yet applied changes.
      *
-     *
-     * @param waitForLoad If <CODE>true</CODE>, blocks until the dictionaries are initialized from
-     *                    the preferences.
      * @return Array of currently active dictionaries.
      */
-    public static Dictionary[] getDictionaries( boolean waitForLoad) {
-        if (waitForLoad) {
-            Dictionaries component = getInstance();
-            // Guarantee that all dictionaries are loaded from the preferences before returning.
-            // By synchronizing on component, guarantee mutual exclusivity with loadPreferences
-            // and savePreferences
-            synchronized (component) {
-                if (activeDictionaries.size() == 0) {
-	                component.loadDictionariesFromPreferences();
-                }
-            }
+    public Dictionary[] getDictionaries() {
+        assert EventQueue.isDispatchThread();
+
+        Dictionary[] out = new Dictionary[activeDictionaries.size()];
+        int index = 0;
+        for ( DictionaryWrapper wrapper : activeDictionaries) {
+            out[index++] = wrapper.dictionary;
         }
 
-        synchronized (activeDictionaries) {
-            Dictionary[] out = new Dictionary[activeDictionaries.size()];
-            int index = 0;
-            for ( DictionaryWrapper wrapper : activeDictionaries) {
-	            out[index++] = wrapper.dictionary;
-            }
-
-            return out;
-        }
+        return out;
     }
 
     /**
@@ -217,17 +218,17 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         return userDictionary;
         }*/
 
-    private final static List<DictionaryListChangeListener> dictionaryListChangeListeners = new CopyOnWriteArrayList<DictionaryListChangeListener>();
+    private final List<DictionaryListChangeListener> dictionaryListChangeListeners = new CopyOnWriteArrayList<DictionaryListChangeListener>();
 
-    public static void addDictionaryListChangeListener( DictionaryListChangeListener listener) {
+    public void addDictionaryListChangeListener( DictionaryListChangeListener listener) {
     	dictionaryListChangeListeners.add( listener);
     }
 
-    public static void removeDictionaryListChangeListener( DictionaryListChangeListener listener) {
+    public void removeDictionaryListChangeListener( DictionaryListChangeListener listener) {
     	dictionaryListChangeListeners.remove( listener);
     }
 
-    protected static void fireDictionaryListChanged() {
+    private void fireDictionaryListChanged() {
         for (DictionaryListChangeListener listener : dictionaryListChangeListeners) {
             listener.dictionaryListChanged();
         }
@@ -503,7 +504,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         chooser.setMultiSelectionEnabled( true);
         chooser.setDialogTitle( JGloss.MESSAGES.getString( "dictionaries.chooser.title"));
         chooser.setFileView( CustomFileView.getFileView());
-        int result = chooser.showDialog( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
+        int result = chooser.showDialog( SwingUtilities.getRoot( instance), JGloss.MESSAGES.getString
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
             new DictionaryLoader().loadDictionaries( chooser.getSelectedFiles());
@@ -578,31 +579,30 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * will be stored in the preferences.
      */
     @Override
-	public synchronized void savePreferences() {
+	public void savePreferences() {
+        assert EventQueue.isDispatchThread();
+        
         ListModel model = dictionaries.getModel();
         StringBuilder paths = new StringBuilder( model.getSize()*32);
         List<DictionaryWrapper> newDictionaries = new ArrayList<DictionaryWrapper>( model.getSize());
 
-        synchronized (model) {
-            for ( int i=0; i<model.getSize(); i++) {
-                DictionaryWrapper dictionaryWrapper = (DictionaryWrapper) model.getElementAt( i);
-				newDictionaries.add( dictionaryWrapper);
-                if (paths.length() > 0) {
-	                paths.append( File.pathSeparatorChar);
-                }
-                paths.append( dictionaryWrapper.descriptor);
+        for ( int i=0; i<model.getSize(); i++) {
+            DictionaryWrapper dictionaryWrapper = (DictionaryWrapper) model.getElementAt( i);
+            newDictionaries.add( dictionaryWrapper);
+            if (paths.length() > 0) {
+                paths.append( File.pathSeparatorChar);
+            }
+            paths.append( dictionaryWrapper.descriptor);
+        }
+
+        // dispose any dictionaries which are no longer active
+        for (DictionaryWrapper d : activeDictionaries) {
+            if (!newDictionaries.contains( d)) {
+                d.dictionary.dispose();
             }
         }
-        synchronized (activeDictionaries) {
-            // dispose any dictionaries which are no longer active
-            for (DictionaryWrapper d : activeDictionaries) {
-                if (!newDictionaries.contains( d)) {
-	                d.dictionary.dispose();
-                }
-            }
-            activeDictionaries.clear();
-            activeDictionaries.addAll( newDictionaries);
-        }
+        activeDictionaries.clear();
+        activeDictionaries.addAll( newDictionaries);
 
         JGloss.PREFS.set( Preferences.DICTIONARIES, paths.toString());
         fireDictionaryListChanged();
@@ -613,7 +613,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * preferences. If the list in the preferences does not contain the user dictionary,
      * it is inserted at the first position.
      */
-    private synchronized void loadDictionariesFromPreferences() {
+    private void loadDictionariesFromPreferences() {
         String[] fs = JGloss.PREFS.getPaths( Preferences.DICTIONARIES);
         // exceptions occurring during dictionary loading
         final List<Object> exceptions = new ArrayList<Object>( 5);
@@ -623,14 +623,13 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 Dictionary d = DictionaryFactory.createDictionary( element);
                 if (d instanceof IndexedDictionary) {
                     if (!((IndexedDictionary) d).loadIndex()) {
-                        LOGGER.severe( "building index for dictionary " + d.getName());
+                        LOGGER.info( "building index for dictionary " + d.getName());
+                        // TODO: add progress feedback
                         ((IndexedDictionary) d).buildIndex();
                     }
                 }
-                synchronized (activeDictionaries) {
-                    activeDictionaries.add( new DictionaryWrapper( element, d));
-                }
-                fireDictionaryListChanged(); // fire for every loaded dictionary
+
+                activeDictionaries.add( new DictionaryWrapper( element, d));
                 /*if (d instanceof UserDictionary)
                   userDictionary = (UserDictionary) d;*/
             } catch (Exception ex) {
@@ -638,6 +637,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 exceptions.add( element);
             }
         }
+        fireDictionaryListChanged();
         // insert the user dictionary if not already in the dictionary list
         /*if (userDictionary == null) try {
             userDictionary = (UserDictionary)
@@ -666,49 +666,39 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * Initializes the list of displayed dictionaries from the preferences setting.
      */
     @Override
-	public synchronized void loadPreferences() {
+	public void loadPreferences() {
+        assert EventQueue.isDispatchThread();
+        
         // activeDictionaries is only initialized from the preferences if it does not
         // already contain dictionaries.
         boolean prefsLoaded = false;
-        if (activeDictionaries.size() == 0) {
+        if (activeDictionaries.isEmpty()) {
             loadDictionariesFromPreferences();
             prefsLoaded = true;
         }
         
         // display the list of loaded dictionaries
         final DefaultListModel model = new DefaultListModel();
-        synchronized (activeDictionaries) {
-            // discard any dictionaries loaded in the component but not in the active list
-            ListModel oldModel = dictionaries.getModel();
-            synchronized (oldModel) {
-                for ( int i=0; i<oldModel.getSize(); i++) {
-                    DictionaryWrapper d = (DictionaryWrapper) oldModel.getElementAt( i);
-                    if (!activeDictionaries.contains( d)) {
-	                    d.dictionary.dispose();
-                    }
-                }
+
+        // discard any dictionaries loaded in the component but not in the active list
+        ListModel oldModel = dictionaries.getModel();
+
+        for ( int i=0; i<oldModel.getSize(); i++) {
+            DictionaryWrapper d = (DictionaryWrapper) oldModel.getElementAt( i);
+            if (!activeDictionaries.contains( d)) {
+                d.dictionary.dispose();
             }
-            
-            for (DictionaryWrapper dictionaryWrapper : activeDictionaries) {
-                model.addElement(dictionaryWrapper);
-            }
-        }
-        Runnable worker = new Runnable() {
-                @Override
-				public void run() {
-                    dictionaries.setModel( model);
-                }
-            };
-        if (!EventQueue.isDispatchThread()) {
-	        EventQueue.invokeLater( worker);
-        } else {
-	        worker.run();
         }
 
-        if (!prefsLoaded)
-		 {
+        for (DictionaryWrapper dictionaryWrapper : activeDictionaries) {
+            model.addElement(dictionaryWrapper);
+        }
+
+        dictionaries.setModel( model);
+
+        if (!prefsLoaded) {
 	        fireDictionaryListChanged();
-        // otherwise loadDictionariesFromPreferences has already fired the event
+	        // otherwise loadDictionariesFromPreferences has already fired the event
         }
     }
 

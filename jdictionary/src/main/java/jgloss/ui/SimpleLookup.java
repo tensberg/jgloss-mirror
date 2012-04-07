@@ -68,7 +68,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 					public boolean enqueue() {
                         boolean enqueued = super.enqueue();
                         if (enqueued) {
-	                        Dictionaries.removeDictionaryListChangeListener
+	                        Dictionaries.getInstance().removeDictionaryListChangeListener
                                 ( WeakDictionaryChangeListener.this);
                         }
                         return enqueued;
@@ -81,7 +81,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
             LookupModel model = modelRef.get();
             if (model != null) {
 	            model.setDictionaries
-                    ( Arrays.asList( Dictionaries.getDictionaries( false)));
+                    ( Arrays.asList( Dictionaries.getInstance().getDictionaries()));
             }
         }
     } // class WeakDictionaryChangeListener
@@ -104,9 +104,9 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
             ( Arrays.asList( new SearchMode[] { ExpressionSearchModes.EXACT,
                                             ExpressionSearchModes.PREFIX,
                                             ExpressionSearchModes.ANY }),
-              Arrays.asList( Dictionaries.getDictionaries( false)),
+              Arrays.asList( Dictionaries.getInstance().getDictionaries()),
               Collections.<LookupResultFilter> emptyList());
-        Dictionaries.addDictionaryListChangeListener
+        Dictionaries.getInstance().addDictionaryListChangeListener
             ( new WeakDictionaryChangeListener( model));
         model.selectAllDictionaries( true);
         model.selectSearchField( DictionaryEntryField.WORD, true);

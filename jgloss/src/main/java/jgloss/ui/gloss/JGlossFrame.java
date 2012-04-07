@@ -212,7 +212,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                         if (d.selectionIsFilename()) {
 	                                        which.importDocument
                                                 ( d.getSelection(), d.isDetectParagraphs(),
-                                                  d.createParser( Dictionaries.getDictionaries( true),
+                                                  d.createParser( Dictionaries.getInstance().getDictionaries(),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
                                                   d.getEncoding());
@@ -221,7 +221,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                                 ( d.getSelection(), d.isDetectParagraphs(), 
                                                   JGloss.MESSAGES.getString( "import.textarea"),
                                                   JGloss.MESSAGES.getString( "import.textarea"),
-                                                  d.createParser( Dictionaries.getDictionaries( true),
+                                                  d.createParser( Dictionaries.getInstance().getDictionaries(),
                                                                   ExclusionList.getExclusions()),
                                                   d.createReadingAnnotationFilter(),
                                                   false);
@@ -970,7 +970,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                       JGloss.MESSAGES.getString( "import.clipboard"),
                       GeneralDialog.getInstance().createReadingAnnotationFilter(),
                       GeneralDialog.getInstance().createImportClipboardParser
-                      ( Dictionaries.getDictionaries( true), ExclusionList.getExclusions()),
+                      ( Dictionaries.getInstance().getDictionaries(), ExclusionList.getExclusions()),
                       len);
                 which.model.setDocumentChanged( true);
             } catch (Exception ex) {
@@ -1206,7 +1206,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         try {
             model.setDocument( new JGlossDocumentBuilder().build( stin, 
-                detectParagraphs, filter, parser, Dictionaries.getDictionaries( true)) );
+                detectParagraphs, filter, parser, Dictionaries.getInstance().getDictionaries()) );
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog

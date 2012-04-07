@@ -253,7 +253,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 	public void dispose() {
         super.dispose();
         engine.dispose();
-        Dictionaries.removeDictionaryListChangeListener( this);
+        Dictionaries.getInstance().removeDictionaryListChangeListener( this);
         if (legendFrame != null) {
 	        legendFrame.dispose();
         }
@@ -297,15 +297,15 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         }
     }
 
-    protected synchronized void createLegendFrame() {
+    private void createLegendFrame() {
         if (legend != null) {
 	        return;
         }
 
         legendFrame = new JFrame( JGloss.MESSAGES.getString( "wordlookup.legendframe.title"));
         legend = new AttributeLegend();
-        legend.setDictionaries( Dictionaries.getDictionaries( false));
-        Dictionaries.addDictionaryListChangeListener( this);
+        legend.setDictionaries( Dictionaries.getInstance().getDictionaries());
+        Dictionaries.getInstance().addDictionaryListChangeListener( this);
         legendFrame.getContentPane().add( legend);
         legendFrame.pack();
         legendFrame.setSize( legendFrame.getPreferredSize());
@@ -315,7 +315,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 	public void dictionaryListChanged() {
         if (legend != null) {
             synchronized (legend) {
-                legend.setDictionaries( Dictionaries.getDictionaries( false));
+                legend.setDictionaries( Dictionaries.getInstance().getDictionaries());
             }
         }
     }

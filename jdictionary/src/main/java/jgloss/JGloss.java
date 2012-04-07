@@ -391,7 +391,7 @@ public abstract class JGloss implements ExitListener {
                                ExpressionSearchModes.SUFFIX,
                                DistanceSearchModes.NEAR,
                                DistanceSearchModes.RADIUS }),
-              Arrays.asList( Dictionaries.getDictionaries( false)),
+              Arrays.asList( Dictionaries.getInstance().getDictionaries()),
               Arrays.asList( new LookupResultFilter[] 
                   { 
                       new AttributeResultFilter( MESSAGES.getString( "filter.mainentry.name"),
@@ -404,12 +404,12 @@ public abstract class JGloss implements ExitListener {
                                                  MESSAGES.getString( "filter.priority.desc"),
                                                  Attributes.PRIORITY, true)
                   }));
-        Dictionaries.addDictionaryListChangeListener
+        Dictionaries.getInstance().addDictionaryListChangeListener
             ( new Dictionaries.DictionaryListChangeListener() {
                     @Override
 					public void dictionaryListChanged() {
                         mainLookupModel.setDictionaries
-                            ( Arrays.asList( Dictionaries.getDictionaries( false)));
+                            ( Arrays.asList( Dictionaries.getInstance().getDictionaries()));
                     }
                 });
         mainLookupModel.loadFromPreferences( PREFS, "wordlookup");
@@ -419,7 +419,7 @@ public abstract class JGloss implements ExitListener {
 
     @Override
     public void onExit() {
-        Dictionary[] dicts = Dictionaries.getDictionaries( true);
+        Dictionary[] dicts = Dictionaries.getInstance().getDictionaries();
         for (Dictionary dict : dicts) {
 	        dict.dispose();
         }
