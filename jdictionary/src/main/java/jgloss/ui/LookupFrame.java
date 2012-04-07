@@ -118,9 +118,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
                 @Override
 				public void windowClosing( WindowEvent e) {
                     setVisible(false);
-                    if (JGloss.exit()) {
-	                    dispose();
-                    }
+                    JGloss.getApplication().exit();
                 }
             });
 
@@ -231,9 +229,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     setVisible(false);
-                    if (JGloss.exit()) {
-	                    dispose();
-                    }
+                    JGloss.getApplication().exit();
                 }
             };
         UIUtilities.initAction( closeAction, "main.menu.close");

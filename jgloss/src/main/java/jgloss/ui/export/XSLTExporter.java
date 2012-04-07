@@ -103,13 +103,13 @@ class XSLTExporter implements Exporter {
             }
         }
         ExportFileChooser filechooser = 
-            new ExportFileChooser( JGloss.getCurrentDir(), configuration.getTitle(),
+            new ExportFileChooser( JGloss.getApplication().getCurrentDir(), configuration.getTitle(),
                                    uiparameters);
         if (configuration.getFileFilter() != null) {
 	        filechooser.setFileFilter( configuration.getFileFilter());
         }
 
-        filechooser.setCurrentDirectory( new File( JGloss.getCurrentDir()));
+        filechooser.setCurrentDirectory( new File( JGloss.getApplication().getCurrentDir()));
         int result = filechooser.showSaveDialog( parent);
 
         if (result == JFileChooser.APPROVE_OPTION) {

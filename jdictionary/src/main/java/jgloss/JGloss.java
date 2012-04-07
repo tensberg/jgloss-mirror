@@ -23,9 +23,14 @@
 
 package jgloss;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.WARNING;
+
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.TextArea;
@@ -33,9 +38,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
@@ -59,7 +65,6 @@ import jgloss.ui.PreferencesFrame;
 import jgloss.ui.PreferencesPanel;
 import jgloss.ui.SplashScreen;
 import jgloss.ui.StyleDialog;
-import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Framework for the initialization of the two applications {@link JGlossApp JGlossApp} and
@@ -69,61 +74,13 @@ import jgloss.util.UTF8ResourceBundleControl;
  *
  * @author Michael Koch
  */
-public abstract class JGloss {
+public abstract class JGloss implements ExitListener {
 	private static final Logger LOGGER = Logger.getLogger(JGloss.class.getPackage().getName());
 	
 	/**
      * Path to the file with message strings.
      */
     private static final String MESSAGES_BUNDLE = "messages";
-
-    /**
-     * Path to the directory last used.
-     */
-    private static String currentDir;
-
-    /**
-     * Ties together ResourceBundles and MessageFormat to access localizable,
-     * customizable messages.
-     */
-    public static class Messages {
-        private final ResourceBundle messages;
-
-        /**
-         * Creates a new Messages object which accesses the given resource bundle.
-         * The system default locale will be used.
-         *
-         * @param bundle Base name of the bundle.
-         */
-        public Messages( String bundle) {
-            messages = ResourceBundle.getBundle( MESSAGES_BUNDLE, new UTF8ResourceBundleControl());
-        }
-
-        /**
-         * Returns the string for the given key.
-         *
-         * @param key Key for a string in the resource bundle.
-         * @return Message for this key.
-         */
-        public String getString( String key) {
-            return messages.getString( key);
-        }
-
-        /**
-         * Returns the string for the given key, filled in with the given values.
-         * MessageFormat is used to parse the string stored in the resource bundle
-         * and fill in the Objects. See the documentation for MessageFormat for the
-         * used format.
-         *
-         * @param key Key for a string in the resource bundle.
-         * @param data Data to insert in the message.
-         * @return Message for this key and data.
-         * @see java.text.MessageFormat
-         */
-        public String getString( String key, Object[] data) {
-            return MessageFormat.format( messages.getString( key), data);
-        }
-    } // class messages
 
     /**
      * The application-wide preferences. Use this to store and retrieve preferences.
@@ -135,22 +92,40 @@ public abstract class JGloss {
      */
     public static final Messages MESSAGES = new Messages( MESSAGES_BUNDLE);
 
-    protected static JGloss application;
+    private static JGloss application;
+
+    private final List<ExitListener> exitListeners = new CopyOnWriteArrayList<ExitListener>();
+    
+    /**
+     * Path to the directory last used.
+     */
+    private String currentDir;
 
     protected LookupModel mainLookupModel;
 
-    public static boolean exit() {
-        return application.doExit();
+    /**
+     * 
+     * @return Singleton instance of the JGloss application.
+     */
+    public static JGloss getApplication() {
+        assert EventQueue.isDispatchThread();
+        assert application != null;
+        return application;
     }
-
+ 
     /**
      * Empty constructor.
      */
     JGloss() {}
 
     protected void init( String[] args) {
+        assert application == null;
+        
         application = this;
+        
         try {
+            addExitListener(this);
+            
             registerDictionaries();
 
             handleCommandLine( args);
@@ -160,14 +135,6 @@ public abstract class JGloss {
             SplashScreen splash = new SplashScreen( getApplicationName());
 
             splash.setInfo( MESSAGES.getString( "splashscreen.initMain"));
-
-            Runtime.getRuntime().addShutdownHook
-                ( new Thread() {
-                        @Override
-						public void run() {
-                            shutdownHook();
-                        }
-                    });
 
             createDialogs();
 
@@ -188,6 +155,18 @@ public abstract class JGloss {
             System.exit( 1);
         }
     }
+    
+    public boolean exit() {
+        boolean exit = doExit();
+        if (exit) {
+            LOGGER.log(FINE, "shutting down JGloss");
+            fireOnExit();
+            
+            LOGGER.log(INFO, "JGloss shut down");
+            System.exit(0);
+        }
+        return exit;
+    }
 
     protected abstract String getApplicationName();
 
@@ -204,7 +183,8 @@ public abstract class JGloss {
      *
      * @return Path to the current directory.
      */
-    public static String getCurrentDir() {
+    public String getCurrentDir() {
+        assert EventQueue.isDispatchThread();
         if (currentDir == null) {
 	        currentDir = System.getProperty( "user.home");
         }
@@ -218,8 +198,27 @@ public abstract class JGloss {
      *
      * @param dir The new current directory.
      */
-    public static void setCurrentDir( String dir) {
+    public void setCurrentDir( String dir) {
+        assert EventQueue.isDispatchThread();
         currentDir = dir;
+    }
+    
+    public void addExitListener(ExitListener listener) {
+        exitListeners.add(listener);
+    }
+    
+    public void removeExitListener(ExitListener listener) {
+        exitListeners.remove(listener);
+    }
+    
+    private void fireOnExit() {
+        for (ExitListener listener : exitListeners) {
+            try {
+                listener.onExit();
+            } catch (RuntimeException ex) {
+                LOGGER.log(WARNING, "exit listener failed", ex);
+            }
+        }
     }
 
     protected void registerDictionaries() {
@@ -418,7 +417,8 @@ public abstract class JGloss {
         return mainLookupModel;
     }
 
-    protected void shutdownHook() {
+    @Override
+    public void onExit() {
         Dictionary[] dicts = Dictionaries.getDictionaries( true);
         for (Dictionary dict : dicts) {
 	        dict.dispose();

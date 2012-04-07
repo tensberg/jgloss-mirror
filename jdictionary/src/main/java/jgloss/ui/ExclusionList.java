@@ -414,14 +414,14 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      * Displays a file chooser and reads the contents of the JList from the selected file.
      */
     private void importList() {
-        JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
+        JFileChooser f = new JFileChooser( JGloss.getApplication().getCurrentDir());
         f.setDialogTitle( JGloss.MESSAGES.getString( "exclusions.import.title"));
         f.setFileHidingEnabled( true);
         f.setFileView( CustomFileView.getFileView());
         int r = f.showOpenDialog( SwingUtilities.getRoot( box));
         if (r == JFileChooser.APPROVE_OPTION) {
 	        try {
-	            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
+	            JGloss.getApplication().setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
 	            DefaultListModel m = new DefaultListModel();
 	            BufferedReader reader = new BufferedReader
 	                ( CharacterEncodingDetector.getReader

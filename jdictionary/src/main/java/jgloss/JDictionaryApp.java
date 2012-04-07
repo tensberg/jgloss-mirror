@@ -54,8 +54,6 @@ public class JDictionaryApp extends JGloss {
 
     @Override
 	protected boolean doExit() {
-        System.exit( 0);
-
         return true;
     }
 } // class JDictionary

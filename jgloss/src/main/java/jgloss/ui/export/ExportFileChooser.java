@@ -106,7 +106,7 @@ class ExportFileChooser extends SaveFileChooser {
     }
 
     private void saveToPrefs() {
-        JGloss.setCurrentDir( getCurrentDirectory().getAbsolutePath());
+        JGloss.getApplication().setCurrentDir( getCurrentDirectory().getAbsolutePath());
         for (UIParameter uiparameter : uiparameters) {
         	uiparameter.saveToPrefs();
         }

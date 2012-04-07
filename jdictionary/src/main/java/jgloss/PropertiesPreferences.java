@@ -61,9 +61,9 @@ class PropertiesPreferences extends Preferences {
             LOGGER.severe( JGloss.MESSAGES.getString( "error.loadPreferences"));
         }
         // store the preferences at shutdown
-        Runtime.getRuntime().addShutdownHook( new Thread() {
+        JGloss.getApplication().addExitListener(new ExitListener() {
                 @Override
-				public void run() {
+				public void onExit() {
                     try {
                         store();
                     } catch (IOException ex) {

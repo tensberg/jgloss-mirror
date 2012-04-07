@@ -65,7 +65,7 @@ public class JGlossApp extends JGloss {
         assert EventQueue.isDispatchThread();
         
         if (lookupFrame == null) {
-	        lookupFrame = new JGlossLookupFrame( application.createLookupModel());
+	        lookupFrame = new JGlossLookupFrame( getApplication().createLookupModel());
         }
 
         return lookupFrame;
@@ -159,8 +159,6 @@ public class JGlossApp extends JGloss {
         } catch (InterruptedException ex) {}
         System.gc();
         */
-
-        System.exit( 0);
 
         return true;
     }

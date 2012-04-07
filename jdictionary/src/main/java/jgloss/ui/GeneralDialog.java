@@ -294,7 +294,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
     }
 
     private void chooseChasenLocation() {
-        JFileChooser chooser = new JFileChooser( JGloss.getCurrentDir());
+        JFileChooser chooser = new JFileChooser( JGloss.getApplication().getCurrentDir());
         chooser.setDialogTitle( JGloss.MESSAGES.getString( "general.chasen.chooser.title"));
         chooser.setFileHidingEnabled( true);
         chooser.setMultiSelectionEnabled( false);

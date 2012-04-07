@@ -192,13 +192,13 @@ public class ImportDialog extends JDialog implements TextListener {
 
 				@Override
 				public void actionPerformed( ActionEvent e) {
-                    JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
+                    JFileChooser f = new JFileChooser( JGloss.getApplication().getCurrentDir());
                     f.setFileHidingEnabled( true);
                     f.setFileView( CustomFileView.getFileView());
                     int r = f.showOpenDialog( ImportDialog.this);
                     if (r == JFileChooser.APPROVE_OPTION) {
                         filename.setText( f.getSelectedFile().getAbsolutePath());
-                        JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
+                        JGloss.getApplication().setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
                     }
                 }
             };

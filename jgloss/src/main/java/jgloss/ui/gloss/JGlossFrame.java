@@ -260,13 +260,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                         new Thread( "JGloss open") {
                                 @Override
 								public void run() {
-                                    JFileChooser f = new JFileChooser( JGloss.getCurrentDir());
+                                    JFileChooser f = new JFileChooser( JGloss.getApplication().getCurrentDir());
                                     f.addChoosableFileFilter( jglossFileFilter);
                                     f.setFileHidingEnabled( true);
                                     f.setFileView( CustomFileView.getFileView());
                                     int r = f.showOpenDialog( target);
                                     if (r == JFileChooser.APPROVE_OPTION) {
-                                        JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
+                                        JGloss.getApplication().setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
                                         // test if the file is already open
                                         String path = f.getSelectedFile().getAbsolutePath();
                                         for (JGlossFrame frame : jglossFrames) {
@@ -920,7 +920,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         this.dispose(); // this.dispose() calls frame.dispose()
 
         if (jglossFrames.size() == 0) { // this was the last open document
-            JGloss.exit();
+            JGloss.getApplication().exit();
         }
     }
 
@@ -1713,7 +1713,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     private void saveDocumentAs() {
         String path;
         if (model.getDocumentPath() == null) {
-	        path = JGloss.getCurrentDir();
+	        path = JGloss.getApplication().getCurrentDir();
         } else {
 	        path = new File( model.getDocumentPath()).getPath();
         }
@@ -1725,7 +1725,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         if (r == JFileChooser.APPROVE_OPTION) {
             model.setDocumentPath(  f.getSelectedFile().getAbsolutePath());
             model.setDocumentName( f.getSelectedFile().getName());
-            JGloss.setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
+            JGloss.getApplication().setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
             updateTitle();
             if (saveDocument()) {
 	            OPEN_RECENT.addDocument( f.getSelectedFile());
