@@ -102,14 +102,6 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * this list is different from the dictionary list displayed.
      */
     private List<DictionaryWrapper> activeDictionaries = new ArrayList<DictionaryWrapper>( 10);
-    /**
-     * An EDICT editable by the user.
-     */
-    //private static UserDictionary userDictionary;
-    /**
-     * Implementation used to create the user dictionary.
-     */
-    //private static UserDictionary.Implementation userDictImplementation;
 
     /**
      * Interface implemented by objects interested in notifications of changes in the
@@ -209,14 +201,6 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 
         return out;
     }
-
-    /**
-     * Returns the user dictionary. If the user dictionary creation failed <CODE>null</CODE>
-     * will be returned.
-     */
-    /*public static UserDictionary getUserDictionary() {
-        return userDictionary;
-        }*/
 
     private final List<DictionaryListChangeListener> dictionaryListChangeListeners = new CopyOnWriteArrayList<DictionaryListChangeListener>();
 
@@ -610,8 +594,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 
     /**
      * Initializes the list of active dictionaries from the dictionaries stored in the
-     * preferences. If the list in the preferences does not contain the user dictionary,
-     * it is inserted at the first position.
+     * preferences.
      */
     private void loadDictionariesFromPreferences() {
         String[] fs = JGloss.PREFS.getPaths( Preferences.DICTIONARIES);
@@ -630,26 +613,12 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 }
 
                 activeDictionaries.add( new DictionaryWrapper( element, d));
-                /*if (d instanceof UserDictionary)
-                  userDictionary = (UserDictionary) d;*/
             } catch (Exception ex) {
                 exceptions.add( ex);
                 exceptions.add( element);
             }
         }
         fireDictionaryListChanged();
-        // insert the user dictionary if not already in the dictionary list
-        /*if (userDictionary == null) try {
-            userDictionary = (UserDictionary)
-                DictionaryFactory.createDictionary( userDictImplementation.getDescriptor());
-            synchronized (activeDictionaries) {
-                activeDictionaries.add( 0, new DictionaryWrapper
-                    ( userDictImplementation.getDescriptor(), userDictionary));
-            }
-        } catch (DictionaryFactory.Exception ex) {
-            exceptions.add( ex);
-            exceptions.add( userDictImplementation.getDescriptor());
-            }*/
         
         EventQueue.invokeLater( new Runnable() {
                 @Override
