@@ -22,6 +22,8 @@
 
 package jgloss.parser;
 
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 
 import java.io.BufferedReader;
@@ -254,8 +256,6 @@ public class Chasen {
         return defaultChasenExecutable;
     }
 
-    static boolean mToldUserThatChasenCantRun;
-
     /**
      * Test if the chasen program is available at the specified path. If the path to the executable
      * is the same as in the previous test, and this test was successfull, the test will not be
@@ -280,7 +280,8 @@ public class Chasen {
             p = Runtime.getRuntime().exec( chasenExecutable + " -V");
         } catch (IOException ex) {
             // specified program probably doesn't exist
-            LOGGER.log(SEVERE, "Error: Cannot start ChaSen now", ex );
+            LOGGER.log(INFO, "cannot start chasen executable {0}", chasenExecutable);
+            LOGGER.log(FINER, "chasen executable stack trace", ex);
 
             return false;
         }
