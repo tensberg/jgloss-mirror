@@ -47,6 +47,7 @@ import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * Panel which provides an interface to select a specific parser. Available parsers are registered

@@ -27,7 +27,7 @@ import javax.swing.JMenu;
 
 import jgloss.ui.LookupFrame;
 import jgloss.ui.LookupModel;
-import jgloss.ui.UIUtilities;
+import jgloss.ui.util.UIUtilities;
 
 public class JGlossLookupFrame extends LookupFrame {
     private static final long serialVersionUID = 1L;

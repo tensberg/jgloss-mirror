@@ -68,6 +68,7 @@ import jgloss.dictionary.attribute.Attributes;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
 import jgloss.ui.DictionaryEntryFormat.DecorationPosition;
 import jgloss.ui.DictionaryEntryFormat.DecorationType;
+import jgloss.ui.util.XCVManager;
 import jgloss.util.ListFormatter;
 
 public class LookupResultList extends JPanel implements LookupResultHandler {

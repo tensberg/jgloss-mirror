@@ -50,6 +50,8 @@ import jgloss.dictionary.MatchMode;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
+import jgloss.ui.util.UIUtilities;
+import jgloss.ui.util.XCVManager;
 
 public class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
     /**
@@ -59,7 +61,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
      * removed from the {@link Dictionaries Dictionaries} listener list.
      */
     private static class WeakDictionaryChangeListener 
-        implements Dictionaries.DictionaryListChangeListener {
+        implements DictionaryListChangeListener {
         private WeakReference<LookupModel> modelRef;
 
         WeakDictionaryChangeListener( LookupModel model) {

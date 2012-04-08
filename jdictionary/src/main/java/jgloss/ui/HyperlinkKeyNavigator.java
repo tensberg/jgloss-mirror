@@ -50,6 +50,8 @@ import javax.swing.text.Element;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
+import jgloss.ui.util.UIUtilities;
+
 /**
  * Allow keyboard navigation of links in a <code>JEditorPane</code> showing HTML content.
  * <p> 

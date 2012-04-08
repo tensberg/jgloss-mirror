@@ -23,10 +23,10 @@
 
 package jgloss.ui;
 
+import static jgloss.ui.util.SwingWorkerProgressFeedback.showProgress;
+
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.EventQueue;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -36,7 +36,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -48,9 +47,7 @@ import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -58,9 +55,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -70,6 +65,7 @@ import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryFactory;
 import jgloss.dictionary.IndexException;
 import jgloss.dictionary.IndexedDictionary;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * Panel which allows the user to add and manipulate dictionaries used for document parsing.
@@ -92,81 +88,17 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * The widget which displays the current selection of dictionaries.
      */
-    private final JList dictionaries;
+    final JList dictionaries;
+
     /**
-     * List of {@link Dictionaries.DictionaryWrapper DictionaryWrapper } instances with
+     * List of {@link DictionaryWrapper DictionaryWrapper } instances with
      * dictionaries currently used in the application. This is the list of dictionaries
      * returned by {@link #getDictionaries() getDictionaries}.
      * If the user has edited
      * the dictionary list in the preference dialog, but not yet applied the changes,
      * this list is different from the dictionary list displayed.
      */
-    private List<DictionaryWrapper> activeDictionaries = new ArrayList<DictionaryWrapper>( 10);
-
-    /**
-     * Interface implemented by objects interested in notifications of changes in the
-     * active dictionary list.
-     */
-    public interface DictionaryListChangeListener {
-        void dictionaryListChanged();
-    } // interface DictionaryListChangeListener
-
-    /**
-     * Wrapper for a dictionary and its descriptor. Used as elements in the list model.
-     */
-    private static class DictionaryWrapper {
-        /**
-         * Descriptor used to create the dictionary. Usually the path to the dictionary file.
-         *
-         * @see jgloss.dictionary.DictionaryFactory
-         */
-        public String descriptor;
-        public Dictionary dictionary;
-
-        public DictionaryWrapper( String descriptor, Dictionary dictionary) {
-            this.descriptor = descriptor;
-            this.dictionary = dictionary;
-        }
-
-        /**
-         * Returns the name of the dictionary.
-         */
-        @Override
-		public String toString() {
-            return dictionary.toString();
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((descriptor == null) ? 0 : descriptor.hashCode());
-            result = prime * result + ((dictionary == null) ? 0 : dictionary.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            DictionaryWrapper other = (DictionaryWrapper) obj;
-            if (descriptor == null) {
-                if (other.descriptor != null)
-                    return false;
-            } else if (!descriptor.equals(other.descriptor))
-                return false;
-            if (dictionary == null) {
-                if (other.dictionary != null)
-                    return false;
-            } else if (!dictionary.equals(other.dictionary))
-                return false;
-            return true;
-        }
-    }
+    private final List<DictionaryWrapper> activeDictionaries = new ArrayList<DictionaryWrapper>( 10);
 
     /**
      * Returns the single application-wide instance.
@@ -215,125 +147,6 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     private void fireDictionaryListChanged() {
         for (DictionaryListChangeListener listener : dictionaryListChangeListeners) {
             listener.dictionaryListChanged();
-        }
-    }
-
-    /**
-     * Thread used to load dictionaries asynchronously when the user has selected "add dictionaries".
-     */
-    private class DictionaryLoader implements Runnable {
-        private boolean dictionariesLoaded = false;
-        private JDialog messageDialog;
-        private JLabel message;
-        private Cursor currentCursor;
-        private File[] dictionaries;
-
-        public DictionaryLoader() {}
-
-        /**
-         * Load the dictionaries from the list of files and add them to the current list of
-         * dictionaries. The dictionaries are loaded in their own thread. If the thread does
-         * not terminate after one second, this method will pop up a model information dialog and
-         * return. The thread will dispose the dialog after it has loaded all dictionaries and display
-         * any error messages for errors in dictionary loading.
-         *
-         * @param dictionaries List of dictionary files to load. If a dictionary file is already
-         *        loaded, it will be ignored.
-         */
-        public void loadDictionaries( File[] dictionaries) {
-            this.dictionaries = dictionaries;
-            dictionariesLoaded = false;
-            if (message == null) {
-	            message = new JLabel( "", SwingConstants.CENTER);
-            }
-            currentCursor = getCursor();
-
-            Thread worker = new Thread( this);
-            worker.start();
-
-            try {
-                worker.join( 1000);
-            } catch (InterruptedException ex) {}
-
-            if (!dictionariesLoaded) {
-                setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-                if (messageDialog == null) {
-                    Frame parent = (Frame) SwingUtilities.getRoot( Dictionaries.this);
-                    messageDialog = new JDialog( parent, true);
-                    messageDialog.setTitle( JGloss.MESSAGES.getString( "dictionaries.loading.title"));
-                    messageDialog.getContentPane().add( message);
-                    messageDialog.setSize( 450, 50);
-                    messageDialog.setLocation( Math.max( (int) (parent.getLocation().getX() + 
-                                                                parent.getSize().getWidth()/2 - 225), 0),
-                                               (int) (parent.getLocation().getY() + 
-                                                      parent.getSize().getHeight()/2 - 25));
-                    messageDialog.setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
-                }
-                messageDialog.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-                messageDialog.setVisible(true);
-            }
-        }
-
-        @Override
-		public void run() {
-            final DefaultListModel model = (DefaultListModel) Dictionaries.this.dictionaries.getModel();
-            List<Object> errors = new ArrayList<Object>( dictionaries.length*2);
-            for (File dictionarie : dictionaries) {
-                final String descriptor = dictionarie.getAbsolutePath();
-                // check if the dictionary is already added
-                boolean alreadyAdded = false;
-                for ( Enumeration<?> e=model.elements(); e.hasMoreElements(); ) {
-                    if (((DictionaryWrapper) e.nextElement()).descriptor.equals( descriptor)) {
-                        alreadyAdded = true;
-                        break;
-                    }
-                }
-                if (!alreadyAdded) {
-                    EventQueue.invokeLater( new Runnable() {
-                            @Override
-							public void run() {
-                                message.setText( JGloss.MESSAGES.getString
-                                                 ( "dictionaries.loading",
-                                                   new String[] { new File( descriptor)
-                                                       .getName() }));
-                            }
-                        });
-                    try {
-                        final Dictionary d = DictionaryFactory
-                            .createDictionary( descriptor);
-                        if (d instanceof IndexedDictionary) {
-                            if (!((IndexedDictionary) d).loadIndex()) {
-	                            ((IndexedDictionary) d).buildIndex();
-                            }
-                        }
-                        if (d != null) {
-                            EventQueue.invokeLater( new Runnable() {
-                                    @Override
-									public void run() {
-                                        model.addElement( new DictionaryWrapper( descriptor, d));
-                                    }
-                                });
-                        }
-                    } catch (Exception ex) {
-                        // stack the errors and show them after all other dictionaries are
-                        // loaded
-                        errors.add( ex);
-                        errors.add( descriptor);
-                    }
-                }
-            }
-
-            dictionariesLoaded = true;
-            setCursor( currentCursor);
-            if (messageDialog != null) {
-                messageDialog.setVisible(false);
-                messageDialog.dispose(); 
-            }               
-
-            // show error messages for dictionary load failures
-            for ( Iterator<Object> i=errors.iterator(); i.hasNext(); ) {
-	            showDictionaryError( (Exception) i.next(), (String) i.next());
-            }
         }
     }
 
@@ -491,18 +304,44 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         int result = chooser.showDialog( SwingUtilities.getRoot( instance), JGloss.MESSAGES.getString
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
-            new DictionaryLoader().loadDictionaries( chooser.getSelectedFiles());
+            loadDictionaries(chooser.getSelectedFiles());
             JGloss.PREFS.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
                               .getAbsolutePath());
         }
     }
 
+    private void loadDictionaries(File[] selectedFiles) {
+        List<String> descriptors = new ArrayList<String>(selectedFiles.length);
+        for (File file : selectedFiles) {
+            String descriptor = file.getAbsolutePath();
+            if (!isAlreadyAdded(descriptor)) {
+                descriptors.add(descriptor);
+            }
+        }
+        
+        if (!descriptors.isEmpty()) {
+            DictionaryLoader loader = new DictionaryLoader(this, (DefaultListModel) dictionaries.getModel(), descriptors);
+            showProgress(loader, this);
+            loader.execute();
+        }
+    }
+    
+    private boolean isAlreadyAdded(String descriptor) {
+        ListModel model = dictionaries.getModel();
+        for (int i=0; i<model.getSize(); i++) {
+            if (((DictionaryWrapper) model.getElementAt(i)).descriptor.equals( descriptor)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Show an error dialog for the dictionary exception.
      */
-    private void showDictionaryError( Exception ex, String file) {
+    void showDictionaryError( Throwable ex, String file) {
         if (ex instanceof DictionaryFactory.InstantiationException) {
-            ex = (Exception) ((DictionaryFactory.InstantiationException) ex).getCause();
+            ex = ((DictionaryFactory.InstantiationException) ex).getCause();
         }
 
         File f = new File( file);
@@ -510,13 +349,13 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         if (ex instanceof DictionaryFactory.NotSupportedException) {
             int choice = JOptionPane.showOptionDialog(
                 SwingUtilities.getRoot(this),
-                JGloss.MESSAGES.getString("error.dictionary.format", new String[] { path }),
+                JGloss.MESSAGES.getString("error.dictionary.format", path),
                 JGloss.MESSAGES.getString("error.dictionary.title"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null,
                 new String[] { JGloss.MESSAGES.getString("button.ok"), JGloss.MESSAGES.getString("button.why") }, null);     
  
             if (choice == JOptionPane.NO_OPTION) { // this is really the Why? option
-                JTextArea text = new JTextArea(JGloss.MESSAGES.getString( "error.dictionary.reason", new String[] { path, ex.getMessage() }), 25, 55);
+                JTextArea text = new JTextArea(JGloss.MESSAGES.getString( "error.dictionary.reason", path, ex.getMessage()), 25, 55);
                 text.setEditable(false);
                 text.setLineWrap(true);
                 text.setWrapStyleWord(true);
@@ -529,7 +368,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         }
         else {
             String msgid;
-            String [] objects;
+            Object[] objects;
 
             if (ex instanceof FileNotFoundException) {
                 msgid = "error.dictionary.filenotfound";

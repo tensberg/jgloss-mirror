@@ -54,9 +54,9 @@ import javax.swing.text.Keymap;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
-import jgloss.ui.UIUtilities;
 import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.gloss.AnnotationList;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * JGlossEditor is a JTextPane with extensions specific to the manipulation on

@@ -43,7 +43,7 @@ public class Messages {
      * @return Message for this key and data.
      * @see java.text.MessageFormat
      */
-    public String getString( String key, Object[] data) {
+    public String getString( String key, Object... data) {
         return MessageFormat.format( messages.getString( key), data);
     }
 } // class messages

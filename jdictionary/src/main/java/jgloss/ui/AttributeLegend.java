@@ -45,6 +45,7 @@ import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeFormatter;
 import jgloss.dictionary.attribute.AttributeValue;
 import jgloss.dictionary.attribute.CategoryAttributeValue;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * Displays a legend to the attributes used by a dictionary.

@@ -49,6 +49,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import jgloss.JGloss;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * The about dialog which shows what this is all about. It will also create a frame

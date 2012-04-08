@@ -36,8 +36,8 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import jgloss.JGloss;
-import jgloss.ui.UIUtilities;
 import jgloss.ui.gloss.JGlossFrameModel;
+import jgloss.ui.util.UIUtilities;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

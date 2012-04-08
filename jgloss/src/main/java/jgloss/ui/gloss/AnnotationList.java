@@ -49,10 +49,10 @@ import javax.swing.text.Element;
 
 import jgloss.JGloss;
 import jgloss.ui.ExclusionList;
-import jgloss.ui.UIUtilities;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.ui.util.UIUtilities;
 import jgloss.util.StringTools;
 
 public class AnnotationList extends JList implements MouseListener, ListSelectionListener {

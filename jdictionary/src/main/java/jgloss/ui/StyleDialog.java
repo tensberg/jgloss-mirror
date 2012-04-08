@@ -57,6 +57,7 @@ import javax.swing.event.ChangeListener;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * Component which allows the user to edit visual-related preferences. This will normally embedded

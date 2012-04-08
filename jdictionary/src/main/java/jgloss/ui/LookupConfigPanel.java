@@ -53,6 +53,7 @@ import jgloss.dictionary.DictionaryEntryField;
 import jgloss.dictionary.MatchMode;
 import jgloss.dictionary.SearchFieldSelection;
 import jgloss.dictionary.SearchMode;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * User configuration for dictionary lookups.

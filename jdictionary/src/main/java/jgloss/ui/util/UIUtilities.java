@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.ui;
+package jgloss.ui.util;
 
 import java.awt.Component;
 import java.awt.Container;

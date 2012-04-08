@@ -35,7 +35,7 @@ import javax.swing.JPanel;
 import jgloss.JGloss;
 import jgloss.ui.CustomFileView;
 import jgloss.ui.SaveFileChooser;
-import jgloss.ui.UIUtilities;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * File chooser with user interface elements typical for file export.

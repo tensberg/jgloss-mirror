@@ -59,6 +59,7 @@ import jgloss.dictionary.attribute.Attributes;
 import jgloss.ui.AboutFrame;
 import jgloss.ui.AttributeResultFilter;
 import jgloss.ui.Dictionaries;
+import jgloss.ui.DictionaryListChangeListener;
 import jgloss.ui.LookupModel;
 import jgloss.ui.LookupResultFilter;
 import jgloss.ui.PreferencesFrame;
@@ -405,7 +406,7 @@ public abstract class JGloss implements ExitListener {
                                                  Attributes.PRIORITY, true)
                   }));
         Dictionaries.getInstance().addDictionaryListChangeListener
-            ( new Dictionaries.DictionaryListChangeListener() {
+            ( new DictionaryListChangeListener() {
                     @Override
 					public void dictionaryListChanged() {
                         mainLookupModel.setDictionaries

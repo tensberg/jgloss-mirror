@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.ui;
+package jgloss.ui.util;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

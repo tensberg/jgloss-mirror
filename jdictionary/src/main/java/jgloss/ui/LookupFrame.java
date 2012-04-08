@@ -51,6 +51,8 @@ import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
+import jgloss.ui.util.UIUtilities;
+import jgloss.ui.util.XCVManager;
 
 /**
  * Frame which ties together a {@link LookupConfigPanel LookupConfigPanel} and a
@@ -59,7 +61,7 @@ import jgloss.dictionary.attribute.ReferenceAttributeValue;
  * @author Michael Koch
  */
 public class LookupFrame extends JFrame implements ActionListener, HyperlinkListener,
-                                                   Dictionaries.DictionaryListChangeListener {
+                                                   DictionaryListChangeListener {
 	private static final Logger LOGGER = Logger.getLogger(LookupFrame.class.getPackage().getName());
 	
 	private static final long serialVersionUID = 1L;

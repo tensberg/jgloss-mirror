@@ -61,6 +61,7 @@ import javax.swing.event.ListSelectionListener;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
+import jgloss.ui.util.UIUtilities;
 import jgloss.util.CharacterEncodingDetector;
 
 /**

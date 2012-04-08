@@ -40,6 +40,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
 import jgloss.JGloss;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * The preferences frame allows the user to set the varying preferences for the JGloss

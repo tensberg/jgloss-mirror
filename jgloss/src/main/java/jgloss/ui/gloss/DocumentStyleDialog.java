@@ -50,9 +50,9 @@ import javax.swing.text.html.StyleSheet;
 import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.ui.StyleDialog;
-import jgloss.ui.UIUtilities;
 import jgloss.ui.html.AnnotationTags;
 import jgloss.ui.html.JGlossEditor;
+import jgloss.ui.util.UIUtilities;
 
 /**
  * Style dialog which also manages JGloss document styles.

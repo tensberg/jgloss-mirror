@@ -60,6 +60,7 @@ import jgloss.parser.Chasen;
 import jgloss.parser.ChasenParser;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
+import jgloss.ui.util.UIUtilities;
 import jgloss.util.CharacterEncodingDetector;
 
 /**
