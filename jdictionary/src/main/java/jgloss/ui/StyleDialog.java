@@ -23,15 +23,16 @@
 
 package jgloss.ui;
 
+import static jgloss.ui.util.FontUtilities.canDisplayJapanese;
+import static jgloss.ui.util.SwingWorkerProgressFeedback.showProgress;
+
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -50,7 +51,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.ProgressMonitor;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -89,10 +89,6 @@ public class StyleDialog extends Box implements PreferencesPanel {
         return box;
     }
 
-    /**
-     * Four japanese characters used to test the fonts.
-     */
-    protected final static String JAPANESE_CHARS_TEST = "A\u3042\u30a2\u660e\u3002";
     /**
      * Default japanese font used if the generic fonts like SansSerif, Dialog etc. don't contain Japanese
      * characters.
@@ -440,29 +436,9 @@ public class StyleDialog extends Box implements PreferencesPanel {
         }
 
         // Try out all fonts. Since this is slow, do this in its own thread.
-        Thread fontTester = new Thread() {
-                @Override
-				public void run() {
-                    String font = searchJapaneseFont();
-                    if (font == null) {
-                        JOptionPane.showMessageDialog
-                            ( StyleDialog.this, 
-                              JGloss.MESSAGES.getString( "style.autodetect.nofont"),
-                              JGloss.MESSAGES.getString( "style.autodetect.title"),
-                              JOptionPane.WARNING_MESSAGE);
-                    }
-                    else {
-                        final String fontc = font;
-                        EventQueue.invokeLater( new Runnable() {
-                                @Override
-								public void run() {
-                                    selectJapaneseFont( fontc);
-                                }
-                            });
-                    }
-                }
-            };
-        fontTester.start();
+        FontTester fontTester = new FontTester(this);
+        showProgress(fontTester, this);
+        fontTester.execute();
     }
 
     /**
@@ -470,7 +446,7 @@ public class StyleDialog extends Box implements PreferencesPanel {
      * font. Only the current dialog settings are modified, not the user preferences.
      * Also displays a dialog with the font name.
      */
-    protected void selectJapaneseFont( String fontname) {
+    protected void selectJapaneseFont(String fontname) {
         if (canDisplayJapanese( "Dialog") && canDisplayJapanese( "DialogInput")) {
             generalFontDefault.setSelected( true);
         }
@@ -482,7 +458,7 @@ public class StyleDialog extends Box implements PreferencesPanel {
 
         JOptionPane.showMessageDialog( this, 
                                        JGloss.MESSAGES.getString( "style.autodetect.selectedfont",
-                                                                  new String[] { fontname }),
+                                                                  fontname),
                                        JGloss.MESSAGES.getString( "style.autodetect.title"),
                                        JOptionPane.INFORMATION_MESSAGE);
     }
@@ -559,65 +535,6 @@ public class StyleDialog extends Box implements PreferencesPanel {
         return null;
     }
 
-    /**
-     * Searches the list of all available fonts for one which can display Japanese characters.
-     * Returns the first font found. The method shows its progress in a dialog, and is interruptible
-     * by the user. If no suitable font is found or n case of an interruption, 
-     * <code>null</code> is returned.
-     */
-    protected String searchJapaneseFont() {
-        final Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment()
-            .getAllFonts();
-        final ProgressMonitor monitor = new ProgressMonitor
-            ( this, JGloss.MESSAGES.getString( "style.autodetect.progress.description"),
-              "______________________________________________", 1, allFonts.length);
-        final int[] i = new int[1]; // mutable final array, accessible by nested class
-        final Font[] currentFont = new Font[1]; // mutable final array, accessible by nested class
-        // use timer to update progress bar
-        javax.swing.Timer timer = new javax.swing.Timer( 1000, new ActionListener() {
-                @Override
-				public void actionPerformed( ActionEvent e) {
-                    monitor.setProgress( i[0]);
-                    monitor.setNote( JGloss.MESSAGES.getString
-                                     ( "style.autodetect.progress.font", 
-                                       new Object[] { currentFont[0].getName() }));
-                }
-            });
-        timer.setRepeats( true);
-        timer.start();
-
-        String font = null;
-        for ( i[0]=0; i[0]<allFonts.length; i[0]++) {
-            if (monitor.isCanceled()) {
-	            break;
-            }
-            currentFont[0] = allFonts[i[0]];
-            int length = currentFont[0].canDisplayUpTo( JAPANESE_CHARS_TEST);
-
-            length = 0;
-
-            if (length == -1 || // all chars succeeded (according to canDisplayUpTo specification)
-                length == JAPANESE_CHARS_TEST.length()) { // all chars succeeded (behavior in Java 1.3)
-                font = currentFont[0].getName();
-                break;
-            }
-        }
-
-        timer.stop();
-        monitor.close();
-
-        return font;
-    }
-
-    /**
-     * Check if the font with the given name can display Japanese characters.
-     */
-    protected static boolean canDisplayJapanese( String fontName) {
-        Font font = new Font( fontName, Font.PLAIN, 1);
-        int length = font.canDisplayUpTo( JAPANESE_CHARS_TEST);
-        return (length == -1 || // all chars succeeded (according to canDisplayUpTo specification)
-                length == JAPANESE_CHARS_TEST.length()); // all chars succeeded (behavior in Java 1.3)
-    }
 
     /**
      * Create a font with the font name taken from the general font settings and the style and size
