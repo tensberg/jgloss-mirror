@@ -41,6 +41,11 @@ import jgloss.Preferences;
  * @author Michael Koch
  */
 public class OpenRecentMenu {
+    /**
+     * Notification of the selection of an item from the {@link OpenRecentMenu}.
+     *
+     * @author Michael Koch <tensberg@gmx.net>
+     */
     public interface FileSelectedListener {
         /**
          * Invoked when the user selects a file from the open recent menu

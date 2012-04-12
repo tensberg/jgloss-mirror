@@ -92,8 +92,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.Position;
@@ -117,7 +115,6 @@ import jgloss.ui.ExclusionList;
 import jgloss.ui.ExtensionFileFilter;
 import jgloss.ui.FirstEntryCache;
 import jgloss.ui.GeneralDialog;
-import jgloss.ui.ImportDialog;
 import jgloss.ui.KeystrokeForwarder;
 import jgloss.ui.LookupFrame;
 import jgloss.ui.LookupResultList;
@@ -157,204 +154,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 	private static final long serialVersionUID = 1L;
 
 	/**
-     * Collection of publically available actions.
-     */
-    public static class Actions {
-        /**
-         * Imports a document into an empty JGlossFrame.
-         */
-        public final Action importDocument;
-        /**
-         * Imports the clipboard content into an empty JGlossFrame.
-         */
-        public final Action importClipboard;
-        /**
-         * Menu listener which will update the state of the import clipboard
-         * action when the menu is selected.
-         */
-        public final ImportClipboardListener importClipboardListener;
-        /**
-         * Opens a document created by JGloss in an empty JGlossFrame.
-         */
-        public final Action open;
-        /**
-         * Listens to open recent selections. Use with 
-         * {@link OpenRecentMenu#createDocumentMenu(File,OpenRecentMenu.FileSelectedListener) 
-         *  OpenRecentMenu.createDocumentMenu}.
-         */
-        public final OpenRecentMenu.FileSelectedListener openRecentListener;
-
-        /**
-         * Creates a new instance of the actions which will invoke the methods
-         * on the specified target. If the target is <CODE>null</CODE>, a new JGlossFrame
-         * will be created on each invocation.
-         */
-        private Actions( final JGlossFrame target) {
-            importDocument = new AbstractAction() {
-                    private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed( ActionEvent e) {
-                        new Thread( "JGloss import") {
-                                @Override
-								public void run() {
-                                    ImportDialog d = new ImportDialog( target != null ? 
-                                                                       target.frame :
-                                                                       null);
-                                    if (d.doDialog()) {
-                                        JGlossFrame which;
-                                        if (target==null || target.model.isEmpty()) {
-	                                        which = new JGlossFrame();
-                                        } else {
-	                                        which = target;
-                                        }
-                                        
-                                        if (d.selectionIsFilename()) {
-	                                        which.importDocument
-                                                ( d.getSelection(), d.isDetectParagraphs(),
-                                                  d.createParser( Dictionaries.getInstance().getDictionaries(),
-                                                                  ExclusionList.getExclusions()),
-                                                  d.createReadingAnnotationFilter(),
-                                                  d.getEncoding());
-                                        } else {
-	                                        which.importString
-                                                ( d.getSelection(), d.isDetectParagraphs(), 
-                                                  JGloss.MESSAGES.getString( "import.textarea"),
-                                                  JGloss.MESSAGES.getString( "import.textarea"),
-                                                  d.createParser( Dictionaries.getInstance().getDictionaries(),
-                                                                  ExclusionList.getExclusions()),
-                                                  d.createReadingAnnotationFilter(),
-                                                  false);
-                                        }
-                                    }
-                                }
-                            }.start();
-                    }
-                };
-            importDocument.setEnabled( true);
-            UIUtilities.initAction( importDocument, "main.menu.import"); 
-            importClipboard = new AbstractAction() {
-                    private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed( ActionEvent e) {
-                        new Thread( "JGloss import") {
-                                @Override
-								public void run() {
-                                    if (target == null) {
-	                                    new JGlossFrame().doImportClipboard();
-                                    } else {
-	                                    target.doImportClipboard();
-                                    }
-                                }
-                            }.start();
-                    }
-                };
-            importClipboard.setEnabled( false);
-            UIUtilities.initAction( importClipboard, "main.menu.importclipboard"); 
-            open = new AbstractAction() {
-                    private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed( ActionEvent e) {
-                        new Thread( "JGloss open") {
-                                @Override
-								public void run() {
-                                    JFileChooser f = new JFileChooser( JGloss.getApplication().getCurrentDir());
-                                    f.addChoosableFileFilter( jglossFileFilter);
-                                    f.setFileHidingEnabled( true);
-                                    f.setFileView( CustomFileView.getFileView());
-                                    int r = f.showOpenDialog( target);
-                                    if (r == JFileChooser.APPROVE_OPTION) {
-                                        JGloss.getApplication().setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-                                        // test if the file is already open
-                                        String path = f.getSelectedFile().getAbsolutePath();
-                                        for (JGlossFrame frame : jglossFrames) {
-                                            if (path.equals( frame.model.getDocumentPath())) {
-                                            	frame.frame.setVisible(true);
-                                                return;
-                                            }
-                                        }
-                                        
-                                        // load the file
-                                        JGlossFrame which = target==null ||
-                                            target.model.isEmpty() ? new JGlossFrame() : target;
-                                        which.loadDocument( f.getSelectedFile());
-                                    }
-                                }
-                            }.start();
-                    }
-                };
-            open.setEnabled( true);
-            UIUtilities.initAction( open, "main.menu.open");
-            
-            openRecentListener = new OpenRecentMenu.FileSelectedListener() {
-                    @Override
-					public void fileSelected( final File file) {
-                        // test if the file is already open
-                        String path = file.getAbsolutePath();
-                        for (JGlossFrame frame : jglossFrames) {
-                            if (path.equals( frame.model.getDocumentPath())) {
-                                frame.frame.setVisible(true);
-                                return;
-                            }
-                        }
-                        
-                        // load the file asynchronously
-                        new Thread() {
-                                @Override
-								public void run() {
-                                    JGlossFrame which = target==null ||
-                                        target.model.isEmpty() ? new JGlossFrame() : target;
-                                    which.loadDocument( file);
-                                }
-                            }.start();
-                    }
-                };
-
-            importClipboardListener = new ImportClipboardListener( importClipboard);
-        }
-    } // class Actions
-
-    /**
      * Static instance of the actions which can be used by other classes. If an action
      * is invoked, a new <CODE>JGlossFrame</CODE> will be created as the target of the
      * action.
      */
-    public final static Actions actions = new Actions( null);
-
-    /**
-     * Updates the status of the import clipboard action corresponding to certain events.
-     * The import clipboard action should only be enabled if the system clipboard contains a
-     * string. This listener checks the status of the clipboard and updates the action state if
-     * the window the listener is attached to is brought to the foreground and/or if the menu the
-     * listener is attached to is expanded.
-     */
-    private static class ImportClipboardListener extends WindowAdapter implements MenuListener {
-        private final Action importClipboard;
-
-        public ImportClipboardListener( Action _importClipboard) {
-            this.importClipboard = _importClipboard;
-        }
-
-        private void checkUpdate() {
-            // enable the import clipboard menu item if the clipboard contains some text
-            importClipboard.setEnabled( UIUtilities.clipboardContainsString());
-        }
-
-        @Override
-		public void windowActivated( WindowEvent e) {
-            checkUpdate();
-        }
-        @Override
-		public void menuSelected( MenuEvent e) {
-            checkUpdate();
-        }
-        @Override
-		public void menuDeselected( MenuEvent e) {}
-        @Override
-		public void menuCanceled( MenuEvent e) {}
-    } // class ImportClipboardListener
+    public static final DocumentActions actions = new DocumentActions( null);
 
     /**
      * Open recent menu used for JGloss documents. The instance is shared between instances of
@@ -365,13 +169,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * Data model of this frame.
      */
-    private JGlossFrameModel model;
+    JGlossFrameModel model;
 
     /**
      * JGloss document frame object. The frame keeps the <code>JGlossFrame</code> as sole component
      * in its content pane.
      */
-    private final JFrame frame;
+    final JFrame frame;
     /**
      * Reacts to the document closed events.
      */
@@ -491,7 +295,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * List of open JGloss documents.
      */
-    private static LinkedList<JGlossFrame> jglossFrames = new LinkedList<JGlossFrame>();
+    static LinkedList<JGlossFrame> jglossFrames = new LinkedList<JGlossFrame>();
 
     /**
      * Returns the number of currently open JGlossFrames.
@@ -649,7 +453,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         frame.setVisible(true);
     }
 
-    private Actions initActions() {
+    private DocumentActions initActions() {
         saveAction = new AbstractAction() {
                 private static final long serialVersionUID = 1L;
 
@@ -753,10 +557,10 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             };
         UIUtilities.initAction( wordLookupAction, "main.menu.wordlookup");
         
-        return new Actions( this);
+        return new DocumentActions( this);
     }
 
-    private JMenuBar initMenuBar( Actions actions) {
+    private JMenuBar initMenuBar( DocumentActions actions) {
         // set up the menu bar
         JMenuBar bar = new JMenuBar();
 
@@ -927,7 +731,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * Imports the content of the clipboard, if it contains plain text.
      */
-    private void doImportClipboard() {
+    void doImportClipboard() {
         Transferable t = getToolkit().getSystemClipboard().getContents( this);
 
         if (t != null) {
@@ -1000,7 +804,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * @param encoding Character encoding of the file. May be either <CODE>null</CODE> or the
      *                 value of the "encodings.default" resource to use autodetection.
      */
-    private void importDocument( String path, boolean detectParagraphs, Parser parser, 
+    void importDocument( String path, boolean detectParagraphs, Parser parser, 
                                  ReadingAnnotationFilter filter, String encoding) {
         try {
             Reader in = null;
