@@ -62,7 +62,7 @@ class OpenDocumentAction extends AbstractAction {
                         // test if the file is already open
                         String path = f.getSelectedFile().getAbsolutePath();
                         for (JGlossFrame frame : JGlossFrame.jglossFrames) {
-                            if (path.equals( frame.model.getDocumentPath())) {
+                            if (path.equals( frame.getModel().getDocumentPath())) {
                             	frame.frame.setVisible(true);
                                 return;
                             }
@@ -70,7 +70,7 @@ class OpenDocumentAction extends AbstractAction {
                         
                         // load the file
                         JGlossFrame which = target==null ||
-                            target.model.isEmpty() ? new JGlossFrame() : target;
+                            target.getModel().isEmpty() ? new JGlossFrame() : target;
                         which.loadDocument( f.getSelectedFile());
                     }
                 }

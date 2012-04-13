@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.SearchException;
-import jgloss.parser.AbstractParser;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotation;
 import jgloss.parser.ReadingAnnotationFilter;
@@ -97,7 +96,6 @@ class AnnotationGenerator extends DefaultHandler {
 	public void endDocument() throws SAXException {
         parent.endDocument();
 
-        // TODO: Progress Bar: the next command takes very long
         parser.reset();
     }
 
@@ -158,9 +156,6 @@ class AnnotationGenerator extends DefaultHandler {
 
         int lastEnd = start; // index one after the end of the last annotation
         for (TextAnnotation annotation : annotations) {
-            // Progress Bar: this loop takes very long
-            ((AbstractParser)parser).tick(1);
-            
             TextAnnotation completedAnnotation = taCompleter.complete(annotation);
             // handle text between annotations
             if (completedAnnotation.getStart() > lastEnd) {

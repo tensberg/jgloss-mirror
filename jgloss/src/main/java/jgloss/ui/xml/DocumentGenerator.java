@@ -39,10 +39,15 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Generate a JGloss {@link Document} from a given XML Document.
+ *
+ * @author Michael Koch <tensberg@gmx.net>
+ */
 class DocumentGenerator extends DefaultHandler {
 	private static final Logger LOGGER = Logger.getLogger(DocumentGenerator.class.getPackage().getName());
 	
-    private DocumentBuilder builder;
+    private final DocumentBuilder builder;
     private Document document;
     private Node currentParent;
 
@@ -51,9 +56,14 @@ class DocumentGenerator extends DefaultHandler {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new ExceptionInInitializerError(ex);
         }
     }
 
+    /**
+     * @return Document which was created by parsing the source document. <code>null</code> if no source
+     *         document was parsed yet.
+     */
     public Document getGeneratedDocument() {
         return document;
     }

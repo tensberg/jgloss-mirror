@@ -57,7 +57,7 @@ class OpenRecentDocumentListener implements OpenRecentMenu.FileSelectedListener 
         String path = file.getAbsolutePath();
         
         for (JGlossFrame frame : JGlossFrame.jglossFrames) {
-            if (path.equals( frame.model.getDocumentPath())) {
+            if (path.equals( frame.getModel().getDocumentPath())) {
                 return frame;
             }
         }
@@ -70,7 +70,7 @@ class OpenRecentDocumentListener implements OpenRecentMenu.FileSelectedListener 
                 @Override
                 public void run() {
                     JGlossFrame which = target==null ||
-                        target.model.isEmpty() ? new JGlossFrame() : target;
+                        target.getModel().isEmpty() ? new JGlossFrame() : target;
                     which.loadDocument( file);
                 }
             }.start();

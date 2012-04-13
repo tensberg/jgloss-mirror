@@ -34,8 +34,6 @@ import java.awt.PageAttributes;
 import java.awt.PrintJob;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -46,21 +44,14 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,7 +71,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JViewport;
-import javax.swing.ProgressMonitor;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
@@ -105,16 +95,10 @@ import jgloss.JGloss;
 import jgloss.JGlossApp;
 import jgloss.Preferences;
 import jgloss.dictionary.DictionaryEntry;
-import jgloss.parser.AbstractParser;
-import jgloss.parser.Parser;
-import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.ui.AboutFrame;
 import jgloss.ui.CustomFileView;
-import jgloss.ui.Dictionaries;
-import jgloss.ui.ExclusionList;
 import jgloss.ui.ExtensionFileFilter;
 import jgloss.ui.FirstEntryCache;
-import jgloss.ui.GeneralDialog;
 import jgloss.ui.KeystrokeForwarder;
 import jgloss.ui.LookupFrame;
 import jgloss.ui.LookupResultList;
@@ -123,7 +107,6 @@ import jgloss.ui.PreferencesFrame;
 import jgloss.ui.SaveFileChooser;
 import jgloss.ui.SimpleLookup;
 import jgloss.ui.SplitPaneManager;
-import jgloss.ui.StopableReader;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.export.ExportMenu;
@@ -136,8 +119,6 @@ import jgloss.ui.html.SelectedAnnotationHighlighter;
 import jgloss.ui.util.UIUtilities;
 import jgloss.ui.util.XCVManager;
 import jgloss.ui.xml.JGlossDocument;
-import jgloss.ui.xml.JGlossDocumentBuilder;
-import jgloss.util.CharacterEncodingDetector;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -169,7 +150,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * Data model of this frame.
      */
-    JGlossFrameModel model;
+    private JGlossFrameModel model;
 
     /**
      * JGloss document frame object. The frame keeps the <code>JGlossFrame</code> as sole component
@@ -210,12 +191,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
     private Position lastSelectionStart;
     private Position lastSelectionEnd;
-    
-    /**
-     * Defer a window closing event until the frame object is in a safe state. This is used while
-     * the <CODE>loadDocument</CODE> method is executing.
-     */
-    private boolean deferWindowClosing = false;
 
     private Transformer jglossWriterTransformer;
 
@@ -349,18 +324,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         windowListener = new WindowAdapter() {
                 @Override
 				public void windowClosing( WindowEvent e) {
-                    synchronized (this) {
-                        if (deferWindowClosing) {
-                            // Another thread is currently executing loadDocument.
-                            // Defer the closing of the window until the frame object is in a safe state.
-                            // The loadDocument method is responsible for closing the window.
-                            deferWindowClosing = false;
-                        }
-                        else {
-                            if (askCloseDocument()) {
-	                            closeDocument();
-                            }
-                        }
+                    if (askCloseDocument()) {
+                        closeDocument();
                     }
                 }
             };
@@ -732,171 +697,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * Imports the content of the clipboard, if it contains plain text.
      */
     void doImportClipboard() {
-        Transferable t = getToolkit().getSystemClipboard().getContents( this);
-
-        if (t != null) {
-            try {
-                Reader in = null;
-                int len = 0;
-                String data = (String) t.getTransferData( DataFlavor.stringFlavor);
-                len = data.length();
-
-                // try to autodetect the character encoding if the transfer didn't honor the 
-                // charset correctly.
-                boolean autodetect = true;
-                for ( int i=0; i<data.length(); i++) {
-                    if (data.charAt( i) > 255) {
-                        // The string contains a character outside the ISO-8859-1 range,
-                        // so presumably the transfer went OK.
-                        autodetect = false;
-                        break;
-                    }
-                }
-                if (autodetect) {
-                    byte[] bytes = data.getBytes( "ISO-8859-1");
-                    String enc = CharacterEncodingDetector.guessEncodingName( bytes);
-                    if (!enc.equals( CharacterEncodingDetector.ENC_UTF_8)) {
-	                    data = new String( bytes, enc);
-                    }
-                }
-
-                in = new StringReader( data);
-
-                JGlossFrame which = this;
-                if (!model.isEmpty()) {
-	                which = new JGlossFrame();
-                }
-                
-                which.importFromReader
-                    ( in, JGloss.PREFS.getBoolean
-                      ( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true),
-                      JGloss.MESSAGES.getString( "import.clipboard"),
-                      JGloss.MESSAGES.getString( "import.clipboard"),
-                      GeneralDialog.getInstance().createReadingAnnotationFilter(),
-                      GeneralDialog.getInstance().createImportClipboardParser
-                      ( Dictionaries.getInstance().getDictionaries(), ExclusionList.getExclusions()),
-                      len);
-                which.model.setDocumentChanged( true);
-            } catch (Exception ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                JOptionPane.showConfirmDialog
-                    ( this, JGloss.MESSAGES.getString
-                      ( "error.import.exception", new Object[] 
-                          { JGloss.MESSAGES.getString( "import.clipboard"), ex.getClass().getName(),
-                            ex.getLocalizedMessage() }),
-                      JGloss.MESSAGES.getString( "error.import.title"),
-                      JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    /**
-     * Sets up everything neccessary to import a file and loads it. If <CODE>filename</CODE> is
-     * a URL, it will create a reader which reads from the location the document points to. If it
-     * is a path to a local file, it will create a reader which reads from it. 
-     * The method will then call <CODE>loadDocument</CODE> with the newly 
-     * created reader.
-     *
-     * @param path URL or path of the file to import.
-     * @param detectParagraphs Flag if paragraph detection should be done.
-     * @param parser Parser used to annotate the text.
-     * @param filter Filter for fetching the reading annotations from a parsed document.
-     * @param encoding Character encoding of the file. May be either <CODE>null</CODE> or the
-     *                 value of the "encodings.default" resource to use autodetection.
-     */
-    void importDocument( String path, boolean detectParagraphs, Parser parser, 
-                                 ReadingAnnotationFilter filter, String encoding) {
-        try {
-            Reader in = null;
-            int contentlength = 0;
-            if (JGloss.MESSAGES.getString( "encodings.default").equals( encoding))
-			 {
-	            encoding = null; // autodetect the encoding
-            }
-            String title = "";
-
-            try {
-                URL url = new URL( path);
-                URLConnection c = url.openConnection();
-                contentlength = c.getContentLength();
-                String enc = c.getContentEncoding();
-                InputStream is = new BufferedInputStream( c.getInputStream());
-                // a user-selected value for encoding overrides enc
-                if (encoding != null) {
-	                in = new InputStreamReader( is, encoding);
-                } else { // auto-detect, works even if enc==null
-                    in = CharacterEncodingDetector.getReader( is, enc);
-                    encoding = ((InputStreamReader) in).getEncoding();
-                }
-                title = url.getFile();
-                if (title==null || title.length()==0) {
-	                title = path;
-                }
-            } catch (MalformedURLException ex) {
-                // probably a local file
-                File f = new File( path);
-                contentlength = (int) f.length();
-                title = f.getName();
-                InputStream is = new BufferedInputStream( new FileInputStream( path));
-                if (encoding != null) {
-	                in = new InputStreamReader( is, encoding);
-                } else { // auto-detect
-                    in = CharacterEncodingDetector.getReader( is);
-                    encoding = ((InputStreamReader) in).getEncoding();
-                }
-            }
-
-            importFromReader( in, detectParagraphs, path, title, filter, parser,
-                              CharacterEncodingDetector.guessLength( contentlength, encoding));
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            JOptionPane.showConfirmDialog
-                ( this, JGloss.MESSAGES.getString
-                  ( "error.import.exception", new Object[] 
-                      { path, ex.getClass().getName(),
-                        ex.getLocalizedMessage() }),
-                  JGloss.MESSAGES.getString( "error.import.title"),
-                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            if (model.getDocumentName() == null) {
-	            // error before document was opened, close window
-                this.dispose();
-            }
-        }
-    }
-
-    /**
-     * Creates a new annotated document by reading the original text from a string.
-     * The method can only be applied on a <CODE>JGlossFrame</CODE> with no open document.
-     *
-     * @param text The text which will be imported.
-     * @param detectParagraphs Flag if paragraph detection should be done.
-     * @param title Title of the newly created document.
-     * @param path Path to the document.
-     * @param setPath If <CODE>true</CODE>, the document path will
-     *        be set to the <CODE>path</CODE> parameter. Use this if path denotes a the file to
-     *        which the newly created document should be written. If <CODE>false</CODE>,
-     *        <CODE>path</CODE> will only be used in informational messages to the user during import.
-     */
-    public void importString( String text, boolean detectParagraphs, String path, String title,
-                              Parser parser, ReadingAnnotationFilter filter, 
-                              boolean setPath) {
-        try {
-            importFromReader( new StringReader( text), detectParagraphs, path, title, filter, parser,
-                              text.length());
-            model.setDocumentChanged( true);
-            if (setPath) {
-	            this.model.setDocumentPath( path);
-            }
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            JOptionPane.showConfirmDialog
-                ( this, JGloss.MESSAGES.getString
-                  ( "error.import.exception", new Object[] 
-                      { path, ex.getClass().getName(),
-                        ex.getLocalizedMessage() }),
-                  JGloss.MESSAGES.getString( "error.import.title"),
-                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-        }
+        new ImportClipboardStrategy(model.isEmpty() ? this : new JGlossFrame()).executeImport();
     }
 
     /**
@@ -956,91 +757,14 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     }
 
     private void loadDocument( InputStream in, String title) throws IOException, SAXException {
-        // Prevent the windowClosing event from directly closing the window.
-        // If a windowClosing event is registered while the loadDocument method is executing,
-        // the deferWindowClosing flag will be cleared.
-        deferWindowClosing = true;
-
+        JGlossFrameModel model = new JGlossFrameModel();
+        model.setDocumentName(title);
         model.setDocument( new JGlossDocument( new InputSource( in)));
-        setupFrame( title);
+        setModel(model);
     }
 
-    private void importFromReader( Reader in, boolean detectParagraphs,
-                                   String path, String title, 
-                                   ReadingAnnotationFilter filter, final Parser parser, final int length) 
-        throws IOException {
-        // Prevent the windowClosing event from directly closing the window.
-        // If a windowClosing event is registered while the loadDocument method is executing,
-        // the deferWindowClosing flag will be cleared.
-        deferWindowClosing = true;
-        
-        final StopableReader stin = new StopableReader( in);
-
-        final ProgressMonitor pm = new ProgressMonitor( this, 
-            JGloss.MESSAGES.getString( "load.progress", new Object[] { path }), null, 0, 100);
-        final Thread currentThread = Thread.currentThread(); // needed to interrupt parsing if user cancels
-        ((AbstractParser)parser).initTick();
-        
-        javax.swing.Timer progressUpdater = new javax.swing.Timer( 500, new ActionListener() {
-            // this handler is called from the event dispatch thread
-            @Override
-			public void actionPerformed( ActionEvent e) {
-                int progress = ((AbstractParser)parser).getTick();
-                if (progress > 1) {
-                    progress = Math.min(99, progress-1);
-                }
-                
-                pm.setProgress( progress );
-
-                int step = Math.max(1, (100 - progress) /20);
-                ((AbstractParser)parser).tick(step);
-                
-                if (pm.isCanceled() || // cancel button of progress bar pressed
-                    !deferWindowClosing) { // close button of document frame pressed
-                    stin.stop();
-                    currentThread.interrupt();
-                }
-            }
-        });
-        
-        pm.setMillisToDecideToPopup(0);
-        pm.setMillisToPopup(0);
-        
-        progressUpdater.start();
-
-        try {
-            model.setDocument( new JGlossDocumentBuilder().build( stin, 
-                detectParagraphs, filter, parser, Dictionaries.getInstance().getDictionaries()) );
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            JOptionPane.showConfirmDialog
-                ( JGlossFrame.this, JGloss.MESSAGES.getString
-                  ( "error.import.exception", new Object[] 
-                      { path, ex.getClass().getName(), ex.getLocalizedMessage() }),
-                  JGloss.MESSAGES.getString( "error.import.title"),
-                  JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-        }
-
-        progressUpdater.stop();
-        
-        in.close();
-        pm.close();
-
-        if (model.isEmpty()) {
-            deferWindowClosing = false;
-        }
-        else {
-            setupFrame( title);
-        }
-    }
-
-    private void setupFrame( String title) throws IOException {
-        if (!deferWindowClosing) {
-            // close button of document frame pressed while document was loading
-            closeDocument();
-            return;
-        }
-
+    void setModel(final JGlossFrameModel model) throws IOException {
+        this.model = model;
         kit = new JGlossEditorKit( compactViewItem.isSelected(),
                                    showReadingItem.isSelected(),
                                    showTranslationItem.isSelected());
@@ -1049,8 +773,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         DocumentStyleDialog.getDocumentStyleDialog()
             .addStyleSheet( htmlDoc.getStyleSheet());
         htmlDoc.setJGlossDocument( model.getDocument());
-
-        model.setDocumentName( title);
 
         Runnable worker = new Runnable() {
                 @Override
@@ -1212,12 +934,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                 }
             }
         }
-
-        if (!deferWindowClosing) {
-            // close button of document frame pressed while document was loading
-            closeDocument();
-        }
-        deferWindowClosing = false;
     }
 
     /**

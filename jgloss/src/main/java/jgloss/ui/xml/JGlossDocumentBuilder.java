@@ -38,11 +38,17 @@ import jgloss.parser.ReadingAnnotationFilter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * Build JGloss XML documents from input sources.
+ *
+ * @author Michael Koch <tensberg@gmx.net>
+ */
 public class JGlossDocumentBuilder {
 	private static final Logger LOGGER = Logger.getLogger(JGlossDocumentBuilder.class.getPackage().getName());
 	
-	private SAXParser xmlParser;
-    private final DocumentGenerator docGen;
+	private final SAXParser xmlParser;
+
+    private final DocumentGenerator docGen = new DocumentGenerator();
 
     public JGlossDocumentBuilder() {
         try {
@@ -50,8 +56,8 @@ public class JGlossDocumentBuilder {
         } catch (Exception ex) {
             // SAXException or ParserConfigurationException
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new ExceptionInInitializerError(ex);
         }
-        docGen = new DocumentGenerator();
     }
 
     public JGlossDocument build( Reader text, boolean detectLineBreaks,

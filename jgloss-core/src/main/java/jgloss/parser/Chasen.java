@@ -89,7 +89,7 @@ public class Chasen {
          *
          * @param expectedEOS EOS lines expected from Chasen process.
          */
-        protected void init( int expectedEOS) throws IOException {
+        protected void init( int expectedEOS) {
             this.expectedEOS = expectedEOS;
             prefetchNextLine();
         }
@@ -429,7 +429,6 @@ public class Chasen {
                 }
 
                 try {
-                    // TODO: Progess Bar: this step takes long
                     LOGGER.info( "Waiting for ChaSen to shut down" );
                     waitForProcess( chasen, 1000l);
                 } catch (InterruptedException ex) {

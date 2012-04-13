@@ -78,20 +78,6 @@ public abstract class AbstractParser implements Parser {
         return parsePosition;
     }
 
-    int mTick;
-    
-    public int getTick() {
-        return mTick;
-    }
-
-    public void initTick() {
-        mTick = 0;
-    }
-    
-    public void tick(int i) {
-        mTick += i;
-    }
-
     /**
      * Clears any caches which may have been filled during parsing. Call this after you have
      * parsed some text to reclaim the memory. This implementation clears the word occurrence

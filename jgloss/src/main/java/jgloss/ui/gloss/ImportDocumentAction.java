@@ -27,7 +27,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import jgloss.JGloss;
+import jgloss.parser.Parser;
 import jgloss.ui.Dictionaries;
 import jgloss.ui.ExclusionList;
 import jgloss.ui.ImportDialog;
@@ -53,39 +53,44 @@ class ImportDocumentAction extends AbstractAction {
 
     @Override
     public void actionPerformed( ActionEvent e) {
-        new Thread( "JGloss import") {
-                @Override
-    			public void run() {
-                    ImportDialog d = new ImportDialog( target != null ? 
-                                                       target.frame :
-                                                       null);
-                    if (d.doDialog()) {
-                        JGlossFrame which;
-                        if (target==null || target.model.isEmpty()) {
-                            which = new JGlossFrame();
-                        } else {
-                            which = target;
-                        }
-                        
-                        if (d.selectionIsFilename()) {
-                            which.importDocument
-                                ( d.getSelection(), d.isDetectParagraphs(),
-                                  d.createParser( Dictionaries.getInstance().getDictionaries(),
-                                                  ExclusionList.getExclusions()),
-                                  d.createReadingAnnotationFilter(),
-                                  d.getEncoding());
-                        } else {
-                            which.importString
-                                ( d.getSelection(), d.isDetectParagraphs(), 
-                                  JGloss.MESSAGES.getString( "import.textarea"),
-                                  JGloss.MESSAGES.getString( "import.textarea"),
-                                  d.createParser( Dictionaries.getInstance().getDictionaries(),
-                                                  ExclusionList.getExclusions()),
-                                  d.createReadingAnnotationFilter(),
-                                  false);
-                        }
-                    }
-                }
-            }.start();
+        ImportDialog dialog = new ImportDialog(target != null ? target.frame : null);
+        if (dialog.doDialog()) {
+            JGlossFrame frame = getFrame();
+
+            if (dialog.selectionIsFilename()) {
+                importDocument(dialog, frame);
+            } else {
+                importString(dialog, frame);
+            }
+        }
+    }
+
+    private void importString(ImportDialog dialog, JGlossFrame frame) {
+        new ImportStringStrategy(frame, dialog.getSelection(), dialog.isDetectParagraphs(), 
+                dialog.createReadingAnnotationFilter(),
+                createParser(dialog)).executeImport();
+    }
+
+    private void importDocument(ImportDialog dialog, JGlossFrame frame) {
+        new ImportDocumentStrategy(frame, dialog.getSelection(), dialog.isDetectParagraphs(),
+                dialog.createReadingAnnotationFilter(),
+                createParser(dialog), dialog.getEncoding()).executeImport();
+    }
+    
+    private Parser createParser(ImportDialog dialog) {
+        return dialog.createParser(Dictionaries.getInstance().getDictionaries(),
+                ExclusionList.getExclusions());
+    }
+
+    private JGlossFrame getFrame() {
+        JGlossFrame frame;
+        
+        if (target == null || target.getModel().isEmpty()) {
+            frame = new JGlossFrame();
+        } else {
+            frame = target;
+        }
+        
+        return frame;
     }
 }
