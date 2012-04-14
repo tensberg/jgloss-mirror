@@ -27,6 +27,8 @@ import static java.awt.Dialog.ModalityType.APPLICATION_MODAL;
 
 import java.awt.Window;
 
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,14 +40,22 @@ import jgloss.JGloss;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
+/** Modal progress dialog with a message, a progress bar and an optional cancel
+ * button.
+ * 
+ * @author Michael Koch <tensberg@gmx.net> */
 public class ProgressDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
     private final JLabel message = new JLabel( "", SwingConstants.CENTER);
-    
+
     private final JProgressBar progress = new JProgressBar();
-    
+
     public ProgressDialog(Window parent) {
+        this(parent, null);
+    }
+
+    public ProgressDialog(Window parent, Action cancelAction) {
         super(parent);
 
         setModalityType(APPLICATION_MODAL);
@@ -54,18 +64,23 @@ public class ProgressDialog extends JDialog {
         JPanel content = new JPanel(new MigLayout(new LC().fillX().wrapAfter(1)));
         content.add(message, "grow");
         content.add(progress, "grow");
+        progress.setIndeterminate(true);
+        if (cancelAction != null) {
+            content.add(new JButton(cancelAction));
+        }
         setContentPane(content);
-        
-        setSize( 450, 80);
+
+        setSize(450, getPreferredSize().height);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
     }
-    
-    public void setMessage(String message) {
-        this.message.setText(message);
+
+    public void setMessage(String messageValue) {
+        message.setText(messageValue);
     }
-    
-    public void setProgress(int progress) {
-        this.progress.setValue(progress);
+
+    public void setProgress(int progressValue) {
+        progress.setIndeterminate(false);
+        progress.setValue(progressValue);
     }
 }

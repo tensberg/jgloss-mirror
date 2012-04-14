@@ -29,13 +29,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
 
 import jgloss.JGloss;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.ui.Dictionaries;
 import jgloss.ui.StopableReader;
+import jgloss.ui.util.Cancelable;
+import jgloss.ui.util.JGlossWorker;
 import jgloss.ui.xml.JGlossDocument;
 import jgloss.ui.xml.JGlossDocumentBuilder;
 
@@ -46,7 +47,7 @@ import org.xml.sax.SAXException;
  *
  * @author Michael Koch <tensberg@gmx.net>
  */
-class ImportFromReaderWorker extends SwingWorker<JGlossDocument, Void> {
+class ImportFromReaderWorker extends JGlossWorker<JGlossDocument, Void> implements Cancelable {
     private static final Logger LOGGER = Logger.getLogger(ImportFromReaderWorker.class.getPackage().getName());
 
     private final JGlossFrame frame;
@@ -54,13 +55,13 @@ class ImportFromReaderWorker extends SwingWorker<JGlossDocument, Void> {
     private final JGlossFrameModel model;
 
     private final StopableReader documentReader;
-    
+
     private final boolean detectParagraphs;
-    
+
     private final ReadingAnnotationFilter filter;
-    
+
     private final Parser parser;
-    
+
     private final int length;
 
     public ImportFromReaderWorker(JGlossFrame frame, JGlossFrameModel model, Reader documentReader, boolean detectParagraphs, ReadingAnnotationFilter filter,
@@ -72,14 +73,18 @@ class ImportFromReaderWorker extends SwingWorker<JGlossDocument, Void> {
         this.filter = filter;
         this.parser = parser;
         this.length = length;
+
+        setMessage(JGloss.MESSAGES.getString("import.progress", model.getDocumentName()));
     }
 
     @Override
     protected JGlossDocument doInBackground() throws IOException, SAXException {
+        // TODO: add progress support
+
         JGlossDocument document;
-        
+
         try {
-            document = new JGlossDocumentBuilder().build(documentReader, 
+            document = new JGlossDocumentBuilder().build(documentReader,
                     detectParagraphs, filter, parser, Dictionaries.getInstance().getDictionaries());
         } finally {
             try {
@@ -88,10 +93,10 @@ class ImportFromReaderWorker extends SwingWorker<JGlossDocument, Void> {
                 LOGGER.log(Level.WARNING, "failed to close reader for " + model.getDocumentPath(), ex);
             }
         }
-        
+
         return document;
     }
-    
+
     @Override
     protected void done() {
         try {
@@ -105,5 +110,10 @@ class ImportFromReaderWorker extends SwingWorker<JGlossDocument, Void> {
                   JGloss.MESSAGES.getString( "error.import.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    @Override
+    public void cancel() {
+        documentReader.stop();
     }
 }

@@ -34,13 +34,14 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.Action;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
 /**
  * Show progress feedback for SwingWorker background execution.
- *  
+ *
  * @author Michael Koch <tensberg@gmx.net>
  */
 public class SwingWorkerProgressFeedback implements PropertyChangeListener {
@@ -51,15 +52,15 @@ public class SwingWorkerProgressFeedback implements PropertyChangeListener {
     private static final String STATE_PROPERTY = "state";
 
     private static final int DIALOG_DELAY_MS = 500;
-    
+
     private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-    
+
     private final SwingWorker<?, ?> worker;
-    
+
     private final String messageProperty;
 
     private final Component feedbackTarget;
-    
+
     private final Cursor originalCursor;
 
     private ProgressDialog progressDialog;
@@ -67,21 +68,26 @@ public class SwingWorkerProgressFeedback implements PropertyChangeListener {
     private String message;
 
     private Timer dialogShowTimer;
-    
+
     public static void showProgress(SwingWorker<?, ?> worker, Component feedbackTarget) {
         if (worker.isDone()) {
             return;
         }
-        
+
         new SwingWorkerProgressFeedback(worker, feedbackTarget, DEFAULT_MESSAGE_PROPERTY);
     }
-    
+
     private SwingWorkerProgressFeedback(SwingWorker<?, ?> worker, Component feedbackTarget, String messageProperty) {
         this.worker = worker;
         this.feedbackTarget = feedbackTarget;
         this.originalCursor = feedbackTarget.getCursor();
         this.messageProperty = messageProperty;
+
         worker.addPropertyChangeListener(this);
+        if (worker instanceof JGlossWorker) {
+            message = ((JGlossWorker<?, ?>) worker).getMessage();
+        }
+
         if (worker.getState() == STARTED) {
             workerStarted();
         }
@@ -123,9 +129,9 @@ public class SwingWorkerProgressFeedback implements PropertyChangeListener {
             public void actionPerformed(ActionEvent e) {
                 showProgressDialog();
             }
-            
+
         });
-        
+
         dialogShowTimer.setRepeats(false);
         dialogShowTimer.start();
     }
@@ -134,18 +140,24 @@ public class SwingWorkerProgressFeedback implements PropertyChangeListener {
         if (worker.isDone()) {
             return;
         }
-        
-       Window feedbackWindow = SwingUtilities.windowForComponent(feedbackTarget);
-       progressDialog = new ProgressDialog(feedbackWindow);
-       progressDialog.setMessage(message);
-       progressDialog.setProgress(worker.getProgress());
-       progressDialog.setVisible(true);
+
+        Window feedbackWindow = SwingUtilities.windowForComponent(feedbackTarget);
+        Action cancelAction;
+        if (worker instanceof Cancelable) {
+            cancelAction = new CancelAction((Cancelable) worker);
+        } else {
+            cancelAction = null;
+        }
+        progressDialog = new ProgressDialog(feedbackWindow, cancelAction);
+        progressDialog.setMessage(message);
+        progressDialog.setProgress(worker.getProgress());
+        progressDialog.setVisible(true);
     }
 
     private void workerDone() {
         worker.removePropertyChangeListener(this);
         feedbackTarget.setCursor(originalCursor);
-        
+
         if (dialogShowTimer != null) {
             dialogShowTimer.stop();
         }

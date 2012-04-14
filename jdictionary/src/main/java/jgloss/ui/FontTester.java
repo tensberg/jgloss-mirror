@@ -25,49 +25,48 @@ package jgloss.ui;
 
 import static java.util.logging.Level.SEVERE;
 import static jgloss.JGloss.MESSAGES;
-import static jgloss.ui.util.SwingWorkerProgressFeedback.DEFAULT_MESSAGE_PROPERTY;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
 
 import jgloss.JGloss;
 import jgloss.ui.util.FontUtilities;
+import jgloss.ui.util.JGlossWorker;
 
 /**
  * Search all fonts for a font which can display Japanese characters.
  *
  * @author Michael Koch <tensberg@gmx.net>
  */
-class FontTester extends SwingWorker<Font, Void> {
+class FontTester extends JGlossWorker<Font, Void> {
     private static final Logger LOGGER = Logger.getLogger(FontTester.class.getPackage().getName());
-    
+
     private final StyleDialog styleDialog;
 
     FontTester(StyleDialog styleDialog) {
         this.styleDialog = styleDialog;
     }
-    
+
     /**
      * Searches the list of all available fonts for one which can display Japanese characters.
      * Returns the first font found.
-     * 
+     *
      * @return First font found which can display Japanese characters, or <code>null</code>.
      */
     @Override
     protected Font doInBackground() {
         setMessage(MESSAGES.getString("style.autodetect.progress.description"));
-        
+
         Font japaneseFont = null;
         Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
         int i = 0;
-        
+
         for (Font font : allFonts) {
             setMessage(MESSAGES.getString("style.autodetect.progress.font", font.getName()));
-            
+
             if (FontUtilities.canDisplayJapanese(font)) {
                 japaneseFont = font;
                 break;
@@ -75,12 +74,8 @@ class FontTester extends SwingWorker<Font, Void> {
             i++;
             setProgress(i*100/allFonts.length);
         }
-        
-        return japaneseFont;
-    }
 
-    private void setMessage(String message) {
-        firePropertyChange(DEFAULT_MESSAGE_PROPERTY, null, message);
+        return japaneseFont;
     }
 
 
@@ -91,7 +86,7 @@ class FontTester extends SwingWorker<Font, Void> {
             font = get();
             if (font == null) {
                 JOptionPane.showMessageDialog
-                (styleDialog, 
+                (styleDialog,
                         JGloss.MESSAGES.getString( "style.autodetect.nofont"),
                         JGloss.MESSAGES.getString( "style.autodetect.title"),
                         JOptionPane.WARNING_MESSAGE);

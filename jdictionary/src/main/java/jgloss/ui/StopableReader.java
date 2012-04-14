@@ -38,7 +38,7 @@ public class StopableReader extends FilterReader {
     /**
      * <CODE>true</CODE> if <CODE>stop</CODE> was called.
      */
-    private boolean stopped = false;
+    private volatile boolean stopped = false;
     private int charsRead = 0;
 
     /**
