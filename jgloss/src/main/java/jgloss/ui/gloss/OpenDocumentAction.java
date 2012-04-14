@@ -41,7 +41,7 @@ class OpenDocumentAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
     private final JGlossFrame target;
-    
+
     OpenDocumentAction(JGlossFrame target) {
         this.target = target;
         UIUtilities.initAction(this, "main.menu.open");
@@ -49,31 +49,25 @@ class OpenDocumentAction extends AbstractAction {
 
     @Override
     public void actionPerformed( ActionEvent e) {
-        new Thread( "JGloss open") {
-                @Override
-    			public void run() {
-                    JFileChooser f = new JFileChooser( JGloss.getApplication().getCurrentDir());
-                    f.addChoosableFileFilter( JGlossFrame.jglossFileFilter);
-                    f.setFileHidingEnabled( true);
-                    f.setFileView( CustomFileView.getFileView());
-                    int r = f.showOpenDialog( target);
-                    if (r == JFileChooser.APPROVE_OPTION) {
-                        JGloss.getApplication().setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-                        // test if the file is already open
-                        String path = f.getSelectedFile().getAbsolutePath();
-                        for (JGlossFrame frame : JGlossFrame.jglossFrames) {
-                            if (path.equals( frame.getModel().getDocumentPath())) {
-                            	frame.frame.setVisible(true);
-                                return;
-                            }
-                        }
-                        
-                        // load the file
-                        JGlossFrame which = target==null ||
-                            target.getModel().isEmpty() ? new JGlossFrame() : target;
-                        which.loadDocument( f.getSelectedFile());
-                    }
+        JFileChooser f = new JFileChooser(JGloss.getApplication().getCurrentDir());
+        f.addChoosableFileFilter(JGlossFrame.jglossFileFilter);
+        f.setFileHidingEnabled(true);
+        f.setFileView(CustomFileView.getFileView());
+        int r = f.showOpenDialog(target);
+        if (r == JFileChooser.APPROVE_OPTION) {
+            JGloss.getApplication().setCurrentDir(f.getCurrentDirectory().getAbsolutePath());
+            // test if the file is already open
+            String path = f.getSelectedFile().getAbsolutePath();
+            for (JGlossFrame frame : JGlossFrame.jglossFrames) {
+                if (path.equals(frame.getModel().getDocumentPath())) {
+                    frame.frame.setVisible(true);
+                    return;
                 }
-            }.start();
+            }
+
+            // load the file
+            JGlossFrame frame = DocumentActions.getFrame(target);
+            OpenDocumentWorker.openDocument(frame, f.getSelectedFile());
+        }
     }
 }

@@ -55,24 +55,17 @@ class OpenRecentDocumentListener implements OpenRecentMenu.FileSelectedListener 
 
     private JGlossFrame getFrameForFile(File file) {
         String path = file.getAbsolutePath();
-        
+
         for (JGlossFrame frame : JGlossFrame.jglossFrames) {
             if (path.equals( frame.getModel().getDocumentPath())) {
                 return frame;
             }
         }
-        
+
         return null;
     }
 
     private void loadFile(final File file) {
-        new Thread() {
-                @Override
-                public void run() {
-                    JGlossFrame which = target==null ||
-                        target.getModel().isEmpty() ? new JGlossFrame() : target;
-                    which.loadDocument( file);
-                }
-            }.start();
+        OpenDocumentWorker.openDocument(DocumentActions.getFrame(target), file);
     }
 }

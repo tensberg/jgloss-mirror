@@ -40,6 +40,7 @@ import jgloss.ui.export.ExportMenu;
 import jgloss.ui.gloss.DocumentStyleDialog;
 import jgloss.ui.gloss.JGlossFrame;
 import jgloss.ui.gloss.JGlossLookupFrame;
+import jgloss.ui.gloss.OpenDocumentWorker;
 
 /**
  * Base class for launching the full application, including the word lookup and document parser
@@ -63,7 +64,7 @@ public class JGlossApp extends JGloss {
 
     public static LookupFrame getLookupFrame() {
         assert EventQueue.isDispatchThread();
-        
+
         if (lookupFrame == null) {
 	        lookupFrame = new JGlossLookupFrame( getApplication().createLookupModel());
         }
@@ -80,7 +81,7 @@ public class JGlossApp extends JGloss {
 
         // register text parsers
         ParserSelector.registerParser( KanjiParser.class, new KanjiParser( null, null, true).getName());
-        ParserSelector.registerParser( ChasenParser.class, 
+        ParserSelector.registerParser( ChasenParser.class,
                                        new ChasenParser( null, false).getName());
         ParserSelector.registerParser( NullParser.class, new NullParser().getName());
 
@@ -88,7 +89,7 @@ public class JGlossApp extends JGloss {
         String chasen = PREFS.getString( Preferences.CHASEN_LOCATION);
         if (chasen==null || chasen.length()==0) {
 	        PREFS.set( Preferences.CHASEN_LOCATION, MESSAGES.getString
-                       ( File.separatorChar=='\\' ? 
+                       ( File.separatorChar=='\\' ?
                          "chasen.location.windows" :
                          "chasen.location.unix"));
         }
@@ -116,10 +117,9 @@ public class JGlossApp extends JGloss {
         }
         else {
             for (String arg : args) {
-                JGlossFrame f = new JGlossFrame();
-                f.loadDocument( new File( arg));
+                OpenDocumentWorker.openDocument(new JGlossFrame(), new File(arg));
             }
-        }   
+        }
     }
 
     /**
