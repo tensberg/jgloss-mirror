@@ -38,26 +38,17 @@ class ImportClipboardAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
     private final JGlossFrame target;
-    
+
     /**
      * @param target frame to import the clipboard content into. If <code>null</code>, creates a new frame.
      */
     ImportClipboardAction(JGlossFrame target) {
         this.target = target;
-        UIUtilities.initAction(this, "main.menu.importclipboard"); 
+        UIUtilities.initAction(this, "main.menu.importclipboard");
     }
 
     @Override
     public void actionPerformed( ActionEvent e) {
-        new Thread( "JGloss import") {
-                @Override
-    			public void run() {
-                    if (target == null) {
-                        new JGlossFrame().doImportClipboard();
-                    } else {
-                        target.doImportClipboard();
-                    }
-                }
-            }.start();
+        new ImportClipboardStrategy(DocumentActions.getFrame(target)).executeImport();
     }
 }

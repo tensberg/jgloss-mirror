@@ -51,8 +51,8 @@ public class DocumentActions {
      */
     public final Action open;
     /**
-     * Listens to open recent selections. Use with 
-     * {@link OpenRecentMenu#createDocumentMenu(File,OpenRecentMenu.FileSelectedListener) 
+     * Listens to open recent selections. Use with
+     * {@link OpenRecentMenu#createDocumentMenu(File,OpenRecentMenu.FileSelectedListener)
      *  OpenRecentMenu.createDocumentMenu}.
      */
     public final OpenRecentMenu.FileSelectedListener openRecentListener;
@@ -62,14 +62,31 @@ public class DocumentActions {
      * on the specified target. If the target is <CODE>null</CODE>, a new JGlossFrame
      * will be created on each invocation.
      */
-    DocumentActions( final JGlossFrame target) {
+    DocumentActions(JGlossFrame target) {
         importDocument = new ImportDocumentAction(target);
         importClipboard = new ImportClipboardAction(target);
         importClipboard.setEnabled( false);
         open = new OpenDocumentAction(target);
-        
+
         openRecentListener = new OpenRecentDocumentListener(target);
 
         importClipboardListener = new ImportClipboardListener( importClipboard);
     }
+
+    /**
+     * Returns the target frame for an import or open action. Returns a new {@link JGlossFrame} if
+     * the given target is <code>null</code> or already contains a document.
+     */
+    public static JGlossFrame getFrame(JGlossFrame target) {
+        JGlossFrame frame;
+
+        if (target == null || !target.getModel().isEmpty()) {
+            frame = new JGlossFrame();
+        } else {
+            frame = target;
+        }
+
+        return frame;
+    }
+
 }

@@ -35,7 +35,7 @@ import jgloss.ui.util.UIUtilities;
 
 /**
  * Action to import a document seleted in the shown {@link ImportDialog}.
- * 
+ *
  * @author Michael Koch <tensberg@gmx.net>
  */
 class ImportDocumentAction extends AbstractAction {
@@ -48,14 +48,14 @@ class ImportDocumentAction extends AbstractAction {
      */
     ImportDocumentAction(JGlossFrame target) {
         this.target = target;
-        UIUtilities.initAction(this, "main.menu.import"); 
+        UIUtilities.initAction(this, "main.menu.import");
     }
 
     @Override
     public void actionPerformed( ActionEvent e) {
         ImportDialog dialog = new ImportDialog(target != null ? target.frame : null);
         if (dialog.doDialog()) {
-            JGlossFrame frame = getFrame();
+            JGlossFrame frame = DocumentActions.getFrame(target);
 
             if (dialog.selectionIsFilename()) {
                 importDocument(dialog, frame);
@@ -66,7 +66,7 @@ class ImportDocumentAction extends AbstractAction {
     }
 
     private void importString(ImportDialog dialog, JGlossFrame frame) {
-        new ImportStringStrategy(frame, dialog.getSelection(), dialog.isDetectParagraphs(), 
+        new ImportStringStrategy(frame, dialog.getSelection(), dialog.isDetectParagraphs(),
                 dialog.createReadingAnnotationFilter(),
                 createParser(dialog)).executeImport();
     }
@@ -76,21 +76,9 @@ class ImportDocumentAction extends AbstractAction {
                 dialog.createReadingAnnotationFilter(),
                 createParser(dialog), dialog.getEncoding()).executeImport();
     }
-    
+
     private Parser createParser(ImportDialog dialog) {
         return dialog.createParser(Dictionaries.getInstance().getDictionaries(),
                 ExclusionList.getExclusions());
-    }
-
-    private JGlossFrame getFrame() {
-        JGlossFrame frame;
-        
-        if (target == null || target.getModel().isEmpty()) {
-            frame = new JGlossFrame();
-        } else {
-            frame = target;
-        }
-        
-        return frame;
     }
 }

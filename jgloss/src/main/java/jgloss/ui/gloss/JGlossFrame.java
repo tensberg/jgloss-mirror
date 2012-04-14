@@ -694,13 +694,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     }
 
     /**
-     * Imports the content of the clipboard, if it contains plain text.
-     */
-    void doImportClipboard() {
-        new ImportClipboardStrategy(model.isEmpty() ? this : new JGlossFrame()).executeImport();
-    }
-
-    /**
      * Loads a JGloss document from a local file.
      *
      * @param f File to load.
