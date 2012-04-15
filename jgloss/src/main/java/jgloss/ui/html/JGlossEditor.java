@@ -29,6 +29,7 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -47,6 +48,7 @@ import javax.swing.JToolTip;
 import javax.swing.JWindow;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -79,68 +81,45 @@ public class JGlossEditor extends JTextPane {
      *
      * @author Michael Koch
      */
-    private class MouseFollowerThread extends Thread implements MouseMotionListener {
+    private class MouseFollower implements MouseMotionListener, ActionListener {
+        /**
+         * Delay the showing of the tooltip so that the tooltip is only shown if the mouse does not
+         * move for the given delay.
+         */
+        private final Timer showDelayedTooltip = new Timer(500, this);
+
         /**
          * Mouse position of the last mouse event.
          */
         private Point pos = new Point();
-        private boolean halt = false;
 
-        public MouseFollowerThread() {
-            super( "Mouse Follower Thread");
-            setDaemon( true);
+        MouseFollower() {
+            showDelayedTooltip.setRepeats(false);
         }
 
         @Override
-		public void run() {
-            boolean updated = false;
-            while (!halt) {
-                try {
-                    if (!updated) {
-	                    sleep( 1000000000);
-                    }
-
-                    while (updated) {
-                        try {
-                            // we don't want to react to every mouse movement event, so
-                            // wait for 500ms with no action until the last mouse event is
-                            // processed.
-                            sleep( 500);
-                            synchronized (this) {
-                                if (tooltips) {
-                                    showToolTip( "FIXME", pos);
-                                }
-                                updated = false;
-                            }
-                        } catch (InterruptedException ex) {}
-                    }
-                } catch (InterruptedException ex) {
-                    updated = true;
-                }
+        public void actionPerformed(ActionEvent e) {
+            if (tooltips) {
+                showToolTip( "FIXME", pos);
             }
         }
 
         @Override
 		public void mouseMoved( MouseEvent e) {
+            showDelayedTooltip.stop();
             hideToolTip();
 
             if (tooltips) {
-                synchronized (this) {
-                    pos = e.getPoint();
-                }
-                this.interrupt();
+                pos = e.getPoint();
+                showDelayedTooltip.start();
             }
         }
 
         @Override
 		public void mouseDragged( MouseEvent e) {}
 
-        public void haltThread() {
-            halt = true;
-            this.interrupt();
-            try {
-                this.join();
-            } catch (InterruptedException ex) {}
+        public void stopTimer() {
+            showDelayedTooltip.stop();
         }
     }
 
@@ -157,7 +136,7 @@ public class JGlossEditor extends JTextPane {
     /**
      * Used to update the display according to the mouse position.
      */
-    private MouseFollowerThread mouseFollower;
+    private MouseFollower mouseFollower;
     /**
      * Displays annotation tooltips or a context menu as reaction to mouse clicks.
      */
@@ -237,8 +216,7 @@ public class JGlossEditor extends JTextPane {
             });
         setKeymap( map);
 
-        mouseFollower = new MouseFollowerThread();
-        mouseFollower.start();
+        mouseFollower = new MouseFollower();
         this.addMouseMotionListener( mouseFollower);
 
         mouseListener = new MouseListener() {
@@ -556,7 +534,8 @@ public class JGlossEditor extends JTextPane {
      */
     public void dispose() {
         UIManager.getDefaults().removePropertyChangeListener( fontChangeListener);
-        mouseFollower.haltThread();
+        removeMouseMotionListener(mouseFollower);
+        mouseFollower.stopTimer();
         removeKeymap( KEYMAP_TAB);
     }
 } // class JEditorPane
