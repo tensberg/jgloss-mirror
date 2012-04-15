@@ -27,7 +27,6 @@ import static jgloss.ui.annotation.Annotation.COMPARE_BY_START_OFFSET;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -36,11 +35,18 @@ import java.util.logging.Logger;
 import javax.swing.text.Element;
 
 public class AnnotationListModel {
+    public enum Bias {
+        NONE,
+        LEFT,
+        RIGHT
+    }
+
 	private static final Logger LOGGER = Logger.getLogger(AnnotationListModel.class.getPackage().getName());
-	
-	public static final int BIAS_NONE = 0;
-    public static final int BIAS_LEFT = 1;
-    public static final int BIAS_RIGHT = 2;
+
+	/**
+	 * Return value of {@link #findAnnotationIndex(int, Bias) findAnnotationIndex} if no annotation is found.
+	 */
+    public static final int NO_ANNOTATION = -2;
 
     private final List<Annotation> annotations;
     private final List<AnnotationListener> annotationListeners = new CopyOnWriteArrayList<AnnotationListener>();
@@ -55,7 +61,7 @@ public class AnnotationListModel {
 
     public int getAnnotationCount() { return annotations.size(); }
 
-    public Annotation getAnnotation( int index) { 
+    public Annotation getAnnotation( int index) {
         return annotations.get( index);
     }
 
@@ -68,14 +74,19 @@ public class AnnotationListModel {
      *
      * @param pos Position in the JGloss html document.
      * @param bias Controls what will be returned if the position is not in an annotation.
-     *        <code>BIAS_NONE</code> will return -2, <code>BIAS_LEFT</code> will return the
+     *        <code>BIAS_NONE</code> will return {@link #NO_ANNOTATION}, <code>BIAS_LEFT</code> will return the
      *        index of the annotation left of the position (<code>-1</code> if the position is
      *        left of the first annotation) and <code>BIAS_RIGHT</code> will return the
-     *        index of the annotation right of the position 
+     *        index of the annotation right of the position
      *        ({@link #getAnnotationCount() getAnnotationCount} if the position is
-     *        right of the last annotation).
+     *        right of the last annotation). In all cases, {@link #NO_ANNOTATION} will be returned
+     *        if there are no annoations in the model.
      */
-    public int findAnnotationIndex( int pos, int bias) {
+    public int findAnnotationIndex( int pos, Bias bias) {
+        if (annotations.isEmpty()) {
+            return NO_ANNOTATION;
+        }
+
         // the finishing index of the previous search is remembered. This will make the
         // search faster if the method is called for close locations. Since this method
         // is often called after mouse movement events, this is likely to be the case.
@@ -92,17 +103,16 @@ public class AnnotationListModel {
             anno = annotations.get( searchindex);
             if (pos < anno.getStartOffset()) {
                 if (searchindex == min || // no annotation for this position
-                    annotations.get( searchindex-1)
-                    .getEndOffset()-1 < pos) { // pos is between two annotation elements
+                    annotations.get( searchindex-1).getEndOffset()-1 < pos) { // pos is between two annotation elements
                     switch (bias) {
-                    case BIAS_NONE:
-                        return -2;
-                    case BIAS_LEFT:
+                    case NONE:
+                        return NO_ANNOTATION;
+                    case LEFT:
                         return searchindex-1;
-                    case BIAS_RIGHT:
+                    case RIGHT:
                         return searchindex;
                     default:
-                        throw new IllegalArgumentException( "bias invalid");
+                        throw new IllegalArgumentException("unsupported bias " + bias);
                     }
                 }
                 else {
@@ -115,14 +125,14 @@ public class AnnotationListModel {
                     annotations.get( searchindex+1)
                     .getStartOffset() > pos) {
                     switch (bias) {
-                    case BIAS_NONE:
-                        return -2;
-                    case BIAS_LEFT:
+                    case NONE:
+                        return NO_ANNOTATION;
+                    case LEFT:
                         return searchindex;
-                    case BIAS_RIGHT:
+                    case RIGHT:
                         return searchindex+1;
                     default:
-                        throw new IllegalArgumentException( "bias invalid");
+                        throw new IllegalArgumentException("unsupported bias " + bias);
                     }
                 }
                 else {
@@ -159,16 +169,7 @@ public class AnnotationListModel {
         // find the index of the Annotation object representing the annoElement by doing a
         // binary search through the list of annotations, which is ordered by start offsets.
         int annoOffset = Collections.binarySearch
-            (annotations, new Annotation(null, annoElement), new Comparator<Annotation>() {
-                    @Override
-					public int compare(Annotation o1, Annotation o2) {
-                        Element e1 = (o1 instanceof Element) ?
-                            (Element) o1 : o1.getAnnotationElement();
-                        Element e2 = (o2 instanceof Element) ? 
-                            (Element) o2 : o2.getAnnotationElement();
-                        return e1.getStartOffset()-e2.getStartOffset();
-                    }
-                });
+            (annotations, new Annotation(null, annoElement), COMPARE_BY_START_OFFSET);
         try {
             // Since the annotation element has already been removed from the document,
             // the invariant that each Element in the annotation list has a distinct start offset
@@ -180,11 +181,11 @@ public class AnnotationListModel {
             // search backward
             while (annoOffset >= 0 &&
                    annoElement != annotations.get(annoOffset).getAnnotationElement() &&
-                   annoElement.getStartOffset() == 
+                   annoElement.getStartOffset() ==
                    annotations.get(annoOffset).getAnnotationElement().getStartOffset()) {
 	            annoOffset--;
             }
-            
+
             // if not found, search forward
             if (annoOffset < 0 ||
                 annoElement != annotations.get(annoOffset).getAnnotationElement()) {
@@ -192,7 +193,7 @@ public class AnnotationListModel {
 
                 while (annoOffset < annotations.size() &&
                        annoElement != annotations.get(annoOffset).getAnnotationElement() &&
-                       annoElement.getStartOffset() == 
+                       annoElement.getStartOffset() ==
                        annotations.get(annoOffset).getAnnotationElement().getStartOffset()) {
 	                annoOffset++;
                 }
@@ -202,8 +203,7 @@ public class AnnotationListModel {
                 annotations.get(annoOffset).getAnnotationElement()==annoElement) {
                 Annotation annotation = annotations.remove(annoOffset);
                 fireAnnotationRemoved(annotation, annoOffset);
-            }
-            else {
+            } else {
                 LOGGER.severe( "WARNING: assertion failed, removed annotation element not found");
             }
         } catch (IndexOutOfBoundsException ex) {

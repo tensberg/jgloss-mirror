@@ -54,7 +54,7 @@ import javax.swing.text.Keymap;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
-import jgloss.ui.annotation.AnnotationListModel;
+import jgloss.ui.annotation.AnnotationListModel.Bias;
 import jgloss.ui.gloss.AnnotationList;
 import jgloss.ui.util.UIUtilities;
 
@@ -271,7 +271,7 @@ public class JGlossEditor extends JTextPane {
 
                     if ((e.getModifiers() & selectButtonMask) != 0) {
                         int pos = viewToModel( e.getPoint());
-                        int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex( pos, AnnotationListModel.BIAS_NONE);
+                        int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex( pos, Bias.NONE);
 
                         if (annoIndex >= 0) {
                             // Selecting the annotation in the AnnotationList also selects it in the Editor

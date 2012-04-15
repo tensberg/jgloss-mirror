@@ -1160,7 +1160,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         frame.setTitle( model.getDocumentName() + ":" + JGloss.MESSAGES.getString( "main.title"));
     }
 
-    protected void annotateDocumentSelection() {
+    private void annotateDocumentSelection() {
         int selectionStart = docpane.getSelectionStart();
         int selectionEnd = docpane.getSelectionEnd();
         if (selectionStart == selectionEnd) {
@@ -1171,7 +1171,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         model.getHTMLDocument().addAnnotation(selectionStart, selectionEnd, kit);
         annotationList.setSelectedIndex
             (model.getAnnotationListModel().findAnnotationIndex
-             (selectionStart, AnnotationListModel.BIAS_NONE));
+             (selectionStart, AnnotationListModel.Bias.NONE));
         // Set the new annotation reading and translation to the reading and translation
         // of the first dictionary item displayed in the lookup result list.
         DictionaryEntry entry = firstEntryCache.getEntry();
