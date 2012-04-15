@@ -50,7 +50,7 @@ class OpenDocumentAction extends AbstractAction {
     @Override
     public void actionPerformed( ActionEvent e) {
         JFileChooser f = new JFileChooser(JGloss.getApplication().getCurrentDir());
-        f.addChoosableFileFilter(JGlossFrame.jglossFileFilter);
+        f.addChoosableFileFilter(JGlossFrame.JGLOSS_FILE_FILTER);
         f.setFileHidingEnabled(true);
         f.setFileView(CustomFileView.getFileView());
         int r = f.showOpenDialog(target);
@@ -58,7 +58,7 @@ class OpenDocumentAction extends AbstractAction {
             JGloss.getApplication().setCurrentDir(f.getCurrentDirectory().getAbsolutePath());
             // test if the file is already open
             String path = f.getSelectedFile().getAbsolutePath();
-            for (JGlossFrame frame : JGlossFrame.jglossFrames) {
+            for (JGlossFrame frame : JGlossFrame.JGLOSS_FRAMES) {
                 if (path.equals(frame.getModel().getDocumentPath())) {
                     frame.frame.setVisible(true);
                     return;

@@ -24,7 +24,6 @@
 package jgloss.ui.gloss;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
@@ -47,9 +46,7 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +65,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
@@ -80,6 +76,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.Position;
@@ -124,7 +121,34 @@ import jgloss.ui.util.XCVManager;
  */
 public class JGlossFrame extends JPanel implements ActionListener, ListSelectionListener,
                                                    HyperlinkListener, CaretListener {
-	private static final Logger LOGGER = Logger.getLogger(JGlossFrame.class.getPackage().getName());
+	/**
+	 * Mark the JGloss document changed if the content changes.
+     *
+     * @author Michael Koch <tensberg@gmx.net>
+     */
+    private class MarkChangedListener implements PropertyChangeListener, DocumentListener {
+        @Override
+        public void propertyChange( PropertyChangeEvent e) {
+            markChanged();
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            markChanged();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            markChanged();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            // triggered by style changes, don't react to this
+        }
+    }
+
+    private static final Logger LOGGER = Logger.getLogger(JGlossFrame.class.getPackage().getName());
 
 	private static final long serialVersionUID = 1L;
 
@@ -133,13 +157,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * is invoked, a new <CODE>JGlossFrame</CODE> will be created as the target of the
      * action.
      */
-    public static final DocumentActions actions = new DocumentActions( null);
+    public static final DocumentActions ACTIONS = new DocumentActions( null);
 
     /**
      * Open recent menu used for JGloss documents. The instance is shared between instances of
      * <CODE>JGlossFrame</CODE> and {@link LookupFrame LookupFrame}.
      */
-    public final static OpenRecentMenu OPEN_RECENT = new OpenRecentMenu( 8);
+    public static final OpenRecentMenu OPEN_RECENT = new OpenRecentMenu( 8);
 
     /**
      * Data model of this frame.
@@ -264,17 +288,17 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * List of open JGloss documents.
      */
-    static LinkedList<JGlossFrame> jglossFrames = new LinkedList<JGlossFrame>();
+    static final LinkedList<JGlossFrame> JGLOSS_FRAMES = new LinkedList<JGlossFrame>();
 
     /**
      * Returns the number of currently open JGlossFrames.
      */
-    public static int getFrameCount() { return jglossFrames.size(); }
+    public static int getFrameCount() { return JGLOSS_FRAMES.size(); }
 
     /**
      * A file filter which will accept JGloss documents.
      */
-    public static final javax.swing.filechooser.FileFilter jglossFileFilter =
+    public static final FileFilter JGLOSS_FILE_FILTER =
         new ExtensionFileFilter( "jgloss",
                                  JGloss.MESSAGES.getString( "filefilter.description.jgloss"));
 
@@ -283,7 +307,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * by using import or open actions.
      */
     public JGlossFrame() {
-        jglossFrames.add( this);
+        JGLOSS_FRAMES.add( this);
 
         model = new JGlossFrameModel();
 
@@ -331,13 +355,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         initActions();
 
-        frame.addWindowListener( actions.importClipboardListener);
+        frame.addWindowListener( ACTIONS.importClipboardListener);
 
         // annotation list must be created before initMenuBar is called
         annotationList = new AnnotationList();
         annotationList.addListSelectionListener( this);
 
-        frame.setJMenuBar( initMenuBar( actions));
+        frame.setJMenuBar( initMenuBar( ACTIONS));
 
         // set up the content of this component
         setBackground( Color.white);
@@ -682,7 +706,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         frame.setVisible(false);
         this.dispose(); // this.dispose() calls frame.dispose()
 
-        if (jglossFrames.size() == 0) { // this was the last open document
+        if (JGLOSS_FRAMES.size() == 0) { // this was the last open document
             JGloss.getApplication().exit();
         }
     }
@@ -711,177 +735,92 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         }
     }
 
-    void setModel(final JGlossFrameModel model) throws IOException {
+    void setModel(final JGlossFrameModel model) {
+        assert EventQueue.isDispatchThread();
+
         this.model = model;
         kit = new JGlossEditorKit( compactViewItem.isSelected(),
                                    showReadingItem.isSelected(),
                                    showTranslationItem.isSelected());
-        final JGlossHTMLDoc htmlDoc = (JGlossHTMLDoc) kit.createDefaultDocument();
-        model.setHTMLDocument( htmlDoc);
-        DocumentStyleDialog.getDocumentStyleDialog()
-            .addStyleSheet( htmlDoc.getStyleSheet());
-        htmlDoc.setJGlossDocument( model.getDocument());
+        JGlossHTMLDoc htmlDoc = createHtmlDoc(model);
 
-        Runnable worker = new Runnable() {
-                @Override
-				public void run() {
-                    final Cursor currentCursor = getCursor();
-                    updateTitle();
-                    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+        DocumentStyleDialog.getDocumentStyleDialog().addStyleSheet( htmlDoc.getStyleSheet());
 
-                    docpane.setEditorKit( kit);
-                    xcvManager.updateActions( docpane);
-                    docpane.setStyledDocument( htmlDoc);
-                    AnnotationListModel annoModel =
-                        new AnnotationListModel( htmlDoc.getAnnotationElements());
-                    new AnnotationListSynchronizer(htmlDoc, annoModel);
-                    model.setAnnotationListModel
-                        ( annoModel);
-                    annotationList.setAnnotationListModel( annoModel);
-                    annoModel.addAnnotationListener( annotationEditor);
-                restoreSelection();
+        updateTitle();
 
-                    frame.getContentPane().removeAll();
-                    frame.getContentPane().add( JGlossFrame.this);
-                    frame.validate();
+        docpane.setEditorKit( kit);
+        xcvManager.updateActions( docpane);
+        docpane.setStyledDocument( htmlDoc);
+        AnnotationListModel annoModel =
+                new AnnotationListModel( htmlDoc.getAnnotationElements());
+        new AnnotationListSynchronizer(htmlDoc, annoModel);
+        model.setAnnotationListModel(annoModel);
+        annotationList.setAnnotationListModel( annoModel);
+        annoModel.addAnnotationListener( annotationEditor);
+        restoreSelection();
 
-                    // must wait after frame validation for split pane setup,
-                    // because otherwise the split pane divider location gets screwed up
-                    SplitPaneManager splitManager = new SplitPaneManager( "view.");
-                    splitManager.add( splitPanes[0], 1.0);
-                    splitManager.add( splitPanes[1], 0.3);
-                    splitManager.add( splitPanes[2], 0.65);
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(this);
+        frame.validate();
 
-                    // Layout document view in the background while still allowing user interaction
-                    // in other windows. Since Swing is single-threaded, this is somewhat complicated:
-                    // 1. A renderer thread is created, which prepares the docpane asynchronously to
-                    //    the event dispatch thread. This is the part that uses the most time.
-                    // 2. After the preparation is done, the
-                    //    docpane is installed in the docpaneScroller. This is done in the event dispatch
-                    //    thread
-                    // 3. The renderer thread is only started after the document window is drawn with
-                    //    the "Creating Document View" notice in the document window. To do this,
-                    //    renderer.start is wrapped in its own runnable and invoked later in the
-                    //    event thread
-                    final Thread renderer = new Thread() {
-                            @Override
-							public void run() {
-                                try {
-                                    setPriority( Math.max( getPriority()-3, Thread.MIN_PRIORITY));
-                                } catch (IllegalArgumentException ex) {}
-                                // the user may close the document before or during rendering,
-                                // so make sure that docpane is not set to null
-                                JGlossEditor dp = docpane;
-                                JScrollPane ds = docpaneScroller;
-                                final JViewport port = new JViewport();
-                                if (dp!=null && ds!=null) {
-                                    synchronized (dp) {
-                                        // the docpane is not visible, and we are synched on it,
-                                        // so it is safe to set the size even though this is not
-                                        // the event dispatch thread
-                                        dp.setSize( ds.getViewport().getExtentSize().width,
-                                                    dp.getPreferredSize().height);
-                                        // now the docpane is set to the correct width, call method again
-                                        // to set to correct height for the applied width
-                                        dp.setSize( ds.getViewport().getExtentSize().width,
-                                                    dp.getPreferredSize().height);
-                                        port.setView( dp);
-                                    }
-                                }
-                                // installing the docpane in the scroller, which is already visible,
-                                // has to be done in the event dispatch thread
-                                Runnable installer = new Runnable() {
-                                        @Override
-										public void run() {
-                                            synchronized (frame) {
-                                                // dispose might already have been called, test if
-                                                // member variables still exist
-                                                if (docpaneScroller!=null &&
-                                                    docpane!=null &&
-                                                    annotationEditor!=null) {
-                                                    docpaneScroller.setViewport( port);
-                                                    frame.validate();
-                                                    docpane.followMouse( showAnnotationItem.isSelected());
-                                                    // scroll to selected annotation
-                                                    Annotation current =
-                                                        (Annotation) annotationList
-                                                        .getSelectedValue();
-                                                    if (current != null) {
-                                                        docpane.makeVisible( current.getStartOffset(),
-                                                                             current.getEndOffset());
-                                                    }
-                                                    setCursor( currentCursor);
-                                                    docpane.requestFocusInWindow();
-                                                }
-                                            }
-                                        }
-                                    };
-                                EventQueue.invokeLater( installer);
-                            }
-                        };
-                    // defer rendering the document until after the window is painted
-                    Runnable rendererStart = new Runnable() {
-                            @Override
-							public void run() {
-                                renderer.start();
-                            }
-                        };
-                    EventQueue.invokeLater( rendererStart);
+        // must wait after frame validation for split pane setup,
+        // because otherwise the split pane divider location gets screwed up
+        SplitPaneManager splitManager = new SplitPaneManager( "view.");
+        splitManager.add( splitPanes[0], 1.0);
+        splitManager.add( splitPanes[1], 0.3);
+        splitManager.add( splitPanes[2], 0.65);
 
-                    // Parser must be set to non-strict mode for editing to work.
-                    htmlDoc.setStrictParsing( false);
-
-                    exportMenu.setContext( model);
-                    printAction.setEnabled( true);
-                    if (model.getDocumentPath() == null) {
-	                    // this means that the document is imported, save will behave like save as
-                        saveAction.setEnabled( true);
-                    }
-                    saveAsAction.setEnabled( true);
-
-                    // get notified of title changes
-                    htmlDoc.addPropertyChangeListener( new PropertyChangeListener() {
-                            @Override
-							public void propertyChange( PropertyChangeEvent e) {
-                                markChanged();
-                            }
-                        });
-                    // mark document as changed if some editing occurs
-                    htmlDoc.addDocumentListener( new DocumentListener() {
-                            @Override
-							public void insertUpdate(DocumentEvent e) {
-                                markChanged();
-                            }
-                            @Override
-							public void removeUpdate(DocumentEvent e) {
-                                markChanged();
-                            }
-                            @Override
-							public void changedUpdate(DocumentEvent e) {
-                                // triggered by style changes, don't react to this
-                            }
-                        });
-                }
-            };
-        if (EventQueue.isDispatchThread()) {
-            worker.run();
+        exportMenu.setContext( model);
+        printAction.setEnabled( true);
+        if (model.getDocumentPath() == null) {
+            // this means that the document is imported, save will behave like save as
+            saveAction.setEnabled( true);
         }
-        else {
-            try {
-                EventQueue.invokeAndWait( worker);
-            } catch (InterruptedException ex) {
-                // What? Should not happen.
-                // Andreas Winter: happens every time to me (truell)
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (InvocationTargetException ex2) {
-                if (ex2.getCause() instanceof IOException) {
-	                throw (IOException) ex2.getCause();
-                } else if (ex2.getCause() instanceof RuntimeException) {
-	                throw (RuntimeException) ex2.getCause();
-                } else {
-	                ex2.printStackTrace();
-                }
+        saveAsAction.setEnabled( true);
+
+        // first paint the frame, then install the docpane in a separate event since showing the docpane
+        // takes a long time for larger documents
+        repaint();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                showDocpane();
             }
+        });
+    }
+
+    private JGlossHTMLDoc createHtmlDoc(JGlossFrameModel model) {
+        JGlossHTMLDoc htmlDoc = (JGlossHTMLDoc) kit.createDefaultDocument();
+
+        // Parser must be set to non-strict mode for editing to work.
+        htmlDoc.setStrictParsing( false);
+
+        htmlDoc.setJGlossDocument( model.getDocument());
+        model.setHTMLDocument( htmlDoc);
+
+        // get notified of title changes
+        MarkChangedListener markChangedListener = new MarkChangedListener();
+        htmlDoc.addPropertyChangeListener(markChangedListener);
+
+        // mark document as changed if some editing occurs
+        htmlDoc.addDocumentListener(markChangedListener);
+
+        return htmlDoc;
+    }
+
+    private void showDocpane() {
+        // dispose might already have been called, test if
+        // member variables still exist
+        if (docpaneScroller != null && docpane != null && annotationEditor != null) {
+            docpaneScroller.setViewportView(docpane);
+            docpane.followMouse( showAnnotationItem.isSelected());
+            // scroll to selected annotation
+            Annotation current = (Annotation) annotationList.getSelectedValue();
+            if (current != null) {
+                docpane.makeVisible( current.getStartOffset(),
+                        current.getEndOffset());
+            }
+            docpane.requestFocusInWindow();
         }
     }
 
@@ -1188,7 +1127,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         }
         JFileChooser f = new SaveFileChooser( path);
         f.setFileHidingEnabled( true);
-        f.addChoosableFileFilter( jglossFileFilter);
+        f.addChoosableFileFilter( JGLOSS_FILE_FILTER);
         f.setFileView( CustomFileView.getFileView());
         int r = f.showSaveDialog( this);
         if (r == JFileChooser.APPROVE_OPTION) {
@@ -1246,8 +1185,8 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     /**
      * Dispose resources associated with the JGloss document.
      */
-    public synchronized void dispose() {
-        jglossFrames.remove( this);
+    public void dispose() {
+        JGLOSS_FRAMES.remove( this);
 
         JGloss.PREFS.removePropertyChangeListener( prefsListener);
         if (model.getDocument() != null) {

@@ -50,16 +50,16 @@ class ImportDocumentStrategy extends ImportStrategy {
     private static final String DEFAULT_ENCODING_NAME = JGloss.MESSAGES.getString("encodings.default");
 
     private final String encoding;
-    
+
     private int contentlength;
-    
+
     private String title;
 
     /**
      * Sets up everything neccessary to import a file and loads it. If <CODE>filename</CODE> is
      * a URL, it will create a reader which reads from the location the document points to. If it
-     * is a path to a local file, it will create a reader which reads from it. 
-     * The method will then call <CODE>loadDocument</CODE> with the newly 
+     * is a path to a local file, it will create a reader which reads from it.
+     * The method will then call <CODE>loadDocument</CODE> with the newly
      * created reader.
      *
      * @param frame Frame into which the document is imported.
@@ -79,7 +79,7 @@ class ImportDocumentStrategy extends ImportStrategy {
     @Override
     Reader createReader() throws IOException {
         Reader in;
- 
+
         try {
             URL url = new URL( path);
             URLConnection connection = url.openConnection();
@@ -116,7 +116,6 @@ class ImportDocumentStrategy extends ImportStrategy {
 
     @Override
     void customizeModel(JGlossFrameModel model) {
-        model.setDocumentPath(path);
         model.setDocumentName(title);
     }
 

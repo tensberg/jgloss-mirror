@@ -38,13 +38,13 @@ public class JGlossLookupFrame extends LookupFrame {
 
     @Override
 	protected void createFileMenuItems( JMenu menu) {
-        menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importDocument));
-        menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.importClipboard));
-        addWindowListener( JGlossFrame.actions.importClipboardListener);
-        menu.addMenuListener( JGlossFrame.actions.importClipboardListener);
+        menu.add( UIUtilities.createMenuItem( JGlossFrame.ACTIONS.importDocument));
+        menu.add( UIUtilities.createMenuItem( JGlossFrame.ACTIONS.importClipboard));
+        addWindowListener( JGlossFrame.ACTIONS.importClipboardListener);
+        menu.addMenuListener( JGlossFrame.ACTIONS.importClipboardListener);
         menu.addSeparator();
-        menu.add( UIUtilities.createMenuItem( JGlossFrame.actions.open));
-        JMenu openRecent = JGlossFrame.OPEN_RECENT.createMenu( JGlossFrame.actions.openRecentListener);
+        menu.add( UIUtilities.createMenuItem( JGlossFrame.ACTIONS.open));
+        JMenu openRecent = JGlossFrame.OPEN_RECENT.createMenu( JGlossFrame.ACTIONS.openRecentListener);
         menu.add( openRecent);
         menu.addSeparator();
 
