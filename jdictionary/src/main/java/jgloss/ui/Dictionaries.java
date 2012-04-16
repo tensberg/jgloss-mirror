@@ -63,8 +63,10 @@ import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryFactory;
+import jgloss.dictionary.DictionaryInstantiationException;
 import jgloss.dictionary.IndexException;
 import jgloss.dictionary.IndexedDictionary;
+import jgloss.dictionary.UnsupportedDescriptorException;
 import jgloss.ui.util.UIUtilities;
 
 /**
@@ -77,7 +79,7 @@ import jgloss.ui.util.UIUtilities;
  */
 public class Dictionaries extends JComponent implements PreferencesPanel {
 	private static final Logger LOGGER = Logger.getLogger(Dictionaries.class.getPackage().getName());
-	
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -318,14 +320,14 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 descriptors.add(descriptor);
             }
         }
-        
+
         if (!descriptors.isEmpty()) {
             DictionaryLoader loader = new DictionaryLoader(this, (DefaultListModel) dictionaries.getModel(), descriptors);
             showProgress(loader, this);
             loader.execute();
         }
     }
-    
+
     private boolean isAlreadyAdded(String descriptor) {
         ListModel model = dictionaries.getModel();
         for (int i=0; i<model.getSize(); i++) {
@@ -340,26 +342,26 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * Show an error dialog for the dictionary exception.
      */
     void showDictionaryError( Throwable ex, String file) {
-        if (ex instanceof DictionaryFactory.InstantiationException) {
-            ex = ((DictionaryFactory.InstantiationException) ex).getCause();
+        if (ex instanceof DictionaryInstantiationException) {
+            ex = ((DictionaryInstantiationException) ex).getCause();
         }
 
         File f = new File( file);
         String path = f.getAbsolutePath();
-        if (ex instanceof DictionaryFactory.NotSupportedException) {
+        if (ex instanceof UnsupportedDescriptorException) {
             int choice = JOptionPane.showOptionDialog(
                 SwingUtilities.getRoot(this),
                 JGloss.MESSAGES.getString("error.dictionary.format", path),
                 JGloss.MESSAGES.getString("error.dictionary.title"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null,
-                new String[] { JGloss.MESSAGES.getString("button.ok"), JGloss.MESSAGES.getString("button.why") }, null);     
- 
+                new String[] { JGloss.MESSAGES.getString("button.ok"), JGloss.MESSAGES.getString("button.why") }, null);
+
             if (choice == JOptionPane.NO_OPTION) { // this is really the Why? option
                 JTextArea text = new JTextArea(JGloss.MESSAGES.getString( "error.dictionary.reason", path, ex.getMessage()), 25, 55);
                 text.setEditable(false);
                 text.setLineWrap(true);
                 text.setWrapStyleWord(true);
-            
+
                 JOptionPane.showConfirmDialog
                     ( SwingUtilities.getRoot( this), new JScrollPane(text),
                       JGloss.MESSAGES.getString( "error.dictionary.title"),
@@ -384,10 +386,10 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             }
             else {
                 msgid = "error.dictionary.exception";
-                objects = new String[] { path, ex.getLocalizedMessage(), 
+                objects = new String[] { path, ex.getLocalizedMessage(),
                                          ex.getClass().getName() };
             }
-    
+
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( SwingUtilities.getRoot( this), JGloss.MESSAGES.getString
@@ -404,7 +406,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     @Override
 	public void savePreferences() {
         assert EventQueue.isDispatchThread();
-        
+
         ListModel model = dictionaries.getModel();
         StringBuilder paths = new StringBuilder( model.getSize()*32);
         List<DictionaryWrapper> newDictionaries = new ArrayList<DictionaryWrapper>( model.getSize());
@@ -442,7 +444,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 
         for (String element : fs) {
             try {
-                Dictionary d = DictionaryFactory.createDictionary( element);
+                Dictionary d = DictionaryFactory.synchronizedDictionary(DictionaryFactory.createDictionary( element));
                 if (d instanceof IndexedDictionary) {
                     if (!((IndexedDictionary) d).loadIndex()) {
                         LOGGER.info( "building index for dictionary " + d.getName());
@@ -458,7 +460,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             }
         }
         fireDictionaryListChanged();
-        
+
         EventQueue.invokeLater( new Runnable() {
                 @Override
 				public void run() {
@@ -476,7 +478,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     @Override
 	public void loadPreferences() {
         assert EventQueue.isDispatchThread();
-        
+
         // activeDictionaries is only initialized from the preferences if it does not
         // already contain dictionaries.
         boolean prefsLoaded = false;
@@ -484,7 +486,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             loadDictionariesFromPreferences();
             prefsLoaded = true;
         }
-        
+
         // display the list of loaded dictionaries
         final DefaultListModel model = new DefaultListModel();
 

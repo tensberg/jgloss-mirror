@@ -48,12 +48,15 @@ import javax.swing.UIManager;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryFactory;
+import jgloss.dictionary.DictionaryImplementation;
+import jgloss.dictionary.DictionaryInstantiationException;
 import jgloss.dictionary.DistanceSearchModes;
 import jgloss.dictionary.EDict;
 import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.IndexedDictionary;
 import jgloss.dictionary.KanjiDic;
 import jgloss.dictionary.SearchMode;
+import jgloss.dictionary.UnsupportedDescriptorException;
 import jgloss.dictionary.WadokuJT;
 import jgloss.dictionary.attribute.Attributes;
 import jgloss.ui.AboutFrame;
@@ -77,7 +80,7 @@ import jgloss.ui.StyleDialog;
  */
 public abstract class JGloss implements ExitListener {
 	private static final Logger LOGGER = Logger.getLogger(JGloss.class.getPackage().getName());
-	
+
 	/**
      * Path to the file with message strings.
      */
@@ -96,7 +99,7 @@ public abstract class JGloss implements ExitListener {
     private static JGloss application;
 
     private final List<ExitListener> exitListeners = new CopyOnWriteArrayList<ExitListener>();
-    
+
     /**
      * Path to the directory last used.
      */
@@ -105,7 +108,7 @@ public abstract class JGloss implements ExitListener {
     protected LookupModel mainLookupModel;
 
     /**
-     * 
+     *
      * @return Singleton instance of the JGloss application.
      */
     public static JGloss getApplication() {
@@ -113,7 +116,7 @@ public abstract class JGloss implements ExitListener {
         assert application != null;
         return application;
     }
- 
+
     /**
      * Empty constructor.
      */
@@ -121,12 +124,12 @@ public abstract class JGloss implements ExitListener {
 
     protected void init( String[] args) {
         assert application == null;
-        
+
         application = this;
-        
+
         try {
             addExitListener(this);
-            
+
             registerDictionaries();
 
             handleCommandLine( args);
@@ -156,13 +159,13 @@ public abstract class JGloss implements ExitListener {
             System.exit( 1);
         }
     }
-    
+
     public boolean exit() {
         boolean exit = doExit();
         if (exit) {
             LOGGER.log(FINE, "shutting down JGloss");
             fireOnExit();
-            
+
             LOGGER.log(INFO, "JGloss shut down");
             System.exit(0);
         }
@@ -203,15 +206,15 @@ public abstract class JGloss implements ExitListener {
         assert EventQueue.isDispatchThread();
         currentDir = dir;
     }
-    
+
     public void addExitListener(ExitListener listener) {
         exitListeners.add(listener);
     }
-    
+
     public void removeExitListener(ExitListener listener) {
         exitListeners.remove(listener);
     }
-    
+
     private void fireOnExit() {
         for (ExitListener listener : exitListeners) {
             try {
@@ -231,13 +234,13 @@ public abstract class JGloss implements ExitListener {
 
     protected void initUI() throws Exception {
         UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
-            
+
         // automatically set the fonts the first time JGloss is run
         if (!JGloss.PREFS.getBoolean( Preferences.FONT_AUTODETECTED, false)) {
             StyleDialog.autodetectFonts();
             JGloss.PREFS.set( Preferences.FONT_AUTODETECTED, true);
         }
-        
+
         // make sure the UI font is initialized before any UI elements are created
         StyleDialog.applyUIFont();
     }
@@ -247,8 +250,7 @@ public abstract class JGloss implements ExitListener {
         if (args.length > 0) {
             if (args[0].equals( "-h") || args[0].equals( "--help") ||
                 args[0].equals( "/?")) {
-                System.out.println( MESSAGES.getString( "main.usage", 
-                                                        new String[] { getApplicationName() }));
+                System.out.println( MESSAGES.getString( "main.usage", getApplicationName()));
                 System.exit( 0);
             }
             else if (args[0].equals( "-i") || args[0].equals( "--createindex")) {
@@ -260,29 +262,25 @@ public abstract class JGloss implements ExitListener {
                         if (d instanceof IndexedDictionary &&
                             !((IndexedDictionary) d).loadIndex()) {
                             LOGGER.severe( MESSAGES.getString
-                                                ( "main.createindex",
-                                                  new String[] { d.getName() }));
+                                                ( "main.createindex", d.getName()));
                             ((IndexedDictionary) d).buildIndex();
                         }
                         else {
                             LOGGER.severe( MESSAGES.getString
-                                                ( "main.createindex.noindex", 
-                                                  new String[] { d.getName() }));
+                                                ( "main.createindex.noindex", d.getName()));
                         }
                         d.dispose();
-                    } catch (DictionaryFactory.NotSupportedException ex) {
+                    } catch (UnsupportedDescriptorException ex) {
                         LOGGER.severe( MESSAGES.getString
-                                            ( "main.format.unrecognized",
-                                              new String[] { args[i] }));
+                                            ( "main.format.unrecognized", args[i] ));
                     } catch (Exception ex) {
-                        if (ex instanceof DictionaryFactory.InstantiationException) {
+                        if (ex instanceof DictionaryInstantiationException) {
 	                        ex = (Exception) ex.getCause();
                         }
                         LOGGER.severe( MESSAGES.getString
-                                            ( "main.createindex.exception",
-                                              new String[] { args[i],
+                                            ( "main.createindex.exception", args[i],
                                                              ex.getClass().getName(),
-                                                             ex.getLocalizedMessage() }));
+                                                             ex.getLocalizedMessage()));
                     }
                 }
                 System.exit( 0);
@@ -290,23 +288,20 @@ public abstract class JGloss implements ExitListener {
             else if (args[0].equals( "-f") || args[0].equals( "--format")) {
                 for ( int i=1; i<args.length; i++) {
                     try {
-                        DictionaryFactory.Implementation<?> imp =
+                        DictionaryImplementation<?> imp =
                             DictionaryFactory.getImplementation( args[i]);
                         LOGGER.severe( MESSAGES.getString
-                                            ( "main.format",
-                                              new String[] { args[i], imp.getName() }));
-                    } catch (DictionaryFactory.NotSupportedException ex) {
+                                            ( "main.format", args[i], imp.getName()));
+                    } catch (UnsupportedDescriptorException ex) {
                         LOGGER.severe( MESSAGES.getString
-                                            ( "error.dictionary.reason",
-                                              new String[] { args[i], ex.getMessage() }));
+                                            ( "error.dictionary.reason", args[i], ex.getMessage()));
                     }
                 }
                 System.exit( 0);
             }
-            else if (args[0].startsWith( "-") || 
+            else if (args[0].startsWith( "-") ||
                      File.separatorChar != '/' && args[0].startsWith( "/")) {
-                LOGGER.severe( MESSAGES.getString( "main.unknownoption",
-                                                        new String[] { args[0] }));
+                LOGGER.severe( MESSAGES.getString( "main.unknownoption", args[0]));
                 LOGGER.severe( MESSAGES.getString( "main.usage"));
                 System.exit( 1);
             }
@@ -327,11 +322,11 @@ public abstract class JGloss implements ExitListener {
         // Display error message in a frame. Note that this needs at least Java 1.1
         final Frame f = new Frame( MESSAGES.getString( "error.initialization.title"));
         f.setLayout( new BorderLayout());
-        
-        String msg = MESSAGES.getString( "error.initialization", new String[] {
+
+        String msg = MESSAGES.getString( "error.initialization",
             fatal ? MESSAGES.getString( "error.initialization.fatal") : "",
-            message, t.getClass().getName(), t.getLocalizedMessage() });
-        
+            message, t.getClass().getName(), t.getLocalizedMessage());
+
         int rows = 1;
         int maxcols = 0;
         int cols = 0;
@@ -349,14 +344,14 @@ public abstract class JGloss implements ExitListener {
         if (maxcols < cols) {
 	        maxcols = cols;
         }
-        
+
         TextArea a = new TextArea
             ( msg, rows, maxcols,
               TextArea.SCROLLBARS_NONE);
         a.setFont( new Font( "Dialog", Font.PLAIN, 12));
         a.setEditable( false);
         f.add( a, BorderLayout.CENTER);
-        
+
         Button ok = new Button( MESSAGES.getString( "button.ok"));
         ok.addActionListener( new ActionListener() {
                 @Override
@@ -370,11 +365,11 @@ public abstract class JGloss implements ExitListener {
             });
         f.add( ok, BorderLayout.SOUTH);
         f.pack();
-        
+
         Dimension d = f.getToolkit().getScreenSize();
         f.setLocation( (d.width-f.getWidth())/2, (d.height-f.getHeight())/2);
         f.setSize( f.getPreferredSize());
-        
+
         f.setVisible(true);
         synchronized (f) {
             try {
@@ -393,11 +388,11 @@ public abstract class JGloss implements ExitListener {
                                DistanceSearchModes.NEAR,
                                DistanceSearchModes.RADIUS }),
               Arrays.asList( Dictionaries.getInstance().getDictionaries()),
-              Arrays.asList( new LookupResultFilter[] 
-                  { 
+              Arrays.asList( new LookupResultFilter[]
+                  {
                       new AttributeResultFilter( MESSAGES.getString( "filter.mainentry.name"),
                                                  MESSAGES.getString( "filter.mainentry.desc"),
-                                                 WadokuJT.MAIN_ENTRY, true), 
+                                                 WadokuJT.MAIN_ENTRY, true),
                       new AttributeResultFilter( MESSAGES.getString( "filter.example.name"),
                                                  MESSAGES.getString( "filter.example.desc"),
                                                  Attributes.EXAMPLE, true),
@@ -436,7 +431,7 @@ public abstract class JGloss implements ExitListener {
         AboutFrame.createShowAction( getApplicationName());
         PreferencesFrame.createFrame( getPreferencesPanels());
     }
-    
+
     /**
      * Return a Preference implementation appropriate for the current Java VM.
      *

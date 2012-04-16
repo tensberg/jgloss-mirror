@@ -81,7 +81,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     private final Highlighter partialHighlighter = new PartialHighlighter();
     private final Highlighter highlighter = partialHighlighter;
 
-    public class DefinitionRenderer extends JLabel  
+    public class DefinitionRenderer extends JLabel
         implements ListCellRenderer {
 
         private static final long serialVersionUID = 1L;
@@ -90,8 +90,8 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         private final Rectangle textBounds = new Rectangle();
 
         @Override
-		public Component getListCellRendererComponent(JList list, Object value, 
-                                                      int index, boolean isSelected, 
+		public Component getListCellRendererComponent(JList list, Object value,
+                                                      int index, boolean isSelected,
                                                       boolean cellHasFocus) {
 
             // Colorize it
@@ -100,7 +100,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
 
             this.setText(String.valueOf(value));
             this.setFont(list.getFont());
-      
+
             this.setBackground(background);
             this.setForeground(foreground);
 
@@ -109,10 +109,10 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         }
 
         @Override
-		public void paintComponent(Graphics g) { 
+		public void paintComponent(Graphics g) {
 
             Insets insets = this.getInsets(textInsets);
-      
+
             int h = this.getHeight();
             int w = this.getWidth();
 
@@ -120,15 +120,15 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
             textBounds.y = insets.top;
             textBounds.width = w - (insets.left + insets.right);
             textBounds.height = h - (insets.top + insets.bottom);
-        
+
             g.setColor(this.getBackground());
             g.fillRect(0, 0, w, h);
 
             g.setColor(this.getForeground());
-            highlighter.paintHighlight(g, getText(), searchText);     
-      
+            highlighter.paintHighlight(g, getText(), searchText);
+
         }
-                                     
+
     }
 
     protected ListCellRenderer cellRenderer = new ListCellRenderer() {
@@ -204,7 +204,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
                                                      .getTranslationSynonymFormatter());
         translationWordReading.addWordFormat( DictionaryEntryFormat.getWordFormatter());
         translationWordReading.addReadingFormat( DictionaryEntryFormat.getReadingFormatter());
- 
+
         setEditable( true);
     }
 
@@ -224,7 +224,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
             if (nextSearchText.equals( searchText) || nextSearchText.length()==0) {
 	            return;
             }
-            
+
             searchText = nextSearchText;
         }
 
@@ -236,7 +236,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
         }
 
         tempModel.setSearchExpression( searchText);
-        if (StringTools.isHiragana( searchText.charAt( 0)) || 
+        if (StringTools.isHiragana( searchText.charAt( 0)) ||
             StringTools.isKatakana( searchText.charAt( 0))) {
 	        currentFormatter = readingWordTranslation;
         } else if (StringTools.isKanji( searchText.charAt( 0))) {
@@ -264,8 +264,7 @@ public class AutoSearchComboBox extends JComboBox implements LookupResultHandler
     @Override
 	public void dictionary( Dictionary d) {
         items.add( new Object[] { Dictionary.class, JGloss.MESSAGES.getString
-                                  ( "wordlookup.matches",
-                                    new String[] { d.getName() }) });
+                                  ( "wordlookup.matches", d.getName()) });
     }
 
     @Override

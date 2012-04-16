@@ -152,7 +152,7 @@ public class WadokuJT extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-    public static final DictionaryFactory.Implementation<WadokuJT> implementation = 
+    public static final DictionaryImplementation<WadokuJT> implementation = 
         initImplementation();
 
     /**
@@ -162,7 +162,7 @@ public class WadokuJT extends FileBasedDictionary {
      * be wrapped in a try/catch block.
      * 
      */
-    private static DictionaryFactory.Implementation<WadokuJT> initImplementation() {
+    private static DictionaryImplementation<WadokuJT> initImplementation() {
         try {
             // Dictionary entries are of the form
             // japanese|reading|part of speech|translation|comment|reference

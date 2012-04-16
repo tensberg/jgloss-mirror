@@ -66,9 +66,9 @@ public class EDict extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-	public static final DictionaryFactory.Implementation<EDict> IMPLEMENTATION_EUC = 
+	public static final DictionaryImplementation<EDict> IMPLEMENTATION_EUC = 
 		initImplementation("EDICT", "EUC-JP");
-	public static final DictionaryFactory.Implementation<EDict> IMPLEMENTATION_UTF8 = 
+	public static final DictionaryImplementation<EDict> IMPLEMENTATION_UTF8 = 
 		initImplementation("EDICT (Unicode)", "UTF-8");
 
     /**
@@ -78,7 +78,7 @@ public class EDict extends FileBasedDictionary {
      * be wrapped in a try/catch block.
      * 
      */
-    private static DictionaryFactory.Implementation<EDict> initImplementation(String name, String encoding) {
+    private static DictionaryImplementation<EDict> initImplementation(String name, String encoding) {
         try {
             // Explanation of the pattern:
             // The EDICT format is "word [reading] /translation/translation/.../", with

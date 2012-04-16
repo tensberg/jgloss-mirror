@@ -53,6 +53,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryFactory;
+import jgloss.dictionary.DictionaryInstantiationException;
+import jgloss.dictionary.UnsupportedDescriptorException;
 import jgloss.parser.KanjiParser;
 import jgloss.parser.Parser;
 import jgloss.util.CharacterEncodingDetector;
@@ -206,14 +208,14 @@ public class JGlossServlet extends HttpServlet {
         for (String dictionaryName : split( d, ' ')) {
             jgloss.dictionary.Dictionary dic = null;
             try {
-                dic = DictionaryFactory.createDictionary( dictionaryName);
-            } catch (DictionaryFactory.InstantiationException ex) {
+                dic = DictionaryFactory.synchronizedDictionary(DictionaryFactory.createDictionary( dictionaryName));
+            } catch (DictionaryInstantiationException ex) {
                 throw new ServletException( MessageFormat.format
                                             ( ResourceBundle.getBundle( MESSAGES)
                                               .getString( "error.loaddictionary"),
                                               new Object[] { dictionaryName })
                                             , ex);
-            } catch (DictionaryFactory.NotSupportedException ex) {
+            } catch (UnsupportedDescriptorException ex) {
                 throw new ServletException( MessageFormat.format
                                             ( ResourceBundle.getBundle( MESSAGES)
                                               .getString( "error.unknowndictionary"),
@@ -339,15 +341,15 @@ public class JGlossServlet extends HttpServlet {
         getServletContext().log( "cookie forwarding " + (enableCookieForwarding ? "enabled" : "disabled"));
         p = config.getInitParameter( ENABLE_SECURE_INSECURE_COOKIE_FORWARDING);
         enableCookieSecureInsecureForwarding = "true".equals( p);
-        getServletContext().log( "secure-to-insecure cookie forwarding " + 
+        getServletContext().log( "secure-to-insecure cookie forwarding " +
                                  (enableCookieSecureInsecureForwarding ? "enabled" : "disabled"));
         p = config.getInitParameter( ENABLE_FORM_DATA_FORWARDING);
         enableFormDataForwarding = "true".equals( p);
-        getServletContext().log( "form data forwarding " + 
+        getServletContext().log( "form data forwarding " +
                                  (enableFormDataForwarding ? "enabled" : "disabled"));
         p = config.getInitParameter( ENABLE_SECURE_INSECURE_FORM_DATA_FORWARDING);
         enableFormDataSecureInsecureForwarding = "true".equals( p);
-        getServletContext().log( "secure-to-insecure form data forwarding " + 
+        getServletContext().log( "secure-to-insecure form data forwarding " +
                                  (enableFormDataSecureInsecureForwarding ? "enabled" : "disabled"));
         try {
             responseBufferSize = Integer.parseInt( config.getInitParameter( RESPONSE_BUFFER_SIZE));
@@ -401,7 +403,7 @@ public class JGlossServlet extends HttpServlet {
                 return;
             }
             boolean allowCookieForwarding = "true".equals( req.getParameter( ALLOW_COOKIE_FORWARDING));
-            boolean allowFormDataForwarding = 
+            boolean allowFormDataForwarding =
                 "true".equals( req.getParameter( ALLOW_FORM_DATA_FORWARDING));
             String target = new JGlossURLRewriter
                 ( req.getContextPath() + req.getServletPath(),
@@ -431,7 +433,7 @@ public class JGlossServlet extends HttpServlet {
         boolean allowCookieForwarding = ((Boolean) oa[0]).booleanValue();
         boolean allowFormDataForwarding = ((Boolean) oa[1]).booleanValue();
         String urlstring = (String) oa[2];
-            
+
         getServletContext().log( "received request for " + urlstring);
 
         // don't allow the servlet to call itself
@@ -508,11 +510,11 @@ public class JGlossServlet extends HttpServlet {
         }
 
         JGlossURLRewriter rewriter = new JGlossURLRewriter
-            ( new URL( req.getScheme(), req.getServerName(), req.getServerPort(), 
+            ( new URL( req.getScheme(), req.getServerName(), req.getServerPort(),
                        req.getContextPath() + req.getServletPath()).toExternalForm(),
               url, connectionAllowedProtocols,
               allowCookieForwarding, allowFormDataForwarding);
-        
+
         // prepare the connection to the remote server
         URLConnection connection = url.openConnection();
 
@@ -576,7 +578,7 @@ public class JGlossServlet extends HttpServlet {
             is.close();
             os.close();
         }
-            
+
         // process the remote server response
         forwardResponseHeaders( connection, req, resp, rewriter);
         if (forwardCookies &&
@@ -614,14 +616,14 @@ public class JGlossServlet extends HttpServlet {
                     break;
                 }
             }
-        }   
+        }
         if (supported) {
             // If the content encoding cannot be decoded by the servlet,
             // the content is tunneled to the browser.
             // Multiple encodings are currently not supported and may lead to wrong
             // behavior.
             String encoding = connection.getContentEncoding();
-            supported = encoding==null || encoding.endsWith( "gzip") || 
+            supported = encoding==null || encoding.endsWith( "gzip") ||
                 encoding.endsWith( "deflate") || encoding.equals( "identity");
         }
 
@@ -632,10 +634,10 @@ public class JGlossServlet extends HttpServlet {
         }
     }
 
-    protected void tunnel( URLConnection connection, HttpServletRequest req, HttpServletResponse resp) 
+    protected void tunnel( URLConnection connection, HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
         byte[] buf = new byte[1024];
-        
+
         if (connection.getContentType() != null) {
 	        resp.setContentType( connection.getContentType());
         }
@@ -661,8 +663,8 @@ public class JGlossServlet extends HttpServlet {
     }
 
     protected void rewrite( URLConnection connection, HttpServletRequest req, HttpServletResponse resp,
-                            URLRewriter rewriter) 
-        throws ServletException, IOException {
+                            URLRewriter rewriter)
+        throws IOException {
         InputStream in = new BufferedInputStream( connection.getInputStream());
         // Decode the content.
         // Multiple encodings are currently not supported and may lead to wrong
@@ -675,7 +677,7 @@ public class JGlossServlet extends HttpServlet {
 	            in = new InflaterInputStream( in);
             }
         }
-        
+
         InputStreamReader reader = CharacterEncodingDetector.getReader( in, null, 5000);
         try {
             resp.setContentType( "text/html; charset=" + reader.getEncoding());
@@ -813,7 +815,7 @@ public class JGlossServlet extends HttpServlet {
     /**
      * Splits a string in a list of strings. Whitespace at the beginning and end of
      * an element in the list is removed.
-     * 
+     *
      * @param s String containing a list of items.
      * @param separator Character which separates the items. The special character ' ' will
      *        split on any whitespace.
@@ -835,7 +837,7 @@ public class JGlossServlet extends HttpServlet {
                 }
                 inword = true;
             }
-            else if (c==separator || 
+            else if (c==separator ||
                      separator==' ' && c<=32) { // separator ' ' means all whitespace chars
                 inword = false;
                 out.add( word.toString().trim());

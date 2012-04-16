@@ -12,9 +12,9 @@ import javax.swing.DefaultListModel;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryFactory;
-import jgloss.dictionary.DictionaryFactory.InstantiationException;
-import jgloss.dictionary.DictionaryFactory.NotSupportedException;
+import jgloss.dictionary.DictionaryInstantiationException;
 import jgloss.dictionary.IndexedDictionary;
+import jgloss.dictionary.UnsupportedDescriptorException;
 import jgloss.ui.util.JGlossWorker;
 
 /**
@@ -80,10 +80,10 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DictionaryWrap
         }
     }
 
-    private DictionaryWrapper loadDictionary(String descriptor) throws NotSupportedException, InstantiationException {
+    private DictionaryWrapper loadDictionary(String descriptor) throws UnsupportedDescriptorException, DictionaryInstantiationException {
         setMessage(MESSAGES.getString("dictionaries.loading", new File(descriptor).getName()));
 
-        Dictionary dictionary = DictionaryFactory.createDictionary(descriptor);
+        Dictionary dictionary = DictionaryFactory.synchronizedDictionary(DictionaryFactory.createDictionary(descriptor));
 
         if (dictionary instanceof IndexedDictionary) {
             IndexedDictionary indexedDictionary = (IndexedDictionary) dictionary;

@@ -23,6 +23,12 @@
 
 package jgloss.ui;
 
+/**
+ * Stores an object together with its selected and enabled state.
+ *
+ * @author Michael Koch <tensberg@gmx.net>
+ * @param <T> Type of the object which is stored.
+ */
 class StateWrapper<T> implements Cloneable {
     private T obj;
     private boolean selected;

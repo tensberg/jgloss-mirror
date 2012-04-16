@@ -39,8 +39,8 @@ import jgloss.dictionary.StandardSearchParameter;
  * @author Michael Koch
  */
 public class LookupEngine {
-    protected LookupResultHandler handler;
-    protected int dictionaryEntryLimit;
+    protected final LookupResultHandler handler;
+    protected final int dictionaryEntryLimit;
 
     public LookupEngine( LookupResultHandler _handler) {
         this( _handler, Integer.MAX_VALUE);
@@ -52,65 +52,73 @@ public class LookupEngine {
     }
 
     public LookupResultHandler getHandler() { return handler; }
-    public void setHandler( LookupResultHandler _handler) { handler = _handler; }
 
     public void doLookup( LookupModel model) throws InterruptedException {
         handler.startLookup( model);
 
-        SearchMode mode = model.getSelectedSearchMode();
-        Object[] parameters = new Object[mode.getParameters().size()];
-        for ( int i=0; i<parameters.length; i++) {
-            SearchParameter param = mode.getParameters().get( i);
-            if (param == StandardSearchParameter.EXPRESSION) {
-	            parameters[i] = model.getSearchExpression();
-            } else if (param == StandardSearchParameter.SEARCH_FIELDS) {
-	            parameters[i] = model.getSearchFields();
-            } else if (param == StandardSearchParameter.DISTANCE) {
-	            parameters[i] = Integer.valueOf( model.getDistance());
-            } else {
-	            throw new IllegalArgumentException( "Unimplemented search parameter " + param);
-            }
-        }
-        LookupResultFilter[] filters = model.getSelectedFilters()
-            .toArray( new LookupResultFilter[0]);
-
-        int dictionaryEntries = 0;
-
         try {
-            for ( Iterator<Dictionary> i=model.getSelectedDictionaries().iterator(); i.hasNext() &&
-                      dictionaryEntries<dictionaryEntryLimit; ) {
-                Dictionary d = i.next();
-                handler.dictionary( d);
-                try {
-                    Iterator<DictionaryEntry> results = d.search( mode, parameters);
-                    results:
-                    while (dictionaryEntries<dictionaryEntryLimit &&
-                           results.hasNext()) {
-	                    try {
-                               if (Thread.interrupted()) {
-	                            throw new InterruptedException();
-                            }
-                               
-                               DictionaryEntry de = results.next();
-                               for ( int f=0; f<filters.length; f++) {
-                                   if (!filters[f].accept( de)) {
-                                       continue results;
-                                   }
-                               }
-                               dictionaryEntries++;
-                               handler.dictionaryEntry( de);
-                           } catch (SearchException ex) {
-                               handler.exception( ex);
-                           }
-                    }
-                } catch (SearchException ex) {
-                    handler.exception( ex);
-                    continue;
+            SearchMode mode = model.getSelectedSearchMode();
+            Object[] parameters = new Object[mode.getParameters().size()];
+            for ( int i=0; i<parameters.length; i++) {
+                SearchParameter param = mode.getParameters().get( i);
+                if (param == StandardSearchParameter.EXPRESSION) {
+                    parameters[i] = model.getSearchExpression();
+                } else if (param == StandardSearchParameter.SEARCH_FIELDS) {
+                    parameters[i] = model.getSearchFields();
+                } else if (param == StandardSearchParameter.DISTANCE) {
+                    parameters[i] = Integer.valueOf( model.getDistance());
+                } else {
+                    throw new IllegalArgumentException( "Unimplemented search parameter " + param);
                 }
             }
+            LookupResultFilter[] filters = model.getSelectedFilters()
+                    .toArray( new LookupResultFilter[0]);
+
+            searchInDictionaries(model, mode, parameters, filters);
         } finally {
-            // do even if interrupted
             handler.endLookup();
         }
+    }
+
+    private void searchInDictionaries(LookupModel model, SearchMode mode, Object[] parameters,
+            LookupResultFilter[] filters) throws InterruptedException {
+        int dictionaryEntries = 0;
+
+        for ( Iterator<Dictionary> i=model.getSelectedDictionaries().iterator(); i.hasNext() &&
+                dictionaryEntries<dictionaryEntryLimit; ) {
+            Dictionary d = i.next();
+            dictionaryEntries = searchInDictionary(mode, parameters, filters, dictionaryEntries, d);
+        }
+    }
+
+    private int searchInDictionary(SearchMode mode, Object[] parameters, LookupResultFilter[] filters,
+            int dictionaryEntries, Dictionary d) throws InterruptedException {
+        handler.dictionary(d);
+
+        try {
+            Iterator<DictionaryEntry> results = d.search(mode, parameters);
+            results: while (dictionaryEntries < dictionaryEntryLimit && results.hasNext()) {
+                try {
+                    if (Thread.interrupted()) {
+                        throw new InterruptedException();
+                    }
+
+                    DictionaryEntry de = results.next();
+                    for (int f = 0; f < filters.length; f++) {
+                        if (!filters[f].accept(de)) {
+                            continue results;
+                        }
+                    }
+                    dictionaryEntries++;
+                    handler.dictionaryEntry(de);
+                } catch (SearchException ex) {
+                    handler.exception(ex);
+                }
+            }
+        } catch (SearchException ex) {
+            handler.exception(ex);
+            return dictionaryEntries;
+        }
+        return dictionaryEntries;
     }
 } // class LookupEngine

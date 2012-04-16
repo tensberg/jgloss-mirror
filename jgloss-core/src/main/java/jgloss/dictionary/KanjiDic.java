@@ -86,10 +86,10 @@ public class KanjiDic implements Dictionary {
      *
      * @see DictionaryFactory
      */
-    public final static DictionaryFactory.Implementation<KanjiDic> IMPLEMENTATION = 
-        new DictionaryFactory.Implementation<KanjiDic>() {
+    public final static DictionaryImplementation<KanjiDic> IMPLEMENTATION = 
+        new DictionaryImplementation<KanjiDic>() {
                 @Override
-				public DictionaryFactory.TestResult isInstance( String descriptor) {
+				public TestResult isInstance( String descriptor) {
                     float confidence = ZERO_CONFIDENCE;
                     String reason = "";
                     try {
@@ -121,7 +121,7 @@ public class KanjiDic implements Dictionary {
                         reason = MESSAGES.getString("dictionary.reason.read");
                     }
                     
-                    return new DictionaryFactory.TestResult(confidence, reason);
+                    return new TestResult(confidence, reason);
                 }
                 
                 @Override
@@ -129,11 +129,11 @@ public class KanjiDic implements Dictionary {
                 
                 @Override
 				public KanjiDic createInstance( String descriptor) 
-                    throws DictionaryFactory.InstantiationException {
+                    throws DictionaryInstantiationException {
                     try {
                         return new KanjiDic( descriptor);
                     } catch (IOException ex) {
-                        throw new DictionaryFactory.InstantiationException( ex.getLocalizedMessage(), ex);
+                        throw new DictionaryInstantiationException( ex.getLocalizedMessage(), ex);
                     }
                 }
 

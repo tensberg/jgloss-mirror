@@ -90,7 +90,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * test reads some bytes from the file to test, converts them to a string using the
      * superclass-supplied encoding and tests it against a regular expression.
      */
-    public static class Implementation<T extends FileBasedDictionary> implements DictionaryFactory.Implementation<T> {
+    public static class Implementation<T extends FileBasedDictionary> implements DictionaryImplementation<T> {
         protected String name;
         protected String encoding;
         private final boolean doEncodingTest;
@@ -137,7 +137,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * is accepted and {@link #maxConfidence maxConfidence} is returned.
          */
         @Override
-		public DictionaryFactory.TestResult isInstance( String descriptor) {
+		public TestResult isInstance( String descriptor) {
 			float confidence = ZERO_CONFIDENCE;
 			String reason = "";
 			
@@ -178,7 +178,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             	LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
             
-            return new DictionaryFactory.TestResult(confidence, reason);
+            return new TestResult(confidence, reason);
         }
 
         /**
@@ -200,16 +200,16 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          */
         @Override
 		public T createInstance( String descriptor) 
-            throws DictionaryFactory.InstantiationException {
+            throws DictionaryInstantiationException {
             try {
                 return dictionaryConstructor.newInstance
                     ( getConstructorParameters(descriptor));
             } catch (InvocationTargetException ex) {
-                throw new DictionaryFactory.InstantiationException
+                throw new DictionaryInstantiationException
                     ( (Exception) ex.getTargetException());
             } catch (Exception ex) {
                 // should never happen
-                throw new DictionaryFactory.InstantiationException( ex);
+                throw new DictionaryInstantiationException( ex);
             }
         }
 
