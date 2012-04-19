@@ -23,14 +23,11 @@
 
 package jgloss.dictionary;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -40,7 +37,6 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.UnsupportedCharsetException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,14 +51,13 @@ import java.util.logging.Logger;
 
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeValue;
-import jgloss.util.CharacterEncodingDetector;
 import jgloss.util.StringTools;
 import jgloss.util.UTF8ResourceBundleControl;
 
 /**
  * Base class for dictionaries stored in a local file with separate index file.
  * <p>
- * The class tries to provide a framework to implement dictionaries which are stored in a file.
+ * The class provides a framework to implement dictionaries which are stored in a file.
  * It is assumed that the dictionary file is a sequence of dictionary entries which are separated by
  * byte-sized entry sepator markers. Each entry is again subdivided into several fields like word,
  * reading or translation. Field division markers can be more complex. Common tasks like index
@@ -77,7 +72,7 @@ import jgloss.util.UTF8ResourceBundleControl;
 public abstract class FileBasedDictionary implements IndexedDictionary, Indexable,
                                                      BaseEntry.MarkerDictionary {
 	private static final Logger LOGGER = Logger.getLogger(FileBasedDictionary.class.getPackage().getName());
-	
+
     /**
      * Localized messages and strings for the dictionary implementations. Stored in
      * <code>resources/messages-dictionary</code>
@@ -86,207 +81,61 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         ( "messages-dictionary", new UTF8ResourceBundleControl());
 
     /**
-     * Generic implementation for file-based dictionaries. The {@link #isInstance(String) isInstance}
-     * test reads some bytes from the file to test, converts them to a string using the
-     * superclass-supplied encoding and tests it against a regular expression.
-     */
-    public static class Implementation<T extends FileBasedDictionary> implements DictionaryImplementation<T> {
-        protected String name;
-        protected String encoding;
-        private final boolean doEncodingTest;
-        private final java.util.regex.Pattern pattern;
-        private final float maxConfidence;
-        private final int lookAtLength;
-        private final Constructor<T> dictionaryConstructor;
-
-        /**
-         * Creates a new implementation instance for some file based dictionary format.
-         *
-         * @param name Name of the dictionary format.
-         * @param encoding Character encoding used by dictionary files.
-         * @param doEncodingTest If <code>true</code>, Use the 
-         *        {@link CharacterEncodingDetector CharacterEncodingDetector} to guess the encoding
-         *        of the tested file and return <code>ZERO_CONFIDENCE</code> if it does not match
-         *        the encoding.
-         * @param pattern Regular expression to match against the start of a tested file.
-         * @param maxConfidence The confidence which is returned when the <code>linePattern</code>
-         *                      matches.
-         * @param lookAtLength Number of bytes read from the tested file. If the file is shorter
-         *                     than the given length, the file will be read completely.
-         * @param dictionaryConstructor Constructor used to create a new dictionary instance for 
-         *        a matching file. The constructor must take a single <code>File</code> as parameter.
-         */
-        public Implementation( String name, String encoding, boolean doEncodingTest,
-                               java.util.regex.Pattern pattern,
-                               float maxConfidence, int lookAtLength, 
-                               Constructor<T> dictionaryConstructor) {
-            this.name = name;
-            this.encoding = encoding;
-            this.doEncodingTest = doEncodingTest;
-            this.pattern = pattern;
-            this.maxConfidence = maxConfidence;
-            this.lookAtLength = lookAtLength;
-            this.dictionaryConstructor = dictionaryConstructor;
-        }
-
-        /**
-         * Test if the descriptor points to a dictionary file supported by this implementation.
-         * The first {@link #lookAtLength lookAtLength} bytes are read from the file pointed to
-         * by the descriptor. The byte array is converted to a string using {@link #encoding encoding}
-         * and the {@link #pattern pattern} is tested against it. If the pattern matches, the file
-         * is accepted and {@link #maxConfidence maxConfidence} is returned.
-         */
-        @Override
-		public TestResult isInstance( String descriptor) {
-			float confidence = ZERO_CONFIDENCE;
-			String reason = "";
-			
-            try {
-                File dic = new File( descriptor);
-                int headlen = (int) Math.min( lookAtLength, dic.length());
-                byte[] buffer = new byte[headlen];
-                DataInputStream in = new DataInputStream( new FileInputStream( dic));
-                try {
-                    in.readFully( buffer);
-                } finally {
-                    in.close();
-                }
-
-				boolean encodingMatches = false;
-                if (doEncodingTest) {
-                	String bufferEncoding = CharacterEncodingDetector.guessEncodingName( buffer);
-					
-					encodingMatches = encoding.equals(bufferEncoding);
-					if (!encodingMatches) {
-                        reason = MessageFormat.format(NAMES.getString("dictionary.reason.encoding"),
-                            bufferEncoding, encoding);
-                    }
-                }
-
-				if (!doEncodingTest || encodingMatches) {
-	              	if (pattern.matcher( new String( buffer, encoding)).find()) {
-						confidence = maxConfidence;
-						reason = NAMES.getString("dictionary.reason.ok");
-					}
-					else {
-						reason = NAMES.getString("dictionary.reason.pattern");
-					}
-	            }
-            } catch (IOException ex) {
-            	confidence = ZERO_CONFIDENCE;
-            	reason = NAMES.getString("dictionary.reason.read");
-            	LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-            
-            return new TestResult(confidence, reason);
-        }
-
-        /**
-         * Returns the confidence passed to the constructor.
-         */
-        @Override
-		public float getMaxConfidence() { return maxConfidence; }
-        /**
-         * Returns the dictionary format name passed to the constructor.
-         */
-        @Override
-		public String getName() { return name; }
-
-        /**
-         * Creates a new dictionary instance using 
-         * {@link FileBasedDictionary.Instance#dictionaryConstructor dictionaryConstructor}.
-         * The constructor is passed a <code>File</code> wrapping the <code>descriptor</code> as only
-         * argument.
-         */
-        @Override
-		public T createInstance( String descriptor) 
-            throws DictionaryInstantiationException {
-            try {
-                return dictionaryConstructor.newInstance
-                    ( getConstructorParameters(descriptor));
-            } catch (InvocationTargetException ex) {
-                throw new DictionaryInstantiationException
-                    ( (Exception) ex.getTargetException());
-            } catch (Exception ex) {
-                // should never happen
-                throw new DictionaryInstantiationException( ex);
-            }
-        }
-
-        /**
-         * Constructs the Object array passed to the Dictionary constructor.
-         * Subclasses can override this method if the constructor takes more arguments.
-         * Default is a single File object constructed using the descriptor.
-         * 
-         * @param descriptor Dictionary descriptor passed to createInstance
-         * @return The Object array used to pass the arguments to the dictionary constructor.
-         */
-        protected Object[] getConstructorParameters(String descriptor) {
-            return new Object[] { new File(descriptor) };
-        }
-
-        @Override
-		public Class<T> getDictionaryClass( String descriptor) {
-            return dictionaryConstructor.getDeclaringClass();
-        }
-    } // class Implementation
-
-    /**
      * File which holds the dictionary.
      */
-    protected File dicfile;
+    private final File dicfile;
     /**
      * Channel used to access the dictionary.
      */
-    protected FileChannel dicchannel;
+    private final FileChannel dicchannel;
     /**
      * Size of the dictionary in bytes. This equals dicchannel.size(), which is slow.
      */
-    protected int dictionarySize;
+    private final int dictionarySize;
     /**
      * Dictionary file mapped into a byte buffer.
      */
-    protected MappedByteBuffer dictionary;
+    private final MappedByteBuffer dictionary;
     /**
      * Duplicate of the  {@link #dictionary dictionary} byte buffer. Created using
      * <code>dictionary.duplicate()</code> and needed for comparison.
      */
-    protected ByteBuffer dictionaryDuplicate;
+    private final ByteBuffer dictionaryDuplicate;
     /**
      * Decoder initialized to convert a byte array to a char array using the charset of the
      * dictionary.
      */
-    protected CharsetDecoder decoder;
+    private final CharsetDecoder decoder;
     /**
-     * Stores the character handler created by a call to 
+     * Stores the character handler created by a call to
      * {@link #createCharacterHandler(String) createCharacterHandler} and used thorough this class.
      */
-    protected EncodedCharacterHandler characterHandler;
+    protected final EncodedCharacterHandler characterHandler;
     /**
      * Name of the dictionary. This will be the filename of the dictionary file.
      */
-    protected String name;    
-    
-    protected File indexFile;
+    private final String name;
+
+    private final File indexFile;
     /**
      * Container which stores the index data for this dictionary.
      */
-    protected IndexContainer indexContainer;
+    private IndexContainer indexContainer;
     /**
      * Binary search index which is used for expression searches.
      */
-    protected Index binarySearchIndex;
+    private final Index binarySearchIndex;
     /**
-     * Stores the supported search modes of this dictionary. Initialized in 
+     * Stores the supported search modes of this dictionary. Initialized in
      * {@link #initSearchModes() initSearchModes}.
      */
-    protected Map<SearchMode, SearchFieldSelection> supportedSearchModes;
+    protected final Map<SearchMode, SearchFieldSelection> supportedSearchModes = new HashMap<SearchMode, SearchFieldSelection>( 11);
     /**
      * Set of attributes supported by this dictionary implementation. Initialized in
      * {@link #initSupportedAttributes() initSupportedAttributes}.
      */
-    protected Map<Attribute<?>, Set<AttributeValue>> supportedAttributes;
-    
+    protected final Map<Attribute<?>, Set<AttributeValue>> supportedAttributes = new HashMap<Attribute<?>, Set<AttributeValue>>( 11);
+
     /**
      * Initializes the dictionary. The dictionary file is opened and mapped into memory.
      * The index file is not loaded from the constructor. Before the dictionary can be used,
@@ -302,12 +151,16 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         indexFile = new File( dicfile.getCanonicalPath() + FileIndexContainer.EXTENSION);
 
         characterHandler = createCharacterHandler(_encoding);
+
+        CharsetDecoder decoder;
         try {
             decoder = Charset.forName(_encoding).newDecoder();
         } catch (UnsupportedCharsetException ex) {
-            // bah...
+            LOGGER.log(Level.WARNING, "unsupported charset " + _encoding, ex);
             // leave decoder==null and use String constructor for byte->char conversion
+            decoder = null;
         }
+        this.decoder = decoder;
 
         // load the dictionary
         dicchannel = new FileInputStream( dicfile).getChannel();
@@ -330,8 +183,6 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         // is stored as value of the search mode key and getSupportedFields() will return this
         // selection.
 
-        supportedSearchModes = new HashMap<SearchMode, SearchFieldSelection>( 11);
-        
         SearchFieldSelection fields = new SearchFieldSelection( true, true, true, true, true);
 
         supportedSearchModes.put( ExpressionSearchModes.EXACT, fields);
@@ -346,7 +197,6 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * an empty set. Derived classes should add their supported attributes.
      */
     protected void initSupportedAttributes() {
-        supportedAttributes = new HashMap<Attribute<?>, Set<AttributeValue>>( 11);
     }
 
     @Override
@@ -373,7 +223,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 	        return out;
         }
     }
-    
+
     @Override
 	public SearchFieldSelection getSupportedFields( SearchMode mode) {
         SearchFieldSelection fields = supportedSearchModes.get( mode);
@@ -442,7 +292,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         initIndexes();
     }
 
-    protected void initIndexes() throws IndexException {
+    private void initIndexes() throws IndexException {
         binarySearchIndex.setContainer( indexContainer);
     }
 
@@ -453,7 +303,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * Throws an <code>IllegalArgumentException</code> otherwise.
      * Subclasses may override this method to create custom character handlers.
      */
-    protected EncodedCharacterHandler createCharacterHandler(String encoding) {
+    private EncodedCharacterHandler createCharacterHandler(String encoding) {
         if ("EUC-JP".equals(encoding)) {
 	        return new EUCJPCharacterHandler();
         } else if ("UTF-8".equals(encoding)) {
@@ -478,7 +328,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             searchmode == ExpressionSearchModes.PREFIX ||
             searchmode == ExpressionSearchModes.SUFFIX ||
             searchmode == ExpressionSearchModes.ANY) {
-            return searchExpression( searchmode, (String) parameters[0], 
+            return searchExpression( searchmode, (String) parameters[0],
                                      (SearchFieldSelection) parameters[1]);
         }
 
@@ -488,8 +338,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Implements search for expression search modes.
      */
-    protected Iterator<DictionaryEntry> searchExpression( SearchMode searchmode, String expression,
-                                               SearchFieldSelection searchFields) 
+    private Iterator<DictionaryEntry> searchExpression( SearchMode searchmode, String expression,
+                                               SearchFieldSelection searchFields)
         throws SearchException {
         expression = escape( expression);
 
@@ -503,7 +353,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             throw new SearchException( ex);
         }
     }
-    
+
     /**
      * Copy the data of a single dictionary entry from the dictionary buffer to a newly created
      * buffer.
@@ -524,7 +374,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      *         <code>entrybuf</code> buffer, its limit will be the length of the entry data and its
      *         position will be the byte pointed to by <code>matchstart</code>.
      */
-    protected ByteBuffer copyEntry( int matchstart, byte[] entrybuf, Set<Integer> seenEntries,
+    private ByteBuffer copyEntry( int matchstart, byte[] entrybuf, Set<Integer> seenEntries,
                                     int[] outOffsets) {
         if (entrybuf == null) {
 	        entrybuf = new byte[8192];
@@ -532,7 +382,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         int start = matchstart; // start of entry (inclusive)
         int end = matchstart+1; // end of entry (exclusive)
-        
+
         // Find beginning of entry line by searching backwards for the entry separator.
         // Read bytes are stored back to front in entry array.
         byte b;
@@ -555,7 +405,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         } catch (IndexOutOfBoundsException ex) {
             // beginning of dictionary
         }
-        
+
         // test if entry was already found through another index word
         // Several index entries can point to the same entry line. For example
         // if a word contains the same kanji twice, and words with this kanji are looked up,
@@ -564,7 +414,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         if (seenEntries!=null && seenEntries.contains( start)) {
             return null;
         }
-        
+
         // move read bytes to beginning of entry array
         try {
             System.arraycopy( entrybuf, entrybuf.length-(matchstart-start), entrybuf, 0,
@@ -574,7 +424,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         }
         // read match start char
         entrybuf[matchstart - start] = dictionary.get( matchstart);
-        
+
         // find end of entry line
         int entrylength = matchstart - start + 1;
         try {
@@ -612,8 +462,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 	public DictionaryEntry createEntryFromMarker( int marker) throws SearchException {
         dictionary.position( marker);
         ByteBuffer entry = dictionary.slice();
-        while (!isEntrySeparator( entry.get()))
-		 {
+        while (!isEntrySeparator( entry.get())) {
 	        ; // entry.get() advances the loop
         }
         entry.limit( entry.position()-1);
@@ -625,9 +474,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * buffer. The method converts the byte buffer data to a string and invokes
      * {@link #parseEntry(String,int) parseEntry}.
      */
-    protected DictionaryEntry createEntryFrom( ByteBuffer entry, int startOffset) 
+    private DictionaryEntry createEntryFrom( ByteBuffer entry, int startOffset)
         throws SearchException {
-        
+
         String entrystring;
         // NIO decoder is faster than new String(), but NIO character encoding support is limited
         if (decoder != null) {
@@ -640,7 +489,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         else { // NIO does not support the required encoding
             try {
                 if (entry.hasArray()) {
-                    entrystring = unescape( new String( entry.array(), entry.arrayOffset(), entry.limit(), 
+                    entrystring = unescape( new String( entry.array(), entry.arrayOffset(), entry.limit(),
                                                         characterHandler.getEncodingName()));
                 } else {
                     entry.rewind();
@@ -653,14 +502,14 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                 throw new SearchException( ex);
             }
         }
-        
+
         return parseEntry( entrystring, startOffset);
     }
-    
+
     /**
      * Test if the character at the given location is the first in an entry field. If the dictionary
      * supports several words, readings or translations in one entry, each counts as its own field.
-     * 
+     *
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
      * @param field Field which the location is in.
@@ -669,7 +518,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Test if the character at the given location is the last in an entry field. If the dictionary
      * supports several words, readings or translations in one entry, each counts as its own field.
-     * 
+     *
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
      * @param field Field which the location is in.
@@ -677,35 +526,35 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     protected abstract boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field);
     /**
      * Test if the character at the given location is the first in a word. The method first tests
-     * if the location is at the start of a field by calling 
-     * {@link #isFieldStart(ByteBuffer,int,DictionaryEntryField) isFieldStart}. 
+     * if the location is at the start of a field by calling
+     * {@link #isFieldStart(ByteBuffer,int,DictionaryEntryField) isFieldStart}.
      * If it is not at the start of a field,
      * it calls {@link #isWordBoundary(ByteBuffer,int,DictionaryEntryField) isWordBoundary}.
-     * 
+     *
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
      * @param field Field which the location is in.
      */
-    protected boolean isWordStart( ByteBuffer entry, int location, DictionaryEntryField field) {
+    private boolean isWordStart( ByteBuffer entry, int location, DictionaryEntryField field) {
         if (isFieldStart( entry, location, field)) {
 	        return true;
         }
-        
+
         return isWordBoundary( entry, location, field);
     }
 
     /**
      * Test if the character at the given location is the last in a word. The method first tests
-     * if the location is at the start of a field by calling 
-     * {@link #isFieldEnd(ByteBuffer,int,DictionaryEntryField) isFieldEnd}. 
+     * if the location is at the start of a field by calling
+     * {@link #isFieldEnd(ByteBuffer,int,DictionaryEntryField) isFieldEnd}.
      * If it is not at the start of a field,
      * it calls {@link #isWordBoundary(ByteBuffer,int,DictionaryEntryField) isWordBoundary}.
-     * 
+     *
      * @param entry Buffer which holds the dictionary entry.
      * @param location Location of the first byte of the character.
      * @param field Field which the location is in.
      */
-    protected boolean isWordEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
+    private boolean isWordEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
         if (isFieldEnd( entry, location, field)) {
 	        return true;
         }
@@ -716,7 +565,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Test if the characters before and at the given location form a word boundary.
      */
-    protected boolean isWordBoundary( ByteBuffer entry, int location, DictionaryEntryField field) {
+    private boolean isWordBoundary( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
             entry.position( location);
             int c1 = characterHandler.readPreviousCharacter( entry);
@@ -758,7 +607,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * if the method returns <code>true</code>.
      * </p>
      */
-    protected String escape( String str) {
+    private String escape( String str) {
         StringBuilder buf = null; // initialize only if needed
         for ( int i=str.length()-1; i>=0; i--) {
             if (escapeChar( str.charAt( i))) {
@@ -792,7 +641,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     protected String unescape( String str) {
         return StringTools.unicodeUnescape( str);
     }
-    
+
     /**
      * Create a {@link DictionaryEntry DictionaryEntry} object from the entry string from the dictionary.
      *
@@ -801,7 +650,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * @exception SearchException if the dictionary entry is malformed.
      */
     protected abstract DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException;
-    
+
     @Override
 	public void dispose() {
         try {
@@ -823,16 +672,16 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 	public String getName() {
         return name;
     }
-    
+
     /**
      * Adds all indexable terms in the dictionary to the index builder.
      *
      * @return The number of index entries created.
      */
-    protected int addIndexTerms( IndexBuilder builder) throws IOException, IndexException {
+    private int addIndexTerms( IndexBuilder builder) throws IOException, IndexException {
         // Indexes all terms in word, reading and translation fields.
         // Index term boundaries are determined using characterHandler.getCharacterClass():
-        // if the character classes of two adjacent characters differ they are assumed to 
+        // if the character classes of two adjacent characters differ they are assumed to
         // belong to two different terms.
         // For kanji characters, each kanji in a term is indexed.
         // For kana characters, whole terms are indexed.
@@ -843,9 +692,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         ArrayList<Integer> termStarts = new ArrayList<Integer>( 25);
 
         int previousTerm = -1;
-        
+
         DictionaryEntryField field = moveToNextField( dictionary, 0, null);
-        while (dictionary.position() < dictionarySize) { 
+        while (dictionary.position() < dictionarySize) {
         	try {
         		boolean inWord = false;
         		int c;
@@ -883,7 +732,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         		} while (clazz2 == clazz);
 
         		// add the term to the index
-        		if (clazz==CharacterClass.KANJI || 
+        		if (clazz==CharacterClass.KANJI ||
         						clazz==CharacterClass.HIRAGANA ||
         						clazz==CharacterClass.KATAKANA ||
         						clazz==CharacterClass.ROMAN_WORD && termLength >= 3) {
@@ -918,10 +767,10 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         	}
         	// end of dictionary file
         }
-        
+
         return indexsize;
     }
-    
+
     /**
      * Skip to the next indexable field. This method is called at index
      * creation time before any character is read from the dictionary and after each read character.
@@ -929,7 +778,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      *
      * @param buf Skip entries in this buffer by moving the current position of the buffer.
      * @param character The last character read from the buffer, or 0 at the first invocation. The
-     *                  character format is dependent on 
+     *                  character format is dependent on
      *                  {@link EncodedCharacterHandler#readCharacter(ByteBuffer) readCharacter}
      *                  and not neccessaryly unicode.
      * @param field The current field.
@@ -974,7 +823,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * @param i2 Offset in the second buffer to the second string.
      * @return -1 if i1&lt;i2, 1 if i1&gt;i2, 0 for equality.
      */
-    protected int compare( ByteBuffer buf1, int i1, int length, ByteBuffer buf2, int i2) 
+    private int compare( ByteBuffer buf1, int i1, int length, ByteBuffer buf2, int i2)
         throws CharacterCodingException {
         if (i1 == i2) {
             return 0;
@@ -1027,16 +876,16 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     /**
      * Iterator returning results from an expression search.
      */
-    protected class ExpressionSearchIterator implements Iterator<DictionaryEntry> {
-        protected SearchMode searchmode;
-        protected SearchFieldSelection fields;
-        protected int expressionLength;
-        protected Index.Iterator matchingIndexEntries;
-        protected byte[] entrybuf = new byte[8192];
-        protected Set<Integer> seenEntries = new HashSet<Integer>();
-        protected int[] entryOffsets = new int[2];
-        protected DictionaryEntry nextEntry = null;
-        protected SearchException deferredException = null;
+    private class ExpressionSearchIterator implements Iterator<DictionaryEntry> {
+        private final SearchMode searchmode;
+        private final SearchFieldSelection fields;
+        private final int expressionLength;
+        private final Index.Iterator matchingIndexEntries;
+        private final byte[] entrybuf = new byte[8192];
+        private final Set<Integer> seenEntries = new HashSet<Integer>();
+        private final int[] entryOffsets = new int[2];
+        private DictionaryEntry nextEntry = null;
+        private SearchException deferredException = null;
 
         public ExpressionSearchIterator( SearchMode _searchmode, SearchFieldSelection _fields,
                                          int _expressionLength,
@@ -1065,7 +914,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             else {
                 SearchException out = new SearchException( deferredException);
                 deferredException = null;
-                
+
                 if (out instanceof MalformedEntryException) {
                     // perhaps the next entry will work
                     generateNextEntry();
@@ -1074,7 +923,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                 throw out;
             }
         }
-        
+
         @Override
         public void remove() throws UnsupportedOperationException {
             throw new UnsupportedOperationException();
@@ -1084,17 +933,17 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
          * Set the {@link #nextEntry nextEntry} variable to the next dictionary entry matching
          * the search. If there are no more entries, it will be set to <code>null</code>.
          */
-        protected void generateNextEntry() {
+        private void generateNextEntry() {
             nextEntry = null;
             try {
                 while (nextEntry==null && matchingIndexEntries.hasNext()) {
                     int match = matchingIndexEntries.next();
-                    
+
                     ByteBuffer entry = copyEntry( match, entrybuf, seenEntries, entryOffsets);
                     if (entry == null) {
 	                    continue;
                     }
-                    
+
                     match = entry.position(); // location of match in entry buffer
                     DictionaryEntryField field = getFieldType( entry, 0, entry.limit(), match);
                     try {
@@ -1106,14 +955,14 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                         // field not WORD, READING or TRANSLATION
                         continue;
                     }
-                    
+
                     // test if entry matches search mode
                     if (searchmode == ExpressionSearchModes.EXACT ||
                         searchmode == ExpressionSearchModes.PREFIX) {
                         // test if the index entry location is at the beginning of a word or field
                         // depending on search parameter.
                         if (match>0 &&
-                            !(fields.isSelected( MatchMode.WORD) ? 
+                            !(fields.isSelected( MatchMode.WORD) ?
                               isWordStart( entry, match, field) :
                               isFieldStart( entry, match, field))) {
 	                        continue;
@@ -1123,13 +972,13 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                         searchmode == ExpressionSearchModes.SUFFIX) {
                         int matchend = match+expressionLength;
                         if (matchend<entry.limit() &&
-                            !(fields.isSelected( MatchMode.WORD) ? 
+                            !(fields.isSelected( MatchMode.WORD) ?
                               isWordEnd( entry, matchend, field) :
                               isFieldEnd( entry, matchend, field))) {
 	                        continue;
                         }
                     }
-                    
+
                     nextEntry = createEntryFrom( entry, entryOffsets[0]);
                     seenEntries.add( entryOffsets[0]); // start offset of entry
                 }

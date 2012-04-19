@@ -51,8 +51,8 @@ import jgloss.dictionary.attribute.SearchReference;
 import jgloss.dictionary.attribute.WithoutValue;
 
 /**
- * Implementation for dictionaries in WadokuJT.txt format. 
- * WadokuJT is a Japanese-German dictionary directed by Ulrich Apel 
+ * Implementation for dictionaries in WadokuJT.txt format.
+ * WadokuJT is a Japanese-German dictionary directed by Ulrich Apel
  * (see <a href="http://www.wadoku.org">http://www.wadoku.org</a>).
  * The WadokuJT.txt file form of the dictionary is maintained by Hans-Joerg Bibiko and available
  * from <a href="http://www.bibiko.com/dlde.htm">http://www.bibiko.com/dlde.htm</a>.
@@ -62,35 +62,35 @@ import jgloss.dictionary.attribute.WithoutValue;
 public class WadokuJT extends FileBasedDictionary {
 
 	private static final Logger LOGGER = Logger.getLogger(WadokuJT.class.getPackage().getName());
-	
+
     public static final Attribute<WithoutValue> MAIN_ENTRY = new Attributes<WithoutValue>
         ( NAMES.getString( "wadoku.att.main_entry.name"),
           NAMES.getString( "wadoku.att.main_entry.desc"),
-          new DictionaryEntry.AttributeGroup[] 
+          new DictionaryEntry.AttributeGroup[]
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute<ReferenceAttributeValue> MAIN_ENTRY_REF = new Attributes<ReferenceAttributeValue>
         ( NAMES.getString( "wadoku.att.main_entry_ref.name"),
           NAMES.getString( "wadoku.att.main_entry_ref.desc"),
           true, ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
-          new DictionaryEntry.AttributeGroup[] 
+          new DictionaryEntry.AttributeGroup[]
             { DictionaryEntry.AttributeGroup.GENERAL });
 
     public static final Attribute<ReferenceAttributeValue> ALT_READING = new Attributes<ReferenceAttributeValue>
         ( NAMES.getString( "wadoku.att.alt_reading.name"),
           NAMES.getString( "wadoku.att.alt_reading.desc"),
           true, ReferenceAttributeValue.class, Attributes.EXAMPLE_REFERENCE_VALUE,
-          new DictionaryEntry.AttributeGroup[] 
+          new DictionaryEntry.AttributeGroup[]
             { DictionaryEntry.AttributeGroup.GENERAL });
 
-    protected static final int EXPLANATION_MIN_LENGTH = 10;
+    private static final int EXPLANATION_MIN_LENGTH = 10;
 
     /**
      * Name of the dictionary format.
      */
     public static final String FORMAT_NAME = "WadokuJT";
 
-    protected static final AttributeMapper mapper = initMapper();
+    private static final AttributeMapper MAPPER = initMapper();
 
     private static AttributeMapper initMapper() {
         try {
@@ -106,12 +106,12 @@ public class WadokuJT extends FileBasedDictionary {
         }
     }
 
-    protected static final Map<String, String> gairaigoMap = initGairaigoMap();
+    private static final Map<String, String> GAIRAIGO_MAP = initGairaigoMap();
 
     private static Map<String, String> initGairaigoMap() {
         try {
             Map<String, String> map = new HashMap<String, String>( 19);
-            
+
             Matcher matcher = Pattern.compile( "\\A(\\S+)\\s+(\\S+)\\Z").matcher( "");
             LineNumberReader r = new LineNumberReader
                 ( new InputStreamReader
@@ -152,15 +152,15 @@ public class WadokuJT extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-    public static final DictionaryImplementation<WadokuJT> implementation = 
+    public static final DictionaryImplementation<WadokuJT> IMPLEMENTATION =
         initImplementation();
 
     /**
-     * Returns a {@link FileBasedDictionary.Implementation FileBasedDictionary.Implementation}
+     * Returns a {@link FileBasedDictionaryImplementation FileBasedDictionary.Implementation}
      * which recognizes UTF-8 encoded Wadoku dictionaries. Used to initialize the
-     * {@link #implementation implementation} final member because the constructor has to
+     * {@link #IMPLEMENTATION implementation} final member because the constructor has to
      * be wrapped in a try/catch block.
-     * 
+     *
      */
     private static DictionaryImplementation<WadokuJT> initImplementation() {
         try {
@@ -169,7 +169,7 @@ public class WadokuJT extends FileBasedDictionary {
             // reading,part of speech, comment and reference may be empty.
             // At least four of the fields must be present in the first line of the file for
             // the match to be successful.
-            return new FileBasedDictionary.Implementation<WadokuJT>
+            return new FileBasedDictionaryImplementation<WadokuJT>
                 ( FORMAT_NAME, "UTF-8", true, Pattern.compile
                   ( "\\A(.*?\\|){3}.*$", Pattern.MULTILINE),
                   1.0f, 4096, WadokuJT.class.getConstructor( new Class[] { File.class }));
@@ -183,51 +183,46 @@ public class WadokuJT extends FileBasedDictionary {
      * Matches each word entry with alternatives. The word match is stored in group 1, the
      * alternatives are stores as single string in group 2.
      */
-    protected static final Pattern WORD_PATTERN = Pattern.compile
+    private static final Pattern WORD_PATTERN = Pattern.compile
         ( "(\\S+)" + // word text
           "(?:(?:\\s\\[\\w+\\])|(?:\\s\\{.+?\\}))*" + // remarks, cross references
           "(?:\\s\\((.+?)\\))?" + // alternative spellings
           "(?:(?:\\s\\[\\w+\\])|(?:\\s\\{.+?\\}))*" + // remarks, cross references
           "(?:;\\s|$)"); // end of word
-    protected final Matcher wordMatcher = WORD_PATTERN.matcher( "");
+
     /**
      * Matches semicolon-separated alternatives. The separator is a semicolon followed by a single
      * whitespace. The matched alternative is stored in group 1. Semicolons in brackets are ignored.
      * If an opening bracket is not matched by a closing bracket, everything to the end of the
      * pattern is matched.
      */
-    protected final static Pattern ALTERNATIVES_PATTERN = Pattern.compile
+    private static final Pattern ALTERNATIVES_PATTERN = Pattern.compile
         ( "((?:[^(\\{]|" + // normal text
           "(?:\\(.*?[)|$])|" + // text in (), ignore "; "
           "(?:\\{.*?[}|$]))+?)" + // text in {}, ignore "; "
           "(?:\\s\\[\\w+\\])?" + // optional comment (ignored)
           "(?:\\s\\{.+?\\})?" + // optional comment (ignored)
           "(?:;\\s|$)"); // separation marker
-    protected final Matcher alternativesMatcher = ALTERNATIVES_PATTERN.matcher( "");
+
     /**
-     * Matches translation ranges of meaning. Group 1 contains the number of the range written in 
-     * brackets at the beginning of the entry (or <code>null</code> if there is no such number), 
+     * Matches translation ranges of meaning. Group 1 contains the number of the range written in
+     * brackets at the beginning of the entry (or <code>null</code> if there is no such number),
      * group 2 contains a string of all the meanings in the range.
      */
-    protected final static Pattern TRANSLATIONS_PATTERN = Pattern.compile
+    private static final Pattern TRANSLATIONS_PATTERN = Pattern.compile
         ( "(?:\\[(\\d+)\\]\\s|//\\s)?(.+?)\\.?\\s?(?=\\[\\d+\\]|//|$)");
-    protected final Matcher translationsMatcher = TRANSLATIONS_PATTERN.matcher( "");
 
-    protected final static Pattern CATEGORY_PATTERN = Pattern.compile
+    private static final Pattern CATEGORY_PATTERN = Pattern.compile
         ( "(.+?)(?:[,;]\\s?|\\z)");
-    protected final Matcher categoryMatcher = CATEGORY_PATTERN.matcher( "");
 
-    protected final static Pattern REFERENCE_PATTERN = Pattern.compile
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile
         ( "(\u21d2|\u2192|\u21d4)\\s(\\S+)(?:\\s\\(.*?\\))(?:;\\s|\\z)");
-    protected final Matcher referenceMatcher = REFERENCE_PATTERN.matcher( "");
 
-    protected final static Pattern GAIRAIGO_PATTERN = Pattern.compile
+    private static final Pattern GAIRAIGO_PATTERN = Pattern.compile
         ( "(?:\\A|; )(?:(?:von (\\S+?)\\.? \"([^\"]+)\")|(?:aus d(?:em|\\.) (\\S+?)\\.?))(?:; |\\Z)");
-    protected final static Matcher gairaigoMatcher = GAIRAIGO_PATTERN.matcher( "");
 
-    protected final static Pattern ABBR_PATTERN = Pattern.compile
+    private static final Pattern ABBR_PATTERN = Pattern.compile
         ( "(?:\\A|; )Abk\\.?(?: (?:f\u00fcr |v(?:on|\\.) )?(?:(\\S+?)\\.?)? ?\"([^\"]+)\")?(?:; |\\Z)");
-    protected final static Matcher abbrMatcher = ABBR_PATTERN.matcher( "");
 
     public WadokuJT( File dicfile) throws IOException {
         super( dicfile, "UTF-8");
@@ -236,8 +231,8 @@ public class WadokuJT extends FileBasedDictionary {
     @Override
 	protected void initSupportedAttributes() {
         super.initSupportedAttributes();
-        
-        supportedAttributes.putAll( mapper.getAttributes());
+
+        supportedAttributes.putAll( MAPPER.getAttributes());
         supportedAttributes.put( Attributes.ABBREVIATION, null);
         supportedAttributes.put( Attributes.GAIRAIGO, null);
         supportedAttributes.put( Attributes.EXPLANATION, null);
@@ -296,7 +291,7 @@ public class WadokuJT extends FileBasedDictionary {
 	                return (entry.get( location+2) == '[');
                 }
             }
-            else if ((b==' ' || b==')') && 
+            else if ((b==' ' || b==')') &&
                      field==DictionaryEntryField.WORD) {
 	            return true;
             }
@@ -322,7 +317,7 @@ public class WadokuJT extends FileBasedDictionary {
         if (character == '|') {
             if (field==DictionaryEntryField.WORD) {
                 field = DictionaryEntryField.READING;
-            } 
+            }
             else if (field==DictionaryEntryField.READING) {
                 // skip to translation field
                 field = DictionaryEntryField.TRANSLATION;
@@ -334,7 +329,7 @@ public class WadokuJT extends FileBasedDictionary {
                         break;
                     }
                 } while (c != '|');
-            } 
+            }
             else if (field==DictionaryEntryField.TRANSLATION) {
                 // skip fields to next entry
                 while (!isEntrySeparator( buf.get()))
@@ -402,7 +397,7 @@ public class WadokuJT extends FileBasedDictionary {
     @Override
 	protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
         try {
-            DictionaryEntry out = null; 
+            DictionaryEntry out = null;
             List<String> wordlist = new ArrayList<String>( 10);
             String reading;
             List<List<String>> rom = new ArrayList<List<String>>( 10);
@@ -418,19 +413,19 @@ public class WadokuJT extends FileBasedDictionary {
             // parse word field
             String words = entry.substring( start, end);
             // split words
-            wordMatcher.reset( words);
+            Matcher wordMatcher = WORD_PATTERN.matcher( words);
             while (wordMatcher.find()) {
                 wordlist.add( unescape( wordMatcher.group( 1)));
                 wordsA.add( null);
                 if (wordMatcher.group( 2) != null) {
                     // word with alternatives
-                    alternativesMatcher.reset( wordMatcher.group( 2));
+                    Matcher alternativesMatcher = ALTERNATIVES_PATTERN.matcher( wordMatcher.group( 2));
                     while (alternativesMatcher.find()) {
                         wordlist.add( unescape( alternativesMatcher.group( 1)));
                         wordsA.add( null);
                     }
                 }
-            }   
+            }
 
             start = end+1;
             end = entry.indexOf( '|', start);
@@ -453,7 +448,7 @@ public class WadokuJT extends FileBasedDictionary {
             // POS attributes for longes possible prefix of pos, and repeat with the remainder.
             nextpos: while (pos.length() > 0) {
                 for ( int i=pos.length(); i>0; i--) {
-                    AttributeMapper.Mapping<?> mapping = mapper.getMapping( pos.substring( 0, i));
+                    AttributeMapper.Mapping<?> mapping = MAPPER.getMapping( pos.substring( 0, i));
                     if (mapping != null) {
                         generalA.addAttribute( mapping);
                         // continue outer loop with remainder
@@ -491,17 +486,17 @@ public class WadokuJT extends FileBasedDictionary {
 	                    // cut off comment (last char before ( is a space)
 	                    crm = crm.substring( 0, openb-1);
 
-	                    abbrMatcher.reset( ex);
+	                    Matcher abbrMatcher = ABBR_PATTERN.matcher( ex);
 	                    if (abbrMatcher.find()) {
 	                        String lang = abbrMatcher.group( 1);
 	                        String code = null;
 	                        if (lang != null) {
-	                            code = gairaigoMap.get( lang.toLowerCase());
+	                            code = GAIRAIGO_MAP.get( lang.toLowerCase());
 	                            if (code == null) {
 	                            	LOGGER.warning( "WadokuJT warning: unrecognized language " +
 	                                                    lang + " (" + ex + ")");
 	                                code = lang;
-	                            } 
+	                            }
 	                        }
 	                        String word = abbrMatcher.group( 2);
 	                        Abbreviation abbr = null;
@@ -528,7 +523,7 @@ public class WadokuJT extends FileBasedDictionary {
 	                        }
 	                    }
 
-	                    gairaigoMatcher.reset( ex);
+	                    Matcher gairaigoMatcher = GAIRAIGO_PATTERN.matcher( ex);
 	                    if (gairaigoMatcher.find()) {
 	                        String lang;
 	                        String word = null;
@@ -541,8 +536,8 @@ public class WadokuJT extends FileBasedDictionary {
 	                            // gairaigo without original word
 	                            lang = gairaigoMatcher.group( 3);
 	                        }
-	                
-	                        String code = gairaigoMap.get( lang.toLowerCase());
+
+	                        String code = GAIRAIGO_MAP.get( lang.toLowerCase());
 	                        if (code != null) {
 	                            Gairaigo gairaigo = new Gairaigo( word, code);
 	                            if (allTranslations) {
@@ -594,10 +589,10 @@ public class WadokuJT extends FileBasedDictionary {
 	                    // attribute strings unrecognized by mapping
 	                    StringBuilder unrecognized = null;
 
-	                    categoryMatcher.reset( crm.substring( 1, endb));
+	                    Matcher categoryMatcher = CATEGORY_PATTERN.matcher(crm.substring( 1, endb));
 	                    while (categoryMatcher.find()) {
 	                        String cat = categoryMatcher.group( 1);
-	                        AttributeMapper.Mapping<?> mapping = mapper.getMapping( cat);
+	                        AttributeMapper.Mapping<?> mapping = MAPPER.getMapping( cat);
 	                        if (mapping != null) {
 	                            Attribute<?> att = mapping.getAttribute();
 	                            if (allTranslations) {
@@ -664,7 +659,7 @@ public class WadokuJT extends FileBasedDictionary {
 
                 List<String> crml = new ArrayList<String>( 10);
                 rom.add( crml);
-                alternativesMatcher.reset( crm);
+                Matcher alternativesMatcher = ALTERNATIVES_PATTERN.matcher( crm);
                 while (alternativesMatcher.find()) {
                     crml.add( unescape( alternativesMatcher.group( 1)));
                 }
@@ -681,7 +676,7 @@ public class WadokuJT extends FileBasedDictionary {
             end = entry.indexOf( '|', start);
             if (end > start+1) {
                 String comment = entry.substring( start, end);
-                referenceMatcher.reset( comment);
+                Matcher referenceMatcher = REFERENCE_PATTERN.matcher( comment);
                 while (referenceMatcher.find()) {
                     char tc = referenceMatcher.group( 1).charAt( 0);
                     Attribute<ReferenceAttributeValue> type;
@@ -713,7 +708,7 @@ public class WadokuJT extends FileBasedDictionary {
             if (mainEntry.length() > 0) {
                 // reference to main entry
                 generalA.addAttribute( MAIN_ENTRY_REF, new SearchReference
-                                       ( mainEntry, this, ExpressionSearchModes.EXACT, new Object[] 
+                                       ( mainEntry, this, ExpressionSearchModes.EXACT, new Object[]
                                            { mainEntry, MATCH_WORD_FIELD }));
             }
 

@@ -27,30 +27,22 @@ package jgloss.dictionary;
  * Typesafe enumeration of field types of dictionary entries. Used as parameter in method
  * {@link IndexBuilder#addEntry IndexBuilder.addEntry}.
  */
-public class DictionaryEntryField {
+public enum DictionaryEntryField {
     /**
      * The index entry is in the word field of a dictionary entry.
      */
-    public static final DictionaryEntryField WORD = new DictionaryEntryField( "WORD");
+    WORD,
     /**
      * The index entry is in the reading field of a dictionary entry.
      */
-    public static final DictionaryEntryField READING = new DictionaryEntryField( "READING");
+    READING,
     /**
      * The index entry is in the translation field of a dictionary entry.
      */
-    public static final DictionaryEntryField TRANSLATION = new DictionaryEntryField( "TRANSLATION");
+    TRANSLATION,
     /**
      * The index entry is in some other field of a dictionary entry.
      */
-    public static final DictionaryEntryField OTHER = new DictionaryEntryField( "OTHER");
-
-    private final String type;
-
-    protected DictionaryEntryField( String _type) {
-        this.type = _type;
-    }
-
-    @Override
-	public String toString() { return type; }
-} // class DictionaryEntryField
+    OTHER,
+    ;
+}

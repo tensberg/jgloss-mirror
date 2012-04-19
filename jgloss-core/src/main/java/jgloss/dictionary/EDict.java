@@ -49,7 +49,7 @@ import jgloss.dictionary.attribute.DefaultAttributeSet;
 import jgloss.dictionary.attribute.Priority;
 
 /**
- * Dictionary implementation for dictionaries in EDICT format 
+ * Dictionary implementation for dictionaries in EDICT format
  * based on {@link FileBasedDictionary}. For a documentation of the format see
  * <a href="http://www.csse.monash.edu.au/~jwb/edict_doc.html">
  * http://www.csse.monash.edu.au/~jwb/edict_doc.html</a>.
@@ -66,17 +66,17 @@ public class EDict extends FileBasedDictionary {
      *
      * @see DictionaryFactory
      */
-	public static final DictionaryImplementation<EDict> IMPLEMENTATION_EUC = 
+	public static final DictionaryImplementation<EDict> IMPLEMENTATION_EUC =
 		initImplementation("EDICT", "EUC-JP");
-	public static final DictionaryImplementation<EDict> IMPLEMENTATION_UTF8 = 
+	public static final DictionaryImplementation<EDict> IMPLEMENTATION_UTF8 =
 		initImplementation("EDICT (Unicode)", "UTF-8");
 
     /**
-     * Returns a {@link FileBasedDictionary.Implementation FileBasedDictionary.Implementation}
+     * Returns a {@link FileBasedDictionaryImplementation FileBasedDictionary.Implementation}
      * which recognizes EUC-JP encoded EDICT dictionaries. Used to initialize the
      * {@link #IMPLEMENTATION implementation} final member because the constructor has to
      * be wrapped in a try/catch block.
-     * 
+     *
      */
     private static DictionaryImplementation<EDict> initImplementation(String name, String encoding) {
         try {
@@ -87,7 +87,7 @@ public class EDict extends FileBasedDictionary {
             // To distinguish an EDICT dictionary from a SKK dictionary, which uses a similar format,
             // it is tested that the first char in the translation is not a Kanji
             // (InCJKUnifiedIdeographs)
-            return new FileBasedDictionary.Implementation<EDict>
+            return new FileBasedDictionaryImplementation<EDict>
                 ( name, encoding, true, Pattern.compile
                   ( "\\A\\S+?(\\s\\[.+?\\])?(\\s/)|/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
                   1.0f, 4096, EDict.class.getConstructor( new Class[] { File.class, String.class })) {
@@ -120,19 +120,17 @@ public class EDict extends FileBasedDictionary {
      * Match an EDICT entry. Group 1 is the word, group 2 the (optional) reading and group 3
      * the translations.
      */
-    protected static final Pattern ENTRY_PATTERN = Pattern.compile
+    private static final Pattern ENTRY_PATTERN = Pattern.compile
         ( "(\\S+)(?:\\s\\[(.+?)\\])?\\s/(.+)/");
-    protected static final Matcher ENTRY_MATCHER = ENTRY_PATTERN.matcher( "");
 
     /**
      * Match a string in brackets at the beginning of a string.
      */
-    protected static final Pattern BRACKET_PATTERN = Pattern.compile( "\\G\\((.+?)\\)\\s");
-    protected static final Matcher BRACKET_MATCHER = BRACKET_PATTERN.matcher( "");
+    private static final Pattern BRACKET_PATTERN = Pattern.compile( "\\G\\((.+?)\\)\\s");
 
-    protected static final String PRIORITY_MARKER = "(P)";
+    private static final String PRIORITY_MARKER = "(P)";
 
-    protected static final Priority PRIORITY_VALUE = new Priority() {
+    private static final Priority PRIORITY_VALUE = new Priority() {
             @Override
 			public String getPriority() { return "_P_"; }
             @Override
@@ -150,11 +148,11 @@ public class EDict extends FileBasedDictionary {
     public EDict( File dicfile, String encoding) throws IOException {
         super( dicfile, encoding);
     }
-    
+
     @Override
 	protected void initSupportedAttributes() {
         super.initSupportedAttributes();
-        
+
         supportedAttributes.putAll( MAPPER.getAttributes());
         supportedAttributes.put( Attributes.PRIORITY, Collections.<AttributeValue> singleton( PRIORITY_VALUE));
     }
@@ -170,7 +168,7 @@ public class EDict extends FileBasedDictionary {
             }
 
             if (field == DictionaryEntryField.TRANSLATION) {
-                // EDICT translation fields support multiple senses, which are marked 
+                // EDICT translation fields support multiple senses, which are marked
                 // as (1),(2)... , and also POS markers in the form (pos), which are all
                 // at the start of the translation field
 
@@ -179,7 +177,7 @@ public class EDict extends FileBasedDictionary {
                     do {
                         b = entry.get( --location);
                     } while (b!='/' && b!='(');
-                    if (b=='/' || 
+                    if (b=='/' ||
                         b=='(' && (b=entry.get( --location))=='/')
 					 {
 	                    return true;
@@ -201,7 +199,7 @@ public class EDict extends FileBasedDictionary {
             byte b = entry.get( location);
             if (field==DictionaryEntryField.WORD && b==' ' ||
                 field==DictionaryEntryField.READING && b==']' ||
-                field==DictionaryEntryField.TRANSLATION && b=='/' 
+                field==DictionaryEntryField.TRANSLATION && b=='/'
                 || b==10 || b==13) {
 	            return true;
             } else {
@@ -272,17 +270,17 @@ public class EDict extends FileBasedDictionary {
      */
     @Override
 	protected DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
-        ENTRY_MATCHER.reset( entry);
-        if (!ENTRY_MATCHER.matches()) {
+        Matcher entryMatcher = ENTRY_PATTERN.matcher(entry);
+        if (!entryMatcher.matches()) {
 	        throw new MalformedEntryException( this, entry);
         }
 
-        String word = ENTRY_MATCHER.group( 1);
-        String reading = ENTRY_MATCHER.group( 2);
+        String word = entryMatcher.group( 1);
+        String reading = entryMatcher.group( 2);
         if (reading == null) {
 	        reading = word;
         }
-        String translations = ENTRY_MATCHER.group( 3);
+        String translations = entryMatcher.group( 3);
         List<List<String>> rom = new ArrayList<List<String>>( 10);
         List<String> crm = new ArrayList<String>( 10);
         rom.add( crm);
@@ -310,15 +308,15 @@ public class EDict extends FileBasedDictionary {
                 generalA.addAttribute( Attributes.PRIORITY, PRIORITY_VALUE);
             }
             else {
-                BRACKET_MATCHER.reset( translation);
+                Matcher bracketMatcher = BRACKET_PATTERN.matcher(translation);
                 int matchend = 0;
                 StringBuilder unrecognized = null;
-                
-                while (BRACKET_MATCHER.find()) {
-                    matchend = BRACKET_MATCHER.end();
-                    
-                    String att = BRACKET_MATCHER.group( 1);
-                    
+
+                while (bracketMatcher.find()) {
+                    matchend = bracketMatcher.end();
+
+                    String att = bracketMatcher.group( 1);
+
                     boolean isNumber = true;
                     for ( int i=0; i<att.length(); i++) {
                         if (att.charAt( i)<'1' ||
@@ -351,7 +349,7 @@ public class EDict extends FileBasedDictionary {
                             if (mapping != null) {
                                 Attribute<?> a = mapping.getAttribute();
                                 if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
-                                    (!seenROM || 
+                                    (!seenROM ||
                                      !a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION))) {
                                     generalA.addAttribute(mapping);
                                 }
@@ -383,7 +381,7 @@ public class EDict extends FileBasedDictionary {
                                 }
                                 unrecognized.append( attsub);
                             }
-                            
+
                             startc = endc + 1;
                         } while (startc < att.length());
                         if (hasUnrecognized) {
@@ -409,7 +407,7 @@ public class EDict extends FileBasedDictionary {
         return new SingleWordEntry( startOffset, word, reading, rom, generalA, wordA, translationA,
                                     roma, this);
     }
-    
+
     @Override
 	public String toString() {
         return "EDICT " + getName();

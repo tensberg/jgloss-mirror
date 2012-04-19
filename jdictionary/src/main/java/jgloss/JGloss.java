@@ -228,7 +228,7 @@ public abstract class JGloss implements ExitListener {
     protected void registerDictionaries() {
         DictionaryFactory.registerImplementation(EDict.IMPLEMENTATION_EUC);
         DictionaryFactory.registerImplementation(EDict.IMPLEMENTATION_UTF8);
-        DictionaryFactory.registerImplementation(WadokuJT.implementation);
+        DictionaryFactory.registerImplementation(WadokuJT.IMPLEMENTATION);
         DictionaryFactory.registerImplementation(KanjiDic.IMPLEMENTATION);
     }
 
