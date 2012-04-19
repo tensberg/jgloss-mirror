@@ -23,7 +23,12 @@
 
 package jgloss.ui;
 
+import java.awt.EventQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
+
 
 /**
  * Lookup engine which performs lookups in its own thread.
@@ -31,97 +36,50 @@ import java.util.logging.Logger;
  * @author Michael Koch
  */
 public class AsynchronousLookupEngine extends LookupEngine {
-    private class SearchThread extends Thread {
-        private final Object THREAD_LOCK = new Object();
-        private final Object LOOKUP_LOCK = new Object();
-        private boolean terminateThread = false;
-        private boolean inLookup = false;
-        
-        private LookupModel model;
-        private Runnable runAfterLookup;
 
-        public SearchThread() {
-            super( "lookup engine search thread");
-            setDaemon( true);
+    private class LookupTask implements Runnable {
+
+        private final LookupModel model;
+        private final Runnable runAfterLookup;
+
+        LookupTask(LookupModel model, Runnable runAfterLookup) {
+            this.model = model;
+            this.runAfterLookup = runAfterLookup;
         }
 
         @Override
-		public void run() {
-            synchronized (THREAD_LOCK) {
-                while (!terminateThread) {
-	                try {
-	                    if (model == null) {
-	                        THREAD_LOCK.wait();
-	                    }
-
-	                    if (terminateThread) {
-	                        break;
-	                    }
-	                    
-	                    synchronized (LOOKUP_LOCK) {
-	                        inLookup = true;
-	                        // clear lingering interrupted flag
-	                        Thread.interrupted();
-	                    }
-	                    doLookupSuper( model);
-	                    synchronized (LOOKUP_LOCK) {
-	                        inLookup = false;
-	                        model = null;
-	                        // clear lingering interrupted flag
-	                        Thread.interrupted();
-	                    }
-
-	                    if (runAfterLookup != null) {
-	                        runAfterLookup.run();
-	                    }
-	                } catch (InterruptedException ex) {}
-                }
-            }
-        }
-
-        public void newSearch( LookupModel _model, Runnable _runAfterLookup) {
-            // abort current search (if any)
-            synchronized (LOOKUP_LOCK) {
-                if (inLookup) {
-                    SearchThread.this.interrupt();
-                }
-            }
-            // start new search
-            synchronized (THREAD_LOCK) {
-                model = _model;
-                runAfterLookup = _runAfterLookup;
-                THREAD_LOCK.notify();
-            }
-        }
-
-        public void dispose() {
-            terminateThread = true;
-            SearchThread.this.interrupt();
+        public void run() {
             try {
-                SearchThread.this.join( 3000);
-            } catch (InterruptedException ex) {}
-            if (SearchThread.this.isAlive()) {
-	            LOGGER.warning( "WARNING: LookupFrame search thread still alive");
+                doLookupSuper(model);
+                if (runAfterLookup != null) {
+                    EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            runAfterLookup.run();
+                        }
+                    });
+                }
+            } catch (InterruptedException e) {
+                // search task was cancelled by new task
+                LOGGER.finest("search task was interrupted");
             }
-            model = null;
-            runAfterLookup = null;
         }
-    } // class SearchThread
+
+    }
 
     private static final Logger LOGGER = Logger.getLogger(AsynchronousLookupEngine.class.getPackage().getName());
-    
-    private SearchThread searchThread;
+
+    private final ExecutorService searchTaskExecutor = Executors.newSingleThreadExecutor();
+
+    private Future<?> searchTask;
 
     public AsynchronousLookupEngine( LookupResultHandler _handler) {
         this( _handler, Integer.MAX_VALUE);
     }
 
     public AsynchronousLookupEngine( LookupResultHandler _handler, int _dictionaryEntryLimit) {
-        super( _handler, _dictionaryEntryLimit);
-        searchThread = new SearchThread();
-        searchThread.start();
+        super(new EdtLookupResultHandler(_handler), _dictionaryEntryLimit);
     }
-
 
     @Override
 	public void doLookup( LookupModel model) {
@@ -137,19 +95,24 @@ public class AsynchronousLookupEngine extends LookupEngine {
      *        the runnable will not be executed. It is possible to schedule a new lookup from
      *        the runnable.
      */
-    public void doLookup( LookupModel model, Runnable runAfterLookup) {
-        searchThread.newSearch( model, runAfterLookup);
+    public void doLookup(LookupModel model, Runnable runAfterLookup) {
+        cancelSearchTask();
+        searchTask = searchTaskExecutor.submit(new LookupTask(model.clone(), runAfterLookup));
     }
 
-    private void doLookupSuper( LookupModel model) throws InterruptedException {
-        super.doLookup( model);
-    }
-    
-    public void dispose() {
-        if (searchThread != null) {
-	        searchThread.dispose();
+    private void cancelSearchTask() {
+        if (searchTask != null) {
+            searchTask.cancel(true);
         }
-        searchThread = null;
+    }
+
+    private void doLookupSuper(LookupModel model) throws InterruptedException {
+        super.doLookup(model);
+    }
+
+    public void dispose() {
+        cancelSearchTask();
+        searchTaskExecutor.shutdown();
     }
 
     @Override

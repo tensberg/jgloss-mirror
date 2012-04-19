@@ -44,14 +44,16 @@ public interface Dictionary {
     String getName();
 
     /**
-     * Searches for entries in the dictionary.
+     * Searches for entries in the dictionary. While the returned iterator itself does not have
+     * to be thread-safe, it must be possible to iterate over multiple search iterators concurrently.
      *
      * @param searchmode The requested search mode. The search mode must be supported by this
      *                   dictionary.
      * @param parameters Search parameters as required by the {@link SearchMode searchmode}.
      *        The parameters must be valid for the selected search mode according to
      *        {@link List<SearchParameter>#isValid(Object[]) List<SearchParameter>.isValid}.
-     * @exception SearchException if the search mode is not supported or there was an error 
+     * @return Iterator over the results of the search.
+     * @exception SearchException if the search mode is not supported or there was an error
      *            during the search.
      */
     Iterator<DictionaryEntry> search( SearchMode searchmode, Object[] parameters) throws SearchException;
@@ -66,7 +68,7 @@ public interface Dictionary {
      * {@link #search(SearchMode,Object[]) search} with this search mode will throw an exception.
      *
      * @param searchmode The search mode to test.
-     * @param fully If <code>true</code>, test if the search mode is fully supported, if 
+     * @param fully If <code>true</code>, test if the search mode is fully supported, if
      *        <code>false</code>, test if it is partially supported.
      */
     boolean supports( SearchMode searchmode, boolean fully);
@@ -81,11 +83,11 @@ public interface Dictionary {
      * Return the set of known attribute values for an attribute. If the set of possible
      * values of an attribute are constant and not dependent on a particular dictionary
      * entry, they will be returned. An example for a constant set of attribute values
-     * are {@link jgloss.dictionary.attribute.PartOfSpeech PartOfSpeech} attributes. 
+     * are {@link jgloss.dictionary.attribute.PartOfSpeech PartOfSpeech} attributes.
      * An example for non-constant values,
-     * which will not be returned by this method, are 
-     * {@link jgloss.dictionary.attribute.InformationAttributeValue InformationAttributeValues}. 
-     * In this case, an empty set is returned. For unsupported attributes, 
+     * which will not be returned by this method, are
+     * {@link jgloss.dictionary.attribute.InformationAttributeValue InformationAttributeValues}.
+     * In this case, an empty set is returned. For unsupported attributes,
      * <code>null</code> will be returned.
      */
     <T extends AttributeValue> Set<T> getAttributeValues( Attribute<T> att);
@@ -95,9 +97,9 @@ public interface Dictionary {
      * this dictionary implementation. If the given search mode is supported and takes
      * a {@link SearchFieldSelection SearchFieldSelection} parameter, at least one search field must be
      * selected in the {@link SearchFieldSelection SearchFieldSelection} object returned.
-     * 
      *
-     * @exception IllegalArgumentException if the search mode is unsupported or does not take a 
+     *
+     * @exception IllegalArgumentException if the search mode is unsupported or does not take a
      *            {@link SearchFieldSelection SearchFieldSelection} as parameter.
      */
     SearchFieldSelection getSupportedFields( SearchMode searchmode);
