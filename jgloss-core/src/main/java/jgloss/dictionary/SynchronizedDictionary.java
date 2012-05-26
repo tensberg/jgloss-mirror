@@ -93,4 +93,11 @@ class SynchronizedDictionary implements Dictionary {
             dictionary.dispose();
         }
     }
+    
+    @Override
+    public String toString() {
+    	synchronized (mutex) {
+    		return dictionary.toString();
+    	}
+    }
 }
