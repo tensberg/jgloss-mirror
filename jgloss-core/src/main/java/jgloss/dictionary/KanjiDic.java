@@ -105,13 +105,16 @@ public class KanjiDic implements Dictionary {
                         r.close();
                         // test if second character is a space and is followed by a
                         // 4-digit hexadecimal number
-                        if (lines<100 && l!=null && l.length()>7 && l.charAt( 1)==' ' &&
-                            Integer.parseInt( l.substring( 2, 6), 16)>0) {
-                            confidence = getMaxConfidence();
-                            reason = MESSAGES.getString("dictionary.reason.ok");
-                        }
-                        else {
-                            reason = MESSAGES.getString("dictionary.reason.pattern");
+                        try {
+                        	if (lines<100 && l!=null && l.length()>7 && l.charAt( 1)==' ' &&
+                        					Integer.parseInt( l.substring( 2, 6), 16)>0) {
+                        		confidence = getMaxConfidence();
+                        		reason = MESSAGES.getString("dictionary.reason.ok");
+                        	} else {
+                        		reason = MESSAGES.getString("dictionary.reason.pattern");
+                        	}
+                        } catch (NumberFormatException ex) {
+                    		reason = MESSAGES.getString("dictionary.reason.pattern");
                         }
                     } catch (IOException ex) {
                         LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
