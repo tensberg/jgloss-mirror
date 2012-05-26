@@ -439,14 +439,12 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         if (fancy) {
             resultTextBuffer.append( "<h4>");
             resultTextBuffer.append
-                ( JGloss.MESSAGES.getString( "wordlookup.matches",
-                                             new String[] { "<font color=\"green\">" +
-                                                            name + "</font>" }));
+                ( JGloss.MESSAGES.getString( "wordlookup.matches", "<font color=\"green\">" +
+                                                            name + "</font>"));
             resultTextBuffer.append( "</h4>");
         }
         else {
-            resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.matches",
-                                                                new String[] { name }));
+            resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.matches", name));
         }
         resultTextBuffer.append( "\n\n");
     }

@@ -128,7 +128,7 @@ public class AttributeLegend extends JPanel {
 
 	protected void createLegend( Dictionary dic, StringBuilder buf) {
         buf.append( "<h2>");
-        buf.append( JGloss.MESSAGES.getString( "legend.dictionary", new String[] { dic.getName() }));
+        buf.append( JGloss.MESSAGES.getString( "legend.dictionary", dic.getName()));
         buf.append( "</h2>\n");
 
         SortedSet<Attribute<?>> attributes = new TreeSet<Attribute<?>>( attributeComparator);
@@ -145,8 +145,7 @@ public class AttributeLegend extends JPanel {
 
             buf.append( "<p><b>");
             buf.append( JGloss.MESSAGES.getString( "legend.attribute",
-                                                   new String[] { att.getName(), 
-                                                                  att.getDescription() }));
+                                                   att.getName(), att.getDescription() ));
             buf.append( "</b><br>\n");
             buf.append( JGloss.MESSAGES.getString( "legend.attributeexample"));
             if (att.canHaveValue()) {

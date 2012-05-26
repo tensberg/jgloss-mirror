@@ -339,8 +339,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         } catch (IOException ex) {
             JOptionPane.showConfirmDialog
                 ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
-                  ( "error.exclusions.load", new String[] 
-                      { filename, ex.getClass().getName(), ex.getLocalizedMessage() }),
+                  ( "error.exclusions.load", filename, ex.getClass().getName(), ex.getLocalizedMessage()),
                   JGloss.MESSAGES.getString( "error.exclusions.load.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
@@ -365,8 +364,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showConfirmDialog
                 ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
-                  ( "error.exclusions.save", new String[] 
-                      { filename, ex.getClass().getName(), ex.getLocalizedMessage() }),
+                  ( "error.exclusions.save", filename, ex.getClass().getName(), ex.getLocalizedMessage()),
                   JGloss.MESSAGES.getString( "error.exclusions.save.title"),
                   JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
@@ -470,8 +468,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                 } catch (Exception ex) {
                     JOptionPane.showConfirmDialog
                         ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
-                          ( "error.exclusions.save", new String[] 
-                              { filename, ex.getClass().getName(), ex.getLocalizedMessage() }),
+                          ( "error.exclusions.save", filename, ex.getClass().getName(), ex.getLocalizedMessage()),
                           JGloss.MESSAGES.getString( "error.exclusions.save.title"),
                           JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
                 }

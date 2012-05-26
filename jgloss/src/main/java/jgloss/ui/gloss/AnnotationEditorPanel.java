@@ -288,11 +288,10 @@ public class AnnotationEditorPanel extends JPanel implements ActionListener, Ann
 	            return;
             }
 
-            String[] base = new String[1];
             for ( int i=0; i<annotation.getReadingCount(); i++) {
-                base[0] = annotation.getReadingBase( i);
+            	String readingBase = annotation.getReadingBase( i);
                 readingLabels.get( i).setText
-                    ( JGloss.MESSAGES.getString( "annotationeditor.reading.base", base));
+                    ( JGloss.MESSAGES.getString( "annotationeditor.reading.base", readingBase));
                 readings.get( i).setText
                     ( annotation.getReading( i));
             }

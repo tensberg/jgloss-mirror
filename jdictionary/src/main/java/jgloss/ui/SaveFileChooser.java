@@ -71,7 +71,7 @@ public class SaveFileChooser extends JFileChooser {
             String cancel = JGloss.MESSAGES.getString( "button.cancel");
             int choice = JOptionPane.showOptionDialog
                 ( this, JGloss.MESSAGES.getString
-                  ( "filechooser.overwrite", new String[] { f.getName() } ),
+                  ( "filechooser.overwrite", f.getName() ),
                   JGloss.MESSAGES.getString( "filechooser.overwrite.title"),
                   JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                   new Object[] { overwrite, cancel }, cancel);
