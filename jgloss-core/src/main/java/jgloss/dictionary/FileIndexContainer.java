@@ -256,7 +256,7 @@ public class FileIndexContainer implements IndexContainer {
 
         IndexMetaData index = getIndexMetaData(indexType);
         if (index == null) {
-            throw new IndexException("No index data of type " + indexType + " available");
+            return; // nothing to do
         }
 
         FileChannel indexChannel = indexFile.getChannel();
@@ -265,10 +265,10 @@ public class FileIndexContainer implements IndexContainer {
         try {
             long remainder = indexChannel.size() - index.nextIndexMetaDataOffset();
             if (remainder > 0) {
-                indexChannel.position(index.getHeaderOffset());
+            	indexChannel.position(index.getHeaderOffset());
                 indexChannel.transferFrom(indexChannel, index.nextIndexMetaDataOffset(), remainder);
-                indexChannel.truncate(index.getHeaderOffset() + remainder);
             }
+            indexChannel.truncate(index.getHeaderOffset() + remainder);
             // reloading the index meta data is the simplest way of correcting the meta data offsets
             readIndexMetaData();
         } catch (IOException ex) {

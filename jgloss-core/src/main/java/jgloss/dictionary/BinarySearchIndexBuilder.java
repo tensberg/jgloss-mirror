@@ -83,7 +83,7 @@ public class BinarySearchIndexBuilder implements IndexBuilder {
                     newIndex = ByteBuffer.allocate( (int) (tempIndex.capacity()*1.5));
                 } catch (OutOfMemoryError er) {
                     tempIndex = null;
-                    throw new IndexException( er);
+                    throw new IndexException("out of memory", er); // NOPMD: BufferOverflowException is irrelevant
                 }
                 newIndex.order( tempIndex.order());
                 newIndex.put( tempIndex);

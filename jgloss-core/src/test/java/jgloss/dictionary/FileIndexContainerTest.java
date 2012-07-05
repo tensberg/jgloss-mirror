@@ -144,6 +144,35 @@ public class FileIndexContainerTest {
 			indexContainer.close();
 		}
 	}
+	
+	@Test
+	public void testDeleteNonexistingIndexDoesNothing() throws FileNotFoundException, IOException {
+		FileIndexContainer indexContainer = createEmptyIndexFile(false);
+		try {
+			indexContainer.deleteIndex(TEST_INDEX_TYPE);
+		} finally {
+			indexContainer.close();
+		}
+	}
+	
+	@Test
+	public void testDeleteIndex() throws FileNotFoundException, IOException {
+		FileIndexContainer indexContainer = createEmptyIndexFile(false);
+		try {
+			indexContainer.createIndex(TEST_INDEX_TYPE, TEST_INDEX_DATA);
+			indexContainer.deleteIndex(TEST_INDEX_TYPE);
+			assertFalse(indexContainer.hasIndex(TEST_INDEX_TYPE));
+		} finally {
+			indexContainer.close();
+		}
+		
+		indexContainer = new FileIndexContainer(indexFile, false);
+		try {
+			assertFalse(indexContainer.hasIndex(TEST_INDEX_TYPE));
+		} finally {
+			indexContainer.close();
+		}
+	}
 
 	private void createEmptyIndexFile() throws FileNotFoundException, IOException {
 		createEmptyIndexFile(true);
