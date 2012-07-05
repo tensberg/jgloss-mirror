@@ -5,6 +5,10 @@
 	xsi:noNamespaceSchemaLocation="http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 	<description>
 		PMD ruleset applied to JGloss Java files.
+        
+        The general rule is to include all rulesets and specifically exclude only these test
+        which should not apply to the JGloss codebase. This way, new rules are included by
+        default when PMD is updated to a new version.
 	</description>
 	
 	<rule ref="rulesets/basic.xml" />
@@ -14,6 +18,8 @@
     </rule>
     <rule ref="rulesets/codesize.xml">
         <exclude name="ExcessiveParameterList" />
+        <exclude name="TooManyMethods" />
+        <exclude name="CyclomaticComplexity" />
     </rule>
     <rule ref="rulesets/controversial.xml">
         <exclude name="NullAssignment" />
@@ -23,6 +29,7 @@
         <exclude name="AvoidUsingShortType" />
         <exclude name="DataflowAnomalyAnalysis" />
         <exclude name="AssignmentInOperand" />
+        <exclude name="AtLeastOneConstructor" />
     </rule>
     <rule ref="rulesets/coupling.xml">
         <exclude name="ExcessiveImports" />
@@ -41,7 +48,10 @@
     <rule ref="rulesets/javabeans.xml">
         <exclude name="BeanMembersShouldSerialize" />
     </rule>
-    <rule ref="rulesets/junit.xml" />
+    <rule ref="rulesets/junit.xml">
+        <exclude name="JUnitTestsShouldIncludeAssert" /><!-- don't warn if test only contains Mockito verifys -->
+        <exclude name="JUnitAssertionsShouldIncludeMessage" /><!-- assert should be self-explaining -->
+    </rule>
     <rule ref="rulesets/logging-java.xml" />
     <rule ref="rulesets/migrating_to_15.xml" />
     <rule ref="rulesets/naming.xml">
