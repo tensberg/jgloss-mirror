@@ -153,8 +153,7 @@ public class UTF8CharacterHandler implements EncodedCharacterHandler {
 	        c -= 96; // katakana-hiragana difference is 96 code points
         } else if ((c >= 'A') && (c <= 'Z')) {
 	        c |= 0x20;
-        } else if (c>127 && c<256)
-		 {
+        } else if (c>127 && c<256) {
 	        c = Character.toLowerCase( (char) c); // this method is slow, only use it for the special case
         }
 

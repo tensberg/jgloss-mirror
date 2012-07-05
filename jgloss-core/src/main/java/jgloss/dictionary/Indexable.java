@@ -42,7 +42,7 @@ public interface Indexable {
      * is implementation-dependent and may be a multibyte encoding, index positions do not directly
      * correspond to character positions.
      */
-    public class CharData {
+    class CharData {
         public int character = 0;
         public int position = 0;
     } // class CharData

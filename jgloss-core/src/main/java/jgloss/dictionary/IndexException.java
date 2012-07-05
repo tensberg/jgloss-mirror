@@ -37,6 +37,10 @@ public class IndexException extends SearchException {
         super( message);
     }
 
+    public IndexException( String message, Throwable rootCause) {
+        super( message, rootCause);
+    }
+
     public IndexException( Throwable rootCause) {
         super( rootCause);
     }

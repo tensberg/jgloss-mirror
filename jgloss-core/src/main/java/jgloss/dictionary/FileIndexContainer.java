@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fest.util.VisibleForTesting;
+
 /**
  * Index container which stores index data in a file.
  *
@@ -48,8 +50,8 @@ public class FileIndexContainer implements IndexContainer {
     /**
      * Meta data for indexes stored in the container.
      */
-    private static class IndexMetaData {
-        private static final int INDEX_OFFSET = 3 * 4;
+    static class IndexMetaData {
+        static final int INDEX_OFFSET = 3 * 4;
 
         private final long start;
 
@@ -125,13 +127,24 @@ public class FileIndexContainer implements IndexContainer {
      */
     public static final String EXTENSION = ".index";
 
-    private static final byte INDEXCONTAINER_HEADER_LENGTH = 4 * 4;
+    /**
+     * Length of the index header of the current index version in bytes.
+     */
+    @VisibleForTesting
+    static final byte INDEXCONTAINER_HEADER_LENGTH = 4 * 4;
 
-    private static final byte FIRST_INDEX_POINTER_OFFSET = 2 * 4; // 2 headers with 4 bytes each
+    /**
+     * Offset in bytes in the index file to the header entry which points to the fist index metadata
+     * (independent of the index version).
+     */
+    @VisibleForTesting
+    static final byte FIRST_INDEX_POINTER_OFFSET = 2 * 4; // 2 headers with 4 bytes each
 
-    private static final int BIG_ENDIAN = 1;
-
-    private static final int LITTLE_ENDIAN = 2;
+    @VisibleForTesting
+    static final int BIG_ENDIAN = 1;
+    
+    @VisibleForTesting
+    static final int LITTLE_ENDIAN = 2;
 
     /**
      * Magic number used in the index file header.
@@ -309,13 +322,13 @@ public class FileIndexContainer implements IndexContainer {
                 // later releases might replace this with a more sophisticated compatibility test
                 throw new IndexException("Index version " + data + " not supported");
             }
-            indexFile.readInt(); // offset, must not generate an EOF exception
+            indexFile.readInt(); // offset to first index metadata, must not generate an EOF exception
 
             // read byte order
             data = indexFile.readInt();
             indexByteOrder = (data == BIG_ENDIAN) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
         } catch (EOFException ex) {
-            throw new IndexException("Premature end of index file");
+            throw new IndexException("Premature end of index file", ex);
         }
     }
 
@@ -334,7 +347,7 @@ public class FileIndexContainer implements IndexContainer {
                 indexOffset = index.nextIndexMetaDataOffset();
             }
         } catch (EOFException ex) {
-            throw new IndexException("Premature end of index file");
+            throw new IndexException("Premature end of index file", ex);
         }
     }
 
