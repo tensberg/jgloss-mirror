@@ -21,13 +21,23 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
+import jgloss.dictionary.BinarySearchIndexBuilder;
+import jgloss.dictionary.CharacterClass;
+import jgloss.dictionary.DictionaryEntryField;
+import jgloss.dictionary.EncodedCharacterHandler;
+import jgloss.dictionary.Index;
+import jgloss.dictionary.IndexBuilder;
+import jgloss.dictionary.IndexContainer;
+import jgloss.dictionary.IndexException;
+import jgloss.dictionary.Indexable;
 
 class FileBasedDictionaryIndexer {
 	

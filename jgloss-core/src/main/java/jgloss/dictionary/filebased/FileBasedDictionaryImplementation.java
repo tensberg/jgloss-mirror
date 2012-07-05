@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -33,6 +33,9 @@ import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jgloss.dictionary.DictionaryImplementation;
+import jgloss.dictionary.DictionaryInstantiationException;
+import jgloss.dictionary.TestResult;
 import jgloss.util.CharacterEncodingDetector;
 
 /**

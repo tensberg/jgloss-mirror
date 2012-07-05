@@ -1,6 +1,9 @@
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import java.nio.ByteBuffer;
+
+import jgloss.dictionary.DictionaryEntryField;
+import jgloss.dictionary.EncodedCharacterHandler;
 
 /**
  * Describes the structure of a concrete {@link FileBasedDictionary} type.

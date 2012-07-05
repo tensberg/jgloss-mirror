@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,6 +48,26 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jgloss.dictionary.BaseEntry;
+import jgloss.dictionary.BinarySearchIndex;
+import jgloss.dictionary.CharacterClass;
+import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.DictionaryEntryField;
+import jgloss.dictionary.EUCJPCharacterHandler;
+import jgloss.dictionary.EncodedCharacterHandler;
+import jgloss.dictionary.ExpressionSearchModes;
+import jgloss.dictionary.Index;
+import jgloss.dictionary.IndexContainer;
+import jgloss.dictionary.IndexException;
+import jgloss.dictionary.Indexable;
+import jgloss.dictionary.IndexedDictionary;
+import jgloss.dictionary.MalformedEntryException;
+import jgloss.dictionary.MatchMode;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SearchFieldSelection;
+import jgloss.dictionary.SearchMode;
+import jgloss.dictionary.UTF8CharacterHandler;
+import jgloss.dictionary.UnsupportedSearchModeException;
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeValue;
 import jgloss.util.StringTools;

@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import static java.util.logging.Level.SEVERE;
 
@@ -38,6 +38,12 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.DictionaryFactory;
+import jgloss.dictionary.DictionaryImplementation;
+import jgloss.dictionary.MalformedEntryException;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SingleWordEntry;
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeMapper;
 import jgloss.dictionary.attribute.AttributeSet;

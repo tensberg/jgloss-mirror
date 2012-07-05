@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import java.io.EOFException;
 import java.io.File;
@@ -36,6 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import jgloss.dictionary.IndexContainer;
+import jgloss.dictionary.IndexException;
 
 import org.fest.util.VisibleForTesting;
 

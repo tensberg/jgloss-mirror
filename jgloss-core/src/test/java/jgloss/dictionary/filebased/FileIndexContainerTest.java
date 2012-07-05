@@ -1,4 +1,4 @@
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -13,7 +13,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import jgloss.dictionary.FileIndexContainer.IndexMetaData;
+import jgloss.dictionary.IndexException;
+import jgloss.dictionary.filebased.FileIndexContainer;
+import jgloss.dictionary.filebased.FileIndexContainer.IndexMetaData;
 
 import org.junit.After;
 import org.junit.Before;

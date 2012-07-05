@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +37,17 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.DictionaryFactory;
+import jgloss.dictionary.DictionaryImplementation;
+import jgloss.dictionary.EncodedCharacterHandler;
+import jgloss.dictionary.ExpressionSearchModes;
+import jgloss.dictionary.MalformedEntryException;
+import jgloss.dictionary.MultiWordEntry;
+import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SearchFieldSelection;
+import jgloss.dictionary.SingleWordEntry;
+import jgloss.dictionary.UTF8CharacterHandler;
 import jgloss.dictionary.attribute.Abbreviation;
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeMapper;

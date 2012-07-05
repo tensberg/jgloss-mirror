@@ -1,6 +1,8 @@
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import java.nio.ByteBuffer;
+
+import jgloss.dictionary.DictionaryEntryField;
 
 public class WadokuJTStructure extends FileBasedDictionaryStructure {
 

@@ -25,7 +25,6 @@ package jgloss.ui;
 
 import jgloss.JGloss;
 import jgloss.dictionary.DictionaryEntryFormatter;
-import jgloss.dictionary.WadokuJT;
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeFormatter;
 import jgloss.dictionary.attribute.AttributeNameFormatter;
@@ -34,6 +33,7 @@ import jgloss.dictionary.attribute.DefaultAttributeFormatter;
 import jgloss.dictionary.attribute.InformationAttributeFormatter;
 import jgloss.dictionary.attribute.ReferenceAttributeFormatter;
 import jgloss.dictionary.attribute.WordFormatter;
+import jgloss.dictionary.filebased.WadokuJT;
 import jgloss.util.DefaultListFormatter;
 import jgloss.util.ListFormatter;
 

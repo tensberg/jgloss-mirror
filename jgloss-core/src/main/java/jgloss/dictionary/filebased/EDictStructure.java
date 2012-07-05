@@ -1,7 +1,9 @@
-package jgloss.dictionary;
+package jgloss.dictionary.filebased;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+
+import jgloss.dictionary.DictionaryEntryField;
 
 class EDictStructure extends FileBasedDictionaryStructure {
 

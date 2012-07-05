@@ -29,7 +29,7 @@ import java.util.List;
 import jgloss.dictionary.attribute.AttributeSet;
 import jgloss.dictionary.attribute.DefaultAttributeSet;
 
-abstract class BaseEntry implements DictionaryEntry {
+public abstract class BaseEntry implements DictionaryEntry {
     protected String reading;
     protected String[][] translations;
     protected AttributeSet generalA;
