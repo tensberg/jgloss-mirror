@@ -51,7 +51,7 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DictionaryWrap
         int loadedDictionaryCount = 0;
         for (String descriptor : dictionaryDescriptors) {
             try {
-                loadDictionary(descriptor);
+                publish(loadDictionary(descriptor));
             } catch (Exception ex) {
                 failures.add(new LoadingFailure(descriptor, ex));
             }
