@@ -78,7 +78,7 @@ public class ExportMenu extends JMenu implements ActionListener {
 	            registerExport( new InputSource( ExportMenu.class.getResource( resource)
 	                                             .toExternalForm()));
 	        } catch (Exception ex) {
-	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+	            LOGGER.log(Level.SEVERE, "failed to load export configuration " + resource, ex);
 	        }
         }
     }

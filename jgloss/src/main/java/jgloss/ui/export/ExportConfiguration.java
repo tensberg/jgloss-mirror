@@ -94,7 +94,7 @@ class ExportConfiguration {
     /**
      * Path to the export descriptor DTD stored in the JGloss JAR file.
      */
-    public static final String DTD_RESOURCE = "/data/export/export-descriptor.dtd";
+    public static final String DTD_RESOURCE = "/export/export-descriptor.dtd";
 
     /**
      * Uses the locally stored export descriptor dtd instead of the system id link.
