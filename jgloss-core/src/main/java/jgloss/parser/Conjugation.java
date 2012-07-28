@@ -54,7 +54,7 @@ public class Conjugation {
     /**
      * Location of the file with the conjugation definition.
      */
-    private final static String VCONJ_RESOURCE = "/data/vconj";
+    private final static String VCONJ_RESOURCE = "/vconj";
 
     /**
      * Prefix used when constructing keys for resource lookups.

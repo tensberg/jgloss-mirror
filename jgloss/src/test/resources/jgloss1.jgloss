@@ -1,0 +1,18 @@
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" >
+<title>JGloss1ConverterTest</title>
+<meta name="generator" content="JGloss 1.01; file format version 2.2" >
+
+</head>
+<body>
+<p>
+<anno text_annotation="foo"><word>
+<rb>
+<reading>bar</reading><bt>baz</bt>
+</rb>
+</word>
+<trans>quux</trans></anno>quuux。
+</p>
+</body>
+</html>

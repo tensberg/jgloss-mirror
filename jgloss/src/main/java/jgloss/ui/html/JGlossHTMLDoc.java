@@ -120,6 +120,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
                                     ( "/data/JGlossToHTML.xslt")));
         } catch (TransformerConfigurationException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new ExceptionInInitializerError(ex);
         }
     }
 

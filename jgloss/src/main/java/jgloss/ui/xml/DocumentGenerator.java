@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Generate a JGloss {@link Document} from a given XML Document.
+ * Generate a JGloss {@link Document} from a given JGloss XML doc.
  *
  * @author Michael Koch <tensberg@gmx.net>
  */

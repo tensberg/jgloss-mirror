@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><jgloss>
+<head>
+
+<title>JGloss1ConverterTest</title>
+<generator>JGloss 1.01; file format version 2.2 (converted to JGloss 2)</generator>
+
+</head>
+<body><div>
+<p>
+<anno tr="quux">
+<rbase re="bar">baz</rbase>
+
+</anno>quuux。
+</p>
+</div></body>
+</jgloss>

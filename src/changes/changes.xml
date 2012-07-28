@@ -7,6 +7,7 @@
     <body>
         <release version="2.1.0" date="not yet released">
             <action type="update">JGloss now requires at least Java 6.</action>
+            <action type="add">Opening JGloss 1 documents is now supported.</action>
             <action type="fix" due-to="Andreas Winter">Reduced ChaSen termination timeout to 1 second, because it doesn't terminate
                 normally.</action>
             <action type="add" due-to="Andreas Winter">Partial support for hiding readings and translations in editor view.</action>

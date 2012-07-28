@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2004 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2012 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -66,7 +66,7 @@ public class JGlossDocument {
     
     public static final String DTD_PUBLIC = "JGloss/0.9.9/JGloss document/EN";
     public static final String DTD_SYSTEM = "http://jgloss.sourceforge.net/jgloss-0.9.9.dtd";
-    public static final String DTD_RESOURCE = "/data/jgloss.dtd";
+    public static final String DTD_RESOURCE = "/xml/jgloss.dtd";
 
     private static final DocumentBuilderFactory docFactory = initDocFactory();
 
