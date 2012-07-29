@@ -117,7 +117,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
             transformerFactory = TransformerFactory.newInstance();
             jglossToHTMLTemplate = transformerFactory.newTemplates
                 ( new StreamSource( JGlossHTMLDoc.class.getResourceAsStream
-                                    ( "/data/JGlossToHTML.xslt")));
+                                    ( "/xml/JGlossToHTML.xslt")));
         } catch (TransformerConfigurationException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new ExceptionInInitializerError(ex);

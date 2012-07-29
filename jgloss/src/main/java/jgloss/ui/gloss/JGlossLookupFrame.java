@@ -31,6 +31,13 @@ import jgloss.ui.util.UIUtilities;
 
 public class JGlossLookupFrame extends LookupFrame {
     private static final long serialVersionUID = 1L;
+    
+	/**
+     * Static instance of the actions which create or open a JGloss document. If an action
+     * is invoked, a new <CODE>JGlossFrame</CODE> will be created as the target of the
+     * action.
+     */
+    private static final DocumentActions ACTIONS = new DocumentActions( null);
 
 	public JGlossLookupFrame( LookupModel _model) {
         super( _model);
@@ -38,13 +45,13 @@ public class JGlossLookupFrame extends LookupFrame {
 
     @Override
 	protected void createFileMenuItems( JMenu menu) {
-        menu.add( UIUtilities.createMenuItem( JGlossFrame.ACTIONS.importDocument));
-        menu.add( UIUtilities.createMenuItem( JGlossFrame.ACTIONS.importClipboard));
-        addWindowListener( JGlossFrame.ACTIONS.importClipboardListener);
-        menu.addMenuListener( JGlossFrame.ACTIONS.importClipboardListener);
+        menu.add( UIUtilities.createMenuItem( ACTIONS.importDocument));
+        menu.add( UIUtilities.createMenuItem( ACTIONS.importClipboard));
+        addWindowListener( ACTIONS.importClipboardListener);
+        menu.addMenuListener( ACTIONS.importClipboardListener);
         menu.addSeparator();
-        menu.add( UIUtilities.createMenuItem( JGlossFrame.ACTIONS.open));
-        JMenu openRecent = JGlossFrame.OPEN_RECENT.createMenu( JGlossFrame.ACTIONS.openRecentListener);
+        menu.add( UIUtilities.createMenuItem( ACTIONS.open));
+        JMenu openRecent = JGlossFrame.OPEN_RECENT.createMenu( ACTIONS.openRecentListener);
         menu.add( openRecent);
         menu.addSeparator();
 

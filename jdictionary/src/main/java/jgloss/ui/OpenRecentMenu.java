@@ -112,7 +112,7 @@ public class OpenRecentMenu {
      * @param listener Will be notified when an entry from the menu is selected.
      * @return A newly created popup menu with the recent documents.
      */
-    public synchronized JMenu createMenu( FileSelectedListener listener) { 
+    public JMenu createMenu( FileSelectedListener listener) { 
         JMenu menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.openrecent"));
         for (File document : documents) {
             menu.add( createDocumentMenu(document, listener));
@@ -130,7 +130,7 @@ public class OpenRecentMenu {
      *
      * @param menu The menu to removed.
      */
-    public synchronized void removeMenu( JMenu menu) {
+    public void removeMenu( JMenu menu) {
     	for (Iterator<MenuWithListener> menuWithListenerIterator=menus.iterator(); menuWithListenerIterator.hasNext(); ) {
     		MenuWithListener menuWithListener = menuWithListenerIterator.next();
     		if (menu.equals(menuWithListener.getMenu())) {
@@ -147,7 +147,7 @@ public class OpenRecentMenu {
      *
      * @param doc Document to add.
      */
-    public synchronized void addDocument( File doc) {
+    public void addDocument( File doc) {
         if (!doc.canRead()) {
 	        return;
         }

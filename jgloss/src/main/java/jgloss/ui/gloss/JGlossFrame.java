@@ -152,13 +152,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
 	private static final long serialVersionUID = 1L;
 
-	/**
-     * Static instance of the actions which can be used by other classes. If an action
-     * is invoked, a new <CODE>JGlossFrame</CODE> will be created as the target of the
-     * action.
-     */
-    public static final DocumentActions ACTIONS = new DocumentActions( null);
-
     /**
      * Open recent menu used for JGloss documents. The instance is shared between instances of
      * <CODE>JGlossFrame</CODE> and {@link LookupFrame LookupFrame}.
@@ -355,13 +348,15 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         initActions();
 
-        frame.addWindowListener( ACTIONS.importClipboardListener);
+        DocumentActions documentActions = new DocumentActions(this);
+        
+        frame.addWindowListener( documentActions.importClipboardListener);
 
         // annotation list must be created before initMenuBar is called
         annotationList = new AnnotationList();
         annotationList.addListSelectionListener( this);
 
-        frame.setJMenuBar( initMenuBar( ACTIONS));
+        frame.setJMenuBar( initMenuBar( documentActions));
 
         // set up the content of this component
         setBackground( Color.white);
