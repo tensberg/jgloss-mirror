@@ -78,6 +78,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.Position;
 import javax.swing.text.View;
@@ -131,6 +132,9 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         @Override
         public void propertyChange( PropertyChangeEvent e) {
             markChanged();
+            if (e.getPropertyName() == Document.TitleProperty) {
+            	updateTitle();
+            }
         }
 
         @Override
@@ -774,6 +778,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             saveAction.setEnabled( true);
         }
         saveAsAction.setEnabled( true);
+        documentTitleAction.setEnabled(true);
 
         // first paint the frame, then install the docpane in a separate event since showing the docpane
         // takes a long time for larger documents
@@ -1147,6 +1152,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             if (model.getDocumentPath() != null) {
 	            saveAction.setEnabled( true);
             }
+            updateTitle();
         }
     }
 
@@ -1154,7 +1160,17 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * Update the document window title.
      */
     protected void updateTitle() {
-        frame.setTitle( model.getDocumentName() + ":" + JGloss.MESSAGES.getString( "main.title"));
+    	String documentTitle = model.getHTMLDocument().getTitle();
+    	
+    	if (documentTitle == null || documentTitle.isEmpty()) {
+    		documentTitle = model.getDocumentName();
+    	}
+    	
+    	if (model.isDocumentChanged()) {
+    		documentTitle = "*" + documentTitle;
+    	}
+    	
+        frame.setTitle( documentTitle + ":" + JGloss.MESSAGES.getString( "main.title"));
     }
 
     private void annotateDocumentSelection() {
