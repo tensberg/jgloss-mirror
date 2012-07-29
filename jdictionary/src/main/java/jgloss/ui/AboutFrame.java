@@ -91,6 +91,7 @@ public class AboutFrame extends JFrame {
      */
     private AboutFrame( String prefix) {
         setTitle( JGloss.MESSAGES.getString( prefix + ".about.frame.title"));
+        setIconImages(JGlossLogo.ALL_LOGO_SIZES);
         
         JLabel label = new JLabel( JGloss.MESSAGES.getString( prefix + ".about.title"));
         label.setHorizontalAlignment( SwingConstants.CENTER);

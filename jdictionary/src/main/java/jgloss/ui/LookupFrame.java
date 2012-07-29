@@ -85,7 +85,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     public LookupFrame( LookupModel _model) {
         super( JGloss.MESSAGES.getString( "wordlookup.title"));
-
+        setIconImages(JGlossLogo.ALL_LOGO_SIZES);
+        
         getContentPane().setLayout( new BorderLayout());
         JPanel center = new JPanel();
         center.setLayout( new BorderLayout());

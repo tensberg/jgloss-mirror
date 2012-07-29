@@ -94,6 +94,7 @@ import jgloss.ui.AboutFrame;
 import jgloss.ui.CustomFileView;
 import jgloss.ui.ExtensionFileFilter;
 import jgloss.ui.FirstEntryCache;
+import jgloss.ui.JGlossLogo;
 import jgloss.ui.KeystrokeForwarder;
 import jgloss.ui.LookupFrame;
 import jgloss.ui.LookupResultList;
@@ -312,6 +313,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
          * See also JGlossFrame.dispose().
          */
         frame = new JFrame( JGloss.MESSAGES.getString( "main.title"));
+        frame.setIconImages(JGlossLogo.ALL_LOGO_SIZES);
         frame.getContentPane().setBackground( Color.white);
         frame.getContentPane().setLayout( new GridLayout( 1, 1));
         frame.setLocation( JGloss.PREFS.getInt( Preferences.FRAME_X, 0),

@@ -28,8 +28,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
@@ -45,7 +43,6 @@ import net.miginfocom.swing.MigLayout;
  * @author Michael Koch
  */
 public class SplashScreen {
-	private static final Icon JGLOSS_LOGO = new ImageIcon(SplashScreen.class.getResource("/images/jgloss-logo.png")); 
 	
     /**
      * The splash screen window.
@@ -68,13 +65,15 @@ public class SplashScreen {
      */
     public SplashScreen( String applicationKey) {
         splash = new JWindow();
+        splash.setIconImages(JGlossLogo.ALL_LOGO_SIZES);
+        
         splash.getContentPane().setLayout( new GridLayout( 1, 1));
 
         JPanel content = new JPanel(new MigLayout(new LC().wrapAfter(1).fillX()));
         content.setBorder( BorderFactory.createEtchedBorder());
         content.setBackground(Color.WHITE);
 
-        JLabel logo = new JLabel(JGLOSS_LOGO);
+        JLabel logo = new JLabel(JGlossLogo.LOGO_LARGE);
 		content.add(logo, "center, growx");
 
 		version = new JLabel( JGloss.MESSAGES.getString( applicationKey + ".version"));
