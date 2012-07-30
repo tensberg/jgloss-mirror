@@ -386,4 +386,6 @@ public class StringTools {
         return regex;
     }
 
+    private StringTools() {
+    }
 } // class StringTools

@@ -559,7 +559,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
                         appendTag(wordhtml, AnnotationTags.READING_BASETEXT, false);
 
                         appendTag(wordhtml, AnnotationTags.READING, false);
-                        wordhtml.append(' ');
+                        wordhtml.append("&nbsp;");
                         appendTag(wordhtml, AnnotationTags.READING, true);
 
                         appendTag(wordhtml, AnnotationTags.BASETEXT, false);
@@ -593,7 +593,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 appendTag(html, AnnotationTags.READING_BASETEXT, false);
 
                 appendTag(html, AnnotationTags.READING, false);
-                html.append(' ');
+                html.append("&nbsp;");
                 appendTag(html, AnnotationTags.READING, true);
 
                 html.append(wordhtml);
@@ -603,9 +603,11 @@ public class JGlossHTMLDoc extends HTMLDocument {
 
             appendTag(html, AnnotationTags.WORD, true);
             appendTag(html, AnnotationTags.TRANSLATION, false);
-            html.append(' ');
+            html.append("&nbsp;");
             appendTag(html, AnnotationTags.TRANSLATION, true);
             appendTag(html, AnnotationTags.ANNOTATION, true);
+            
+            html.append("</p></body></html>");
 
             // The insertion will create a new annotation element and trigger a document changed
             // event. The AnnotationListSynchronizer will react to this by creating a new

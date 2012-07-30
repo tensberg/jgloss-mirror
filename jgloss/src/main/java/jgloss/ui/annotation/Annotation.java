@@ -23,13 +23,14 @@
 
 package jgloss.ui.annotation;
 
+import static jgloss.ui.annotation.TextElement.getTextFromElement;
+import static jgloss.ui.html.AnnotationTags.ANNOTATION;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
 
@@ -61,6 +62,12 @@ public class Annotation {
     protected String[] rbases;
 
     public Annotation( AnnotationListModel _owner, Element _anno) {
+    	if (!ANNOTATION.getId().equals(_anno.getName())) {
+    		throw new IllegalArgumentException("element must be annotation element, was " + _anno.getName());
+    	}
+    	
+    	dump(_anno);
+    	
         owner = _owner;
         anno = _anno;
 
@@ -73,13 +80,13 @@ public class Annotation {
         for ( int i=0; i<word.getElementCount(); i++) {
             Element child = word.getElement( i);
             if (child.getElementCount() == 0) { // base text
-                String et = getText( child);
+                String et = getTextFromElement( child);
                 text.append( et);
                 reading.append( et);
             }
             else {
                 // rb containing reading and basetext
-                String rbase = getText( child.getElement( 1));
+                String rbase = getTextFromElement( child.getElement( 1));
                 rbasesl.add( rbase);
                 text.append( rbase);
                 TextElement r = new TextElement( child.getElement( 0));
@@ -211,16 +218,6 @@ public class Annotation {
             ( (MutableAttributeSet) anno.getAttributes(), name, value, false);
     }
 
-    private static String getText( Element elem) {
-        try {
-            return elem.getDocument().getText( elem.getStartOffset(), 
-                                               elem.getEndOffset()-elem.getStartOffset());
-        } catch (BadLocationException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return "";
-        }
-    }
-
     private void updateAnnotatedTextReading() {
         StringBuilder reading = new StringBuilder();
         Element word = anno.getElement( 0);
@@ -229,13 +226,13 @@ public class Annotation {
             if (child.getElementCount() > 0) {
                 // rb element, get re child
                 child = child.getElement( 0);
-                String text = getText( child);
+                String text = getTextFromElement( child);
                 if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER)) {
 	                text = "";
                 }
                 reading.append( text);
             } else {
-	            reading.append( getText( child));
+	            reading.append( getTextFromElement( child));
             }
         }
         annotatedTextReading = reading.toString();
@@ -263,4 +260,16 @@ public class Annotation {
 
     public int getStartOffset() { return anno.getStartOffset(); }
     public int getEndOffset() { return anno.getEndOffset(); }
+    
+	public void dump(Element elem) {
+		if (elem.isLeaf()) {
+			System.out.println(TextElement.getTextFromElement(elem));
+		} else {
+			System.out.println("<" + elem.getName() + ">");
+			for (int i=0; i<elem.getElementCount(); i++) {
+				dump(elem.getElement(i));
+			}
+			System.out.println("</" + elem.getName() + ">");
+		}
+	}
 } // class Annotation

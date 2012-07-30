@@ -82,18 +82,26 @@ class TextElement {
      */
     public String getText() {
         if (text == null) {
-	        try {
-	            text = element.getDocument().getText( element.getStartOffset(),
-	                                                  element.getEndOffset()-element.getStartOffset());
-	            if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER)) {
-	                text = "";
-	            }
-	        } catch (BadLocationException ex) {
-	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-	        }
+	        text = getTextFromElement(element);
         }
 
         return text;
+    }
+
+	public static String getTextFromElement(Element element) {
+		String text = "";
+		
+	    try {
+	        text = element.getDocument().getText( element.getStartOffset(),
+	                                              element.getEndOffset()-element.getStartOffset());
+	        if (text.equals( JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER)) {
+	            text = "";
+	        }
+	    } catch (BadLocationException ex) {
+	        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+	    }
+	    
+	    return text;
     }
 
     public Element getElement() { return element; }

@@ -252,6 +252,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
 		protected TagElement makeTag( javax.swing.text.html.parser.Element e, boolean fictional) {
             return new JGlossTagElement( e, fictional);
         }
+        
+        @Override
+        protected void handleError(int ln, String errorMsg) {
+            LOGGER.warning("error parsing JGloss document at line " + ln + ": " + errorMsg);
+        }
     }
 
     /**
@@ -930,15 +935,18 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	            ContentModel pcdata = new ContentModel( '*', 
 	                                                    new ContentModel( dtd.pcdata),
 	                                                    null);
-	            javax.swing.text.html.parser.Element reading = 
-	                dtd.defineElement( AnnotationTags.READING.getId(),
-	                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
-	            javax.swing.text.html.parser.Element base = 
-	                dtd.defineElement( AnnotationTags.BASETEXT.getId(),
-	                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
-	            javax.swing.text.html.parser.Element translation = 
-	                dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
-	                                   DTDConstants.MODEL, false, false, pcdata, null, null, null);
+	            dtd.defineElement( AnnotationTags.READING.getId(),
+	            				DTDConstants.MODEL, false, false, pcdata, null, null, null);
+	            dtd.defineElement( AnnotationTags.BASETEXT.getId(),
+	            				DTDConstants.MODEL, false, false, pcdata, null, null, null);
+	            dtd.defineElement( AnnotationTags.TRANSLATION.getId(),
+	            				DTDConstants.MODEL, false, false, pcdata, null, null, null);
+	            javax.swing.text.html.parser.Element reading = dtd.getElement
+	            				( AnnotationTags.READING.getId());
+	            javax.swing.text.html.parser.Element base = dtd.getElement
+	            				( AnnotationTags.BASETEXT.getId());
+	            javax.swing.text.html.parser.Element translation = dtd.getElement
+	            				( AnnotationTags.TRANSLATION.getId());
 	            
 	            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE, DTDConstants.CDATA, 0, null, null, al);
 	            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE_READING, DTDConstants.CDATA, 0, null, null, al);
@@ -961,15 +969,15 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	            javax.swing.text.html.parser.Element reading_base = dtd.getElement
 	                ( AnnotationTags.READING_BASETEXT.getId());            
 
-	            // (anno | word | reading_base | reading | base | translation | kanji | #pcdata*)
+	            // (anno | word | reading_base | reading | base | translation | #pcdata*)
 	            ContentModel annotationmodel = new ContentModel( '|', new ContentModel
-	                ( 0, annotation, new ContentModel
-	                    ( 0, word, new ContentModel
-	                        ( 0, reading_base, new ContentModel
-	                            ( 0, reading, new ContentModel
-	                                ( 0, base, new ContentModel
-	                                    ( 0, translation, new ContentModel
-	                                      ( '*', new ContentModel( dtd.pcdata), null))))))));
+	                ( '|', new ContentModel(annotation), new ContentModel
+	                    ( '|', new ContentModel(word), new ContentModel
+	                        ( '|', new ContentModel(reading_base), new ContentModel
+	                            ( '|', new ContentModel(reading), new ContentModel
+	                                ( '|', new ContentModel(base), new ContentModel
+	                                    ( '|', new ContentModel(translation), new ContentModel
+	                                      ( '*', new ContentModel( dtd.pcdata)))))))));
 	            // allow an annotation element or any of its subelements anywhere the DTD allows #pcdata
 	            for (javax.swing.text.html.parser.Element e : dtd.elements) {
 	                if (e!=annotation && e!=word && e!=reading_base && e!=reading && e!=base 
