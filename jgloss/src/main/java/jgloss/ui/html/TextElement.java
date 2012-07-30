@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2004 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2012 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -21,7 +21,7 @@
  *
  */
 
-package jgloss.ui.annotation;
+package jgloss.ui.html;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,15 +30,16 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 
-import jgloss.ui.html.JGlossHTMLDoc;
-
-class TextElement {
+/**
+ * Wraps a leaf element and provides accessors for the contained text.
+ */
+public class TextElement {
 	private static final Logger LOGGER = Logger.getLogger(TextElement.class.getPackage().getName());
 	
 	private final Element element;
     private String text = null;
 
-    TextElement( Element _element) {
+    public TextElement( Element _element) {
         element = _element;
 
         if (element.getElementCount() > 0) {

@@ -23,8 +23,8 @@
 
 package jgloss.ui.annotation;
 
-import static jgloss.ui.annotation.TextElement.getTextFromElement;
 import static jgloss.ui.html.AnnotationTags.ANNOTATION;
+import static jgloss.ui.html.TextElement.getTextFromElement;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,6 +35,7 @@ import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
 
 import jgloss.ui.html.JGlossHTMLDoc;
+import jgloss.ui.html.TextElement;
 import jgloss.ui.xml.JGlossDocument;
 import jgloss.util.StringTools;
 
@@ -65,9 +66,7 @@ public class Annotation {
     	if (!ANNOTATION.getId().equals(_anno.getName())) {
     		throw new IllegalArgumentException("element must be annotation element, was " + _anno.getName());
     	}
-    	
-    	dump(_anno);
-    	
+    	    	
         owner = _owner;
         anno = _anno;
 
@@ -260,16 +259,5 @@ public class Annotation {
 
     public int getStartOffset() { return anno.getStartOffset(); }
     public int getEndOffset() { return anno.getEndOffset(); }
-    
-	public void dump(Element elem) {
-		if (elem.isLeaf()) {
-			System.out.println(TextElement.getTextFromElement(elem));
-		} else {
-			System.out.println("<" + elem.getName() + ">");
-			for (int i=0; i<elem.getElementCount(); i++) {
-				dump(elem.getElement(i));
-			}
-			System.out.println("</" + elem.getName() + ">");
-		}
-	}
+
 } // class Annotation

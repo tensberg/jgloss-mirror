@@ -1,4 +1,4 @@
-package jgloss.ui.annotation;
+package jgloss.ui.html;
 
 import static jgloss.ui.html.JGlossHTMLDoc.EMPTY_ELEMENT_PLACEHOLDER;
 import static org.fest.assertions.Assertions.assertThat;
@@ -9,6 +9,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+
+import jgloss.ui.html.TextElement;
 
 import org.junit.Before;
 import org.junit.Test;
