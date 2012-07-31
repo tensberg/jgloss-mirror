@@ -248,23 +248,7 @@ public class JGlossEditor extends JTextPane {
                     }
 
                     if ((e.getModifiers() & selectButtonMask) != 0) {
-                        int pos = viewToModel( e.getPoint());
-                        int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex( pos, Bias.NONE);
-
-                        if (annoIndex >= 0) {
-                            // Selecting the annotation in the AnnotationList also selects it in the Editor
-
-                            annotationList.setSelectedIndex( annoIndex);
-                            // transfer input focus to annotation list to enable keyboard
-                            // navigation
-                            annotationList.requestFocus();
-                        } else {
-                            // Deselect any selected annotation
-                            //annotationList.setSelectedIndex(0);
-
-                            // FIXME: does not work!
-                            annotationList.clearSelection();
-                        }
+                        selectAnnotationUnderMouse(e);
                     } else if (!tooltips && (e.getModifiers() & tooltipButtonMask)!=0) {
                         //    showToolTip( ((AnnotationModel) annotationEditor.getModel())
                         //                 .getAnnotationText( viewToModel( e.getPoint())),
@@ -272,14 +256,30 @@ public class JGlossEditor extends JTextPane {
                     }
                 }
             }
-
+            
             private boolean checkPopupTrigger( MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    //annotationList.setSelectedItem( doc.getAnnotationAt( int pos));
-                    annotationList.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
-                    return true;
-                }
-                return false;
+            	if (e.isPopupTrigger()) {
+            		selectAnnotationUnderMouse(e);
+            		annotationList.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
+            		return true;
+            	}
+            	return false;
+            }
+
+			private void selectAnnotationUnderMouse(MouseEvent e) {
+	            int pos = viewToModel( e.getPoint());
+	            int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex( pos, Bias.NONE);
+
+	            if (annoIndex >= 0) {
+	                // Selecting the annotation in the AnnotationList also selects it in the Editor
+
+	                annotationList.setSelectedIndex( annoIndex);
+	                // transfer input focus to annotation list to enable keyboard
+	                // navigation
+	                annotationList.requestFocus();
+	            } else {
+	                annotationList.clearSelection();
+	            }
             }
 
             @Override
