@@ -129,8 +129,6 @@ public class JGlossEditor extends JTextPane {
 	            // transfer input focus to annotation list to enable keyboard
 	            // navigation
 	            annotationList.requestFocus();
-	        } else {
-	            annotationList.clearSelection();
 	        }
 	    }
 
