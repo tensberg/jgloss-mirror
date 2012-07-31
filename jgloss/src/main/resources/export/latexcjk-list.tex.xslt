@@ -2,7 +2,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   
-  <xsl:output method="text" encoding="EUC-JP" />
+  <xsl:output method="text" encoding="UTF-8" />
 
   <xsl:param name="document-filename" />
   <xsl:param name="document-title" />
@@ -15,7 +15,7 @@
     <xsl:apply-templates select="jgloss/body" />
   </xsl:template>
   <xsl:template match="body">
-    <xsl:text>%encoding: EUC-JP
+    <xsl:text>%encoding: UTF-8
 %short-description: LaTeX-CJK - transl. at end - hyperlinks
 %description
 % Generate a latex/pdflatex input file which uses the CJK and hyperref
@@ -25,7 +25,7 @@
 %
 % Run latex twice on the document to get the bookmarks right.
 %end description
-% This is a EUC-JP encoded Japanese LaTeX document generated
+% This is a UTF-8 encoded Japanese LaTeX document generated
 % by JGloss from </xsl:text><xsl:value-of select="$document-filename" /><xsl:text> on </xsl:text><xsl:value-of select="$generation-time" /><xsl:text>.
 % The CJK macro package must be installed to process this file.
 %
@@ -65,7 +65,7 @@
    \usepackage[plainpages={false}]{hyperref}
 \fi
 
-\usepackage{CJK}
+\usepackage{CJKutf8}
 \usepackage[overlap,CJK]{ruby}
 
 \renewcommand{\thefootnote}{}
@@ -73,7 +73,7 @@
 \newcommand{\para}[1]{\noindent \textbf{Paragraph #1}}
 
 \begin{document}
-\begin{CJK*}[dnp]{JIS}{min}
+\begin{CJK*}{UTF8}{min}
 \CJKtilde
 
 \renewcommand{\rubysize}{0.5}

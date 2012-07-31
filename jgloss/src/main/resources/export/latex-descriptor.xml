@@ -53,18 +53,6 @@
   
   <templates label-key="export.templates" prefs-key="export.latex.templates">
     <template>
-      <label-key>export.latex.template.platex-top</label-key>
-      <source>platex-top.tex.xslt</source>
-    </template>
-    <template>
-      <label-key>export.latex.template.platex-list</label-key>
-      <source>platex-list.tex.xslt</source>
-    </template>
-    <template>
-      <label-key>export.latex.template.platex-ruby</label-key>
-      <source>platex-ruby.tex.xslt</source>
-    </template>
-    <template>
       <label-key>export.latex.template.latexcjk-top</label-key>
       <source>latexcjk-top.tex.xslt</source>
     </template>

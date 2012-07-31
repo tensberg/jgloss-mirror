@@ -34,52 +34,27 @@ import java.util.Map;
  * @author Michael Koch
  */
 public class LaTeXEscaper extends AbstractEscaper {
-    protected static final Map<Character, String> DEFAULT_ESCAPE_MAP;
-    protected static final Map<Character, String> UMLAUT_ESCAPE_MAP;
+    private static final Map<Character, String> ESCAPE_MAP = initEscapeMap();
 
-    protected Map<Character, String> escapeMap;
-
-    static {
-        DEFAULT_ESCAPE_MAP = new HashMap<Character, String>();
-        DEFAULT_ESCAPE_MAP.put( new Character('#'), "\\#");
-        DEFAULT_ESCAPE_MAP.put( new Character('$'), "\\$");
-        DEFAULT_ESCAPE_MAP.put( new Character('%'), "\\%");
-        DEFAULT_ESCAPE_MAP.put( new Character('&'), "\\&");
-        DEFAULT_ESCAPE_MAP.put( new Character('_'), "\\_");
-        DEFAULT_ESCAPE_MAP.put( new Character('{'), "\\{");
-        DEFAULT_ESCAPE_MAP.put( new Character('}'), "\\}");
-        DEFAULT_ESCAPE_MAP.put( new Character('~'), "\\verb|~|");
-        DEFAULT_ESCAPE_MAP.put( new Character('^'), "\\verb|^|");
-        DEFAULT_ESCAPE_MAP.put( new Character('\\'), "$\\backslash$");
-        DEFAULT_ESCAPE_MAP.put( new Character('\u00a0'), "~"); // non-breakable space
-
-        UMLAUT_ESCAPE_MAP = new HashMap<Character, String>(DEFAULT_ESCAPE_MAP);
-        // German umlauts
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00e4'), "\\\"{a}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00f6'), "\\\"{o}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00fc'), "\\\"{u}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00c4'), "\\\"{A}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00d6'), "\\\"{O}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00dc'), "\\\"{U}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00df'), "\\ss ");
-
-        // umlauts with circumflex
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00e2'), "\\={a}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00f4'), "\\={o}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00fb'), "\\={u}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00c2'), "\\={A}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00d4'), "\\={O}");
-        UMLAUT_ESCAPE_MAP.put( new Character('\u00db'), "\\={U}");
-
-        //TODO: add umlauts for languages other than German
-    }
-
-    public LaTeXEscaper(boolean escapeUmlauts) {
-        escapeMap = escapeUmlauts ? UMLAUT_ESCAPE_MAP : DEFAULT_ESCAPE_MAP;
+    private static Map<Character, String> initEscapeMap() {
+        Map<Character, String> escapeMap = new HashMap<Character, String>();
+        escapeMap.put( new Character('#'), "\\#");
+        escapeMap.put( new Character('$'), "\\$");
+        escapeMap.put( new Character('%'), "\\%");
+        escapeMap.put( new Character('&'), "\\&");
+        escapeMap.put( new Character('_'), "\\_");
+        escapeMap.put( new Character('{'), "\\{");
+        escapeMap.put( new Character('}'), "\\}");
+        escapeMap.put( new Character('~'), "\\verb|~|");
+        escapeMap.put( new Character('^'), "\\verb|^|");
+        escapeMap.put( new Character('\\'), "$\\backslash$");
+        escapeMap.put( new Character('\u00a0'), "~"); // non-breakable space
+        
+        return unmodifiableMap(escapeMap);
     }
 
     @Override
 	protected Map<Character, String> getEscapeMap() {
-        return unmodifiableMap(escapeMap);
+        return ESCAPE_MAP;
     }
 } // class LaTeXEscaper

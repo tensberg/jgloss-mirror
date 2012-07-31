@@ -2,7 +2,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   
-  <xsl:output method="text" encoding="EUC-JP" />
+  <xsl:output method="text" encoding="UTF-8" />
 
   <xsl:param name="document-filename" />
   <xsl:param name="document-title" />
@@ -15,14 +15,14 @@
     <xsl:apply-templates select="jgloss/body" />
   </xsl:template>
   <xsl:template match="body">
-    <xsl:text>%encoding: EUC-JP
+    <xsl:text>%encoding: UTF-8
 %short-description: LaTeX-CJK - translations on page
 %description
 % Generate a latex input file which uses the CJK macro package.
 % Translations are put in a footnote on the page where the
 % word appears.
 %end description
-% This is a EUC-JP encoded Japanese LaTeX document generated
+% This is a UTF-8 encoded Japanese LaTeX document generated
 % by JGloss from </xsl:text><xsl:value-of select="$document-filename" /><xsl:text> on </xsl:text><xsl:value-of select="$generation-time" /><xsl:text>.
 % The CJK macro package must be installed to process this file.
 %
@@ -33,13 +33,13 @@
 
 \documentclass[</xsl:text><xsl:value-of select="$font-size" /><xsl:text>pt]{article}
 
-\usepackage{CJK}
+\usepackage{CJKutf8}
 \usepackage[overlap,CJK]{ruby}
 
 \renewcommand{\thefootnote}{}
 
 \begin{document}
-\begin{CJK*}[dnp]{JIS}{min}
+\begin{CJK*}{UTF8}{min}
 \CJKtilde
 
 \renewcommand{\rubysize}{0.5}

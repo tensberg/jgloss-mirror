@@ -36,9 +36,7 @@ class LaTeXExporter extends XSLTExporter {
     @Override
 	protected Document applyFilter(ExportConfiguration configuration, Document doc) {
         doc = (Document) doc.cloneNode(true);
-        boolean escapeUmlauts = configuration.getEncoding()==null ||
-            !configuration.getEncoding().toUpperCase().startsWith("UTF");
-        DOMTextEscaper escaper = new DOMTextEscaper(new LaTeXEscaper(escapeUmlauts));
+        DOMTextEscaper escaper = new DOMTextEscaper(new LaTeXEscaper());
         escaper.escapeTextIn( doc);
         return doc;
     }
