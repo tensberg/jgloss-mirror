@@ -250,7 +250,7 @@ public class Annotation {
 
         String translation = getTranslation();
         if (translation!=null && translation.length()>0) {
-            out.append( ' ');
+            out.append( '\n');
             out.append( translation);
         }
 

@@ -40,9 +40,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JToolTip;
 import javax.swing.JWindow;
@@ -75,13 +73,86 @@ public class JGlossEditor extends JTextPane {
     new DefaultHighlighter.DefaultHighlightPainter( new Color
         ( Math.max( 0, JGloss.PREFS.getInt( Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))));
 
-    /**
+    private class SelectAnnotationListener implements MouseListener {
+	    @Override
+	    public void mousePressed( MouseEvent e) {
+	        checkShowContextMenu( e);
+	    }
+
+	    @Override
+	    public void mouseReleased( MouseEvent e) {
+	        checkShowContextMenu( e);
+	    }
+
+	    @Override
+	    public void mouseClicked( MouseEvent e) {
+	        if (!(checkShowContextMenu( e) || annotationList.getContextMenu().isVisible())) {
+	            int tooltipButtonMask;
+	            int selectButtonMask;
+	            if (JGloss.PREFS.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) {
+	                // left mouse button shows annotation tooltip,
+	                // all other select the annotation
+	                tooltipButtonMask = InputEvent.BUTTON1_MASK;
+	                selectButtonMask = InputEvent.BUTTON2_MASK | InputEvent.BUTTON3_MASK;
+	            } else {
+	                // left mouse button selects annotation,
+	                // all other show annotation tooltip
+	                tooltipButtonMask = InputEvent.BUTTON2_MASK | InputEvent.BUTTON3_MASK;
+	                selectButtonMask = InputEvent.BUTTON1_MASK;
+	            }
+
+	            if ((e.getModifiers() & selectButtonMask) != 0) {
+	                selectAnnotationUnderMouse(e);
+	            } else if (!tooltips && (e.getModifiers() & tooltipButtonMask)!=0) {
+	            	showAnnotationTooltip(e.getPoint());
+	            }
+	        }
+	    }
+
+	    private boolean checkShowContextMenu( MouseEvent e) {
+	    	if (e.isPopupTrigger()) {
+	    		selectAnnotationUnderMouse(e);
+	    		annotationList.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
+	    		return true;
+	    	} else {
+	    		return false;
+	    	}
+	    }
+
+	    private void selectAnnotationUnderMouse(MouseEvent e) {
+	        int annoIndex = findAnnotationUnderMouse(e.getPoint());
+
+	        if (annoIndex >= 0) {
+	            // Selecting the annotation in the AnnotationList also selects it in the Editor
+
+	            annotationList.setSelectedIndex( annoIndex);
+	            // transfer input focus to annotation list to enable keyboard
+	            // navigation
+	            annotationList.requestFocus();
+	        } else {
+	            annotationList.clearSelection();
+	        }
+	    }
+
+	    @Override
+	    public void mouseEntered( MouseEvent e) {
+	        inComponent = true;
+	    }
+
+	    @Override
+	    public void mouseExited( MouseEvent e) {
+	        inComponent = false;
+	        hideToolTip();
+	    }
+    }
+
+	/**
      * Manages the automatic display of anntotation tooltips and annotation editor scrolling
      * when the mouse hovers over an annotation.
      *
      * @author Michael Koch
      */
-    private class MouseFollower implements MouseMotionListener, ActionListener {
+    private class ShowTooltipForAnnotationUnderMouse implements MouseMotionListener, ActionListener {
         /**
          * Delay the showing of the tooltip so that the tooltip is only shown if the mouse does not
          * move for the given delay.
@@ -91,16 +162,16 @@ public class JGlossEditor extends JTextPane {
         /**
          * Mouse position of the last mouse event.
          */
-        private Point pos = new Point();
+        private Point cursorLocation = new Point();
 
-        MouseFollower() {
+        ShowTooltipForAnnotationUnderMouse() {
             showDelayedTooltip.setRepeats(false);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (tooltips) {
-                showToolTip( "FIXME", pos);
+                showAnnotationTooltip(cursorLocation);
             }
         }
 
@@ -110,7 +181,7 @@ public class JGlossEditor extends JTextPane {
             hideToolTip();
 
             if (tooltips) {
-                pos = e.getPoint();
+                cursorLocation = e.getPoint();
                 showDelayedTooltip.start();
             }
         }
@@ -128,7 +199,7 @@ public class JGlossEditor extends JTextPane {
      */
     private final static String KEYMAP_TAB = "tab map";
 
-    private AnnotationList annotationList;
+    private final AnnotationList annotationList;
     /**
      * Object identifying the currently highlighted annotation in the <CODE>HighlightPainter</CODE>.
      */
@@ -136,11 +207,11 @@ public class JGlossEditor extends JTextPane {
     /**
      * Used to update the display according to the mouse position.
      */
-    private MouseFollower mouseFollower;
+    private final ShowTooltipForAnnotationUnderMouse showTooltipForAnnotationUnderMouse;
     /**
      * Displays annotation tooltips or a context menu as reaction to mouse clicks.
      */
-    private MouseListener mouseListener;
+    private final MouseListener selectAnnotationListener;
     /**
      * <CODE>true</CODE>, if annotation tooltips will be shown automatically if the mouse
      * moves over an annotation.
@@ -157,16 +228,16 @@ public class JGlossEditor extends JTextPane {
     /**
      * Widget which holds the annotation tooltip text.
      */
-    private JTextArea tooltip;
+    private final JToolTip tooltip = new JToolTip();
 
     /**
      * Searches a string in the document.
      */
-    private Action findAction;
+    private final Action findAction;
     /**
      * Repeats the last search.
      */
-    private Action findAgainAction;
+    private final Action findAgainAction;
     /**
      * Last search string. Used with find again action.
      */
@@ -179,7 +250,7 @@ public class JGlossEditor extends JTextPane {
     /**
      * Update the tooltip font in response to default ui changes.
      */
-    private PropertyChangeListener fontChangeListener;
+    private final PropertyChangeListener fontChangeListener;
 
     /**
      * Sets the highlight color to a new value. Used if the preferences changed.
@@ -216,92 +287,11 @@ public class JGlossEditor extends JTextPane {
             });
         setKeymap( map);
 
-        mouseFollower = new MouseFollower();
-        this.addMouseMotionListener( mouseFollower);
+        showTooltipForAnnotationUnderMouse = new ShowTooltipForAnnotationUnderMouse();
+        this.addMouseMotionListener( showTooltipForAnnotationUnderMouse);
 
-        mouseListener = new MouseListener() {
-            @Override
-			public void mousePressed( MouseEvent e) {
-                checkPopupTrigger( e);
-            }
-
-            @Override
-			public void mouseReleased( MouseEvent e) {
-                checkPopupTrigger( e);
-            }
-
-            @Override
-			public void mouseClicked( MouseEvent e) {
-                if (!(checkPopupTrigger( e) || annotationList.getContextMenu().isVisible())) {
-                    int tooltipButtonMask;
-                    int selectButtonMask;
-                    if (JGloss.PREFS.getBoolean( Preferences.LEFTCLICK_TOOLTIP, false)) {
-                        // left mouse button shows annotation tooltip,
-                        // all other select the annotation
-                        tooltipButtonMask = InputEvent.BUTTON1_MASK;
-                        selectButtonMask = InputEvent.BUTTON2_MASK | InputEvent.BUTTON3_MASK;
-                    } else {
-                        // left mouse button selects annotation,
-                        // all other show annotation tooltip
-                        tooltipButtonMask = InputEvent.BUTTON2_MASK | InputEvent.BUTTON3_MASK;
-                        selectButtonMask = InputEvent.BUTTON1_MASK;
-                    }
-
-                    if ((e.getModifiers() & selectButtonMask) != 0) {
-                        selectAnnotationUnderMouse(e);
-                    } else if (!tooltips && (e.getModifiers() & tooltipButtonMask)!=0) {
-                        //    showToolTip( ((AnnotationModel) annotationEditor.getModel())
-                        //                 .getAnnotationText( viewToModel( e.getPoint())),
-                        //                 e.getPoint());
-                    }
-                }
-            }
-            
-            private boolean checkPopupTrigger( MouseEvent e) {
-            	if (e.isPopupTrigger()) {
-            		selectAnnotationUnderMouse(e);
-            		annotationList.showContextMenu( JGlossEditor.this, e.getX(), e.getY());
-            		return true;
-            	}
-            	return false;
-            }
-
-			private void selectAnnotationUnderMouse(MouseEvent e) {
-	            int pos = viewToModel( e.getPoint());
-	            int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex( pos, Bias.NONE);
-
-	            if (annoIndex >= 0) {
-	                // Selecting the annotation in the AnnotationList also selects it in the Editor
-
-	                annotationList.setSelectedIndex( annoIndex);
-	                // transfer input focus to annotation list to enable keyboard
-	                // navigation
-	                annotationList.requestFocus();
-	            } else {
-	                annotationList.clearSelection();
-	            }
-            }
-
-            @Override
-			public void mouseEntered( MouseEvent e) {
-                inComponent = true;
-            }
-
-            @Override
-			public void mouseExited( MouseEvent e) {
-                inComponent = false;
-                hideToolTip();
-            }
-        };
-        addMouseListener( mouseListener);
-
-        tooltip = new JTextArea();
-        JToolTip tt = createToolTip();
-        tooltip.setEditable( false);
-        tooltip.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2));
-        tooltip.setBackground( tt.getBackground());
-        tooltip.setForeground( tt.getForeground());
-        tt.setComponent( null); // remove reference to this (which prevents garbage collection)
+        selectAnnotationListener = new SelectAnnotationListener();
+        addMouseListener( selectAnnotationListener);
 
         // update display if user changed font
         fontChangeListener = new PropertyChangeListener() {
@@ -420,6 +410,21 @@ public class JGlossEditor extends JTextPane {
         }
     }
 
+    private int findAnnotationUnderMouse(Point cursorLocation) {
+        int pos = viewToModel( cursorLocation);
+        int annoIndex = annotationList.getAnnotationListModel().findAnnotationIndex( pos, Bias.NONE);
+        return annoIndex;
+    }
+
+	private void showAnnotationTooltip(Point cursorLocation) {
+        int annoIndex = findAnnotationUnderMouse(cursorLocation);
+        
+        if (annoIndex >= 0) {
+        	String annotationText = annotationList.getAnnotationListModel().getAnnotation(annoIndex).toString();
+			showTooltip("<html><body>" + annotationText.replaceAll("\n", "<br>") + "</body></html>", cursorLocation);
+        }
+    }
+    
     /**
      * Shows a tooltip with the specified tip at the given location. If the mouse pointer
      * is not over the JGlossEditor component, the tooltip will not be shown.
@@ -428,23 +433,14 @@ public class JGlossEditor extends JTextPane {
      * @param where Coordinate for the tooltip in the JGlossEditor coordinate system. The
      *              location will be adapted if the tooltip does not fit on the screen.
      */
-    private void showToolTip( String text, Point where) {
+    private void showTooltip( String text, Point where) {
         if (!inComponent || text==null || text.length()==0) {
             hideToolTip();
             return;
         }
 
         if (tooltipWindow==null && getTopLevelAncestor()!=null) {
-            tooltipWindow = new JWindow( (Frame) getTopLevelAncestor()) {
-                private static final long serialVersionUID = 1L;
-
-				@Override
-				public void setVisible(boolean visible) {
-                    super.setVisible(visible);
-                    // work around bug in interaction with the KDE2 window manager:
-                    this.removeNotify();
-                }
-            };
+            tooltipWindow = new JWindow( (Frame) getTopLevelAncestor());
             tooltipWindow.getContentPane().setLayout( new GridLayout( 1, 1));
             tooltipWindow.getContentPane().add( tooltip);
         }
@@ -454,7 +450,7 @@ public class JGlossEditor extends JTextPane {
             where.x += screen.x + 15;
             where.y += screen.y + 15;
 
-            tooltip.setText( text);
+            tooltip.setTipText(text);
             Dimension windowsize = tooltip.getPreferredSize();
             Dimension screensize = getToolkit().getScreenSize();
 
@@ -534,8 +530,8 @@ public class JGlossEditor extends JTextPane {
      */
     public void dispose() {
         UIManager.getDefaults().removePropertyChangeListener( fontChangeListener);
-        removeMouseMotionListener(mouseFollower);
-        mouseFollower.stopTimer();
+        removeMouseMotionListener(showTooltipForAnnotationUnderMouse);
+        showTooltipForAnnotationUnderMouse.stopTimer();
         removeKeymap( KEYMAP_TAB);
     }
 } // class JEditorPane
