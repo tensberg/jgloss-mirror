@@ -296,6 +296,7 @@ public class ImportDialog extends JDialog implements TextListener {
         this.pack();
         this.setResizable( false);
         pastearea.setVisible( false);
+        setLocationRelativeTo(parent);
     }
 
     /**

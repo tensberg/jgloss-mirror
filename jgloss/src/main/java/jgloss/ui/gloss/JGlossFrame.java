@@ -319,7 +319,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         frame = new JFrame( JGloss.MESSAGES.getString( "main.title"));
         frame.setIconImages(JGlossLogo.ALL_LOGO_SIZES);
         frame.getContentPane().setBackground( Color.white);
-        frame.getContentPane().setLayout( new GridLayout( 1, 1));
+        frame.getContentPane().setLayout( new GridLayout(1, 1));
         frame.setLocation( JGloss.PREFS.getInt( Preferences.FRAME_X, 0),
                            JGloss.PREFS.getInt( Preferences.FRAME_Y, 0));
         frame.setSize( JGloss.PREFS.getInt( Preferences.FRAME_WIDTH, frame.getPreferredSize().width),
@@ -355,6 +355,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         initActions();
 
         DocumentActions documentActions = new DocumentActions(this);
+        frame.getContentPane().add(new EmptyDocumentActionsPanel(documentActions));
         
         frame.addWindowListener( documentActions.importClipboardListener);
 

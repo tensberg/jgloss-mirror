@@ -16,6 +16,8 @@
             <action type="update" due-to="Andreas Winter">Don't change current selection on mouseclick in empty screen area.</action>
             <action type="add" due-to="Andreas Winter">View is automatically scrolled to show selected annotation.</action>
             <action type="add" due-to="Andreas Winter">Show progress bar on import.</action>
+            <action type="add">An empty JGloss document now shows a panel with the most imporant
+actions.</action>
         </release>
         <release version="2.0 Alpha 3" date="2004-06-06">
             <action type="add">Support for UTF-8 encoded KANJIDIC dictionary files.</action>
