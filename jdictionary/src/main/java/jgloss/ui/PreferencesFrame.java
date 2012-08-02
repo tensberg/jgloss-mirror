@@ -177,6 +177,7 @@ public class PreferencesFrame {
         
         frame.pack();
         frame.setResizable( false);
+        frame.setLocationRelativeTo(null);
     }
 
     /**
