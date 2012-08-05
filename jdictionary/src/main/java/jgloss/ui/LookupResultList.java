@@ -23,10 +23,8 @@
 
 package jgloss.ui;
 
-import static jgloss.ui.DictionaryEntryFormat.DecorationPosition.POSITION_BEFORE;
-import static jgloss.ui.DictionaryEntryFormat.DecorationType.READING;
-import static jgloss.ui.DictionaryEntryFormat.DecorationType.TRANSLATION_SYN;
-import static jgloss.ui.DictionaryEntryFormat.DecorationType.WORD;
+
+import static java.util.logging.Level.SEVERE;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -35,9 +33,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,11 +43,9 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.StyleSheet;
 
@@ -62,214 +56,69 @@ import jgloss.dictionary.DictionaryEntry;
 import jgloss.dictionary.DictionaryEntryFormatter;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.UnsupportedSearchModeException;
-import jgloss.dictionary.attribute.Attribute;
-import jgloss.dictionary.attribute.AttributeFormatter;
-import jgloss.dictionary.attribute.Attributes;
-import jgloss.dictionary.attribute.ReferenceAttributeValue;
-import jgloss.ui.DictionaryEntryFormat.DecorationPosition;
-import jgloss.ui.DictionaryEntryFormat.DecorationType;
 import jgloss.ui.util.XCVManager;
-import jgloss.util.ListFormatter;
 
 public class LookupResultList extends JPanel implements LookupResultHandler {
 	private static final Logger LOGGER = Logger.getLogger(LookupResultList.class.getPackage().getName());
 	
 	private static final long serialVersionUID = 1L;
 
-	private static class Marker implements DictionaryEntryFormat.Decorator {
-        private final MarkerListFormatter.Group markerGroup = 
-            new MarkerListFormatter.Group( "<font color=\"blue\">", "</font>");
-        private final DictionaryEntryFormat.Decorator child;
+	private static final String DEFAULT_STYLE_SHEET = "/data/lookup.css";
 
-        private Marker( DictionaryEntryFormat.Decorator _child) {
-            child = _child;
-        }
-
-        @Override
-		public ListFormatter decorateList( ListFormatter formatter, DecorationType type) {
-            if (type==WORD || type==READING || type==TRANSLATION_SYN) {
-                formatter = new MarkerListFormatter( markerGroup, formatter);
-            }
-
-            if (child != null) {
-	            formatter = child.decorateList( formatter, type);
-            }
-
-            return formatter;
-        }
-
-        @Override
-		public ListFormatter decorateList( ListFormatter formatter, Attribute<?> type,
-						DecorationPosition position) {
-            if (type == Attributes.EXPLANATION) {
-	            formatter = new MarkerListFormatter( markerGroup, formatter);
-            }
-
-            if (child != null) {
-	            formatter = child.decorateList( formatter, type, position);
-            }
-            
-            return formatter;
-        }
-
-        @Override
-		public AttributeFormatter decorateAttribute( AttributeFormatter formatter, Attribute<?> type,
-						DecorationPosition position) {
-            if (child != null) {
-	            formatter = child.decorateAttribute( formatter, type, position);
-            }
-
-            return formatter;
-        }
-
-        public void setMarkedText( String text) {
-            markerGroup.setMarkedText( text);
-        }
-    } // class Marker
-
-    public static class Hyperlinker extends DictionaryEntryFormat.IdentityDecorator {
-        public static final String WORD_PROTOCOL = "wo";
-        public static final String READING_PROTOCOL = "re";
-        public static final String TRANSLATION_PROTOCOL = "tr";
-        public static final String REFERENCE_PROTOCOL = "ref";
-        public static final String ATTRIBUTE_BEFORE_PROTOCOL = "atb";
-        public static final String ATTRIBUTE_AFTER_PROTOCOL = "ata";
-
-        private final boolean words;
-        private final boolean readings;
-        private final boolean translations;
-        private final boolean references;
-        private final boolean allAttributes;
-
-        private final Map<String, Object> hyperrefs;
-
-        public Hyperlinker() {
-            this( false, false, false, true, false);
-        }
-
-        public Hyperlinker( boolean _words, boolean _readings, boolean _translations,
-                            boolean _references, boolean _allAttributes) {
-            words = _words;
-            readings = _readings;
-            translations = _translations;
-            references = _references | _allAttributes;
-            allAttributes = _allAttributes;
-
-            hyperrefs = new HashMap<String, Object>();
-        }
-
-        @Override
-		public ListFormatter decorateList( ListFormatter formatter, DecorationType type) {
-            if (words && type==WORD) {
-	            formatter = new HyperlinkListFormatter( WORD_PROTOCOL, hyperrefs, formatter);
-            } else if (readings && type==READING) {
-	            formatter = new HyperlinkListFormatter( READING_PROTOCOL, hyperrefs, formatter);
-            } else if (translations && type==TRANSLATION_SYN) {
-	            formatter = new HyperlinkListFormatter( TRANSLATION_PROTOCOL, hyperrefs, formatter);
-            }
-
-            return formatter;
-        }
-
-        @Override
-		public AttributeFormatter decorateAttribute( AttributeFormatter formatter,
-                                                     Attribute<?> type, DecorationPosition position) {
-            if (references && type.canHaveValue() && 
-                ReferenceAttributeValue.class.isAssignableFrom
-                ( type.getAttributeValueClass())) {
-                formatter = new HyperlinkAttributeFormatter( REFERENCE_PROTOCOL,
-                                                             true, hyperrefs, formatter);
-            }
-            else if (allAttributes) {
-                formatter = new HyperlinkAttributeFormatter( (position==POSITION_BEFORE) ? 
-                                                             ATTRIBUTE_BEFORE_PROTOCOL :
-                                                             ATTRIBUTE_AFTER_PROTOCOL,
-                                                             true, hyperrefs, formatter);
-            }
-            
-            return formatter;
-        }
-
-        public Object getReference( String key) {
-            return hyperrefs.get( key);
-        }
-
-        public void clearReferences() {
-            hyperrefs.clear();
-        }
-    } // class Hyperlinker
-
-    protected final static String DEFAULT_STYLE_SHEET = "/data/lookup.css";
-
+	private static final int MAX_RESULT_BUFFER_SIZE = 10;
+	
     /**
      * Text field used to display the result as HTML text.
      */
-    protected JEditorPane resultFancy;
-    /**
-     * Text field used to display the result as plain text, if the result list becomes too
-     * long for fast HTML rendering.
-     */
-    protected JTextArea resultPlain;
-    protected JScrollPane resultScroller;
+    private final JEditorPane resultPane;
+    private final JScrollPane resultScroller;
 
-    protected int fancyLimit;
-    protected boolean showAllDictionaries;
+    private final int entryLimit;
+    private final boolean showAllDictionaries;
 
-    protected DictionaryEntryFormatter plainFormatter;
-    protected DictionaryEntryFormatter htmlFormatter;
-    protected Marker marker;
-    protected Hyperlinker hyperlinker;
+    private final DictionaryEntryFormatter htmlFormatter;
+    private final LookupResultMarker marker;
+    private final LookupResultHyperlinker hyperlinker;
     
-    protected boolean multipleDictionaries;
-    protected List<Object> resultBuffer;
-    protected StringBuilder resultTextBuffer = new StringBuilder( 8192);
-    protected int entriesInTextBuffer;
-    protected int dictionaryEntries;
-    protected String previousDictionaryName;
-    protected boolean previousDictionaryHasMatch;
-    protected JLabel status;
-    protected String searchExpression;
-    protected int entryCount;
-
-    protected final static int BUFFER_LIMIT = 500;
+    private boolean multipleDictionaries;
+    private final List<Object> resultBuffer = new ArrayList<Object>(MAX_RESULT_BUFFER_SIZE);
+    private final StringBuilder resultTextBuffer = new StringBuilder( 8192);
+    private int dictionaryEntries;
+    private String previousDictionaryName;
+    private boolean previousDictionaryHasMatch;
+    private final JLabel status;
+    private String searchExpression;
+    private int entryCount;
 
     public LookupResultList() {
-        this( 300);
+        this( 500);
     }
 
-    public LookupResultList( int _fancyLimit) {
-        this( _fancyLimit, null, true, new Hyperlinker());
+    public LookupResultList( int _entryLimit) {
+        this( _entryLimit, null, true, new LookupResultHyperlinker());
     }
 
-    public LookupResultList( int _fancyLimit, URL _styleSheet, boolean _showAllDictionaries,
-                             Hyperlinker _hyperlinker) {
+    public LookupResultList( int _entryLimit, URL _styleSheet, boolean _showAllDictionaries,
+                             LookupResultHyperlinker _hyperlinker) {
         setLayout( new BorderLayout());
 
-        fancyLimit = _fancyLimit;
+        entryLimit = _entryLimit;
         showAllDictionaries = _showAllDictionaries;
         if (_styleSheet == null) {
 	        _styleSheet = LookupResultList.class.getResource( DEFAULT_STYLE_SHEET);
         }
         hyperlinker = _hyperlinker;
 
-        resultFancy = new JEditorPane();
-        resultFancy.setContentType( "text/html");
-        resultFancy.setEditable( false);
+        resultPane = new JEditorPane();
+        resultPane.setContentType( "text/html");
+        resultPane.setEditable( false);
         
-        StyleSheet styleSheet = ((HTMLDocument) resultFancy.getDocument()).getStyleSheet();
+        StyleSheet styleSheet = ((HTMLDocument) resultPane.getDocument()).getStyleSheet();
         styleSheet.importStyleSheet( _styleSheet);
         styleSheet.addRule
             ( "body { font-family: '" + JGloss.PREFS.getString( Preferences.FONT_WORDLOOKUP) +
               "'; font-size: " + JGloss.PREFS.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12) + 
               "pt; }\n");
-
-        resultPlain = new JTextArea();
-        resultPlain.setFont( new Font( JGloss.PREFS.getString( Preferences.FONT_WORDLOOKUP),
-                                       Font.PLAIN, 
-                                       JGloss.PREFS.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12)));
-        resultPlain.setEditable( false);
-        resultPlain.setLineWrap( true);
-        resultPlain.setWrapStyleWord( true);
 
         Action transferFocus = new AbstractAction() {
                 private static final long serialVersionUID = 1L;
@@ -279,9 +128,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                     transferFocus();
                 }
             };
-        resultFancy.getKeymap().addActionForKeyStroke
-            ( KeyStroke.getKeyStroke( "pressed TAB"), transferFocus);
-        resultPlain.getKeymap().addActionForKeyStroke
+        resultPane.getKeymap().addActionForKeyStroke
             ( KeyStroke.getKeyStroke( "pressed TAB"), transferFocus);
 
         // update display if user changed font
@@ -293,38 +140,35 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                         String fontname = JGloss.PREFS.getString( Preferences.FONT_WORDLOOKUP);
                         int size = JGloss.PREFS.getInt( Preferences.FONT_WORDLOOKUP_SIZE, 12);
                         Font font = new Font( fontname, Font.PLAIN, size);
-                        ((HTMLDocument) resultFancy.getDocument()).getStyleSheet().addRule
+                        ((HTMLDocument) resultPane.getDocument()).getStyleSheet().addRule
                             ( "body { font-family: '" + fontname +
                               "'; font-size: " + size +
                               "pt; }\n");
-                        resultFancy.setFont( font);
-                        resultPlain.setFont( font);
+                        resultPane.setFont( font);
                     }
                 }
             });
 
-        resultScroller = new JScrollPane( resultFancy, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+        resultScroller = new JScrollPane( resultPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                                           ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add( resultScroller, BorderLayout.CENTER);
         status = new JLabel( " ");
         this.add( status, BorderLayout.SOUTH);
 
-        marker = new Marker( hyperlinker);
+        marker = new LookupResultMarker( hyperlinker);
         htmlFormatter = DictionaryEntryFormat.createFormatter( marker);
-        plainFormatter = DictionaryEntryFormat.createFormatter();
     }
 
     public void addHyperlinkListener( HyperlinkListener listener) {
-        resultFancy.addHyperlinkListener( listener);
+        resultPane.addHyperlinkListener( listener);
     }
 
     public void removeHyperlinkListener( HyperlinkListener listener) {
-        resultFancy.removeHyperlinkListener( listener);
+        resultPane.removeHyperlinkListener( listener);
     }
 
     public void addToXCVManager( XCVManager manager) {
-        manager.addManagedComponent( resultFancy);
-        manager.addManagedComponent( resultPlain);
+        manager.addManagedComponent( resultPane);
     }
 
     public int getEntryCount() { return entryCount; }
@@ -348,86 +192,55 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     }
 
     private void startLookup() {
+    	resultPane.setText("");
         marker.setMarkedText( searchExpression);
         hyperlinker.clearReferences();
         previousDictionaryName = null;
         previousDictionaryHasMatch = true;
         dictionaryEntries = 0;
-        entriesInTextBuffer = 0;
-        resultBuffer = new ArrayList<Object>( fancyLimit);
         entryCount = 0;
     }
 
     @Override
 	public void dictionary( Dictionary d) {
-        if (!addToResultBuffer( d)) {
-	        formatNow( d);
-        }
+        addToResultBuffer( d);
     }
 
     @Override
 	public void dictionaryEntry( DictionaryEntry de) {
-        if (!addToResultBuffer( de)) {
-	        formatNow( de);
-        }
-
-        entryCount++;
+    	entryCount++;
+    	if (entryCount <= entryLimit) {
+    		addToResultBuffer( de);
+    	}
     }
 
     @Override
 	public void exception( SearchException ex) {
-        if (!addToResultBuffer( ex)) {
-	        formatNow( ex);
-        }
+        addToResultBuffer( ex);
     }
 
     @Override
 	public void note( String note) {
-        if (!addToResultBuffer( note)) {
-	        formatNow( note);
-        }
+        addToResultBuffer( note);
     }
 
-    protected boolean addToResultBuffer( Object o) {
-        if (resultBuffer == null) {
-	        return false;
-        }
-
+    private void addToResultBuffer( Object o) {
         resultBuffer.add( o);
-        if (resultBuffer.size() == fancyLimit) {
-	        flushBuffer( false);
+        if (resultBuffer.size() == MAX_RESULT_BUFFER_SIZE) {
+	        flushBuffer();
+	        updateStatusText();
         }
-        return true;
     }
 
-    protected void formatNow( Object o) {
-        if (o instanceof Dictionary) {
-	        format( (Dictionary) o, false);
-        } else if (o instanceof DictionaryEntry) {
-	        format( (DictionaryEntry) o, false);
-        } else if (o instanceof SearchException) {
-	        format( (SearchException) o, false);
-        } else {
-	        format( String.valueOf( o), false);
-        }
-        if (++entriesInTextBuffer > BUFFER_LIMIT) {
-	        flushTextBuffer();
-        }
-    }   
-
-    protected void format( Dictionary d, boolean fancy) {
+    private void format( Dictionary d) {
         if (showAllDictionaries && !previousDictionaryHasMatch) {
             // No match in the previous dictionary. Print the dictionary name
             // and a comment.
 
-            formatDictionaryName( previousDictionaryName, fancy);
-            if (fancy) {
-	            resultTextBuffer.append( "<p>");
-            }
+            formatDictionaryName( previousDictionaryName);
+            resultTextBuffer.append( "<p>");
             resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.nomatches_dictionary"));
-            if (fancy) {
-	            resultTextBuffer.append( "</p>");
-            }
+            resultTextBuffer.append( "</p>");
             resultTextBuffer.append( "\n\n");
         }
 
@@ -435,49 +248,38 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         previousDictionaryHasMatch = false;
     }
 
-    protected void formatDictionaryName( String name, boolean fancy) {
-        if (fancy) {
-            resultTextBuffer.append( "<h4>");
-            resultTextBuffer.append
-                ( JGloss.MESSAGES.getString( "wordlookup.matches", "<font color=\"green\">" +
-                                                            name + "</font>"));
-            resultTextBuffer.append( "</h4>");
-        }
-        else {
-            resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.matches", name));
-        }
+    private void formatDictionaryName( String name) {
+    	resultTextBuffer.append( "<h4>");
+    	resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.matches", "<font color=\"green\">" +
+    					name + "</font>"));
+    	resultTextBuffer.append( "</h4>");
         resultTextBuffer.append( "\n\n");
     }
 
-    protected void format( DictionaryEntry de, boolean fancy) {
+    private void format( DictionaryEntry de) {
         if (previousDictionaryName != null) {
             // First entry for this dictionary. Print the dictionary name
             // if multi-dictionary mode is active.
             if (multipleDictionaries) {
-	            formatDictionaryName( previousDictionaryName, fancy);
+	            formatDictionaryName( previousDictionaryName);
             }
             previousDictionaryName = null;
         }
 
         previousDictionaryHasMatch = true;
-        if (fancy) {
-            resultTextBuffer.append( "<p>");
-            htmlFormatter.format( de, resultTextBuffer);
-            resultTextBuffer.append( "</p>");
-        } else {
-	        plainFormatter.format( de, resultTextBuffer);
-        }
+
+        resultTextBuffer.append( "<p>");
+        htmlFormatter.format( de, resultTextBuffer);
+        resultTextBuffer.append( "</p>");
 
         resultTextBuffer.append( "\n\n");
         dictionaryEntries++;
     }
 
-    protected void format( SearchException ex, boolean fancy) {
+    private void format( SearchException ex) {
         LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         
-        if (fancy) {
-	        resultTextBuffer.append( "<p><font color=\"red\">");
-        }
+        resultTextBuffer.append( "<p><font color=\"red\">");
         if (ex instanceof UnsupportedSearchModeException) {
             resultTextBuffer.append( JGloss.MESSAGES.getString( "wordlookup.unsupportedsearchmode"));
         }
@@ -487,108 +289,78 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
                                              new Object[] { ex.getClass().getName(),
                                                             ex.getLocalizedMessage() }));
         }
-        if (fancy) {
-	        resultTextBuffer.append( "</font></p>");
-        }
+        resultTextBuffer.append( "</font></p>");
         resultTextBuffer.append( "\n\n");
     }
 
-    protected void format( String note, boolean fancy) {
-        if (fancy) {
-	        resultTextBuffer.append( "<p><i>");
-        }
-        resultTextBuffer.append( note);
-        if (fancy) {
-	        resultTextBuffer.append( "</i></p>");
-        }
-        resultTextBuffer.append( "\n\n");
+    private void format( String note) {
+    	resultTextBuffer.append( "<p><i>");
+    	resultTextBuffer.append( note);
+    	resultTextBuffer.append( "</i></p>");
+    	resultTextBuffer.append( "\n\n");
     }
 
     @Override
 	public void endLookup() {
-        if (resultBuffer != null) {
-	        flushBuffer( true);
-        } else {
-	        flushTextBuffer();
-        }
-        updateStatusText( JGloss.MESSAGES.getString( "wordlookup.status.matches",
-                                                     new Object[] { Integer.valueOf( dictionaryEntries) }));
+    	flushBuffer();
+        updateStatusText(false);
     }
 
-    protected void flushBuffer( final boolean fancy) {
+    private void updateStatusText() {
+    	updateStatusText(true);
+    }
+    
+	private void updateStatusText(boolean performingLookup) {
+		String key = performingLookup ? "wordlookup.status.searching" : "wordlookup.status.matches";
+	    String message = JGloss.MESSAGES.getString( key, Integer.valueOf( entryCount));
+	    if (entryCount > entryLimit) {
+	    	message += " " + JGloss.MESSAGES.getString("wordlookup.status.limit", Integer.valueOf(entryLimit));
+	    }
+		updateStatusText( message);
+    }
+
+    private void flushBuffer() {
+    	assert EventQueue.isDispatchThread();
+    	
         for (Object o : resultBuffer) {
             if (o instanceof Dictionary) {
-	            format( (Dictionary) o, fancy);
+	            format( (Dictionary) o);
             } else if (o instanceof DictionaryEntry) {
-	            format( (DictionaryEntry) o, fancy);
+	            format( (DictionaryEntry) o);
             } else if (o instanceof SearchException) {
-	            format( (SearchException) o, fancy);
+	            format( (SearchException) o);
             } else {
-	            format( String.valueOf( o), fancy);
+	            format( String.valueOf( o));
             }
         }
-        resultBuffer = null;
+        resultBuffer.clear();
 
-        if (fancy) {
-            // build complete html structure
-            resultTextBuffer.insert( 0, "<html><head></head><body>");
-            resultTextBuffer.append( "</body></html>");
-        }
+        // build complete html structure
+        resultTextBuffer.insert( 0, "<html><head></head><body id=\"body\">");
+        resultTextBuffer.append( "</body></html>");
 
-        final JTextComponent target = fancy ? (JTextComponent) resultFancy : 
-            (JTextComponent) resultPlain;
-
-        if (resultScroller.getViewport().getView() != target) {
-            Runnable updater = new Runnable() {
-                    @Override
-					public void run() {
-                        resultScroller.setViewportView( target);
-                    }
-                };
-            
-            if (EventQueue.isDispatchThread()) {
-	            updater.run();
-            } else {
-	            try {
-	                EventQueue.invokeAndWait( updater);
-	            } catch (Exception ex) {}
-            }
-
-            // preserve memory by deleting the old text from the unused view
-            // setText is thread-safe
-            if (fancy) {
-	            resultPlain.setText( "");
-            } else {
-	            resultFancy.setText( "");
-            }
-        }
-
-        target.setText( resultTextBuffer.toString());
-        resultTextBuffer.setLength( 0);
-    }
-
-    protected void flushTextBuffer() {
-        resultPlain.append( resultTextBuffer.toString());
-        resultTextBuffer.setLength( 0);
-        entriesInTextBuffer = 0;
-        updateStatusText( JGloss.MESSAGES.getString( "wordlookup.status.searching",
-                                                     new Object[] { Integer.valueOf( dictionaryEntries) }));
-    }
-
-    protected void updateStatusText( final String text) {
-        Runnable updater = new Runnable() {
-                @Override
-				public void run() {
-                    status.setText( text);
-                }
-            };
-        if (EventQueue.isDispatchThread()) {
-	        updater.run();
+        HTMLDocument document = (HTMLDocument) resultPane.getDocument();
+        if (document.getLength() == 0) {
+        	resultPane.setText(resultTextBuffer.toString());
         } else {
-	        EventQueue.invokeLater( updater);
+        	try {
+        		document.insertBeforeEnd(document.getElement("body"), resultTextBuffer.toString());
+        	} catch (Exception ex) {
+        		LOGGER.log(SEVERE, "failed to append search result", ex);
+        	}
         }
+        resultTextBuffer.setLength( 0);
     }
 
+    private void updateStatusText( final String text) {
+    	assert EventQueue.isDispatchThread();
+    	
+    	status.setText( text);
+    }
+
+    /**
+     * Stores the scroll pane position of the lookup result list.
+     */
     public static class ViewState {
         private final Point resultScrollerPosition;
 
@@ -608,14 +380,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     /**
      * Return the editor pane which is used to display the result list marked up as HTML.
      */
-    public JEditorPane getFancyResultPane() {
-        return resultFancy;
-    }
-
-    /**
-     * Return the editor pane which is used to display the result list marked up as plain text.
-     */
-    public JTextArea getPlainResultPane() {
-        return resultPlain;
+    public JEditorPane getResultPane() {
+        return resultPane;
     }
 } // class LookupResultList

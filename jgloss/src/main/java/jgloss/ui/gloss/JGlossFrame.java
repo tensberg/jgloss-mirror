@@ -98,7 +98,7 @@ import jgloss.ui.FirstEntryCache;
 import jgloss.ui.JGlossLogo;
 import jgloss.ui.KeystrokeForwarder;
 import jgloss.ui.LookupFrame;
-import jgloss.ui.LookupResultList;
+import jgloss.ui.LookupResultHyperlinker;
 import jgloss.ui.OpenRecentMenu;
 import jgloss.ui.PreferencesFrame;
 import jgloss.ui.SaveFileChooser;
@@ -197,7 +197,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     private AnnotationEditorPanel annotationEditor;
     private SimpleLookup lookupPanel;
     private JSplitPane[] splitPanes;
-    private final LookupResultList.Hyperlinker hyperlinker;
+    private final LookupResultHyperlinker hyperlinker;
     /**
      * Remembers the first dictionary entry shown in the result list of the lookup panel.
      * This is used when a new annotation is created to automatically set the reading and
@@ -374,7 +374,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         docpane.addCaretListener( this);
         new SelectedAnnotationHighlighter(annotationList, docpane);
         xcvManager.addManagedComponent( docpane);
-        hyperlinker = new LookupResultList.Hyperlinker
+        hyperlinker = new LookupResultHyperlinker
             ( true, true, true, true, true);
         lookupPanel = new SimpleLookup( new Component[] { new JButton( addAnnotationAction) },
                                         hyperlinker);
@@ -403,12 +403,11 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         KeystrokeForwarder forwarder = new KeystrokeForwarder();
         docpane.addKeyListener(forwarder);
         forwarder.addTarget(annotationList);
-        forwarder.addTarget(lookupPanel.getLookupResultList().getFancyResultPane());
+        forwarder.addTarget(lookupPanel.getLookupResultList().getResultPane());
         // Disable focusability (and thereby tab traversal) for annotation list and
         // result list. They receive their keyboard events via forwarding.
         annotationList.setFocusable(false);
-        lookupPanel.getLookupResultList().getFancyResultPane().setFocusable(false);
-        lookupPanel.getLookupResultList().getPlainResultPane().setFocusable(false);
+        lookupPanel.getLookupResultList().getResultPane().setFocusable(false);
         // Disable focusability of some more components
         annotationEditorScroller.getHorizontalScrollBar().setFocusable(false);
         annotationListScroller.getHorizontalScrollBar().setFocusable(false);
@@ -884,13 +883,13 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                                             e.getEndOffset()-e.getStartOffset());
         } catch (BadLocationException ex) {}
 
-        if (protocol.equals( LookupResultList.Hyperlinker.WORD_PROTOCOL)) {
+        if (protocol.equals( LookupResultHyperlinker.WORD_PROTOCOL)) {
 	        anno.setDictionaryForm( text);
-        } else if (protocol.equals( LookupResultList.Hyperlinker.READING_PROTOCOL)) {
+        } else if (protocol.equals( LookupResultHyperlinker.READING_PROTOCOL)) {
             anno.setDictionaryFormReading( text);
             anno.setReading( text);
         }
-        else if (protocol.equals( LookupResultList.Hyperlinker.TRANSLATION_PROTOCOL)) {
+        else if (protocol.equals( LookupResultHyperlinker.TRANSLATION_PROTOCOL)) {
 	        anno.setTranslation( text);
         }
     }

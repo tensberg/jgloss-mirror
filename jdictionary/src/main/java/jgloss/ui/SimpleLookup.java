@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -94,14 +95,14 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
     
     private static final String STYLE_SHEET = "/data/lookup-minimal.css";
     
-    private final AutoSearchComboBox expression;
+    private final JTextField expression;
     private final LookupModel model;
     
     private final AsynchronousLookupEngine engine;
     private final LookupResultProxy lookupResultProxy;
     private final LookupResultList list;
     
-    public SimpleLookup( Component[] additionalControls, LookupResultList.Hyperlinker hyperlinker) {
+    public SimpleLookup( Component[] additionalControls, LookupResultHyperlinker hyperlinker) {
         model = new LookupModel
             ( Arrays.asList( new SearchMode[] { ExpressionSearchModes.EXACT,
                                             ExpressionSearchModes.PREFIX,
@@ -130,7 +131,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         expandableC.fill = GridBagConstraints.HORIZONTAL;
         expandableC.weightx = 1.0f;
 
-        expression = new AutoSearchComboBox( model, 50);
+        expression = new JTextField();
         JLabel expressionDescription = 
             new JLabel( JGloss.MESSAGES.getString( "wordlookup.enterexpression"));
         expressionDescription.setDisplayedMnemonic
@@ -138,6 +139,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         expressionDescription.setLabelFor( expression);
         controls.add( expressionDescription, fixedC);
         controls.add( expression, expandableC);
+        expression.addActionListener(this);
 
         JButton search = new JButton();
         UIUtilities.initButton( search, "wordlookup.search");
@@ -158,7 +160,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         new HyperlinkKeyNavigator(new Color
                                   (Math.max(0, JGloss.PREFS.getInt
                                             (Preferences.ANNOTATION_HIGHLIGHT_COLOR, 0xcccccc))))
-            .setTargetEditor(list.getFancyResultPane());
+            .setTargetEditor(list.getResultPane());
 
         this.add( list, BorderLayout.CENTER);
         lookupResultProxy = new LookupResultProxy(list);
@@ -174,7 +176,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 	        return;
         }
 
-        expression.setSelectedItem( text);
+        expression.setText( text);
 
         final LookupModel modelClone = model.clone();
         modelClone.setSearchExpression( text);
@@ -214,7 +216,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 
     @Override
 	public void actionPerformed( ActionEvent e) {
-        search( expression.getSelectedItem().toString());
+        search( expression.getText());
     }
 
     @Override
@@ -235,7 +237,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
     }
 
     protected void followReference( String type, String refKey) {
-        if (LookupResultList.Hyperlinker.REFERENCE_PROTOCOL.equals( type)) {
+        if (LookupResultHyperlinker.REFERENCE_PROTOCOL.equals( type)) {
             ReferenceAttributeValue ref = (ReferenceAttributeValue) 
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
             if (ref != null) {

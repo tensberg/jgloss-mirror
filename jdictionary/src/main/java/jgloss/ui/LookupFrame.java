@@ -44,6 +44,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.Timer;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -62,26 +63,42 @@ import jgloss.ui.util.XCVManager;
  */
 public class LookupFrame extends JFrame implements ActionListener, HyperlinkListener,
                                                    DictionaryListChangeListener {
+	private static class SearchOnModelChangeListener implements LookupChangeListener {
+
+		private final Timer delayedActionTimer;
+		
+		SearchOnModelChangeListener(ActionListener searchActionListener) {
+			delayedActionTimer = new Timer(500, searchActionListener);
+			delayedActionTimer.setRepeats(false);
+		}
+		
+		@Override
+		public void stateChanged(LookupChangeEvent event) {
+			delayedActionTimer.restart();
+		}
+
+	}
+	
 	private static final Logger LOGGER = Logger.getLogger(LookupFrame.class.getPackage().getName());
 	
 	private static final long serialVersionUID = 1L;
     
-	protected LookupConfigPanel config;
-    protected LookupModel model;
-    protected AsynchronousLookupEngine engine;
-    protected LookupResultList list;
-    protected LookupResultCache currentResults;
+	private final LookupConfigPanel config;
+    private LookupModel model;
+    private final AsynchronousLookupEngine engine;
+    private final LookupResultList list;
+    private LookupResultCache currentResults;
     
-    protected List<HistoryItem> history;
-    protected int historyPosition;
-    protected static final int MAX_HISTORY_SIZE = 20;
-    protected Action historyBackAction;
-    protected Action historyForwardAction;
+    private List<HistoryItem> history;
+    private int historyPosition;
+    private static final int MAX_HISTORY_SIZE = 20;
+    private final Action historyBackAction;
+    private final Action historyForwardAction;
     
-    protected Dimension preferredSize;
+    private final Dimension preferredSize;
 
-    protected JFrame legendFrame;
-    protected AttributeLegend legend;
+    private JFrame legendFrame;
+    private AttributeLegend legend;
 
     public LookupFrame( LookupModel _model) {
         super( JGloss.MESSAGES.getString( "wordlookup.title"));
@@ -93,10 +110,10 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         getContentPane().add( center, BorderLayout.CENTER);
         
         model = _model;
-        config = new LookupConfigPanel( model, this);
         list = new LookupResultList();
         currentResults = new LookupResultCache( list);
         engine = new AsynchronousLookupEngine( currentResults);
+        config = new LookupConfigPanel( model);
 
         config.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2));
         center.add( config, BorderLayout.NORTH);
@@ -106,7 +123,6 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
                        BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
         list.addHyperlinkListener( this);
         center.add( list, BorderLayout.CENTER);
-        getRootPane().setDefaultButton( config.getSearchButton());
 
         // create actions
         /*Action printAction = new AbstractAction() {
@@ -214,6 +230,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         getContentPane().add( toolbar, BorderLayout.NORTH);
 
         setSize( getPreferredSize());
+        
+        model.addLookupChangeListener(new SearchOnModelChangeListener(this));
     }
 
     public void search( String text) {
@@ -281,8 +299,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         }
     }
 
-    protected void followReference( String type, String refKey) {
-        if (LookupResultList.Hyperlinker.REFERENCE_PROTOCOL.equals( type)) {
+    private void followReference( String type, String refKey) {
+        if (LookupResultHyperlinker.REFERENCE_PROTOCOL.equals( type)) {
             ReferenceAttributeValue ref = (ReferenceAttributeValue) 
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
             if (ref != null) {
@@ -323,7 +341,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         }
     }
 
-    protected void historyBack() {
+    private void historyBack() {
         historyPosition--;
         HistoryItem hi = history.get( historyPosition);
 
@@ -336,7 +354,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         showHistoryItem( hi);
     }
 
-    protected void historyForward() {
+    private void historyForward() {
         HistoryItem hi = history.get( historyPosition);
         historyPosition++;
 
@@ -349,7 +367,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         showHistoryItem( hi);
     }
 
-    protected void addToHistory( HistoryItem hi) {
+    private void addToHistory( HistoryItem hi) {
         history.add( historyPosition, hi);
         historyPosition++;
         history = history.subList( 0, historyPosition);
@@ -365,7 +383,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         historyForwardAction.setEnabled( false);
     }
 
-    protected void showHistoryItem( HistoryItem hi) {
+    private void showHistoryItem( HistoryItem hi) {
         model = hi.lookupModel;
         config.setModel( model);
         currentResults = hi.resultCache;
@@ -373,18 +391,18 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         list.restoreViewState( hi.resultState);
     }
 
-    protected HistoryItem createHistoryItem() {
+    private HistoryItem createHistoryItem() {
         return new HistoryItem( model.clone(), 
                                 currentResults.clone(),
                                 list.saveViewState());
     }
 
-    protected static class HistoryItem {
-        private final LookupModel lookupModel;
-        private final LookupResultCache resultCache;
-        private final LookupResultList.ViewState resultState;
+    private static class HistoryItem {
+        final LookupModel lookupModel;
+        final LookupResultCache resultCache;
+        final LookupResultList.ViewState resultState;
 
-        private HistoryItem( LookupModel _lookupModel, LookupResultCache _resultCache,
+        HistoryItem( LookupModel _lookupModel, LookupResultCache _resultCache,
                              LookupResultList.ViewState _resultState) {
             lookupModel = _lookupModel;
             resultCache = _resultCache;

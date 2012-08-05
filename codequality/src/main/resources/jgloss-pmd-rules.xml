@@ -20,6 +20,7 @@
         <exclude name="ExcessiveParameterList" />
         <exclude name="TooManyMethods" />
         <exclude name="CyclomaticComplexity" />
+        <exclude name="NPathComplexity" />
     </rule>
     <rule ref="rulesets/controversial.xml">
         <exclude name="NullAssignment" />

@@ -45,25 +45,37 @@ import jgloss.dictionary.StandardSearchParameter;
  * @author Michael Koch
  */
 public class LookupModel implements Cloneable {
-    protected List<StateWrapper<SearchMode>> searchModes;
+    private static final String PREF_SEARCHMODE = ".searchmode";
+    private static final String PREF_DICTIONARY_SELECTION = ".dictionary_selection";
+    private static final String PREF_ALL_DICTIONARIES_SELECTED = ".all_dictionaries_selected";
+    private static final String PREF_MULTI_DICTIONARY_MODE = ".multi_dictionary_mode";
+    private static final String PREF_FILTER_SELECTION = ".filter_selection";
+    private static final String PREF_SEARCHFIELD_WORD = ".searchfield.word";
+    private static final String PREF_SEARCHFIELD_READING = ".searchfield.reading";
+    private static final String PREF_SEARCHFIELD_TRANSLATION = ".searchfield.translation";
+    private static final String PREF_SEARCHFIELD_MATCH_FIELD = ".searchfield.match_field";
+    private static final String PREF_SEARCHEXPRESSION = ".searchexpression";
+    private static final String PREF_DISTANCE = ".distance";
 
-    protected List<StateWrapper<Dictionary>> dictionaries;
-    protected boolean allDictionariesSelected = false;
-    protected boolean multiDictionaryMode = false;
-    protected boolean multiDictionarySelection = false;
+    private List<StateWrapper<SearchMode>> searchModes;
 
-    protected List<StateWrapper<LookupResultFilter>> filters;
+    private List<StateWrapper<Dictionary>> dictionaries;
+    private boolean allDictionariesSelected = false;
+    private boolean multiDictionaryMode = false;
+    private boolean multiDictionarySelection = false;
 
-    protected SearchFieldSelection searchFields = 
+    private List<StateWrapper<LookupResultFilter>> filters;
+
+    private SearchFieldSelection searchFields = 
         new SearchFieldSelection( true, true, true, true, false);
-    protected SearchFieldSelection searchFieldsEnabled = new SearchFieldSelection();
+    private SearchFieldSelection searchFieldsEnabled = new SearchFieldSelection();
 
-    protected String searchExpression = "";
-    protected boolean searchExpressionEnabled = false;
-    protected int distance = 1;
-    protected boolean distanceEnabled = false;
+    private String searchExpression = "";
+    private boolean searchExpressionEnabled = false;
+    private int distance = 1;
+    private boolean distanceEnabled = false;
 
-    protected final List<LookupChangeListener> listeners = new CopyOnWriteArrayList<LookupChangeListener>();
+    private final List<LookupChangeListener> listeners = new CopyOnWriteArrayList<LookupChangeListener>();
 
     public LookupModel( List<SearchMode> _searchModes, List<Dictionary> _dictionaries, List<LookupResultFilter> _filters) {
         searchModes = new ArrayList<StateWrapper<SearchMode>>( _searchModes.size());
@@ -81,7 +93,7 @@ public class LookupModel implements Cloneable {
             filters.add( new StateWrapper<LookupResultFilter>(filter));
         }
         
-        if (dictionaries.size() > 0) {
+        if (!dictionaries.isEmpty()) {
             dictionaries.get( 0).setEnabled( true);
             dictionaries.get( 0).setSelected( true);
             updateSearchModeAvailability();
@@ -159,12 +171,21 @@ public class LookupModel implements Cloneable {
     public boolean isSearchModeEnabled( int index) {
         return searchModes.get( index).isEnabled();
     }
+    
+    public boolean isSearchModeEnabled(SearchMode mode) {
+    	for (StateWrapper<SearchMode> modeWrapper : searchModes) {
+    		if (modeWrapper.getObject().equals(mode)) {
+    			return modeWrapper.isEnabled();
+    		}
+    	}
+    	
+    	throw new IllegalArgumentException("unsupported search mode " + mode);
+    }
 
     public boolean selectSearchMode( SearchMode mode) {
-        for ( ListIterator<StateWrapper<SearchMode>> i=searchModes.listIterator(); i.hasNext(); ) {
-            StateWrapper<SearchMode> wrapper = i.next();
-            if (wrapper.getObject() == mode) {
-                selectSearchMode( i.previousIndex());
+        for (StateWrapper<SearchMode> modeWrapper : searchModes) {
+            if (modeWrapper.getObject().equals(mode)) {
+                selectSearchMode( modeWrapper);
                 return true;
             }
         }
@@ -173,7 +194,11 @@ public class LookupModel implements Cloneable {
 
     public void selectSearchMode( int index) {
         StateWrapper<SearchMode> newModeWrapper = searchModes.get( index);
-        if (newModeWrapper.isSelected()) {
+        selectSearchMode(newModeWrapper);
+    }
+
+	private void selectSearchMode(StateWrapper<SearchMode> newModeWrapper) {
+	    if (newModeWrapper.isSelected()) {
             return; // nothing to do
         }
 
@@ -302,7 +327,7 @@ public class LookupModel implements Cloneable {
             newDictionaryWrappers.add(wrapper);
         }
 
-        boolean selectNewDictionary = dictionaries.size()==0 && newDictionaries.size()>0 && 
+        boolean selectNewDictionary = dictionaries.isEmpty() && !newDictionaries.isEmpty() && 
             !multiDictionarySelection;
         dictionaries = newDictionaryWrappers;
 
@@ -442,9 +467,24 @@ public class LookupModel implements Cloneable {
     public SearchFieldSelection getSearchFields() { return searchFields; }
     public SearchFieldSelection getEnabledSearchFields() { return searchFieldsEnabled; }
 
+	public boolean selectFilter(LookupResultFilter filter, boolean select) {
+	    for (StateWrapper<LookupResultFilter> filterWrapper : filters) {
+	    	if (filterWrapper.getObject().equals(filter)) {
+	    		selectFilter(filterWrapper, select);
+	    		return true;
+	    	}
+	    }
+	    
+	    return false;
+    }
+    
     public void selectFilter( int index, boolean select) {
         StateWrapper<LookupResultFilter> filterWrapper = filters.get( index);
-        if (filterWrapper.isSelected() == select)
+        selectFilter(filterWrapper, select);
+    }
+
+	private void selectFilter(StateWrapper<LookupResultFilter> filterWrapper, boolean select) {
+	    if (filterWrapper.isSelected() == select)
 		 {
 	        return; // nothing to do
         }
@@ -462,6 +502,16 @@ public class LookupModel implements Cloneable {
 
     public boolean isFilterEnabled( int index) {
         return filters.get( index).isEnabled();
+    }
+    
+    public boolean isFilterEnabled(LookupResultFilter filter) {
+    	for (StateWrapper<LookupResultFilter> filterWrapper : filters) {
+    		if (filterWrapper.getObject().equals(filter)) {
+    			return filterWrapper.isEnabled();
+    		}
+    	}
+    	
+    	throw new IllegalArgumentException("unsupported filter " + filter);
     }
 
     public LookupResultFilter[] getFilters() {
@@ -506,7 +556,7 @@ public class LookupModel implements Cloneable {
 
     public boolean isDistanceEnabled() { return distanceEnabled; }
     
-    protected boolean updateSearchModeAvailability() {
+    private boolean updateSearchModeAvailability() {
         boolean changed = false;
 
         modes: 
@@ -516,7 +566,7 @@ public class LookupModel implements Cloneable {
                 Dictionary dic = dictionaryWrapper.getObject();
                 if (dictionaryWrapper.isEnabled() && (allDictionariesSelected || dictionaryWrapper.isSelected()) &&
                     !dic.supports( mode, false)) {
-                    if (searchModeWrapper.isEnabled()) {
+                	if (searchModeWrapper.isEnabled()) {
                         searchModeWrapper.setEnabled( false);
                         changed = true;
                     }
@@ -533,7 +583,7 @@ public class LookupModel implements Cloneable {
         return changed;
     }
 
-    protected boolean updateDictionaryAvailability( SearchMode searchmode) {
+    private boolean updateDictionaryAvailability( SearchMode searchmode) {
         boolean changed = false;
 
         for (StateWrapper<Dictionary> wrapper : dictionaries) {
@@ -549,7 +599,7 @@ public class LookupModel implements Cloneable {
         return changed;
     }
 
-    protected boolean updateFilterAvailability() {
+    private boolean updateFilterAvailability() {
         boolean changed = false;
         
         filters: 
@@ -576,7 +626,7 @@ public class LookupModel implements Cloneable {
         return changed;
     }
 
-    protected boolean updateSearchParametersAvailability( SearchMode searchmode) {
+    private boolean updateSearchParametersAvailability( SearchMode searchmode) {
         boolean changed = false;
 
         if (searchmode != null) {
@@ -602,7 +652,7 @@ public class LookupModel implements Cloneable {
         return changed;
     }
 
-    protected boolean updateSearchFieldsAvailability( SearchMode searchmode) {
+    private boolean updateSearchFieldsAvailability( SearchMode searchmode) {
         SearchFieldSelection newEnabled = new SearchFieldSelection( false, false, false,
                                                                     false, false);
 
@@ -634,7 +684,7 @@ public class LookupModel implements Cloneable {
         listeners.remove( listener);
     }
 
-    protected void fireLookupChange( LookupChangeEvent event) {
+    private void fireLookupChange( LookupChangeEvent event) {
         for (LookupChangeListener listener : listeners) {
             listener.stateChanged( event);
         }
@@ -664,18 +714,6 @@ public class LookupModel implements Cloneable {
         }
         return out;
     }
-
-    protected final static String PREF_SEARCHMODE = ".searchmode";
-    protected final static String PREF_DICTIONARY_SELECTION = ".dictionary_selection";
-    protected final static String PREF_ALL_DICTIONARIES_SELECTED = ".all_dictionaries_selected";
-    protected final static String PREF_MULTI_DICTIONARY_MODE = ".multi_dictionary_mode";
-    protected final static String PREF_FILTER_SELECTION = ".filter_selection";
-    protected final static String PREF_SEARCHFIELD_WORD = ".searchfield.word";
-    protected final static String PREF_SEARCHFIELD_READING = ".searchfield.reading";
-    protected final static String PREF_SEARCHFIELD_TRANSLATION = ".searchfield.translation";
-    protected final static String PREF_SEARCHFIELD_MATCH_FIELD = ".searchfield.match_field";
-    protected final static String PREF_SEARCHEXPRESSION = ".searchexpression";
-    protected final static String PREF_DISTANCE = ".distance";
 
     public void saveToPreferences( Preferences prefs, String prefix) {
         prefs.set( prefix + PREF_SEARCHMODE, getSelectedSearchModeIndex());

@@ -132,20 +132,40 @@ public class SearchFieldSelection implements Cloneable {
     }
 
     @Override
-	public boolean equals( Object o) {
-        return (o instanceof SearchFieldSelection &&
-                equals( (SearchFieldSelection) o));
+    public int hashCode() {
+	    final int prime = 31;
+	    int result = 1;
+	    result = prime * result + (matchField ? 1231 : 1237);
+	    result = prime * result + (matchWord ? 1231 : 1237);
+	    result = prime * result + (readingSelected ? 1231 : 1237);
+	    result = prime * result + (translationSelected ? 1231 : 1237);
+	    result = prime * result + (wordSelected ? 1231 : 1237);
+	    return result;
+    }
+    
+	@Override
+    public boolean equals(Object obj) {
+	    if (this == obj)
+		    return true;
+	    if (obj == null)
+		    return false;
+	    if (getClass() != obj.getClass())
+		    return false;
+	    SearchFieldSelection other = (SearchFieldSelection) obj;
+	    if (matchField != other.matchField)
+		    return false;
+	    if (matchWord != other.matchWord)
+		    return false;
+	    if (readingSelected != other.readingSelected)
+		    return false;
+	    if (translationSelected != other.translationSelected)
+		    return false;
+	    if (wordSelected != other.wordSelected)
+		    return false;
+	    return true;
     }
 
-    public boolean equals( SearchFieldSelection sfs) {
-        return wordSelected == sfs.wordSelected &&
-            readingSelected == sfs.readingSelected &&
-            translationSelected == sfs.translationSelected &&
-            matchField == sfs.matchField &&
-            matchWord == sfs.matchWord;
-    }
-
-    @Override
+	@Override
 	public Object clone() {
         try {
             return super.clone();

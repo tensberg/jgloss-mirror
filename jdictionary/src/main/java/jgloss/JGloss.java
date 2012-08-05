@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
@@ -50,7 +51,6 @@ import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryFactory;
 import jgloss.dictionary.DictionaryImplementation;
 import jgloss.dictionary.DictionaryInstantiationException;
-import jgloss.dictionary.DistanceSearchModes;
 import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.IndexedDictionary;
 import jgloss.dictionary.KanjiDic;
@@ -316,8 +316,7 @@ public abstract class JGloss implements ExitListener {
      * @param fatal <code>true</code> if the application cannot be started because of the error.
      */
     protected static void displayError( String message, Throwable t, boolean fatal) {
-        LOGGER.severe( message);
-        t.printStackTrace();
+        LOGGER.log(Level.SEVERE, message, t);
 
         // Display error message in a frame. Note that this needs at least Java 1.1
         final Frame f = new Frame( MESSAGES.getString( "error.initialization.title"));
@@ -359,7 +358,7 @@ public abstract class JGloss implements ExitListener {
                     synchronized (f) {
                         f.setVisible(false);
                         f.dispose();
-                        f.notify();
+                        f.notifyAll();
                     }
                 }
             });
@@ -385,8 +384,10 @@ public abstract class JGloss implements ExitListener {
                                ExpressionSearchModes.ANY,
                                ExpressionSearchModes.PREFIX,
                                ExpressionSearchModes.SUFFIX,
-                               DistanceSearchModes.NEAR,
-                               DistanceSearchModes.RADIUS }),
+                               // distance search modes are currently not supported by any dictionary implementation
+//                               DistanceSearchModes.NEAR,
+//                               DistanceSearchModes.RADIUS 
+                               }),
               Arrays.asList( Dictionaries.getInstance().getDictionaries()),
               Arrays.asList( new LookupResultFilter[]
                   {
