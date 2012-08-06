@@ -54,8 +54,6 @@ public class LookupModel implements Cloneable {
     private static final String PREF_SEARCHFIELD_READING = ".searchfield.reading";
     private static final String PREF_SEARCHFIELD_TRANSLATION = ".searchfield.translation";
     private static final String PREF_SEARCHFIELD_MATCH_FIELD = ".searchfield.match_field";
-    private static final String PREF_SEARCHEXPRESSION = ".searchexpression";
-    private static final String PREF_DISTANCE = ".distance";
 
     private List<StateWrapper<SearchMode>> searchModes;
 
@@ -753,8 +751,6 @@ public class LookupModel implements Cloneable {
                    ( DictionaryEntryField.TRANSLATION));
         prefs.set( prefix + PREF_SEARCHFIELD_MATCH_FIELD, searchFields.isSelected
                    ( MatchMode.FIELD));
-        prefs.set( prefix + PREF_SEARCHEXPRESSION, searchExpression);
-        prefs.set( prefix + PREF_DISTANCE, distance);
     }
 
     public void loadFromPreferences( Preferences prefs, String prefix) {
@@ -800,9 +796,6 @@ public class LookupModel implements Cloneable {
         searchFields.select( MatchMode.WORD,
                              !prefs.getBoolean( prefix + PREF_SEARCHFIELD_MATCH_FIELD,
                                                 !searchFields.isSelected( MatchMode.FIELD)));
-
-        searchExpression = prefs.getString( prefix + PREF_SEARCHEXPRESSION);
-        distance = prefs.getInt( prefix + PREF_DISTANCE, distance);
 
         SearchMode mode = getSelectedSearchMode();
         updateDictionaryAvailability( mode);
