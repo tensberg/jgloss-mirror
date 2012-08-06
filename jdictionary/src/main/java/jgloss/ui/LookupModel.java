@@ -703,7 +703,7 @@ public class LookupModel implements Cloneable {
 
             return out;
         } catch (CloneNotSupportedException ex) { 
-        	throw new RuntimeException(ex);
+        	throw new AssertionError(ex);
         }
     }
     
