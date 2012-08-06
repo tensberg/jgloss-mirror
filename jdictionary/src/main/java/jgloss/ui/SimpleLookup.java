@@ -33,13 +33,16 @@ import java.awt.event.ActionListener;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -51,7 +54,6 @@ import jgloss.dictionary.MatchMode;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
-import jgloss.ui.util.UIUtilities;
 import jgloss.ui.util.XCVManager;
 
 public class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
@@ -63,7 +65,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
      */
     private static class WeakDictionaryChangeListener 
         implements DictionaryListChangeListener {
-        private WeakReference<LookupModel> modelRef;
+        private final WeakReference<LookupModel> modelRef;
 
         WeakDictionaryChangeListener( LookupModel model) {
             modelRef = new WeakReference<LookupModel>( model) {
@@ -88,6 +90,33 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
             }
         }
     } // class WeakDictionaryChangeListener
+    
+    private static class SearchOnTextChangeListener implements DocumentListener {
+
+    	private final Timer delayedActionTimer;
+
+    	SearchOnTextChangeListener(ActionListener searchActionListener) {
+    		delayedActionTimer = new Timer(500, searchActionListener);
+    		delayedActionTimer.setRepeats(false);
+    	}
+
+    	@Override
+        public void insertUpdate(DocumentEvent e) {
+    		delayedActionTimer.restart();
+        }
+
+    	@Override
+        public void removeUpdate(DocumentEvent e) {
+    		delayedActionTimer.restart();
+        }
+
+    	@Override
+        public void changedUpdate(DocumentEvent e) {
+    		delayedActionTimer.restart();
+        }
+
+    }
+
 
     private static final Logger LOGGER = Logger.getLogger(SimpleLookup.class.getPackage().getName());
     
@@ -141,11 +170,6 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         controls.add( expression, expandableC);
         expression.addActionListener(this);
 
-        JButton search = new JButton();
-        UIUtilities.initButton( search, "wordlookup.search");
-        search.addActionListener( this);
-        controls.add( search, fixedC);
-
         if (additionalControls != null) {
             for (Component additionalControl : additionalControls) {
 	            controls.add( additionalControl, fixedC);
@@ -165,6 +189,8 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         this.add( list, BorderLayout.CENTER);
         lookupResultProxy = new LookupResultProxy(list);
         engine = new AsynchronousLookupEngine( lookupResultProxy);
+        
+        expression.getDocument().addDocumentListener(new SearchOnTextChangeListener(this));
     }
 
     public void addLookupResultHandler(LookupResultHandler handler) {
@@ -176,7 +202,9 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
 	        return;
         }
 
-        expression.setText( text);
+        if (!text.equals(expression.getText())) {
+        	expression.setText( text);
+        }
 
         final LookupModel modelClone = model.clone();
         modelClone.setSearchExpression( text);
@@ -185,17 +213,14 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         // To do this in asynchronous search mode, a runnable is created which is executed
         // after a search ends. If the search did not find any results, the runnable selects
         // the next search mode and repeats the search.
-        modelClone.selectSearchMode( 0);
+        final Iterator<SearchMode> searchModes = Arrays.asList(modelClone.getSearchModes()).iterator();
+        modelClone.selectSearchMode(searchModes.next());
         engine.doLookup( modelClone, new Runnable() {
                 @Override
 				public void run() {
-                    if (list.getEntryCount() == 0) {
-	                    try {
-	                        model.selectSearchMode( model.getSelectedSearchModeIndex() + 1);
-	                        engine.doLookup( modelClone, this);
-	                    } catch (IndexOutOfBoundsException ex) {
-	                        // All search modes tried. End search.
-	                    }
+                    if (list.getEntryCount() == 0 && searchModes.hasNext()) {
+                    	model.selectSearchMode(searchModes.next());
+                    	engine.doLookup( modelClone, this);
                     }
                 }
             });

@@ -65,7 +65,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 
 	private static final String DEFAULT_STYLE_SHEET = "/data/lookup.css";
 
-	private static final int MAX_RESULT_BUFFER_SIZE = 10;
+	private static final int MAX_RESULT_BUFFER_SIZE = 50;
 	
     /**
      * Text field used to display the result as HTML text.
@@ -83,7 +83,6 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     private boolean multipleDictionaries;
     private final List<Object> resultBuffer = new ArrayList<Object>(MAX_RESULT_BUFFER_SIZE);
     private final StringBuilder resultTextBuffer = new StringBuilder( 8192);
-    private int dictionaryEntries;
     private String previousDictionaryName;
     private boolean previousDictionaryHasMatch;
     private final JLabel status;
@@ -197,7 +196,6 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         hyperlinker.clearReferences();
         previousDictionaryName = null;
         previousDictionaryHasMatch = true;
-        dictionaryEntries = 0;
         entryCount = 0;
     }
 
@@ -273,7 +271,6 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         resultTextBuffer.append( "</p>");
 
         resultTextBuffer.append( "\n\n");
-        dictionaryEntries++;
     }
 
     private void format( SearchException ex) {

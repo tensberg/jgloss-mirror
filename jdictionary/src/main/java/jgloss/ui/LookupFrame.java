@@ -44,7 +44,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import javax.swing.Timer;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -63,22 +62,6 @@ import jgloss.ui.util.XCVManager;
  */
 public class LookupFrame extends JFrame implements ActionListener, HyperlinkListener,
                                                    DictionaryListChangeListener {
-	private static class SearchOnModelChangeListener implements LookupChangeListener {
-
-		private final Timer delayedActionTimer;
-		
-		SearchOnModelChangeListener(ActionListener searchActionListener) {
-			delayedActionTimer = new Timer(500, searchActionListener);
-			delayedActionTimer.setRepeats(false);
-		}
-		
-		@Override
-		public void stateChanged(LookupChangeEvent event) {
-			delayedActionTimer.restart();
-		}
-
-	}
-	
 	private static final Logger LOGGER = Logger.getLogger(LookupFrame.class.getPackage().getName());
 	
 	private static final long serialVersionUID = 1L;

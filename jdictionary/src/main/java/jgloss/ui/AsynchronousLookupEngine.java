@@ -116,7 +116,8 @@ public class AsynchronousLookupEngine extends LookupEngine {
     }
 
     @Override
-	protected void finalize() {
+	protected void finalize() throws Throwable {
         dispose();
+        super.finalize();
     }
 } // class AsynchronousLookupEngine
