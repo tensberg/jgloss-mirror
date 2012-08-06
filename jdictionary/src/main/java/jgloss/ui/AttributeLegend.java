@@ -87,7 +87,6 @@ public class AttributeLegend extends JPanel {
 
     private final JComboBox dictionaryChoice;
     private final JEditorPane legend;
-    private final JScrollPane legendScroller;
 
     public AttributeLegend() {
         setLayout( new BorderLayout());
@@ -108,7 +107,7 @@ public class AttributeLegend extends JPanel {
         legend = new JEditorPane();
         legend.setEditable( false);
         legend.setContentType( "text/html");
-        legendScroller = new JScrollPane( legend, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+        JScrollPane legendScroller = new JScrollPane( legend, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
                                           ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add( legendScroller, BorderLayout.CENTER);
     }

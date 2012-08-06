@@ -23,6 +23,8 @@
 
 package jgloss.ui;
 
+import static jgloss.ui.util.UIUtilities.fitToScreen;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -312,7 +314,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         Dictionaries.getInstance().addDictionaryListChangeListener( this);
         legendFrame.getContentPane().add( legend);
         legendFrame.pack();
-        legendFrame.setSize( legendFrame.getPreferredSize());
+		legendFrame.setSize( fitToScreen(legendFrame.getPreferredSize(), legendFrame.getGraphicsConfiguration()));
     }
 
     @Override

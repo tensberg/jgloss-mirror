@@ -25,8 +25,11 @@ package jgloss.ui.util;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -279,5 +282,26 @@ public class UIUtilities {
         } catch (javax.swing.text.BadLocationException ex) {
             // can happen if layout of text component is not done yet
         }
+    }
+    
+    /**
+     * Returns a new size where width and height are the minimum of the given size and the available screen space.
+     * 
+     * @param size The original size of the component on the screen (usually a window).
+     * @param screen Configuration of the screen on which the component should be shown.
+     * @return A new size object with a size no larger than the available screen space.
+     */
+    public static Dimension fitToScreen(Dimension size, GraphicsConfiguration screen) {
+    	Dimension resizedSize = new Dimension();
+
+        Dimension displaySize = screen.getBounds().getSize();
+        Insets displayInsets = Toolkit.getDefaultToolkit().getScreenInsets(screen);
+        resizedSize.width = Math.min(size.width, displaySize.width - displayInsets.left - displayInsets.right);
+        resizedSize.height = Math.min(size.height, displaySize.height - displayInsets.top - displayInsets.bottom);
+    	
+    	return resizedSize;
+    }
+    
+    private UIUtilities() {
     }
 } // class UIUtilities
