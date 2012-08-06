@@ -154,14 +154,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
         setJMenuBar( bar);
 
-        addWindowFocusListener(new WindowAdapter() {
-        	@Override
-        	public void windowGainedFocus(WindowEvent e) {
-        		config.getSearchExpressionField().requestFocusInWindow();
-        	}
-		});
-
         pack();
+		config.getSearchExpressionField().requestFocusInWindow();
 
         preferredSize = new Dimension
             ( Math.max( super.getPreferredSize().width,
