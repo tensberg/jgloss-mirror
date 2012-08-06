@@ -339,6 +339,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
         HTMLDocument document = (HTMLDocument) resultPane.getDocument();
         if (document.getLength() == 0) {
         	resultPane.setText(resultTextBuffer.toString());
+        	resultPane.setCaretPosition(0); // prevent autoscrolling of the document by leaving the caret at the top
         } else {
         	try {
         		document.insertBeforeEnd(document.getElement("body"), resultTextBuffer.toString());
