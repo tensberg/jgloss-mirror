@@ -23,8 +23,11 @@
 
 package jgloss.ui;
 
+import static jgloss.JGloss.MESSAGES;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -39,6 +42,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,7 +52,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-import jgloss.JGloss;
 import jgloss.ui.util.UIUtilities;
 
 /**
@@ -90,55 +93,69 @@ public class AboutFrame extends JFrame {
      * Creates the about dialog.
      */
     private AboutFrame( String prefix) {
-        setTitle( JGloss.MESSAGES.getString( prefix + ".about.frame.title"));
+        setTitle( MESSAGES.getString( prefix + ".about.frame.title"));
+        setBackground(Color.WHITE);
         setIconImages(JGlossLogo.ALL_LOGO_SIZES);
         
-        JLabel label = new JLabel( JGloss.MESSAGES.getString( prefix + ".about.title"));
-        label.setHorizontalAlignment( SwingConstants.CENTER);
-        label.setFont( new Font( "SansSerif", Font.BOLD, label.getFont().getSize()+3));
-        label.setForeground( Color.black);
-        JTextArea area = new JTextArea( JGloss.MESSAGES.getString( prefix + ".about.text"));
-        area.setEditable( false);
-        area.setOpaque( false);
+        JLabel label = new JLabel( MESSAGES.getString( prefix + ".about.title"), JGlossLogo.LOGO_LARGE,
+        				SwingConstants.CENTER);
+        label.setHorizontalTextPosition(SwingConstants.CENTER);
+        label.setVerticalTextPosition(SwingConstants.BOTTOM);
+        label.setFont( new Font( "SansSerif", Font.BOLD, label.getFont().getSize()+2));
+        label.setForeground( Color.BLACK);
+        label.setOpaque(false);
+        String tagline = MESSAGES.getString(prefix + ".about.tagline");
+        String text = MESSAGES.getString("jgloss.about.text", tagline);
+        JEditorPane aboutText = new JEditorPane( "text/html", text);
+        aboutText.setEditable( false);
+        aboutText.setOpaque( false);
+        aboutText.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+        aboutText.addHyperlinkListener(new BrowseHyperlinkListener());
+        aboutText.setSize(600, Integer.MAX_VALUE); // set the width explicitly so that the preferred height is computed based on this width
+        aboutText.setPreferredSize(new Dimension(600, aboutText.getPreferredSize().height));
 
         JPanel p = new JPanel( new BorderLayout());
         p.add( label, BorderLayout.NORTH);
-        p.add( area, BorderLayout.CENTER);
+        p.add( aboutText, BorderLayout.CENTER);
         JPanel p2 = new JPanel();
         p2.setLayout( new GridLayout( 1, 1));
         p2.setBorder( BorderFactory.createCompoundBorder
-                     ( BorderFactory.createEmptyBorder( 5, 5, 5, 5),
-                       BorderFactory.createCompoundBorder
-                       ( BorderFactory.createEtchedBorder(),
-                         BorderFactory.createEmptyBorder( 5, 5, 5, 5))));
+        				( BorderFactory.createEmptyBorder( 5, 5, 5, 5),
+        								BorderFactory.createCompoundBorder
+        								( BorderFactory.createEtchedBorder(),
+        												BorderFactory.createEmptyBorder( 5, 5, 5, 5))));
         p2.add( p);
+        p.setOpaque(false);
+        p2.setOpaque(false);
         getContentPane().add( p2, BorderLayout.CENTER);
 
         Box b = Box.createHorizontalBox();
         b.add( Box.createHorizontalGlue());
-        b.add( new JButton( new AbstractAction( JGloss.MESSAGES.getString( "about.showlicense")) {
-            private static final long serialVersionUID = 1L;
+        b.add( new JButton( new AbstractAction( MESSAGES.getString( "about.showlicense")) {
+        	private static final long serialVersionUID = 1L;
 
-				@Override
-				public void actionPerformed( ActionEvent e) {
-					createLicenseFrame().setVisible( true);
-                }
-            }));
+        	@Override
+        	public void actionPerformed( ActionEvent e) {
+        		createLicenseFrame().setVisible( true);
+        	}
+        }));
         b.add( Box.createHorizontalStrut( 5));
-        b.add( new JButton( new AbstractAction( JGloss.MESSAGES.getString( "button.close")) {
-            private static final long serialVersionUID = 1L;
+        b.add( new JButton( new AbstractAction( MESSAGES.getString( "button.close")) {
+        	private static final long serialVersionUID = 1L;
 
-				@Override
-				public void actionPerformed( ActionEvent e) {
-                    setVisible(false);
-                }
-            }));
+        	@Override
+        	public void actionPerformed( ActionEvent e) {
+        		setVisible(false);
+        	}
+        }));
+        b.setOpaque(false);
         p = new JPanel();
         p.setLayout( new GridLayout( 1, 1));
         p.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5));
         p.add( b);
         getContentPane().add( p, BorderLayout.SOUTH);
-
+        getContentPane().setBackground(Color.WHITE);
+ 
         setDefaultCloseOperation( WindowConstants.HIDE_ON_CLOSE);
         pack();
         setResizable( false);
@@ -171,7 +188,7 @@ public class AboutFrame extends JFrame {
         	}
         }
 
-        JFrame license = new JFrame( JGloss.MESSAGES.getString( "about.license.title"));
+        JFrame license = new JFrame( MESSAGES.getString( "about.license.title"));
         JTextArea ta = new JTextArea( gpl.toString());
         ta.setEditable( false);
         ta.setCaretPosition( 0);

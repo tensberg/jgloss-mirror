@@ -270,7 +270,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
 
         inputPanel.add( Box.createHorizontalStrut( 4), c3);
 		distance = new JTextField();
-		// distance search modes are currently not supported by any dictionary
+		// TODO: distance search modes are currently not supported by any dictionary
 //        JLabel distanceDescription = 
 //            new JLabel( JGloss.MESSAGES.getString( "wordlookup.enterdistance"));
 //        distanceDescription.setDisplayedMnemonic
