@@ -40,8 +40,6 @@ import java.util.logging.Logger;
 import jgloss.dictionary.IndexContainer;
 import jgloss.dictionary.IndexException;
 
-import org.fest.util.VisibleForTesting;
-
 /**
  * Index container which stores index data in a file.
  *
@@ -133,20 +131,20 @@ public class FileIndexContainer implements IndexContainer {
     /**
      * Length of the index header of the current index version in bytes.
      */
-    @VisibleForTesting
+    // VisibleForTesting
     static final byte INDEXCONTAINER_HEADER_LENGTH = 4 * 4;
 
     /**
      * Offset in bytes in the index file to the header entry which points to the fist index metadata
      * (independent of the index version).
      */
-    @VisibleForTesting
+    // VisibleForTesting
     static final byte FIRST_INDEX_POINTER_OFFSET = 2 * 4; // 2 headers with 4 bytes each
 
-    @VisibleForTesting
+    // VisibleForTesting
     static final int BIG_ENDIAN = 1;
     
-    @VisibleForTesting
+    // VisibleForTesting
     static final int LITTLE_ENDIAN = 2;
 
     /**
