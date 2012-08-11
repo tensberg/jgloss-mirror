@@ -104,6 +104,11 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      */
 	private final FileBasedDictionaryStructure structure;
 
+	/**
+	 * Entry parser of the concrete dictionary implementation.
+	 */
+	private final EntryParser entryParser;
+
     /**
      * File which holds the dictionary.
      */
@@ -169,8 +174,9 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
      * @param _encoding Character encoding of the dictionary file.
      * @exception IOException if the dictionary or the index file cannot be read.
      */
-    protected FileBasedDictionary( FileBasedDictionaryStructure structure, File _dicfile, String _encoding) throws IOException {
+    protected FileBasedDictionary( FileBasedDictionaryStructure structure, EntryParser entryParser, File _dicfile, String _encoding) throws IOException {
         this.structure = structure;
+		this.entryParser = entryParser;
 		this.dicfile = _dicfile;
         this.name = _dicfile.getName();
         indexFile = new File( dicfile.getCanonicalPath() + FileIndexContainer.EXTENSION);
@@ -195,6 +201,8 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
 
         binarySearchIndex = new BinarySearchIndex( BinarySearchIndex.TYPE);
 
+        entryParser.setDictionary(this);
+        
         initSearchModes();
         initSupportedAttributes();
     }
@@ -522,7 +530,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             }
         }
 
-        return parseEntry( entrystring, startOffset);
+        return entryParser.parseEntry( entrystring, startOffset);
     }
 
     /**
@@ -632,15 +640,6 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
     protected String unescape( String str) {
         return StringTools.unicodeUnescape( str);
     }
-
-    /**
-     * Create a {@link DictionaryEntry DictionaryEntry} object from the entry string from the dictionary.
-     *
-     * @param entry Entry string as found in the dictionary.
-     * @param startOffset Start offset of the entry in the dictionary file.
-     * @exception SearchException if the dictionary entry is malformed.
-     */
-    protected abstract DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException;
 
     @Override
 	public void dispose() {
