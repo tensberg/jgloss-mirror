@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2004 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2012 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -28,18 +28,22 @@ import java.util.List;
 import jgloss.dictionary.attribute.AttributeSet;
 
 public class MultiWordEntry extends BaseEntry {
-    protected String[] words;
-    protected AttributeSet[] wordsA;
+	private static final AttributeSet[] EMPTY_ATTRIBUTE_SET_ARRAY = new AttributeSet[0];
+	
+    private final String[] words;
+    private final AttributeSet[] wordsA;
+    private final String[] readings;
 
-    public MultiWordEntry( int _entryMarker, List<String> _words, String _reading, List<List<String>> _translations,
-                           AttributeSet _generalA, AttributeSet _wordA, List<AttributeSet> _wordsA,
+    public MultiWordEntry( int _entryMarker, String[] _words, String[] _readings, List<List<String>> _translations,
+                           AttributeSet _generalA, AttributeSet _wordA, AttributeSet[] _wordsA,
                            AttributeSet _translationA,
                            List<AttributeSet> _translationRomA, Dictionary _dictionary) {
-        super( _entryMarker, _reading, _translations,
+        super( _entryMarker, _translations,
                _generalA, _wordA,
                _translationA, _translationRomA, _dictionary);
-        words = _words.toArray( new String[_words.size()]);
-        wordsA = _wordsA.toArray( new AttributeSet[_wordsA.size()]);
+		this.words = _words;
+		this.wordsA = _wordsA == null ? EMPTY_ATTRIBUTE_SET_ARRAY : _wordsA;
+		this.readings = _readings;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class MultiWordEntry extends BaseEntry {
         try {
             return words[alternative];
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ex);
         }
     }
 
@@ -57,14 +61,28 @@ public class MultiWordEntry extends BaseEntry {
     @Override
 	public AttributeSet getWordAttributes( int alternative) {
         try {
-            if (wordsA[alternative] == null) {
+            if (alternative >= wordsA.length || wordsA[alternative] == null) {
 	            return emptySet.setParent( wordA);
             } else {
 	            return wordsA[alternative];
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ex);
         }
+    }
+    
+    @Override
+    public int getReadingAlternativeCount() {
+    	return readings.length;
+    }
+
+	@Override
+    public String getReading(int alternative) {
+		try {
+			return readings[alternative];
+		} catch (ArrayIndexOutOfBoundsException ex) {
+			throw new IllegalArgumentException(ex);
+		}
     }
 
     @Override
@@ -86,7 +104,12 @@ public class MultiWordEntry extends BaseEntry {
             out.append( words[i]);
         }
         out.append( " [");
-        out.append( reading);
+        for ( int i=0; i<readings.length; i++) {
+        	if (i > 0) {
+        		out.append( "; ");
+        	}
+        	out.append(readings[i]);
+        }
         out.append( "] ");
         out.append( translationA.toString());
         for ( int i=0; i<translations.length; i++) {

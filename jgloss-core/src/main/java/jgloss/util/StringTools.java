@@ -24,7 +24,9 @@
 package jgloss.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Utility functions for handling Japanese characters and strings.
@@ -386,6 +388,36 @@ public class StringTools {
         return regex;
     }
 
+    public static Iterable<String> tokenize(final String string, final String delimiter) {
+    	return new Iterable<String>() {
+
+			@Override
+            public Iterator<String> iterator() {
+				return new Iterator<String>() {
+
+					private final StringTokenizer tokenizer = new StringTokenizer(string, delimiter);
+					
+					@Override
+                    public boolean hasNext() {
+	                    return tokenizer.hasMoreTokens();
+                    }
+
+					@Override
+                    public String next() {
+	                    return tokenizer.nextToken();
+                    }
+
+					@Override
+                    public void remove() {
+	                    throw new UnsupportedOperationException("remote is not supported");
+                    }
+					
+				};
+            }
+    		
+    	};
+    }
+    
     private StringTools() {
     }
 } // class StringTools

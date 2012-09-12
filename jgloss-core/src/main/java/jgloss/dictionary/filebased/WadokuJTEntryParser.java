@@ -83,7 +83,7 @@ class WadokuJTEntryParser implements EntryParser {
 
     private static final int EXPLANATION_MIN_LENGTH = 10;
 
-    protected static final SearchFieldSelection MATCH_WORD_FIELD =
+    private static final SearchFieldSelection MATCH_WORD_FIELD =
         new SearchFieldSelection( true, false, false, true, false);
     
     static final AttributeMapper MAPPER = initMapper();
@@ -442,8 +442,7 @@ class WadokuJTEntryParser implements EntryParser {
                     generalA.addAttribute( type, new SearchReference
                                            ( referenceMatcher.group( 2), wadokujt,
                                              ExpressionSearchModes.EXACT,
-                                             new Object[] { referenceMatcher.group( 2),
-                                                            MATCH_WORD_FIELD }));
+                                             referenceMatcher.group( 2), MATCH_WORD_FIELD));
                 }
             }
 
@@ -470,8 +469,10 @@ class WadokuJTEntryParser implements EntryParser {
                                            generalA, wordA, translationA, romA, wadokujt);
             }
             else {
-                out = new MultiWordEntry( startOffset, wordlist, reading, rom, generalA,
-                                          wordA, wordsA, translationA, romA, wadokujt);
+                out = new MultiWordEntry( startOffset, wordlist.toArray(new String[wordlist.size()]),
+                					new String[] { reading }, rom, generalA,
+                					wordA, wordsA.toArray(new AttributeSet[wordsA.size()]),
+                					translationA, romA, wadokujt);
             }
 
             return out;

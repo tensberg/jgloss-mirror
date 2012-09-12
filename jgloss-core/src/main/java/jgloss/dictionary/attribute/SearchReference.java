@@ -43,7 +43,7 @@ public class SearchReference implements ReferenceAttributeValue {
     private final Object[] searchParameters;
 
     public SearchReference( String _title, Dictionary _dictionary, SearchMode _searchMode,
-                            Object[] _searchParameters) {
+                            Object... _searchParameters) {
         title = _title;
         dictionary = _dictionary;
         searchMode = _searchMode;

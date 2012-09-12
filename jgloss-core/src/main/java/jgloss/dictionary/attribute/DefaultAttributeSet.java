@@ -39,9 +39,17 @@ public class DefaultAttributeSet implements AttributeSet {
     protected AttributeSet parent = null;
     protected Map<Attribute<?>, List<? extends AttributeValue>> attributes = null;
 
+    /**
+     * Creates a default attribute set which does not have a parent.
+     */
     public DefaultAttributeSet() {
     }
 
+    /**
+     * Creates a default attribute set with the given parent.
+     * 
+     * @param _parent Parent of the new attribute set.
+     */
     public DefaultAttributeSet( AttributeSet _parent) {
         this.parent = _parent;
     }
@@ -146,15 +154,23 @@ public class DefaultAttributeSet implements AttributeSet {
         if (attributes == null) {
 	        attributes = new HashMap<Attribute<?>, List<? extends AttributeValue>>();
         }
-        List<? extends AttributeValue> v = attributes.get( key);
+        
+        List<? extends AttributeValue> values = attributes.get( key);
 
-        if (v == null) {
-	        attributes.put( key, value!=null ? checkedList(new ArrayList<T>(3), key.getAttributeValueClass()) : null);
+        if (values == null) {
+        	List<T> newValues;
+        	if (value != null) {
+				newValues = checkedList(new ArrayList<T>(3), key.getAttributeValueClass());
+        		newValues.add(value);
+        	} else {
+        		newValues = null;
+        	}
+	        attributes.put( key, newValues);
         } else if (value == null) {
-	        // nothing to be done, since attibute already set
+	        // nothing to be done, since attribute already set
             return;
         } else {
-            ((List<T>) v).add( value);
+            ((List<T>) values).add( value);
         }
     }
 

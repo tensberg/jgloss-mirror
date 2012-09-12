@@ -1,5 +1,7 @@
 package jgloss.dictionary.filebased;
 
+import static jgloss.util.StringTools.tokenize;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -13,31 +15,38 @@ import java.util.regex.Pattern;
 
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.DictionaryEntry;
+import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.MalformedEntryException;
+import jgloss.dictionary.MultiWordEntry;
 import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SearchFieldSelection;
 import jgloss.dictionary.SingleWordEntry;
 import jgloss.dictionary.attribute.Attribute;
 import jgloss.dictionary.attribute.AttributeMapper;
 import jgloss.dictionary.attribute.AttributeSet;
 import jgloss.dictionary.attribute.Attributes;
 import jgloss.dictionary.attribute.DefaultAttributeSet;
+import jgloss.dictionary.attribute.InformationAttributeValue;
 import jgloss.dictionary.attribute.Priority;
+import jgloss.dictionary.attribute.SearchReference;
 
 class EDictEntryParser implements EntryParser {
 
 	private static final Logger LOGGER = Logger.getLogger(EDictEntryParser.class.getPackage().getName());
 	
     /**
-     * Match an EDICT entry. Group 1 is the word, group 2 the (optional) reading and group 3
-     * the translations.
+     * Match an EDICT entry. Group 1 is the word(s), group 2 the (optional) reading(s) and group 3
+     * the translations. The optional last group is a reference to the corresponding JMDict entry.
+     * This entry is currently not used and skipped
      */
     private static final Pattern ENTRY_PATTERN = Pattern.compile
-        ( "(\\S+)(?:\\s\\[(.+?)\\])?\\s/(.+)/");
+        ( "(\\S+)(?:\\s\\[(.+?)\\])?\\s/(.+?)/(EntL.+/)?");
 
     /**
-     * Match a string in brackets at the beginning of a string.
+     * Match a string in brackets at the beginning of a string. Group 1 matches all numbers, which is the ROM marker.
+     * Group 2 matches a reference to another entry. Group 3 matches an arbitrary string in brackets.
      */
-    private static final Pattern BRACKET_PATTERN = Pattern.compile( "\\G\\((.+?)\\)\\s");
+    private static final Pattern BRACKET_PATTERN = Pattern.compile( "\\G(?:\\((\\d+)\\)|\\([Ss]ee (.+?)\\)|\\((.+?)\\))\\s");
 
     private static final String PRIORITY_MARKER = "(P)";
 
@@ -56,6 +65,9 @@ class EDictEntryParser implements EntryParser {
 			public String toString() { return "_P_"; }
         };
 
+
+    private static final SearchFieldSelection MATCH_WORD_FIELD =
+    				new SearchFieldSelection( true, false, false, true, false);
 
     static final AttributeMapper MAPPER = initMapper();
 
@@ -90,17 +102,11 @@ class EDictEntryParser implements EntryParser {
      */
 	@Override
     public DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
-        Matcher entryMatcher = ENTRY_PATTERN.matcher(entry);
-        if (!entryMatcher.matches()) {
-	        throw new MalformedEntryException( edict, entry);
-        }
+        Matcher entryMatcher = matchEntry(entry);
 
-        String word = entryMatcher.group( 1);
-        String reading = entryMatcher.group( 2);
-        if (reading == null) {
-	        reading = word;
-        }
-        String translations = entryMatcher.group( 3);
+        String[] words = parseWords(entryMatcher);
+        String[] readings = parseReadings(entryMatcher, words);
+
         List<List<String>> rom = new ArrayList<List<String>>( 10);
         List<String> crm = new ArrayList<String>( 10);
         rom.add( crm);
@@ -112,40 +118,42 @@ class EDictEntryParser implements EntryParser {
         DefaultAttributeSet translationromA = new DefaultAttributeSet( translationA);
         roma.add( translationromA);
 
-        // ROM markers and entry attributes are written in brackets before the translation text.
+        parseTranslations(entryMatcher.group( 3), rom, crm, generalA, wordA, translationA, roma, translationromA);
+
+        DictionaryEntry dictionaryEntry;
+        if (words.length == 1 && readings.length == 1) {
+        	dictionaryEntry = new SingleWordEntry(startOffset, words[0], readings[0], rom,
+        					generalA, wordA, translationA, roma, edict);
+        } else {
+        	dictionaryEntry = new MultiWordEntry(startOffset, words, readings,
+        					rom, generalA, wordA, null, translationA, roma, edict);
+        }
+        return dictionaryEntry;
+    }
+
+	private void parseTranslations(String translations, List<List<String>> rom, List<String> crm, DefaultAttributeSet generalA, DefaultAttributeSet wordA,
+                    DefaultAttributeSet translationA, List<AttributeSet> roma, DefaultAttributeSet translationromA) {
+	    // ROM markers and entry attributes are written in brackets before the translation text.
         // Attributes which are placed in the first translation before the first ROM marker apply
         // to the whole entry, the other attributes only apply to the ROM.
         boolean seenROM = false;
-        int start = 0;
-        do {
-            int end = translations.indexOf( '/', start);
-            if (end == -1) {
-	            end = translations.length();
-            }
-
-            String translation = translations.substring( start, end);
+        
+        for (String translation : tokenize(translations, "/")) {
             if (translation.equals( PRIORITY_MARKER)) {
                 generalA.addAttribute( Attributes.PRIORITY, PRIORITY_VALUE);
-            }
-            else {
+            } else {
                 Matcher bracketMatcher = BRACKET_PATTERN.matcher(translation);
                 int matchend = 0;
-                StringBuilder unrecognized = null;
 
                 while (bracketMatcher.find()) {
                     matchend = bracketMatcher.end();
 
-                    String att = bracketMatcher.group( 1);
+                    // the matcher is constructed such that either group 1, group 2 or group 3 matches (is not null)
+                    String romMarker = bracketMatcher.group(1);
+                    String ref = bracketMatcher.group(2);
+                    String att = bracketMatcher.group(3);
 
-                    boolean isNumber = true;
-                    for ( int i=0; i<att.length(); i++) {
-                        if (att.charAt( i)<'1' ||
-                            att.charAt( i)>'9') {
-                            isNumber = false;
-                            break;
-                        }
-                    }
-                    if (isNumber) {
+                    if (romMarker != null) {
                         // ROM marker, start new ROM unless this is the first ROM
                         if (!crm.isEmpty()) {
                             crm = new ArrayList<String>( 10);
@@ -154,58 +162,13 @@ class EDictEntryParser implements EntryParser {
                             roma.add( translationromA);
                         }
                         seenROM = true;
-                    }
-                    else {
+                    } else if (ref != null) {
+                    	generalA.addAttribute(Attributes.REFERENCE, 
+                    					new SearchReference(ref, edict, ExpressionSearchModes.EXACT, ref, MATCH_WORD_FIELD));
+                    } else {
                         // attribute list separated by ','
-                        int startc = 0;
-                        boolean hasUnrecognized = false;
-                        do {
-                            int endc = att.indexOf( ',', startc);
-                            if (endc == -1) {
-	                            endc = att.length();
-                            }
-                            String attsub = att.substring( startc, endc);
-                            AttributeMapper.Mapping<?> mapping = MAPPER.getMapping( attsub);
-                            if (mapping != null) {
-                                Attribute<?> a = mapping.getAttribute();
-                                if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
-                                    (!seenROM ||
-                                     !a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION))) {
-                                    generalA.addAttribute(mapping);
-                                }
-                                else if (a.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
-                                    wordA.addAttribute(mapping);
-                                }
-                                else if (a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
-                                    if (seenROM) {
-	                                    translationromA.addAttribute(mapping);
-                                    } else {
-	                                    translationA.addAttribute(mapping);
-                                    }
-                                }
-                                else {
-                                    // should not happen, edict does not support READING attributes
-                                    LOGGER.warning( "EDICT warning: illegal attribute type");
-                                }
-                            }
-                            else {
-                                // Not a recognized attribute. Since the whole bracket expression
-                                // will be cut off from the translation, store it seperately and
-                                // prepend it.
-                                if (unrecognized == null) {
-	                                unrecognized = new StringBuilder();
-                                }
-                                if (!hasUnrecognized) {
-                                    unrecognized.append( '(');
-                                    hasUnrecognized = true;
-                                }
-                                unrecognized.append( attsub);
-                            }
-
-                            startc = endc + 1;
-                        } while (startc < att.length());
-                        if (hasUnrecognized) {
-	                        unrecognized.append( ") ");
+                    	for (String attsub : tokenize(att, ",")) {
+                            addAttribute(generalA, wordA, translationA, translationromA, seenROM, attsub);
                         }
                     }
                 }
@@ -213,18 +176,64 @@ class EDictEntryParser implements EntryParser {
                 if (matchend > 0) {
 	                translation = translation.substring( matchend, translation.length());
                 }
-                if (unrecognized != null) {
-                    unrecognized.append( translation);
-                    translation = unrecognized.toString();
-                }
 
                 crm.add( translation);
             }
+        }
+    }
 
-            start = end+1;
-        } while (start < translations.length());
+	private void addAttribute(DefaultAttributeSet generalA, DefaultAttributeSet wordA, DefaultAttributeSet translationA, DefaultAttributeSet translationromA,
+                    boolean seenROM, String attsub) {
+	    AttributeMapper.Mapping<?> mapping = MAPPER.getMapping( attsub);
+	    if (mapping != null) {
+	        Attribute<?> a = mapping.getAttribute();
+	        if (a.appliesTo( DictionaryEntry.AttributeGroup.GENERAL) &&
+	            (!seenROM ||
+	             !a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION))) {
+	            generalA.addAttribute(mapping);
+	        } else if (a.appliesTo( DictionaryEntry.AttributeGroup.WORD)) {
+	            wordA.addAttribute(mapping);
+	        } else if (a.appliesTo( DictionaryEntry.AttributeGroup.TRANSLATION)) {
+	            if (seenROM) {
+	                translationromA.addAttribute(mapping);
+	            } else {
+	                translationA.addAttribute(mapping);
+	            }
+	        } else {
+	            // should not happen, edict does not support READING attributes
+	            LOGGER.warning( "EDICT warning: illegal attribute type");
+	        }
+	    } else {
+	        // Not an explicitly defined attribute.
+	    	InformationAttributeValue attributeValue = new InformationAttributeValue(attsub);
+	    	if (seenROM) {
+	    		translationromA.addAttribute(Attributes.EXPLANATION, attributeValue);
+	    	} else {
+	    		translationA.addAttribute(Attributes.EXPLANATION, attributeValue);
+	    	}
+	    }
+    }
 
-        return new SingleWordEntry( startOffset, word, reading, rom, generalA, wordA, translationA,
-                                    roma, edict);
+	private String[] parseReadings(Matcher entryMatcher, String[] words) {
+	    String[] readings;
+        String readingGroup = entryMatcher.group( 2);
+        if (readingGroup == null) {
+	        readings = words;
+        } else {
+        	readings = readingGroup.split(";");
+        }
+        return readings;
+    }
+
+	private String[] parseWords(Matcher entryMatcher) {
+	    return entryMatcher.group( 1).split(";");
+    }
+
+	private Matcher matchEntry(String entry) {
+	    Matcher entryMatcher = ENTRY_PATTERN.matcher(entry);
+        if (!entryMatcher.matches()) {
+	        throw new MalformedEntryException( edict, entry);
+        }
+	    return entryMatcher;
     }
 }

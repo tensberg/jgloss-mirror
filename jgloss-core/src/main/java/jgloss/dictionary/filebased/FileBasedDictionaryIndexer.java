@@ -75,18 +75,17 @@ class FileBasedDictionaryIndexer {
 	
     /**
      * Adds all indexable terms in the dictionary to the index builder.
+     * Indexes all terms in word, reading and translation fields.
+     * Index term boundaries are determined using characterHandler.getCharacterClass():
+     * if the character classes of two adjacent characters differ they are assumed to
+     * belong to two different terms.
+     * For kanji characters, each kanji in a term is indexed.
+     * For kana characters, whole terms are indexed.
+     * For romaji, terms of length >= 3 are indexed.
      *
      * @return The number of index entries created.
      */
     private int addIndexTerms( IndexBuilder builder, MappedByteBuffer dictionary) throws IOException, IndexException {
-        // Indexes all terms in word, reading and translation fields.
-        // Index term boundaries are determined using characterHandler.getCharacterClass():
-        // if the character classes of two adjacent characters differ they are assumed to
-        // belong to two different terms.
-        // For kanji characters, each kanji in a term is indexed.
-        // For kana characters, whole terms are indexed.
-        // For romaji, terms of length >= 3 are indexed.
-
         int indexsize = 0;
         dictionary.position( 0);
         ArrayList<Integer> termStarts = new ArrayList<Integer>( 25);
@@ -130,10 +129,10 @@ class FileBasedDictionaryIndexer {
         			clazz2 = characterHandler.getCharacterClass( c, inWord);
 
         			// for kanji terms, each kanji in the term is indexed
-        			if (clazz == CharacterClass.KANJI && clazz2==clazz) {
+        			if (clazz == CharacterClass.KANJI && clazz2==clazz) { // NOPMD: enum comparison
 	                    termStarts.add( Integer.valueOf( termEnd));
                     }
-        		} while (clazz2 == clazz);
+        		} while (clazz2 == clazz); // NOPMD: enum comparison
 
         		// add the term to the index
         		if (clazz==CharacterClass.KANJI ||

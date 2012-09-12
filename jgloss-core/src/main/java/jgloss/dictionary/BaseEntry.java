@@ -30,7 +30,6 @@ import jgloss.dictionary.attribute.AttributeSet;
 import jgloss.dictionary.attribute.DefaultAttributeSet;
 
 public abstract class BaseEntry implements DictionaryEntry {
-    protected String reading;
     protected String[][] translations;
     protected AttributeSet generalA;
     protected AttributeSet wordA;
@@ -93,12 +92,11 @@ public abstract class BaseEntry implements DictionaryEntry {
         }
     } // class BaseEntryRef
 
-    public BaseEntry( int _entryMarker, String _reading, List<List<String>> _translations,
+    public BaseEntry( int _entryMarker, List<List<String>> _translations,
                       AttributeSet _generalA, AttributeSet _wordA,
                       AttributeSet _translationA,
                       List<AttributeSet> _translationRomA, Dictionary _dictionary) {
         entryMarker = _entryMarker;
-        reading = _reading;
         translations = new String[_translations.size()][];
         int rom = 0;
         for (List<String> crm : _translations) {
@@ -117,15 +115,6 @@ public abstract class BaseEntry implements DictionaryEntry {
 	public AttributeSet getGeneralAttributes() {
         return generalA;
     }
- 
-    @Override
-	public abstract String getWord( int alternative);
-
-    @Override
-	public abstract int getWordAlternativeCount();
-
-    @Override
-	public abstract AttributeSet getWordAttributes( int alternative);
 
     @Override
 	public AttributeSet getWordAttributes() {
@@ -133,19 +122,8 @@ public abstract class BaseEntry implements DictionaryEntry {
     }
 
     @Override
-	public String getReading( int alternative) {
-        if (alternative != 0) {
-	        throw new IllegalArgumentException();
-        }
-        return reading;
-    }
-
-    @Override
-	public int getReadingAlternativeCount() { return 1; }
-
-    @Override
 	public AttributeSet getReadingAttributes( int alternative) {
-        if (alternative != 0) {
+        if (alternative < 0 || alternative >= getReadingAlternativeCount()) {
 	        throw new IllegalArgumentException();
         }
 
@@ -198,20 +176,20 @@ public abstract class BaseEntry implements DictionaryEntry {
             if (crm<0 || crm >= translations[rom].length) {
 	            throw new IllegalArgumentException();
             }
-            if (translationRomA[rom] != null) {
+            if (rom < translationRomA.length && translationRomA[rom] != null) {
 	            return emptySet.setParent( translationRomA[rom]);
             } else {
 	            return emptySet.setParent( translationA);
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ex);
         }
     }
 
     @Override
 	public AttributeSet getTranslationAttributes( int rom) {
         try {
-            if (translationRomA[rom] != null) {
+            if (rom < translationRomA.length && translationRomA[rom] != null) {
 	            return translationRomA[rom];
             } else {
 	            return emptySet.setParent( translationA);
@@ -229,14 +207,41 @@ public abstract class BaseEntry implements DictionaryEntry {
     @Override
 	public Dictionary getDictionary() { return dictionary; }
 
+
+    @SuppressWarnings("PMD") // generated code
     @Override
-	public boolean equals( Object o) {
-        return (o instanceof BaseEntry &&
-                ((BaseEntry) o).dictionary == dictionary &&
-                ((BaseEntry) o).entryMarker == entryMarker);
+    public int hashCode() {
+	    final int prime = 31;
+	    int result = 1;
+	    result = prime * result + ((dictionary == null) ? 0 : dictionary.hashCode());
+	    result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+	    return result;
     }
 
-    /**
+    @SuppressWarnings("PMD") // generated code
+	@Override
+    public boolean equals(Object obj) {
+	    if (this == obj)
+		    return true;
+	    if (obj == null)
+		    return false;
+	    if (getClass() != obj.getClass())
+		    return false;
+	    BaseEntry other = (BaseEntry) obj;
+	    if (dictionary == null) {
+		    if (other.dictionary != null)
+			    return false;
+	    } else if (!dictionary.equals(other.dictionary))
+		    return false;
+	    if (reference == null) {
+		    if (other.reference != null)
+			    return false;
+	    } else if (!reference.equals(other.reference))
+		    return false;
+	    return true;
+    }
+
+	/**
      * Creates a new reference to this entry. If the dictionary from which the entry
      * originated implements the {@link MarkerDictionary MarkerDictionary} interface, a
      * {@link BaseEntryRef BaseEntryRef} is created, otherwise a reference which simply stores

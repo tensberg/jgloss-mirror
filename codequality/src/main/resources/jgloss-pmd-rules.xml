@@ -67,7 +67,9 @@
     </rule>
     <rule ref="rulesets/strictexception.xml" />
     <rule ref="rulesets/strings.xml" />
-    <rule ref="rulesets/sunsecure.xml" />
+    <rule ref="rulesets/sunsecure.xml">
+        <exclude name="ArrayIsStoredDirectly" />
+    </rule>
     <rule ref="rulesets/typeresolution.xml" />
     <rule ref="rulesets/unusedcode.xml" />
 </ruleset>

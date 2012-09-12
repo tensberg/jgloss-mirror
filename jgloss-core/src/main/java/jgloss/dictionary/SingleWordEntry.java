@@ -28,15 +28,18 @@ import java.util.List;
 import jgloss.dictionary.attribute.AttributeSet;
 
 public class SingleWordEntry extends BaseEntry {
-    protected String word;
+    private final String word;
+
+    private final String reading;
 
     public SingleWordEntry( int _entryMarker, String _word, String _reading, List<List<String>> _translations,
                        AttributeSet _generalA, AttributeSet _wordA, AttributeSet _translationA,
                        List<AttributeSet> _translationRomA, Dictionary _dictionary) {
-        super( _entryMarker, _reading, _translations,
+        super( _entryMarker, _translations,
                _generalA, _wordA, _translationA,
                _translationRomA, _dictionary);
         this.word = _word;
+        this.reading = _reading;
     }
 
     @Override
@@ -58,6 +61,17 @@ public class SingleWordEntry extends BaseEntry {
 
         return emptySet.setParent( wordA);
     }
+
+    @Override
+	public String getReading( int alternative) {
+        if (alternative != 0) {
+	        throw new IllegalArgumentException();
+        }
+        return reading;
+    }
+
+    @Override
+	public int getReadingAlternativeCount() { return 1; }
 
     @Override
 	public String toString() {
