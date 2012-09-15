@@ -153,7 +153,7 @@ public class EDictEntryParserTest {
 	
 	@Test
 	public void testParseComplexEntry() {
-		DictionaryEntry entry = parser.parseEntry("KANJI-1;KANJI-2 [KANA-1;KANA-2] /(general information) (see xxxx,yyyy) gloss/gloss2/.../EntL12345678X/" , TEST_OFFSET);
+		DictionaryEntry entry = parser.parseEntry("KANJI-1;KANJI-2 [KANA-1;KANA-2] /(general information) (see xxxx,yyyy・reading・subentry) gloss/gloss2/.../EntL12345678X/" , TEST_OFFSET);
 		assertThat(entry).isNotNull();
 		assertThat(entry.getDictionary()).isEqualTo(dictionary);
 		assertThat(entry.getWordAlternativeCount()).isEqualTo(2);
@@ -175,9 +175,9 @@ public class EDictEntryParserTest {
 		assertThat(references).isNotNull();
 		assertThat(references).hasSize(2);
 		ReferenceAttributeValue referenceX = references.get(0);
-		assertReference(referenceX, "xxxx");
+		assertReference(referenceX, "xxxx", "xxxx");
 		ReferenceAttributeValue referenceY = references.get(1);
-		assertReference(referenceY, "yyyy");
+		assertReference(referenceY, "yyyy・reading・subentry", "yyyy");
 
 		List<InformationAttributeValue> explanations = entry.getTranslationAttributes().getAttribute(Attributes.EXPLANATION, false);
 		assertThat(explanations).isNotNull();
@@ -187,12 +187,12 @@ public class EDictEntryParserTest {
 		assertThat(explanation.getInformation()).isEqualTo(GENERAL_INFORMATION);
 	}
 
-	private void assertReference(ReferenceAttributeValue reference, String text) {
+	private void assertReference(ReferenceAttributeValue reference, String referenceTitle, String referenceText) {
 	    assertThat(reference).isNotNull();
 		assertThat(reference).isInstanceOf(SearchReference.class);
-		assertThat(reference.getReferenceTitle()).isEqualTo(text);
+		assertThat(reference.getReferenceTitle()).isEqualTo(referenceTitle);
 		SearchReference searchReference = (SearchReference) reference;
-		assertThat(searchReference.getReference()).isEqualTo(text);
+		assertThat(searchReference.getReference()).isEqualTo(referenceText);
 		assertThat(searchReference.getDictionary()).isEqualTo(dictionary);
 		assertThat(searchReference.getSearchMode()).isNotNull();
 		assertThat(searchReference.getSearchFieldSelection()).isNotNull();

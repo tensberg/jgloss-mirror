@@ -164,9 +164,7 @@ class EDictEntryParser implements EntryParser {
                         seenROM = true;
                     } else if (refs != null) {
                     	for (String ref : tokenize(refs, ",")) {
-                    	generalA.addAttribute(Attributes.REFERENCE, 
-                    					new SearchReference(ref, edict, ExpressionSearchModes.EXACT,
-                    									ref, MATCH_WORD_FIELD));
+                    		addReference(generalA, ref);
                     	}
                     } else {
                         // attribute list separated by ','
@@ -183,6 +181,20 @@ class EDictEntryParser implements EntryParser {
                 crm.add( translation);
             }
         }
+    }
+
+	private void addReference(DefaultAttributeSet generalA, String ref) {
+	    int dot = ref.indexOf('・');
+	    String refText;
+	    if (dot < 0) {
+	    	refText = ref;
+	    } else {
+	    	refText = ref.substring(0, dot);
+	    }
+	    
+	    generalA.addAttribute(Attributes.REFERENCE, 
+	    				new SearchReference(ref, edict, ExpressionSearchModes.EXACT,
+	    								refText, MATCH_WORD_FIELD));
     }
 
 	private void addAttribute(DefaultAttributeSet generalA, DefaultAttributeSet wordA, DefaultAttributeSet translationA, DefaultAttributeSet translationromA,
