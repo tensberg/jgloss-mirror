@@ -9,6 +9,7 @@ import jgloss.dictionary.attribute.Attributes;
 import jgloss.dictionary.attribute.InformationAttributeValue;
 import jgloss.dictionary.attribute.Priority;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
+import jgloss.dictionary.attribute.SearchReference;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -152,7 +153,7 @@ public class EDictEntryParserTest {
 	
 	@Test
 	public void testParseComplexEntry() {
-		DictionaryEntry entry = parser.parseEntry("KANJI-1;KANJI-2 [KANA-1;KANA-2] /(general information) (see xxxx) gloss/gloss2/.../EntL12345678X/" , TEST_OFFSET);
+		DictionaryEntry entry = parser.parseEntry("KANJI-1;KANJI-2 [KANA-1;KANA-2] /(general information) (see xxxx,yyyy) gloss/gloss2/.../EntL12345678X/" , TEST_OFFSET);
 		assertThat(entry).isNotNull();
 		assertThat(entry.getDictionary()).isEqualTo(dictionary);
 		assertThat(entry.getWordAlternativeCount()).isEqualTo(2);
@@ -172,10 +173,11 @@ public class EDictEntryParserTest {
 		
 		List<ReferenceAttributeValue> references = entry.getGeneralAttributes().getAttribute(Attributes.REFERENCE, false);
 		assertThat(references).isNotNull();
-		assertThat(references).hasSize(1);
-		ReferenceAttributeValue reference = references.get(0);
-		assertThat(reference).isNotNull();
-		assertThat(reference.getReferenceTitle()).isEqualTo("xxxx");
+		assertThat(references).hasSize(2);
+		ReferenceAttributeValue referenceX = references.get(0);
+		assertReference(referenceX, "xxxx");
+		ReferenceAttributeValue referenceY = references.get(1);
+		assertReference(referenceY, "yyyy");
 
 		List<InformationAttributeValue> explanations = entry.getTranslationAttributes().getAttribute(Attributes.EXPLANATION, false);
 		assertThat(explanations).isNotNull();
@@ -184,4 +186,15 @@ public class EDictEntryParserTest {
 		assertThat(explanation).isNotNull();
 		assertThat(explanation.getInformation()).isEqualTo(GENERAL_INFORMATION);
 	}
+
+	private void assertReference(ReferenceAttributeValue reference, String text) {
+	    assertThat(reference).isNotNull();
+		assertThat(reference).isInstanceOf(SearchReference.class);
+		assertThat(reference.getReferenceTitle()).isEqualTo(text);
+		SearchReference searchReference = (SearchReference) reference;
+		assertThat(searchReference.getReference()).isEqualTo(text);
+		assertThat(searchReference.getDictionary()).isEqualTo(dictionary);
+		assertThat(searchReference.getSearchMode()).isNotNull();
+		assertThat(searchReference.getSearchFieldSelection()).isNotNull();
+    }
 }

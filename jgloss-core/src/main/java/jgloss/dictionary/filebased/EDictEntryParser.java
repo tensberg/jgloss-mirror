@@ -150,7 +150,7 @@ class EDictEntryParser implements EntryParser {
 
                     // the matcher is constructed such that either group 1, group 2 or group 3 matches (is not null)
                     String romMarker = bracketMatcher.group(1);
-                    String ref = bracketMatcher.group(2);
+                    String refs = bracketMatcher.group(2);
                     String att = bracketMatcher.group(3);
 
                     if (romMarker != null) {
@@ -162,9 +162,12 @@ class EDictEntryParser implements EntryParser {
                             roma.add( translationromA);
                         }
                         seenROM = true;
-                    } else if (ref != null) {
+                    } else if (refs != null) {
+                    	for (String ref : tokenize(refs, ",")) {
                     	generalA.addAttribute(Attributes.REFERENCE, 
-                    					new SearchReference(ref, edict, ExpressionSearchModes.EXACT, ref, MATCH_WORD_FIELD));
+                    					new SearchReference(ref, edict, ExpressionSearchModes.EXACT,
+                    									ref, MATCH_WORD_FIELD));
+                    	}
                     } else {
                         // attribute list separated by ','
                     	for (String attsub : tokenize(att, ",")) {
