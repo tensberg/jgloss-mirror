@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2004 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2012 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -23,27 +23,13 @@
 
 package jgloss.dictionary.attribute;
 
-import java.util.Iterator;
-
-import jgloss.dictionary.DictionaryEntry;
-import jgloss.dictionary.SearchException;
-
 /**
- * Reference to other dictionary entries.
+ * Reference to other dictionary entries. Subclasses define how the reference is resolved. Usually
+ * this will be by using the search parameters given in the subclass.
  *
  * @author Michael Koch
  */
 public interface ReferenceAttributeValue extends AttributeValue {
-    /**
-     * Return an iterator over the {@link jgloss.dictionary.DictionaryEntry dictionary entries}
-     * referenced by this attribute value. The value object will often not store the entries
-     * directly, but will perform a dictionary search every time this method is called. The
-     * iterator result should therefore be stored if it is used multiple times. The iterator
-     * should usually have at least one result, though under exceptional circumstances it may
-     * be empty (for example if at attribute value instantiation time it can't be easily checked if
-     * the referenced entry exists).
-     */
-    Iterator<DictionaryEntry> getReferencedEntries() throws SearchException;
     /**
      * Return the title of the reference. This is usually the word field of the referenced entry.
      */

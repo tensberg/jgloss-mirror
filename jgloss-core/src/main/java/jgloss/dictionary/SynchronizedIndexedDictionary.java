@@ -36,21 +36,22 @@ class SynchronizedIndexedDictionary extends SynchronizedDictionary implements In
         super(dictionary);
     }
 
-    private IndexedDictionary getDictionary() {
+    @Override
+    public IndexedDictionary getWrappedDictionary() {
         return (IndexedDictionary) dictionary;
     }
 
     @Override
     public boolean loadIndex() throws IndexException {
         synchronized (mutex) {
-            return getDictionary().loadIndex();
+            return getWrappedDictionary().loadIndex();
         }
     }
 
     @Override
     public void buildIndex() throws IndexException {
         synchronized (mutex) {
-            getDictionary().buildIndex();
+            getWrappedDictionary().buildIndex();
         }
     }
 }

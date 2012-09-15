@@ -459,8 +459,8 @@ class WadokuJTEntryParser implements EntryParser {
             if (mainEntry.length() > 0) {
                 // reference to main entry
                 generalA.addAttribute( WadokuJT.MAIN_ENTRY_REF, new SearchReference
-                                       ( mainEntry, wadokujt, ExpressionSearchModes.EXACT, new Object[]
-                                           { mainEntry, MATCH_WORD_FIELD }));
+                                       ( mainEntry, wadokujt, ExpressionSearchModes.EXACT,
+                                    				   mainEntry, MATCH_WORD_FIELD));
             }
 
             // create entry

@@ -1,11 +1,12 @@
 package jgloss.ui;
 
 import jgloss.dictionary.Dictionary;
+import jgloss.dictionary.DictionaryWrapper;
 
 /**
  * Wrapper for a dictionary and its descriptor. Used as elements in the list model.
  */
-class DictionaryWrapper {
+class DescriptorDictionaryWrapper implements DictionaryWrapper {
     /**
      * Descriptor used to create the dictionary. Usually the path to the dictionary file.
      *
@@ -14,7 +15,7 @@ class DictionaryWrapper {
     public String descriptor;
     public Dictionary dictionary;
 
-    public DictionaryWrapper( String descriptor, Dictionary dictionary) {
+    public DescriptorDictionaryWrapper( String descriptor, Dictionary dictionary) {
         this.descriptor = descriptor;
         this.dictionary = dictionary;
     }
@@ -25,6 +26,11 @@ class DictionaryWrapper {
     @Override
 	public String toString() {
         return dictionary.toString();
+    }
+    
+    @Override
+    public Dictionary getWrappedDictionary() {
+        return dictionary;
     }
 
     @Override
@@ -44,7 +50,7 @@ class DictionaryWrapper {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        DictionaryWrapper other = (DictionaryWrapper) obj;
+        DescriptorDictionaryWrapper other = (DescriptorDictionaryWrapper) obj;
         if (descriptor == null) {
             if (other.descriptor != null)
                 return false;

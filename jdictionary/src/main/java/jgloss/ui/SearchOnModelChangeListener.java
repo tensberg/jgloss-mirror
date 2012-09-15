@@ -1,5 +1,6 @@
 package jgloss.ui;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
@@ -26,7 +27,13 @@ class SearchOnModelChangeListener implements LookupChangeListener {
 	
 	@Override
 	public void stateChanged(LookupChangeEvent event) {
-		delayedActionTimer.restart();
+		if (event.isChangeComplete()) {
+			delayedActionTimer.stop();
+			delayedActionTimer.getActionListeners()[0].actionPerformed(
+							new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "search"));
+		} else {
+			delayedActionTimer.restart();
+		}
 	}
 
 }

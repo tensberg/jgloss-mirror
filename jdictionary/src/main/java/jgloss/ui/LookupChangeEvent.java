@@ -45,12 +45,25 @@ class LookupChangeEvent extends EventObject {
 
     private final int changes;
 
-    public LookupChangeEvent( Object _source, int _changes) {
-        super( _source);
-        changes = _changes;
+    private final boolean changeComplete;
+    
+    public LookupChangeEvent( Object source, int changes, boolean changeComplete) {
+        super(source);
+        this.changes = changes;
+		this.changeComplete = changeComplete;
     }
 
     public boolean hasChanged( int what) {
         return (changes & what) != 0;
+    }
+    
+    /**
+     * 
+     * @return <code>true</code> if this is the last in a series of consecutive changes to the model and the search
+     *     can start immediately. Usually <code>false</code> for changes performed by the user because it is not
+     *     known if he will do another change soon.
+     */
+    public boolean isChangeComplete() {
+	    return changeComplete;
     }
 } // class LookupChangeEvent

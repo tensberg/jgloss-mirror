@@ -34,8 +34,6 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,9 +49,9 @@ import jgloss.Preferences;
 import jgloss.dictionary.DictionaryEntryField;
 import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.MatchMode;
-import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
+import jgloss.dictionary.attribute.SearchReference;
 import jgloss.ui.util.XCVManager;
 
 public class SimpleLookup extends JPanel implements ActionListener, HyperlinkListener {
@@ -116,10 +114,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         }
 
     }
-
-
-    private static final Logger LOGGER = Logger.getLogger(SimpleLookup.class.getPackage().getName());
-    
+   
     private static final long serialVersionUID = 1L;
     
     private static final String STYLE_SHEET = "/data/lookup-minimal.css";
@@ -265,15 +260,14 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         if (LookupResultHyperlinker.REFERENCE_PROTOCOL.equals( type)) {
             ReferenceAttributeValue ref = (ReferenceAttributeValue) 
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
-            if (ref != null) {
-	            try {
-	                new LookupResultCache
-	                    ( JGloss.MESSAGES.getString( "wordlookup.reference", 
-	                                                 new Object[] { ref.getReferenceTitle() }),
-	                      ref.getReferencedEntries()).replay( lookupResultProxy);
-	            } catch (SearchException ex) {
-	                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-	            }
+            if (ref instanceof SearchReference) {
+            	SearchReference searchRef = (SearchReference) ref;
+            	model.selectAllDictionaries(false);
+            	model.selectDictionary(searchRef.getDictionary());
+            	model.setSearchExpression(searchRef.getReference());
+            	model.setSearchFieldSelection(searchRef.getSearchFieldSelection());
+            } else {
+            	throw new IllegalArgumentException("unsupported reference type " + ref);
             }
         }
     }

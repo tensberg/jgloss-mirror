@@ -131,6 +131,7 @@ public class SearchFieldSelection implements Cloneable {
         return this;
     }
 
+    @SuppressWarnings("PMD") // generated code
     @Override
     public int hashCode() {
 	    final int prime = 31;
@@ -143,6 +144,7 @@ public class SearchFieldSelection implements Cloneable {
 	    return result;
     }
     
+    @SuppressWarnings("PMD") // generated code
 	@Override
     public boolean equals(Object obj) {
 	    if (this == obj)

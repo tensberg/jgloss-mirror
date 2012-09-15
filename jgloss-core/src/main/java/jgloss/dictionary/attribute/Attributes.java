@@ -23,8 +23,6 @@
 
 package jgloss.dictionary.attribute;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 
 import jgloss.dictionary.DictionaryEntry;
@@ -54,19 +52,6 @@ public class Attributes<T extends AttributeValue> implements Attribute<T> {
         new ReferenceAttributeValue() {
             @Override
 			public String getReferenceTitle() { return NAMES.getString( "example.reference"); }
-            @Override
-			public Iterator<DictionaryEntry> getReferencedEntries() {
-                return new Iterator<DictionaryEntry>() {
-                        @Override
-						public boolean hasNext() { return false; }
-                        @Override
-						public DictionaryEntry next() { throw new NoSuchElementException(); }
-						@Override
-                        public void remove() {
-	                        throw new UnsupportedOperationException();
-                        }
-                    };
-            }
         };
 
     public static final Abbreviation EXAMPLE_ABBREVIATION_VALUE =

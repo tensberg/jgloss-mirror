@@ -36,7 +36,7 @@ import jgloss.dictionary.attribute.AttributeValue;
  * @see DictionaryFactory#synchronizedDictionary(Dictionary)
  * @author Michael Koch <tensberg@gmx.net>
  */
-class SynchronizedDictionary implements Dictionary {
+class SynchronizedDictionary implements Dictionary, DictionaryWrapper {
     protected final Dictionary dictionary;
 
     protected final Object mutex = new Object();
@@ -99,5 +99,10 @@ class SynchronizedDictionary implements Dictionary {
     	synchronized (mutex) {
     		return dictionary.toString();
     	}
+    }
+
+    @Override
+    public Dictionary getWrappedDictionary() {
+	    return dictionary;
     }
 }

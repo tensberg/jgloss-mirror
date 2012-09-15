@@ -23,45 +23,54 @@
 
 package jgloss.dictionary.attribute;
 
-import java.util.Iterator;
-
 import jgloss.dictionary.Dictionary;
-import jgloss.dictionary.DictionaryEntry;
-import jgloss.dictionary.SearchException;
+import jgloss.dictionary.SearchFieldSelection;
 import jgloss.dictionary.SearchMode;
 
 /**
- * Reference other dictionary entries by storing search parameters and performing the
- * search if the entries are requested.
- *
+ * Reference other dictionary entries by storing search parameters and
+ * performing the search if the entries are requested.
+ * 
  * @author Michael Koch
  */
 public class SearchReference implements ReferenceAttributeValue {
-    private final String title;
-    private final Dictionary dictionary;
-    private final SearchMode searchMode;
-    private final Object[] searchParameters;
+	private final String title;
+	private final Dictionary dictionary;
+	private final SearchMode searchMode;
+	private final String reference;
+	private final SearchFieldSelection searchFieldSelection;
 
-    public SearchReference( String _title, Dictionary _dictionary, SearchMode _searchMode,
-                            Object... _searchParameters) {
-        title = _title;
-        dictionary = _dictionary;
-        searchMode = _searchMode;
-        searchParameters = _searchParameters;
-    }   
+	public SearchReference(String title, Dictionary dictionary, SearchMode searchMode, String reference, SearchFieldSelection searchFieldSelection) {
+		this.title = title;
+		this.dictionary = dictionary;
+		this.searchMode = searchMode;
+		this.reference = reference;
+		this.searchFieldSelection = searchFieldSelection;
+	}
 
-    @Override
-	public Iterator<DictionaryEntry> getReferencedEntries() throws SearchException {
-        return dictionary.search( searchMode, searchParameters);
-    }
+	@Override
+	public String getReferenceTitle() {
+		return title;
+	}
 
-    @Override
-	public String getReferenceTitle() { return title; }
+	public Dictionary getDictionary() {
+		return dictionary;
+	}
 
-    public Dictionary getDictionary() { return dictionary; }
-    public SearchMode getSearchMode() { return searchMode; }
-    public Object[] getSearchParameters() { return searchParameters; }
+	public SearchMode getSearchMode() {
+		return searchMode;
+	}
 
-    @Override
-	public String toString() { return "\u2192" + title; }
+	public String getReference() {
+		return reference;
+	}
+
+	public SearchFieldSelection getSearchFieldSelection() {
+		return searchFieldSelection;
+	}
+
+	@Override
+	public String toString() {
+		return "\u2192" + title;
+	}
 } // class SearchReference

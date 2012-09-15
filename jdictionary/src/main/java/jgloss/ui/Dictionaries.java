@@ -93,14 +93,14 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     final JList dictionaries;
 
     /**
-     * List of {@link DictionaryWrapper DictionaryWrapper } instances with
+     * List of {@link DescriptorDictionaryWrapper DictionaryWrapper } instances with
      * dictionaries currently used in the application. This is the list of dictionaries
      * returned by {@link #getDictionaries() getDictionaries}.
      * If the user has edited
      * the dictionary list in the preference dialog, but not yet applied the changes,
      * this list is different from the dictionary list displayed.
      */
-    private final List<DictionaryWrapper> activeDictionaries = new ArrayList<DictionaryWrapper>( 10);
+    private final List<DescriptorDictionaryWrapper> activeDictionaries = new ArrayList<DescriptorDictionaryWrapper>( 10);
 
     /**
      * Returns the single application-wide instance.
@@ -129,7 +129,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 
         Dictionary[] out = new Dictionary[activeDictionaries.size()];
         int index = 0;
-        for ( DictionaryWrapper wrapper : activeDictionaries) {
+        for ( DescriptorDictionaryWrapper wrapper : activeDictionaries) {
             out[index++] = wrapper.dictionary;
         }
 
@@ -331,7 +331,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     private boolean isAlreadyAdded(String descriptor) {
         ListModel model = dictionaries.getModel();
         for (int i=0; i<model.getSize(); i++) {
-            if (((DictionaryWrapper) model.getElementAt(i)).descriptor.equals( descriptor)) {
+            if (((DescriptorDictionaryWrapper) model.getElementAt(i)).descriptor.equals( descriptor)) {
                 return true;
             }
         }
@@ -409,10 +409,10 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 
         ListModel model = dictionaries.getModel();
         StringBuilder paths = new StringBuilder( model.getSize()*32);
-        List<DictionaryWrapper> newDictionaries = new ArrayList<DictionaryWrapper>( model.getSize());
+        List<DescriptorDictionaryWrapper> newDictionaries = new ArrayList<DescriptorDictionaryWrapper>( model.getSize());
 
         for ( int i=0; i<model.getSize(); i++) {
-            DictionaryWrapper dictionaryWrapper = (DictionaryWrapper) model.getElementAt( i);
+            DescriptorDictionaryWrapper dictionaryWrapper = (DescriptorDictionaryWrapper) model.getElementAt( i);
             newDictionaries.add( dictionaryWrapper);
             if (paths.length() > 0) {
                 paths.append( File.pathSeparatorChar);
@@ -421,7 +421,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         }
 
         // dispose any dictionaries which are no longer active
-        for (DictionaryWrapper d : activeDictionaries) {
+        for (DescriptorDictionaryWrapper d : activeDictionaries) {
             if (!newDictionaries.contains( d)) {
                 d.dictionary.dispose();
             }
@@ -453,7 +453,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                     }
                 }
 
-                activeDictionaries.add( new DictionaryWrapper( element, d));
+                activeDictionaries.add( new DescriptorDictionaryWrapper( element, d));
             } catch (Exception ex) {
                 exceptions.add( ex);
                 exceptions.add( element);
@@ -494,13 +494,13 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         ListModel oldModel = dictionaries.getModel();
 
         for ( int i=0; i<oldModel.getSize(); i++) {
-            DictionaryWrapper d = (DictionaryWrapper) oldModel.getElementAt( i);
+            DescriptorDictionaryWrapper d = (DescriptorDictionaryWrapper) oldModel.getElementAt( i);
             if (!activeDictionaries.contains( d)) {
                 d.dictionary.dispose();
             }
         }
 
-        for (DictionaryWrapper dictionaryWrapper : activeDictionaries) {
+        for (DescriptorDictionaryWrapper dictionaryWrapper : activeDictionaries) {
             model.addElement(dictionaryWrapper);
         }
 

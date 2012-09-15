@@ -23,6 +23,8 @@
 
 package jgloss.ui;
 
+import static jgloss.dictionary.DictionaryUtils.unwrap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +40,7 @@ import jgloss.dictionary.SearchFieldSelection;
 import jgloss.dictionary.SearchMode;
 import jgloss.dictionary.SearchParameter;
 import jgloss.dictionary.StandardSearchParameter;
+import jgloss.dictionary.attribute.SearchReference;
 
 /**
  * Model for user configuration of dictionary lookups.
@@ -57,7 +60,7 @@ public class LookupModel implements Cloneable {
 
     private List<StateWrapper<SearchMode>> searchModes;
 
-    private List<StateWrapper<Dictionary>> dictionaries;
+    private List<DictionaryStateWrapper> dictionaries;
     private boolean allDictionariesSelected = false;
     private boolean multiDictionaryMode = false;
     private boolean multiDictionarySelection = false;
@@ -72,6 +75,8 @@ public class LookupModel implements Cloneable {
     private boolean searchExpressionEnabled = false;
     private int distance = 1;
     private boolean distanceEnabled = false;
+    
+    private boolean eventChangeComplete;
 
     private final List<LookupChangeListener> listeners = new CopyOnWriteArrayList<LookupChangeListener>();
 
@@ -81,9 +86,9 @@ public class LookupModel implements Cloneable {
             searchModes.add( new StateWrapper<SearchMode>(searchMode));
         }
 
-        dictionaries = new ArrayList<StateWrapper<Dictionary>>( _dictionaries.size());
+        dictionaries = new ArrayList<DictionaryStateWrapper>( _dictionaries.size());
         for (Dictionary dictionary : _dictionaries) {
-            dictionaries.add( new StateWrapper<Dictionary>(dictionary));
+            dictionaries.add( new DictionaryStateWrapper(dictionary));
         }
 
         filters = new ArrayList<StateWrapper<LookupResultFilter>>( _filters.size());
@@ -223,7 +228,7 @@ public class LookupModel implements Cloneable {
                             (parameterFieldsChanged ? 
                             LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY : 0) |
                             (searchFieldsChanged ? 
-                            LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0)));
+                            LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0), eventChangeComplete));
     }
 
     public void setMultiDictionarySelectionMode( boolean mode) {
@@ -269,7 +274,7 @@ public class LookupModel implements Cloneable {
                             (parameterFieldsChanged ? 
                             LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY : 0) |
                             (searchFieldsChanged ? 
-                            LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0)));
+                            LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0), eventChangeComplete));
     }
 
     public void selectAllDictionaries( boolean select) {
@@ -292,26 +297,26 @@ public class LookupModel implements Cloneable {
                             (parameterFieldsChanged ? 
                             LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY : 0) |
                             (searchFieldsChanged ? 
-                            LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0)));
+                            LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0), eventChangeComplete));
     }
 
     public boolean isAllDictionariesSelected() { return allDictionariesSelected; }
 
     public void setDictionaries( List<Dictionary> _newDictionaries) {
         List<Dictionary> newDictionaries = new ArrayList<Dictionary>( _newDictionaries);
-        Map<Dictionary, StateWrapper<Dictionary>> oldDictionaries = new HashMap<Dictionary, StateWrapper<Dictionary>>( (int) (dictionaries.size()*1.5));
-        for (StateWrapper<Dictionary> wrapper : dictionaries) {
+        Map<Dictionary, DictionaryStateWrapper> oldDictionaries = new HashMap<Dictionary, DictionaryStateWrapper>( (int) (dictionaries.size()*1.5));
+        for (DictionaryStateWrapper wrapper : dictionaries) {
             oldDictionaries.put( wrapper.getObject(), wrapper);
         }
 
         boolean seenSelectedDictionary = false;
         multiDictionarySelection = false;
 
-        List<StateWrapper<Dictionary>> newDictionaryWrappers = new ArrayList<StateWrapper<Dictionary>>(newDictionaries.size());
+        List<DictionaryStateWrapper> newDictionaryWrappers = new ArrayList<DictionaryStateWrapper>(newDictionaries.size());
         for (Dictionary d : newDictionaries) {
-            StateWrapper<Dictionary> wrapper = oldDictionaries.get( d);
+            DictionaryStateWrapper wrapper = oldDictionaries.get( d);
             if (wrapper == null) {
-	            wrapper = new StateWrapper<Dictionary>( d, false, false);
+	            wrapper = new DictionaryStateWrapper( d, false, false);
             } else {
                 if (wrapper.isSelected() && wrapper.isEnabled()) {
                     if (seenSelectedDictionary) {
@@ -349,16 +354,31 @@ public class LookupModel implements Cloneable {
                             (parameterFieldsChanged ? 
                              LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY : 0) |
                             (searchFieldsChanged ? 
-                             LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0)));
+                             LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0), eventChangeComplete));
     }
 
+    public void selectDictionary(Dictionary dictionary) {
+    	for (DictionaryStateWrapper wrapper : dictionaries) {
+    		Dictionary wrappedDictionary = unwrap(wrapper);
+			if (wrappedDictionary.equals(dictionary)) {
+    			selectDictionary(true, wrapper);
+    			return;
+    		}
+    	}
+    	
+    	throw new IllegalArgumentException("unsupported dictionary " + dictionary);
+    }
+    
     public void selectDictionary( int index, boolean select) {
         StateWrapper<Dictionary> newDictionaryWrapper = dictionaries.get( index);
-        if (newDictionaryWrapper.isSelected() == select)
-		 {
+        selectDictionary(select, newDictionaryWrapper);
+    }
+
+	private void selectDictionary(boolean select, StateWrapper<Dictionary> dictionaryWrapper) {
+	    if (dictionaryWrapper.isSelected() == select) {
 	        return; // nothing to do
         }
-        if (select && !newDictionaryWrapper.isEnabled()) {
+        if (select && !dictionaryWrapper.isEnabled()) {
 	        throw new IllegalArgumentException( "selected dictionary not enabled");
         }
 
@@ -372,7 +392,7 @@ public class LookupModel implements Cloneable {
             }
         }
 
-        newDictionaryWrapper.setSelected( select);
+        dictionaryWrapper.setSelected( select);
         
         if (multiDictionaryMode) {
             // check if more than one dictionary is selected
@@ -403,7 +423,7 @@ public class LookupModel implements Cloneable {
                             (parameterFieldsChanged ? 
                             LookupChangeEvent.SEARCH_PARAMETERS_AVAILABILITY : 0) |
                             (searchFieldsChanged ? 
-                            LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0)));
+                            LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY : 0), eventChangeComplete));
     }
 
     public boolean isDictionarySelected( int index) {
@@ -420,7 +440,7 @@ public class LookupModel implements Cloneable {
 
     public Dictionary[] getDictionaries() {
         Dictionary[] out = new Dictionary[dictionaries.size()];
-        for ( ListIterator<StateWrapper<Dictionary>> i=dictionaries.listIterator(); i.hasNext(); ) {
+        for ( ListIterator<DictionaryStateWrapper> i=dictionaries.listIterator(); i.hasNext(); ) {
             Dictionary dictionary = i.next().getObject();
             out[i.previousIndex()] = dictionary;
         }
@@ -446,7 +466,7 @@ public class LookupModel implements Cloneable {
         }
         searchFields.select( field, selected);
         
-        fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_FIELDS_SELECTION));
+        fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_FIELDS_SELECTION, eventChangeComplete));
     }
 
     public void selectMatchMode( MatchMode mode, boolean selected) {
@@ -459,7 +479,12 @@ public class LookupModel implements Cloneable {
         searchFields.select( mode, selected);
         searchFields.select( mode==MatchMode.FIELD ? MatchMode.WORD : MatchMode.FIELD, !selected);
         
-        fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_FIELDS_SELECTION));
+        fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_FIELDS_SELECTION, eventChangeComplete));
+    }
+    
+    public void setSearchFieldSelection(SearchFieldSelection searchFields) {
+    	this.searchFields = searchFields;
+    	fireLookupChange(new LookupChangeEvent(this, LookupChangeEvent.SEARCH_FIELDS_SELECTION, eventChangeComplete));
     }
 
     public SearchFieldSelection getSearchFields() { return searchFields; }
@@ -491,7 +516,7 @@ public class LookupModel implements Cloneable {
         }
 
         filterWrapper.setSelected( select);
-        fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.FILTER_SELECTION));
+        fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.FILTER_SELECTION, eventChangeComplete));
     }
 
     public boolean isFilterSelected( int index) {
@@ -537,7 +562,7 @@ public class LookupModel implements Cloneable {
     public void setSearchExpression( String _searchExpression) {
         if (!searchExpression.equals( _searchExpression)) {
             searchExpression = _searchExpression;
-            fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_PARAMETERS));
+            fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_PARAMETERS, eventChangeComplete));
         }
     }
 
@@ -548,7 +573,7 @@ public class LookupModel implements Cloneable {
     public void setDistance( int _distance) {
         if (distance != _distance) {
             distance = _distance;
-            fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_PARAMETERS));
+            fireLookupChange( new LookupChangeEvent( this, LookupChangeEvent.SEARCH_PARAMETERS, eventChangeComplete));
         }
     }
 
@@ -705,10 +730,11 @@ public class LookupModel implements Cloneable {
         }
     }
     
-    private <T> List<StateWrapper<T>> cloneStateList( List<StateWrapper<T>> in) {
-        List<StateWrapper<T>> out = new ArrayList<StateWrapper<T>>( in.size());
-        for (StateWrapper<T> wrapper : in) {
-            out.add(wrapper.clone());
+    @SuppressWarnings("unchecked")
+    private <S, T extends StateWrapper<S>> List<T> cloneStateList( List<T> in) {
+        List<T> out = new ArrayList<T>( in.size());
+        for (T wrapper : in) {
+            out.add((T) wrapper.clone());
         }
         return out;
     }
@@ -803,5 +829,15 @@ public class LookupModel implements Cloneable {
         updateSearchParametersAvailability( mode);
         updateSearchFieldsAvailability( mode);
         updateFilterAvailability();
+    }
+    
+    public void followReference(SearchReference reference) {
+    	selectAllDictionaries(false);
+    	selectDictionary(reference.getDictionary());
+    	setSearchExpression(reference.getReference());
+    	selectSearchMode(reference.getSearchMode());
+    	eventChangeComplete = true;
+    	setSearchFieldSelection(reference.getSearchFieldSelection());
+    	eventChangeComplete = false;
     }
 } // class LookupModel

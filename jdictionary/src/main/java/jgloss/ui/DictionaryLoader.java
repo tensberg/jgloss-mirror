@@ -20,7 +20,7 @@ import jgloss.ui.util.JGlossWorker;
 /**
  * Thread used to load dictionaries asynchronously when the user has selected "add dictionaries".
  */
-class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DictionaryWrapper> {
+class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DescriptorDictionaryWrapper> {
     private static final Logger LOGGER = Logger.getLogger(DictionaryLoader.class.getPackage().getName());
 
     private final List<String> dictionaryDescriptors;
@@ -63,8 +63,8 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DictionaryWrap
     }
 
     @Override
-    protected void process(List<DictionaryWrapper> chunks) {
-        for (DictionaryWrapper wrapper : chunks) {
+    protected void process(List<DescriptorDictionaryWrapper> chunks) {
+        for (DescriptorDictionaryWrapper wrapper : chunks) {
             model.addElement(wrapper);
         }
     }
@@ -80,7 +80,7 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DictionaryWrap
         }
     }
 
-    private DictionaryWrapper loadDictionary(String descriptor) throws UnsupportedDescriptorException, DictionaryInstantiationException {
+    private DescriptorDictionaryWrapper loadDictionary(String descriptor) throws UnsupportedDescriptorException, DictionaryInstantiationException {
         setMessage(MESSAGES.getString("dictionaries.loading", new File(descriptor).getName()));
 
         Dictionary dictionary = DictionaryFactory.synchronizedDictionary(DictionaryFactory.createDictionary(descriptor));
@@ -93,6 +93,6 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DictionaryWrap
             }
         }
 
-        return new DictionaryWrapper(descriptor, dictionary);
+        return new DescriptorDictionaryWrapper(descriptor, dictionary);
     }
 }

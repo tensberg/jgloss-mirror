@@ -59,6 +59,7 @@
         <exclude name="ShortVariable" />
         <exclude name="LongVariable" />
         <exclude name="AbstractNaming" />
+        <exclude name="ShortMethodName" />
     </rule>
     <rule ref="rulesets/optimizations.xml">
         <exclude name="MethodArgumentCouldBeFinal" />

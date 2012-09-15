@@ -35,8 +35,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -51,8 +49,8 @@ import javax.swing.event.HyperlinkListener;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
-import jgloss.dictionary.SearchException;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
+import jgloss.dictionary.attribute.SearchReference;
 import jgloss.ui.util.UIUtilities;
 import jgloss.ui.util.XCVManager;
 
@@ -64,8 +62,6 @@ import jgloss.ui.util.XCVManager;
  */
 public class LookupFrame extends JFrame implements ActionListener, HyperlinkListener,
                                                    DictionaryListChangeListener {
-	private static final Logger LOGGER = Logger.getLogger(LookupFrame.class.getPackage().getName());
-	
 	private static final long serialVersionUID = 1L;
     
 	private final LookupConfigPanel config;
@@ -287,17 +283,11 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         if (LookupResultHyperlinker.REFERENCE_PROTOCOL.equals( type)) {
             ReferenceAttributeValue ref = (ReferenceAttributeValue) 
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
-            if (ref != null) {
-	            try {
-	                addToHistory( createHistoryItem());
-	                currentResults.setData
-	                ( JGloss.MESSAGES.getString( "wordlookup.reference", 
-	                                             new Object[] { ref.getReferenceTitle() }),
-	                  ref.getReferencedEntries());
-	                currentResults.replay();
-	            } catch (SearchException ex) {
-	                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-	            }
+            if (ref instanceof SearchReference) {
+            	addToHistory( createHistoryItem());
+            	model.followReference((SearchReference) ref);
+            } else {
+            	throw new IllegalArgumentException("unsupported reference type " + ref);
             }
         }
     }
