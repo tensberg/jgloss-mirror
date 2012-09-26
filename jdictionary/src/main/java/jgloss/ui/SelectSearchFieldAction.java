@@ -14,29 +14,27 @@ class SelectSearchFieldAction extends LookupModelAction {
 
 	private final DictionaryEntryField searchField;
 	
-	SelectSearchFieldAction(LookupModel model, DictionaryEntryField searchField) {
-		super(model);
+	SelectSearchFieldAction(View<LookupModel> view, DictionaryEntryField searchField) {
+		super(view);
 		this.searchField = searchField;
 		UIUtilities.initAction(this, "wordlookup.searchfield." + searchField.toString().toLowerCase(Locale.US));
-		checkSetEnabled();
-		model.addLookupChangeListener(new LookupChangeListener() {
-			
-			@Override
-			public void stateChanged(LookupChangeEvent event) {
-				if (event.hasChanged(LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY)) {
-					checkSetEnabled();
-				}
-			}
-		});
+		updateEnabled(getModel());
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	    model.selectSearchField(searchField, ((AbstractButton) e.getSource()).isSelected());
+	    getModel().selectSearchField(searchField, ((AbstractButton) e.getSource()).isSelected());
 	}
 	
-	private void checkSetEnabled() {
-		 SearchFieldSelection sf = model.getEnabledSearchFields();
-		 setEnabled(sf.isSelected(searchField));
+	@Override
+    protected void updateEnabled(LookupModel model) {
+	    boolean enabled;
+	    if (model != null) {
+	        SearchFieldSelection sf = getModel().getEnabledSearchFields();
+	        enabled = sf.isSelected(searchField);
+	    } else {
+	        enabled = false;
+	    }
+	    setEnabled(enabled);
 	}
 }

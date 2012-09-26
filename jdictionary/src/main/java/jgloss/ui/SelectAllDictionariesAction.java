@@ -9,14 +9,19 @@ class SelectAllDictionariesAction extends LookupModelAction {
 
 	private final boolean selectAllDictionaries;
 
-	SelectAllDictionariesAction(LookupModel model, boolean selectAllDictionaries) {
-		super(model);
+	SelectAllDictionariesAction(View<LookupModel> view, boolean selectAllDictionaries) {
+		super(view);
 		this.selectAllDictionaries = selectAllDictionaries;
 		UIUtilities.initAction(this, selectAllDictionaries ? "wordlookup.choice.alldictionaries" : "wordlookup.choice.dictionary");
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	    model.selectAllDictionaries(selectAllDictionaries);
+	    getModel().selectAllDictionaries(selectAllDictionaries);
 	}
+
+    @Override
+    protected void updateEnabled(LookupModel model) {
+        setEnabled(model != null);
+    }
 }

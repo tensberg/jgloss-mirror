@@ -13,12 +13,12 @@
             <action type="add">Opening JGloss 1 documents is now supported.</action>
             <action type="update">Maven is now used for build and site generation.</action>
             <action type="removed">Removed platex export templates. The Latex-CJK templates work just as well.</action>
+            <action type="fix">Fixed search history.</action>
             <action type="fix" due-to="Andreas Winter">Reduced ChaSen termination timeout to 1 second, because it doesn't terminate
                 normally.</action>
             <action type="add" due-to="Andreas Winter">Partial support for hiding readings and translations in editor view.</action>
             <action type="update" due-to="Andreas Winter">Don't change current selection on mouseclick in empty screen area.</action>
             <action type="add" due-to="Andreas Winter">View is automatically scrolled to show selected annotation.</action>
-            <action type="add" due-to="Andreas Winter">Show progress bar on import.</action>
         </release>
         <release version="2.0 Alpha 3" date="2004-06-06">
             <action type="add">Support for UTF-8 encoded KANJIDIC dictionary files.</action>

@@ -203,7 +203,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * This is used when a new annotation is created to automatically set the reading and
      * translation.
      */
-    private final FirstEntryCache firstEntryCache;
+    private final FirstEntryCache firstEntryCache = new FirstEntryCache();
 
     private Position lastSelectionStart;
     private Position lastSelectionEnd;
@@ -375,11 +375,10 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         new SelectedAnnotationHighlighter(annotationList, docpane);
         xcvManager.addManagedComponent( docpane);
         hyperlinker = new LookupResultHyperlinker
-            ( true, true, true, true, true);
+            ( true, true, true, false, false);
         lookupPanel = new SimpleLookup( new Component[] { new JButton( addAnnotationAction) },
-                                        hyperlinker);
+        				hyperlinker);
         lookupPanel.addHyperlinkListener( this);
-        firstEntryCache = new FirstEntryCache();
         lookupPanel.addLookupResultHandler(firstEntryCache);
 
         JScrollPane annotationEditorScroller =

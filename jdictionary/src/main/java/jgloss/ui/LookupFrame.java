@@ -33,8 +33,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -63,23 +62,22 @@ import jgloss.ui.util.XCVManager;
 public class LookupFrame extends JFrame implements ActionListener, HyperlinkListener,
                                                    DictionaryListChangeListener {
 	private static final long serialVersionUID = 1L;
-    
+
+	private static final Logger LOGGER = Logger.getLogger(LookupFrame.class.getPackage().getName());
+	
 	private final LookupConfigPanel config;
     private LookupModel model;
     private final AsynchronousLookupEngine engine;
     private final LookupResultList list;
-    private LookupResultCache currentResults;
-    
-    private List<HistoryItem> history;
-    private int historyPosition;
-    private static final int MAX_HISTORY_SIZE = 20;
-    private final Action historyBackAction;
-    private final Action historyForwardAction;
     
     private final Dimension preferredSize;
 
+    private final LookupHistory lookupHistory = new LookupHistory(this);
+    
     private JFrame legendFrame;
     private AttributeLegend legend;
+
+	private final SearchOnModelChangeListener searchOnModelChange = new SearchOnModelChangeListener(this);
 
     public LookupFrame( LookupModel _model) {
         super( JGloss.MESSAGES.getString( "wordlookup.title"));
@@ -92,8 +90,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         
         model = _model;
         list = new LookupResultList();
-        currentResults = new LookupResultCache( list);
-        engine = new AsynchronousLookupEngine( currentResults);
+        engine = new AsynchronousLookupEngine(list);
         config = new LookupConfigPanel( model);
 
         config.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2));
@@ -167,28 +164,6 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
                 }
             });
 
-        history = new ArrayList<HistoryItem>( MAX_HISTORY_SIZE);
-        historyBackAction = new AbstractAction() {
-                private static final long serialVersionUID = 1L;
-
-				@Override
-				public void actionPerformed( ActionEvent e) {
-                    historyBack();
-                }
-            };
-        UIUtilities.initAction( historyBackAction, "wordlookup.history.back");
-        historyBackAction.setEnabled( false);
-        historyForwardAction = new AbstractAction() {
-                private static final long serialVersionUID = 1L;
-
-				@Override
-				public void actionPerformed( ActionEvent e) {
-                    historyForward();
-                }
-            };
-        UIUtilities.initAction( historyForwardAction, "wordlookup.history.forward");
-        historyForwardAction.setEnabled( false);
-
         Action legendAction = new AbstractAction() {
                 private static final long serialVersionUID = 1L;
 
@@ -204,14 +179,14 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         legendAction.setEnabled( true);
 
         JToolBar toolbar = new JToolBar();
-        toolbar.add( historyBackAction);
-        toolbar.add( historyForwardAction);
+        toolbar.add(lookupHistory.getHistoryBackAction());
+        toolbar.add(lookupHistory.getHistoryForwardAction());
         toolbar.add( legendAction);
         getContentPane().add( toolbar, BorderLayout.NORTH);
 
         setSize( getPreferredSize());
         
-        model.addLookupChangeListener(new SearchOnModelChangeListener(this));
+        model.addLookupChangeListener(searchOnModelChange);
     }
 
     public void search( String text) {
@@ -239,15 +214,14 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     @Override
 	public void actionPerformed( ActionEvent event) {
-        if (currentResults.isEmpty()) {
-	        // first lookup
-            engine.doLookup( model.clone());
-        } else {
-            // save current state in history
-            HistoryItem hi = createHistoryItem();
-            addToHistory( hi);
-            engine.doLookup( hi.lookupModel); // hi.lookupModel is cloned model
-        }
+        LOGGER.severe("performing lookup");
+    	engine.doLookup(model, new Runnable() {
+    		@Override
+    		public void run() {
+    		    LOGGER.severe("adding state for model " + model);
+    			lookupHistory.addCurrentState(createHistoryItem());
+    		}
+    	});
     }
 
     @Override
@@ -284,7 +258,6 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
             ReferenceAttributeValue ref = (ReferenceAttributeValue) 
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
             if (ref instanceof SearchReference) {
-            	addToHistory( createHistoryItem());
             	model.followReference((SearchReference) ref);
             } else {
             	throw new IllegalArgumentException("unsupported reference type " + ref);
@@ -315,72 +288,18 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         }
     }
 
-    private void historyBack() {
-        historyPosition--;
-        HistoryItem hi = history.get( historyPosition);
-
-        history.set( historyPosition, createHistoryItem());
-
-        if (historyPosition == 0) {
-	        historyBackAction.setEnabled( false);
-        }
-        historyForwardAction.setEnabled( true);
-        showHistoryItem( hi);
-    }
-
-    private void historyForward() {
-        HistoryItem hi = history.get( historyPosition);
-        historyPosition++;
-
-        history.set( historyPosition-1, createHistoryItem());
-
-        if (historyPosition == history.size()) {
-	        historyForwardAction.setEnabled( false);
-        }
-        historyBackAction.setEnabled( true);
-        showHistoryItem( hi);
-    }
-
-    private void addToHistory( HistoryItem hi) {
-        history.add( historyPosition, hi);
-        historyPosition++;
-        history = history.subList( 0, historyPosition);
-        if (history.size() > MAX_HISTORY_SIZE) {
-            if (historyPosition*2>MAX_HISTORY_SIZE) {
-                history.remove( 0);
-                historyPosition--;
-            } else {
-	            history.remove( history.size()-1);
-            }
-        }
-        historyBackAction.setEnabled( true);
-        historyForwardAction.setEnabled( false);
-    }
-
-    private void showHistoryItem( HistoryItem hi) {
-        model = hi.lookupModel;
+    void showHistoryItem( HistoryItem hi) {
+        model = hi.getLookupModel().clone();
+        
+        // ignore model changes triggered by setModel
+        model.removeLookupChangeListener(searchOnModelChange);
         config.setModel( model);
-        currentResults = hi.resultCache;
-        currentResults.replay();
-        list.restoreViewState( hi.resultState);
+        list.restoreViewState( hi.getResultState());
+        model.addLookupChangeListener(searchOnModelChange);
     }
 
     private HistoryItem createHistoryItem() {
         return new HistoryItem( model.clone(), 
-                                currentResults.clone(),
                                 list.saveViewState());
-    }
-
-    private static class HistoryItem {
-        final LookupModel lookupModel;
-        final LookupResultCache resultCache;
-        final LookupResultList.ViewState resultState;
-
-        HistoryItem( LookupModel _lookupModel, LookupResultCache _resultCache,
-                             LookupResultList.ViewState _resultState) {
-            lookupModel = _lookupModel;
-            resultCache = _resultCache;
-            resultState = _resultState;
-        }
     }
 } // class LookupFrame

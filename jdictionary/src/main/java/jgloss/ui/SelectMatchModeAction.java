@@ -14,29 +14,27 @@ class SelectMatchModeAction extends LookupModelAction {
 	
 	private final MatchMode matchMode;
 	
-	SelectMatchModeAction(LookupModel model, MatchMode matchMode) {
-		super(model);
+	SelectMatchModeAction(View<LookupModel> view, MatchMode matchMode) {
+		super(view);
 		this.matchMode = matchMode;
 		UIUtilities.initAction(this, "wordlookup.matchmode." + matchMode.toString().toLowerCase(Locale.US));
-		checkSetEnabled();
-		model.addLookupChangeListener(new LookupChangeListener() {
-			
-			@Override
-			public void stateChanged(LookupChangeEvent event) {
-				if (event.hasChanged(LookupChangeEvent.SEARCH_FIELDS_AVAILABILITY)) {
-					checkSetEnabled();
-				}
-			}
-		});
+		updateEnabled(getModel());
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	    model.selectMatchMode(matchMode, ((AbstractButton) e.getSource()).isSelected());
+	    getModel().selectMatchMode(matchMode, ((AbstractButton) e.getSource()).isSelected());
 	}
 	
-	private void checkSetEnabled() {
-        SearchFieldSelection sf = model.getEnabledSearchFields();
-        setEnabled(sf.isSelected(matchMode));
+	@Override
+    protected void updateEnabled(LookupModel model) {
+	    boolean enabled;
+	    if (model != null) {
+	        SearchFieldSelection sf = model.getEnabledSearchFields();
+	        enabled = sf.isSelected(matchMode);
+	    } else {
+	        enabled = false;
+	    }
+		setEnabled(enabled);
 	}
 }

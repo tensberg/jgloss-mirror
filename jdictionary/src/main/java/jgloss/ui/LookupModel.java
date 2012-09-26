@@ -700,6 +700,8 @@ public class LookupModel implements Cloneable {
     }
 
     public void addLookupChangeListener( LookupChangeListener listener) {
+    	assert !listeners.contains(listener);
+    	
         listeners.add( listener);
     }
 
@@ -708,7 +710,7 @@ public class LookupModel implements Cloneable {
     }
 
     private void fireLookupChange( LookupChangeEvent event) {
-        for (LookupChangeListener listener : listeners) {
+    	for (LookupChangeListener listener : listeners) {
             listener.stateChanged( event);
         }
     }

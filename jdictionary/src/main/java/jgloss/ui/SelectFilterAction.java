@@ -1,7 +1,5 @@
 package jgloss.ui;
 
-import static jgloss.ui.LookupChangeEvent.FILTER_AVAILABILITY;
-
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractButton;
@@ -13,28 +11,20 @@ class SelectFilterAction extends LookupModelAction {
 	
 	private final LookupResultFilter filter;
 	
-	SelectFilterAction(LookupModel model, LookupResultFilter filter) {
-		super(model, filter.getName());
+	SelectFilterAction(View<LookupModel> view, LookupResultFilter filter) {
+		super(view, filter.getName());
 		this.filter = filter;
 		putValue(Action.SHORT_DESCRIPTION, filter.getDescription());
-		checkSetEnabled();
-		model.addLookupChangeListener(new LookupChangeListener() {
-			
-			@Override
-			public void stateChanged(LookupChangeEvent event) {
-				if (event.hasChanged(FILTER_AVAILABILITY)) {
-					checkSetEnabled();
-				}
-			}
-		});
+		updateEnabled(getModel());
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	    model.selectFilter(filter, ((AbstractButton) e.getSource()).isSelected());
+	    getModel().selectFilter(filter, ((AbstractButton) e.getSource()).isSelected());
 	}
 	
-	private void checkSetEnabled() {
-		setEnabled(model.isFilterEnabled(filter));
+	@Override
+    protected void updateEnabled(LookupModel model) {
+		setEnabled(model != null && model.isFilterEnabled(filter));
 	}
 }

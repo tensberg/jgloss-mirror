@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import jgloss.JGloss;
+import jgloss.dictionary.Dictionary;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
 import jgloss.ui.Dictionaries;
@@ -64,6 +65,8 @@ class ImportFromReaderWorker extends JGlossWorker<JGlossDocument, Void> implemen
 
     private final int length;
 
+    private final Dictionary[] dictionaries;
+
     public ImportFromReaderWorker(JGlossFrame frame, JGlossFrameModel model, Reader documentReader, boolean detectParagraphs, ReadingAnnotationFilter filter,
             Parser parser, int length) {
         this.frame = frame;
@@ -75,6 +78,7 @@ class ImportFromReaderWorker extends JGlossWorker<JGlossDocument, Void> implemen
         this.length = length;
 
         setMessage(JGloss.MESSAGES.getString("import.progress", model.getDocumentName()));
+        dictionaries = Dictionaries.getInstance().getDictionaries();
     }
 
     @Override
@@ -85,7 +89,7 @@ class ImportFromReaderWorker extends JGlossWorker<JGlossDocument, Void> implemen
 
         try {
             document = new JGlossDocumentBuilder().build(documentReader,
-                    detectParagraphs, filter, parser, Dictionaries.getInstance().getDictionaries());
+                    detectParagraphs, filter, parser, dictionaries);
         } finally {
             try {
                 documentReader.close();

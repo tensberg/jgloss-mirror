@@ -78,8 +78,8 @@ public class LookupResultHyperlinker extends DictionaryEntryFormat.IdentityDecor
         return formatter;
     }
 
-    public Object getReference( String key) {
-        return hyperrefs.get( key);
+    public Map<String, Object> getReferences() {
+        return hyperrefs;
     }
 
     public void clearReferences() {

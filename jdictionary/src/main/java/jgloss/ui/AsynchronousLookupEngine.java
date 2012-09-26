@@ -71,7 +71,7 @@ public class AsynchronousLookupEngine extends LookupEngine {
 
     private final ExecutorService searchTaskExecutor = Executors.newSingleThreadExecutor();
 
-    private Future<?> searchTask;
+    private Future<?> lookupTask;
 
     public AsynchronousLookupEngine( LookupResultHandler _handler) {
         this( _handler, Integer.MAX_VALUE);
@@ -96,13 +96,13 @@ public class AsynchronousLookupEngine extends LookupEngine {
      *        the runnable.
      */
     public void doLookup(LookupModel model, Runnable runAfterLookup) {
-        cancelSearchTask();
-        searchTask = searchTaskExecutor.submit(new LookupTask(model.clone(), runAfterLookup));
+        cancelLookupTask();
+        lookupTask = searchTaskExecutor.submit(new LookupTask(model.clone(), runAfterLookup));
     }
 
-    private void cancelSearchTask() {
-        if (searchTask != null) {
-            searchTask.cancel(true);
+    private void cancelLookupTask() {
+        if (lookupTask != null) {
+            lookupTask.cancel(true);
         }
     }
 
@@ -111,7 +111,7 @@ public class AsynchronousLookupEngine extends LookupEngine {
     }
 
     public void dispose() {
-        cancelSearchTask();
+        cancelLookupTask();
         searchTaskExecutor.shutdown();
     }
 

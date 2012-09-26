@@ -23,6 +23,9 @@
 
 package jgloss;
 
+import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
+
 import jgloss.ui.Dictionaries;
 import jgloss.ui.LookupFrame;
 import jgloss.ui.PreferencesPanel;
@@ -34,8 +37,13 @@ import jgloss.ui.StyleDialog;
  * @author Michael Koch
  */
 public class JDictionaryApp extends JGloss {
-    public static void main( String[] args) {
-        new JDictionaryApp().init( args);
+    public static void main( final String[] args) throws InterruptedException, InvocationTargetException {
+    	EventQueue.invokeAndWait(new Runnable() {
+	        @Override
+            public void run() {
+	        	new JDictionaryApp().init( args);
+	        }
+        });
     }
 
     @Override

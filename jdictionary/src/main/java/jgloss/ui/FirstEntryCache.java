@@ -11,8 +11,6 @@ import jgloss.dictionary.SearchException;
 public class FirstEntryCache implements LookupResultHandler {
     private DictionaryEntry firstEntry;
 
-    public FirstEntryCache() {}
-
     /**
      * Return the first dictionary entry found in the previous search. If no entry was found,
      * <code>null</code> is returned.

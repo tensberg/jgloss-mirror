@@ -249,7 +249,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
 
         /**
          * Handles an error in paring the document. This will print the error to
-         * <CODE>System.err</CODE>.
+         * the logger with level severe.
          *
          * @param errorMsg The error message.
          * @param pos Position at which the error occured.

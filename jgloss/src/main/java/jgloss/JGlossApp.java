@@ -25,6 +25,7 @@ package jgloss;
 
 import java.awt.EventQueue;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 
 import jgloss.parser.Chasen;
 import jgloss.parser.ChasenParser;
@@ -57,9 +58,16 @@ public class JGlossApp extends JGloss {
      * Starts JGloss.
      *
      * @param args Arguments to the application.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public static void main( String args[]) {
-        new JGlossApp().init( args);
+    public static void main( final String args[]) throws InterruptedException, InvocationTargetException {
+        EventQueue.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                new JGlossApp().init( args);
+            }
+        });
     }
 
     public static LookupFrame getLookupFrame() {

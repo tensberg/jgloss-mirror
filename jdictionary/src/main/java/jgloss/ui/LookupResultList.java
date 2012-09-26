@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2004 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2012 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -33,7 +33,9 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,6 +61,44 @@ import jgloss.dictionary.UnsupportedSearchModeException;
 import jgloss.ui.util.XCVManager;
 
 public class LookupResultList extends JPanel implements LookupResultHandler {
+	
+	/**
+	 * Stores the scroll pane position of the lookup result list.
+	 */
+	public static class ViewState {
+		private final String resultText;
+		
+		private final String statusText;
+		
+		private final Point resultScrollerPosition;
+
+        private final Map<String, Object> hyperrefs;
+		
+		private ViewState(String resultText, String statusText, Point resultScrollerPosition, Map<String, Object> hyperrefs) {
+			this.resultText = resultText;
+			this.statusText = statusText;
+			this.resultScrollerPosition = resultScrollerPosition;
+            this.hyperrefs = new HashMap<String, Object>(hyperrefs.size()*2);
+            this.hyperrefs.putAll(hyperrefs);
+		}
+
+		public String getResultText() {
+			return resultText;
+		}
+
+		public String getStatusText() {
+			return statusText;
+		}
+
+		public Point getResultScrollerPosition() {
+			return resultScrollerPosition;
+		}
+		
+		public Map<String, Object> getHyperrefs() {
+            return hyperrefs;
+        }
+	}
+
 	private static final Logger LOGGER = Logger.getLogger(LookupResultList.class.getPackage().getName());
 	
 	private static final long serialVersionUID = 1L;
@@ -66,7 +106,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
 	private static final String DEFAULT_STYLE_SHEET = "/data/lookup.css";
 
 	private static final int MAX_RESULT_BUFFER_SIZE = 50;
-	
+
     /**
      * Text field used to display the result as HTML text.
      */
@@ -79,6 +119,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     private final DictionaryEntryFormatter htmlFormatter;
     private final LookupResultMarker marker;
     private final LookupResultHyperlinker hyperlinker;
+    private Map<String, Object> hyperrefs;
     
     private boolean multipleDictionaries;
     private final List<Object> resultBuffer = new ArrayList<Object>(MAX_RESULT_BUFFER_SIZE);
@@ -173,7 +214,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     public int getEntryCount() { return entryCount; }
 
     public Object getReference( String key) {
-        return hyperlinker.getReference( key);
+        return hyperrefs.get( key);
     }
 
     @Override
@@ -194,6 +235,7 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     	resultPane.setText("");
         marker.setMarkedText( searchExpression);
         hyperlinker.clearReferences();
+        hyperrefs = hyperlinker.getReferences();
         previousDictionaryName = null;
         previousDictionaryHasMatch = true;
         entryCount = 0;
@@ -356,23 +398,18 @@ public class LookupResultList extends JPanel implements LookupResultHandler {
     	status.setText( text);
     }
 
-    /**
-     * Stores the scroll pane position of the lookup result list.
-     */
-    public static class ViewState {
-        private final Point resultScrollerPosition;
-
-        private ViewState( Point _resultScrollerPosition) {
-            resultScrollerPosition = _resultScrollerPosition;
-        }
-    }
-
     public ViewState saveViewState() {
-        return new ViewState( resultScroller.getViewport().getViewPosition());
+        return new ViewState(resultPane.getText(), status.getText(), 
+        				resultScroller.getViewport().getViewPosition(), hyperrefs);
     }
 
     public void restoreViewState( ViewState state) {
-        resultScroller.getViewport().setViewPosition( state.resultScrollerPosition);
+    	assert EventQueue.isDispatchThread();
+    	
+    	status.setText(state.getStatusText());
+    	resultPane.setText(state.getResultText());
+    	resultScroller.getViewport().setViewPosition( state.resultScrollerPosition);
+    	hyperrefs = state.getHyperrefs();
     }
 
     /**

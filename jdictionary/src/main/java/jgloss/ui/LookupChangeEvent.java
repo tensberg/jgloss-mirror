@@ -66,4 +66,10 @@ class LookupChangeEvent extends EventObject {
     public boolean isChangeComplete() {
 	    return changeComplete;
     }
+
+    @Override
+    public String toString() {
+        return "LookupChangeEvent [changes=0x" + Integer.toHexString(changes) + ", changeComplete=" + changeComplete + "]";
+    }
+    
 } // class LookupChangeEvent

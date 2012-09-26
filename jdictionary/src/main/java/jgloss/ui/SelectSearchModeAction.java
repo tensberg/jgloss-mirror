@@ -12,28 +12,20 @@ class SelectSearchModeAction extends LookupModelAction {
     
 	private final SearchMode searchMode;
 
-    SelectSearchModeAction(LookupModel model, SearchMode searchMode) {
-    	super(model, searchMode.getName());
+    SelectSearchModeAction(View<LookupModel> view, SearchMode searchMode) {
+    	super(view, searchMode.getName());
     	putValue(Action.SHORT_DESCRIPTION, searchMode.getDescription());
 		this.searchMode = searchMode;	
-		checkSetEnabled();
-		model.addLookupChangeListener(new LookupChangeListener() {
-			
-			@Override
-			public void stateChanged(LookupChangeEvent event) {
-				if (event.hasChanged(LookupChangeEvent.SEARCH_MODE_AVAILABILITY)) {
-					checkSetEnabled();
-				}
-			}
-		});
+		updateEnabled(getModel());
     }
     
 	@Override
     public void actionPerformed(ActionEvent e) {
-    	model.selectSearchMode(searchMode);
+    	getModel().selectSearchMode(searchMode);
     }
 	
-	private void checkSetEnabled() {
-		setEnabled(model.isSearchModeEnabled(searchMode));
+	@Override
+    protected void updateEnabled(LookupModel model) {
+		setEnabled(model != null && model.isSearchModeEnabled(searchMode));
 	}
 }

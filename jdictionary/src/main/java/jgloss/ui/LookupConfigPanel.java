@@ -34,6 +34,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -65,8 +66,8 @@ import jgloss.ui.util.UIUtilities;
  *
  * @author Michael Koch
  */
-public class LookupConfigPanel extends JPanel implements LookupChangeListener {
-    private class DictionaryChoiceActionListener implements ActionListener {
+public class LookupConfigPanel extends JPanel implements View<LookupModel>, LookupChangeListener {
+	private class DictionaryChoiceActionListener implements ActionListener {
     	@Override
     	public void actionPerformed(ActionEvent e) {
             int choice = dictionaryChoice.getSelectedIndex();
@@ -125,6 +126,10 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
     private final JTextField expression;
     private final JTextField distance;
 
+    private final SetSearchExpressionListener searchExpressionListener;
+
+    private final SetDistanceListener setDistanceListener;
+
     public LookupConfigPanel( LookupModel _model) {
         setLayout( new GridBagLayout());
 
@@ -135,7 +140,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
         JPanel modesPanel = new JPanel( new GridLayout( 0, 2));
         for ( int i=0; i<_searchModes.length; i++) {
             SearchMode mode = _searchModes[i];
-            JRadioButton button = new JRadioButton( new SelectSearchModeAction(_model, mode));
+            JRadioButton button = new JRadioButton( new SelectSearchModeAction(this, mode));
             modesGroup.add( button);
             modesPanel.add( button);
             searchModes[i] = button;
@@ -149,13 +154,13 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
         // search fields setup
         JPanel fieldsPanel = new JPanel( new GridLayout( 0, 1));
         searchFields = new JCheckBox[3];
-        searchFields[0] = new JCheckBox(new SelectSearchFieldAction(_model, DictionaryEntryField.WORD));
+        searchFields[0] = new JCheckBox(new SelectSearchFieldAction(this, DictionaryEntryField.WORD));
         fieldsPanel.add( searchFields[0]);
 
-        searchFields[1] = new JCheckBox(new SelectSearchFieldAction(_model, DictionaryEntryField.READING));
+        searchFields[1] = new JCheckBox(new SelectSearchFieldAction(this, DictionaryEntryField.READING));
         fieldsPanel.add( searchFields[1]);
 
-        searchFields[2] = new JCheckBox(new SelectSearchFieldAction(_model, DictionaryEntryField.TRANSLATION));
+        searchFields[2] = new JCheckBox(new SelectSearchFieldAction(this, DictionaryEntryField.TRANSLATION));
         fieldsPanel.add( searchFields[2]);
         
         fieldsPanel = UIUtilities.createFlexiblePanel( fieldsPanel, false);
@@ -169,11 +174,11 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
         JPanel matchPanel = new JPanel( new GridLayout( 0, 1));
         ButtonGroup matchmodeGroup = new ButtonGroup();
         matchModes = new JRadioButton[2];
-        matchModes[0] = new JRadioButton(new SelectMatchModeAction(_model, MatchMode.FIELD));
+        matchModes[0] = new JRadioButton(new SelectMatchModeAction(this, MatchMode.FIELD));
         matchmodeGroup.add( matchModes[0]);
         matchPanel.add( matchModes[0]);
 
-        matchModes[1] = new JRadioButton(new SelectMatchModeAction(_model, MatchMode.WORD));
+        matchModes[1] = new JRadioButton(new SelectMatchModeAction(this, MatchMode.WORD));
         matchmodeGroup.add( matchModes[1]);
         matchPanel.add( matchModes[1]);
         
@@ -193,7 +198,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
         dictionaryChoice.setEditable( false);
 
         ButtonGroup dictionaries = new ButtonGroup();
-        dictionary = new JRadioButton(new SelectAllDictionariesAction(_model, false));
+        dictionary = new JRadioButton(new SelectAllDictionariesAction(this, false));
         dictionaries.add( dictionary);
         dictionary.addChangeListener( new ChangeListener() {
                 @Override
@@ -201,7 +206,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
                     dictionaryChoice.setEnabled( dictionary.isSelected());
                 }
             });
-        allDictionaries = new JRadioButton(new SelectAllDictionariesAction(_model, true));
+        allDictionaries = new JRadioButton(new SelectAllDictionariesAction(this, true));
         dictionaries.add( allDictionaries);
 
         JPanel dictionaryPanel = new JPanel( new GridBagLayout());
@@ -233,7 +238,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
         LookupResultFilter[] _filters = _model.getFilters();
         filters = new JCheckBox[_filters.length];
         for ( int i=0; i<_filters.length; i++) {
-            JCheckBox box = new JCheckBox( new SelectFilterAction(_model, _filters[i]));
+            JCheckBox box = new JCheckBox( new SelectFilterAction(this, _filters[i]));
             filterPanel.add( box);
             filters[i] = box;
         }
@@ -266,19 +271,13 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
         expressionDescription.setLabelFor( expression);
         inputPanel.add( expressionDescription, c3);
         inputPanel.add( expression, c);
-        expression.getDocument().addDocumentListener(new SetSearchExpressionListener(_model));
+        searchExpressionListener = new SetSearchExpressionListener(_model);
+        expression.getDocument().addDocumentListener(searchExpressionListener);
 
         inputPanel.add( Box.createHorizontalStrut( 4), c3);
 		distance = new JTextField();
-		// TODO: distance search modes are currently not supported by any dictionary
-//        JLabel distanceDescription = 
-//            new JLabel( JGloss.MESSAGES.getString( "wordlookup.enterdistance"));
-//        distanceDescription.setDisplayedMnemonic
-//            ( JGloss.MESSAGES.getString( "wordlookup.enterdistance.mk").charAt( 0));
-//        distanceDescription.setLabelFor( expression);
-//        inputPanel.add( distanceDescription, c3);
-//        inputPanel.add( distance, c2);
-        distance.getDocument().addDocumentListener(new SetDistanceListener(_model));
+		setDistanceListener = new SetDistanceListener(_model);
+        distance.getDocument().addDocumentListener(setDistanceListener);
 
         // layout the panel
         c = new GridBagConstraints();
@@ -336,6 +335,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
         }
     }
 
+    @Override
     public LookupModel getModel() { return model; }
 
     public final void setModel( LookupModel _model) {
@@ -347,6 +347,7 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
 	        model.removeLookupChangeListener( this);
         }
 
+        LookupModel oldModel = model;
         model = _model;
         model.setMultiDictionarySelectionMode( false);
 
@@ -358,7 +359,14 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
         updateDictionarySelection();
         updateInputAvailability();
         updateInputSelection();
+        
         model.addLookupChangeListener( this);
+        firePropertyChange(MODEL_PROPERTY_NAME, oldModel, model);
+    }
+
+	@Override
+    public void addModelChangeListener(PropertyChangeListener modelChangeListener) {
+		addPropertyChangeListener(MODEL_PROPERTY_NAME, modelChangeListener);
     }
 
     private void updateSearchFieldSelection() {
@@ -404,12 +412,19 @@ public class LookupConfigPanel extends JPanel implements LookupChangeListener {
     private void updateInputSelection() {
         String newExpression = model.getSearchExpression();
         if (!newExpression.equals(expression.getText())) {
+            // The listener has to be removed because changing the text will generate a
+            // delete event followed by an insert event, triggering two model updates
+            // through the searchExpressionListener.
+            expression.getDocument().removeDocumentListener(searchExpressionListener);
         	expression.setText( newExpression);
+        	expression.getDocument().addDocumentListener(searchExpressionListener);
         }
         
         String newDistance = DISTANCE_FORMAT.format( model.getDistance());
         if (!newDistance.equals(distance.getText())) {
+            distance.getDocument().removeDocumentListener(setDistanceListener);
         	distance.setText( newDistance);
+        	distance.getDocument().addDocumentListener(setDistanceListener);
         }
     }
 
