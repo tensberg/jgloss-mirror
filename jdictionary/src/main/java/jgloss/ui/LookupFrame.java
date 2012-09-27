@@ -78,6 +78,8 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
     private AttributeLegend legend;
 
 	private final SearchOnModelChangeListener searchOnModelChange = new SearchOnModelChangeListener(this);
+	
+	private final PerformSearchPreconditions performSearchPreconditions = new PerformSearchPreconditions();
 
     public LookupFrame( LookupModel _model) {
         super( JGloss.MESSAGES.getString( "wordlookup.title"));
@@ -214,14 +216,17 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     @Override
 	public void actionPerformed( ActionEvent event) {
-        LOGGER.severe("performing lookup");
-    	engine.doLookup(model, new Runnable() {
-    		@Override
-    		public void run() {
-    		    LOGGER.severe("adding state for model " + model);
-    			lookupHistory.addCurrentState(createHistoryItem());
-    		}
-    	});
+        if (performSearchPreconditions.performSearch(model)) {
+            engine.doLookup(model, new Runnable() {
+                @Override
+                public void run() {
+                    LOGGER.severe("adding state for model " + model);
+                    lookupHistory.addCurrentState(createHistoryItem());
+                }
+            });
+        } else {
+            LOGGER.finer("not performing search because preconditions of model not fulfilled");
+        }
     }
 
     @Override
