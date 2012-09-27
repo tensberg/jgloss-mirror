@@ -6,7 +6,6 @@
 <!-- (c) 2001 Michael Koch (tensberg@gmx.net)
  Example deployment descriptor for use with the jgloss.www.JGlossServlet.
 
- $Id$ 
 -->
 
     <display-name>JGloss-WWW</display-name>

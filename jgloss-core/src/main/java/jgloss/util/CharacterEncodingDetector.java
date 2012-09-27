@@ -18,7 +18,6 @@
  * along with JGloss; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id$
  *
  * The code is a java port of the encoding detection routine in Yasuhiro Tonooka's
  * "Kanji Code Converter" (kcc) unix program. I (Michael)
