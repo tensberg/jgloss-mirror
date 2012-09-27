@@ -46,17 +46,10 @@ public class MarkerListFormatter implements ListFormatter {
         private String textAfter;
 
         public Group() {
-            this( null, "", "");
+            this("", "");
         }
 
         public Group( String _textBefore, String _textAfter) {
-            this( null, _textBefore, _textAfter);
-        }
-
-        public Group( String _markedText, String _textBefore, String _textAfter) {
-            if (markedText != null) {
-	            markedText = normalize( _markedText);
-            }
             textBefore = _textBefore;
             textAfter = _textAfter;
         }
