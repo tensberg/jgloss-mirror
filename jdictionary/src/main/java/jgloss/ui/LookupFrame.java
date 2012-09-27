@@ -219,7 +219,6 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
             engine.doLookup(model, new Runnable() {
                 @Override
                 public void run() {
-                    LOGGER.severe("adding state for model " + model);
                     lookupHistory.addCurrentState(createHistoryItem());
                 }
             });

@@ -408,7 +408,6 @@ public abstract class JGloss implements ExitListener {
                             ( Arrays.asList( Dictionaries.getInstance().getDictionaries()));
                     }
                 });
-        mainLookupModel.loadFromPreferences( PREFS, "wordlookup");
 
         return mainLookupModel;
     }
@@ -418,9 +417,6 @@ public abstract class JGloss implements ExitListener {
         Dictionary[] dicts = Dictionaries.getInstance().getDictionaries();
         for (Dictionary dict : dicts) {
 	        dict.dispose();
-        }
-        if (mainLookupModel != null) {
-            mainLookupModel.saveToPreferences( PREFS, "wordlookup");
         }
     }
 

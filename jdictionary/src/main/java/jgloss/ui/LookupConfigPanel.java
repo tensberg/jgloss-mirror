@@ -399,10 +399,13 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
         else {
             dictionary.setSelected( true);
             dictionaryChoice.setEnabled( true);
+            List<Dictionary> selectedDictionaries = model.getSelectedDictionaries();
+            if (!selectedDictionaries.isEmpty()) {
+                // since the model is not in multi-selection mode, there should always be
+                // exactly one selection
+                dictionaryChoice.setSelectedItem( selectedDictionaries.get( 0));
+            }
         }
-        // since the model is not in multi-selection mode, there should always be
-        // exactly one selection
-        dictionaryChoice.setSelectedItem( model.getSelectedDictionaries().get( 0));
     }
 
     private void updateDictionaryAvailability() {
