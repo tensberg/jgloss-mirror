@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:dictionaries xmlns:tns="http://jgloss.sf.net/dictionaries/1.0">
+    <dictionary>
+        <name>EDICT</name>
+        <description xml:lang="en">Freely available Japanese/English Dictionary.</description>
+        <download>
+            <url>http://ftp.monash.edu.au/pub/nihongo/edict2.gz</url>
+            <compression>gzip</compression>
+        </download>
+        <homepage>http://www.csse.monash.edu.au/~jwb/edict_doc.html</homepage>
+        <copyright>
+            <year>2010</year>
+            <by>The Electronic Dictionary Research and Development Group</by>
+        </copyright>
+        <languages>
+            <language>ja</language>
+            <language>en</language>
+        </languages>
+    </dictionary>
+    <dictionary>
+        <name>KANJIDIC</name>
+        <description xml:lang="en">The KANJIDIC file contains comprehensive information about Japanese kanji.</description>
+        <download>
+            <url>http://ftp.monash.edu.au/pub/nihongo/kanjidic.gz</url>
+            <compression>gzip</compression>
+        </download>
+        <homepage>http://www.csse.monash.edu.au/~jwb/kanjidic.html</homepage>
+        <copyright>            
+            <year>2009</year>
+            <by>The Electronic Dictionary Research and Development Group</by>
+        </copyright>
+        <languages>
+            <language>ja</language>
+            <language>en</language>
+        </languages>
+    </dictionary>
+    <dictionary>
+        <name>Wadoku Jiten</name>
+        <description xml:lang="de">Japanese/German dictionary.</description>
+        <download>
+            <url>http://www.wadoku.de/downloads/wadokudict2_20120701.tar.bz2</url>
+            <compression>tar.bz2</compression>
+        </download>
+        <homepage>http://www.wadoku.de/wiki/display/WAD/WadokuWiki</homepage>
+        <license>http://www.wadoku.de/wiki/x/ZQE</license>
+        <copyright>            
+            <year>2009</year>
+            <by>The Electronic Dictionary Research and Development Group</by>
+        </copyright>
+        <languages>
+            <language>ja</language>
+            <language>de</language>
+        </languages>
+    </dictionary>
+</tns:dictionaries>

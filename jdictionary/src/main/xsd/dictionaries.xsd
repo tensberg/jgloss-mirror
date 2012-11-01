@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+    xmlns:tns="http://jgloss.sf.net/dictionaries/1.0"
+    xmlns:xml="http://www.w3.org/XML/1998/namespace"
+    targetNamespace="http://jgloss.sf.net/dictionaries/1.0" 
+    elementFormDefault="unqualified">
+    <import namespace="http://www.w3.org/XML/1998/namespace"
+                      schemaLocation="xml.xsd"/>
+    <element name="dictionaries">
+        <complexType>
+            <sequence>
+                <element name="dictionary" type="tns:Dictionary" maxOccurs="unbounded" minOccurs="0"></element>
+            </sequence>
+        </complexType>
+    </element>
+
+    <complexType name="Dictionary">
+        <sequence>
+            <element name="name" type="string"></element>
+            <element name="description" maxOccurs="unbounded" minOccurs="1">
+                <complexType>
+<simpleContent>
+      <extension base="string">
+        <attribute ref="xml:lang"/>
+      </extension>
+    </simpleContent>
+                </complexType>
+            </element>
+            <element name="download" type="tns:Download"></element>
+            <element name="homepage" type="anyURI"></element>
+            <element name="license" type="anyURI"></element>
+            <element name="copyright" type="tns:Copyright">
+            </element>
+            <element name="languages">
+                <complexType>
+                    <sequence>
+                        <element name="language" type="language" maxOccurs="unbounded" minOccurs="1"></element>
+                    </sequence>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="Copyright">
+        <sequence>
+            <element minOccurs="0" maxOccurs="1" name="year" type="gYear"></element>
+            <element name="by" type="string"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="Download">
+        <sequence>
+            <element name="url" type="anyURI"></element>
+            <element name="compression">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="gzip" />
+                        <enumeration value="zip" />
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="dictionaryFile" type="string" minOccurs="0" maxOccurs="1" />
+        </sequence>
+    </complexType>
+
+    <attribute name="NewAttribute" type="string"></attribute>
+
+</schema>
