@@ -35,7 +35,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -53,6 +52,7 @@ import jgloss.parser.Chasen;
 import jgloss.parser.ChasenParser;
 import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
+import jgloss.ui.util.Icons;
 import jgloss.ui.util.UIUtilities;
 
 /**
@@ -300,8 +300,7 @@ public class GeneralDialog extends Box implements PreferencesPanel {
         chooser.setMultiSelectionEnabled( false);
         chooser.setFileSelectionMode( JFileChooser.FILES_ONLY);
         chooser.setFileView( new CustomFileView() {
-                private final Icon CHASEN_ICON = 
-                    new ImageIcon( CustomFileView.class.getResource( "/icons/chasen.png"));
+                private final Icon CHASEN_ICON = Icons.getIcon("chasen.png");
                 @Override
 				public Icon getIcon( java.io.File f) {
                     String name = f.getName().toLowerCase();

@@ -25,10 +25,10 @@ package jgloss.ui;
 import java.io.File;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileView;
 
 import jgloss.JGloss;
+import jgloss.ui.util.Icons;
 
 /**
  * File view which adds icons and descriptions for filetypes used by JGloss.
@@ -73,13 +73,12 @@ public class CustomFileView extends FileView {
             TEXT_DESCRIPTION = JGloss.MESSAGES.getString( "fileview.description.text");
             TEMPLATE_DESCRIPTION = JGloss.MESSAGES.getString( "fileview.description.template");
 
-            JGLOSS_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/jgloss.png"));
-            HTML_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/html.png"));
+            JGLOSS_ICON = Icons.getIcon("jgloss.png");
+            HTML_ICON = Icons.getIcon("html.png");
             XML_ICON = HTML_ICON; // no individual icon for now
-            TEX_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/tex.png"));
-            TEXT_ICON = new ImageIcon( CustomFileView.class.getResource( "/icons/txt.png"));
-            TEMPLATE_ICON = new ImageIcon( CustomFileView.class.getResource
-                                           ( "/icons/template.png"));
+            TEX_ICON = Icons.getIcon("tex.png");
+            TEXT_ICON = Icons.getIcon("txt.png");
+            TEMPLATE_ICON = Icons.getIcon("template.png");
         }
     }
 

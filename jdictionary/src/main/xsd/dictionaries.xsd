@@ -19,11 +19,11 @@
             <element name="name" type="string"></element>
             <element name="description" maxOccurs="unbounded" minOccurs="1">
                 <complexType>
-<simpleContent>
-      <extension base="string">
-        <attribute ref="xml:lang"/>
-      </extension>
-    </simpleContent>
+                    <simpleContent>
+                        <extension base="string">
+                            <attribute ref="xml:lang" />
+                        </extension>
+                    </simpleContent>
                 </complexType>
             </element>
             <element name="download" type="tns:Download"></element>
@@ -42,7 +42,7 @@
     </complexType>
     <complexType name="Copyright">
         <sequence>
-            <element minOccurs="0" maxOccurs="1" name="year" type="gYear"></element>
+            <element name="year" type="gYear"></element>
             <element name="by" type="string"></element>
         </sequence>
     </complexType>
@@ -61,7 +61,5 @@
             <element name="dictionaryFile" type="string" minOccurs="0" maxOccurs="1" />
         </sequence>
     </complexType>
-
-    <attribute name="NewAttribute" type="string"></attribute>
 
 </schema>

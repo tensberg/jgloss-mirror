@@ -36,7 +36,8 @@
     </dictionary>
     <dictionary>
         <name>Wadoku Jiten</name>
-        <description xml:lang="de">Japanese/German dictionary.</description>
+        <description xml:lang="de">Freies japanisch-deutsches Wörterbuch.</description>
+        <description xml:lang="en">Free Japanese/German dictionary.</description>
         <download>
             <url>http://www.wadoku.de/downloads/wadokudict2_20120701.tar.bz2</url>
             <compression>tar.bz2</compression>
@@ -44,8 +45,8 @@
         <homepage>http://www.wadoku.de/wiki/display/WAD/WadokuWiki</homepage>
         <license>http://www.wadoku.de/wiki/x/ZQE</license>
         <copyright>            
-            <year>2009</year>
-            <by>The Electronic Dictionary Research and Development Group</by>
+            <year>2012</year>
+            <by>Ulrich Apel und weitere Miturheber</by>
         </copyright>
         <languages>
             <language>ja</language>

@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import jgloss.JGlossApp;
+import jgloss.ui.util.Icons;
 import jgloss.ui.util.UIUtilities;
 
 /**
@@ -24,7 +25,7 @@ import jgloss.ui.util.UIUtilities;
 class EmptyDocumentActionsPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
-	private static final ImageIcon BACKGROUND_IMAGE = new ImageIcon(EmptyDocumentActionsPanel.class.getResource("/images/emptydocument_background.png"));
+	private static final ImageIcon BACKGROUND_IMAGE = Icons.getIcon("images/emptydocument_background.png");
 	
 	private final Action wordLookupAction = new AbstractAction() {
         private static final long serialVersionUID = 1L;

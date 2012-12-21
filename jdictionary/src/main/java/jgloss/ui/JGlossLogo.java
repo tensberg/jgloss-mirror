@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
+import jgloss.ui.util.Icons;
+
 public class JGlossLogo {
 	public static final ImageIcon LOGO_LARGE = getLogo("");
 	
@@ -20,7 +22,7 @@ public class JGlossLogo {
 	public static final List<Image> ALL_LOGO_SIZES = unmodifiableList(Arrays.asList(new Image[] { LOGO_LARGE.getImage(), LOGO_64.getImage(), LOGO_48.getImage(), LOGO_32.getImage() }));
 	
 	private static ImageIcon getLogo(String sizeExtension) {
-		return new ImageIcon(JGlossLogo.class.getResource("/images/jgloss-logo" + sizeExtension + ".png"));
+		return Icons.getIcon("logos/jgloss-logo" + sizeExtension + ".png");
 	}
 	
 	private JGlossLogo() {
