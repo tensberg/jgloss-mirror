@@ -6,7 +6,7 @@
     </properties>
     <body>
         <release version="2.1.0" date="not yet released">
-            <action type="update">JGloss now requires at least Java 6.</action>
+            <action type="update">JGloss now requires at least Java 7.</action>
             <action type="add">Support for EDICT2 dictionary format.</action>
             <action type="update">The dictionary lookup dialog now performs searches immediately (no more search button).</action>
             <action type="add">An empty JGloss document now shows a panel with the most imporant actions.</action>
