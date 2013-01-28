@@ -22,7 +22,9 @@
 package jgloss.ui.download;
 
 import static jgloss.ui.download.DictionarySchemaUtils.getDescriptionForLocale;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,10 +32,18 @@ import java.util.List;
 import java.util.Locale;
 
 import jgloss.ui.download.schema.Dictionary.Description;
+import jgloss.ui.download.schema.Download;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DictionarySchemaUtilsTest {
+    @Mock
+    private Download download;
+    
     @Test
     public void testGetDescriptionForLocaleEmptyList() {
         assertEquals("", getDescriptionForLocale(Collections.<Description> emptyList(), Locale.GERMAN));
@@ -58,6 +68,28 @@ public class DictionarySchemaUtilsTest {
         
         assertEquals("foo", getDescriptionForLocale(descriptions, Locale.ENGLISH));
     }
+    
+    @Test
+    public void testCreateUnpackerForZip() {
+        when(download.getCompression()).thenReturn("zip");
+        
+        assertThat(DictionarySchemaUtils.createUnpackerFor(download)).isInstanceOf(ZipUnpacker.class);
+    }
+    
+    @Test
+    public void testCreateUnpackerForGZip() {
+        when(download.getCompression()).thenReturn("gzip");
+        
+        assertThat(DictionarySchemaUtils.createUnpackerFor(download)).isInstanceOf(GZipUnpacker.class);
+    }
+        
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateUnpackerForUnsupportedType() {
+        when(download.getCompression()).thenReturn("foo");
+        
+        DictionarySchemaUtils.createUnpackerFor(download);
+    }
+
 
     private Description createDescription(String lang, String value) {
         Description description = new Description();

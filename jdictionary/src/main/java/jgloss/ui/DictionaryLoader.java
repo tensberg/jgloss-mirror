@@ -27,7 +27,7 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DescriptorDict
 
     private final Dictionaries dictionaries;
 
-    private final DefaultListModel model;
+    private final DefaultListModel<DescriptorDictionaryWrapper> model;
 
     /**
      * Load the dictionaries from the list of files and add them to the current list of
@@ -39,7 +39,7 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DescriptorDict
      * @param dictionaryDescriptors List of dictionary descriptors to load. If a dictionary descriptor is already
      *        loaded, it will be ignored.
      */
-    DictionaryLoader(Dictionaries dictionaries, DefaultListModel model, List<String> dictionaryDescriptors) {
+    DictionaryLoader(Dictionaries dictionaries, DefaultListModel<DescriptorDictionaryWrapper> model, List<String> dictionaryDescriptors) {
         this.dictionaries = dictionaries;
         this.model = model;
         this.dictionaryDescriptors = dictionaryDescriptors;

@@ -24,6 +24,7 @@ package jgloss.ui.download;
 import static jgloss.ui.download.DictionarySchemaUtils.getDescriptionForLocale;
 
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -31,6 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import jgloss.JGloss;
 import jgloss.ui.download.schema.Dictionary;
 import jgloss.ui.download.schema.Dictionary.Languages;
 import jgloss.ui.util.HyperlinkLabel;
@@ -48,22 +50,70 @@ class DictionaryPanel extends JPanel {
     
     private static final Logger LOGGER = Logger.getLogger(DictionaryPanel.class.getPackage().getName());
 
-    DictionaryPanel(Dictionary dictionary) {
+    private final JLabel name = new JLabel();
+    
+    private final JPanel flags = new JPanel(new GridLayout(1, 0, 2, 2));
+
+    private final JLabel description = new JLabel();
+
+    private final HyperlinkLabel homepage = new HyperlinkLabel();
+    
+    private final HyperlinkLabel license = new HyperlinkLabel();
+
+    private final JLabel copyright = new JLabel();
+
+    private Dictionary dictionary;
+    
+    DictionaryPanel() {
         setLayout(new MigLayout());
         
-        JLabel name = new JLabel(dictionary.getName());
-        name.setFont(name.getFont().deriveFont(Font.BOLD, 16f));
-        addFlags(dictionary.getLanguages());
+        Font baseFont = name.getFont();
+
+        add(flags, "split");
+        name.setFont(baseFont.deriveFont(Font.BOLD, baseFont.getSize()*1.3F));
+        copyright.setFont(baseFont.deriveFont(baseFont.getSize()*0.8F));
+        license.setFont(copyright.getFont());
+        
         add(name, "wrap");
-        add(new JLabel(getDescriptionForLocale(dictionary.getDescription(), Locale.getDefault())), "wrap");
-        add(new HyperlinkLabel(dictionary.getHomepage()), "wrap");
-        add(new HyperlinkLabel(dictionary.getLicense()), "wrap");
-        add(new JLabel(MessageFormat.format("(c) {0} {1}", dictionary.getCopyright().getYear().getYear(), dictionary.getCopyright().getBy())));
+        add(description, "split");
+        add(homepage, "wrap");
+        add(copyright, "split");
+        add(license);
+    }
+    
+    DictionaryPanel(Dictionary dictionary) {
+        this();
+        setDictionary(dictionary);
+    }
+    
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
+        
+        setFlags(dictionary.getLanguages());
+        name.setText(dictionary.getName());
+        description.setText(getDescriptionForLocale(dictionary.getDescription(), Locale.getDefault()));
+        String homepageLink = dictionary.getHomepage();
+        if (homepageLink != null && !homepageLink.isEmpty()) {
+            homepage.setHyperlink(homepageLink, JGloss.MESSAGES.getString( "dictionarypanel.homepage"));
+        } else {
+            homepage.setText(null);
+        }
+        copyright.setText(MessageFormat.format("(C) {0,number,0000} {1}", dictionary.getCopyright().getYear().getYear(), dictionary.getCopyright().getBy()));
+        String licenseLink = dictionary.getLicense();
+        if (licenseLink != null && !licenseLink.isEmpty()) {
+            license.setHyperlink(licenseLink, JGloss.MESSAGES.getString( "dictionarypanel.license"));
+        } else {
+            license.setText(null);
+        }
+    }
+    
+    public Dictionary getDictionary() {
+        return dictionary;
     }
 
-    private void addFlags(Languages languages) {
-        boolean firstFlag = true;
-        
+    private void setFlags(Languages languages) {
+        flags.removeAll();
+
         for (String language : languages.getLanguage()) {
             JLabel languageLabel = new JLabel();
             try {
@@ -73,8 +123,9 @@ class DictionaryPanel extends JPanel {
                 languageLabel.setText(language);
             }
             
-            add(languageLabel, firstFlag ? "split" : null);
-            firstFlag = false;
+            flags.add(languageLabel);
         }
+        
+        flags.validate();
     }
 }

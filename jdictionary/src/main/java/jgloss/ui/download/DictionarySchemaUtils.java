@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 import jgloss.ui.download.schema.Dictionary.Description;
+import jgloss.ui.download.schema.Download;
 
 /**
  * Utility methods for working with the dictionaries xml file schema classes.
@@ -53,6 +54,23 @@ class DictionarySchemaUtils {
         }
         
         return descriptionForLocale;
+    }
+    
+    /**
+     * Factory method which creates an unpacker for the given dictionary download.
+     */
+    public static DictionaryUnpacker createUnpackerFor(Download dictionaryDownload) {
+        String compression = dictionaryDownload.getCompression();
+        switch (compression) {
+        case "gzip":
+            return new GZipUnpacker();
+            
+        case "zip":
+            return new ZipUnpacker();
+            
+        default:
+            throw new IllegalArgumentException("unsupported compression type " + compression);
+        }
     }
     
     private DictionarySchemaUtils() {

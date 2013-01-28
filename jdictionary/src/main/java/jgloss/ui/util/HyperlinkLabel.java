@@ -21,35 +21,38 @@
 
 package jgloss.ui.util;
 
+import static java.awt.Cursor.DEFAULT_CURSOR;
 import static java.awt.Cursor.HAND_CURSOR;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
 import java.awt.Cursor;
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
-import javax.swing.JTextField;
+import javax.swing.JLabel;
 
 /**
  * Label which shows a hyperlink which will be opened in the default browser on click.
  * 
  * @author Michael Koch <tensberg@gmx.net>
  */
-public class HyperlinkLabel extends JTextField {
+public class HyperlinkLabel extends JLabel {
     
-    private class BrowseHyperlinkListener implements ActionListener {
+    private class BrowseHyperlinkListener extends MouseAdapter {
         @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                Desktop.getDesktop().browse(hyperlink);
-            } catch (IOException ex) {
-                LOGGER.log(SEVERE, "could not open hyperlink " + hyperlink + " for browsing");
+        public void mouseClicked(MouseEvent e) {
+            if (hyperlink != null) {
+                try {
+                    Desktop.getDesktop().browse(hyperlink);
+                } catch (IOException ex) {
+                    LOGGER.log(SEVERE, "could not open hyperlink " + hyperlink + " for browsing");
+                }
             }
         }
     }
@@ -61,33 +64,50 @@ public class HyperlinkLabel extends JTextField {
     private URI hyperlink;
 
     public HyperlinkLabel() {
-        setEditable(false);
-        addActionListener(new BrowseHyperlinkListener());
-        setCursor(Cursor.getPredefinedCursor(HAND_CURSOR));
+        addMouseListener(new BrowseHyperlinkListener());
     }
     
     public HyperlinkLabel(String hyperlink) {
         this();
         setHyperlink(hyperlink);
     }
+
+    @Override
+    public void setText(String text) {
+        setHyperlink(null, text);
+    }
     
     public void setHyperlink(String hyperlink) {
-        this.hyperlink = null;
-        setText(null);
-        setEnabled(false);
+        setHyperlink(hyperlink, hyperlink);
+    }
+    
+    public void setHyperlink(String hyperlinkLink, String text) {
+        URI newHyperlink = null;
+        String newText;
+        Cursor newCursor;
         
-        if (hyperlink != null) {
-            setText(toHtmlLink(hyperlink));
+        if (hyperlinkLink != null) {
             try {
-                this.hyperlink = new URI(hyperlink);
-                setEnabled(true);
+                newHyperlink = new URI(hyperlinkLink);
             } catch (URISyntaxException ex) {
-                LOGGER.log(WARNING, hyperlink + " is not a valid URI", ex);
+                LOGGER.log(WARNING, hyperlinkLink + " is not a valid URI", ex);
             }
         }
+        
+        if (newHyperlink != null) {
+            newCursor = Cursor.getPredefinedCursor(HAND_CURSOR);
+            newText = toHtmlLink(hyperlinkLink, text);
+        } else {
+            newCursor = Cursor.getPredefinedCursor(DEFAULT_CURSOR);
+            newText = text;
+        }
+
+        setCursor(newCursor);
+        super.setText(newText);
+        this.hyperlink = newHyperlink;
     }
 
-    private static String toHtmlLink(String link) {
-        return "<a href=\"" + link + "\">" + link + "</a>";
+    private static String toHtmlLink(String link, String text) {
+        return "<html><body><a href=\"" + link + "\">" + text + "</a></body></html>";
     }
 }

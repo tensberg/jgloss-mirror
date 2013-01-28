@@ -25,6 +25,7 @@ package jgloss.ui;
 import static jgloss.ui.util.SwingWorkerProgressFeedback.showProgress;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -66,6 +67,7 @@ import jgloss.dictionary.DictionaryInstantiationException;
 import jgloss.dictionary.IndexException;
 import jgloss.dictionary.IndexedDictionary;
 import jgloss.dictionary.UnsupportedDescriptorException;
+import jgloss.ui.download.DictionaryDownloadDialog;
 import jgloss.ui.util.UIUtilities;
 
 /**
@@ -89,7 +91,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * The widget which displays the current selection of dictionaries.
      */
-    final JList dictionaries;
+    final JList<DescriptorDictionaryWrapper> dictionaries;
 
     /**
      * List of {@link DescriptorDictionaryWrapper DictionaryWrapper } instances with
@@ -158,17 +160,17 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         setLayout( new GridBagLayout());
 
         // construct the dictionaries list editor
-        dictionaries = new JList();
+        dictionaries = new JList<>();
         dictionaries.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
-
+        
         final Action up = new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
-                    DefaultListModel m = (DefaultListModel) dictionaries.getModel();
-                    Object o = m.remove( i);
+                    DefaultListModel<DescriptorDictionaryWrapper> m = (DefaultListModel<DescriptorDictionaryWrapper>) dictionaries.getModel();
+                    DescriptorDictionaryWrapper o = m.remove( i);
                     m.insertElementAt( o, i-1);
                     dictionaries.setSelectedIndex( i-1);
                 }
@@ -181,20 +183,37 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
-                    DefaultListModel m = (DefaultListModel) dictionaries.getModel();
-                    Object o = m.remove( i);
+                    DefaultListModel<DescriptorDictionaryWrapper> m = (DefaultListModel<DescriptorDictionaryWrapper>) dictionaries.getModel();
+                    DescriptorDictionaryWrapper o = m.remove( i);
                     m.insertElementAt( o, i+1);
                     dictionaries.setSelectedIndex( i+1);
                 }
             };
         down.setEnabled( false);
         UIUtilities.initAction( down, "dictionaries.button.down");
+
+        final Action download = new AbstractAction() {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO: use download location from home page
+                DictionaryDownloadDialog dialog = new DictionaryDownloadDialog(SwingUtilities.getWindowAncestor(Dictionaries.this), Dictionaries.class.getResource("/dictionaries.xml"));
+                dialog.setSize(new Dimension(600, 400));
+                dialog.setLocationRelativeTo(Dictionaries.this);
+                dialog.setVisible(true);
+            }
+            
+        };
+        UIUtilities.initAction(download, "dictionaries.button.download");
+
         final Action add = new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
 				@Override
 				public void actionPerformed( ActionEvent e) {
-                    addDictionary();
+                    selectAndAddDictionary();
                 }
             };
         add.setEnabled( true);
@@ -205,7 +224,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     int i = dictionaries.getSelectedIndex();
-                    DefaultListModel m = (DefaultListModel) dictionaries.getModel();
+                    DefaultListModel<DescriptorDictionaryWrapper> m = (DefaultListModel<DescriptorDictionaryWrapper>) dictionaries.getModel();
                     m.remove( i);
                     if (i < m.getSize()) {
 	                    dictionaries.setSelectedIndex( i);
@@ -261,6 +280,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         gc.insets = new Insets( 0, 0, 0, 5);
         add( scroller, gc);
         JPanel p = new JPanel( new GridLayout( 0, 1));
+        p.add( new JButton( download));
         p.add( new JButton( add));
         p.add( new JButton( remove));
         p.add( new JButton( up));
@@ -291,11 +311,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     /**
      * Runs the dialog to add a new dictionary to the list.
      */
-    private void addDictionary() {
-        String dir = JGloss.PREFS.getString( Preferences.DICTIONARIES_DIR);
-        if (dir==null || dir.trim().length()==0) {
-            dir = System.getProperty( "user.home");
-        }
+    private void selectAndAddDictionary() {
+        File dir = getDictionariesDir();
 
         final JFileChooser chooser = new JFileChooser( dir);
         chooser.setFileHidingEnabled( true);
@@ -305,14 +322,30 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         int result = chooser.showDialog( SwingUtilities.getRoot( instance), JGloss.MESSAGES.getString
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
-            loadDictionaries(chooser.getSelectedFiles());
-            JGloss.PREFS.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
-                              .getAbsolutePath());
+            addDictionaryFiles(chooser.getSelectedFiles());
+            setDictionariesDir(chooser.getCurrentDirectory());
         }
     }
 
-    private void loadDictionaries(File[] selectedFiles) {
-        List<String> descriptors = new ArrayList<String>(selectedFiles.length);
+    public static File getDictionariesDir() {
+        String dir = JGloss.PREFS.getString( Preferences.DICTIONARIES_DIR);
+        if (dir==null || dir.trim().length()==0) {
+            dir = System.getProperty( "user.home");
+        }
+        return new File(dir);
+    }
+    
+    public static void setDictionariesDir(File dir) {
+        JGloss.PREFS.set( Preferences.DICTIONARIES_DIR, dir.getAbsolutePath());
+    }
+
+    /**
+     * Adds the given dictionary files to the list of configured dictionaries and loads them.
+     * Dictionary files which are already added are skipped. Loading the dictionary files is
+     * done asynchrously.
+     */
+    public void addDictionaryFiles(File[] selectedFiles) {
+        List<String> descriptors = new ArrayList<>(selectedFiles.length);
         for (File file : selectedFiles) {
             String descriptor = file.getAbsolutePath();
             if (!isAlreadyAdded(descriptor)) {
@@ -321,16 +354,16 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         }
 
         if (!descriptors.isEmpty()) {
-            DictionaryLoader loader = new DictionaryLoader(this, (DefaultListModel) dictionaries.getModel(), descriptors);
+            DictionaryLoader loader = new DictionaryLoader(this, (DefaultListModel<DescriptorDictionaryWrapper>) dictionaries.getModel(), descriptors);
             showProgress(loader, this);
             loader.execute();
         }
     }
 
     private boolean isAlreadyAdded(String descriptor) {
-        ListModel model = dictionaries.getModel();
+        ListModel<DescriptorDictionaryWrapper> model = dictionaries.getModel();
         for (int i=0; i<model.getSize(); i++) {
-            if (((DescriptorDictionaryWrapper) model.getElementAt(i)).descriptor.equals( descriptor)) {
+            if (model.getElementAt(i).descriptor.equals( descriptor)) {
                 return true;
             }
         }
@@ -406,12 +439,12 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 	public void savePreferences() {
         assert EventQueue.isDispatchThread();
 
-        ListModel model = dictionaries.getModel();
+        ListModel<DescriptorDictionaryWrapper> model = dictionaries.getModel();
         StringBuilder paths = new StringBuilder( model.getSize()*32);
         List<DescriptorDictionaryWrapper> newDictionaries = new ArrayList<DescriptorDictionaryWrapper>( model.getSize());
 
         for ( int i=0; i<model.getSize(); i++) {
-            DescriptorDictionaryWrapper dictionaryWrapper = (DescriptorDictionaryWrapper) model.getElementAt( i);
+            DescriptorDictionaryWrapper dictionaryWrapper = model.getElementAt( i);
             newDictionaries.add( dictionaryWrapper);
             if (paths.length() > 0) {
                 paths.append( File.pathSeparatorChar);
@@ -487,13 +520,13 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         }
 
         // display the list of loaded dictionaries
-        final DefaultListModel model = new DefaultListModel();
+        final DefaultListModel<DescriptorDictionaryWrapper> model = new DefaultListModel<DescriptorDictionaryWrapper>();
 
         // discard any dictionaries loaded in the component but not in the active list
-        ListModel oldModel = dictionaries.getModel();
+        ListModel<DescriptorDictionaryWrapper> oldModel = dictionaries.getModel();
 
         for ( int i=0; i<oldModel.getSize(); i++) {
-            DescriptorDictionaryWrapper d = (DescriptorDictionaryWrapper) oldModel.getElementAt( i);
+            DescriptorDictionaryWrapper d = oldModel.getElementAt( i);
             if (!activeDictionaries.contains( d)) {
                 d.dictionary.dispose();
             }
@@ -517,4 +550,4 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      */
     @Override
 	public void applyPreferences() {}
-} // class Dictionaries
+}

@@ -58,7 +58,7 @@
                     </restriction>
                 </simpleType>
             </element>
-            <element name="dictionaryFile" type="string" minOccurs="0" maxOccurs="1" />
+            <element name="dictionaryFile" type="string" />
         </sequence>
     </complexType>
 
