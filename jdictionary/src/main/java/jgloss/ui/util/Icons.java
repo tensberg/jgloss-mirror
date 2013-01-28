@@ -37,7 +37,7 @@ public class Icons {
     private static final String ICONS_RESOURCE_FOLDER = "/icons/";
 
     /**
-     * Loads the icon with the given filename from the icons resource folder.
+     * Loads the icon with the given filename from the icons resource folder. The icon is cached the first time it is loaded.
      * 
      * @param name filename of the icon. May be a path relative to the icons resource folder.
      */

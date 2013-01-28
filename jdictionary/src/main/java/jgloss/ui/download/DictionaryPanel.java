@@ -24,6 +24,7 @@ package jgloss.ui.download;
 import static jgloss.ui.download.DictionarySchemaUtils.getDescriptionForLocale;
 
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -48,22 +49,50 @@ class DictionaryPanel extends JPanel {
     
     private static final Logger LOGGER = Logger.getLogger(DictionaryPanel.class.getPackage().getName());
 
-    DictionaryPanel(Dictionary dictionary) {
+    private final JLabel name = new JLabel();
+    
+    private final JPanel flags = new JPanel(new GridLayout(1, 0, 2, 2));
+
+    private final JLabel description = new JLabel();
+
+    private final HyperlinkLabel homepage = new HyperlinkLabel();
+    
+    private final HyperlinkLabel license = new HyperlinkLabel();
+
+    private final JLabel copyright = new JLabel();
+
+    private Dictionary dictionary;
+
+    DictionaryPanel() {
         setLayout(new MigLayout());
         
-        JLabel name = new JLabel(dictionary.getName());
         name.setFont(name.getFont().deriveFont(Font.BOLD, 16f));
-        addFlags(dictionary.getLanguages());
+        add(flags);
         add(name, "wrap");
-        add(new JLabel(getDescriptionForLocale(dictionary.getDescription(), Locale.getDefault())), "wrap");
-        add(new HyperlinkLabel(dictionary.getHomepage()), "wrap");
-        add(new HyperlinkLabel(dictionary.getLicense()), "wrap");
-        add(new JLabel(MessageFormat.format("(c) {0} {1}", dictionary.getCopyright().getYear().getYear(), dictionary.getCopyright().getBy())));
+        add(description, "wrap");
+        add(homepage, "wrap");
+        add(license, "wrap");
+        add(copyright);
+    }
+    
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
+        
+        setFlags(dictionary.getLanguages());
+        name.setText(dictionary.getName());
+        description.setText(getDescriptionForLocale(dictionary.getDescription(), Locale.getDefault()));
+        homepage.setHyperlink(dictionary.getHomepage());
+        license.setHyperlink(dictionary.getLicense());
+        copyright.setText(MessageFormat.format("(c) {0} {1}", dictionary.getCopyright().getYear().getYear(), dictionary.getCopyright().getBy()));
+    }
+    
+    public Dictionary getDictionary() {
+        return dictionary;
     }
 
-    private void addFlags(Languages languages) {
-        boolean firstFlag = true;
-        
+    private void setFlags(Languages languages) {
+        flags.removeAll();
+
         for (String language : languages.getLanguage()) {
             JLabel languageLabel = new JLabel();
             try {
@@ -73,8 +102,9 @@ class DictionaryPanel extends JPanel {
                 languageLabel.setText(language);
             }
             
-            add(languageLabel, firstFlag ? "split" : null);
-            firstFlag = false;
+            flags.add(languageLabel);
         }
+        
+        flags.validate();
     }
 }

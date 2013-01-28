@@ -27,25 +27,25 @@ import static java.util.logging.Level.WARNING;
 
 import java.awt.Cursor;
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
-import javax.swing.JTextField;
+import javax.swing.JLabel;
 
 /**
  * Label which shows a hyperlink which will be opened in the default browser on click.
  * 
  * @author Michael Koch <tensberg@gmx.net>
  */
-public class HyperlinkLabel extends JTextField {
+public class HyperlinkLabel extends JLabel {
     
-    private class BrowseHyperlinkListener implements ActionListener {
+    private class BrowseHyperlinkListener extends MouseAdapter {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void mouseClicked(MouseEvent e) {
             try {
                 Desktop.getDesktop().browse(hyperlink);
             } catch (IOException ex) {
@@ -61,9 +61,9 @@ public class HyperlinkLabel extends JTextField {
     private URI hyperlink;
 
     public HyperlinkLabel() {
-        setEditable(false);
-        addActionListener(new BrowseHyperlinkListener());
+        addMouseListener(new BrowseHyperlinkListener());
         setCursor(Cursor.getPredefinedCursor(HAND_CURSOR));
+        setEnabled(false);
     }
     
     public HyperlinkLabel(String hyperlink) {
@@ -88,6 +88,6 @@ public class HyperlinkLabel extends JTextField {
     }
 
     private static String toHtmlLink(String link) {
-        return "<a href=\"" + link + "\">" + link + "</a>";
+        return "<html><body><a href=\"" + link + "\">" + link + "</a></body></html>";
     }
 }
