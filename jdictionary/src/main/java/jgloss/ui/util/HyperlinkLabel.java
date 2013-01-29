@@ -21,6 +21,7 @@
 
 package jgloss.ui.util;
 
+import static java.awt.Cursor.DEFAULT_CURSOR;
 import static java.awt.Cursor.HAND_CURSOR;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
@@ -46,10 +47,12 @@ public class HyperlinkLabel extends JLabel {
     private class BrowseHyperlinkListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            try {
-                Desktop.getDesktop().browse(hyperlink);
-            } catch (IOException ex) {
-                LOGGER.log(SEVERE, "could not open hyperlink " + hyperlink + " for browsing");
+            if (hyperlink != null) {
+                try {
+                    Desktop.getDesktop().browse(hyperlink);
+                } catch (IOException ex) {
+                    LOGGER.log(SEVERE, "could not open hyperlink " + hyperlink + " for browsing");
+                }
             }
         }
     }
@@ -62,32 +65,49 @@ public class HyperlinkLabel extends JLabel {
 
     public HyperlinkLabel() {
         addMouseListener(new BrowseHyperlinkListener());
-        setCursor(Cursor.getPredefinedCursor(HAND_CURSOR));
-        setEnabled(false);
     }
     
     public HyperlinkLabel(String hyperlink) {
         this();
         setHyperlink(hyperlink);
     }
+
+    @Override
+    public void setText(String text) {
+        setHyperlink(null, text);
+    }
     
     public void setHyperlink(String hyperlink) {
-        this.hyperlink = null;
-        setText(null);
-        setEnabled(false);
+        setHyperlink(hyperlink, hyperlink);
+    }
+    
+    public void setHyperlink(String hyperlinkLink, String text) {
+        URI newHyperlink = null;
+        String newText;
+        Cursor newCursor;
         
-        if (hyperlink != null) {
-            setText(toHtmlLink(hyperlink));
+        if (hyperlinkLink != null) {
             try {
-                this.hyperlink = new URI(hyperlink);
-                setEnabled(true);
+                newHyperlink = new URI(hyperlinkLink);
             } catch (URISyntaxException ex) {
-                LOGGER.log(WARNING, hyperlink + " is not a valid URI", ex);
+                LOGGER.log(WARNING, hyperlinkLink + " is not a valid URI", ex);
             }
         }
+        
+        if (newHyperlink != null) {
+            newCursor = Cursor.getPredefinedCursor(HAND_CURSOR);
+            newText = toHtmlLink(hyperlinkLink, text);
+        } else {
+            newCursor = Cursor.getPredefinedCursor(DEFAULT_CURSOR);
+            newText = text;
+        }
+
+        setCursor(newCursor);
+        super.setText(newText);
+        this.hyperlink = newHyperlink;
     }
 
-    private static String toHtmlLink(String link) {
-        return "<html><body><a href=\"" + link + "\">" + link + "</a></body></html>";
+    private static String toHtmlLink(String link, String text) {
+        return "<html><body><a href=\"" + link + "\">" + text + "</a></body></html>";
     }
 }

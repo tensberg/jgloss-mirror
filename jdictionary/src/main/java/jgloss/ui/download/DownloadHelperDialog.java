@@ -31,11 +31,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
-import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
+import jgloss.JGloss;
 import jgloss.ui.download.schema.Dictionary;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Dialog where you can select dictionaries which are downloaded and installed.
@@ -45,18 +48,22 @@ public class DownloadHelperDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     
     private static final Logger LOGGER = Logger.getLogger(DownloadHelperDialog.class.getPackage().getName());
-    
-    private final DefaultListModel<Dictionary> listModel = new DefaultListModel<>();
+   
+    private final JPanel dictionariesPanel = new JPanel();
 
     public DownloadHelperDialog(Window parent, URL dictionariesUrl) {
         super(parent);
         
+        setTitle(JGloss.MESSAGES.getString( "downloadhelper.title"));
         setModalityType(ModalityType.APPLICATION_MODAL);
         setLayout(new BorderLayout());
         
-        JList<Dictionary> list = new JList<>(listModel);
-        list.setCellRenderer(new DictionaryListCellRenderer());
-        add(list);
+        dictionariesPanel.setLayout(new MigLayout(new LC().wrapAfter(1)));
+        JScrollPane dictionariesScroller = new JScrollPane(dictionariesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        dictionariesScroller.getVerticalScrollBar().setUnitIncrement(40);
+        dictionariesScroller.getVerticalScrollBar().setBlockIncrement(40);
+        add(dictionariesScroller);
         loadDictionaries(dictionariesUrl);
     }
 
@@ -77,7 +84,8 @@ public class DownloadHelperDialog extends JDialog {
 
     private void showDictionaries(List<Dictionary> dictionaries) {
         for (Dictionary dictionary : dictionaries) {
-            listModel.addElement(dictionary);
+            dictionariesPanel.add(new DictionaryPanel(dictionary));
         }
+        dictionariesPanel.validate();
     }
 }

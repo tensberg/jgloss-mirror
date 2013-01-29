@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import jgloss.JGloss;
 import jgloss.ui.download.schema.Dictionary;
 import jgloss.ui.download.schema.Dictionary.Languages;
 import jgloss.ui.util.HyperlinkLabel;
@@ -62,17 +63,27 @@ class DictionaryPanel extends JPanel {
     private final JLabel copyright = new JLabel();
 
     private Dictionary dictionary;
-
+    
     DictionaryPanel() {
         setLayout(new MigLayout());
         
-        name.setFont(name.getFont().deriveFont(Font.BOLD, 16f));
-        add(flags);
+        Font baseFont = name.getFont();
+
+        add(flags, "split");
+        name.setFont(baseFont.deriveFont(Font.BOLD, baseFont.getSize()*1.3F));
+        copyright.setFont(baseFont.deriveFont(baseFont.getSize()*0.8F));
+        license.setFont(copyright.getFont());
+        
         add(name, "wrap");
-        add(description, "wrap");
+        add(description, "split");
         add(homepage, "wrap");
-        add(license, "wrap");
-        add(copyright);
+        add(copyright, "split");
+        add(license);
+    }
+    
+    DictionaryPanel(Dictionary dictionary) {
+        this();
+        setDictionary(dictionary);
     }
     
     public void setDictionary(Dictionary dictionary) {
@@ -81,9 +92,19 @@ class DictionaryPanel extends JPanel {
         setFlags(dictionary.getLanguages());
         name.setText(dictionary.getName());
         description.setText(getDescriptionForLocale(dictionary.getDescription(), Locale.getDefault()));
-        homepage.setHyperlink(dictionary.getHomepage());
-        license.setHyperlink(dictionary.getLicense());
-        copyright.setText(MessageFormat.format("(c) {0} {1}", dictionary.getCopyright().getYear().getYear(), dictionary.getCopyright().getBy()));
+        String homepageLink = dictionary.getHomepage();
+        if (homepageLink != null && !homepageLink.isEmpty()) {
+            homepage.setHyperlink(homepageLink, JGloss.MESSAGES.getString( "dictionarypanel.homepage"));
+        } else {
+            homepage.setText(null);
+        }
+        copyright.setText(MessageFormat.format("(C) {0,number,0000} {1}", dictionary.getCopyright().getYear().getYear(), dictionary.getCopyright().getBy()));
+        String licenseLink = dictionary.getLicense();
+        if (licenseLink != null && !licenseLink.isEmpty()) {
+            license.setHyperlink(licenseLink, JGloss.MESSAGES.getString( "dictionarypanel.license"));
+        } else {
+            license.setText(null);
+        }
     }
     
     public Dictionary getDictionary() {
