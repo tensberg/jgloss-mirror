@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -43,18 +44,22 @@ import net.miginfocom.swing.MigLayout;
 /**
  * Dialog where you can select dictionaries which are downloaded and installed.
  */
-public class DownloadHelperDialog extends JDialog {
+public class DictionaryDownloadDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger LOGGER = Logger.getLogger(DownloadHelperDialog.class.getPackage().getName());
+    private static final Logger LOGGER = Logger.getLogger(DictionaryDownloadDialog.class.getPackage().getName());
    
     private final JPanel dictionariesPanel = new JPanel();
+    
+    private final JPanel buttonsPanel = new JPanel();
 
-    public DownloadHelperDialog(Window parent, URL dictionariesUrl) {
+    private final ChooseDownloadDirectoryAction chooseDownloadDirAction = new ChooseDownloadDirectoryAction(this);
+
+    public DictionaryDownloadDialog(Window parent, URL dictionariesUrl) {
         super(parent);
         
-        setTitle(JGloss.MESSAGES.getString( "downloadhelper.title"));
+        setTitle(JGloss.MESSAGES.getString( "dictionarydownload.title"));
         setModalityType(ModalityType.APPLICATION_MODAL);
         setLayout(new BorderLayout());
         
@@ -63,7 +68,12 @@ public class DownloadHelperDialog extends JDialog {
                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         dictionariesScroller.getVerticalScrollBar().setUnitIncrement(40);
         dictionariesScroller.getVerticalScrollBar().setBlockIncrement(40);
-        add(dictionariesScroller);
+        
+        buttonsPanel.add(new JButton(chooseDownloadDirAction));
+        
+        add(dictionariesScroller, BorderLayout.CENTER);
+        add(buttonsPanel, BorderLayout.PAGE_END);
+        
         loadDictionaries(dictionariesUrl);
     }
 

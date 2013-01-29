@@ -67,7 +67,7 @@ import jgloss.dictionary.DictionaryInstantiationException;
 import jgloss.dictionary.IndexException;
 import jgloss.dictionary.IndexedDictionary;
 import jgloss.dictionary.UnsupportedDescriptorException;
-import jgloss.ui.download.DownloadHelperDialog;
+import jgloss.ui.download.DictionaryDownloadDialog;
 import jgloss.ui.util.UIUtilities;
 
 /**
@@ -199,7 +199,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: use download location from home page
-                DownloadHelperDialog dialog = new DownloadHelperDialog(SwingUtilities.getWindowAncestor(Dictionaries.this), Dictionaries.class.getResource("/dictionaries.xml"));
+                DictionaryDownloadDialog dialog = new DictionaryDownloadDialog(SwingUtilities.getWindowAncestor(Dictionaries.this), Dictionaries.class.getResource("/dictionaries.xml"));
                 dialog.setSize(new Dimension(600, 400));
                 dialog.setLocationRelativeTo(Dictionaries.this);
                 dialog.setVisible(true);
@@ -312,10 +312,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * Runs the dialog to add a new dictionary to the list.
      */
     private void addDictionary() {
-        String dir = JGloss.PREFS.getString( Preferences.DICTIONARIES_DIR);
-        if (dir==null || dir.trim().length()==0) {
-            dir = System.getProperty( "user.home");
-        }
+        File dir = getDictionariesDir();
 
         final JFileChooser chooser = new JFileChooser( dir);
         chooser.setFileHidingEnabled( true);
@@ -326,9 +323,20 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
             loadDictionaries(chooser.getSelectedFiles());
-            JGloss.PREFS.set( Preferences.DICTIONARIES_DIR, chooser.getCurrentDirectory()
-                              .getAbsolutePath());
+            setDictionariesDir(chooser.getCurrentDirectory());
         }
+    }
+
+    public static File getDictionariesDir() {
+        String dir = JGloss.PREFS.getString( Preferences.DICTIONARIES_DIR);
+        if (dir==null || dir.trim().length()==0) {
+            dir = System.getProperty( "user.home");
+        }
+        return new File(dir);
+    }
+    
+    public static void setDictionariesDir(File dir) {
+        JGloss.PREFS.set( Preferences.DICTIONARIES_DIR, dir.getAbsolutePath());
     }
 
     private void loadDictionaries(File[] selectedFiles) {
