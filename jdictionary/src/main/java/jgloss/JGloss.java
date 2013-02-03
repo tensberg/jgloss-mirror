@@ -27,14 +27,8 @@ import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.Frame;
-import java.awt.TextArea;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -44,6 +38,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import jgloss.dictionary.Dictionary;
@@ -318,62 +313,13 @@ public abstract class JGloss implements ExitListener {
         LOGGER.log(Level.SEVERE, message, t);
 
         // Display error message in a frame. Note that this needs at least Java 1.1
-        final Frame f = new Frame( MESSAGES.getString( "error.initialization.title"));
+        final Frame f = new Frame();
         f.setLayout( new BorderLayout());
 
         String msg = MESSAGES.getString( "error.initialization",
-            fatal ? MESSAGES.getString( "error.initialization.fatal") : "",
-            message, t.getClass().getName(), t.getLocalizedMessage());
+            fatal ? MESSAGES.getString( "error.initialization.fatal") : "",  message);
 
-        int rows = 1;
-        int maxcols = 0;
-        int cols = 0;
-        for ( int i=0; i<msg.length(); i++) {
-            if (msg.charAt( i) == '\n') {
-                rows++;
-                if (maxcols < cols) {
-	                maxcols = cols;
-                }
-                cols = 0;
-            } else {
-	            cols++;
-            }
-        }
-        if (maxcols < cols) {
-	        maxcols = cols;
-        }
-
-        TextArea a = new TextArea
-            ( msg, rows, maxcols,
-              TextArea.SCROLLBARS_NONE);
-        a.setFont( new Font( "Dialog", Font.PLAIN, 12));
-        a.setEditable( false);
-        f.add( a, BorderLayout.CENTER);
-
-        Button ok = new Button( MESSAGES.getString( "button.ok"));
-        ok.addActionListener( new ActionListener() {
-                @Override
-				public void actionPerformed( ActionEvent e) {
-                    synchronized (f) {
-                        f.setVisible(false);
-                        f.dispose();
-                        f.notifyAll();
-                    }
-                }
-            });
-        f.add( ok, BorderLayout.SOUTH);
-        f.pack();
-
-        Dimension d = f.getToolkit().getScreenSize();
-        f.setLocation( (d.width-f.getWidth())/2, (d.height-f.getHeight())/2);
-        f.setSize( f.getPreferredSize());
-
-        f.setVisible(true);
-        synchronized (f) {
-            try {
-                f.wait();
-            } catch (InterruptedException ex) {}
-        }
+        JOptionPane.showMessageDialog(null, msg, MESSAGES.getString("error.initialization.title"), JOptionPane.ERROR_MESSAGE);
     }
 
     protected LookupModel createLookupModel() {
@@ -385,7 +331,7 @@ public abstract class JGloss implements ExitListener {
                                ExpressionSearchModes.SUFFIX,
                                // distance search modes are currently not supported by any dictionary implementation
 //                               DistanceSearchModes.NEAR,
-//                               DistanceSearchModes.RADIUS 
+//                               DistanceSearchModes.RADIUS
                                }),
               Arrays.asList( Dictionaries.getInstance().getDictionaries()),
               Arrays.asList( new LookupResultFilter[]
