@@ -70,7 +70,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
     	@Override
     	public void actionPerformed(ActionEvent e) {
             int choice = dictionaryChoice.getSelectedIndex();
-            if (choice >= 0) { 
+            if (choice >= 0 && choice < model.getDictionaryCount()) {
             	if (model.isDictionaryEnabled( choice)) {
             		model.selectDictionary( dictionaryChoice.getSelectedIndex(), true);
             	} else {
@@ -82,7 +82,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
             }
     	}
     }
-    
+
 	private class DictionaryCellRenderer implements ListCellRenderer {
         ListCellRenderer parent;
 
@@ -104,11 +104,11 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
             return out;
         }
     } // class DictionaryCellRenderer
-	
+
     private static final long serialVersionUID = 1L;
 
     static final Logger LOGGER = Logger.getLogger(LookupConfigPanel.class.getPackage().getName());
-    
+
 	private LookupModel model;
 
     private final JRadioButton[] searchModes;
@@ -145,7 +145,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
             searchModes[i] = button;
         }
         modesPanel = UIUtilities.createFlexiblePanel( modesPanel, false);
-        modesPanel.setBorder( BorderFactory.createCompoundBorder 
+        modesPanel.setBorder( BorderFactory.createCompoundBorder
                               ( BorderFactory.createTitledBorder
                                 ( JGloss.MESSAGES.getString( "wordlookup.searchoptions")),
                                 BorderFactory.createEmptyBorder( 2, 2, 2, 2)));
@@ -161,7 +161,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
 
         searchFields[2] = new JCheckBox(new SelectSearchFieldAction(this, DictionaryEntryField.TRANSLATION));
         fieldsPanel.add( searchFields[2]);
-        
+
         fieldsPanel = UIUtilities.createFlexiblePanel( fieldsPanel, false);
         fieldsPanel.setBorder( BorderFactory.createCompoundBorder
                                ( BorderFactory.createTitledBorder
@@ -180,7 +180,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
         matchModes[1] = new JRadioButton(new SelectMatchModeAction(this, MatchMode.WORD));
         matchmodeGroup.add( matchModes[1]);
         matchPanel.add( matchModes[1]);
-        
+
         matchPanel = UIUtilities.createFlexiblePanel( matchPanel, false);
         matchPanel.setBorder( BorderFactory.createCompoundBorder
                               ( BorderFactory.createTitledBorder
@@ -263,7 +263,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
         c3.weightx = 0;
 
         expression = new JTextField();
-        JLabel expressionDescription = 
+        JLabel expressionDescription =
             new JLabel( JGloss.MESSAGES.getString( "wordlookup.enterexpression"));
         expressionDescription.setDisplayedMnemonic
             ( JGloss.MESSAGES.getString( "wordlookup.enterexpression.mk").charAt( 0));
@@ -294,7 +294,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
         }
         this.add( fieldsPanel, c);
         this.add( matchPanel, c);
-        
+
         c = (GridBagConstraints) c.clone();
         c.gridy = 2;
         c.gridx = 0;
@@ -305,7 +305,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
         // update font if prefs change
         UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                 @Override
-				public void propertyChange( java.beans.PropertyChangeEvent e) { 
+				public void propertyChange( java.beans.PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( "TextField.font")) {
                         expression.setFont( (Font) e.getNewValue());
                     }
@@ -358,7 +358,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
         updateDictionarySelection();
         updateInputAvailability();
         updateInputSelection();
-        
+
         model.addLookupChangeListener( this);
         firePropertyChange(MODEL_PROPERTY_NAME, oldModel, model);
     }
@@ -421,7 +421,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
         	expression.setText( newExpression);
         	expression.getDocument().addDocumentListener(searchExpressionListener);
         }
-        
+
         String newDistance = DISTANCE_FORMAT.format( model.getDistance());
         if (!newDistance.equals(distance.getText())) {
             distance.getDocument().removeDocumentListener(setDistanceListener);
