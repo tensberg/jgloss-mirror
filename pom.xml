@@ -51,10 +51,10 @@
         
         <!-- 
             The Japanese font is used when generating JGloss docbook PDF.
-            The following font works in Ubuntu 11.10 with package ttf-takao-mincho installed. 
+            The following font works in Ubuntu 12.04 with package ttf-takao-mincho installed. 
         -->
         <japanesefont.name>TakaoMincho</japanesefont.name><!-- Name of a Japanese TrueType font without the .ttf ending. -->
-        <japanesefont.dir>/usr/share/fonts/truetype/takao/</japanesefont.dir><!-- Directory where the name is stored. -->
+        <japanesefont.dir>/usr/share/fonts/truetype/takao-mincho/</japanesefont.dir><!-- Directory where the font configured above is stored. -->
 	</properties>
 
 	<modules>
