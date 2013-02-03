@@ -32,7 +32,7 @@ import org.junit.Test;
 public class DictionaryListLoaderTest {
     @Test
     public void testLoadDictionaries() throws JAXBException {
-        DictionaryListLoader loader = new DictionaryListLoader(DictionaryListLoaderTest.class.getResource("/dictionaries.xml"));
+        DictionaryListLoader loader = new DictionaryListLoader(DictionaryListLoaderTest.class.getResource("dictionaries.xml"));
         Dictionaries dictionaries = loader.loadDictionaries();
         assertThat(dictionaries).isNotNull();
         assertThat(dictionaries.getDictionary()).isNotEmpty();

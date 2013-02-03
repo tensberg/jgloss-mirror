@@ -19,26 +19,28 @@
  *
  */
 
-package jgloss.ui.download;
+package jgloss.util;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.zip.GZIPInputStream;
-
-import jgloss.ui.download.schema.Dictionary;
-import jgloss.util.IOUtils;
 
 /**
- * Dictionary unpacker for a single GZip-compressed file.
+ * Static utility methods for input/output.
  */
-class GZipUnpacker implements DictionaryUnpacker {
+public class IOUtils {
+    public static void copy(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[16000];
 
-    @Override
-    public void unpack(Dictionary dictionary, InputStream sourceStream, OutputStream outStream) throws IOException {
-        try (GZIPInputStream gunzipIn = new GZIPInputStream(sourceStream)) {
-            IOUtils.copy(gunzipIn, outStream);
-        }
+        int bytesRead;
+        do {
+            bytesRead = in.read(buffer);
+            if (bytesRead > 0) {
+                out.write(buffer, 0, bytesRead);
+            }
+        } while (bytesRead >= 0);
     }
 
+    private IOUtils() {
+    }
 }

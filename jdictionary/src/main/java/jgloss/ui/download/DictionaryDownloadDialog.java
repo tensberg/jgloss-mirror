@@ -47,33 +47,33 @@ import net.miginfocom.swing.MigLayout;
 public class DictionaryDownloadDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
-    
+
     private static final Logger LOGGER = Logger.getLogger(DictionaryDownloadDialog.class.getPackage().getName());
-   
+
     private final JPanel dictionariesPanel = new JPanel();
-    
+
     private final JPanel buttonsPanel = new JPanel();
 
     private final ChooseDownloadDirectoryAction chooseDownloadDirAction = new ChooseDownloadDirectoryAction(this);
 
     public DictionaryDownloadDialog(Window parent, URL dictionariesUrl) {
         super(parent);
-        
+
         setTitle(MESSAGES.getString("dictionarydownload.title"));
         setModalityType(ModalityType.APPLICATION_MODAL);
         setLayout(new BorderLayout());
-        
+
         dictionariesPanel.setLayout(new MigLayout(new LC().wrapAfter(1)));
         JScrollPane dictionariesScroller = new JScrollPane(dictionariesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         dictionariesScroller.getVerticalScrollBar().setUnitIncrement(40);
         dictionariesScroller.getVerticalScrollBar().setBlockIncrement(40);
-        
+
         buttonsPanel.add(new JButton(chooseDownloadDirAction));
-        
+
         add(dictionariesScroller, BorderLayout.CENTER);
         add(buttonsPanel, BorderLayout.PAGE_END);
-        
+
         loadDictionaries(dictionariesUrl);
     }
 
@@ -95,6 +95,7 @@ public class DictionaryDownloadDialog extends JDialog {
     private void showDictionaries(List<Dictionary> dictionaries) {
         for (Dictionary dictionary : dictionaries) {
             dictionariesPanel.add(new DictionaryPanel(dictionary));
+            dictionariesPanel.add(new DownloadPanel(dictionary));
         }
         dictionariesPanel.validate();
     }

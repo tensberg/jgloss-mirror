@@ -21,13 +21,49 @@
 
 package jgloss.ui.download;
 
-import static org.junit.Assert.fail;
+import static org.fest.assertions.Assertions.assertThat;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import jgloss.ui.download.schema.Dictionary;
+import jgloss.ui.download.schema.Download;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class GZipUnpackerTest {
+    
+    private final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    
+    private InputStream sourceStream;
+    
+    @Before
+    public void initSourceStream() {
+        sourceStream = GZipUnpackerTest.class.getResourceAsStream("GZipUnpackerTest.gz");
+        assertThat(sourceStream).isNotNull();
+    }
+    
+    @After
+    public void closeSourceStream() throws IOException {
+        sourceStream.close();
+    }
+    
     @Test
-    public void testUnpack() {
-        fail("not yet implemented");
+    public void testUnpack() throws IOException {
+        Dictionary dictionary = new Dictionary();
+        Download download = new Download();
+        download.setCompression("gz");
+        dictionary.setDownload(download);
+        
+        try {
+            new GZipUnpacker().unpack(dictionary, sourceStream, outStream);
+        } finally {
+            outStream.close();
+        }
+        
+        assertThat(new String(outStream.toByteArray(), "ASCII")).isEqualTo("test");
     }
 }

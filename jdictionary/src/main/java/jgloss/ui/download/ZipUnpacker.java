@@ -21,11 +21,15 @@
 
 package jgloss.ui.download;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import jgloss.ui.download.schema.Dictionary;
+import jgloss.util.IOUtils;
 
 /**
  * Dictionary unpacker which unpacks a single dictionary file from the Zip archive.
@@ -34,8 +38,26 @@ class ZipUnpacker implements DictionaryUnpacker {
 
     @Override
     public void unpack(Dictionary dictionary, InputStream sourceStream, OutputStream outStream) throws IOException {
-        // TODO Auto-generated method stub
+        String dictionaryFile = dictionary.getDownload().getDictionaryFile();
+        ZipInputStream zipIn = new ZipInputStream(sourceStream);
 
+        boolean dictionaryFileFound = false;
+        ZipEntry entry;
+        while ((entry = zipIn.getNextEntry()) != null) {
+            if (filenameMatches(dictionaryFile, entry.getName())) {
+                dictionaryFileFound = true;
+                IOUtils.copy(zipIn, outStream);
+                break;
+            }
+        }
+
+        if (!dictionaryFileFound) {
+            throw new FileNotFoundException("no file " + dictionaryFile + " found in zip archive");
+        }
+    }
+
+    private static boolean filenameMatches(String filename, String pathname) {
+        return pathname.equals(filename) || pathname.endsWith("/" + filename);
     }
 
 }

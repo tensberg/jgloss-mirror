@@ -22,7 +22,7 @@
 package jgloss.ui.download;
 
 import static java.lang.Math.min;
-import static java.nio.file.Files.move;
+import static java.nio.file.StandardOpenOption.WRITE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
@@ -55,44 +55,47 @@ import jgloss.ui.util.JGlossWorker;
  * Downloads and optionally unpacks a dictionary and adds to the list of dictionaries.
  */
 class DictionaryDownloader extends JGlossWorker<File, Void> {
-    
+
     private static final Logger LOGGER = Logger.getLogger(DictionaryDownloader.class.getPackage().getName());
 
     private final Dictionary dictionary;
-    
+
     private final File dictionaryDir;
-    
+
     private final Dictionaries dictionaries;
 
     private File dictionaryFile;
+
+    DictionaryDownloader(Dictionary dictionary) {
+        this(dictionary, Dictionaries.getDictionariesDir(), Dictionaries.getInstance());
+    }
 
     DictionaryDownloader(Dictionary dictionary, File dictionaryDir, Dictionaries dictionaries) {
         this.dictionary = dictionary;
         this.dictionaryDir = dictionaryDir;
         this.dictionaries = dictionaries;
     }
-    
+
     @Override
     protected File doInBackground() throws Exception {
         Download download = dictionary.getDownload();
-        
+
         prepareDictionaryDir();
         dictionaryFile = new File(dictionaryDir, download.getDictionaryFile());
         if (dictionaryFile.exists()) {
             LOGGER.log(INFO, "dictionary file {0} already exists, skipping download", dictionaryFile.getAbsolutePath());
             return dictionaryFile;
         }
-        
+
         File tmpDictionaryFile = File.createTempFile(download.getDictionaryFile(), null, dictionaryDir);
         URL url = new URL(download.getUrl());
         URLConnection connection = url.openConnection();
-        
+
         try {
             download(connection, tmpDictionaryFile);
             unpackDictionary(tmpDictionaryFile);
-            move(tmpDictionaryFile.toPath(), dictionaryFile.toPath());
             setProgress(100);
-            
+
             return dictionaryFile;
         } finally {
             deleteTempFile(tmpDictionaryFile);
@@ -116,7 +119,7 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
 
         try (
              ReadableByteChannel in = Channels.newChannel(connection.getInputStream());
-             FileChannel out = FileChannel.open(tmpDictionaryFile.toPath())
+             FileChannel out = FileChannel.open(tmpDictionaryFile.toPath(), WRITE)
              ) {
             do {
                 transferred = out.transferFrom(in, position, 16000);
@@ -127,7 +130,7 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
             } while (transferred > 0);
         }
     }
-    
+
     private void deleteTempFile(File tmpDictionaryFile) {
         try {
             Files.deleteIfExists(tmpDictionaryFile.toPath());
@@ -144,7 +147,7 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
             }
         }
     }
-    
+
     @Override
     protected void done() {
         try {
