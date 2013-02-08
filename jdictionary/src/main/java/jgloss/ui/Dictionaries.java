@@ -162,7 +162,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         // construct the dictionaries list editor
         dictionaries = new JList<>();
         dictionaries.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
-        
+
         final Action up = new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
@@ -199,12 +199,14 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: use download location from home page
+                savePreferences(); // the download dialog will only see the
+                                   // dictionaries already applied
                 DictionaryDownloadDialog dialog = new DictionaryDownloadDialog(SwingUtilities.getWindowAncestor(Dictionaries.this), Dictionaries.class.getResource("/dictionaries.xml"));
-                dialog.setSize(new Dimension(600, 400));
+                dialog.setSize(new Dimension(800, 600));
                 dialog.setLocationRelativeTo(Dictionaries.this);
                 dialog.setVisible(true);
             }
-            
+
         };
         UIUtilities.initAction(download, "dictionaries.button.download");
 
@@ -322,7 +324,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         int result = chooser.showDialog( SwingUtilities.getRoot( instance), JGloss.MESSAGES.getString
                                          ( "dictionaries.chooser.button.add"));
         if (result == JFileChooser.APPROVE_OPTION) {
-            addDictionaryFiles(chooser.getSelectedFiles());
+            addDictionaryFiles(chooser.getSelectedFiles(), false);
             setDictionariesDir(chooser.getCurrentDirectory());
         }
     }
@@ -334,7 +336,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         }
         return new File(dir);
     }
-    
+
     public static void setDictionariesDir(File dir) {
         JGloss.PREFS.set( Preferences.DICTIONARIES_DIR, dir.getAbsolutePath());
     }
@@ -345,6 +347,10 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
      * done asynchrously.
      */
     public void addDictionaryFiles(File[] selectedFiles) {
+        addDictionaryFiles(selectedFiles, true);
+    }
+
+    private void addDictionaryFiles(File[] selectedFiles, boolean applyChange) {
         List<String> descriptors = new ArrayList<>(selectedFiles.length);
         for (File file : selectedFiles) {
             String descriptor = file.getAbsolutePath();
@@ -354,7 +360,8 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         }
 
         if (!descriptors.isEmpty()) {
-            DictionaryLoader loader = new DictionaryLoader(this, (DefaultListModel<DescriptorDictionaryWrapper>) dictionaries.getModel(), descriptors);
+            DictionaryLoader loader = new DictionaryLoader(this, (DefaultListModel<DescriptorDictionaryWrapper>) dictionaries.getModel(), descriptors,
+                            applyChange);
             showProgress(loader, this);
             loader.execute();
         }

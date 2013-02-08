@@ -46,9 +46,9 @@ import javax.swing.Timer;
 public class SwingWorkerProgressFeedback implements PropertyChangeListener {
     public static final String DEFAULT_MESSAGE_PROPERTY = "message";
 
-    private static final String PROGRESS_PROPERTY = "progress";
+    public static final String PROGRESS_PROPERTY = "progress";
 
-    private static final String STATE_PROPERTY = "state";
+    public static final String STATE_PROPERTY = "state";
 
     private static final int DIALOG_DELAY_MS = 500;
 

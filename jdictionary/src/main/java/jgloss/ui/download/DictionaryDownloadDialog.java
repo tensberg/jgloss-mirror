@@ -37,7 +37,9 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import jgloss.ui.Dictionaries;
 import jgloss.ui.download.schema.Dictionary;
+import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
@@ -63,7 +65,7 @@ public class DictionaryDownloadDialog extends JDialog {
         setModalityType(ModalityType.APPLICATION_MODAL);
         setLayout(new BorderLayout());
 
-        dictionariesPanel.setLayout(new MigLayout(new LC().wrapAfter(1)));
+        dictionariesPanel.setLayout(new MigLayout(new LC().fillX().wrapAfter(1)));
         JScrollPane dictionariesScroller = new JScrollPane(dictionariesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         dictionariesScroller.getVerticalScrollBar().setUnitIncrement(40);
@@ -95,8 +97,8 @@ public class DictionaryDownloadDialog extends JDialog {
     private void showDictionaries(List<Dictionary> dictionaries) {
         for (Dictionary dictionary : dictionaries) {
             dictionariesPanel.add(new DictionaryPanel(dictionary));
-            dictionariesPanel.add(new DownloadPanel(dictionary));
+            dictionariesPanel.add(new DownloadPanel(dictionary, Dictionaries.getInstance()), new CC().growX());
         }
-        dictionariesPanel.validate();
+        dictionariesPanel.revalidate();
     }
 }

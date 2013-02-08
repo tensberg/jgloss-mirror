@@ -29,20 +29,28 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DescriptorDict
 
     private final DefaultListModel<DescriptorDictionaryWrapper> model;
 
+    private final boolean applyChange;
+
     /**
-     * Load the dictionaries from the list of files and add them to the current list of
-     * dictionaries. The dictionaries are loaded in their own thread. If the thread does
-     * not terminate after one second, this method will pop up a model information dialog and
-     * return. The thread will dispose the dialog after it has loaded all dictionaries and display
-     * any error messages for errors in dictionary loading.
+     * Load the dictionaries from the list of files and add them to the current
+     * list of dictionaries. The dictionaries are loaded in their own thread. If
+     * the thread does not terminate after one second, this method will pop up a
+     * model information dialog and return. The thread will dispose the dialog
+     * after it has loaded all dictionaries and display any error messages for
+     * errors in dictionary loading.
      *
-     * @param dictionaryDescriptors List of dictionary descriptors to load. If a dictionary descriptor is already
-     *        loaded, it will be ignored.
+     * @param dictionaryDescriptors
+     *            List of dictionary descriptors to load. If a dictionary
+     *            descriptor is already loaded, it will be ignored.
+     * @param applyChange
+     *            <code>true</code> if the change to the dictionary list should
+     *            be applied after the dictionaries are loaded.
      */
-    DictionaryLoader(Dictionaries dictionaries, DefaultListModel<DescriptorDictionaryWrapper> model, List<String> dictionaryDescriptors) {
+    DictionaryLoader(Dictionaries dictionaries, DefaultListModel<DescriptorDictionaryWrapper> model, List<String> dictionaryDescriptors, boolean applyChange) {
         this.dictionaries = dictionaries;
         this.model = model;
         this.dictionaryDescriptors = dictionaryDescriptors;
+        this.applyChange = applyChange;
     }
 
     @Override
@@ -77,6 +85,10 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DescriptorDict
             }
         } catch (Exception ex) {
             LOGGER.log(SEVERE, "failed to load dictionaries", ex);
+        }
+
+        if (applyChange) {
+            dictionaries.savePreferences();
         }
     }
 
