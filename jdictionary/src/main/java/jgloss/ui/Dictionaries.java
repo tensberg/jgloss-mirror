@@ -22,6 +22,7 @@
 
 package jgloss.ui;
 
+import static jgloss.JGloss.MESSAGES;
 import static jgloss.ui.util.SwingWorkerProgressFeedback.showProgress;
 
 import java.awt.Component;
@@ -332,7 +333,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
     public static File getDictionariesDir() {
         String dir = JGloss.PREFS.getString( Preferences.DICTIONARIES_DIR);
         if (dir==null || dir.trim().length()==0) {
-            dir = System.getProperty( "user.home");
+            dir = System.getProperty("user.home") + File.separator + MESSAGES.getString("dictionaries.defaultdir");
         }
         return new File(dir);
     }

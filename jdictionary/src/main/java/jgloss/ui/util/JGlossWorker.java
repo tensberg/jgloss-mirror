@@ -30,7 +30,7 @@ import javax.swing.SwingWorker;
  * @author Michael Koch <tensberg@gmx.net>
  */
 public abstract class JGlossWorker<T, V> extends SwingWorker<T, V> {
-    private static final String MESSAGE_PROPERTY = "message";
+    public static final String MESSAGE_PROPERTY = "message";
 
     private String message;
 

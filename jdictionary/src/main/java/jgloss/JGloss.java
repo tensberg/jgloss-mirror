@@ -116,42 +116,44 @@ public abstract class JGloss implements ExitListener {
      */
     JGloss() {}
 
-    protected void init( String[] args) {
+    protected void init(final String[] args) {
         assert application == null;
 
         application = this;
 
+        addExitListener(this);
+
+        registerDictionaries();
+
         try {
-            addExitListener(this);
-
-            registerDictionaries();
-
-            handleCommandLine( args);
+            handleCommandLine(args);
 
             initUI();
-
-            SplashScreen splash = new SplashScreen( getApplicationName());
-
-            splash.setInfo( MESSAGES.getString( "splashscreen.initMain"));
-
-            createDialogs();
-
-            showMainWindow( args);
-
-            splash.close();
-        } catch (NoClassDefFoundError ex) {
-            displayError( MESSAGES.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (NoSuchMethodError ex) {
-            displayError( MESSAGES.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
-        } catch (ClassNotFoundException ex) {
-            displayError( MESSAGES.getString( "error.noclassdef"), ex, true);
-            System.exit( 1);
         } catch (Exception ex) {
-            displayError( MESSAGES.getString( "error.initialization.generic"), ex, true);
-            System.exit( 1);
+            displayError(MESSAGES.getString("error.initialization.generic"), ex, true);
+            System.exit(1);
         }
+
+        final SplashScreen splash = new SplashScreen(getApplicationName());
+
+        splash.setInfo(MESSAGES.getString("splashscreen.initMain"));
+
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    createDialogs();
+                    showMainWindow(args);
+                } catch (NoClassDefFoundError | NoSuchMethodError | ClassNotFoundException ex) {
+                    displayError(MESSAGES.getString("error.noclassdef"), ex, true);
+                    System.exit(1);
+                } catch (Exception ex) {
+                    displayError(MESSAGES.getString("error.initialization.generic"), ex, true);
+                    System.exit(1);
+                }
+                splash.close();
+            }
+        });
     }
 
     public boolean exit() {

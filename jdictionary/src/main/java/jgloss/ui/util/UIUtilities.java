@@ -59,7 +59,7 @@ import jgloss.JGloss;
  */
 public class UIUtilities {
 	private static final Logger LOGGER = Logger.getLogger(UIUtilities.class.getPackage().getName());
-	
+
 	/**
      * Initializes an action with values taken from the messages resource bundle.
      * The name of the action, keyboard shortcuts and the action tool tip will be
@@ -71,8 +71,8 @@ public class UIUtilities {
      * @param key The base key in the messages resource bundle.
      * @see javax.swing.Action
      */
-    public static void initAction( Action a, String key) {
-        a.putValue( Action.NAME, JGloss.MESSAGES.getString( key));
+    public static void initAction(Action a, String key, Object... data) {
+        a.putValue(Action.NAME, JGloss.MESSAGES.getString(key, data));
 
         // accelerator key
         String s = null;
@@ -96,7 +96,7 @@ public class UIUtilities {
 	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	        }
         }
-        
+
         // tooltip
         try {
             s = JGloss.MESSAGES.getString( key + ".tt");
@@ -134,7 +134,7 @@ public class UIUtilities {
 	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	        }
         }
-        
+
         // tooltip
         try {
             s = JGloss.MESSAGES.getString( key + ".tt");
@@ -181,7 +181,7 @@ public class UIUtilities {
         gbc.weighty = 1;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         se.add( c, gbc);
-        
+
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.gridheight = GridBagConstraints.REMAINDER;
         if (horizontal) {
@@ -282,10 +282,10 @@ public class UIUtilities {
             // can happen if layout of text component is not done yet
         }
     }
-    
+
     /**
      * Returns a new size where width and height are the minimum of the given size and the available screen space.
-     * 
+     *
      * @param size The original size of the component on the screen (usually a window).
      * @param screen Configuration of the screen on which the component should be shown.
      * @return A new size object with a size no larger than the available screen space.
@@ -297,10 +297,10 @@ public class UIUtilities {
         Insets displayInsets = Toolkit.getDefaultToolkit().getScreenInsets(screen);
         resizedSize.width = Math.min(size.width, displaySize.width - displayInsets.left - displayInsets.right);
         resizedSize.height = Math.min(size.height, displaySize.height - displayInsets.top - displayInsets.bottom);
-    	
+
     	return resizedSize;
     }
-    
+
     private UIUtilities() {
     }
 } // class UIUtilities

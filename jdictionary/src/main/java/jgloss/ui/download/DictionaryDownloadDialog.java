@@ -21,10 +21,13 @@
 
 package jgloss.ui.download;
 
+import static java.awt.BorderLayout.LINE_START;
+import static java.awt.FlowLayout.LEADING;
 import static jgloss.JGloss.MESSAGES;
 import static jgloss.ui.util.SwingWorkerProgressFeedback.showProgress;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Window;
 import java.net.URL;
 import java.util.List;
@@ -34,6 +37,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -54,8 +58,6 @@ public class DictionaryDownloadDialog extends JDialog {
 
     private final JPanel dictionariesPanel = new JPanel();
 
-    private final JPanel buttonsPanel = new JPanel();
-
     private final ChooseDownloadDirectoryAction chooseDownloadDirAction = new ChooseDownloadDirectoryAction(this);
 
     public DictionaryDownloadDialog(Window parent, URL dictionariesUrl) {
@@ -71,7 +73,11 @@ public class DictionaryDownloadDialog extends JDialog {
         dictionariesScroller.getVerticalScrollBar().setUnitIncrement(40);
         dictionariesScroller.getVerticalScrollBar().setBlockIncrement(40);
 
-        buttonsPanel.add(new JButton(chooseDownloadDirAction));
+        JPanel buttonsPanel = new JPanel(new BorderLayout());
+        JPanel leftButtonPanel = new JPanel(new FlowLayout(LEADING));
+        buttonsPanel.add(leftButtonPanel, LINE_START);
+        leftButtonPanel.add(new JLabel(MESSAGES.getString("dictionarydownload.downloaddir", Dictionaries.getDictionariesDir().getAbsolutePath())));
+        leftButtonPanel.add(new JButton(chooseDownloadDirAction));
 
         add(dictionariesScroller, BorderLayout.CENTER);
         add(buttonsPanel, BorderLayout.PAGE_END);

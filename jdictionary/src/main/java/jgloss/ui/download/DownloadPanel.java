@@ -24,13 +24,19 @@ package jgloss.ui.download;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.LINE_START;
 import static javax.swing.SwingWorker.StateValue.DONE;
+import static jgloss.JGloss.MESSAGES;
+import static jgloss.ui.util.JGlossWorker.MESSAGE_PROPERTY;
 import static jgloss.ui.util.SwingWorkerProgressFeedback.PROGRESS_PROPERTY;
+import static jgloss.ui.util.SwingWorkerProgressFeedback.STATE_PROPERTY;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.ConnectException;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -43,7 +49,6 @@ import jgloss.ui.Dictionaries;
 import jgloss.ui.DictionaryListChangeListener;
 import jgloss.ui.download.schema.Dictionary;
 import jgloss.ui.util.ShowingChangedAdapter;
-import jgloss.ui.util.SwingWorkerProgressFeedback;
 import jgloss.ui.util.UIUtilities;
 
 /**
@@ -84,7 +89,11 @@ class DownloadPanel extends JPanel {
                 updateProgress(source);
                 break;
 
-            case SwingWorkerProgressFeedback.STATE_PROPERTY:
+            case MESSAGE_PROPERTY:
+                updateMessage(source);
+                break;
+
+            case STATE_PROPERTY:
                 updateState(source);
                 break;
             }
@@ -95,7 +104,7 @@ class DownloadPanel extends JPanel {
 
         @Override
         public void dictionaryListChanged() {
-            updateControls(dictionary, dictionaries);
+            updateControls();
         }
     };
 
@@ -103,8 +112,10 @@ class DownloadPanel extends JPanel {
 
     private final Dictionaries dictionaries;
 
-    public DownloadPanel(final Dictionary dictionary, final Dictionaries dictionaries) {
+    public DownloadPanel(Dictionary dictionary, final Dictionaries dictionaries) {
         setLayout(new BorderLayout());
+
+        progressBar.setStringPainted(true);
 
         this.dictionary = dictionary;
         this.dictionaries = dictionaries;
@@ -113,7 +124,7 @@ class DownloadPanel extends JPanel {
             @Override
             protected void componentShown(HierarchyEvent event) {
                 dictionaries.addDictionaryListChangeListener(dictionaryChangeListener);
-                updateControls(dictionary, dictionaries);
+                updateControls();
             }
 
             @Override
@@ -123,12 +134,12 @@ class DownloadPanel extends JPanel {
         });
     }
 
-    private void updateControls(Dictionary dictionary, Dictionaries dictionaries) {
+    private void updateControls() {
         removeAll();
         if (alreadyInstalled(dictionary, dictionaries)) {
             add(new JLabel(JGloss.MESSAGES.getString("downloadpanel.installed")), LINE_START);
         } else {
-            add(new JButton(new DownloadAction(dictionary)), LINE_START);
+            add(createDownloadButton(), LINE_START);
         }
         revalidate();
     }
@@ -146,6 +157,7 @@ class DownloadPanel extends JPanel {
     private void showProgress(DictionaryDownloader downloader) {
         removeAll();
         add(progressBar, CENTER);
+        updateMessage(downloader);
         revalidate();
         progressBar.setIndeterminate(true);
 
@@ -157,6 +169,10 @@ class DownloadPanel extends JPanel {
         progressBar.setValue(downloader.getProgress());
     }
 
+    private void updateMessage(DictionaryDownloader downloader) {
+        progressBar.setString(downloader.getMessage());
+    }
+
     private void updateState(DictionaryDownloader downloader) {
         if (downloader.getState() == DONE) {
             downloadFinished(downloader);
@@ -165,7 +181,38 @@ class DownloadPanel extends JPanel {
 
     private void downloadFinished(DictionaryDownloader downloader) {
         downloader.removePropertyChangeListener(progressUpdateListener);
-        // TODO: handle download errors
+        try {
+            downloader.get();
+        } catch (InterruptedException | ExecutionException ex) {
+            showDownloadFailed(ex);
+        }
+    }
+
+    private void showDownloadFailed(Exception ex) {
+        removeAll();
+        JPanel downloadAndMessage = new JPanel(new FlowLayout());
+        downloadAndMessage.add(createDownloadButton());
+        downloadAndMessage.add(new JLabel(createErrorMessage(ex)));
+        add(downloadAndMessage, LINE_START);
+        revalidate();
+    }
+
+    private String createErrorMessage(Exception ex) {
+        String errorMessage = MESSAGES.getString("downloadpanel.error.generic", dictionary.getDownload().getUrl());
+
+        if (ex instanceof ExecutionException) {
+            Throwable cause = ex.getCause();
+
+            if (cause instanceof ConnectException) {
+                errorMessage = MESSAGES.getString("downloadpanel.error.connect", dictionary.getDownload().getUrl());
+            }
+        }
+
+        return errorMessage;
+    }
+
+    private JButton createDownloadButton() {
+        return new JButton(new DownloadAction(dictionary));
     }
 
 }

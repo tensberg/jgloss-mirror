@@ -26,6 +26,7 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
+import static jgloss.JGloss.MESSAGES;
 import static jgloss.ui.download.DictionarySchemaUtils.createUnpackerFor;
 
 import java.io.BufferedInputStream;
@@ -74,6 +75,7 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
         this.dictionary = dictionary;
         this.dictionaryDir = dictionaryDir;
         this.dictionaries = dictionaries;
+        setMessage(MESSAGES.getString("dictionarydownloader.downloading", dictionary.getDownload().getUrl()));
     }
 
     @Override
@@ -88,6 +90,7 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
         }
 
         File tmpDictionaryFile = File.createTempFile(download.getDictionaryFile(), null, dictionaryDir);
+        tmpDictionaryFile.deleteOnExit();
         URL url = new URL(download.getUrl());
         URLConnection connection = url.openConnection();
 
@@ -103,6 +106,7 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
     }
 
     private void unpackDictionary(File tmpDictionaryFile) throws IOException {
+        setMessage(MESSAGES.getString("dictionarydownloader.unpacking", dictionaryFile.getName()));
         try (
              InputStream in = new BufferedInputStream(new FileInputStream(tmpDictionaryFile));
              OutputStream out = new BufferedOutputStream(new FileOutputStream(dictionaryFile))
@@ -115,7 +119,8 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
     private void download(URLConnection connection, File tmpDictionaryFile) throws IOException {
         long position = 0;
         long transferred;
-        int contentLength = connection.getContentLength();
+        long contentLength = connection.getContentLengthLong();
+        Double contentLengthMb = toMegabytes(contentLength);
 
         try (
              ReadableByteChannel in = Channels.newChannel(connection.getInputStream());
@@ -125,10 +130,15 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
                 transferred = out.transferFrom(in, position, 16000);
                 position += transferred;
                 if (contentLength > 0) {
-                    setProgress(min(((int) position*100/contentLength), 100));
+                    setProgress(min(((int) (position * 100 / contentLength)), 100));
+                    setMessage(MESSAGES.getString("dictionarydownloader.downloadprogress", toMegabytes(position), contentLengthMb));
                 }
             } while (transferred > 0);
         }
+    }
+
+    private static Double toMegabytes(long value) {
+        return Double.valueOf(value / ((double) (1024 * 1024)));
     }
 
     private void deleteTempFile(File tmpDictionaryFile) {

@@ -22,9 +22,10 @@
 
 package jgloss.ui;
 
+import static java.awt.BorderLayout.CENTER;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -42,7 +43,7 @@ import net.miginfocom.swing.MigLayout;
  * @author Michael Koch
  */
 public class SplashScreen {
-	
+
     /**
      * The splash screen window.
      */
@@ -65,10 +66,10 @@ public class SplashScreen {
     public SplashScreen( String applicationKey) {
         splash = new JWindow();
         splash.setIconImages(JGlossLogo.ALL_LOGO_SIZES);
-        
-        splash.getContentPane().setLayout( new GridLayout( 1, 1));
 
-        JPanel content = new JPanel(new MigLayout(new LC().wrapAfter(1).fillX()));
+        splash.getContentPane().setLayout(new BorderLayout());
+
+        JPanel content = new JPanel(new MigLayout(new LC().wrapAfter(1).fill()));
         content.setBorder( BorderFactory.createEtchedBorder());
         content.setBackground(Color.WHITE);
 
@@ -82,16 +83,11 @@ public class SplashScreen {
         info = new JLabel( JGloss.MESSAGES.getString( "splashscreen.dummyinfo"));
         info.setOpaque(false);
         content.add(info);
-        
-        splash.getContentPane().add( content);
-        
-        splash.validate();
-        Dimension d = content.getPreferredSize();
-        splash.setSize( d.width+10, d.height);
 
-        Dimension s = splash.getToolkit().getScreenSize();
-        splash.setLocation( (s.width-d.width)/2, (s.height-d.height)/2);
+        splash.getContentPane().add(content, CENTER);
 
+        splash.pack();
+        splash.setLocationRelativeTo(null);
         splash.setVisible( true);
     }
 

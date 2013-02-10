@@ -21,9 +21,10 @@
 
 package jgloss.ui.download;
 
+import static jgloss.JGloss.MESSAGES;
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
@@ -38,21 +39,17 @@ import jgloss.ui.util.UIUtilities;
 class ChooseDownloadDirectoryAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
-    
+
     private final Component parent;
 
     public ChooseDownloadDirectoryAction(Component parent) {
         this.parent = parent;
-        UIUtilities.initAction(this, "choosedownloaddir.action");
+        UIUtilities.initAction(this, "choosedownloaddir.action", Dictionaries.getDictionariesDir());
     }
-    
-    public File getDownloadDirectory() {
-        return Dictionaries.getDictionariesDir();
-    }
-    
+
     @Override
     public void actionPerformed(ActionEvent event) {
-        JFileChooser dirChooser = new JFileChooser(getDownloadDirectory());
+        JFileChooser dirChooser = new JFileChooser(Dictionaries.getDictionariesDir());
         dirChooser.setDialogType(JFileChooser.CUSTOM_DIALOG);
         dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         dirChooser.setDialogTitle(JGloss.MESSAGES.getString("choosedownloaddir.title"));
@@ -60,6 +57,7 @@ class ChooseDownloadDirectoryAction extends AbstractAction {
         int result = dirChooser.showDialog(parent, null);
         if (result == JFileChooser.APPROVE_OPTION) {
             Dictionaries.setDictionariesDir(dirChooser.getSelectedFile());
+            putValue(NAME, MESSAGES.getString("choosedownloaddir.action", Dictionaries.getDictionariesDir()));
         }
     }
 
