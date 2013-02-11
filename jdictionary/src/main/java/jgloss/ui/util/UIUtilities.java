@@ -60,15 +60,20 @@ import jgloss.JGloss;
 public class UIUtilities {
 	private static final Logger LOGGER = Logger.getLogger(UIUtilities.class.getPackage().getName());
 
-	/**
-     * Initializes an action with values taken from the messages resource bundle.
-     * The name of the action, keyboard shortcuts and the action tool tip will be
-     * initialized if they are available in the resource bundle. The key is taken as key to
-     * the name property, the accellerator key property will be accessed by adding ".ak",
-     * the mnemonic key property by adding ".mk" and the tooltip by adding ".tt" to the key.
-     *
-     * @param a The action to initialize.
-     * @param key The base key in the messages resource bundle.
+	    /**
+     * Initializes an action with values taken from the messages resource
+     * bundle. The name of the action, keyboard shortcuts and the action tool
+     * tip will be initialized if they are available in the resource bundle. The
+     * key is taken as key to the name property, the accellerator key property
+     * will be accessed by adding ".ak", the mnemonic key property by adding
+     * ".mk" and the tooltip by adding ".tt" to the key.
+     * 
+     * @param a
+     *            The action to initialize.
+     * @param key
+     *            The base key in the messages resource bundle.
+     * @param data
+     *            data to insert as parameters in the name of the action.
      * @see javax.swing.Action
      */
     public static void initAction(Action a, String key, Object... data) {
