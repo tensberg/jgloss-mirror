@@ -57,7 +57,6 @@ import jgloss.ui.util.UIUtilities;
 class DownloadPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private final JProgressBar progressBar = new JProgressBar();
 
     private class DownloadAction extends AbstractAction {
 
@@ -72,9 +71,10 @@ class DownloadPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            DictionaryDownloader downloader = new DictionaryDownloader(dictionary);
-            showProgress(downloader);
+            downloader = new DictionaryDownloader(dictionary);
+            downloader.addPropertyChangeListener(progressUpdateListener);
             downloader.execute();
+            updateControls();
         }
 
     }
@@ -83,18 +83,19 @@ class DownloadPanel extends JPanel {
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            DictionaryDownloader source = (DictionaryDownloader) evt.getSource();
+            assert evt.getSource() == downloader;
+
             switch (evt.getPropertyName()) {
             case PROGRESS_PROPERTY:
-                updateProgress(source);
+                updateProgress();
                 break;
 
             case MESSAGE_PROPERTY:
-                updateMessage(source);
+                updateMessage();
                 break;
 
             case STATE_PROPERTY:
-                updateState(source);
+                updateState();
                 break;
             }
         }
@@ -108,14 +109,19 @@ class DownloadPanel extends JPanel {
         }
     };
 
+    private final JProgressBar progressBar = new JProgressBar();
+
     private final Dictionary dictionary;
 
     private final Dictionaries dictionaries;
+
+    private DictionaryDownloader downloader;
 
     public DownloadPanel(Dictionary dictionary, final Dictionaries dictionaries) {
         setLayout(new BorderLayout());
 
         progressBar.setStringPainted(true);
+        progressBar.setIndeterminate(true);
 
         this.dictionary = dictionary;
         this.dictionaries = dictionaries;
@@ -136,11 +142,16 @@ class DownloadPanel extends JPanel {
 
     private void updateControls() {
         removeAll();
-        if (alreadyInstalled(dictionary, dictionaries)) {
+
+        if (downloader != null && downloader.getState() != DONE) {
+            add(progressBar, CENTER);
+            updateMessage();
+        } else if (alreadyInstalled(dictionary, dictionaries)) {
             add(new JLabel(JGloss.MESSAGES.getString("downloadpanel.installed")), LINE_START);
         } else {
             add(createDownloadButton(), LINE_START);
         }
+
         revalidate();
     }
 
@@ -154,32 +165,22 @@ class DownloadPanel extends JPanel {
         return false;
     }
 
-    private void showProgress(DictionaryDownloader downloader) {
-        removeAll();
-        add(progressBar, CENTER);
-        updateMessage(downloader);
-        revalidate();
-        progressBar.setIndeterminate(true);
-
-        downloader.addPropertyChangeListener(progressUpdateListener);
-    }
-
-    private void updateProgress(DictionaryDownloader downloader) {
+    private void updateProgress() {
         progressBar.setIndeterminate(false);
         progressBar.setValue(downloader.getProgress());
     }
 
-    private void updateMessage(DictionaryDownloader downloader) {
+    private void updateMessage() {
         progressBar.setString(downloader.getMessage());
     }
 
-    private void updateState(DictionaryDownloader downloader) {
+    private void updateState() {
         if (downloader.getState() == DONE) {
-            downloadFinished(downloader);
+            downloadFinished();
         }
     }
 
-    private void downloadFinished(DictionaryDownloader downloader) {
+    private void downloadFinished() {
         downloader.removePropertyChangeListener(progressUpdateListener);
         try {
             downloader.get();

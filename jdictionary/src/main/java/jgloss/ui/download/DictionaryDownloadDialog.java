@@ -21,20 +21,27 @@
 
 package jgloss.ui.download;
 
+import static java.awt.BorderLayout.LINE_END;
 import static java.awt.BorderLayout.LINE_START;
 import static java.awt.FlowLayout.LEADING;
+import static java.awt.FlowLayout.TRAILING;
 import static jgloss.JGloss.MESSAGES;
 import static jgloss.ui.util.SwingWorkerProgressFeedback.showProgress;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -43,6 +50,7 @@ import javax.swing.JScrollPane;
 
 import jgloss.ui.Dictionaries;
 import jgloss.ui.download.schema.Dictionary;
+import jgloss.ui.util.UIUtilities;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
@@ -52,6 +60,10 @@ import net.miginfocom.swing.MigLayout;
  */
 public class DictionaryDownloadDialog extends JDialog {
 
+    private static final LC LC_FILL_AND_WRAP = new LC().fillX().wrapAfter(1).gridGap("0", "0");
+
+    private static final CC CC_GROWX = new CC().growX();
+
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(DictionaryDownloadDialog.class.getPackage().getName());
@@ -60,6 +72,20 @@ public class DictionaryDownloadDialog extends JDialog {
 
     private final ChooseDownloadDirectoryAction chooseDownloadDirAction = new ChooseDownloadDirectoryAction(this);
 
+    private final Action closeAction = new AbstractAction() {
+
+        private static final long serialVersionUID = 1L;
+
+        {
+            UIUtilities.initAction(this, "dictionarydownloaddialog.close");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            DictionaryDownloadDialog.this.setVisible(false);
+        }
+    };
+
     public DictionaryDownloadDialog(Window parent, URL dictionariesUrl) {
         super(parent);
 
@@ -67,7 +93,7 @@ public class DictionaryDownloadDialog extends JDialog {
         setModalityType(ModalityType.APPLICATION_MODAL);
         setLayout(new BorderLayout());
 
-        dictionariesPanel.setLayout(new MigLayout(new LC().fillX().wrapAfter(1)));
+        dictionariesPanel.setLayout(new MigLayout(LC_FILL_AND_WRAP));
         JScrollPane dictionariesScroller = new JScrollPane(dictionariesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         dictionariesScroller.getVerticalScrollBar().setUnitIncrement(40);
@@ -78,6 +104,9 @@ public class DictionaryDownloadDialog extends JDialog {
         buttonsPanel.add(leftButtonPanel, LINE_START);
         leftButtonPanel.add(new JLabel(MESSAGES.getString("dictionarydownload.downloaddir", Dictionaries.getDictionariesDir().getAbsolutePath())));
         leftButtonPanel.add(new JButton(chooseDownloadDirAction));
+        JPanel rightButtonPanel = new JPanel(new FlowLayout(TRAILING));
+        rightButtonPanel.add(new JButton(closeAction));
+        buttonsPanel.add(rightButtonPanel, LINE_END);
 
         add(dictionariesScroller, BorderLayout.CENTER);
         add(buttonsPanel, BorderLayout.PAGE_END);
@@ -102,8 +131,11 @@ public class DictionaryDownloadDialog extends JDialog {
 
     private void showDictionaries(List<Dictionary> dictionaries) {
         for (Dictionary dictionary : dictionaries) {
-            dictionariesPanel.add(new DictionaryPanel(dictionary));
-            dictionariesPanel.add(new DownloadPanel(dictionary, Dictionaries.getInstance()), new CC().growX());
+            JPanel dictionaryDownloadPanel = new JPanel(new MigLayout(LC_FILL_AND_WRAP));
+            dictionaryDownloadPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+            dictionaryDownloadPanel.add(new DictionaryPanel(dictionary));
+            dictionaryDownloadPanel.add(new DownloadPanel(dictionary, Dictionaries.getInstance()), CC_GROWX);
+            dictionariesPanel.add(dictionaryDownloadPanel, CC_GROWX);
         }
         dictionariesPanel.revalidate();
     }
