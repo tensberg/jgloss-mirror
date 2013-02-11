@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="$encoding"?>
+<jnlp
+    spec="$jnlpspec"
+    codebase="$jnlpCodebase"
+    href="$outputFile">
+  <information>
+    <title>JGloss</title>
+    <homepage href="http://jgloss.sf.net/"/>
+    <description>Annotate Japanese text with readings and translations.</description>
+    <icon kind="splash" href="jgloss-logo.png" width="175" height="100" />
+    <offline-allowed/>
+  </information>
+  <security>
+     <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.7+"/>
+     $dependencies
+  </resources>
+  <application-desc main-class="$mainClass"/>
+</jnlp>
+

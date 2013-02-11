@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.sf.jgloss</groupId>
+		<artifactId>jgloss-parent</artifactId>
+		<version>2.1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>webstart</artifactId>
+	<packaging>pom</packaging>
+
+	<name>JGloss Webstart</name>
+	<description>
+	   Builds the Java Web Start files for JGloss and JDictionary.
+	</description>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>make-jgloss-webstart-zip</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jnlp-inline</goal>
+						</goals>
+						<configuration>
+                            <codebase>${project.url}</codebase>
+                            <jnlp>
+                                <inputTemplate>src/main/jnlp/jgloss.vm</inputTemplate>
+                                <outputFile>jgloss.jnlp</outputFile>
+                                <mainClass>jgloss.JGlossApp</mainClass>
+                            </jnlp>
+                            <!--<sign>
+                                <keystore>testbuild-keystore</keystore>
+                                <keypass>dummy</keypass>
+                                <storepass>dummy</storepass>
+                                <alias>testbuild</alias>
+
+                                <dnameCn>fillme</dnameCn>
+                                <dnameOu>fillme</dnameOu>
+                                <dnameO>fillme</dnameO>
+                                <dnameL>fillme</dnameL>
+                                <dnameSt>fillme</dnameSt>
+                                <dnameC>fillme</dnameC>
+
+                                <verify>true</verify>
+
+                                <keystoreConfig>
+                                  <delete>true</delete>
+                                  <gen>true</gen>
+                                </keystoreConfig>
+                             </sign>-->
+
+        					<pack200>true</pack200>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.jgloss</groupId>
+			<artifactId>jgloss</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jgloss</groupId>
+			<artifactId>jdictionary</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>
