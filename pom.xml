@@ -73,7 +73,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>1.0.1</version>
+				<version>1.2</version>
 				<executions>
 					<execution>
 						<id>enforce-java</id>
@@ -85,6 +85,9 @@
 								<requireJavaVersion>
 									<version>[1.7.0,)</version>
 								</requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>[3.0.4,)</version>
+                                </requireMavenVersion>
 							</rules>
 						</configuration>
 					</execution>
