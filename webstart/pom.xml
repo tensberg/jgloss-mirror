@@ -16,6 +16,12 @@
 	   Builds the Java Web Start files for JGloss as part of the site build.
 	</description>
 
+    <properties>
+        <keystore>testbuild-keystore</keystore>
+        <keypass>testpass</keypass>
+        <storepass>testpass</storepass>
+    </properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -39,9 +45,9 @@
                             </jnlp>
         					<pack200>true</pack200>
                             <sign>
-                                <keystore>testbuild-keystore</keystore>
-                                <keypass>foobar</keypass>
-                                <storepass>foobar</storepass>
+                                <keystore>${keystore}</keystore>
+                                <keypass>${keypass}</keypass>
+                                <storepass>${storepass}</storepass>
                                 <alias>jgloss</alias>
 
                                 <dnameCn>test</dnameCn>
