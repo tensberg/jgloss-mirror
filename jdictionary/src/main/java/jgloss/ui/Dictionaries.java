@@ -24,6 +24,7 @@ package jgloss.ui;
 
 import static jgloss.JGloss.MESSAGES;
 import static jgloss.ui.util.SwingWorkerProgressFeedback.showProgress;
+import static jgloss.util.ConfigurationProperties.CONFIGURATION;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -36,6 +37,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -119,6 +122,16 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         return instance;
     }
 
+    private static URL getDictionariesUrl() throws MalformedURLException {
+        String urlString;
+
+        // the string passed as system property overrides the inbuilt value
+        urlString = System.getProperty("dictionarydownload.url",
+                        CONFIGURATION.getProperty("dictionarydownload.url"));
+
+        return new URL(urlString);
+    }
+
     /**
      * Returns the array of currently active dictionaries in the order in which they are
      * displayed. This can be different from the currently shown list if the user has not
@@ -199,13 +212,18 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: use download location from home page
                 savePreferences(); // the download dialog will only see the
                                    // dictionaries already applied
-                DictionaryDownloadDialog dialog = new DictionaryDownloadDialog(SwingUtilities.getWindowAncestor(Dictionaries.this), Dictionaries.class.getResource("/dictionaries.xml"));
-                dialog.setSize(new Dimension(800, 600));
-                dialog.setLocationRelativeTo(Dictionaries.this);
-                dialog.setVisible(true);
+                DictionaryDownloadDialog dialog;
+                try {
+                    dialog = new DictionaryDownloadDialog(SwingUtilities.getWindowAncestor(Dictionaries.this), getDictionariesUrl());
+                    dialog.setSize(new Dimension(800, 600));
+                    dialog.setLocationRelativeTo(Dictionaries.this);
+                    dialog.setVisible(true);
+                } catch (MalformedURLException ex) {
+                    LOGGER.log(Level.SEVERE, "failed to create dictionary download URL", ex);
+                    setEnabled(false);
+                }
             }
 
         };

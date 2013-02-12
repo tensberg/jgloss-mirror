@@ -18,6 +18,7 @@
 
 	<properties>
 		<mainClass>jgloss.JDictionaryApp</mainClass>
+        <dictionarydownload.url>${project.url}dictionaries.xml</dictionarydownload.url>
 	</properties>
 
 	<build>
