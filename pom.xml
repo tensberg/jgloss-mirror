@@ -15,10 +15,6 @@
 		<connection>scm:git:git://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss</connection>
 		<developerConnection>scm:git:ssh://username@jgloss.git.sourceforge.net/gitroot/jgloss/jgloss</developerConnection>
 	</scm>
-    <ciManagement>
-        <url>http://tensberg-ec2.dyndns.org:8080/</url>
-        <system>Jenkins</system>
-    </ciManagement>
     <developers>
         <developer>
             <name>Michael Koch</name>
