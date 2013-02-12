@@ -13,7 +13,7 @@
 
 	<name>JGloss Webstart</name>
 	<description>
-	   Builds the Java Web Start files for JGloss and JDictionary.
+	   Builds the Java Web Start files for JGloss as part of the site build.
 	</description>
 
 	<build>
@@ -24,39 +24,35 @@
 				<executions>
 					<execution>
 						<id>make-jgloss-webstart-zip</id>
-						<phase>package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>jnlp-inline</goal>
 						</goals>
 						<configuration>
-                            <codebase>${project.url}</codebase>
+                            <workDirectory>${project.build.directory}/site/jnlp</workDirectory>
+                            <codebase>${project.url}jnlp</codebase>
+                            <makeArchive>false</makeArchive>
                             <jnlp>
                                 <inputTemplate>src/main/jnlp/jgloss.vm</inputTemplate>
                                 <outputFile>jgloss.jnlp</outputFile>
                                 <mainClass>jgloss.JGlossApp</mainClass>
                             </jnlp>
-                            <!--<sign>
+        					<pack200>true</pack200>
+                            <sign>
                                 <keystore>testbuild-keystore</keystore>
-                                <keypass>dummy</keypass>
-                                <storepass>dummy</storepass>
-                                <alias>testbuild</alias>
+                                <keypass>foobar</keypass>
+                                <storepass>foobar</storepass>
+                                <alias>jgloss</alias>
 
-                                <dnameCn>fillme</dnameCn>
-                                <dnameOu>fillme</dnameOu>
-                                <dnameO>fillme</dnameO>
-                                <dnameL>fillme</dnameL>
-                                <dnameSt>fillme</dnameSt>
-                                <dnameC>fillme</dnameC>
+                                <dnameCn>test</dnameCn>
 
                                 <verify>true</verify>
 
                                 <keystoreConfig>
-                                  <delete>true</delete>
+                                  <delete>false</delete>
                                   <gen>true</gen>
                                 </keystoreConfig>
-                             </sign>-->
-
-        					<pack200>true</pack200>
+                             </sign>
 						</configuration>
 					</execution>
 				</executions>

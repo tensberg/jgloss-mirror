@@ -59,6 +59,7 @@
 		<module>jgloss</module>
 		<module>kanaim</module>
 		<module>jgloss-www</module>
+        <module>webstart</module>
 	</modules>
 
 	<build>
