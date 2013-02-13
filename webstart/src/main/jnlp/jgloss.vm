@@ -5,10 +5,19 @@
     href="$outputFile">
   <information>
     <title>JGloss</title>
+    <vendor>The JGloss Developers</vendor>
     <homepage href="http://jgloss.sf.net/"/>
-    <description>Annotate Japanese text with readings and translations.</description>
-    <icon kind="splash" href="jgloss-logo.png" width="175" height="100" />
-    <offline-allowed/>
+    <description>Add reading and translation annotations to Japanese text.</description>
+    <icon kind="splash" href="jgloss-logo.png" width="367" height="202" />
+    <icon href="jgloss-logo_32.png" width="32" height="32" />
+    <icon href="jgloss-logo_48.png" width="48" height="48" />
+    <icon href="jgloss-logo_64.png" width="64" height="64" />
+    <offline-allowed />
+    <association mime-type="application/x-jgloss" extensions="jgloss" />
+    <shortcut online="false">
+      <desktop/>
+      <menu submenu="JGloss"/>
+    </shortcut>
   </information>
   <security>
      <all-permissions/>
