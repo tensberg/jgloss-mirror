@@ -62,7 +62,46 @@
         <module>webstart</module>
 	</modules>
 
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>jgloss-releases</id>
+            <name>JGloss releases repository</name>
+            <url>http://jgloss.sourceforge.net/m2repo/releases</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+            <id>jgloss-snapshots</id>
+            <name>JGloss snapshots repository</name>
+            <url>http://jgloss.sourceforge.net/m2repo/snapshots</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
 	<build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>1.0-beta-6</version>
+            </extension>
+        </extensions>
+
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -330,10 +369,25 @@
 	</dependencyManagement>
     
 	<distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>jgloss-releases</id>
+            <name>JGloss releases repository</name>
+            <url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/m2repo/releases</url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>jgloss-snapshots</id>
+            <name>JGloss snapshots repository</name>
+            <url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/m2repo/snapshots</url>
+            <layout>default</layout>
+        </snapshotRepository>
+
 		<site>
 			<id>jgloss.sf.net</id>
 			<name>SourceForge JGloss Homepage</name>
-			<url>scp://shell.sourceforge.net/home/project-web/jgloss/htdocs/maven</url>
+			<url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/snapshot</url>
 		</site>
 	</distributionManagement>
 	
