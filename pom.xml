@@ -15,9 +15,9 @@
 	<url>http://jgloss.sourceforge.net/</url>
     <inceptionYear>2001</inceptionYear>
 	<scm>
-		<url>http://jgloss.git.sourceforge.net/</url>
-		<connection>scm:git:git://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss</connection>
-		<developerConnection>scm:git:ssh://username@jgloss.git.sourceforge.net/gitroot/jgloss/jgloss</developerConnection>
+		<url>http://sourceforge.net/p/jgloss/code/</url>
+		<connection>scm:git:git://git.code.sf.net/p/jgloss/code</connection>
+		<developerConnection>scm:git:ssh://username@git.code.sf.net/p/jgloss/code</developerConnection>
 	</scm>
     <developers>
         <developer>
