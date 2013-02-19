@@ -1,0 +1,35 @@
+  ---------------------
+  Developing JGloss
+  ---------------------
+
+ JGloss is open source software. You can grab the source code and enhance
+ it yourself. All you need is knowledge of the Java programming language and
+ a few tools.
+
+ These are the prerequisites:
+
+   * {{{http://git-scm.com/}Git}} distributed version control system.
+   
+   * A Java 7 development kit ({{{http://openjdk.java.net/}OpenJDK}} or {{{http://www.oracle.com/technetwork/java/javase/downloads/index.html}Oracle JDK}}).
+   
+   * {{{http://maven.apache.org/}Maven 3.0.4}} for building the project on the command-line.
+   
+   * Using an IDE is recommended. I use {{{http://eclipse.org/}Eclipse}}, but {{{http://netbeans.org}Netbeans}} and {{{http://www.jetbrains.com/idea/}IntelliJ IDEA}} should also work.
+
+  Basic workflow:
+
+   * Get the sources by cloning the {{{./source-repository.html}JGloss repository}}:
+     <<<git clone git://git.code.sf.net/p/jgloss/code jgloss-code>>>
+
+   * Import the JGloss Maven modules into your IDE (e. g. Import > Existing Maven projects... in Eclipse).
+
+   * Code, code, code...
+
+   * Build the artifacts from the sources:
+     <<<mvn install>>>
+
+   * Test your changes.
+
+   * Commit the changes to your local Git repository.
+
+   * Send a patch or pull request to tensberg@gmx.net if you want to contribute your code.

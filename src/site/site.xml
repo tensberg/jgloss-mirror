@@ -34,6 +34,7 @@
 			<item name="Export templates" href="templates.html" />
 		</menu>
 		<menu name="Information for Developers">
+            <item name="Developing JGloss" href="developing.html" />
             <item name="Design Notes" href="designnotes.html" />
             <item name="JGloss-WWW" href="jgloss-www.html" />
 		</menu>
