@@ -12,7 +12,7 @@
     </prerequisites>
 
 	<name>JGloss</name>
-	<url>http://jgloss.sourceforge.net/</url>
+	<url>http://jgloss.sourceforge.net${siteDirectory}</url>
     <inceptionYear>2001</inceptionYear>
 	<scm>
 		<url>http://sourceforge.net/p/jgloss/code/</url>
@@ -49,6 +49,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codequality.version>1-SNAPSHOT</codequality.version>
         
+        <siteDirectory>/snapshot</siteDirectory>
+
         <!-- 
             The Japanese font is used when generating JGloss docbook PDF.
             The following font works in Ubuntu 12.04 with package ttf-takao-mincho installed. 
@@ -443,7 +445,7 @@
 		<site>
 			<id>jgloss.sf.net</id>
 			<name>SourceForge JGloss Homepage</name>
-			<url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/snapshot</url>
+			<url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/${siteDirectory}</url>
 		</site>
 	</distributionManagement>
 	
