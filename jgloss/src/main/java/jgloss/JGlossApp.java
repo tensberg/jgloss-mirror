@@ -23,6 +23,7 @@
 package jgloss;
 
 import java.awt.EventQueue;
+import java.awt.Window;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
@@ -41,6 +42,7 @@ import jgloss.ui.gloss.DocumentStyleDialog;
 import jgloss.ui.gloss.JGlossFrame;
 import jgloss.ui.gloss.JGlossLookupFrame;
 import jgloss.ui.gloss.OpenDocumentWorker;
+import jgloss.ui.welcome.WelcomeDialog;
 
 /**
  * Base class for launching the full application, including the word lookup and document parser
@@ -57,8 +59,8 @@ public class JGlossApp extends JGloss {
      * Starts JGloss.
      *
      * @param args Arguments to the application.
-     * @throws InvocationTargetException 
-     * @throws InterruptedException 
+     * @throws InvocationTargetException
+     * @throws InterruptedException
      */
     public static void main( final String args[]) throws InterruptedException, InvocationTargetException {
         EventQueue.invokeAndWait(new Runnable() {
@@ -116,10 +118,17 @@ public class JGlossApp extends JGloss {
         ExportMenu.registerStandardExporters();
 
         if (args.length == 0) {
+            Window parentFrame;
             if (PREFS.getBoolean( Preferences.STARTUP_WORDLOOKUP, false)) {
-	            getLookupFrame().setVisible(true);
+                parentFrame = getLookupFrame();
+                parentFrame.setVisible(true);
             } else {
-	            new JGlossFrame();
+                JGlossFrame jglossFrame = new JGlossFrame();
+                parentFrame = jglossFrame.getFrame();
+            }
+
+            if (PREFS.getBoolean(Preferences.SHOW_WELCOME_DIALOG, true)) {
+                showWelcomeDialog(parentFrame);
             }
         }
         else {
@@ -127,6 +136,13 @@ public class JGlossApp extends JGloss {
                 OpenDocumentWorker.openDocument(new JGlossFrame(), new File(arg));
             }
         }
+    }
+
+    private void showWelcomeDialog(Window parentFrame) {
+        WelcomeDialog welcomeDialog = new WelcomeDialog(parentFrame);
+        welcomeDialog.setSize(800, 600);
+        welcomeDialog.setLocationRelativeTo(null);
+        welcomeDialog.setVisible(true);
     }
 
     /**

@@ -355,7 +355,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         DocumentActions documentActions = new DocumentActions(this);
         frame.getContentPane().add(new EmptyDocumentActionsPanel(documentActions));
-        
+
         frame.addWindowListener( documentActions.importClipboardListener);
 
         // annotation list must be created before initMenuBar is called
@@ -433,6 +433,10 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         // show the created frame
         frame.setVisible(true);
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 
     private DocumentActions initActions() {
@@ -1159,15 +1163,15 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      */
     protected void updateTitle() {
     	String documentTitle = model.getHTMLDocument().getTitle();
-    	
+
     	if (documentTitle == null || documentTitle.isEmpty()) {
     		documentTitle = model.getDocumentName();
     	}
-    	
+
     	if (model.isDocumentChanged()) {
     		documentTitle = "*" + documentTitle;
     	}
-    	
+
         frame.setTitle( documentTitle + ":" + JGloss.MESSAGES.getString( "main.title"));
     }
 

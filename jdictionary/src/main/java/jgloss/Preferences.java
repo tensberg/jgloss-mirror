@@ -40,7 +40,7 @@ import jgloss.util.UTF8ResourceBundleControl;
  * {@link JavaPreferences JavaPreferences} is used, which uses the <CODE>java.util.prefs</CODE> preferences.
  * <p>
  * A set of default preferences is stored with the application jar file and accessed using the
- * <CODE>ResourceBundle</CODE> mechanism from the resource "/preferences". 
+ * <CODE>ResourceBundle</CODE> mechanism from the resource "/preferences".
  * If a user preference is not yet set, the value from the default preferences is used.
  * The default value passed to the methods <CODE>getInt</CODE>,... is only used if the default
  * preference setting (a string) cannot be converted to the requested data type.
@@ -93,7 +93,7 @@ public abstract class Preferences {
 
     public static final String FONT_DEFAULTFONTS = "font.defaultfonts";
     public static final String FONT_AUTODETECTED = "font.autodetected";
-    
+
     public static final String ANNOTATION_HIGHLIGHT_COLOR = "annotation.highlight.color";
 
     public static final String DTD_DEFAULT = "dtd.default";
@@ -121,23 +121,23 @@ public abstract class Preferences {
 
     public static final String EXPORT_PLAINTEXT_ENCODING = "export.plaintext.encoding";
     public static final String EXPORT_PLAINTEXT_WRITEREADING = "export.plaintext.writereading";
-    public static final String EXPORT_PLAINTEXT_WRITETRANSLATIONS = 
+    public static final String EXPORT_PLAINTEXT_WRITETRANSLATIONS =
         "export.plaintext.writetranslations";
-    public static final String EXPORT_PLAINTEXT_WRITEHIDDEN = 
-        "export.plaintext.writehidden";    
+    public static final String EXPORT_PLAINTEXT_WRITEHIDDEN =
+        "export.plaintext.writehidden";
 
     public static final String EXPORT_HTML_ENCODING = "export.html.encoding";
     public static final String EXPORT_HTML_WRITEREADING = "export.html.writereading";
-    public static final String EXPORT_HTML_WRITETRANSLATIONS = 
+    public static final String EXPORT_HTML_WRITETRANSLATIONS =
         "export.html.writetranslations";
-    public static final String EXPORT_HTML_BACKWARDSCOMPATIBLE = 
+    public static final String EXPORT_HTML_BACKWARDSCOMPATIBLE =
         "export.html.backwardscompatible";
-    public static final String EXPORT_HTML_WRITEHIDDEN = 
+    public static final String EXPORT_HTML_WRITEHIDDEN =
         "export.html.writehidden";
 
-    public static final String EXPORT_LATEX_WRITEHIDDEN = 
-        "export.latex.writehidden";    
-    public static final String EXPORT_LATEX_TEMPLATE = "export.latex.template";    
+    public static final String EXPORT_LATEX_WRITEHIDDEN =
+        "export.latex.writehidden";
+    public static final String EXPORT_LATEX_TEMPLATE = "export.latex.template";
     public static final String EXPORT_LATEX_USERTEMPLATES = "export.latex.usertemplates";
     public static final String EXPORT_LATEX_FONTSIZES = "export.latex.fontsizes";
     public static final String EXPORT_LATEX_FONTSIZE = "export.latex.fontsize";
@@ -168,10 +168,12 @@ public abstract class Preferences {
     public static final String HISTORY_SELECTION = "history.selection";
     public static final String HISTORY_SIZE = "history.size";
 
+    public static final String SHOW_WELCOME_DIALOG = "welcomedialog.show";
+
     public static final String PREFERENCES_MIGRATED = "preferences.migrated";
-    
+
     /**
-     * Default application preferences. The default preferences are loaded from the 
+     * Default application preferences. The default preferences are loaded from the
      * resource "/preferences" and stored in a property file and initialized in the
      * <CODE>Preferences</CODE> constructor.
      */
