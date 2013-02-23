@@ -70,6 +70,10 @@
 
     <repositories>
         <repository>
+            <id>jgloss-releases</id>
+            <name>JGloss releases repository</name>
+            <url>http://jgloss.sourceforge.net/m2repo/releases</url>
+            <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
@@ -78,12 +82,12 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-            <id>jgloss-releases</id>
-            <name>JGloss releases repository</name>
-            <url>http://jgloss.sourceforge.net/m2repo/releases</url>
-            <layout>default</layout>
         </repository>
         <repository>
+            <id>jgloss-snapshots</id>
+            <name>JGloss snapshots repository</name>
+            <url>http://jgloss.sourceforge.net/m2repo/snapshots</url>
+            <layout>default</layout>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -92,12 +96,39 @@
                 <updatePolicy>always</updatePolicy>
                 <checksumPolicy>fail</checksumPolicy>
             </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jgloss-releases</id>
+            <name>JGloss releases repository</name>
+            <url>http://jgloss.sourceforge.net/m2repo/releases</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
             <id>jgloss-snapshots</id>
             <name>JGloss snapshots repository</name>
             <url>http://jgloss.sourceforge.net/m2repo/snapshots</url>
             <layout>default</layout>
-        </repository>
-    </repositories>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
 	<build>
         <extensions>
