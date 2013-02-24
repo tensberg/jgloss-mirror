@@ -21,12 +21,21 @@
 
 package jgloss.ui.welcome;
 
+import java.awt.GridLayout;
+
 import jgloss.JGloss;
+import jgloss.ui.wizard.DescriptionLabel;
 import jgloss.ui.wizard.WizardPage;
 
 class FinishPage extends WizardPage {
 
     private static final long serialVersionUID = 1L;
+
+    FinishPage() {
+        setLayout(new GridLayout(1, 1));
+
+        add(new DescriptionLabel(JGloss.MESSAGES.getString("welcome.finish.description")));
+    }
 
     @Override
     public String getTitle() {

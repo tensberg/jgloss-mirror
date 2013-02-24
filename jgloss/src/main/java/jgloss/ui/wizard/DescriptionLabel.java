@@ -40,6 +40,8 @@ public class DescriptionLabel extends JLabel {
     }
 
     public DescriptionLabel(String text) {
+        setHorizontalAlignment(LEADING);
+        setVerticalAlignment(TOP);
         setBorder(WizardPage.EMPTY_BORDER);
         setStyledText(text);
     }

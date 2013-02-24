@@ -28,7 +28,7 @@ import javax.swing.border.Border;
 /**
  * Base class for a page which is part of a wizard.
  */
-public abstract class WizardPage extends JPanel {
+public abstract class WizardPage extends JPanel implements WizardNavigationListener {
     private static final long serialVersionUID = 1L;
 
     public static final String FORWARD_ENABLED_PROPERTY = "forwardEnabled";
@@ -47,5 +47,12 @@ public abstract class WizardPage extends JPanel {
 
     public boolean isForwardEnabled() {
         return forwardEnabled;
+    }
+
+    /**
+     * Called when the current wizard page is closed by the given navigation.
+     */
+    @Override
+    public void navigate(WizardNavigation navigation) {
     }
 }

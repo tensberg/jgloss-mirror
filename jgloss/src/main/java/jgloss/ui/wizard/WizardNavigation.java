@@ -24,7 +24,7 @@ package jgloss.ui.wizard;
 /**
  * Enumeration of navigation controls available.
  */
-enum WizardNavigation {
+public enum WizardNavigation {
     /**
      * Navigate to the next page. Close the wizard if the current page is the
      * last one.

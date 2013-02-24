@@ -21,16 +21,83 @@
 
 package jgloss.ui.welcome;
 
+import static jgloss.JGloss.MESSAGES;
+import static jgloss.ui.wizard.WizardNavigation.FORWARD;
+
+import java.awt.BorderLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.util.Collections;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import jgloss.JGloss;
+import jgloss.parser.KanjiParser;
+import jgloss.ui.Dictionaries;
+import jgloss.ui.gloss.DocumentActions;
+import jgloss.ui.gloss.ImportStringStrategy;
+import jgloss.ui.gloss.JGlossFrame;
+import jgloss.ui.wizard.DescriptionLabel;
+import jgloss.ui.wizard.WizardNavigation;
 import jgloss.ui.wizard.WizardPage;
 
 class ImportPage extends WizardPage {
 
     private static final long serialVersionUID = 1L;
 
+    private final JGlossFrame targetDocument;
+
+    private final JTextArea importText = new JTextArea();
+
+    public ImportPage(JGlossFrame targetDocument) {
+        this.targetDocument = DocumentActions.getFrame(targetDocument);
+        setLayout(new BorderLayout());
+        add(new DescriptionLabel(MESSAGES.getString("welcome.import.description")), BorderLayout.NORTH);
+        add(new JScrollPane(importText), BorderLayout.CENTER);
+        importText.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateForwardEnabled();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateForwardEnabled();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateForwardEnabled();
+            }
+        });
+        importText.setText(MESSAGES.getString("welcome.import.example"));
+        importText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                importText.selectAll();
+            }
+        });
+        updateForwardEnabled();
+    }
+
     @Override
     public String getTitle() {
         return JGloss.MESSAGES.getString("welcome.import.title");
     }
 
+    @Override
+    public void navigate(WizardNavigation navigation) {
+        if (navigation == FORWARD) {
+            new ImportStringStrategy(targetDocument, importText.getText(), true, null, new KanjiParser(Dictionaries
+                            .getInstance().getDictionaries(), Collections.<String> emptySet())).executeImport();
+        }
+    }
+
+    private void updateForwardEnabled() {
+        setForwardEnabled(!importText.getText().isEmpty());
+    }
 }

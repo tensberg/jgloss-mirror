@@ -64,6 +64,7 @@ class WizardPageContainer extends JPanel {
         setTitle(page.getTitle());
         add(page, CENTER);
         revalidate();
+        repaint();
     }
 
     private void setTitle(String title) {

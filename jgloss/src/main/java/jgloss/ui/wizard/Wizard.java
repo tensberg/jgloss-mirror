@@ -124,6 +124,7 @@ public class Wizard {
     private void showCurrentPage() {
         if (currentPage != null) {
             currentPage.removePropertyChangeListener(FORWARD_ENABLED_PROPERTY, forwardEnabledChangeListener);
+            buttons.removeNavigationListener(currentPage);
         }
 
         currentPage = pages[currentPageIndex];
@@ -132,6 +133,7 @@ public class Wizard {
         buttons.setNavigationText(FORWARD, MESSAGES.getString(isLastPage(currentPageIndex) ? "wizard.action.close" : "wizard.action.forward"));
         buttons.setNavigationVisible(BACK, !isFirstPage(currentPageIndex));
         currentPage.addPropertyChangeListener(FORWARD_ENABLED_PROPERTY, forwardEnabledChangeListener);
+        buttons.addNavigationListener(currentPage);
     }
 
     private boolean isLastPage(int pageIndex) {

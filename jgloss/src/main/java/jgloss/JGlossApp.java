@@ -118,17 +118,19 @@ public class JGlossApp extends JGloss {
         ExportMenu.registerStandardExporters();
 
         if (args.length == 0) {
+            JGlossFrame targetDocument;
             Window parentFrame;
             if (PREFS.getBoolean( Preferences.STARTUP_WORDLOOKUP, false)) {
+                targetDocument = null;
                 parentFrame = getLookupFrame();
                 parentFrame.setVisible(true);
             } else {
-                JGlossFrame jglossFrame = new JGlossFrame();
-                parentFrame = jglossFrame.getFrame();
+                targetDocument = new JGlossFrame();
+                parentFrame = targetDocument.getFrame();
             }
 
             if (PREFS.getBoolean(Preferences.SHOW_WELCOME_DIALOG, true)) {
-                showWelcomeDialog(parentFrame);
+                showWelcomeDialog(targetDocument, parentFrame);
             }
         }
         else {
@@ -138,8 +140,9 @@ public class JGlossApp extends JGloss {
         }
     }
 
-    private void showWelcomeDialog(Window parentFrame) {
-        WelcomeDialog welcomeDialog = new WelcomeDialog(parentFrame);
+    private void showWelcomeDialog(JGlossFrame targetDocument, Window parentFrame) {
+        WelcomeDialog welcomeDialog = new WelcomeDialog(targetDocument, parentFrame);
+        welcomeDialog.pack();
         welcomeDialog.setSize(800, 600);
         welcomeDialog.setLocationRelativeTo(null);
         welcomeDialog.setVisible(true);

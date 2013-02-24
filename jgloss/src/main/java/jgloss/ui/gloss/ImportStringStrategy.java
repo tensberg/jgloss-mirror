@@ -34,12 +34,12 @@ import jgloss.parser.ReadingAnnotationFilter;
  *
  * @author Michael Koch <tensberg@gmx.net>
  */
-class ImportStringStrategy extends ImportStrategy {
+public class ImportStringStrategy extends ImportStrategy {
 
     private static final String IMPORT_STRING = JGloss.MESSAGES.getString("import.textarea");
 
     private final String string;
-    
+
     /**
      * Creates a new annotated document by reading the original text from a string.
      * The method can only be applied on a <CODE>JGlossFrame</CODE> with no open document.
@@ -47,8 +47,8 @@ class ImportStringStrategy extends ImportStrategy {
      * @param string The text which will be imported.
      * @param detectParagraphs Flag if paragraph detection should be done.
      */
-    ImportStringStrategy(JGlossFrame frame, String string, boolean detectParagraphs, ReadingAnnotationFilter filter,
-            Parser parser) {
+    public ImportStringStrategy(JGlossFrame frame, String string, boolean detectParagraphs,
+                    ReadingAnnotationFilter filter, Parser parser) {
         super(frame, IMPORT_STRING, detectParagraphs, filter, parser);
         this.string = string;
     }
