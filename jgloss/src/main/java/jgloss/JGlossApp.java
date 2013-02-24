@@ -143,7 +143,7 @@ public class JGlossApp extends JGloss {
     private void showWelcomeDialog(JGlossFrame targetDocument, Window parentFrame) {
         WelcomeDialog welcomeDialog = new WelcomeDialog(targetDocument, parentFrame);
         welcomeDialog.pack();
-        welcomeDialog.setSize(800, 600);
+        welcomeDialog.setSize(800, 500);
         welcomeDialog.setLocationRelativeTo(null);
         welcomeDialog.setVisible(true);
     }

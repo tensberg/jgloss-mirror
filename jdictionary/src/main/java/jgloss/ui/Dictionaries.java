@@ -221,7 +221,7 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
                 DictionaryDownloadDialog dialog;
                 try {
                     dialog = new DictionaryDownloadDialog(SwingUtilities.getWindowAncestor(Dictionaries.this), getDictionariesUrl());
-                    dialog.setSize(new Dimension(800, 600));
+                    dialog.setSize(new Dimension(800, 500));
                     dialog.setLocationRelativeTo(Dictionaries.this);
                     dialog.setVisible(true);
                 } catch (MalformedURLException ex) {
