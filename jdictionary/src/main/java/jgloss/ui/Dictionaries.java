@@ -122,7 +122,11 @@ public class Dictionaries extends JComponent implements PreferencesPanel {
         return instance;
     }
 
-    private static URL getDictionariesUrl() throws MalformedURLException {
+    /**
+     * @return configured URL where the dictionary download list configuration
+     *         is located.
+     */
+    public static URL getDictionariesUrl() throws MalformedURLException {
         String urlString;
 
         // the string passed as system property overrides the inbuilt value

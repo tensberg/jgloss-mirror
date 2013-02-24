@@ -21,7 +21,9 @@
 
 package jgloss.ui.wizard;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 /**
  * Base class for a page which is part of a wizard.
@@ -30,6 +32,8 @@ public abstract class WizardPage extends JPanel {
     private static final long serialVersionUID = 1L;
 
     public static final String FORWARD_ENABLED_PROPERTY = "forwardEnabled";
+
+    public static final Border EMPTY_BORDER = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
     private boolean forwardEnabled = true;
 
