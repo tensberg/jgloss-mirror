@@ -40,7 +40,7 @@ public abstract class WizardPage extends JPanel implements WizardNavigationListe
     public abstract String getTitle();
 
     public void setForwardEnabled(boolean forwardEnabled) {
-        boolean oldForwardEnabled = forwardEnabled;
+        boolean oldForwardEnabled = this.forwardEnabled;
         this.forwardEnabled = forwardEnabled;
         firePropertyChange(FORWARD_ENABLED_PROPERTY, oldForwardEnabled, forwardEnabled);
     }
