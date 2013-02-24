@@ -26,26 +26,24 @@ import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JLabel;
-
 import jgloss.JGloss;
 import jgloss.ui.Dictionaries;
 import jgloss.ui.DictionaryListChangeListener;
 import jgloss.ui.download.DictionaryDownloadPanel;
+import jgloss.ui.wizard.DescriptionLabel;
 import jgloss.ui.wizard.WizardPage;
 
 class DictionaryDownloadPage extends WizardPage {
 
-    private static final long serialVersionUID = -8621062357645917541L;
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(DictionaryDownloadPage.class.getPackage().getName());
 
     public DictionaryDownloadPage() {
         setLayout(new BorderLayout());
         try {
-            JLabel description = new JLabel(JGloss.MESSAGES.getString("welcome.dictionarydownload.description"));
-            description.setBorder(EMPTY_BORDER);
-            add(description, BorderLayout.PAGE_START);
+            add(new DescriptionLabel(JGloss.MESSAGES.getString("welcome.dictionarydownload.description")),
+                            BorderLayout.PAGE_START);
             add(new DictionaryDownloadPanel(Dictionaries.getDictionariesUrl()), BorderLayout.CENTER);
             updateForwardEnabled();
             Dictionaries.getInstance().addDictionaryListChangeListener(new DictionaryListChangeListener() {

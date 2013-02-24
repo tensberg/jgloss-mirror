@@ -78,6 +78,7 @@ public class DictionaryDownloadPanel extends JPanel {
         dictionariesPanel.setLayout(new MigLayout(LC_FILL_AND_WRAP));
         JScrollPane dictionariesScroller = new JScrollPane(dictionariesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        dictionariesScroller.setViewportBorder(BorderFactory.createEmptyBorder());
         dictionariesScroller.getVerticalScrollBar().setUnitIncrement(40);
         dictionariesScroller.getVerticalScrollBar().setBlockIncrement(40);
 
