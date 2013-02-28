@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import jgloss.JGloss;
+import jgloss.Preferences;
 import jgloss.dictionary.Dictionary;
 import jgloss.dictionary.SearchException;
 import jgloss.parser.Parser;
@@ -54,8 +56,10 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Michael Koch
  */
 class AnnotationGenerator extends DefaultHandler {
-	private static final Logger LOGGER = Logger.getLogger(AnnotationGenerator.class.getPackage().getName());
-	
+    private static final Logger LOGGER = Logger.getLogger(AnnotationGenerator.class.getPackage().getName());
+
+    private static final int MAX_TRANSLATION_LENGTH = JGloss.PREFS.getInt(Preferences.VIEW_MAXTRANSLATIONLENGTH, 50);
+
 	private final DefaultHandler parent;
     private final ReadingAnnotationFilter readingFilter;
     private final Parser parser;
@@ -64,7 +68,7 @@ class AnnotationGenerator extends DefaultHandler {
     private final List<ReadingAnnotation> readingsList = new ArrayList<ReadingAnnotation>( 5);
     private boolean annotateText;
     private boolean inP;
-    private final AttributesImpl readingAtts = new AttributesImpl(); 
+    private final AttributesImpl readingAtts = new AttributesImpl();
 
     private final static String CDATA = "CDATA";
     private final static String P_ELEMENT = "p";
@@ -161,14 +165,14 @@ class AnnotationGenerator extends DefaultHandler {
 	            parent.characters( c, lastEnd, completedAnnotation.getStart() - lastEnd);
             }
             lastEnd = completedAnnotation.getStart() + completedAnnotation.getLength();
-            
+
             String annotatedWord = new String( c, completedAnnotation.getStart(), completedAnnotation.getLength());
 
             // start annotation element
             AttributesImpl annoAtts = new AttributesImpl();
             if (completedAnnotation.getTranslation() != null) {
 	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TRANSLATION,
-                                       CDATA, completedAnnotation.getTranslation());
+	                            CDATA, shortenIfNeeded(completedAnnotation.getTranslation()));
             }
             if (completedAnnotation.getGrammaticalType() != null) {
 	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TYPE,
@@ -243,6 +247,18 @@ class AnnotationGenerator extends DefaultHandler {
         if (lastEnd < start+length) {
 	        parent.characters( c, lastEnd, start+length-lastEnd);
         }
+    }
+
+    private String shortenIfNeeded(String translation) {
+        String shortenedTranslation;
+
+        if (translation.length() <= MAX_TRANSLATION_LENGTH) {
+            shortenedTranslation = translation;
+        } else {
+            shortenedTranslation = translation.substring(0, MAX_TRANSLATION_LENGTH - 1) + '\u2026';
+        }
+
+        return shortenedTranslation;
     }
 
     @Override

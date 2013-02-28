@@ -34,10 +34,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.Segment;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
@@ -59,14 +57,14 @@ import jgloss.Preferences;
 import jgloss.ui.xml.JGlossDocument;
 
 /**
- * The <CODE>JGlossEditorKit</CODE> is an extension of the <CODE>HTMLEditorKit</CODE> 
+ * The <CODE>JGlossEditorKit</CODE> is an extension of the <CODE>HTMLEditorKit</CODE>
  * with several additions to manage the generation, display and manipulation of JGloss documents.
  * It also has to work around the shortcomings in the HTML document API.
  * It contains the views for the annotation
  * elements and its subelements as subclasses, since they share some view attribute state with the
  * <CODE>JGlossEditorKit</CODE> instance.
  * <P>
- * The DTD element definition for an annotation element is 
+ * The DTD element definition for an annotation element is
  * <CODE>(#PCDATA|READING|BASETEXT|TRANSLATION)*</CODE>. Additional constraints which are
  * not enforceable through the DTD but used throughout JGloss are that each reading element
  * is followed by a kanji element, and there is exactly one translation element which is the
@@ -77,7 +75,7 @@ import jgloss.ui.xml.JGlossDocument;
  */
 public class JGlossEditorKit extends HTMLEditorKit {
 	private static final Logger LOGGER = Logger.getLogger(JGlossEditorKit.class.getPackage().getName());
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private static final String JGLOSS_STYLE_SHEET = "/data/jgloss.css";
@@ -140,7 +138,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 		public HTML.Tag getHTMLTag() {
             return htmlTag;
         }
-        
+
         @Override
 		public boolean breaksFlow() {
             return htmlTag.breaksFlow();
@@ -155,7 +153,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
     /**
      * Instance of <CODE>HTMLEditorKit.Parser</CODE>, which will forward parse requests to a
      * {@link JGlossEditorKit.JGlossParser JGlossParser}. <CODE>JGlossParser</CODE> is derived from
-     * <CODE>DocumentParser</CODE>, which prevents it from also being a 
+     * <CODE>DocumentParser</CODE>, which prevents it from also being a
      * <CODE>HTMLEditorKit.Parser</CODE>.
      */
     class JGlossParserWrapper extends HTMLEditorKit.Parser {
@@ -182,7 +180,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
         /**
          * Sets strict parsing mode on the wrapped <CODE>JGlossParser</CODE>.
-         * 
+         *
          * @see JGlossEditorKit.JGlossParser#setStrict(boolean)
          */
         public void setStrict( boolean strict) {
@@ -202,7 +200,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
         public JGlossParser() {
             super( getDTD());
 
-            // Swing 1.4 changes how whitespace is coalesced in class 
+            // Swing 1.4 changes how whitespace is coalesced in class
             // javax.swing.text.html.parser.Parser. The new behavior breaks reading of JGloss documents
             // with tags containing only a single space character (e. g. <trans> </trans>). To switch
             // back to the old behavior, the protected member strict must be changed to true.
@@ -251,7 +249,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 		protected TagElement makeTag( javax.swing.text.html.parser.Element e, boolean fictional) {
             return new JGlossTagElement( e, fictional);
         }
-        
+
         @Override
         protected void handleError(int ln, String errorMsg) {
             LOGGER.warning("error parsing JGloss document at line " + ln + ": " + errorMsg);
@@ -295,10 +293,10 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	                return new BaseView( elem);
                 }
             }
-            else if (a.isDefined( AnnotationTags.TRANSLATION) || 
+            else if (a.isDefined( AnnotationTags.TRANSLATION) ||
                      a.isDefined( AnnotationTags.TRANSLATION.getId())) {
 	            return new ReadingTranslationView( elem, AnnotationTags.TRANSLATION);
-            } else if (a.isDefined( AnnotationTags.READING) || 
+            } else if (a.isDefined( AnnotationTags.READING) ||
                      a.isDefined( AnnotationTags.READING.getId())) {
                 return new ReadingTranslationView( elem, AnnotationTags.READING);
             }
@@ -335,11 +333,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
         }
 
         /**
-         * Fix setting of <CODE>null</CODE> parent with Swing 1.4. <CODE>AnnotationViews</CODE> 
+         * Fix setting of <CODE>null</CODE> parent with Swing 1.4. <CODE>AnnotationViews</CODE>
          * can be referenced
-         * from two parents at the same time: a <CODE>FlowView.LogicalView</CODE> and a 
+         * from two parents at the same time: a <CODE>FlowView.LogicalView</CODE> and a
          * <CODE>ParagraphView.Row</CODE>. If the <CODE>AnnotationView</CODE> is removed from the
-         * <CODE>ParagraphView.Row</CODE> by calling <CODE>setParent(null)</CODE>, the 
+         * <CODE>ParagraphView.Row</CODE> by calling <CODE>setParent(null)</CODE>, the
          * <CODE>LogicalView</CODE> has to be made parent again for the layout to work.
          */
         @Override
@@ -419,7 +417,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
             if (axis == View.Y_AXIS) {
 
                 return 0.25f;
-                
+
                 /*if (!showReading)
                     return VAdjustedView.BASE_TEXT_ALIGNMENT;
                 else if (!startsAnnotated) {
@@ -431,7 +429,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
                         return 0.36f;
                 }*/
             }
-            
+
             return super.getAlignment( axis);
         }
     } // class AnnotationView
@@ -505,7 +503,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	                return VAdjustedView.BASE_TEXT_ALIGNMENT;
                 }
             }
-            
+
             return super.getAlignment( axis);
         }
     } // class ReadingBaseView
@@ -551,8 +549,8 @@ public class JGlossEditorKit extends HTMLEditorKit {
 
         /**
          * Calculates the preferred span by summing up the preferred span of all child views.
-         * For reading/base views, the 
-         * {@link JGlossEditorKit.ReadingBaseView#getRealXSpan() real horizontal span} 
+         * For reading/base views, the
+         * {@link JGlossEditorKit.ReadingBaseView#getRealXSpan() real horizontal span}
          * is used instead of the one returned by <CODE>getPreferredSpan</CODE> so that
          * the word will always have enough space to display the whole reading.
          */
@@ -574,26 +572,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
             }
         }
     } // class WordView
-
-
-    /**
-     * Maximum number of characters displayed by a <code>ReadingTranslationView</code>.
-     * If the content of the reading/translation is longer than <code>MAX_TRANSLATION_LENGTH</code>,
-     * only <code>MAX_TRANSLATION_LENGTH-3</code> chars, followed by "..." will be rendered.
-     */
-    private final static int MAX_TRANSLATION_LENGTH = JGloss.PREFS.getInt
-        ( Preferences.VIEW_MAXTRANSLATIONLENGTH, 50);
-
-    /**
-     * Shared segment used by instances of <code>ReadingTranslationView</code> used to retrieve
-     * text from the document.
-     */
-    private final Segment segment = new Segment();
-
-    /**
-     * Segment character buffer used by instances of <code>ReadingTranslationView</code>.
-     */
-    private final char[] segmentBuffer = new char[MAX_TRANSLATION_LENGTH];
 
     /**
      * A view which renders a reading or a translation element. These views are placed
@@ -665,7 +643,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 (type==AnnotationTags.TRANSLATION)&&!showTranslation) {
 	            return true;
             }
-            
+
             /*View parent = getParent();
             if (parent instanceof AnnotationView)
                 return ((AnnotationView) parent).isAnnotationHidden();
@@ -673,35 +651,10 @@ public class JGlossEditorKit extends HTMLEditorKit {
                 return ((ReadingBaseView) parent).isAnnotationHidden();
             else
                 return false;*/
-                
+
             return false;
         }
 
-        /**
-         * Return the text in the given span, possibly shortened to 
-         * {@link JGlossEditorKit#MAX_TRANSLATION_LENGTH MAX_TRANSLATION_LENGTH}.
-         */
-        @Override
-		public Segment getText( int p0, int p1) {
-            if (p1-p0 <= MAX_TRANSLATION_LENGTH) {
-	            return super.getText( p0, p1);
-            } else {
-	            try {
-	                getDocument().getText( p0, MAX_TRANSLATION_LENGTH-3, segment);
-	                // segment.count should not be larger than MAX_TRANSLATION_LENGTH
-	                System.arraycopy( segment.array, segment.offset, segmentBuffer, 0, segment.count);
-	                segmentBuffer[segment.count] = '.';
-	                segmentBuffer[segment.count+1] = '.';
-	                segmentBuffer[segment.count+2] = '.';
-	                segment.array = segmentBuffer;
-	                segment.offset = 0;
-	                segment.count += 3;
-	                return segment;
-	            } catch (BadLocationException ex) {
-	                return super.getText( p0, p1);
-	            }
-            }
-        }
     } // class ReadingTranslationView
 
     /**
@@ -725,7 +678,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
             super( elem);
             this.alignment = alignment;
         }
-        
+
         /**
          * Returns the alignment. The vertical alignment is changed to make the text align properly
          * with annotation views.
@@ -741,15 +694,15 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	            return alignment;
             }
         }
-        
+
         /**
-         * Overridden to always break the line at the last char. 
+         * Overridden to always break the line at the last char.
          */
         @Override
 		public int getBreakWeight( int axis, float pos, float len) {
             /*
              * J2SE 1.4 introduces a new, more
-             * sophisticated way to choose where to break a line with class 
+             * sophisticated way to choose where to break a line with class
              * <CODE>java.text.RuleBasedBreakIterator</CODE>. <CODE>GlyphView.getBreakWeight</CODE>
              * uses this class to decide where to break a line. Unfortunately, this is a major
              * performance bottleneck. Since the utility of this way of breaking lines for
@@ -799,7 +752,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * @param showReading <CODE>true</CODE> if reading annotations should be visible.
      * @param showTranslation <CODE>true</CODE> if translation annotations should be visible.
      */
-    public JGlossEditorKit( boolean _compactView, 
+    public JGlossEditorKit( boolean _compactView,
                             boolean _showReading, boolean _showTranslation) {
         super();
         compactView = _compactView;
@@ -808,7 +761,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
     }
 
     /**
-     * Sets the compact view mode. In compact view, each annotation element gets only enough 
+     * Sets the compact view mode. In compact view, each annotation element gets only enough
      * horizontal space for the annotated word, and not neccessarily for the annotations.
      * This means that the normal text part of the annotation will align with
      * the rest of the rest of the text, but also that annotations could overlap if they need
@@ -872,7 +825,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
     }
 
     /**
-     * Creates a new document. This will return an instance of 
+     * Creates a new document. This will return an instance of
      * {@link JGlossDocument JGlossDocument} initialized with the text parser
      * passed to the constructor of this JGlossEditorKit.
      *
@@ -928,10 +881,10 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	                }
 	                al = al.getNext();
 	            }
-	            
+
 	            // add custom elements
 	            // #pcdata*
-	            ContentModel pcdata = new ContentModel( '*', 
+	            ContentModel pcdata = new ContentModel( '*',
 	                                                    new ContentModel( dtd.pcdata),
 	                                                    null);
 	            dtd.defineElement( AnnotationTags.READING.getId(),
@@ -946,7 +899,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	            				( AnnotationTags.BASETEXT.getId());
 	            javax.swing.text.html.parser.Element translation = dtd.getElement
 	            				( AnnotationTags.TRANSLATION.getId());
-	            
+
 	            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE, DTDConstants.CDATA, 0, null, null, al);
 	            al = new AttributeList( JGlossHTMLDoc.Attributes.BASE_READING, DTDConstants.CDATA, 0, null, null, al);
 
@@ -960,13 +913,13 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	                               DTDConstants.ANY, false, false, null, null, null, null);
 	            dtd.defineElement( AnnotationTags.READING_BASETEXT.getId(),
 	                               DTDConstants.ANY, false, false, null, null, null, null);
-	            
+
 	            javax.swing.text.html.parser.Element annotation = dtd.getElement
 	                ( AnnotationTags.ANNOTATION.getId());
 	            javax.swing.text.html.parser.Element word = dtd.getElement
 	                ( AnnotationTags.WORD.getId());
 	            javax.swing.text.html.parser.Element reading_base = dtd.getElement
-	                ( AnnotationTags.READING_BASETEXT.getId());            
+	                ( AnnotationTags.READING_BASETEXT.getId());
 
 	            // (anno | word | reading_base | reading | base | translation | #pcdata*)
 	            ContentModel annotationmodel = new ContentModel( '|', new ContentModel
@@ -979,7 +932,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
 	                                      ( '*', new ContentModel( dtd.pcdata)))))))));
 	            // allow an annotation element or any of its subelements anywhere the DTD allows #pcdata
 	            for (javax.swing.text.html.parser.Element e : dtd.elements) {
-	                if (e!=annotation && e!=word && e!=reading_base && e!=reading && e!=base 
+	                if (e!=annotation && e!=word && e!=reading_base && e!=reading && e!=base
 	                    && e!=translation) {
 	                    updateContentModel( dtd, e.getContent(), annotationmodel);
 	                }
@@ -1002,7 +955,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * @param annotationmodel The model which will replace any occurrences of #pcdata.
      * @param return <CODE>true</CODE> if the content model was changed.
      */
-    private static boolean updateContentModel( DTD dtd, ContentModel cm, 
+    private static boolean updateContentModel( DTD dtd, ContentModel cm,
                                                ContentModel annotationmodel) {
         if (cm == null) {
 	        return false;
