@@ -22,8 +22,10 @@
 
 package jgloss.ui.html;
 
+import static jgloss.ui.html.AnnotationTags.READING;
+import static jgloss.ui.html.AnnotationTags.TRANSLATION;
+
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -449,33 +451,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
         }
 
         /**
-         * Returns the minimum span of the view.
-         */
-        @Override
-		public float getMinimumSpan( int axis) {
-            if (axis==View.X_AXIS && getView( 1)!=null) {
-	            // view 1 is the view for the BASETEXT element
-                return getView( 1).getMinimumSpan( axis);
-            } else {
-	            return super.getMinimumSpan( axis);
-            }
-        }
-
-        /**
-         * Returns the preferred span of the view. For the x axis, the width of the base
-         * is returned and the width of the reading ignored. This allows bases to align properly.
-         */
-        @Override
-		public float getPreferredSpan( int axis) {
-            if (axis==View.X_AXIS && getView( 1)!=null) {
-	            // view 1 is the view for the BASETEXT element
-                return getView( 1).getPreferredSpan( axis);
-            } else {
-	            return super.getPreferredSpan( axis);
-            }
-        }
-
-        /**
          * Returns the maximum span of the view. Overridden to prevent it to grow beyond
          * the preferred span.
          */
@@ -529,48 +504,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
             }
         }
 
-        @Override
-		public float getMinimumSpan( int axis) {
-            if (axis == X_AXIS) {
-                float span = 0;
-                for ( int i=0; i<getViewCount(); i++) {
-                    View v = getView( i);
-                    if (!compactView && v instanceof ReadingBaseView) {
-	                    span += ((ReadingBaseView) v).getRealXSpan();
-                    } else {
-	                    span += v.getMinimumSpan( axis);
-                    }
-                }
-                return span;
-            } else {
-	            return super.getPreferredSpan( axis);
-            }
-        }
-
-        /**
-         * Calculates the preferred span by summing up the preferred span of all child views.
-         * For reading/base views, the
-         * {@link JGlossEditorKit.ReadingBaseView#getRealXSpan() real horizontal span}
-         * is used instead of the one returned by <CODE>getPreferredSpan</CODE> so that
-         * the word will always have enough space to display the whole reading.
-         */
-        @Override
-		public float getPreferredSpan( int axis) {
-            if (axis == X_AXIS) {
-                float span = 0;
-                for ( int i=0; i<getViewCount(); i++) {
-                    View v = getView( i);
-                    if (!compactView && v instanceof ReadingBaseView) {
-	                    span += ((ReadingBaseView) v).getRealXSpan();
-                    } else {
-	                    span += v.getPreferredSpan( axis);
-                    }
-                }
-                return span;
-            } else {
-	            return super.getPreferredSpan( axis);
-            }
-        }
     } // class WordView
 
     /**
@@ -606,27 +539,55 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @param allocation The allocation the view should be rendered into.
          */
         @Override
-		public void paint( Graphics g, Shape allocation) {
+        public void paint(Graphics g, Shape allocation) {
             if (isHidden()) {
-	            return;
+                return;
             }
+
             if (getParent() == null) {
-	            return;
+                return;
             }
 
-            if (allocation instanceof Rectangle) {
-                Rectangle a = (Rectangle) allocation;
-                float xs;
-                // center on annotated word
-                xs = getParent().getMinimumSpan( View.X_AXIS);
-                if (a.getWidth() > xs) {
-                    a.setRect( a.getX() + (xs - a.getWidth())/2, a.getY(),
-                               a.getWidth(), a.getHeight());
-                    allocation = a;
-                }
+            super.paint(g, allocation);
+        }
+
+        @Override
+        public float getMinimumSpan(int axis) {
+            float span;
+
+            if (isHidden()) {
+                span = 0;
+            } else {
+                span = super.getMinimumSpan(axis);
             }
 
-            super.paint( g, allocation);
+            return span;
+        }
+
+        @Override
+        public float getPreferredSpan(int axis) {
+            float span;
+
+            if (isHidden()) {
+                span = 0;
+            } else {
+                span = super.getPreferredSpan(axis);
+            }
+
+            return span;
+        }
+
+        @Override
+        public float getMaximumSpan(int axis) {
+            float span;
+
+            if (isHidden()) {
+                span = 0;
+            } else {
+                span = super.getMaximumSpan(axis);
+            }
+
+            return span;
         }
 
         /**
@@ -639,8 +600,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @return <CODE>true</CODE> if the annotation is hidden.
          */
         public boolean isHidden() {
-            if ((type==AnnotationTags.READING)&&!showReading ||
-                (type==AnnotationTags.TRANSLATION)&&!showTranslation) {
+            if (READING.equals(type) && !showReading || TRANSLATION.equals(type) && !showTranslation) {
 	            return true;
             }
 
@@ -687,11 +647,11 @@ public class JGlossEditorKit extends HTMLEditorKit {
          * @return The alignment.
          */
         @Override
-		public float getAlignment( int axis) {
-            if (axis!=View.Y_AXIS || alignment == DEFAULT_ALIGNMENT) {
-	            return super.getAlignment( axis);
+        public float getAlignment(int axis) {
+            if (axis != View.Y_AXIS || alignment == DEFAULT_ALIGNMENT) {
+                return super.getAlignment(axis);
             } else {
-	            return alignment;
+                return alignment;
             }
         }
 
