@@ -50,7 +50,7 @@ public class Annotation {
     };
 
     private static final Logger LOGGER = Logger.getLogger(Annotation.class.getPackage().getName());
-	
+
     protected AnnotationListModel owner;
     protected Element anno;
 
@@ -65,7 +65,7 @@ public class Annotation {
     	if (!ANNOTATION.getId().equals(_anno.getName())) {
     		throw new IllegalArgumentException("element must be annotation element, was " + _anno.getName());
     	}
-    	    	
+
         owner = _owner;
         anno = _anno;
 
@@ -99,7 +99,7 @@ public class Annotation {
     }
 
     public Element getAnnotationElement() { return anno; }
-    
+
     public String getAnnotatedText() { return annotatedText; }
     public String getAnnotatedTextReading() { return annotatedTextReading; }
 
@@ -249,7 +249,7 @@ public class Annotation {
 
         String translation = getTranslation();
         if (translation!=null && translation.length()>0) {
-            out.append( '\n');
+            out.append(' ');
             out.append( translation);
         }
 

@@ -54,13 +54,13 @@ import jgloss.ui.html.JGlossHTMLDoc;
 import jgloss.ui.util.UIUtilities;
 import jgloss.util.StringTools;
 
-public class AnnotationList extends JList implements MouseListener, ListSelectionListener {
+public class AnnotationList extends JList<Annotation> implements MouseListener, ListSelectionListener {
     private static final long serialVersionUID = 1L;
 
 	/**
      * Delegator for key events which only forwards <CODE>keyPressed</CODE> and <CODE>keyReleased</CODE>
-     * events. In Swing 1.4, the <CODE>BasicTreeUI</CODE> key listener adds first letter navigation, 
-     * triggered by a <CODE>keyTyped</CODE> event. Since this behavior conflicts with the 
+     * events. In Swing 1.4, the <CODE>BasicTreeUI</CODE> key listener adds first letter navigation,
+     * triggered by a <CODE>keyTyped</CODE> event. Since this behavior conflicts with the
      * <CODE>AnnotationEditor</CODE> keyboard navigation, the listener is wrapped by this delegator,
      * which ignores the <CODE>keyTyped</CODE> events.
      */
@@ -78,7 +78,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
             }
             delegators.add( this);
         }
-        
+
         public KeyListener getDelegatee() { return delegatee; }
 
         @Override
@@ -113,7 +113,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
                 return delegator;
             }
         }
-        
+
         return null;
     }
 
@@ -201,7 +201,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 
 				@Override
 				public void actionPerformed( ActionEvent e) {
-                    Annotation selection = (Annotation) getSelectedValue();
+                    Annotation selection = getSelectedValue();
                     if (selection != null) {
 	                    selection.setTranslation( null);
                     }
@@ -393,7 +393,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
 
     @Override
 	public void setSelectedIndex(int index) {
-        
+
         super.setSelectedIndex(index);
         // Scroll to visible
         ensureIndexIsVisible(index);
@@ -433,7 +433,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
      * Adds the word of the currently selected annotation to the list of exclusions.
      */
     private void addSelectionToExclusions() {
-        Annotation selection = (Annotation) getSelectedValue();
+        Annotation selection = getSelectedValue();
         if (selection == null) {
 	        return;
         }
@@ -475,7 +475,7 @@ public class AnnotationList extends JList implements MouseListener, ListSelectio
      * Adds the currently selected annotation to the user dictionary.
      */
     private void addSelectionToDictionary() {
-        Annotation selection = (Annotation) getSelectedValue();
+        Annotation selection = getSelectedValue();
         if (selection == null) {
 	        return;
         }
