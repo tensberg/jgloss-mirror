@@ -93,7 +93,7 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
                 <checksumPolicy>fail</checksumPolicy>
             </snapshots>
         </repository>
@@ -107,7 +107,7 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
                 <checksumPolicy>fail</checksumPolicy>
             </snapshots>
         </repository>
@@ -138,7 +138,7 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
                 <checksumPolicy>fail</checksumPolicy>
             </snapshots>
         </pluginRepository>
