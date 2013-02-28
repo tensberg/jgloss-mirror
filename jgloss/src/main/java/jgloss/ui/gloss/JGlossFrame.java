@@ -259,11 +259,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
      * Menu item which holds the show about box action.
      */
     private JMenuItem aboutItem;
-
-    /**
-     * Toggles compact view.
-     */
-    private JCheckBoxMenuItem compactViewItem;
     /**
      * Toggles the display of reading annotations.
      */
@@ -585,10 +580,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         menu.add( preferencesItem);
         bar.add( menu);
 
-        compactViewItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString( "main.menu.compactview"));
-        compactViewItem.setSelected( JGloss.PREFS.getBoolean( Preferences.VIEW_COMPACTVIEW, false));
-        compactViewItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.compactview.tt"));
-        compactViewItem.addActionListener( this);
         showReadingItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString( "main.menu.showreading"));
         showReadingItem.setSelected( JGloss.PREFS.getBoolean( Preferences.VIEW_SHOWREADING, true));
         showReadingItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showreading.tt"));
@@ -607,7 +598,6 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         showAnnotationItem.addActionListener( this);
 
         menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.view"));
-        menu.add( compactViewItem);
         menu.add( showReadingItem);
         menu.add( showTranslationItem);
         menu.add( showAnnotationItem);
@@ -742,9 +732,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         assert EventQueue.isDispatchThread();
 
         this.model = model;
-        kit = new JGlossEditorKit( compactViewItem.isSelected(),
-                                   showReadingItem.isSelected(),
-                                   showTranslationItem.isSelected());
+        kit = new JGlossEditorKit(showReadingItem.isSelected(), showTranslationItem.isSelected());
         JGlossHTMLDoc htmlDoc = createHtmlDoc(model);
 
         DocumentStyleDialog.getDocumentStyleDialog().addStyleSheet( htmlDoc.getStyleSheet());
@@ -836,14 +824,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     @Override
 	public void actionPerformed( ActionEvent e) {
         if (kit != null) {
-            if (e.getSource() == compactViewItem) {
-                JGloss.PREFS.set( Preferences.VIEW_COMPACTVIEW, compactViewItem.isSelected());
-                kit.setCompactView( compactViewItem.isSelected());
-                // force docpane to be re-layouted.
-                model.getHTMLDocument().getStyleSheet().addRule
-                    ( AnnotationTags.ANNOTATION.getId() + " {}");
-            }
-            else if (e.getSource()==showReadingItem) {
+            if (e.getSource() == showReadingItem) {
                 JGloss.PREFS.set( Preferences.VIEW_SHOWREADING, showReadingItem.isSelected());
                 kit.showReading( showReadingItem.isSelected());
                 // force docpane to be re-layouted.

@@ -88,10 +88,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
     private final JGlossFactory viewFactory = new JGlossFactory();
 
     /**
-     * Flag if the view should be in compact mode.
-     */
-    private boolean compactView;
-    /**
      * Flag if reading annotations should be shown.
      */
     private boolean showReading;
@@ -371,34 +367,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
             }
 
             super.setParent( parent);
-        }
-
-        /**
-         * Returns the minimum span of the view. If compact view is set, the width of the
-         * translation view is ignored and only the width of the word is returned.
-         */
-        @Override
-		public float getMinimumSpan( int axis) {
-            if (axis==View.X_AXIS && compactView) {
-	            // view 0 is the view for the WORD element
-                return getView( 0).getMinimumSpan( axis);
-            } else {
-	            return super.getMinimumSpan( axis);
-            }
-        }
-
-        /**
-         * Returns the preferred span of the view. If compact view is set, the width of the
-         * translation view is ignored and only the width of the word is returned.
-         */
-        @Override
-		public float getPreferredSpan( int axis) {
-            if (axis==View.X_AXIS && compactView) {
-	            // view 0 is the view for the WORD element
-                return getView( 0).getPreferredSpan( axis);
-            } else {
-	            return super.getPreferredSpan( axis);
-            }
         }
 
         /**
@@ -712,25 +680,9 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * @param showReading <CODE>true</CODE> if reading annotations should be visible.
      * @param showTranslation <CODE>true</CODE> if translation annotations should be visible.
      */
-    public JGlossEditorKit( boolean _compactView,
-                            boolean _showReading, boolean _showTranslation) {
-        super();
-        compactView = _compactView;
+    public JGlossEditorKit(boolean _showReading, boolean _showTranslation) {
         showReading = _showReading;
         showTranslation = _showTranslation;
-    }
-
-    /**
-     * Sets the compact view mode. In compact view, each annotation element gets only enough
-     * horizontal space for the annotated word, and not neccessarily for the annotations.
-     * This means that the normal text part of the annotation will align with
-     * the rest of the rest of the text, but also that annotations could overlap if they need
-     * more space.
-     *
-     * @param compactView <CODE>true</CODE> if compact view mode should be set.
-     */
-    public void setCompactView( boolean compactView) {
-        this.compactView = compactView;
     }
 
     /**
@@ -751,15 +703,6 @@ public class JGlossEditorKit extends HTMLEditorKit {
      */
     public void showTranslation( boolean showTranslation) {
         this.showTranslation = showTranslation;
-    }
-
-    /**
-     * Returns the current view mode.
-     *
-     * @return <CODE>true</CODE> if compact view is enabled.
-     */
-    public boolean isCompactView() {
-        return compactView;
     }
 
     /**
