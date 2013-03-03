@@ -126,7 +126,8 @@ body {
 		<hr>
 
 		<footer>
-			<p>&copy; Company 2013</p>
+#set ( $currentYear = ${project.properties.buildTimestamp.substring(0,4)} )
+			<p>&copy; ${project.inceptionYear}-${currentYear} ${project.organization.name}.</p>
 		</footer>
 
 	</div>

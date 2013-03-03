@@ -19,6 +19,9 @@
 		<connection>scm:git:git://git.code.sf.net/p/jgloss/code</connection>
 		<developerConnection>scm:git:ssh://username@git.code.sf.net/p/jgloss/code</developerConnection>
 	</scm>
+    <organization>
+        <name>the JGloss developers</name>
+    </organization>
     <developers>
         <developer>
             <name>Michael Koch</name>
@@ -48,6 +51,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codequality.version>1-SNAPSHOT</codequality.version>
+        <buildTimestamp>${maven.build.timestamp}</buildTimestamp><!-- used in index.html.vm -->
         
         <siteDirectory>/snapshot</siteDirectory>
 
@@ -278,7 +282,28 @@
 					</reportPlugins>
 				</configuration>
 			</plugin>
-			
+
+            <plugin>
+                <groupId>net.rumati.maven.plugins</groupId>
+                <artifactId>velocity-maven-plugin</artifactId>
+                <version>0.3.0</version>
+ 
+                <executions>
+                    <execution>
+                        <id>process-site-templates</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>velocity</goal>
+                        </goals>
+                        <configuration>
+                            <template>src/site/vm/index.html.vm</template>
+                            <outputFile>${project.build.directory}/site/index.html</outputFile>
+                            <removeExtension>.vm</removeExtension>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
