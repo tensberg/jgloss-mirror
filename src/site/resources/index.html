@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Language" content="en" />
-    <title>JGloss</title>
-    <link rel="stylesheet" href="./css/apache-maven-fluido-1.3.1-SNAPSHOT.min.css" />
-    <link rel="stylesheet" href="./css/site.css" />
-    <link rel="stylesheet" href="./css/print.css" media="print" />
-    <style type="text/css">
-      body {
-        padding-top: 20px;
-        padding-bottom: 40px;
-      }
-    </style>
-      
-    <script type="text/javascript" src="./js/apache-maven-fluido-1.3.1-SNAPSHOT.min.js"></script>
-    
-    <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Language" content="en" />
+<title>JGloss</title>
+<link rel="stylesheet"
+	href="./css/apache-maven-fluido-1.3.1-SNAPSHOT.min.css" />
+<link rel="stylesheet" href="./css/site.css" />
+<link rel="stylesheet" href="./css/print.css" media="print" />
+<style type="text/css">
+body {
+	padding-top: 20px;
+	padding-bottom: 40px;
+}
 
-    <script type="text/javascript">
+.hero-unit {
+    background-color: #f3dfdf;
+}
+
+.nav-pills li {
+    padding-left: 5px;
+}
+</style>
+
+<script type="text/javascript"
+	src="./js/apache-maven-fluido-1.3.1-SNAPSHOT.min.js"></script>
+
+<script type="text/javascript"
+	src="https://apis.google.com/js/plusone.js"></script>
+
+<script type="text/javascript">
     /* <![CDATA[ */
         (function() {
             var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
@@ -29,83 +40,117 @@
             t.parentNode.insertBefore(s, t);
         })();
     /* ]]> */</script>
-    </head>
-    <body>
-    <div class="container">
+</head>
+<body>
+	<div class="container">
 
-        <div>
-            <ul class="nav pull-right" style="margin: 5pt;">
-                <li class="active">
-                    <div class="g-plusone" data-href="http://jgloss.sourceforge.net/snapshot" data-size="tall" ></div>
-                </li>
-                <li>
-                    <iframe src="http://www.facebook.com/plugins/like.php?href=http://jgloss.sourceforge.net/snapshot&send=false&layout=box_count&show-faces=false&action=like&colorscheme=light"
-        scrolling="no" frameborder="0"
-        style="border:none; width:48px; height:63px; margin-top: 10px;" ></iframe>
-               </li>
-                <li>
-                    <div id="flattr">    
-                        <a class="FlattrButton" style="display:none;"  href="http://jgloss.sourceforge.net/"></a>
-                        <noscript><a href="http://flattr.com/thing/1136753/JGloss" target="_blank">
-                        <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        <div class="hero-unit">
+            <a href="webstart/jnlp/jgloss.jnlp"><img
+                src="images/jgloss-logo.png" alt="JGloss logo" width="175"
+                height="100" /></a>
 
-      <div class="hero-unit">
-        <a href="webstart/jnlp/jgloss.jnlp"><img src="images/jgloss-logo.png" alt="JGloss logo" width="175" height="100" /></a>
-        
-        <ul>
-            <li>Automatically annotate Japanese text with readings and translations.</li>
-            <li>Export the annotated document and vocabulary list.</li>
-            <li>Supports EDICT and Wadoku Jiten dictionaries.</li>
-        </ul>
+			<ul class="nav nav-pills nav-border pull-right" style="margin: 5pt;">
+				<li >
+					<div class="g-plusone"
+						data-href="http://jgloss.sourceforge.net/snapshot"
+						data-size="tall"></div>
+				</li>
+				<li><iframe
+						src="http://www.facebook.com/plugins/like.php?href=http://jgloss.sourceforge.net/snapshot&send=false&layout=box_count&show-faces=false&action=like&colorscheme=light"
+						scrolling="no" frameborder="0"
+						style="border: none; width: 48px; height: 63px;"></iframe>
+				</li>
+				<li>
+					<div id="flattr">
+						<a class="FlattrButton" style="display: none;"
+							href="http://jgloss.sourceforge.net/"></a>
+						<noscript>
+							<a href="http://flattr.com/thing/1136753/JGloss" target="_blank">
+								<img src="http://api.flattr.com/button/flattr-badge-large.png"
+								alt="Flattr this" title="Flattr this" border="0" />
+							</a>
+						</noscript>
+					</div>
+				</li>
+			</ul>
 
-        <p><a href="webstart/jnlp/jgloss.jnlp" class="btn btn-primary">Launch JGloss &raquo;</a> <a href="#" class="btn">Read more &raquo;</a></p>
-        <div class="pull-right">
-                Requires Java 7
-        </div>
-      </div>
+			<ul>
+				<li>Automatically annotate Japanese text with readings and
+					translations.</li>
+				<li>Export the annotated document and vocabulary list.</li>
+				<li>Supports EDICT and Wadoku Jiten dictionaries.</li>
+			</ul>
 
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="span4">
-          <h2>Dictionaries</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-        </div>
-        <div class="span4">
-          <h2>Download</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-       </div>
-        <div class="span4">
-          <h2>Screenshots</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-        </div>
-      </div>
+			<p>
+				<a href="webstart/jnlp/jgloss.jnlp" class="btn btn-primary">Launch
+					JGloss &raquo;</a> 
+					<a href="#" class="btn">Read more &raquo;</a>
+            <a href="http://www.java.com/download/" class="pull-right">Requires Java 7</a>
+			</p>
+		</div>
 
-      <hr>
+		<!-- Example row of columns -->
+		<div class="row">
+			<div class="span4">
+				<h2>Dictionaries</h2>
+				<p>Donec id elit non mi porta gravida at eget metus. Fusce
+					dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
+					ut fermentum massa justo sit amet risus. Etiam porta sem malesuada
+					magna mollis euismod. Donec sed odio dui.</p>
+				<p>
+					<a class="btn" href="#">View details &raquo;</a>
+				</p>
+			</div>
+			<div class="span4">
+				<h2>Download</h2>
+				<p>Donec id elit non mi porta gravida at eget metus. Fusce
+					dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
+					ut fermentum massa justo sit amet risus. Etiam porta sem malesuada
+					magna mollis euismod. Donec sed odio dui.</p>
+				<p>
+					<a class="btn" href="#">View details &raquo;</a>
+				</p>
+			</div>
+			<div class="span4">
+				<h2>Screenshots</h2>
+				<p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in,
+					egestas eget quam. Vestibulum id ligula porta felis euismod semper.
+					Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum
+					nibh, ut fermentum massa justo sit amet risus.</p>
+				<p>
+					<a class="btn" href="#">View details &raquo;</a>
+				</p>
+			</div>
+		</div>
 
-      <footer>
-        <p>&copy; Company 2013</p>
-      </footer>
+		<hr>
 
-    </div> <!-- /container -->
+		<footer>
+			<p>&copy; Company 2013</p>
+		</footer>
 
-    <!-- Piwik -->
-    <script type="text/javascript">
+	</div>
+	<!-- /container -->
+
+	<!-- Piwik -->
+	<script type="text/javascript">
     var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/jgloss/" : "http://sourceforge.net/apps/piwik/jgloss/");
     document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-    </script><script type="text/javascript">
+    </script>
+	<script type="text/javascript">
     try {
     var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
     piwikTracker.trackPageView();
     piwikTracker.enableLinkTracking();
     } catch( err ) {}
-    </script><noscript><p><img src="http://sourceforge.net/apps/piwik/jgloss/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
-    <!-- End Piwik Tag -->
-    </body>
+    </script>
+	<noscript>
+		<p>
+			<img
+				src="http://sourceforge.net/apps/piwik/jgloss/piwik.php?idsite=1"
+				style="border: 0" alt="" />
+		</p>
+	</noscript>
+	<!-- End Piwik Tag -->
+</body>
 </html>
