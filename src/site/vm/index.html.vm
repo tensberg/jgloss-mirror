@@ -16,10 +16,11 @@ body {
 }
 
 .hero-unit {
-    background-color: #f3dfdf;
+    background-color: #F7F2F3;
 }
 
 .nav-pills li {
+    padding-top:  10px;
     padding-left: 5px;
 }
 </style>
@@ -52,11 +53,11 @@ body {
 			<ul class="nav nav-pills nav-border pull-right" style="margin: 5pt;">
 				<li >
 					<div class="g-plusone"
-						data-href="http://jgloss.sourceforge.net/snapshot"
+						data-href="${project.url}"
 						data-size="tall"></div>
 				</li>
 				<li><iframe
-						src="http://www.facebook.com/plugins/like.php?href=http://jgloss.sourceforge.net/snapshot&send=false&layout=box_count&show-faces=false&action=like&colorscheme=light"
+						src="http://www.facebook.com/plugins/like.php?href=${project.url}&send=false&layout=box_count&show-faces=false&action=like&colorscheme=light"
 						scrolling="no" frameborder="0"
 						style="border: none; width: 48px; height: 63px;"></iframe>
 				</li>
@@ -84,42 +85,46 @@ body {
 			<p>
 				<a href="webstart/jnlp/jgloss.jnlp" class="btn btn-primary">Launch
 					JGloss &raquo;</a> 
-					<a href="#" class="btn">Read more &raquo;</a>
+					<a href="details.html" class="btn">Read more &raquo;</a>
             <a href="http://www.java.com/download/" class="pull-right">Requires Java 7</a>
 			</p>
 		</div>
 
-		<!-- Example row of columns -->
 		<div class="row">
 			<div class="span4">
-				<h2>Dictionaries</h2>
+				<h2><a href="details.html#Dictionaries">Dictionaries &raquo;</a></h2>
+				<p>
+                    JGloss supports the popular <a href="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDICT2</a> dictionary file format.
+                    Available dictionaries include the Japanese-English 
+                    <a href="http://www.csse.monash.edu.au/~jwb/edict.html">EDICT</a> itself, 
+                    the Japanese-German <a href="http://www.wadoku.de/">Wadoku Jiten</a>, and many others. The
+                    <a href="http://www.csse.monash.edu.au/~jwb/kanjidic.html">Kanjidic</a> dictionary format is also supported.
+                </p>
+			</div>
+			<div class="span4">
+				<h2><a href="details.html#Examples">Examples &raquo;</a></h2>
 				<p>Donec id elit non mi porta gravida at eget metus. Fusce
 					dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
 					ut fermentum massa justo sit amet risus. Etiam porta sem malesuada
 					magna mollis euismod. Donec sed odio dui.</p>
-				<p>
-					<a class="btn" href="#">View details &raquo;</a>
-				</p>
 			</div>
 			<div class="span4">
-				<h2>Download</h2>
-				<p>Donec id elit non mi porta gravida at eget metus. Fusce
-					dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
-					ut fermentum massa justo sit amet risus. Etiam porta sem malesuada
-					magna mollis euismod. Donec sed odio dui.</p>
+				<h2><a href="developing.html">Free Software &raquo;</a></h2>
 				<p>
-					<a class="btn" href="#">View details &raquo;</a>
-				</p>
-			</div>
-			<div class="span4">
-				<h2>Screenshots</h2>
-				<p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in,
-					egestas eget quam. Vestibulum id ligula porta felis euismod semper.
-					Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum
-					nibh, ut fermentum massa justo sit amet risus.</p>
-				<p>
-					<a class="btn" href="#">View details &raquo;</a>
-				</p>
+                    JGloss is Free Software, distributed under the
+                    terms of the <a href="http://www.gnu.org/licenses/licenses.html#TOCGPL">GNU General Public License</a>.
+                    You can get the source code, modify it to your liking and
+                    contribute your enhancements if you want.
+                </p>
+                <p>
+                    The <a href="http://sourceforge.net/projects/jgloss">JGloss project</a> is hosted at 
+                    <a href="http://sourceforge.net/">SourceForge</a>.
+                </p>
+                <p class="text-center">
+                    <a href="http://sourceforge.net/projects/jgloss" title="SourceForge" class="builtBy">
+                    <img class="builtBy"  alt="Get JGloss at SourceForge.net. Fast, secure and Free Open Source software downloads" src="http://sflogo.sourceforge.net/sflogo.php?group_id=29259&type=12"   width="120"  height="30" />
+                  </a>
+                </p>
 			</div>
 		</div>
 

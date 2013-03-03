@@ -26,10 +26,10 @@
 	    </breadcrumbs>
 		<menu name="Information for Users">
 			<item name="Home" href="index.html">
-			   <item name="About JGloss" href="index.html#About_JGloss" />
-			   <item name="Download" href="index.html#Download" />
-			   <item name="Links" href="index.html#Links" />
-			   <item name="Examples" href="index.html#Examples" />
+			   <item name="About JGloss" href="details.html#About_JGloss" />
+			   <item name="Download" href="details.html#Download" />
+			   <item name="Links" href="details.html#Links" />
+			   <item name="Examples" href="details.html#Examples" />
 			</item>
 			<item name="Export templates" href="templates.html" />
 		</menu>
