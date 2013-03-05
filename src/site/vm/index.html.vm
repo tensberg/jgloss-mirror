@@ -114,7 +114,7 @@ body {
 			<div class="span4">
 				<h2><a href="developing.html">Free Software &raquo;</a></h2>
 				<p>
-                    JGloss is Free Software, distributed under the
+                    JGloss is free and open source software, distributed under the
                     terms of the <a href="http://www.gnu.org/licenses/licenses.html#TOCGPL">GNU General Public License</a>.
                     You can get the source code, modify it to your liking and
                     contribute your enhancements if you want.
@@ -139,7 +139,7 @@ body {
 
 		<footer>
 #set ( $currentYear = ${project.properties.buildTimestamp.substring(0,4)} )
-			<p>&copy; ${project.inceptionYear}-${currentYear} ${project.organization.name}.</p>
+			<p>Current version: ${project.version} - Last published: ${project.properties.buildTimestamp}<span class="pull-right">&copy; ${project.inceptionYear}-${currentYear} ${project.organization.name}. </span></p>
 		</footer>
 
 	</div>
