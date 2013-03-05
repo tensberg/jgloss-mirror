@@ -119,19 +119,6 @@ body {
                     You can get the source code, modify it to your liking and
                     contribute your enhancements if you want.
                 </p>
-                <p>
-                    You are also welcome to post your questions, comments and suggestions
-                    to the <a href="mail-lists.html">JGloss mailing list</a>. Or report a bug in the <a href="https://sourceforge.net/p/jgloss/bugs/">issue tracker</a>.
-                </p>
-                <p>
-                    The <a href="http://sourceforge.net/projects/jgloss">JGloss project</a> is hosted at 
-                    <a href="http://sourceforge.net/">SourceForge</a>.
-                </p>
-                <p class="text-center">
-                    <a href="http://sourceforge.net/projects/jgloss" title="SourceForge" class="builtBy">
-                    <img class="builtBy"  alt="Get JGloss at SourceForge.net. Fast, secure and Free Open Source software downloads" src="http://sflogo.sourceforge.net/sflogo.php?group_id=29259&type=12"   width="120"  height="30" />
-                  </a>
-                </p>
 			</div>
 		</div>
 
@@ -139,7 +126,19 @@ body {
 
 		<footer>
 #set ( $currentYear = ${project.properties.buildTimestamp.substring(0,4)} )
-			<p>Current version: ${project.version} - Last published: ${project.properties.buildTimestamp}<span class="pull-right">&copy; ${project.inceptionYear}-${currentYear} ${project.organization.name}. </span></p>
+			<p>
+                Current version: ${project.version} - Last published: ${project.properties.buildTimestamp}
+                <span class="pull-right">&copy; ${project.inceptionYear}-${currentYear} ${project.organization.name}.</span>
+            </p>
+
+            <p>
+                <a href="http://sourceforge.net/projects/jgloss" title="SourceForge">
+                <img alt="Get JGloss at SourceForge.net. Fast, secure and Free Open Source software downloads" src="http://sflogo.sourceforge.net/sflogo.php?group_id=29259&type=12"   width="120"  height="30" />
+              </a>
+               The <a href="http://sourceforge.net/projects/jgloss">JGloss project</a> is hosted at 
+               <a href="http://sourceforge.net/">SourceForge</a>.
+            </p>
+
 		</footer>
 
 	</div>
