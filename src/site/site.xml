@@ -27,7 +27,7 @@
 		<menu name="Information for Users">
 			<item name="Home" href="index.html" />
  		    <item name="About JGloss" href="details.html" />
-		    <item name="Screenshots" href="details.html#Examples" />
+		    <item name="Screenshots" href="details.html#Screenshots" />
 		    <item name="Examples" href="details.html#Examples" />
  		    <item name="Download" href="download.html" />
 		    <item name="Dictionaries" href="download.html#Dictionaries" />
