@@ -25,13 +25,14 @@
 	       <item name="${project.name}" href="index.html" />
 	    </breadcrumbs>
 		<menu name="Information for Users">
-			<item name="Home" href="index.html">
-			   <item name="About JGloss" href="details.html#About_JGloss" />
-			   <item name="Download" href="details.html#Download" />
-			   <item name="Links" href="details.html#Links" />
-			   <item name="Examples" href="details.html#Examples" />
-			</item>
+			<item name="Home" href="index.html" />
+ 		    <item name="About JGloss" href="details.html" />
+		    <item name="Screenshots" href="details.html#Examples" />
+		    <item name="Examples" href="details.html#Examples" />
+ 		    <item name="Download" href="download.html" />
+		    <item name="Dictionaries" href="download.html#Dictionaries" />
 			<item name="Export templates" href="templates.html" />
+		    <item name="Related Links" href="links.html" />
 		</menu>
 		<menu name="Information for Developers">
             <item name="Developing JGloss" href="developing.html" />
