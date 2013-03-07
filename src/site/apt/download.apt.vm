@@ -1,0 +1,50 @@
+	------------
+	Download
+	------------
+
+Download
+
+* Development release: JGloss ${project.version}
+
+  JGloss ${project.version}, last updated on ${date.short_date}, is a snapshot of the development currently
+  done on JGloss. There may be still be missing or broken functionality and bugs.
+
+  The dictionary lookup part of JGloss is also available as a separate application: JDictionary.
+  You can use this if for example you want to offer your language students a dictionary lookup program,
+  but not the (too) easy text parsing of the full JGloss.
+
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-${project.version}.zip}jgloss-${project.version}.zip}}          | ZIP archive of the application.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jdictionary-${project.version}.zip}jdictionary-${project.version}.zip}}| ZIP archive of only the dictionary lookup program.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-${project.version}-src.zip}jgloss-${project.version}-src.zip}}  | ZIP archive of the source code.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+
+
+* Java
+
+  To run JGloss, you need to have a Java 7 runtime installed. {{{http://www.java.com/}Get it here}}.
+
+* Other downloads
+
+  The archive of previous releases is {{{http://sourceforge.net/project/showfiles.php?group_id=29259}here}}.
+
+
+Dictionaries
+
+  JGloss supports the EDICT2 and Kanjidic dictionary file formats. You can add downloaded dictionary
+  files in the Dictionaries preferences dialog.
+
+  Here are some links to dictionary files which can be used with JGloss. If you know of dictionaries not
+  listed here, {{{mailto:tensberg@gmx.net}drop me a note}}.
+
+    * A list of EDICT and KANJIDIC dictionaries is available at the 
+      {{{http://ftp.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil}Monash Nihongo FTP archive}}.
+      The main EDICT file is an English-Japanese dictionary, but files in other languages are
+      also available.
+
+    * The {{{http://www.wadoku.de/}Wadoku Jiten}}
+      is an extensive Japanese-German dictionary. The dictionary is available for download
+      in {{{http://www.wadoku.de/wiki/display/WAD/Downloads+und+Links}EDICT2 format here}}.
+
