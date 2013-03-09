@@ -135,9 +135,10 @@ body {
             <p>
                 <a href="http://sourceforge.net/projects/jgloss" title="SourceForge">
                 <img alt="Get JGloss at SourceForge.net. Fast, secure and Free Open Source software downloads" src="http://sflogo.sourceforge.net/sflogo.php?group_id=29259&type=12"   width="120"  height="30" />
-              </a>
-               The <a href="http://sourceforge.net/projects/jgloss">JGloss project</a> is hosted at 
-               <a href="http://sourceforge.net/">SourceForge</a>.
+                </a>
+                The <a href="http://sourceforge.net/projects/jgloss">JGloss project</a> is hosted at 
+                <a href="http://sourceforge.net/">SourceForge</a>.
+                <span class="pull-right"><a href="imprint.html">Imprint</a></span>
             </p>
 
 		</footer>

@@ -32,6 +32,7 @@
  		    <item name="Download" href="download.html" />
 		    <item name="Dictionaries" href="download.html#Dictionaries" />
 		    <item name="Related Links" href="links.html" />
+            <item name="Imprint" href="imprint.html" />
 		</menu>
 		<menu name="Information for Developers">
             <item name="Developing JGloss" href="developing.html" />
