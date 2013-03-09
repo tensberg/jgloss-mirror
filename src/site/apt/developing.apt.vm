@@ -6,7 +6,7 @@
  it yourself. All you need is knowledge of the Java programming language and
  a few tools.
 
-* Prerequisites
+Prerequisites
 
    * {{{http://git-scm.com/}Git}} distributed version control system.
    
@@ -16,7 +16,7 @@
    
    * Using an IDE is recommended. I use {{{http://eclipse.org/}Eclipse}}, but {{{http://netbeans.org}Netbeans}} and {{{http://www.jetbrains.com/idea/}IntelliJ IDEA}} should also work.
 
-* Basic workflow
+Basic workflow
 
    * Get the sources by cloning the {{{./source-repository.html}JGloss repository}}:
      <<<git clone git://git.code.sf.net/p/jgloss/code jgloss-code>>>
@@ -34,7 +34,7 @@
 
    * Send a patch or pull request to tensberg@gmx.net if you want to contribute your code.
 
-* Export templates
+Export templates
 
    JGloss uses XSLT style sheets to convert the JGloss document to the various export formats.
    Currently, the only way to add new export formats is to modify the source code and building
