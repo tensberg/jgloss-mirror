@@ -84,9 +84,10 @@ body {
 
 			<p>
 				<a href="webstart/jnlp/jgloss.jnlp" class="btn btn-primary">Launch
-					JGloss &raquo;</a> 
-					<a href="details.html" class="btn">Read more &raquo;</a>
-            <a href="http://www.java.com/download/" class="pull-right">Requires Java 7</a>
+					JGloss &raquo;</a>
+		        <a href="download.html" class="btn">Download &raquo;</a>
+		        <a href="details.html" class="btn">Read more &raquo;</a>
+                <a href="http://www.java.com/download/" class="pull-right">Requires Java 7</a>
 			</p>
 		</div>
 
