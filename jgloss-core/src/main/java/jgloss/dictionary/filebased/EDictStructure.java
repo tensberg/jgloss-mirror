@@ -1,5 +1,9 @@
 package jgloss.dictionary.filebased;
 
+import static jgloss.dictionary.DictionaryEntryField.READING;
+import static jgloss.dictionary.DictionaryEntryField.TRANSLATION;
+import static jgloss.dictionary.DictionaryEntryField.WORD;
+
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
@@ -11,13 +15,14 @@ class EDictStructure extends FileBasedDictionaryStructure {
 	public boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
             byte b = entry.get( --location);
-            if (field==DictionaryEntryField.READING && b=='['
-                || field==DictionaryEntryField.TRANSLATION && b=='/'
-                || b==10 || b==13) {
+            if (field == WORD && b == ';'
+                            || field == READING && (b == '[' || b == ';')
+                            || field == TRANSLATION && b == '/'
+                            || b == '\r' || b == '\n') {
 	            return true;
             }
 
-            if (field == DictionaryEntryField.TRANSLATION) {
+            if (field == TRANSLATION) {
                 // EDICT translation fields support multiple senses, which are marked
                 // as (1),(2)... , and also POS markers in the form (pos), which are all
                 // at the start of the translation field
@@ -47,10 +52,10 @@ class EDictStructure extends FileBasedDictionaryStructure {
     public boolean isFieldEnd( ByteBuffer entry, int location, DictionaryEntryField field) {
         try {
             byte b = entry.get( location);
-            return (field==DictionaryEntryField.WORD && b==' ' ||
-                field==DictionaryEntryField.READING && b==']' ||
-                field==DictionaryEntryField.TRANSLATION && b=='/'
-                || b==10 || b==13);
+            return field == WORD && (b == ' ' || b == ';' || b == '(')
+                            || field == READING && (b == ']' || b == ';')
+                            || field == TRANSLATION && b == '/'
+                            || b == '\r' || b == '\n';
         } catch (IndexOutOfBoundsException ex) {
             return true; // end of entry buffer
         }
@@ -61,21 +66,31 @@ class EDictStructure extends FileBasedDictionaryStructure {
                                                     DictionaryEntryField field) {
         if (field == null) {
             // first call to moveToNextField
-            return DictionaryEntryField.WORD;
+            return WORD;
         }
 
-        if (field==DictionaryEntryField.WORD && character==' ') {
+        if (field == WORD && character == ' ') {
             byte b = buf.get();
             if (b == '[') {
-	            field = DictionaryEntryField.READING;
+                field = READING;
             } else {
-	            field = DictionaryEntryField.TRANSLATION;
+                field = TRANSLATION;
             }
-        } else if (field==DictionaryEntryField.READING && character==']') {
+        } else if (field == READING && character == ']') {
             buf.get(); // skip the ' '
-            field = DictionaryEntryField.TRANSLATION;
-        } else if (character==10 || character==13) {
-            field = DictionaryEntryField.WORD;
+            buf.get(); // skip the '/'
+            field = TRANSLATION;
+        } else if (field == TRANSLATION && character == '/') {
+            byte nextChar = buf.get();
+            if (nextChar == '\r' || nextChar == '\n') {
+                field = WORD;
+            } else {
+                // unread the last character which is part of the next
+                // translation
+                buf.position(buf.position() - 1);
+            }
+        } else if (character == '\r' || character == '\n') {
+            field = WORD;
         }
 
         return field;
@@ -89,23 +104,30 @@ class EDictStructure extends FileBasedDictionaryStructure {
         try {
             do {
                 b = buf.get();
-            } while (b!=' ' && b!='/' && b!=']');
+            } while (b != ' ' && b != '/' && b != ']' && b != '\r' && b != '\n');
+
             if (b == '/') {
-	            return DictionaryEntryField.TRANSLATION;
+                return TRANSLATION;
             } else if (b == ']') {
-	            return DictionaryEntryField.READING;
+                return READING;
             } else {
                 // word or translation
                 b = buf.get();
-                if (b=='/' || b=='[') {
-	                return DictionaryEntryField.WORD;
+                if (b == '[') {
+                    return WORD;
+                } else if (b == '/') {
+                    if (buf.get(buf.position() - 3) == ']') {
+                        return READING;
+                    } else {
+                        return WORD;
+                    }
                 } else {
-	                return DictionaryEntryField.TRANSLATION;
+                    return TRANSLATION;
                 }
             }
         } catch (BufferUnderflowException ex) {
             // reached end of entry, must be translation
-            return DictionaryEntryField.TRANSLATION;
+            return TRANSLATION;
         }
     }
 

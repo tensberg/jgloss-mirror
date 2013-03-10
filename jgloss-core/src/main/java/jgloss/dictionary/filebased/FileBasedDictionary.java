@@ -201,7 +201,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         binarySearchIndex = new BinarySearchIndex( BinarySearchIndex.TYPE);
 
         entryParser.setDictionary(this);
-        
+
         initSearchModes();
         initSupportedAttributes();
     }
@@ -303,7 +303,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
             indexContainer = new FileIndexContainer( indexFile, true);
 
             indexContainer.deleteIndex(binarySearchIndex.getType()); // rebuild if exists
-            
+
             new FileBasedDictionaryIndexer(this, structure, dictionary, characterHandler).buildIndex(indexContainer, binarySearchIndex);
 
             // put creation of additional index types here
@@ -716,8 +716,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
         } catch (BufferUnderflowException ex) {
             if (buf1.hasRemaining()) {
 	            return 1;
-            } else if (buf2.hasRemaining())
-			 {
+            } else if (buf2.hasRemaining()) {
 	            return -1;
             // else equality
             }
@@ -779,8 +778,7 @@ public abstract class FileBasedDictionary implements IndexedDictionary, Indexabl
                 DictionaryEntry current = nextEntry;
                 generateNextEntry(); // changes nextEntry
                 return current;
-            }
-            else {
+            } else {
                 SearchException out = new SearchException( deferredException);
                 deferredException = null;
 
