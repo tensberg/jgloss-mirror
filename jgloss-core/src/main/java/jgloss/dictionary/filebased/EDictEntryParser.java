@@ -32,8 +32,31 @@ import jgloss.dictionary.attribute.SearchReference;
 
 class EDictEntryParser implements EntryParser {
 
+    /**
+     * Holder class for a word and its attributes.
+     */
+    private static class WordAndAttributes {
+        private final String word;
+
+        private final DefaultAttributeSet attributes;
+
+        public WordAndAttributes(String word, DefaultAttributeSet attributes) {
+            super();
+            this.word = word;
+            this.attributes = attributes;
+        }
+
+        public String getWord() {
+            return word;
+        }
+
+        public DefaultAttributeSet getAttributes() {
+            return attributes;
+        }
+    }
+
 	private static final Logger LOGGER = Logger.getLogger(EDictEntryParser.class.getPackage().getName());
-	
+
     /**
      * Match an EDICT entry. Group 1 is the word(s), group 2 the (optional) reading(s) and group 3
      * the translations. The optional last group is a reference to the corresponding JMDict entry.
@@ -46,7 +69,13 @@ class EDictEntryParser implements EntryParser {
      * Match a string in brackets at the beginning of a string. Group 1 matches all numbers, which is the ROM marker.
      * Group 2 matches a reference to another entry. Group 3 matches an arbitrary string in brackets.
      */
-    private static final Pattern BRACKET_PATTERN = Pattern.compile( "\\G(?:\\((\\d+)\\)|\\([Ss]ee (.+?)\\)|\\((.+?)\\))\\s");
+    private static final Pattern TRANSLATION_BRACKET_PATTERN = Pattern.compile( "\\G(?:\\((\\d+)\\)|\\([Ss]ee (.+?)\\)|\\((.+?)\\))\\s");
+
+    /**
+     * Match the markers at the end of words. Markers are text in brackets.
+     * Group 1 captures the marker text including brackets.
+     */
+    private static final Pattern WORD_MARKER_PATTERN = Pattern.compile("(\\(.*?\\))$");
 
     private static final String PRIORITY_MARKER = "(P)";
 
@@ -82,7 +111,7 @@ class EDictEntryParser implements EntryParser {
     		return null;
     	}
     }
-        
+
     private Dictionary edict;
 
 	EDictEntryParser() {
@@ -94,7 +123,7 @@ class EDictEntryParser implements EntryParser {
 		this.edict = edict;
 	}
 
-	
+
     /**
      * Parses an EDICT formatted entry. The format is
      * <CODE>word [reading] /translation 1/translation 2/...</CODE> with the reading
@@ -104,32 +133,60 @@ class EDictEntryParser implements EntryParser {
     public DictionaryEntry parseEntry( String entry, int startOffset) throws SearchException {
         Matcher entryMatcher = matchEntry(entry);
 
-        String[] words = parseWords(entryMatcher);
-        String[] readings = parseReadings(entryMatcher, words);
+        String[] wordsWithMarkers = parseWords(entryMatcher);
+        String[] readings = parseReadings(entryMatcher, wordsWithMarkers);
 
         List<List<String>> rom = new ArrayList<List<String>>( 10);
         List<String> crm = new ArrayList<String>( 10);
         rom.add( crm);
 
         DefaultAttributeSet generalA = new DefaultAttributeSet();
-        DefaultAttributeSet wordA = new DefaultAttributeSet( generalA);
+        DefaultAttributeSet baseWordA = new DefaultAttributeSet( generalA);
         DefaultAttributeSet translationA = new DefaultAttributeSet( generalA);
         List<AttributeSet> roma = new ArrayList<AttributeSet>( 10);
         DefaultAttributeSet translationromA = new DefaultAttributeSet( translationA);
         roma.add( translationromA);
 
-        parseTranslations(entryMatcher.group( 3), rom, crm, generalA, wordA, translationA, roma, translationromA);
+        parseTranslations(entryMatcher.group( 3), rom, crm, generalA, baseWordA, translationA, roma, translationromA);
 
         DictionaryEntry dictionaryEntry;
-        if (words.length == 1 && readings.length == 1) {
-        	dictionaryEntry = new SingleWordEntry(startOffset, words[0], readings[0], rom,
-        					generalA, wordA, translationA, roma, edict);
+        if (wordsWithMarkers.length == 1 && readings.length == 1) {
+            WordAndAttributes wordAndAttributes = parseWordMarkers(wordsWithMarkers[0], baseWordA);
+            dictionaryEntry = new SingleWordEntry(startOffset, wordAndAttributes.getWord(), readings[0], rom, generalA,
+                            wordAndAttributes.getAttributes(), translationA, roma, edict);
         } else {
-        	dictionaryEntry = new MultiWordEntry(startOffset, words, readings,
-        					rom, generalA, wordA, null, translationA, roma, edict);
+            String[] words = new String[wordsWithMarkers.length];
+            DefaultAttributeSet[] wordA = new DefaultAttributeSet[wordsWithMarkers.length];
+            for (int i = 0; i < wordsWithMarkers.length; i++) {
+                WordAndAttributes wordAndAttributes = parseWordMarkers(wordsWithMarkers[i], baseWordA);
+                words[i] = wordAndAttributes.getWord();
+                wordA[i] = wordAndAttributes.getAttributes();
+            }
+
+            dictionaryEntry = new MultiWordEntry(startOffset, words, readings, rom, generalA, baseWordA,
+                            wordA, translationA, roma, edict);
         }
         return dictionaryEntry;
     }
+
+    private WordAndAttributes parseWordMarkers(String wordWithMarkers, DefaultAttributeSet baseWordAttributes) {
+        DefaultAttributeSet wordAttributes = baseWordAttributes;
+
+	    Matcher matcher = WORD_MARKER_PATTERN.matcher(wordWithMarkers);
+	    while (matcher.find()) {
+            String marker = matcher.group(1);
+            if (PRIORITY_MARKER.equals(marker)) {
+                wordAttributes = new DefaultAttributeSet(baseWordAttributes);
+                wordAttributes.addAttribute(Attributes.PRIORITY, PRIORITY_VALUE);
+            } else {
+                LOGGER.log(Level.FINE, "ignoring unsupported word marker {0}", marker);
+            }
+            wordWithMarkers = wordWithMarkers.substring(0, matcher.start());
+            matcher.reset(wordWithMarkers);
+	    }
+
+        return new WordAndAttributes(wordWithMarkers, wordAttributes);
+	}
 
 	private void parseTranslations(String translations, List<List<String>> rom, List<String> crm, DefaultAttributeSet generalA, DefaultAttributeSet wordA,
                     DefaultAttributeSet translationA, List<AttributeSet> roma, DefaultAttributeSet translationromA) {
@@ -137,12 +194,12 @@ class EDictEntryParser implements EntryParser {
         // Attributes which are placed in the first translation before the first ROM marker apply
         // to the whole entry, the other attributes only apply to the ROM.
         boolean seenROM = false;
-        
+
         for (String translation : tokenize(translations, "/")) {
             if (translation.equals( PRIORITY_MARKER)) {
                 generalA.addAttribute( Attributes.PRIORITY, PRIORITY_VALUE);
             } else {
-                Matcher bracketMatcher = BRACKET_PATTERN.matcher(translation);
+                Matcher bracketMatcher = TRANSLATION_BRACKET_PATTERN.matcher(translation);
                 int matchend = 0;
 
                 while (bracketMatcher.find()) {
@@ -191,8 +248,8 @@ class EDictEntryParser implements EntryParser {
 	    } else {
 	    	refText = ref.substring(0, dot);
 	    }
-	    
-	    generalA.addAttribute(Attributes.REFERENCE, 
+
+	    generalA.addAttribute(Attributes.REFERENCE,
 	    				new SearchReference(ref, edict, ExpressionSearchModes.EXACT,
 	    								refText, MATCH_WORD_FIELD));
     }
