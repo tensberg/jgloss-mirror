@@ -15,7 +15,6 @@
     <offline-allowed />
     <association mime-type="application/x-jgloss" extensions="jgloss" />
     <shortcut online="false">
-      <desktop/>
       <menu submenu="JGloss"/>
     </shortcut>
   </information>
