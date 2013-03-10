@@ -4,6 +4,15 @@
 
 Download
 
+* Launch JGloss with Java Web Start
+
+  {{{./webstart/jnlp/jgloss.jnlp}Launch JGloss}}
+
+  You can launch the latest version of JGloss directly from the web site using Java Web Start. 
+  When the Java runtime is correctly installed, you can open the above link with the javaws application.
+  It will automatically download the required librariess and launch JGloss. This works even if
+  you have disabled the Java Plugin in your browser.
+
 * Development release: JGloss ${project.version}
 
   JGloss ${project.version}, last updated on ${date.short_date}, is a snapshot of the development currently
@@ -29,7 +38,6 @@ Download
 * Other downloads
 
   The archive of previous releases is {{{http://sourceforge.net/project/showfiles.php?group_id=29259}here}}.
-
 
 Dictionaries
 
