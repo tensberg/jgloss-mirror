@@ -22,10 +22,16 @@
 
 package jgloss.dictionary.filebased;
 
+import static jgloss.dictionary.CharacterClass.HIRAGANA;
+import static jgloss.dictionary.CharacterClass.KANJI;
+import static jgloss.dictionary.CharacterClass.KATAKANA;
+import static jgloss.dictionary.CharacterClass.ROMAN_WORD;
+
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
-import java.nio.MappedByteBuffer;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import jgloss.dictionary.BinarySearchIndexBuilder;
@@ -39,26 +45,30 @@ import jgloss.dictionary.IndexException;
 import jgloss.dictionary.Indexable;
 
 class FileBasedDictionaryIndexer {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(FileBasedDictionaryIndexer.class.getPackage().getName());
 
 	private final Indexable indexable;
-	
+
 	private final FileBasedDictionaryStructure structure;
-	
-	private final MappedByteBuffer dictionary;
+
+    private final ByteBuffer dictionary;
 
 	private final EncodedCharacterHandler characterHandler;
-	
-	FileBasedDictionaryIndexer(Indexable indexable, FileBasedDictionaryStructure structure, MappedByteBuffer dictionary, EncodedCharacterHandler characterHandler) {
+
+    FileBasedDictionaryIndexer(Indexable indexable, FileBasedDictionaryStructure structure, ByteBuffer dictionary,
+                    EncodedCharacterHandler characterHandler) {
 		this.indexable = indexable;
 		this.structure = structure;
 		this.dictionary = dictionary;
 		this.characterHandler = characterHandler;
 	}
-	
-	void buildIndex(IndexContainer indexContainer, Index index) {
-        IndexBuilder builder = new BinarySearchIndexBuilder(index.getType());
+
+    void buildIndex(IndexContainer indexContainer, Index index) {
+        buildIndex(indexContainer, new BinarySearchIndexBuilder(index.getType()));
+    }
+
+    void buildIndex(IndexContainer indexContainer, IndexBuilder builder) {
         builder.startBuildIndex(indexContainer, indexable);
         boolean commit = false;
         try {
@@ -71,23 +81,23 @@ class FileBasedDictionaryIndexer {
         }
 
 	}
-	
+
     /**
-     * Adds all indexable terms in the dictionary to the index builder.
-     * Indexes all terms in word, reading and translation fields.
-     * Index term boundaries are determined using characterHandler.getCharacterClass():
-     * if the character classes of two adjacent characters differ they are assumed to
-     * belong to two different terms.
-     * For kanji characters, each kanji in a term is indexed.
-     * For kana characters, whole terms are indexed.
-     * For romaji, terms of length >= 3 are indexed.
-     *
+     * Adds all indexable terms in the dictionary to the index builder. Indexes
+     * all terms in word, reading and translation fields. Index term boundaries
+     * are determined using characterHandler.getCharacterClass(): if the
+     * character classes of two adjacent characters differ they are assumed to
+     * belong to two different terms, unless it is a kanji character followed by
+     * hiragana. For kanji characters, each kanji in a term is indexed. For kana
+     * characters, whole terms are indexed. For romaji, terms of length >= 3 are
+     * indexed.
+     * 
      * @return The number of index entries created.
      */
-    private int addIndexTerms( IndexBuilder builder, MappedByteBuffer dictionary) throws IOException, IndexException {
+    private int addIndexTerms(IndexBuilder builder, ByteBuffer dictionary) throws IOException, IndexException {
         int indexsize = 0;
         dictionary.position( 0);
-        ArrayList<Integer> termStarts = new ArrayList<Integer>( 25);
+        List<Integer> termStarts = new ArrayList<Integer>(25);
 
         int previousTerm = -1;
 
@@ -109,7 +119,7 @@ class FileBasedDictionaryIndexer {
         		if (dictionary.remaining() == 0) {
         			break;
         		}
-        		
+
         		termStarts.clear();
         		termStarts.add( Integer.valueOf( termStart));
         		termField = field;
@@ -128,16 +138,15 @@ class FileBasedDictionaryIndexer {
         			clazz2 = characterHandler.getCharacterClass( c, inWord);
 
         			// for kanji terms, each kanji in the term is indexed
-        			if (clazz == CharacterClass.KANJI && clazz2==clazz) { // NOPMD: enum comparison
+                    // for kanji/hiragana boundaries, the kana part is also
+                    // indexed
+                    if (clazz == KANJI && (clazz2 == clazz || clazz2 == HIRAGANA)) { // NOPMD
 	                    termStarts.add( Integer.valueOf( termEnd));
                     }
-        		} while (clazz2 == clazz); // NOPMD: enum comparison
+                } while (clazz2 == clazz || clazz == KANJI && clazz2 == HIRAGANA); // NOPMD
 
         		// add the term to the index
-        		if (clazz==CharacterClass.KANJI ||
-        						clazz==CharacterClass.HIRAGANA ||
-        						clazz==CharacterClass.KATAKANA ||
-        						clazz==CharacterClass.ROMAN_WORD && termLength >= 3) {
+                if (clazz == KANJI || clazz == HIRAGANA || clazz == KATAKANA || clazz == ROMAN_WORD && termLength >= 3) {
         			for ( int i=0; i<termStarts.size(); i++) {
         				termStart = termStarts.get( i).intValue();
 
