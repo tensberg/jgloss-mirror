@@ -137,10 +137,6 @@ public class AnnotationList extends JList<Annotation> implements MouseListener, 
      */
     private final Action addToExclusionsAction;
     /**
-     * Action which adds the selected annotation to the user dictionary.
-     */
-    private final Action addToDictionaryAction;
-    /**
      * Action which will set the current reading/translation text to the empty string.
      */
     private final Action clearTranslationAction;
@@ -171,17 +167,6 @@ public class AnnotationList extends JList<Annotation> implements MouseListener, 
             };
         UIUtilities.initAction( addToExclusionsAction, "annotationeditor.menu.addtoexclusions");
         addToExclusionsAction.setEnabled( false);
-        // add the selected annotation to the user dictionary
-        addToDictionaryAction = new AbstractAction() {
-                private static final long serialVersionUID = 1L;
-
-				@Override
-				public void actionPerformed( ActionEvent e) {
-                    addSelectionToDictionary();
-                }
-            };
-        UIUtilities.initAction( addToDictionaryAction, "annotationeditor.menu.addtodictionary");
-        addToDictionaryAction.setEnabled( false);
 
         menu = new JMenu( JGloss.MESSAGES.getString( "annotationeditor.menu.title"));
         pmenu = new JPopupMenu();
@@ -189,8 +174,6 @@ public class AnnotationList extends JList<Annotation> implements MouseListener, 
         pmenu.add( removeAction);
         menu.add( UIUtilities.createMenuItem( addToExclusionsAction));
         pmenu.add( addToExclusionsAction);
-        menu.add( UIUtilities.createMenuItem( addToDictionaryAction));
-        pmenu.add( addToDictionaryAction);
 
         addMouseListener( this);
 
@@ -262,10 +245,6 @@ public class AnnotationList extends JList<Annotation> implements MouseListener, 
                                         ( "annotationeditor.action.addtoexclusions.ak")),
                 addToExclusionsAction.getValue( Action.NAME));
         am.put( addToExclusionsAction.getValue( Action.NAME), addToExclusionsAction);
-        im.put( KeyStroke.getKeyStroke( JGloss.MESSAGES.getString
-                                        ( "annotationeditor.action.addtodictionary.ak")),
-                addToDictionaryAction.getValue( Action.NAME));
-        am.put( addToDictionaryAction.getValue( Action.NAME), addToDictionaryAction);
 
         addListSelectionListener(this);
     }
@@ -407,7 +386,6 @@ public class AnnotationList extends JList<Annotation> implements MouseListener, 
         boolean annoSelected = (getSelectedIndex() != -1); // HERE
         removeAction.setEnabled(annoSelected);
         addToExclusionsAction.setEnabled(annoSelected);
-        addToDictionaryAction.setEnabled(annoSelected);
         clearTranslationAction.setEnabled(annoSelected);
     }
 
@@ -471,28 +449,4 @@ public class AnnotationList extends JList<Annotation> implements MouseListener, 
         }
     }
 
-    /**
-     * Adds the currently selected annotation to the user dictionary.
-     */
-    private void addSelectionToDictionary() {
-        Annotation selection = getSelectedValue();
-        if (selection == null) {
-	        return;
-        }
-        String translation = selection.getTranslation();
-        if (translation==null || translation.length()==0) {
-	        return;
-        }
-        String word = selection.getDictionaryForm();
-        if (word==null || word.length()==0) {
-	        return;
-        }
-        String reading = selection.getDictionaryFormReading();
-        if (reading!=null && (reading.length()==0 || reading.equals( word))) {
-	        reading = null;
-        /*try {
-          Dictionaries.getUserDictionary().addEntry( word, reading, translation);
-          } catch (NullPointerException ex) {}*/
-        }
-    }
 } // class AnnotationList
