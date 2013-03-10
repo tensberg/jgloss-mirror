@@ -57,6 +57,9 @@ class ImportPage extends WizardPage {
         setLayout(new BorderLayout());
         add(new DescriptionLabel(MESSAGES.getString("welcome.import.description")), BorderLayout.NORTH);
         add(new JScrollPane(importText), BorderLayout.CENTER);
+
+        importText.setLineWrap(true);
+        importText.setWrapStyleWord(false);
         importText.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
