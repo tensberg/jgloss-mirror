@@ -24,7 +24,7 @@ public class MultiWordEntryTest {
 		MultiWordEntry entry = new MultiWordEntry(TEST_ENTRY_MARKER, new String[] { "word" }, new String[] { "reading" },
 						Collections.singletonList(Collections.singletonList("translation")), 
 						new DefaultAttributeSet(), new DefaultAttributeSet(),
-						null, 
+						null, new DefaultAttributeSet(), null,
 						new DefaultAttributeSet(), Collections.<AttributeSet> emptyList(), dictionary);
 		assertThat(entry.getGeneralAttributes()).isNotNull();
 		assertThat(entry.getWordAlternativeCount()).isEqualTo(1);

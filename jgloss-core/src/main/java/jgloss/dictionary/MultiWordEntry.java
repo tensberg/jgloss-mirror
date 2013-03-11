@@ -28,21 +28,23 @@ import jgloss.dictionary.attribute.AttributeSet;
 
 public class MultiWordEntry extends BaseEntry {
 	private static final AttributeSet[] EMPTY_ATTRIBUTE_SET_ARRAY = new AttributeSet[0];
-	
+
     private final String[] words;
     private final AttributeSet[] wordsA;
     private final String[] readings;
+    private final AttributeSet[] readingsA;
 
     public MultiWordEntry( int _entryMarker, String[] _words, String[] _readings, List<List<String>> _translations,
                            AttributeSet _generalA, AttributeSet _wordA, AttributeSet[] _wordsA,
-                           AttributeSet _translationA,
+                           AttributeSet _readingA, AttributeSet[] _readingsA, AttributeSet _translationA,
                            List<AttributeSet> _translationRomA, Dictionary _dictionary) {
         super( _entryMarker, _translations,
-               _generalA, _wordA,
+               _generalA, _wordA, _readingA,
                _translationA, _translationRomA, _dictionary);
 		this.words = _words;
-		this.wordsA = _wordsA == null ? EMPTY_ATTRIBUTE_SET_ARRAY : _wordsA;
+        this.wordsA = _wordsA == null ? EMPTY_ATTRIBUTE_SET_ARRAY : _wordsA;
 		this.readings = _readings;
+        this.readingsA = _readingsA == null ? EMPTY_ATTRIBUTE_SET_ARRAY : _readingsA;
     }
 
     @Override
@@ -59,17 +61,9 @@ public class MultiWordEntry extends BaseEntry {
 
     @Override
 	public AttributeSet getWordAttributes( int alternative) {
-        try {
-            if (alternative >= wordsA.length || wordsA[alternative] == null) {
-	            return emptySet.setParent( wordA);
-            } else {
-	            return wordsA[alternative];
-            }
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        return getAttributes(alternative, wordsA, wordA);
     }
-    
+
     @Override
     public int getReadingAlternativeCount() {
     	return readings.length;
@@ -82,6 +76,23 @@ public class MultiWordEntry extends BaseEntry {
 		} catch (ArrayIndexOutOfBoundsException ex) {
 			throw new IllegalArgumentException(ex);
 		}
+    }
+
+    @Override
+    public AttributeSet getReadingAttributes(int alternative) {
+        return getAttributes(alternative, readingsA, readingA);
+    }
+
+    private AttributeSet getAttributes(int alternative, AttributeSet[] attributeSets, AttributeSet baseA) {
+        try {
+            if (alternative >= attributeSets.length || attributeSets[alternative] == null) {
+                return emptySet.setParent(baseA);
+            } else {
+                return attributeSets[alternative];
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
     @Override
@@ -127,7 +138,7 @@ public class MultiWordEntry extends BaseEntry {
                 out.append( translations[i][j]);
             }
         }
-        
+
         return out.toString();
     }
 } // class MultiWordEntry

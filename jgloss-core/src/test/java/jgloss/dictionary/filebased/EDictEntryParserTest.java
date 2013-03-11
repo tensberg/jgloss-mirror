@@ -134,6 +134,30 @@ public class EDictEntryParserTest {
         assertThat(priorities).isNull();
     }
 
+    @Test
+    public void testParseTwoReadingsPriorityEntry() {
+        DictionaryEntry entry = parser.parseEntry("KANJI [KANA(P);KANA-2] /gloss/", TEST_OFFSET);
+        assertThat(entry).isNotNull();
+        assertThat(entry.getDictionary()).isEqualTo(dictionary);
+        assertThat(entry.getWordAlternativeCount()).isEqualTo(1);
+        assertThat(entry.getWord(0)).isEqualTo(KANJI);
+        assertThat(entry.getReadingAlternativeCount()).isEqualTo(2);
+        assertThat(entry.getReading(0)).isEqualTo(KANA);
+        assertThat(entry.getReading(1)).isEqualTo("KANA-2");
+        assertThat(entry.getTranslationRomCount()).isEqualTo(1);
+        assertThat(entry.getTranslationCrmCount(0)).isEqualTo(1);
+        assertThat(entry.getTranslationSynonymCount(0, 0)).isEqualTo(1);
+        assertThat(entry.getTranslation(0, 0, 0)).isEqualTo(GLOSS);
+        List<Priority> priorities = entry.getReadingAttributes(0).getAttribute(Attributes.PRIORITY, false);
+        assertThat(priorities).isNotNull();
+        assertThat(priorities).hasSize(1);
+        Priority priority = priorities.get(0);
+        assertThat(priority).isNotNull();
+
+        priorities = entry.getReadingAttributes(1).getAttribute(Attributes.PRIORITY, false);
+        assertThat(priorities).isNull();
+    }
+
 	@Test
 	public void testParseSimpleEntryWithRangeOfMeaning() {
 		DictionaryEntry entry = parser.parseEntry("KANJI [KANA] /(general information) (1) gloss/(2) (rom-specific) gloss2/.../" , TEST_OFFSET);

@@ -35,18 +35,18 @@ class EDictEntryParser implements EntryParser {
     /**
      * Holder class for a word and its attributes.
      */
-    private static class WordAndAttributes {
+    private static class FieldAndAttributes {
         private final String word;
 
         private final DefaultAttributeSet attributes;
 
-        public WordAndAttributes(String word, DefaultAttributeSet attributes) {
+        public FieldAndAttributes(String word, DefaultAttributeSet attributes) {
             super();
             this.word = word;
             this.attributes = attributes;
         }
 
-        public String getWord() {
+        public String getField() {
             return word;
         }
 
@@ -134,7 +134,7 @@ class EDictEntryParser implements EntryParser {
         Matcher entryMatcher = matchEntry(entry);
 
         String[] wordsWithMarkers = parseWords(entryMatcher);
-        String[] readings = parseReadings(entryMatcher, wordsWithMarkers);
+        String[] readingsWithMarkers = parseReadings(entryMatcher, wordsWithMarkers);
 
         List<List<String>> rom = new ArrayList<List<String>>( 10);
         List<String> crm = new ArrayList<String>( 10);
@@ -142,6 +142,7 @@ class EDictEntryParser implements EntryParser {
 
         DefaultAttributeSet generalA = new DefaultAttributeSet();
         DefaultAttributeSet baseWordA = new DefaultAttributeSet( generalA);
+        DefaultAttributeSet baseReadingA = new DefaultAttributeSet(generalA);
         DefaultAttributeSet translationA = new DefaultAttributeSet( generalA);
         List<AttributeSet> roma = new ArrayList<AttributeSet>( 10);
         DefaultAttributeSet translationromA = new DefaultAttributeSet( translationA);
@@ -150,26 +151,37 @@ class EDictEntryParser implements EntryParser {
         parseTranslations(entryMatcher.group( 3), rom, crm, generalA, baseWordA, translationA, roma, translationromA);
 
         DictionaryEntry dictionaryEntry;
-        if (wordsWithMarkers.length == 1 && readings.length == 1) {
-            WordAndAttributes wordAndAttributes = parseWordMarkers(wordsWithMarkers[0], baseWordA);
-            dictionaryEntry = new SingleWordEntry(startOffset, wordAndAttributes.getWord(), readings[0], rom, generalA,
-                            wordAndAttributes.getAttributes(), translationA, roma, edict);
+        if (wordsWithMarkers.length == 1 && readingsWithMarkers.length == 1) {
+            FieldAndAttributes wordAndAttributes = parseFieldMarkers(wordsWithMarkers[0], baseWordA);
+            FieldAndAttributes readingAndAttributes = parseFieldMarkers(readingsWithMarkers[0], baseReadingA);
+            dictionaryEntry = new SingleWordEntry(startOffset, wordAndAttributes.getField(),
+                            readingAndAttributes.getField(), rom, generalA, wordAndAttributes.getAttributes(),
+                            readingAndAttributes.getAttributes(), translationA, roma, edict);
         } else {
             String[] words = new String[wordsWithMarkers.length];
             DefaultAttributeSet[] wordA = new DefaultAttributeSet[wordsWithMarkers.length];
-            for (int i = 0; i < wordsWithMarkers.length; i++) {
-                WordAndAttributes wordAndAttributes = parseWordMarkers(wordsWithMarkers[i], baseWordA);
-                words[i] = wordAndAttributes.getWord();
-                wordA[i] = wordAndAttributes.getAttributes();
-            }
+            parseFieldMarkers(wordsWithMarkers, baseWordA, words, wordA);
+
+            String[] readings = new String[readingsWithMarkers.length];
+            DefaultAttributeSet[] readingA = new DefaultAttributeSet[readingsWithMarkers.length];
+            parseFieldMarkers(readingsWithMarkers, baseReadingA, readings, readingA);
 
             dictionaryEntry = new MultiWordEntry(startOffset, words, readings, rom, generalA, baseWordA,
-                            wordA, translationA, roma, edict);
+                            wordA, baseReadingA, readingA, translationA, roma, edict);
         }
         return dictionaryEntry;
     }
 
-    private WordAndAttributes parseWordMarkers(String wordWithMarkers, DefaultAttributeSet baseWordAttributes) {
+    private void parseFieldMarkers(String[] fieldsWithMarkers, DefaultAttributeSet baseFieldA, String[] fields,
+                    DefaultAttributeSet[] fieldA) {
+        for (int i = 0; i < fieldsWithMarkers.length; i++) {
+            FieldAndAttributes wordAndAttributes = parseFieldMarkers(fieldsWithMarkers[i], baseFieldA);
+            fields[i] = wordAndAttributes.getField();
+            fieldA[i] = wordAndAttributes.getAttributes();
+        }
+    }
+
+    private FieldAndAttributes parseFieldMarkers(String wordWithMarkers, DefaultAttributeSet baseWordAttributes) {
         DefaultAttributeSet wordAttributes = baseWordAttributes;
 
 	    Matcher matcher = WORD_MARKER_PATTERN.matcher(wordWithMarkers);
@@ -185,7 +197,7 @@ class EDictEntryParser implements EntryParser {
             matcher.reset(wordWithMarkers);
 	    }
 
-        return new WordAndAttributes(wordWithMarkers, wordAttributes);
+        return new FieldAndAttributes(wordWithMarkers, wordAttributes);
 	}
 
 	private void parseTranslations(String translations, List<List<String>> rom, List<String> crm, DefaultAttributeSet generalA, DefaultAttributeSet wordA,

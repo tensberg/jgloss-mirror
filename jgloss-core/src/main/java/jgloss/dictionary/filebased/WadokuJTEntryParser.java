@@ -466,13 +466,13 @@ class WadokuJTEntryParser implements EntryParser {
             // create entry
             if (wordlist.size() == 1) {
                 out = new SingleWordEntry( startOffset, wordlist.get( 0), reading, rom,
-                                           generalA, wordA, translationA, romA, wadokujt);
+                                           generalA, wordA, null, translationA, romA, wadokujt);
             }
             else {
                 out = new MultiWordEntry( startOffset, wordlist.toArray(new String[wordlist.size()]),
                 					new String[] { reading }, rom, generalA,
                 					wordA, wordsA.toArray(new AttributeSet[wordsA.size()]),
-                					translationA, romA, wadokujt);
+                					null, null, translationA, romA, wadokujt);
             }
 
             return out;

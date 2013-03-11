@@ -32,6 +32,7 @@ public abstract class BaseEntry implements DictionaryEntry {
     protected String[][] translations;
     protected AttributeSet generalA;
     protected AttributeSet wordA;
+    protected AttributeSet readingA;
     protected AttributeSet translationA;
     protected AttributeSet[] translationRomA;
 
@@ -65,7 +66,7 @@ public abstract class BaseEntry implements DictionaryEntry {
     /**
      * Reference to a base dictionary entry. The dictionary entry object which is referenced
      * is stored using a <code>SoftReference</code>. If the object is garbage collected when
-     * {@link #getEntry() getEntry} is called, it will be recreated by calling 
+     * {@link #getEntry() getEntry} is called, it will be recreated by calling
      * {@link BaseEntry.MarkerDictionary#createEntryFromMarker(int) createEntryFromMarker} on the entry's
      * dictionary.
      */
@@ -92,7 +93,8 @@ public abstract class BaseEntry implements DictionaryEntry {
     } // class BaseEntryRef
 
     public BaseEntry( int _entryMarker, List<List<String>> _translations,
-                      AttributeSet _generalA, AttributeSet _wordA,
+ AttributeSet _generalA, AttributeSet _wordA,
+                    AttributeSet _readingA,
                       AttributeSet _translationA,
                       List<AttributeSet> _translationRomA, Dictionary _dictionary) {
         entryMarker = _entryMarker;
@@ -104,6 +106,7 @@ public abstract class BaseEntry implements DictionaryEntry {
 
         generalA = _generalA;
         wordA = _wordA;
+        readingA = _readingA;
         translationA = _translationA;
         translationRomA = _translationRomA.toArray( new AttributeSet[_translationRomA.size()]);
 
@@ -131,7 +134,7 @@ public abstract class BaseEntry implements DictionaryEntry {
 
     @Override
 	public AttributeSet getReadingAttributes() {
-        return emptySet.setParent( generalA);
+        return readingA;
     }
 
     @Override
@@ -220,23 +223,30 @@ public abstract class BaseEntry implements DictionaryEntry {
     @SuppressWarnings("PMD") // generated code
 	@Override
     public boolean equals(Object obj) {
-	    if (this == obj)
-		    return true;
-	    if (obj == null)
-		    return false;
-	    if (getClass() != obj.getClass())
-		    return false;
+	    if (this == obj) {
+            return true;
+        }
+	    if (obj == null) {
+            return false;
+        }
+	    if (getClass() != obj.getClass()) {
+            return false;
+        }
 	    BaseEntry other = (BaseEntry) obj;
 	    if (dictionary == null) {
-		    if (other.dictionary != null)
-			    return false;
-	    } else if (!dictionary.equals(other.dictionary))
-		    return false;
+		    if (other.dictionary != null) {
+                return false;
+            }
+	    } else if (!dictionary.equals(other.dictionary)) {
+            return false;
+        }
 	    if (reference == null) {
-		    if (other.reference != null)
-			    return false;
-	    } else if (!reference.equals(other.reference))
-		    return false;
+		    if (other.reference != null) {
+                return false;
+            }
+	    } else if (!reference.equals(other.reference)) {
+            return false;
+        }
 	    return true;
     }
 

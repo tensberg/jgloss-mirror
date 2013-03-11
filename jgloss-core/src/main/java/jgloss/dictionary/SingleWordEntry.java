@@ -32,10 +32,9 @@ public class SingleWordEntry extends BaseEntry {
     private final String reading;
 
     public SingleWordEntry( int _entryMarker, String _word, String _reading, List<List<String>> _translations,
-                       AttributeSet _generalA, AttributeSet _wordA, AttributeSet _translationA,
+                       AttributeSet _generalA, AttributeSet _wordA, AttributeSet _readingA, AttributeSet _translationA,
                        List<AttributeSet> _translationRomA, Dictionary _dictionary) {
-        super( _entryMarker, _translations,
-               _generalA, _wordA, _translationA,
+        super(_entryMarker, _translations, _generalA, _wordA, _readingA, _translationA,
                _translationRomA, _dictionary);
         this.word = _word;
         this.reading = _reading;
@@ -73,6 +72,15 @@ public class SingleWordEntry extends BaseEntry {
 	public int getReadingAlternativeCount() { return 1; }
 
     @Override
+    public AttributeSet getReadingAttributes(int alternative) {
+        if (alternative != 0) {
+            throw new IllegalArgumentException();
+        }
+
+        return emptySet.setParent(readingA);
+    }
+
+    @Override
 	public String toString() {
         StringBuilder out = new StringBuilder( 30);
         out.append( generalA.toString());
@@ -100,7 +108,7 @@ public class SingleWordEntry extends BaseEntry {
                 out.append( translations[i][j]);
             }
         }
-        
+
         return out.toString();
     }
 } // class SingleWordEntry
