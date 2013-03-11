@@ -18,18 +18,24 @@ public abstract class FileBasedDictionaryStructure {
 	public boolean isEntrySeparator(byte c) {
 		return (c==10 || c==13);
 	}
-	
+
     /**
-     * Skip to the next indexable field. This method is called at index
-     * creation time before any character is read from the dictionary and after each read character.
-     * It can be used to skip entry fields which should not be indexed.
-     *
-     * @param buf Skip entries in this buffer by moving the current position of the buffer.
-     * @param character The last character read from the buffer, or 0 at the first invocation. The
-     *                  character format is dependent on
-     *                  {@link EncodedCharacterHandler#readCharacter(ByteBuffer) readCharacter}
-     *                  and not neccessaryly unicode.
-     * @param field The current field.
+     * Skip to the next indexable field. This method is called at index creation
+     * time before any character is read from the dictionary and after each read
+     * character. It can be used to skip entry fields which should not be
+     * indexed.
+     * 
+     * @param buf
+     *            Skip entries in this buffer by moving the current position of
+     *            the buffer.
+     * @param character
+     *            The last character read from the buffer, or 0 at the first
+     *            invocation. The character format is dependent on
+     *            {@link EncodedCharacterHandler#readCharacter(ByteBuffer)
+     *            readCharacter} and not neccessaryly unicode.
+     * @param field
+     *            The current field. <code>null</code> if the end of the buffer
+     *            is reached while moving to the next field.
      * @return The type of the field the method moved to.
      */
     public abstract DictionaryEntryField moveToNextField( ByteBuffer buf, int character,
@@ -50,7 +56,7 @@ public abstract class FileBasedDictionaryStructure {
      * @param field Field which the location is in.
      */
     public abstract boolean isFieldStart( ByteBuffer entry, int location, DictionaryEntryField field);
-    
+
     /**
      * Test if the character at the given location is the last in an entry field. If the dictionary
      * supports several words, readings or translations in one entry, each counts as its own field.

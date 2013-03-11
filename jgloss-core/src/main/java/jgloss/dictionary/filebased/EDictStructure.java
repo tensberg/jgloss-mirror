@@ -69,28 +69,33 @@ class EDictStructure extends FileBasedDictionaryStructure {
             return WORD;
         }
 
-        if (field == WORD && character == ' ') {
-            byte b = buf.get();
-            if (b == '[') {
-                field = READING;
-            } else {
+        try {
+            if (field == WORD && character == ' ') {
+                byte b = buf.get();
+                if (b == '[') {
+                    field = READING;
+                } else {
+                    field = TRANSLATION;
+                }
+            } else if (field == READING && character == ']') {
+                buf.get(); // skip the ' '
+                buf.get(); // skip the '/'
                 field = TRANSLATION;
-            }
-        } else if (field == READING && character == ']') {
-            buf.get(); // skip the ' '
-            buf.get(); // skip the '/'
-            field = TRANSLATION;
-        } else if (field == TRANSLATION && character == '/') {
-            byte nextChar = buf.get();
-            if (nextChar == '\r' || nextChar == '\n') {
+            } else if (field == TRANSLATION && character == '/') {
+                byte nextChar = buf.get();
+                if (nextChar == '\r' || nextChar == '\n') {
+                    field = WORD;
+                } else {
+                    // unread the last character which is part of the next
+                    // translation
+                    buf.position(buf.position() - 1);
+                }
+            } else if (character == '\r' || character == '\n') {
                 field = WORD;
-            } else {
-                // unread the last character which is part of the next
-                // translation
-                buf.position(buf.position() - 1);
             }
-        } else if (character == '\r' || character == '\n') {
-            field = WORD;
+        } catch (BufferUnderflowException ex) {
+            // end of dictionary
+            field = null;
         }
 
         return field;
