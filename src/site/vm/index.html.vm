@@ -103,7 +103,7 @@ body {
                 </p>
 			</div>
 			<div class="span4">
-				<h2><a href="details.html#Examples">Examples &raquo;</a></h2>
+				<h2><a href="examples.html">Examples &raquo;</a></h2>
 				<p>
                     Have a look a the <a href="screenshots.html">screenshots</a> to see JGloss in action.
                     <a href="karinodouji/kari.pdf">This PDF document</a> is generated from a LaTeX file
