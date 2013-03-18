@@ -1,3 +1,5 @@
+Screenshots
+===========
 
 <ul class="thumbnails">
 <li class="span5">
