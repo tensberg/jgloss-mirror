@@ -526,7 +526,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
                     JGlossApp.getLookupFrame().setVisible(true);
                     String selection = docpane.getSelectedText();
                     if (selection == null || selection.length() == 0) {
-                        Annotation anno = (Annotation) annotationList.getSelectedValue();
+                    Annotation anno = annotationList.getSelectedValue();
                         if (anno != null) {
 	                        selection = anno.getDictionaryForm();
                         }
@@ -807,7 +807,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
             docpaneScroller.setViewportView(docpane);
             docpane.followMouse( showAnnotationItem.isSelected());
             // scroll to selected annotation
-            Annotation current = (Annotation) annotationList.getSelectedValue();
+            Annotation current = annotationList.getSelectedValue();
             if (current != null) {
                 docpane.makeVisible( current.getStartOffset(),
                         current.getEndOffset());
@@ -855,7 +855,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     }
 
     private void handleHyperlink( String protocol, String refKey, Element e) {
-        Annotation anno = (Annotation) annotationList.getSelectedValue();
+        Annotation anno = annotationList.getSelectedValue();
         if (anno == null) {
 	        return;
         }
@@ -884,7 +884,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
     @Override
 	public void valueChanged( ListSelectionEvent e) {
         if (e.getFirstIndex() >= 0) {
-            Annotation anno = (Annotation) annotationList.getSelectedValue(); // HERE
+            Annotation anno = annotationList.getSelectedValue();
             if (anno != null) {
                 annotationEditor.setAnnotation( anno);
                 lookupPanel.search( anno.getDictionaryForm());
@@ -1172,7 +1172,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         // of the first dictionary item displayed in the lookup result list.
         DictionaryEntry entry = firstEntryCache.getEntry();
         if (entry != null) {
-            Annotation anno = (Annotation) annotationList.getSelectedValue();
+            Annotation anno = annotationList.getSelectedValue();
             anno.setReading(entry.getReading(0));
             anno.setTranslation(entry.getTranslation(0, 0, 0));
         }

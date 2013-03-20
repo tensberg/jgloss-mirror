@@ -54,7 +54,7 @@ import jgloss.ui.xml.JGlossDocument;
 import jgloss.util.StringTools;
 
 /**
- * Extends the HTML document class to handle JGloss document annotations. 
+ * Extends the HTML document class to handle JGloss document annotations.
  * Each JGloss html document is linked to a {@link jgloss.ui.xml.JGlossDocument JGloss XML document}.
  * The JGloss HTML document is generated from the JGloss XML document via a XSLT style sheet.
  * If the HTML document is changed, the XML document is marked as invalid and is re-generated
@@ -67,7 +67,7 @@ import jgloss.util.StringTools;
  */
 public class JGlossHTMLDoc extends HTMLDocument {
 	private static final Logger LOGGER = Logger.getLogger(JGlossHTMLDoc.class.getPackage().getName());
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public interface Attributes {
@@ -127,7 +127,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
      * Stores a newline character as a char array. Used by the <CODE>JGlossReader</CODE>.
      */
     private final static char[] NEWLINE = new char[] { '\n' };
-    
+
     /**
      * Extends the <CODE>HTMLDocument.HTMLReader</CODE> to support the JGloss extensions
      * to HTML and the addition of annotations while loading a document.
@@ -141,7 +141,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         private int pos;
 
         private final char[] EMPTY_CHAR_ARRAY = new char[0];
-        
+
         /**
          * Handle Annotation tags in the document. Annotation elements need special
          * treatment because they are "inline blocks", something which is not possible in
@@ -150,7 +150,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
          */
         private class AnnotationAction extends HTMLDocument.HTMLReader.TagAction {
             private final boolean forceParagraph;
-            
+
             public AnnotationAction( boolean forceParagraph) {
                 this.forceParagraph = forceParagraph;
             }
@@ -169,14 +169,14 @@ public class JGlossHTMLDoc extends HTMLDocument {
                     ( a.copyAttributes(), ElementSpec.StartTagType);
                 parseBuffer.addElement( es);
             }
-            
+
             @Override
 			public void end(HTML.Tag t) {
                 ElementSpec es = new ElementSpec( null, ElementSpec.EndTagType);
                 parseBuffer.addElement( es);
             }
         }
-        
+
         public JGlossReader( int pos) {
             super( pos);
             this.pos = pos;
@@ -191,7 +191,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
             this.pos = pos;
             addCustomTags( true);
         }
-        
+
         /**
          * Adds the annotation tags from {@link AnnotationTags AnnotationTags} to the set of tags
          * this <CODE>HTMLReader</CODE> knows how to handle.
@@ -229,7 +229,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         }
 
         /**
-         * Handles a closing tag. 
+         * Handles a closing tag.
          *
          * @param t The tag which is closed.
          * @param pos Position in the document.
@@ -242,7 +242,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 super.addContent( NEWLINE, 0, 1, false);
                 pos++;
             }
-            
+
             super.handleEndTag( t, pos);
         }
 
@@ -319,7 +319,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
      *
      * @param pos Position in the document.
      * @param popDepth The number of ElementSpec.EndTagTypes to generate before inserting
-     * @param pushDepth The number of ElementSpec.StartTagTypes with a direction of 
+     * @param pushDepth The number of ElementSpec.StartTagTypes with a direction of
      *                  ElementSpec.JoinNextDirection that should be generated before
      *                  inserting, but after the end tags have been generated.
      * @param insertTag The first tag to start inserting into document.
@@ -450,7 +450,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
     @Override
 	public Element getParagraphElement(int offset) {
         Element para = getDefaultRootElement();
-        while (!para.isLeaf() && 
+        while (!para.isLeaf() &&
                !para.getAttributes().getAttribute(StyleConstants.NameAttribute)
                .equals(AnnotationTags.ANNOTATION)) {
             para = para.getElement(para.getElementIndex(offset));
@@ -504,7 +504,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
             // So wrap them in position objects, which adapt to changes.
             Position startp = createPosition( start);
             Position endp = createPosition( end);
-            
+
             // remove any annotations in the area
             removeAnnotations(start, end);
 
@@ -523,7 +523,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
                 paragraphSpaceInserted = true;
             }
 
-            // If we insert new text directly after an annotation, the new annotation will 
+            // If we insert new text directly after an annotation, the new annotation will
             // be made a child of the first one, which is not what we want. So insert an
             // additional character if needed.
             Element sae = getAnnotationElement(startp.getOffset()-1);
@@ -605,7 +605,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
             html.append("&nbsp;");
             appendTag(html, AnnotationTags.TRANSLATION, true);
             appendTag(html, AnnotationTags.ANNOTATION, true);
-            
+
             html.append("</p></body></html>");
 
             // The insertion will create a new annotation element and trigger a document changed
@@ -643,8 +643,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
         return StringTools.isKanji( c) ||
             // handle special case with infix katakana 'ke', which is read as 'ka' or 'ga'
             // when used as counter or in place names, as in ikkagetsu or Sakuragaoka
-            (c=='\u30f6' || c=='\u30b1') && 
-            pos>0 && StringTools.isKanji( text.charAt( pos-1)) && 
+            (c=='\u30f6' || c=='\u30b1') &&
+            pos>0 && StringTools.isKanji( text.charAt( pos-1)) &&
             pos+1<text.length() && StringTools.isKanji( text.charAt( pos+1));
     }
 
@@ -706,7 +706,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         protected Position start;
         protected Position end;
         protected boolean writeLock;
-        
+
         /**
          * Initialize the tree walker.
          *
@@ -811,7 +811,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
 		protected void recurse(Element elem) {
             for ( int i=elem.getElementCount()-1; i>=0; i--) {
 	            walk(elem.getElement( i));
-            }            
+            }
         }
     } // class AnnotationRemover
 
