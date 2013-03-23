@@ -34,7 +34,6 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.Position;
-import javax.swing.text.Segment;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
@@ -197,14 +196,16 @@ public class JGlossHTMLDoc extends HTMLDocument {
         }
 
         /**
-         * Adds the annotation tags from {@link AnnotationTags AnnotationTags} to the set of tags
-         * this <CODE>HTMLReader</CODE> knows how to handle.
+         * Adds the annotation tags from {@link AnnotationTags AnnotationTags}
+         * to the set of tags this <CODE>HTMLReader</CODE> knows how to handle.
          *
-         * @param blockCompatible If this is <CODE>true</CODE>, a BlockAction will be used for
-         *        annotation elements instead of an AnnotationAction. This is needed because
-         *        the canInsertTag, which is needed to correctly handle the case where only a
-         *        fragment of the HTML document should be inserted, is private and thus cannot
-         *        be called from the AnnotationActiendon.
+         * @param blockCompatible
+         *            If this is <CODE>true</CODE>, a BlockAction will be used
+         *            for annotation elements instead of an AnnotationAction.
+         *            This is needed because the canInsertTag, which is needed
+         *            to correctly handle the case where only a fragment of the
+         *            HTML document should be inserted, is private and thus
+         *            cannot be called from the AnnotationAction.
          */
         private void addCustomTags( boolean blockCompatible) {
             if (blockCompatible) {
@@ -272,7 +273,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         }
     }
 
-    public JGlossHTMLDoc( StyleSheet _styles, HTMLEditorKit.Parser _htmlparser) {
+    JGlossHTMLDoc(StyleSheet _styles, HTMLEditorKit.Parser _htmlparser) {
         super(_styles);
         setParser(_htmlparser);
     }
@@ -678,26 +679,13 @@ public class JGlossHTMLDoc extends HTMLDocument {
      * spans with just the unannotated plain text.
      */
     public void removeAnnotationElement(Element annotation) {
-        // get unannotated text
-        Element word = annotation.getElement(0);
-        Segment textSegment = new Segment();
-        StringBuilder unannotatedText = new StringBuilder(word.getEndOffset()-word.getStartOffset());
-        for (int i=0; i<word.getElementCount(); i++) {
-            Element basetext = word.getElement(i);
-            if (basetext.getName().equals(AnnotationTags.READING_BASETEXT.getId())) {
-	            basetext = basetext.getElement(1);
-            }
-            try {
-                getText(basetext.getStartOffset(),
-                        basetext.getEndOffset()-basetext.getStartOffset(),
-                        textSegment);
-            } catch (BadLocationException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
-            unannotatedText.append(textSegment.array, textSegment.offset, textSegment.count);
-        }
+        int startOffset = annotation.getStartOffset();
+        int endOffset = annotation.getEndOffset();
+        String unannotatedText = getUnannotatedText(startOffset, endOffset);
 
         // remove annotation element
         try {
-            setOuterHTML(annotation, unannotatedText.toString());
+            setOuterHTML(annotation, "<span>" + unannotatedText + "</span>");
         } catch (Exception ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
         // remove the newline which the stupid HTMLDocument.insertHTML insists on adding
         try {
