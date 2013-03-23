@@ -30,7 +30,7 @@ public class SelectedAnnotationHighlighter implements ListSelectionListener {
     }
 
     protected void highlightSelection(AnnotationList list) {
-        Annotation anno = (Annotation) list.getSelectedValue();
+        Annotation anno = list.getSelectedValue();
         if (anno != null) {
             editor.highlightText( anno.getStartOffset(),
                                   anno.getEndOffset());

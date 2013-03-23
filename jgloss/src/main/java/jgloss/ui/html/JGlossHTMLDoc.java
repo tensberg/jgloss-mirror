@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -66,7 +65,7 @@ import jgloss.util.StringTools;
  * @author Michael Koch
  */
 public class JGlossHTMLDoc extends HTMLDocument {
-	private static final Logger LOGGER = Logger.getLogger(JGlossHTMLDoc.class.getPackage().getName());
+    private static final Logger LOGGER = Logger.getLogger(JGlossHTMLDoc.class.getPackage().getName());
 
 	private static final long serialVersionUID = 1L;
 
@@ -96,6 +95,8 @@ public class JGlossHTMLDoc extends HTMLDocument {
 
     public static final String EMPTY_ELEMENT_PLACEHOLDER = " ";
 
+    private final DocumentTreeWalker documentTreeWalker = new DocumentTreeWalker(this);
+
     private JGlossDocument baseDoc;
 
     private JGlossReader reader;
@@ -108,19 +109,22 @@ public class JGlossHTMLDoc extends HTMLDocument {
      */
     private final PropertyChangeSupport listeners = new PropertyChangeSupport( this);
 
-    private static TransformerFactory transformerFactory;
-    private static Templates jglossToHTMLTemplate;
+    private static final Templates JGLOSS_TO_HTML_TEMPLATES = initTemplates();
 
-    static {
+    private static Templates initTemplates() {
+        Templates templates;
+
         try {
-            transformerFactory = TransformerFactory.newInstance();
-            jglossToHTMLTemplate = transformerFactory.newTemplates
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            templates = transformerFactory.newTemplates
                 ( new StreamSource( JGlossHTMLDoc.class.getResourceAsStream
                                     ( "/xml/JGlossToHTML.xslt")));
         } catch (TransformerConfigurationException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new ExceptionInInitializerError(ex);
         }
+
+        return templates;
     }
 
     /**
@@ -282,7 +286,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
         baseDoc = _baseDoc;
 
         try {
-            jglossDocTransformer = jglossToHTMLTemplate.newTransformer();
+            jglossDocTransformer = JGLOSS_TO_HTML_TEMPLATES.newTransformer();
         } catch (TransformerConfigurationException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -372,10 +376,10 @@ public class JGlossHTMLDoc extends HTMLDocument {
     /**
      * Switches strict HTML parsing on or off.
      *
-     * @see JGlossEditorKit.JGlossParser#setStrict(boolean)
+     * @see JGlossParser#setStrict(boolean)
      */
     public void setStrictParsing( boolean strict) {
-        ((JGlossEditorKit.JGlossParserWrapper) getParser()).setStrict( strict);
+        ((JGlossParserWrapper) getParser()).setStrict( strict);
     }
 
     /**
@@ -444,7 +448,9 @@ public class JGlossHTMLDoc extends HTMLDocument {
      * Returns only the base text of the selected span, not reading and translation annotations.
      */
     public String getUnannotatedText( int start, int end) {
-        return new UnannotatedTextFetcher().getText(start, end).toString();
+        UnannotatedTextFetcher textFetcher = new UnannotatedTextFetcher();
+        documentTreeWalker.startWalk(start, end, textFetcher);
+        return textFetcher.getText();
     }
 
     @Override
@@ -664,7 +670,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
      * Remove all annotations which intersect the given region of the document.
      */
     public void removeAnnotations(int start, int end) {
-        new AnnotationRemover().removeAnnotations(start, end);
+        documentTreeWalker.startWalk(start, end, new AnnotationRemover());
     }
 
     /**
@@ -699,173 +705,19 @@ public class JGlossHTMLDoc extends HTMLDocument {
         } catch (BadLocationException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
     }
 
-    /**
-     * Recursively process the elements spanning a region of the document tree.
-     */
-    private abstract class TreeWalker {
-        protected Position start;
-        protected Position end;
-        protected boolean writeLock;
-
-        /**
-         * Initialize the tree walker.
-         *
-         * @param _writeLock If <code>true</code>, the tree walker will aquire a write lock on the
-         *        HTML document prior to recursing over the tree, otherwise a read lock will be used.
-         */
-        protected TreeWalker(boolean _writeLock) {
-            writeLock = _writeLock;
+    void walkStarts(boolean writeLock) {
+        if (writeLock) {
+            writeLock();
+        } else {
+            readLock();
         }
+    }
 
-        /**
-         * Starts the walk over the tree. The start and end offsets specify the region of elements
-         * covered by the algorithm. This method will first aquire a read or write lock on the
-         * HTML document, call {@link #walk(Element) walk} with the default root element and afterwards
-         * release the lock held on the document.
-         */
-        protected void startWalk(int _start, int _end) {
-            try {
-                start = JGlossHTMLDoc.this.createPosition(_start);
-                end = JGlossHTMLDoc.this.createPosition(_end);
-            } catch (BadLocationException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
-
-            if (writeLock) {
-	            JGlossHTMLDoc.this.writeLock();
-            } else {
-	            JGlossHTMLDoc.this.readLock();
-            }
-
-            try {
-                walk(JGlossHTMLDoc.this.getDefaultRootElement());
-            } finally {
-                if (writeLock) {
-	                JGlossHTMLDoc.this.writeUnlock();
-                } else {
-	                JGlossHTMLDoc.this.readUnlock();
-                }
-            }
+    void walkEnds(boolean writeLock) {
+        if (writeLock) {
+            writeUnlock();
+        } else {
+            readUnlock();
         }
-
-        protected void walk(Element elem) {
-            if (elem.getStartOffset() >= end.getOffset() || elem.getEndOffset() <= start.getOffset()) {
-	            return;
-            }
-
-            boolean recurse = processElement(elem);
-            if (recurse) {
-	            recurse(elem);
-            }
-        }
-
-        /**
-         * Iterates forward over all children and calls {@link #walk(Element) walk} for every child.
-         * This method is called by {@link #walk(Element) walk} if {@link #processElement(Element)
-         * processElement} returns <code>true</code>.
-         */
-        protected void recurse(Element elem) {
-            for ( int i=0; i<elem.getElementCount(); i++) {
-	            walk(elem.getElement( i));
-            }
-        }
-
-        /**
-         * Process the element of the tree in some way. This method will only be called for an element
-         * if its region (the area between its start and end offset) intersects with the region
-         * specified by the {@link #start start} and {@link #end end} offsets of the walker object.
-         * If the element has children, the return value of the method determines if the algorithm
-         * should recurse over the children.
-         *
-         * @return <code>true</code> if the tree walker should recurse over the children of the element.
-         */
-        protected abstract boolean processElement(Element elem);
-    } // class TreeWalker
-
-    /**
-     * Remove all annotation elements intersecting a span of text in the document.
-     */
-    private class AnnotationRemover extends TreeWalker {
-        AnnotationRemover() {
-            super(true);
-        }
-
-        public void removeAnnotations(int _start, int _end) {
-            startWalk(_start, _end);
-        }
-
-        @Override
-		protected boolean processElement(Element elem) {
-            if (elem.getName().equals(AnnotationTags.ANNOTATION.getId())) {
-                removeAnnotationElement(elem);
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-
-        /**
-         * Recurse over children backwards because children may be removed while the algorithm
-         * runs, changing the forward iteration order.
-         */
-        @Override
-		protected void recurse(Element elem) {
-            for ( int i=elem.getElementCount()-1; i>=0; i--) {
-	            walk(elem.getElement( i));
-            }
-        }
-    } // class AnnotationRemover
-
-    /**
-     * Fetch a span of text from the document, leaving out text with is part of an annotation.
-     */
-    private class UnannotatedTextFetcher extends TreeWalker {
-        private StringBuilder text;
-        private final Segment textSegment;
-
-        UnannotatedTextFetcher() {
-            super(false);
-            textSegment = new Segment();
-            textSegment.setPartialReturn(true);
-        }
-
-        /**
-         * Returns the unannotated text between the given start and end offsets.
-         */
-        public StringBuilder getText( int _start, int _end) {
-            text = new StringBuilder(_end - _start);
-            startWalk(_start, _end);
-            return text;
-        }
-
-        @Override
-		protected boolean processElement(Element elem) {
-            if (elem.getName().equals(HTML.Tag.CONTENT.toString())) {
-                // element spanning some text, add if the text is not part of an annotation
-                AttributeSet as = elem.getAttributes();
-                if (!as.isDefined( AnnotationTags.READING) &&
-                    !as.isDefined( AnnotationTags.TRANSLATION)) {
-                    // copy the part of the element text which intersects with the requested
-                    // text span to the string buffer
-                    int offset = Math.max(start.getOffset(),elem.getStartOffset());
-                    int length = Math.min(end.getOffset(),elem.getEndOffset())-offset;
-                    try {
-                        // partial return is activated for the text segment, so we have
-                        // to iterate until all segment fragments are copied
-                        while (length > 0) {
-                            JGlossHTMLDoc.this.getText(offset,length,textSegment);
-                            text.append(textSegment.array,textSegment.offset,textSegment.count);
-                            offset += textSegment.count;
-                            length -= textSegment.count;
-                        }
-                    } catch (BadLocationException ex) {
-                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                    }
-                }
-                return false;
-            }
-            else {
-                return true; // recurse over children
-            }
-        }
-    } // class UnannotatedTextFetcher
+    }
 } // class JGlossDocument
