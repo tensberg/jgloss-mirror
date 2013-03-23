@@ -6,6 +6,6 @@
 
 </head>
 <body><div>
-<p><anno tr="quux"><rbase re="bar">baz</rbase></anno>quuux。</p>
+<p><anno tr="quux"><rbase re="bar">baz</rbase></anno>q漢う字x。</p>
 </div></body>
 </jgloss>

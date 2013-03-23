@@ -42,6 +42,7 @@ import jgloss.ui.gloss.DocumentStyleDialog;
 import jgloss.ui.gloss.JGlossFrame;
 import jgloss.ui.gloss.JGlossLookupFrame;
 import jgloss.ui.gloss.OpenDocumentWorker;
+import jgloss.ui.html.JGlossEditorKit;
 import jgloss.ui.welcome.WelcomeDialog;
 
 /**
@@ -116,6 +117,12 @@ public class JGlossApp extends JGloss {
     @Override
 	protected void showMainWindow( String[] args) throws Exception {
         ExportMenu.registerStandardExporters();
+
+        // The DTD must be initialized before the first HTML document is shown.
+        // (HTML text fields of the Welcome Page also count).
+        // Otherwise a HTML DTD-internal cache will not be initialized to the
+        // correct size, causing errors when adding annotations later.
+        JGlossEditorKit.getDTD();
 
         if (args.length == 0) {
             JGlossFrame targetDocument;

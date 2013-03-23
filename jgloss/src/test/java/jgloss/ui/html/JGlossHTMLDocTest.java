@@ -26,6 +26,8 @@ import static org.custommonkey.xmlunit.XMLUnit.buildControlDocument;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Properties;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
@@ -37,28 +39,34 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class JGlossHTMLDocTest {
-
-    private static final String EXPECTED_REMOVE_ANNOTATIONS = "<jgloss><head>" +
-    		"<title>JGloss1ConverterTest</title>" +
-    		"<generator>JGloss 2.1.0-SNAPSHOT</generator>" +
-    		"</head>" +
-    		"<body><div><p>bazquuux。</p></div></body>" +
-    		"</jgloss>";
+    private static final Properties expectedResults = initExpectedResults();
 
     private JGlossDocument jglossDoc;
 
     private final JGlossHTMLDoc doc = new JGlossHTMLDoc(new StyleSheet(), new JGlossParserWrapper());
 
+    private final JGlossEditorKit editorKit = new JGlossEditorKit(true, true);
+
     @BeforeClass
     public static void configureXMLUnit() {
         XMLUnit.setNormalize(true);
+    }
+
+    private static Properties initExpectedResults() {
+        Properties expectedResults = new Properties();
+
+        try {
+            expectedResults.load(new InputStreamReader(JGlossHTMLDocTest.class
+                            .getResourceAsStream(JGlossHTMLDocTest.class.getSimpleName() + ".properties"), "UTF-8"));
+        } catch (IOException ex) {
+            throw new ExceptionInInitializerError(ex);
+        }
+
+        return expectedResults;
     }
 
     @Before
@@ -75,22 +83,64 @@ public class JGlossHTMLDocTest {
     public void testRemoveAnnotations() throws IOException, SAXException, BadLocationException {
         doc.removeAnnotations(0, doc.getLength());
 
-        assertXMLEqual(buildControlDocument(EXPECTED_REMOVE_ANNOTATIONS), jglossDoc.getDOMDocument());
+        assertXMLEqual(buildControlDocument(getExpectedResult("testRemoveAnnotations")), jglossDoc.getDOMDocument());
+    }
+
+    @Test
+    public void testAddAnnotation() throws IOException, BadLocationException, SAXException {
+        doc.addAnnotation(77, 80, editorKit);
+        dumpDocument();
+
+        assertXMLEqual(buildControlDocument(getExpectedResult("testAddAnnotation")), jglossDoc.getDOMDocument());
+    }
+
+    @Test
+    public void testAddAnnotationSingleKanji() throws IOException, BadLocationException, SAXException {
+        doc.addAnnotation(77, 78, editorKit);
+        dumpDocument();
+
+        assertXMLEqual(buildControlDocument(getExpectedResult("testAddAnnotationSingleKanji")),
+                        jglossDoc.getDOMDocument());
+    }
+
+    @Test
+    public void testAddAnnotationAfterOther() throws SAXException, IOException, BadLocationException {
+        doc.addAnnotation(76, 78, editorKit);
+
+        assertXMLEqual(buildControlDocument(getExpectedResult("testAddAnnotationAfterOther")),
+                        jglossDoc.getDOMDocument());
+    }
+
+    @Test
+    public void testAnnotateAll() throws SAXException, IOException, BadLocationException {
+        doc.addAnnotation(66, 100, editorKit);
+        dumpDocument();
+
+        assertXMLEqual(buildControlDocument(getExpectedResult("testAnnotateAll")), jglossDoc.getDOMDocument());
     }
 
     @Test
     public void testGetUnannotatedText() {
-        assertThat(doc.getUnannotatedText(0, doc.getLength())).isEqualTo("bazquuux。");
+        assertThat(doc.getUnannotatedText(0, doc.getLength())).isEqualTo("bazq漢う字x。");
+    }
+
+    private String getExpectedResult(String key) {
+        String expectedResult = expectedResults.getProperty(key + ".expected");
+        assertThat(expectedResult).isNotNull();
+        return expectedResult;
     }
 
     private void dumpDocument() throws IOException, BadLocationException {
+        // System.out.println("HTML");
         // StringWriter docString = new StringWriter();
         // new HTMLWriter(docString, doc).write();
         // System.out.println(docString);
-
-        Document domdoc = jglossDoc.getDOMDocument();
-        DOMImplementationLS domImplementation = (DOMImplementationLS) domdoc.getImplementation();
-        LSSerializer lsSerializer = domImplementation.createLSSerializer();
-        System.out.println(lsSerializer.writeToString(domdoc));
+        //
+        // System.out.println("XML");
+        // Document domdoc = jglossDoc.getDOMDocument();
+        // DOMImplementationLS domImplementation = (DOMImplementationLS)
+        // domdoc.getImplementation();
+        // LSSerializer lsSerializer = domImplementation.createLSSerializer();
+        // System.out.println(lsSerializer.writeToString(domdoc));
     }
 }

@@ -509,21 +509,22 @@ public class JGlossHTMLDoc extends HTMLDocument {
 
             // The start and end offsets will move around while we change the document.
             // So wrap them in position objects, which adapt to changes.
-            Position startp = createPosition( start);
+            Position startp = createPosition(start - 1);
             Position endp = createPosition( end);
 
             // remove any annotations in the area
             removeAnnotations(start, end);
 
             // The interval now only contains document plain text.
-            start = startp.getOffset();
+            start = startp.getOffset() + 1;
+            startp = createPosition(start);
             end = endp.getOffset();
             String text = getText( start, end-start);
 
             // work around Document construction quirks
             boolean paragraphSpaceInserted = false;
             if (start == paragraph.getStartOffset()) {
-                insertAfterStart( paragraph, "&nbsp;");
+                insertAfterStart(paragraph, "<span>&nbsp;</span>");
                 start++;
                 startp = createPosition( start);
                 end = endp.getOffset();
@@ -535,12 +536,12 @@ public class JGlossHTMLDoc extends HTMLDocument {
             // additional character if needed.
             Element sae = getAnnotationElement(startp.getOffset()-1);
             if (sae != null) {
-                insertAfterEnd( sae, "&nbsp;");
+                insertAfterEnd(sae, "<span>&nbsp;</span>");
             }
             // The same for an annotation in front.
             Element eae = getAnnotationElement(endp.getOffset());
             if (eae != null) {
-                insertBeforeStart( eae, "&nbsp;");
+                insertBeforeStart(eae, "<span>&nbsp;</span>");
                 // the nbsp is inserted before endp, move endp to the left of the nbsp
                 endp = createPosition(endp.getOffset()-1);
             }
@@ -549,71 +550,7 @@ public class JGlossHTMLDoc extends HTMLDocument {
             remove( startp.getOffset(), endp.getOffset()-startp.getOffset());
 
             // construct the new annotation and insert it
-
-            // Split word in base/readings. Add a reading/base pair for every kanji substring of the
-            // word and a base element for every other substring. If there is no kanji substring, add
-            // a reading for the whole string since there has to be at least one reading.
-            StringBuilder wordhtml = new StringBuilder(128);
-            int baseStart = 0;
-            boolean hasReading = false;
-            boolean needsReading = needsReading( text, 0);
-            for ( int baseEnd=1; baseEnd<=text.length(); baseEnd++) {
-                if (needsReading) {
-                    if (baseEnd==text.length() || !needsReading(text, baseEnd)) {
-                        hasReading = true;
-
-                        appendTag(wordhtml, AnnotationTags.READING_BASETEXT, false);
-
-                        appendTag(wordhtml, AnnotationTags.READING, false);
-                        wordhtml.append("&nbsp;");
-                        appendTag(wordhtml, AnnotationTags.READING, true);
-
-                        appendTag(wordhtml, AnnotationTags.BASETEXT, false);
-                        wordhtml.append(text.substring( baseStart, baseEnd));
-                        appendTag(wordhtml, AnnotationTags.BASETEXT, true);
-
-                        appendTag(wordhtml, AnnotationTags.READING_BASETEXT, true);
-                        needsReading = false;
-                        baseStart = baseEnd;
-                    }
-                }
-                else if (baseEnd==text.length() || needsReading(text, baseEnd)) {
-                    appendTag(wordhtml, AnnotationTags.BASETEXT, false);
-                    wordhtml.append(text.substring( baseStart, baseEnd));
-                    appendTag(wordhtml, AnnotationTags.BASETEXT, true);
-                    needsReading = true;
-                    baseStart = baseEnd;
-                }
-            }
-
-            StringBuilder html = new StringBuilder(128);
-            html.append("<html><body><p>");
-            appendTag(html, AnnotationTags.ANNOTATION, false);
-            appendTag(html, AnnotationTags.WORD, false);
-
-            if (hasReading) {
-                html.append(wordhtml);
-            }
-            else {
-                // must have at least one reading, create it
-                appendTag(html, AnnotationTags.READING_BASETEXT, false);
-
-                appendTag(html, AnnotationTags.READING, false);
-                html.append("&nbsp;");
-                appendTag(html, AnnotationTags.READING, true);
-
-                html.append(wordhtml);
-
-                appendTag(html, AnnotationTags.READING_BASETEXT, true);
-            }
-
-            appendTag(html, AnnotationTags.WORD, true);
-            appendTag(html, AnnotationTags.TRANSLATION, false);
-            html.append("&nbsp;");
-            appendTag(html, AnnotationTags.TRANSLATION, true);
-            appendTag(html, AnnotationTags.ANNOTATION, true);
-
-            html.append("</p></body></html>");
+            StringBuilder html = createAnnotationHtml(text);
 
             // The insertion will create a new annotation element and trigger a document changed
             // event. The AnnotationListSynchronizer will react to this by creating a new
@@ -640,6 +577,74 @@ public class JGlossHTMLDoc extends HTMLDocument {
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
+    }
+
+    private StringBuilder createAnnotationHtml(String text) {
+        // Split word in base/readings. Add a reading/base pair for every kanji substring of the
+        // word and a base element for every other substring. If there is no kanji substring, add
+        // a reading for the whole string since there has to be at least one reading.
+        StringBuilder wordhtml = new StringBuilder(128);
+        int baseStart = 0;
+        boolean hasReading = false;
+        boolean needsReading = needsReading( text, 0);
+        for ( int baseEnd=1; baseEnd<=text.length(); baseEnd++) {
+            if (needsReading) {
+                if (baseEnd==text.length() || !needsReading(text, baseEnd)) {
+                    hasReading = true;
+
+                    appendTag(wordhtml, AnnotationTags.READING_BASETEXT, false);
+
+                    appendTag(wordhtml, AnnotationTags.READING, false);
+                    wordhtml.append("&nbsp;");
+                    appendTag(wordhtml, AnnotationTags.READING, true);
+
+                    appendTag(wordhtml, AnnotationTags.BASETEXT, false);
+                    wordhtml.append(text.substring( baseStart, baseEnd));
+                    appendTag(wordhtml, AnnotationTags.BASETEXT, true);
+
+                    appendTag(wordhtml, AnnotationTags.READING_BASETEXT, true);
+                    needsReading = false;
+                    baseStart = baseEnd;
+                }
+            }
+            else if (baseEnd==text.length() || needsReading(text, baseEnd)) {
+                appendTag(wordhtml, AnnotationTags.BASETEXT, false);
+                wordhtml.append(text.substring( baseStart, baseEnd));
+                appendTag(wordhtml, AnnotationTags.BASETEXT, true);
+                needsReading = true;
+                baseStart = baseEnd;
+            }
+        }
+
+        StringBuilder html = new StringBuilder(128);
+        html.append("<html><body><p>");
+        appendTag(html, AnnotationTags.ANNOTATION, false);
+        appendTag(html, AnnotationTags.WORD, false);
+
+        if (hasReading) {
+            html.append(wordhtml);
+        }
+        else {
+            // must have at least one reading, create it
+            appendTag(html, AnnotationTags.READING_BASETEXT, false);
+
+            appendTag(html, AnnotationTags.READING, false);
+            html.append("&nbsp;");
+            appendTag(html, AnnotationTags.READING, true);
+
+            html.append(wordhtml);
+
+            appendTag(html, AnnotationTags.READING_BASETEXT, true);
+        }
+
+        appendTag(html, AnnotationTags.WORD, true);
+        appendTag(html, AnnotationTags.TRANSLATION, false);
+        html.append("&nbsp;");
+        appendTag(html, AnnotationTags.TRANSLATION, true);
+        appendTag(html, AnnotationTags.ANNOTATION, true);
+
+        html.append("</p></body></html>");
+        return html;
     }
 
     /**

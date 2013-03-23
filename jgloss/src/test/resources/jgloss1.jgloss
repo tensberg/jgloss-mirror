@@ -6,6 +6,6 @@
 
 </head>
 <body>
-<p><anno text_annotation="foo"><word><rb><reading>bar</reading><bt>baz</bt></rb></word><trans>quux</trans></anno>quuux。</p>
+<p><anno text_annotation="foo"><word><rb><reading>bar</reading><bt>baz</bt></rb></word><trans>quux</trans></anno>q漢う字x。</p>
 </body>
 </html>
