@@ -22,8 +22,11 @@
 
 package jgloss.dictionary;
 
-import java.util.HashSet;
-import java.util.Set;
+import static java.util.logging.Level.INFO;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 /**
  * The dictionary factory is used to create instances of dictionaries based on a descriptor.
@@ -36,10 +39,13 @@ import java.util.Set;
  * @author Michael Koch
  */
 public class DictionaryFactory {
+
+    private static final Logger LOGGER = Logger.getLogger(DictionaryFactory.class.getPackage().getName());
+
     /**
      * Collection of dictionary implementations.
      */
-    private static final Set<DictionaryImplementation<?>> IMPLEMENTATIONS = new HashSet<DictionaryImplementation<?>>( 10);
+    private static final List<DictionaryImplementation<?>> IMPLEMENTATIONS = new CopyOnWriteArrayList<>();
 
     /**
      * Creates a dictionary instance based on the descriptor. The format of the descriptor
@@ -108,7 +114,7 @@ public class DictionaryFactory {
 
         // search for implementation with greatest confidence that the descriptor is a
         // dictionary handled by the instance.
-        String reasons = ""; // reasons for dictionary confidences
+        StringBuilder reasons = new StringBuilder(); // reasons for dictionary confidences
         for (DictionaryImplementation<?> ic : IMPLEMENTATIONS) {
             TestResult result = ic.isInstance( descriptor);
             if (result.getConfidence() > conf) {
@@ -117,13 +123,18 @@ public class DictionaryFactory {
             }
 
             if (reasons.length() > 0) {
-	            reasons += '\n';
+	            reasons.append('\n');
             }
-            reasons += ic.getName() + ":" + result.getReason();
+            reasons.append(ic.getName())
+                .append(":")
+                .append(result.getReason());
         }
 
+        LOGGER.log(INFO, "dictionary implementation detection results for {0}:\n{1}", new Object[] { descriptor,
+                        reasons.toString() });
+
         if (imp == null) {
-	        throw new UnsupportedDescriptorException( reasons);
+	        throw new UnsupportedDescriptorException( reasons.toString());
         }
 
         return imp;
@@ -137,7 +148,9 @@ public class DictionaryFactory {
      * @param imp <CODE>Implementation</CODE> object which describes the implementation.
      */
     public static <T extends Dictionary> void registerImplementation(DictionaryImplementation<T> imp) {
-        IMPLEMENTATIONS.add(imp);
+        synchronized (IMPLEMENTATIONS) {
+            IMPLEMENTATIONS.add(imp);
+        }
     }
 
     private DictionaryFactory() {

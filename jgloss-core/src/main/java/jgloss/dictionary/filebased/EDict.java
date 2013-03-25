@@ -76,7 +76,7 @@ public class EDict extends FileBasedDictionary {
             // (InCJKUnifiedIdeographs)
             return new FileBasedDictionaryImplementation<EDict>
                 ( name, encoding, true, Pattern.compile
-                  ( "\\A\\S+?(\\s\\[.+?\\])?(\\s/)|/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
+                  ( "\\A\\S+?(\\s\\[.+?\\])?\\s/\\P{InCJKUnifiedIdeographs}.*/$", Pattern.MULTILINE),
                   1.0f, 4096, EDict.class.getConstructor( new Class[] { File.class, String.class })) {
                         @Override
 						protected Object[] getConstructorParameters(String descriptor) {
