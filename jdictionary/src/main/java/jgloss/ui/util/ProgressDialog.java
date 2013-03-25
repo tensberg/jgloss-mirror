@@ -41,7 +41,7 @@ import net.miginfocom.swing.MigLayout;
 
 /** Modal progress dialog with a message, a progress bar and an optional cancel
  * button.
- * 
+ *
  * @author Michael Koch <tensberg@gmx.net> */
 public class ProgressDialog extends JDialog {
     private static final long serialVersionUID = 1L;
@@ -68,7 +68,7 @@ public class ProgressDialog extends JDialog {
             content.add(new JButton(cancelAction));
         }
         setContentPane(content);
-
+        pack();
         setSize(450, getPreferredSize().height);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
