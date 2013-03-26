@@ -27,6 +27,7 @@ import java.io.File;
 import javax.swing.Action;
 
 import jgloss.ui.OpenRecentMenu;
+import jgloss.ui.welcome.ShowWelcomeDialogAction;
 
 /**
  * Collection of actions to create and open JGloss documents.
@@ -56,6 +57,8 @@ public class DocumentActions {
      */
     public final OpenRecentMenu.FileSelectedListener openRecentListener;
 
+    public final Action showWelcomeDialog;
+
     /**
      * Creates a new instance of the actions which will invoke the methods
      * on the specified target. If the target is <CODE>null</CODE>, a new JGlossFrame
@@ -70,6 +73,7 @@ public class DocumentActions {
         openRecentListener = new OpenRecentDocumentListener(target);
 
         importClipboardListener = new ImportClipboardListener( importClipboard);
+        showWelcomeDialog = new ShowWelcomeDialogAction(target);
     }
 
     /**

@@ -37,7 +37,6 @@ import javax.swing.event.DocumentListener;
 import jgloss.JGloss;
 import jgloss.parser.KanjiParser;
 import jgloss.ui.Dictionaries;
-import jgloss.ui.gloss.DocumentActions;
 import jgloss.ui.gloss.ImportStringStrategy;
 import jgloss.ui.gloss.JGlossFrame;
 import jgloss.ui.wizard.DescriptionLabel;
@@ -53,7 +52,7 @@ class ImportPage extends WizardPage {
     private final JTextArea importText = new JTextArea();
 
     public ImportPage(JGlossFrame targetDocument) {
-        this.targetDocument = DocumentActions.getFrame(targetDocument);
+        this.targetDocument = targetDocument;
         setLayout(new BorderLayout());
         add(new DescriptionLabel(MESSAGES.getString("welcome.import.description")), BorderLayout.NORTH);
         add(new JScrollPane(importText), BorderLayout.CENTER);

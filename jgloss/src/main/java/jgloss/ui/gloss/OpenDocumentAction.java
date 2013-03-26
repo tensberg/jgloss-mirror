@@ -24,7 +24,6 @@ package jgloss.ui.gloss;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 
 import jgloss.JGloss;
@@ -36,13 +35,11 @@ import jgloss.ui.util.UIUtilities;
  *
  * @author Michael Koch <tensberg@gmx.net>
  */
-class OpenDocumentAction extends AbstractAction {
+class OpenDocumentAction extends DocumentAction {
     private static final long serialVersionUID = 1L;
 
-    private final JGlossFrame target;
-
     OpenDocumentAction(JGlossFrame target) {
-        this.target = target;
+        super(target);
         UIUtilities.initAction(this, "main.menu.open");
     }
 
@@ -52,7 +49,7 @@ class OpenDocumentAction extends AbstractAction {
         f.addChoosableFileFilter(JGlossFrame.JGLOSS_FILE_FILTER);
         f.setFileHidingEnabled(true);
         f.setFileView(CustomFileView.getFileView());
-        int r = f.showOpenDialog(target);
+        int r = f.showOpenDialog(getParentWindow());
         if (r == JFileChooser.APPROVE_OPTION) {
             JGloss.getApplication().setCurrentDir(f.getCurrentDirectory().getAbsolutePath());
             // test if the file is already open
@@ -65,8 +62,7 @@ class OpenDocumentAction extends AbstractAction {
             }
 
             // load the file
-            JGlossFrame frame = DocumentActions.getFrame(target);
-            OpenDocumentWorker.openDocument(frame, f.getSelectedFile());
+            OpenDocumentWorker.openDocument(getFrame(), f.getSelectedFile());
         }
     }
 }

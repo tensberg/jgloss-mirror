@@ -24,8 +24,6 @@ package jgloss.ui.gloss;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
-
 import jgloss.parser.Parser;
 import jgloss.ui.Dictionaries;
 import jgloss.ui.ExclusionList;
@@ -37,24 +35,22 @@ import jgloss.ui.util.UIUtilities;
  *
  * @author Michael Koch <tensberg@gmx.net>
  */
-class ImportDocumentAction extends AbstractAction {
+class ImportDocumentAction extends DocumentAction {
     private static final long serialVersionUID = 1L;
-
-    private final JGlossFrame target;
 
     /**
      * @param target frame to import the document into. If <code>null</code>, creates a new frame.
      */
     ImportDocumentAction(JGlossFrame target) {
-        this.target = target;
+        super(target);
         UIUtilities.initAction(this, "main.menu.import");
     }
 
     @Override
     public void actionPerformed( ActionEvent e) {
-        ImportDialog dialog = new ImportDialog(target != null ? target.frame : null);
+        ImportDialog dialog = new ImportDialog(getParentWindow());
         if (dialog.doDialog()) {
-            JGlossFrame frame = DocumentActions.getFrame(target);
+            JGlossFrame frame = getFrame();
 
             if (dialog.selectionIsFilename()) {
                 importDocument(dialog, frame);

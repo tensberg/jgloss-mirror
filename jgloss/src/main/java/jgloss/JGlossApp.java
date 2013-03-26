@@ -137,7 +137,7 @@ public class JGlossApp extends JGloss {
             }
 
             if (PREFS.getBoolean(Preferences.SHOW_WELCOME_DIALOG, true)) {
-                showWelcomeDialog(targetDocument, parentFrame);
+                WelcomeDialog.showWelcomeDialog(targetDocument, parentFrame);
             }
         }
         else {
@@ -145,14 +145,6 @@ public class JGlossApp extends JGloss {
                 OpenDocumentWorker.openDocument(new JGlossFrame(), new File(arg));
             }
         }
-    }
-
-    private void showWelcomeDialog(JGlossFrame targetDocument, Window parentFrame) {
-        WelcomeDialog welcomeDialog = new WelcomeDialog(targetDocument, parentFrame);
-        welcomeDialog.pack();
-        welcomeDialog.setSize(800, 500);
-        welcomeDialog.setLocationRelativeTo(null);
-        welcomeDialog.setVisible(true);
     }
 
     /**

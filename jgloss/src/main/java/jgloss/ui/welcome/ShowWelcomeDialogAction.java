@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2012 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2013 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -17,33 +17,31 @@
  * along with JGloss; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *
  */
 
-package jgloss.ui.gloss;
+package jgloss.ui.welcome;
 
 import java.awt.event.ActionEvent;
 
+import jgloss.ui.gloss.DocumentAction;
+import jgloss.ui.gloss.JGlossFrame;
 import jgloss.ui.util.UIUtilities;
 
 /**
- * Action to import the clipboard content.
- *
- * @author Michael Koch <tensberg@gmx.net>
+ * Action which shows the {@link WelcomeDialog}.
  */
-class ImportClipboardAction extends DocumentAction {
+public class ShowWelcomeDialogAction extends DocumentAction {
+
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param target frame to import the clipboard content into. If <code>null</code>, creates a new frame.
-     */
-    ImportClipboardAction(JGlossFrame target) {
+    public ShowWelcomeDialogAction(JGlossFrame target) {
         super(target);
-        UIUtilities.initAction(this, "main.menu.importclipboard");
+        UIUtilities.initAction(this, "main.menu.welcome");
     }
 
     @Override
-    public void actionPerformed( ActionEvent e) {
-        new ImportClipboardStrategy(getFrame()).executeImport();
+    public void actionPerformed(ActionEvent e) {
+        WelcomeDialog.showWelcomeDialog(getFrame(), getParentWindow());
     }
+
 }

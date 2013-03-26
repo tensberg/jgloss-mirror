@@ -23,7 +23,7 @@
 package jgloss.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -97,7 +97,7 @@ public class ImportDialog extends JDialog {
      * @param parent Parent of this dialog.
      */
     @SuppressWarnings("unchecked")
-    public ImportDialog( Frame parent) {
+    public ImportDialog(Window parent) {
         super( parent, JGloss.MESSAGES.getString( "import.title"));
         setModal( true);
 

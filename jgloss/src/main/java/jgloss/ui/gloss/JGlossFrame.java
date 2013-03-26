@@ -357,7 +357,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         annotationList = new AnnotationList();
         annotationList.addListSelectionListener( this);
 
-        frame.setJMenuBar( initMenuBar( documentActions));
+        frame.setJMenuBar( createMenuBar( documentActions));
 
         // set up the content of this component
         setBackground( Color.white);
@@ -541,10 +541,75 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         return new DocumentActions( this);
     }
 
-    private JMenuBar initMenuBar( DocumentActions actions) {
+    private JMenuBar createMenuBar( DocumentActions actions) {
         // set up the menu bar
         JMenuBar bar = new JMenuBar();
 
+        bar.add(createFileMenu(actions));
+        bar.add(createEditMenu());
+        bar.add(createViewMenu());
+        bar.add(annotationList.getMenu());
+        bar.add(createHelpMenu(actions));
+
+        return bar;
+    }
+
+    private JMenu createHelpMenu(DocumentActions actions) {
+        JMenu menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.help"));
+
+        menu.add(UIUtilities.createMenuItem(actions.showWelcomeDialog));
+        menu.addSeparator();
+
+        aboutItem = UIUtilities.createMenuItem( AboutFrame.getShowAction());
+        menu.add( aboutItem);
+        return menu;
+    }
+
+    private JMenu createViewMenu() {
+        showReadingItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString( "main.menu.showreading"));
+        showReadingItem.setSelected( JGloss.PREFS.getBoolean( Preferences.VIEW_SHOWREADING, true));
+        showReadingItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showreading.tt"));
+        showReadingItem.addActionListener( this);
+        showTranslationItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString
+                                                     ( "main.menu.showtranslation"));
+        showTranslationItem.setSelected( JGloss.PREFS.getBoolean
+                                         ( Preferences.VIEW_SHOWTRANSLATION, true));
+        showTranslationItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showtranslation.tt"));
+        showTranslationItem.addActionListener( this);
+        showAnnotationItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString
+                                                    ( "main.menu.showannotation"));
+        showAnnotationItem.setSelected( JGloss.PREFS.getBoolean
+                                        ( Preferences.VIEW_SHOWANNOTATION, false));
+        showAnnotationItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showannotation.tt"));
+        showAnnotationItem.addActionListener( this);
+
+        JMenu menu = new JMenu(JGloss.MESSAGES.getString("main.menu.view"));
+        menu.add( showReadingItem);
+        menu.add( showTranslationItem);
+        menu.add( showAnnotationItem);
+
+        return menu;
+    }
+
+    private JMenu createEditMenu() {
+        JMenu menu;
+        menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.edit"));
+        menu.add( UIUtilities.createMenuItem( xcvManager.getCutAction()));
+        menu.add( UIUtilities.createMenuItem( xcvManager.getCopyAction()));
+        menu.add( UIUtilities.createMenuItem( xcvManager.getPasteAction()));
+        menu.addMenuListener( xcvManager.getEditMenuListener());
+
+        menu.addSeparator();
+        menu.add( UIUtilities.createMenuItem( wordLookupAction));
+        menu.add( UIUtilities.createMenuItem( addAnnotationAction));
+        menu.add( UIUtilities.createMenuItem( documentTitleAction));
+        menu.addSeparator();
+        preferencesItem = UIUtilities.createMenuItem( PreferencesFrame.SHOW_ACTION);
+        menu.add( preferencesItem);
+        return menu;
+    }
+
+    private JMenu createFileMenu(DocumentActions actions) {
         JMenu menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.file"));
         menu.add( UIUtilities.createMenuItem( actions.importDocument));
         menu.add( UIUtilities.createMenuItem( actions.importClipboard));
@@ -563,54 +628,7 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
         menu.add( UIUtilities.createMenuItem( printAction));
         menu.addSeparator();
         menu.add( UIUtilities.createMenuItem( closeAction));
-        bar.add( menu);
-
-        menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.edit"));
-        menu.add( UIUtilities.createMenuItem( xcvManager.getCutAction()));
-        menu.add( UIUtilities.createMenuItem( xcvManager.getCopyAction()));
-        menu.add( UIUtilities.createMenuItem( xcvManager.getPasteAction()));
-        menu.addMenuListener( xcvManager.getEditMenuListener());
-
-        menu.addSeparator();
-        menu.add( UIUtilities.createMenuItem( wordLookupAction));
-        menu.add( UIUtilities.createMenuItem( addAnnotationAction));
-        menu.add( UIUtilities.createMenuItem( documentTitleAction));
-        menu.addSeparator();
-        preferencesItem = UIUtilities.createMenuItem( PreferencesFrame.SHOW_ACTION);
-        menu.add( preferencesItem);
-        bar.add( menu);
-
-        showReadingItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString( "main.menu.showreading"));
-        showReadingItem.setSelected( JGloss.PREFS.getBoolean( Preferences.VIEW_SHOWREADING, true));
-        showReadingItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showreading.tt"));
-        showReadingItem.addActionListener( this);
-        showTranslationItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString
-                                                     ( "main.menu.showtranslation"));
-        showTranslationItem.setSelected( JGloss.PREFS.getBoolean
-                                         ( Preferences.VIEW_SHOWTRANSLATION, true));
-        showTranslationItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showtranslation.tt"));
-        showTranslationItem.addActionListener( this);
-        showAnnotationItem = new JCheckBoxMenuItem( JGloss.MESSAGES.getString
-                                                    ( "main.menu.showannotation"));
-        showAnnotationItem.setSelected( JGloss.PREFS.getBoolean
-                                        ( Preferences.VIEW_SHOWANNOTATION, false));
-        showAnnotationItem.setToolTipText( JGloss.MESSAGES.getString( "main.menu.showannotation.tt"));
-        showAnnotationItem.addActionListener( this);
-
-        menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.view"));
-        menu.add( showReadingItem);
-        menu.add( showTranslationItem);
-        menu.add( showAnnotationItem);
-        bar.add( menu);
-
-        bar.add( annotationList.getMenu());
-
-        menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.help"));
-        aboutItem = UIUtilities.createMenuItem( AboutFrame.getShowAction());
-        menu.add( aboutItem);
-        bar.add( menu);
-
-        return bar;
+        return menu;
     }
 
     public JGlossFrameModel getModel() { return model; }

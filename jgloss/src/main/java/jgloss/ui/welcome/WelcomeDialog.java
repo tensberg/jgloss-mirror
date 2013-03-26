@@ -23,13 +23,13 @@ package jgloss.ui.welcome;
 
 import static java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE;
 import static jgloss.JGloss.MESSAGES;
+import static jgloss.Preferences.SHOW_WELCOME_DIALOG;
 
 import java.awt.Window;
 
 import javax.swing.JDialog;
 
 import jgloss.JGloss;
-import jgloss.Preferences;
 import jgloss.ui.gloss.JGlossFrame;
 import jgloss.ui.wizard.Wizard;
 import jgloss.ui.wizard.WizardListener;
@@ -43,6 +43,14 @@ public class WelcomeDialog extends JDialog implements WizardListener {
     private static final long serialVersionUID = 1L;
 
     private final Wizard welcomeWizard;
+
+    public static void showWelcomeDialog(JGlossFrame target, Window parentFrame) {
+        WelcomeDialog welcomeDialog = new WelcomeDialog(target, parentFrame);
+        welcomeDialog.pack();
+        welcomeDialog.setSize(800, 500);
+        welcomeDialog.setLocationRelativeTo(null);
+        welcomeDialog.setVisible(true);
+    }
 
     public WelcomeDialog(JGlossFrame targetDocument, Window parent) {
         super(parent);
@@ -58,6 +66,7 @@ public class WelcomeDialog extends JDialog implements WizardListener {
 
         setContentPane(welcomeWizard.getWizardPanel());
         welcomeWizard.addWizardListener(this);
+        welcomeWizard.setDontShowAgain(!JGloss.PREFS.getBoolean(SHOW_WELCOME_DIALOG, true));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
@@ -74,6 +83,6 @@ public class WelcomeDialog extends JDialog implements WizardListener {
     private void close() {
         setVisible(false);
         dispose();
-        JGloss.PREFS.set(Preferences.SHOW_WELCOME_DIALOG, !welcomeWizard.isDontShowAgain());
+        JGloss.PREFS.set(SHOW_WELCOME_DIALOG, !welcomeWizard.isDontShowAgain());
     }
 }
