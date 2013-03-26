@@ -95,6 +95,14 @@ public class Wizard {
         return container;
     }
 
+    public void setDontShowAgain(boolean dontShowAgain) {
+        buttons.setDontShowAgainSelected(dontShowAgain);
+    }
+
+    public boolean isDontShowAgain() {
+        return buttons.isDontShowAgainSelected();
+    }
+
     private void goBack() {
         currentPageIndex--;
         showCurrentPage();

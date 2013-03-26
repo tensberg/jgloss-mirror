@@ -28,6 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 import jgloss.ui.util.UIUtilities;
@@ -75,9 +76,14 @@ class ButtonBar extends JPanel {
 
     private final JButton backButton = new JButton(backAction);
 
+    private final JCheckBox dontShowAgain = new JCheckBox();
+
     ButtonBar() {
         setLayout(new MigLayout(new LC().fillX()));
+
+        UIUtilities.initButton(dontShowAgain, "wizard.dontshowagain");
         add(cancelButton, "dock west");
+        add(dontShowAgain, "dock west");
         add(forwardButton, "dock east");
         add(backButton, "dock east");
     }
@@ -94,6 +100,14 @@ class ButtonBar extends JPanel {
         for (WizardNavigationListener listener : listeners) {
             listener.navigate(navigation);
         }
+    }
+
+    void setDontShowAgainSelected(boolean selected) {
+        dontShowAgain.setSelected(selected);
+    }
+
+    boolean isDontShowAgainSelected() {
+        return dontShowAgain.isSelected();
     }
 
     void setNavigationVisible(WizardNavigation navigation, boolean visible) {

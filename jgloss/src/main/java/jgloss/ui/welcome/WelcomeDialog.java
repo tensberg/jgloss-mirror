@@ -28,6 +28,8 @@ import java.awt.Window;
 
 import javax.swing.JDialog;
 
+import jgloss.JGloss;
+import jgloss.Preferences;
 import jgloss.ui.gloss.JGlossFrame;
 import jgloss.ui.wizard.Wizard;
 import jgloss.ui.wizard.WizardListener;
@@ -46,14 +48,14 @@ public class WelcomeDialog extends JDialog implements WizardListener {
         super(parent);
         setTitle(MESSAGES.getString("welcome.title"));
         setModalExclusionType(APPLICATION_EXCLUDE);
-        
+
         welcomeWizard = new Wizard(new WizardPage[] {
                         new WelcomePage(),
                         new DictionaryDownloadPage(),
                         new ImportPage(targetDocument),
                         new FinishPage()
                     });
-        
+
         setContentPane(welcomeWizard.getWizardPanel());
         welcomeWizard.addWizardListener(this);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -61,13 +63,17 @@ public class WelcomeDialog extends JDialog implements WizardListener {
 
     @Override
     public void wizardCancelled() {
-        setVisible(false);
-        dispose();
+        close();
     }
 
     @Override
     public void wizardClosed() {
+        close();
+    }
+
+    private void close() {
         setVisible(false);
         dispose();
+        JGloss.PREFS.set(Preferences.SHOW_WELCOME_DIALOG, !welcomeWizard.isDontShowAgain());
     }
 }
