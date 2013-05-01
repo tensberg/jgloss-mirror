@@ -49,3 +49,14 @@ JGloss Information Links
   group gmane.comp.java.jgloss}} or {{{http://news.gmane.org/gmane.comp.java.jgloss}access the newsgroup
   with your web browser}}.
 
+Acknowledgements
+
+  JGloss owes many ideas to Jim Breen's work, particularly the
+  {{{http://www.dgs.monash.edu.au/~jwb/wwwjdic.html}WWWJDIC}} and
+  {{{http://www.csse.monash.edu.au/~jwb/xjdic/}XJDIC}}.
+  The kanji parser is based on
+  {{{ftp://ftp.monash.edu.au/pub/nihongo/www-jdict.ps.gz}ideas from the WWWJDIC}}.
+  The character encoding detection uses code from Yasuhiro Tonooka's kcc (Kanji Code Converter).
+  The French localization is contributed by Alexandre Beraud. Heinrich Künsting helped with the LaTeX export template design and wrote the LaTeX-CJK list
+  template. Some of the file chooser icons are taken from
+  {{{http://artists.kde.org}the KDE project}}.
