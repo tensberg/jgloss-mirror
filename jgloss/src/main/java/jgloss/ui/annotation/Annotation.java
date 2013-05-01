@@ -239,12 +239,13 @@ public class Annotation {
     @Override
 	public String toString() {
         StringBuilder out = new StringBuilder();
-        out.append( annotatedText);
-        if (annotatedTextReading!=null &&
-            annotatedTextReading.length() > 0) {
-            out.append( " [");
-            out.append( annotatedTextReading);
-            out.append( ']');
+        String dictionaryForm = getDictionaryForm();
+        out.append(dictionaryForm);
+        String dictionaryFormReading = getDictionaryFormReading();
+        if (!dictionaryFormReading.equals(dictionaryForm)) {
+            out.append( " [")
+                .append(dictionaryFormReading)
+                .append( ']');
         }
 
         String translation = getTranslation();
