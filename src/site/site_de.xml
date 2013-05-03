@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JGloss">
+	<version position="none" />
+	<bannerLeft>
+		<name>JGloss</name>
+		<src>images/jgloss-logo.png</src>
+		<href>http://jgloss.sourceforge.net/</href>
+	</bannerLeft>
+
+	<poweredBy>
+		<logo name="SourceForge" href="http://sourceforge.net/projects/jgloss"
+			img="http://sflogo.sourceforge.net/sflogo.php?group_id=29259&amp;type=12"
+			width="120" height="30"
+			alt="Get JGloss at SourceForge.net. Fast, secure and Free Open Source software downloads" />
+	</poweredBy>
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-fluido-skin</artifactId>
+		<version>1.3.1-SNAPSHOT</version>
+	</skin>
+
+	<body>
+	    <breadcrumbs>
+	       <item name="${project.name}" href="index.html" />
+	    </breadcrumbs>
+		<menu name="Informationen für Benutzer">
+			<item name="Startseite" href="index.html" />
+ 		    <item name="Über JGloss" href="details.html" />
+		    <item name="Bildschirmfotos" href="screenshots.html" />
+		    <item name="Beispiele" href="examples.html" />
+ 		    <item name="Download" href="download.html" />
+		    <item name="Wörterbücher" href="download.html#Dictionaries" />
+		    <item name="Weiterführende Links" href="links.html" />
+            <item name="Impressum" href="imprint.html" />
+		</menu>
+		<menu name="Informationen für Entwickler (EN)">
+            <item name="Developing JGloss" href="../developing.html" />
+            <item name="Design Notes" href="../designnotes.html" />
+            <item name="JGloss-WWW" href="../jgloss-www.html" />
+		</menu>
+		<menu ref="reports" />
+		<menu ref="modules" />
+	</body>
+
+    <custom>
+        <fluidoSkin>
+            <flattr>
+                <thing>1136753/JGloss</thing>
+                <url>http://jgloss.sourceforge.net/</url>
+            </flattr>
+            <ohloh>
+                <projectId>80552</projectId>
+                <widget>factoids</widget>
+            </ohloh>
+            <facebookLike />
+            <googlePlusOne />
+        </fluidoSkin>
+    </custom>
+</project>

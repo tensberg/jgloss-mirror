@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Language" content="de" />
+<title>JGloss</title>
+<link rel="stylesheet"
+	href="./css/apache-maven-fluido-1.3.1-SNAPSHOT.min.css" />
+<link rel="stylesheet" href="./css/site.css" />
+<link rel="stylesheet" href="./css/print.css" media="print" />
+<style type="text/css">
+body {
+	padding-top: 20px;
+	padding-bottom: 40px;
+}
+
+.hero-unit {
+    background-color: #F7F2F3;
+}
+
+.nav-pills li {
+    padding-top:  10px;
+    padding-left: 5px;
+}
+</style>
+
+<script type="text/javascript"
+	src="./js/apache-maven-fluido-1.3.1-SNAPSHOT.min.js"></script>
+
+<script type="text/javascript"
+	src="https://apis.google.com/js/plusone.js"></script>
+
+<script type="text/javascript">
+    /* <![CDATA[ */
+        (function() {
+            var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+            t.parentNode.insertBefore(s, t);
+        })();
+    /* ]]> */</script>
+</head>
+<body>
+	<div class="container">
+
+        <div class="hero-unit">
+            <a href="../webstart/jnlp/jgloss.jnlp"><img
+                src="../images/jgloss-logo.png" alt="JGloss logo" width="175"
+                height="100" /></a>
+
+			<ul class="nav nav-pills nav-border pull-right" style="margin: 5pt;">
+				<li >
+					<div class="g-plusone"
+						data-href="${project.url}"
+						data-size="tall"></div>
+				</li>
+				<li><iframe
+						src="http://www.facebook.com/plugins/like.php?href=${project.url}&send=false&layout=box_count&show-faces=false&action=like&colorscheme=light"
+						scrolling="no" frameborder="0"
+						style="border: none; width: 48px; height: 63px;"></iframe>
+				</li>
+				<li>
+					<div id="flattr">
+						<a class="FlattrButton" style="display: none;"
+							href="http://jgloss.sourceforge.net/"></a>
+						<noscript>
+							<a href="http://flattr.com/thing/1136753/JGloss" target="_blank">
+								<img src="http://api.flattr.com/button/flattr-badge-large.png"
+								alt="Flattr this" title="Flattr this" border="0" />
+							</a>
+						</noscript>
+					</div>
+				</li>
+			</ul>
+
+			<ul>
+			    <li>Annotiere japanische Texte automatisch mit Lesungen und Übersetzungen.</li>
+                <li>Exportiere das annotierte Dokument und die Vokabelliste.</li>
+                <li>Unterstützt Wadoku Jiten und EDICT Wörterbücher.</li>
+			</ul>
+
+			<p>
+				<a href="../webstart/jnlp/jgloss.jnlp" class="btn btn-primary">
+					JGloss starten &raquo;</a>
+		        <a href="download.html" class="btn">Download &raquo;</a>
+		        <a href="details.html" class="btn">Weiterlesen &raquo;</a>
+                <a href="http://www.java.com/de/download/" class="pull-right">Benötigt Java 7</a>
+			</p>
+		</div>
+
+		<div class="row">
+			<div class="span4">
+				<h2><a href="details.html#Dictionaries">Wörterbücher &raquo;</a></h2>
+				<p>
+                    JGloss unterstützt das populäre <a href="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDICT2</a> Wörterbuch-Dateiformat.
+                    Nutzbare Wörterbücher sind unter anderem das Japanisch-Englische 
+                    <a href="http://www.csse.monash.edu.au/~jwb/edict.html">EDICT</a> selbst, 
+                    das Japanisch-Deutsche <a href="http://www.wadoku.de/">Wadoku Jiten</a>, und viele andere. Das
+                    <a href="http://www.csse.monash.edu.au/~jwb/kanjidic.html">Kanjidic</a> Wörterbuchformat wird auch unterstützt.
+                </p>
+			</div>
+			<div class="span4">
+				<h2><a href="examples.html">Beispiele &raquo;</a></h2>
+				<p>
+                    Ein Blick auf die <a href="screenshots.html">Bildschirmfotos</a> zeigt JGloss in Aktion.
+                    <a href="../karinodouji/kari.pdf">Dieses PDF-Dokument</a> ist aus einer LaTeX-Datei erzeugt, die JGloss generiert hat. 
+                    Dokumente können auch als <a href="../karinodouji/kari.html">HTML</a> exportiert werden. Außerdem kann eine
+                    <a href="../karinodouji/kari.annotations.txt">Vokabelliste</a> als Text gespeichert werden.
+                </p>
+			</div>
+			<div class="span4">
+				<h2><a href="developing.html">Freie Software &raquo;</a></h2>
+				<p>
+				    JGloss ist Freie und Open Source Software, die unter der <a href="http://www.gnu.org/licenses/licenses.html#TOCGPL">GNU General Public License</a>
+				    lizensiert ist. Sie können den Quellcode herunterladen, nach ihren Wünschen anpassen und wenn Sie mögen ihre Verbesserungen zum Projekt beitragen.
+                </p>
+			</div>
+		</div>
+
+		<hr>
+
+		<footer>
+#set ( $currentYear = ${project.properties.buildTimestamp.substring(0,4)} )
+			<p>
+                Aktuelle Version: ${project.version} - Zuletzt veröffentlicht: ${project.properties.buildTimestamp}
+                <span class="pull-right">&copy; ${project.inceptionYear}-${currentYear} ${project.organization.name}.</span>
+            </p>
+
+            <p>
+                <a href="http://sourceforge.net/projects/jgloss" title="SourceForge">
+                <img alt="Get JGloss at SourceForge.net. Fast, secure and Free Open Source software downloads" src="http://sflogo.sourceforge.net/sflogo.php?group_id=29259&type=12"   width="120"  height="30" />
+                </a>
+                Das <a href="http://sourceforge.net/projects/jgloss">JGloss Project</a> ist bei 
+                <a href="http://sourceforge.net/">SourceForge</a> gehostet.
+                <span class="pull-right"><a href="imprint.html">Impressum</a></span>
+            </p>
+
+		</footer>
+
+	</div>
+	<!-- /container -->
+</body>
+</html>

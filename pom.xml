@@ -223,7 +223,6 @@
             <plugin>
                 <groupId>net.rumati.maven.plugins</groupId>
                 <artifactId>velocity-maven-plugin</artifactId>
-                <version>0.3.0</version>
  
                 <executions>
                     <execution>
@@ -359,6 +358,11 @@
 					<artifactId>maven-war-plugin</artifactId>
 					<version>2.3</version>
 				</plugin>
+                <plugin>
+                    <groupId>net.rumati.maven.plugins</groupId>
+                    <artifactId>velocity-maven-plugin</artifactId>
+                    <version>0.3.0</version>
+                </plugin>
         	</plugins>
 		</pluginManagement>
 
@@ -596,6 +600,25 @@
 							<locales>en,de</locales>
 						</configuration>
 					</plugin>
+                    <plugin>
+                        <groupId>net.rumati.maven.plugins</groupId>
+                        <artifactId>velocity-maven-plugin</artifactId>
+         
+                        <executions>
+                            <execution>
+                                <id>process-site-templates-de</id>
+                                <phase>site</phase>
+                                <goals>
+                                    <goal>velocity</goal>
+                                </goals>
+                                <configuration>
+                                    <template>src/site/de/vm/index.html.vm</template>
+                                    <outputFile>${project.build.directory}/site/de/index.html</outputFile>
+                                    <removeExtension>.vm</removeExtension>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
 	           </plugins>
 	       </build>
 	   </profile>
