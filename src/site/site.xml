@@ -49,10 +49,6 @@
                 <thing>1136753/JGloss</thing>
                 <url>http://jgloss.sourceforge.net/</url>
             </flattr>
-            <piwik>
-                <piwikUrl>sourceforge.net/apps/piwik/jgloss</piwikUrl>
-                <idsite>1</idsite>
-            </piwik>
             <ohloh>
                 <projectId>80552</projectId>
                 <widget>factoids</widget>
