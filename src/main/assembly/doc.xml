@@ -13,7 +13,7 @@
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>COPYING</include>
-				<include>README.txt</include>
+				<include>README.md</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -22,6 +22,9 @@
 			<includes>
 				<include>**/*</include>
 			</includes>
+            <excludes>
+                <exclude>**/*.fo</exclude>
+            </excludes>
 		</fileSet>
 	</fileSets>
 </assembly>

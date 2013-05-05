@@ -16,14 +16,6 @@
 				<include>*-with-dependencies.jar</include>
 			</includes>
 		</fileSet>
-		<fileSet>
-			<directory>${basedir}/src/main</directory>
-			<outputDirectory>/</outputDirectory>
-			<includes>
-				<include>latex/**</include>
-				<include>xslfo/**</include>
-			</includes>
-		</fileSet>
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
