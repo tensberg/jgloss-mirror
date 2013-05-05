@@ -1,0 +1,65 @@
+	------------
+	JGloss
+	------------
+	
+Über JGloss
+
+  JGloss ist eine Anwendung zum Hinzufügen von Lesungs- und Übersetzungs-Annotationen
+  zu Wörtern in einem japanischen Textdokument. Dies kann automatisch und
+  manuell geschehen. Wenn ein Textdokument zum ersten Mal geöffnet wird, werden
+  die Wörter im Text in den Wörterbüchern nachgesehen; jedes Wort wird mit
+  der ersten gefundenen Lesung und Übersetzung annotiert. Diese Annotation kann dann vom
+  Benutzer editiert werden: in den Wörterbüchern gefundenen Lesungen und Übersetzungen
+  können ausgewählt werden, oder es können eigene Lesungen/Übersetzungen eingegeben werden,
+  Annotationen können entfernt und neue Annotationen erstellt werden. Das editierte Dokument
+  kann exportiert werden als unformatierter Text mit Annotationen, HTML (mit Unterstützung
+  für die {{{http://www.w3.org/TR/ruby/}Ruby Annotation}} XHTML Spezifikation 
+  {{{http://meiert.com/de/w3/TR/ruby/}deutsche Übersetzung}})) oder
+  LaTeX.
+  
+  Die Anwendung ist als Übersetzungshilfe für Japanisch-Lernende entworfen.
+  Ein neues Dokument kann mit JGloss zuerst überflogen und editiert werden. Das editierte
+  Dokument kann dann gedruckt oder exportiert werden um es detailliert zu bearbeiten,
+  ohne ständig nach einem Papier-Wörterbuch greifen zu müssen.
+
+  JGloss ist in Java geschrieben und sollte auf jedem Computer laufen, der
+  {{{http://www.java.com/}Java 7}} unterstützt. Es kann entsprechend den Bestimmungen der 
+  {{{http://www.gnu.org/licenses/licenses.html#TOCGPL}GNU General Public License}} Version 2 oder folgende
+  frei kopiert werden.
+
+JGloss Informations-Links
+
+    * {{{../doc/index.html}Des JGloss Benutzerhandbuch (EN)}} ({{{../jgloss.pdf}PDF}}).
+
+    * Die {{{http://sourceforge.net/projects/jgloss/}JGloss Projektseite}} bei {{{http://sourceforge.net/}SourceForge}}.
+
+    * {{{http://lists.sourceforge.net/lists/listinfo/jgloss-discussion}Mailingliste}} ({{{http://news.gmane.org/gmane.comp.java.jgloss}Nachrichtenarchiv}})
+
+    * {{{news://news.gmane.org/gmane.comp.java.jgloss}Newsgruppe}}
+
+  Die {{{http://lists.sourceforge.net/lists/listinfo/jgloss-discussion}JGloss
+  Mailingliste}} ist das zentrale Diskussionsforum für alle JGloss Benutzer und Entwickler.
+  Sie ist offen für jeden mit Interesse an JGloss. Sie können dort Fragen über Installation
+  und Benutzung posten, diskutieren wie sie JGloss nutzen und vorschlagen, in welche Richtung die
+  Anwendung weiterentwickelt werden sollte. Um die Leute zum Schreiben zu ermutigen, ist das Posten
+  in beliebigen Sprachen erlaubt.
+  
+  Die Mailingliste ist dank dem {{{http://www.gmane.org/}gmane mail-news gateway}} auch als Internet Newsgruppe verfügbar.
+  Um auf die Liste zuzugreifen, richten sie ihren Lieblings-Newsreader so ein, dass er
+  den News-Server {{{news://news.gmane.org/gmane.comp.java.jgloss}news.gmane.org,
+  Gruppe gmane.comp.java.jgloss}} anzeigt. Sie können die Newsgruppe auch 
+  {{{http://news.gmane.org/gmane.comp.java.jgloss}im Browser öffnen}}.
+
+Dank
+
+  Viele Ideen in JGloss stammen aus Jim Breen's Arbeit, insbesondere dem 
+  {{{http://www.dgs.monash.edu.au/~jwb/wwwjdic.html}WWWJDIC}} und dem
+  {{{http://www.csse.monash.edu.au/~jwb/xjdic/}XJDIC}}.
+  Der Kanji-Parser basiert auf
+  {{{ftp://ftp.monash.edu.au/pub/nihongo/www-jdict.ps.gz}Ideen aus dem WWWJDIC}}.
+  Die Zeichencode-Erkennung benutzt Code von Yasuhiro Tonooka's kcc (Kanji Code Converter).
+  Die französische Übersetzung hat Alexandre Beraud erstellt. Heinrich Künsting 
+  hat beim Erstellen der LaTeX Exportvorlagen geholfen und das LaTeX-CJK Listen-Template
+  geschrieben.
+  Einige der Dateiauswahl-Icons entstammen dem
+  {{{http://artists.kde.org}KDE project}}.
