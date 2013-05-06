@@ -1,0 +1,56 @@
+	------------
+	Download
+	------------
+
+Download
+
+* JGloss mit Java Web Start starten
+
+  {{{../webstart/jnlp/jgloss.jnlp}JGloss starten}}
+
+  Sie können die aktuelle Version von JGloss direkt von dieser Webseite starten, wenn Sie
+  Java Web Start benutzen. Wenn die Java Runtime korrekt installiert ist, wird der obige Link
+  mit der "javaws" Anwendung geöffnet. JGloss wird dann automatisch heruntergeladen und gestartet.
+  Dies sollte auch dann funktionieren, wenn Sie das Java Plugin im Browser deaktiviert haben.
+
+* JGloss ${project.version}
+
+  JGloss ${project.version}, zuletzt aktualisiert am ${date.short_date}, ist die aktuelle Version.
+
+  Der Wörterbuchteil von JGloss ist auch als eigenständige Anwendung verfügbar: JDictionary.
+  Sie können sie z. B. verwenden wenn Sie ihren Sprachschülern eine Wörterbuchanwendung zur Verfügung
+  stellen wollen, aber nicht das (zu) einfache Textlesen von JGloss.
+
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-${project.version}.zip}jgloss-${project.version}.zip}}          | ZIP Archiv der Anwendung.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jdictionary-${project.version}.zip}jdictionary-${project.version}.zip}}| ZIP Archiv mit nur der Wörterbuchfunktion.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+{{{http://prdownloads.sourceforge.net/jgloss/jgloss-${project.version}-src.zip}jgloss-${project.version}-src.zip}}  | ZIP Archiv des Quellcodes.
+*-----------------------------------------------------------------------------------------+---------------------------------+
+
+
+* Java
+
+  Um JGloss auszuführen, müssen Sie eine Java 7 Laufzeitumgebung installiert haben. {{{http://www.java.com/}Diese bekommen Sie hier}}.
+
+* Weitere Downloads
+
+  Das Archiv mit früheren Releases ist {{{http://sourceforge.net/project/showfiles.php?group_id=29259}hier}}.
+
+Wörterbücher
+
+  JGloss unterstützt die EDICT2 und KANJIDIC Wörterbuchformate. Sie können heruntergeladene Wörterbücher
+  auf der Seite Wörterbücher in den Einstellungen hinzufügen.
+
+  Hier folgen einige Links zu Wörterbuchdateien, die mit JGloss genutzt werden können. Wenn Sie weitere
+  Wörterbücher kennen, die hier nicht aufgeführt sind, {{{mailto:tensberg@gmx.net}schreiben Sie mir}}.
+
+    * Eine Liste mit EDICT und KANJIDIC-Wörterbüchern gibt es im 
+      {{{http://ftp.monash.edu.au/pub/nihongo/00INDEX.html#dic_fil}Monash Nihongo FTP Archiv}}.
+      Die Haupt-EDICT Datei ist ein Englisch-Japanisches Wörterbuch, aber Wörterbücher in anderen
+      Sprachen sind auch verfügbar.
+
+    * Das {{{http://www.wadoku.de/}Wadoku Jiten}} ist ein umfangreiches Japanisch-Deutsches Wörterbuch.
+      Das Wörterbuch kann {{{http://www.wadoku.de/wiki/display/WAD/Downloads+und+Links}hier im EDICT2-Format}}
+      heruntergeladen werden.

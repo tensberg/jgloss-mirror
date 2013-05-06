@@ -14,12 +14,12 @@
   Annotationen können entfernt und neue Annotationen erstellt werden. Das editierte Dokument
   kann exportiert werden als unformatierter Text mit Annotationen, HTML (mit Unterstützung
   für die {{{http://www.w3.org/TR/ruby/}Ruby Annotation}} XHTML Spezifikation 
-  {{{http://meiert.com/de/w3/TR/ruby/}deutsche Übersetzung}})) oder
+  ({{{http://meiert.com/de/w3/TR/ruby/}deutsche Übersetzung}})) oder
   LaTeX.
   
   Die Anwendung ist als Übersetzungshilfe für Japanisch-Lernende entworfen.
   Ein neues Dokument kann mit JGloss zuerst überflogen und editiert werden. Das editierte
-  Dokument kann dann gedruckt oder exportiert werden um es detailliert zu bearbeiten,
+  Dokument kann dann gedruckt oder exportiert werden um es eingehend zu bearbeiten,
   ohne ständig nach einem Papier-Wörterbuch greifen zu müssen.
 
   JGloss ist in Java geschrieben und sollte auf jedem Computer laufen, der

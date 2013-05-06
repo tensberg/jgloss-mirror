@@ -10,16 +10,16 @@
       can be used by JGloss to parse Japanese text. Download it from its
       {{{http://sourceforge.jp/projects/chasen-legacy/releases/}project page}}.
 
-    * {{{http://www.csse.monash.edu.au/cgi-bin/cgiwrap/jwb/wwwjdic}Online search in EDICT 
+    * {{{http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi}Online search in EDICT 
       dictionaries}}.
 
-    * The {{{http://www.wadoku.de/}Wadoku Jiten}} page offers online search in the dictionary.
+    * The {{{http://www.wadoku.de/}Wadoku Jiten}} page offers online search in the Japanese-German dictionary.
       You can also help improving the dictionary there.
 
     * Two WWW interfaces which provide glosses for any Japanese web page without having to
       run an extra program:
       Todd Rudick's {{{http://www.rikai.com/}RIKAI server}}
-      and Jim Breen's {{{http://www.csse.monash.edu.au/cgi-bin/cgiwrap/jwb/wwwjdic?9T}WWWJDIC}}.
+      and Jim Breen's {{{http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi?9T}WWWJDIC}}.
 
     * {{{https://play.google.com/store/apps/details?id=sk.baka.aedict}aedict}} is an 
       open source Japanese dictionary app for Android ({{{http://code.google.com/p/aedict/}project page}}). 

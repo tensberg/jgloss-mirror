@@ -1,0 +1,48 @@
+	------------
+	Beispiele
+	------------
+
+Beispiele
+
+  Hier folgt ein Beispiel für einen mit JGloss annotierten Text
+  Es ist die Geschichte "Kari no Douji" von Kenji Miyazawa. Ich habe den 
+  {{{http://www.aozora.gr.jp/cards/000081/card461.html}
+  Originaltext}} bei der {{{http://www.aozora.gr.jp/}Blue Sky Collection}} Heruntergeladen.
+  Wie Sie vielleicht merken, ist mein Englisch nicht perfekt, und mein Japanisch ist noch schlimmer.
+  Die Übersetzungen sind nur so ausgewählt, dass ein grundsätzliches Verständnis des Textes möglich ist.
+  Sie sind möglicherweise unpräzise oder völlig verkehrt.
+  
+  Eine Webseite mit Informationen über
+  {{{http://www.kenji-world.net/english/}
+  Kenji Miyazawa und seine Geschichten ist hier}}. Eine
+  {{{http://www.kenji-world.net/english/download/works/goose.html}
+  englische Übersetzung von "Kari no Douji"}} ist dort auch verfügbar.
+  {{{../karinodouji/kari.jgloss.zip}Hier}} ist die JGloss Datei, aus der die folgenden Beispiele
+  generiert sind.
+
+  Zuerst ein {{{../karinodouji/kari.html}Beispiel der HTML Exportfunktion}}. 
+  Das generierte Dokument benutzt eine Untermenge der {{{http://www.w3.org/TR/ruby/}Ruby Annotation}}
+  XHTML Spezifikation um Lesungen und Übersetzungen in Browsern anzuzeigen, die sie unterstützen
+  (zur Zeit nur der Microsoft Internet Explorer). In anderen Browsern wird, falls die notwendigen
+  JavaScript-Funktionen verfügbar sind, die Lesungen als Tooltip-Popup und in der Statuszeile
+  angezeigt.
+  
+  JGloss unterstützt auch den Export in LaTeX und einfachem Textformat:
+
+    * {{{../karinodouji/kari.pdf}Hier}} ist ein LaTeX
+      Beispiel, geTeXed von {{{../karinodouji/kari.tex}dieser Quelldatei}} und mit dem
+      Ghostscript ps2pdf Tool nach PDF konvertiert. Dies ist mein bevorzugtes Exportformat. 
+      {{{../karinodouji/kari_end.pdf}Hier}}
+      ist eine alternative Version mit einer Übersetzungsliste am Ende des Dokuments
+      ({{{../karinodouji/kari_end.tex}Quelldatei}}).
+
+    * Es kann auch unformatierter Text erzeugt werden. 
+      {{{../karinodouji/kari.txt}Hier}} ist der Text mit Lesungen und Übersetzungs-Annotationen und
+      {{{../karinodouji/kari.readings.txt}hier}} der Text mit nur Lesungen.
+
+    * Die {{{../karinodouji/kari.annotations.txt}Liste der Annotationen}} kann in eine Datei exportiert
+      werden.
+
+    * Zum Abschluss ist {{{../karinodouji/kari.jgloss.pdf}hier}} ein Ausdruck der Datei, generiert
+      via Druck in Datei und mit dem Ghostscript ps2pdf Tool nach PDF konvertiert.
+

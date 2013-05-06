@@ -10,7 +10,7 @@ The JGloss document window after importing a document.
 </li>
 <li class="span5">
 <a href="images/jgloss-screenshot-2.png" class="thumbnail">
-<img src="images/jgloss-screenshot-2_thumb.jpg" alt="JGloss editing screen without readings" />
+<img src="images/jgloss-screenshot-2_thumb.jpg" alt="JGloss editing screen without translations" />
 </a>
 The same document window, with hidden translations and changed colors.
 </li>

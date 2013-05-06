@@ -10,13 +10,12 @@ Download
 
   You can launch the latest version of JGloss directly from the web site using Java Web Start. 
   When the Java runtime is correctly installed, you can open the above link with the javaws application.
-  It will automatically download the required librariess and launch JGloss. This works even if
+  It will automatically download the required libraries and launch JGloss. This works even if
   you have disabled the Java Plugin in your browser.
 
-* Development release: JGloss ${project.version}
+* JGloss ${project.version}
 
-  JGloss ${project.version}, last updated on ${date.short_date}, is a snapshot of the development currently
-  done on JGloss. There may be still be missing or broken functionality and bugs.
+  JGloss ${project.version}, last updated on ${date.short_date}, is the most recent release.
 
   The dictionary lookup part of JGloss is also available as a separate application: JDictionary.
   You can use this if for example you want to offer your language students a dictionary lookup program,

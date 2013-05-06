@@ -1,0 +1,35 @@
+	-------------
+	Weiterführende Links
+	-------------
+
+    * {{{http://www.dgs.monash.edu.au/~jwb/Japanese.html}Jim Breen's Japanese Page}} 
+      enthält viele interessante Links. Er ist der Autor von verschiedenen Tools
+      auf denen JGloss basiiert und ist der Initiator von EDICT und KANJIDIC.
+      
+    * Das {{{http://chasen-legacy.sourceforge.jp/}ChaSen Tool für morphologische Analyse}}
+      kann von JGloss genutzt werden um japanischen Text zu parsen. Sie können es von der
+      {{{http://sourceforge.jp/projects/chasen-legacy/releases/}Projektseite}} herunterladen.
+
+    * {{{http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi}Online-Suche in EDICT 
+      Wörterbüchern}}.
+
+    * Die {{{http://www.wadoku.de/}Wadoku Jiten}} Seite ermöglicht eine Online-Suche
+      im Japanisch-Deutschen Wörterbuch. Sie können dort auch daran mitarbeiten, das Wörterbuch 
+      zu verbessern.
+
+    * Zwei Seiten im WWW die Glossare von beliebigen japanischen Webseiten erzeugen,
+      ohne das Sie dafür ein Extra-Programm installieren müssen:
+      Todd Rudick's {{{http://www.rikai.com/}RIKAI server}}
+      und Jim Breen's {{{http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi?9T}WWWJDIC}}.
+
+    * {{{https://play.google.com/store/apps/details?id=sk.baka.aedict}aedict}} ist eine
+      Open Source japanische Wörterbüch-App für Android
+      ({{{http://code.google.com/p/aedict/}Projektseite}}). 
+
+    * Die {{{http://www.aozora.gr.jp/}Blue Sky Collection}} ist ein Online-Archiv von freien
+      japanischen Texten.
+
+    * Eine {{{https://addons.mozilla.org/en-US/firefox/addon/html-ruby/}Ruby Erweiterung}} für 
+      {{{http://www.mozilla.org/products/firefox/}Firefox}} ermöglicht das Anzeigen von Ruby 
+      im Browser.
+
