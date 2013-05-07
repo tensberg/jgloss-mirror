@@ -42,9 +42,17 @@ body {
         })();
     /* ]]> */</script>
 </head>
-<body>
-	<div class="container">
+<body style="padding-top: 50px; ">
 
+	<div class="container">
+        
+        <div class="navbar navbar-fixed-top">
+            <ul class="nav nav-pills nav-border pull-right">
+                <li><a href="../index.html"><img src="../images/en.png" alt="English" width="16" height="11" /> English</a></li>
+                <li class="active"><a href="#"><img src="../images/de.png" alt="Deutsch" width="16" height="11" /> Deutsch</a></li>
+            </ul>
+        </div>
+        
         <div class="hero-unit">
             <a href="../webstart/jnlp/jgloss.jnlp"><img
                 src="../images/jgloss-logo.png" alt="JGloss logo" width="175"
