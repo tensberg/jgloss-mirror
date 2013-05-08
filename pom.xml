@@ -14,20 +14,24 @@
 	<name>JGloss</name>
 	<url>http://jgloss.sourceforge.net${siteDirectory}</url>
     <inceptionYear>2001</inceptionYear>
+    
 	<scm>
 		<url>http://sourceforge.net/p/jgloss/code/</url>
 		<connection>scm:git:git://git.code.sf.net/p/jgloss/code</connection>
 		<developerConnection>scm:git:ssh://username@git.code.sf.net/p/jgloss/code</developerConnection>
 	</scm>
+    
     <organization>
         <name>the JGloss developers</name>
     </organization>
+    
     <developers>
         <developer>
             <name>Michael Koch</name>
             <email>tensberg@gmx.net</email>
         </developer>
     </developers>
+    
     <contributors>
         <contributor>
             <name>Eric Crahen</name>
@@ -182,7 +186,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>1.2</version>
 				<executions>
 					<execution>
 						<id>enforce-java</id>
@@ -266,7 +269,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -280,7 +282,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -293,6 +294,7 @@
 		</plugins>
 
 		<pluginManagement>
+
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -303,65 +305,107 @@
 						<target>1.7</target>
 					</configuration>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-clean-plugin</artifactId>
 					<version>2.5</version>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>2.4</version>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>2.7</version>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>2.4</version>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.13</version>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>2.4</version>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>3.2</version>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>2.6</version>
 				</plugin>
+
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>jaxb2-maven-plugin</artifactId>
                     <version>1.5</version>
                 </plugin>		
+
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>webstart-maven-plugin</artifactId>
                     <version>1.0-beta-3</version>
                 </plugin>
+
                	<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
 					<version>2.3</version>
 				</plugin>
+
                 <plugin>
                     <groupId>net.rumati.maven.plugins</groupId>
                     <artifactId>velocity-maven-plugin</artifactId>
                     <version>0.3.0</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.2</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>com.agilejava.docbkx</groupId>
+                    <artifactId>docbkx-maven-plugin</artifactId>
+                    <version>2.0.14</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>com.agilejava.docbkx</groupId>
+                    <artifactId>docbkx-fop-support</artifactId>
+                    <version>2.0.14</version>
                 </plugin>
         	</plugins>
 		</pluginManagement>
@@ -375,6 +419,18 @@
 			    <artifactId>miglayout-swing</artifactId>
 			    <version>4.2</version>
 			</dependency>
+            
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.6.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+            </dependency>
 
 			<!-- test dependencies -->
 			<dependency>
@@ -383,12 +439,14 @@
 				<version>4.10</version>
 				<scope>test</scope>
 			</dependency>
+
 			<dependency>
 				<groupId>org.easytesting</groupId>
 				<artifactId>fest-assert</artifactId>
 				<version>1.4</version>
 				<scope>test</scope>
 			</dependency>
+
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
@@ -523,7 +581,6 @@
                     <plugin>
                         <groupId>com.agilejava.docbkx</groupId>
                         <artifactId>docbkx-fop-support</artifactId>
-                        <version>2.0.14</version>
                         <inherited>false</inherited>
                         <executions>
                             <execution>
@@ -543,7 +600,6 @@
 					<plugin>
 						<groupId>com.agilejava.docbkx</groupId>
 						<artifactId>docbkx-maven-plugin</artifactId>
-						<version>2.0.14</version>
 						<dependencies>
                             <dependency>
                                 <groupId>net.sf.docbook</groupId>
