@@ -34,8 +34,8 @@
     
 	<scm>
 		<url>http://jgloss.git.sourceforge.net/</url>
-		<connection>scm:git:git://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss/codequality</connection>
-		<developerConnection>scm:git:ssh://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss/codequality</developerConnection>
+		<connection>scm:git:git://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss</connection>
+		<developerConnection>scm:git:ssh://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss</developerConnection>
 	</scm>
 
     <licenses>
