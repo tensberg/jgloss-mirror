@@ -132,7 +132,7 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh</artifactId>
-                <version>2.5-WAGON-354-SNAPSHOT</version>
+                <version>2.5-WAGON-354.0</version>
             </extension>
         </extensions>
 
