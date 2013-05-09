@@ -18,7 +18,7 @@
 	<scm>
 		<url>http://sourceforge.net/p/jgloss/code/</url>
 		<connection>scm:git:git://git.code.sf.net/p/jgloss/code</connection>
-		<developerConnection>scm:git:ssh://username@git.code.sf.net/p/jgloss/code</developerConnection>
+		<developerConnection>scm:git:ssh://git.code.sf.net/p/jgloss/code</developerConnection>
 	</scm>
     
     <organization>
