@@ -6,17 +6,125 @@
 	<artifactId>codequality</artifactId>
 	<version>1-SNAPSHOT</version>
 	<packaging>jar</packaging>
+    
+    <description>
+        FindBugs and PMD ruleset which is used in the JGloss project.
+        Packaged as Jar so that it can be referenced as dependency in 
+        the FindBugs/PMD Maven plugins.  
+    </description>
+
+    <prerequisites>
+        <maven>3.0.4</maven>
+    </prerequisites>
+    
+    <organization>
+        <name>the JGloss developers</name>
+    </organization>
+    
+    <developers>
+        <developer>
+            <name>Michael Koch</name>
+            <email>tensberg@gmx.net</email>
+        </developer>
+    </developers>
 
 	<name>codequality</name>
 	<url>http://jgloss.sf.net/</url>
     <inceptionYear>2012</inceptionYear>
+    
 	<scm>
 		<url>http://jgloss.git.sourceforge.net/</url>
 		<connection>scm:git:git://jgloss.git.sourceforge.net/gitroot/jgloss/jgloss/codequality</connection>
 		<developerConnection>scm:git:ssh://username@jgloss.git.sourceforge.net/gitroot/jgloss/jgloss/codequality</developerConnection>
 	</scm>
 
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 2 or later</name>
+            <url>http://www.gnu.org/licenses/gpl-2.0.html</url>
+        </license>
+    </licenses>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+    
+    <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.5-WAGON-354-SNAPSHOT</version>
+            </extension>
+        </extensions>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.0</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.4.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>jgloss-releases</id>
+            <name>JGloss releases repository</name>
+            <url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/m2repo/releases</url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>jgloss-snapshots</id>
+            <name>JGloss snapshots repository</name>
+            <url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/m2repo/snapshots</url>
+            <layout>default</layout>
+        </snapshotRepository>
+
+        <site>
+            <id>jgloss.sf.net</id>
+            <name>SourceForge JGloss Homepage</name>
+            <url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/codequality</url>
+        </site>
+    </distributionManagement>
 </project>
