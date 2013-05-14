@@ -241,6 +241,7 @@
                     <execution>
                         <id>process-site-templates</id>
                         <phase>site</phase>
+                        <inherited>false</inherited>
                         <goals>
                             <goal>velocity</goal>
                         </goals>
@@ -548,6 +549,7 @@
 				<reportSets>
 					<reportSet>
 						<reports>
+                            <report>index</report>
 							<report>dependencies</report>
 							<report>dependency-convergence</report>
 							<report>dependency-management</report>
@@ -719,6 +721,7 @@
                             <execution>
                                 <id>process-site-templates-de</id>
                                 <phase>site</phase>
+                                <inherited>false</inherited>
                                 <goals>
                                     <goal>velocity</goal>
                                 </goals>
