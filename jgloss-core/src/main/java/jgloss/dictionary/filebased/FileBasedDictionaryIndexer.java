@@ -140,10 +140,10 @@ class FileBasedDictionaryIndexer {
         			// for kanji terms, each kanji in the term is indexed
                     // for kanji/hiragana boundaries, the kana part is also
                     // indexed
-                    if (clazz == KANJI && (clazz2 == clazz || clazz2 == HIRAGANA)) { // NOPMD
+                    if (clazz == KANJI && (clazz2 == clazz || clazz2 == HIRAGANA)) { 
 	                    termStarts.add( Integer.valueOf( termEnd));
                     }
-                } while (clazz2 == clazz || clazz == KANJI && clazz2 == HIRAGANA); // NOPMD
+                } while (clazz2 == clazz || clazz == KANJI && clazz2 == HIRAGANA); 
 
         		// add the term to the index
                 if (clazz == KANJI || clazz == HIRAGANA || clazz == KATAKANA || clazz == ROMAN_WORD && termLength >= 3) {

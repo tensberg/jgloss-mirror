@@ -84,7 +84,7 @@ class EDictEntryParser implements EntryParser {
 			public String getPriority() { return "_P_"; }
             @Override
 			public int compareTo( Priority p) {
-                if (p == PRIORITY_VALUE) { // NOPMD: singleton comparison
+                if (p == PRIORITY_VALUE) { 
 	                return 0;
                 } else {
 	                throw new IllegalArgumentException();

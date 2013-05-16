@@ -49,11 +49,11 @@ import jgloss.util.UTF8ResourceBundleControl;
  */
 public class Conjugation {
 	private static final Logger LOGGER = Logger.getLogger(Conjugation.class.getPackage().getName());
-	
+
     /**
      * Location of the file with the conjugation definition.
      */
-    private final static String VCONJ_RESOURCE = "/vconj";
+    private final static String VCONJ_RESOURCE = "/vconj.utf-8";
 
     /**
      * Prefix used when constructing keys for resource lookups.
@@ -63,7 +63,7 @@ public class Conjugation {
     /**
      * Localizable message resource.
      */
-    private final static ResourceBundle messages = 
+    private final static ResourceBundle MESSAGES =
         ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl());
 
     /**
@@ -188,7 +188,7 @@ public class Conjugation {
         Node n = root;
         Conjugation c[] = null;
         boolean stop = false;
-       
+
         while (!stop) {
             stop = true; // will be set false if matching child is found
             for (Node element : n.children) {
@@ -239,7 +239,8 @@ public class Conjugation {
             root = new Node( "", null, new Node[0]);
 
             LineNumberReader in = new LineNumberReader( new InputStreamReader
-                (Conjugation.class.getResourceAsStream( VCONJ_RESOURCE), "EUC-JP"));
+(
+                            Conjugation.class.getResourceAsStream(VCONJ_RESOURCE), "UTF-8"));
             String line = in.readLine();
 
             // the vconj files begin with a mapping of abbreviations to longer type
@@ -261,9 +262,9 @@ public class Conjugation {
                     if (i != -1) {
                         String label = line.substring( 0, i).trim();
                         try {
-                            labels.put( label, messages.getString( RESOURCE_PREFIX + label));
+                            labels.put( label, MESSAGES.getString( RESOURCE_PREFIX + label));
                         } catch (MissingResourceException ex) {
-                            LOGGER.warning( "vconj: missing resource for description " + 
+                            LOGGER.warning( "vconj: missing resource for description " +
                                                 RESOURCE_PREFIX + label);
                             labels.put( label, line.substring( i+1).trim());
                         }
@@ -285,7 +286,7 @@ public class Conjugation {
                     addConjugation( c, d, labels.get( l.trim()));
                 }
             }
-            
+
             propagateConjugations( root, new Conjugation[0]);
         } catch (IOException ex) {
             LOGGER.log(SEVERE, ex.getMessage(), ex);
@@ -345,7 +346,7 @@ public class Conjugation {
                     }
                     else if (p+j == conjugatedForm.length()) {
                         // insert new conjugation between pn and n
-                        Node nn = new Node( conjugatedForm.substring( p), c, 
+                        Node nn = new Node( conjugatedForm.substring( p), c,
                                             new Node[] { n });
                         pn.children[i] = nn;
                         n.edge = n.edge.substring( j);
@@ -394,7 +395,7 @@ public class Conjugation {
             for (Conjugation conjugation : n.conjugations) {
 	            conjugations.add( conjugation);
             }
-                
+
             for (Conjugation element : c) {
                 boolean add = true;
                 for (Conjugation conjugation : n.conjugations) {
@@ -416,7 +417,7 @@ public class Conjugation {
             }
             c = n.conjugations; // propagate conjugations of this node
         }
-        
+
         for (Node element : n.children) {
 	        propagateConjugations( element, c);
         }
@@ -427,11 +428,11 @@ public class Conjugation {
      */
     public static void dump() {
         loadConjugations();
-        
+
         LOGGER.info( "Printing conjugations");
         dump( root, "");
     }
-    
+
     /**
      * Dumps the node and all of its descendants on the logger.
      *
@@ -462,7 +463,7 @@ public class Conjugation {
                 }
             }
         }
-        
+
         return out;
     }
 } // class Conjugation

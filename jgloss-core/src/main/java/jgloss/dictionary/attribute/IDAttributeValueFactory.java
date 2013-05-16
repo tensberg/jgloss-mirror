@@ -39,7 +39,7 @@ public abstract class IDAttributeValueFactory {
 
     public CategoryAttributeValue getValueFor( String id) {
         if (!values.containsKey( id)) {
-            id = new String( id); // NOPMD: invoking the copy constructor minimizes the space requirements
+            id = new String( id); 
             values.put( id, createValue( id));
         }
 
