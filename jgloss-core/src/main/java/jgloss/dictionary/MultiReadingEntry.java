@@ -35,7 +35,7 @@ import jgloss.dictionary.attribute.DefaultAttributeSet;
  */
 class MultiReadingEntry implements DictionaryEntry {
     protected static final AttributeSet EMPTY_ATTRIBUTE_SET = new DefaultAttributeSet();
-    
+
     protected String word;
     protected String[] readings;
     protected String[] translations;
@@ -60,7 +60,7 @@ class MultiReadingEntry implements DictionaryEntry {
 
     @Override
 	public AttributeSet getGeneralAttributes() { return EMPTY_ATTRIBUTE_SET; }
- 
+
     @Override
 	public String getWord( int alternative) {
         if (alternative != 0) {
@@ -132,7 +132,8 @@ class MultiReadingEntry implements DictionaryEntry {
     @Override
 	public int getTranslationSynonymCount( int rom, int crm) {
         if (rom!=0 || crm<0 || crm>=translations.length) {
-	        throw new IllegalArgumentException();
+            throw new IllegalArgumentException("rom: " + rom + ", crm: " + crm + ", translations.length: "
+                            + translations.length);
         }
         return 1;
     }

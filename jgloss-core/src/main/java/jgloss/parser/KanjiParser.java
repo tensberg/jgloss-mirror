@@ -328,11 +328,11 @@ public class KanjiParser extends AbstractParser {
                     }
                 }
                 
-                for (Dictionary dictionarie : dictionaries) {
+                for (Dictionary dictionary : dictionaries) {
                     for (Conjugation conjugation : conjugations) {
                         String dictionaryWord = word +
                             conjugation.getDictionaryForm();
-                        if (hasMatch( dictionarie, dictionaryWord)) {
+                        if (hasMatch( dictionary, dictionaryWord)) {
                             String conjugatedForm = word +
                                 conjugation.getConjugatedForm();
                             annotations.add( new TextAnnotation
@@ -353,8 +353,8 @@ public class KanjiParser extends AbstractParser {
                 return true;
             }
             else {
-                for (Dictionary dictionarie : dictionaries) {
-                    if (hasMatch( dictionarie, word)) {
+                for (Dictionary dictionary : dictionaries) {
+                    if (hasMatch( dictionary, word)) {
                         annotations.add( new TextAnnotation
                                          ( wordStart, word.length(), word));
                         if (firstOccurrenceOnly) {

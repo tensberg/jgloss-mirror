@@ -41,7 +41,7 @@ public interface DictionaryEntry {
      * Return the set of attributes which apply to the whole entry.
      */
     AttributeSet getGeneralAttributes();
- 
+
     /**
      * Return one spelling variant of the entry word. Each entry word may have several spelling
      * variants (okurigana/katakana/romaji/irr. spellings).
@@ -67,7 +67,7 @@ public interface DictionaryEntry {
     AttributeSet getWordAttributes();
 
     /**
-     * Returns the reading of the word. There is always at least one reading. 
+     * Returns the reading of the word. There is always at least one reading.
      * More than one reading is only allowed if
      * (a) the meaning (translation and all attributes) of all readings are identical
      * and (b) the spelling of the reading does not conflict with any word part.
@@ -96,7 +96,7 @@ public interface DictionaryEntry {
      * Returns a translation of this entry. Translations are separated in several groups, forming
      * a tree-like structure. With the entry as root, the first level of children are the
      * <em>ranges of meaning (rom)</em> . Each range of meaning can have one or more <em>closely related
-     * meanings (crm)</em>. The lowest level is the translation, 
+     * meanings (crm)</em>. The lowest level is the translation,
      * where there can be several synonymous
      * words for every crm. There is always at least 1 rom, 1 crm and one definition (synonym).
      *
@@ -106,8 +106,9 @@ public interface DictionaryEntry {
      * @exception IllegalArgumentException if one of the parameters is out of range.
      */
     String getTranslation( int rom, int crm, int synonym);
+    
     /**
-     * Returns the number of ranges of meanings. Returns values >= 1.
+     * Returns the number of ranges of meanings. Returns values >= 0.
      */
     int getTranslationRomCount();
     /**

@@ -22,6 +22,8 @@
 
 package jgloss.parser;
 
+import static jgloss.dictionary.attribute.Attributes.PRIORITY;
+
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,7 +36,7 @@ import jgloss.dictionary.SearchFieldSelection;
 
 public class TextAnnotationCompleter {
 	private static final Logger LOGGER = Logger.getLogger(TextAnnotationCompleter.class.getPackage().getName());
-	
+
     private final Dictionary[] dictionaries;
     private final Object[] searchParameters;
 
@@ -51,9 +53,9 @@ public class TextAnnotationCompleter {
         }
 
         searchParameters[0] = anno.getDictionaryForm();
-        for (Dictionary dictionarie : dictionaries) {
+        for (Dictionary dictionary : dictionaries) {
 	        try {
-	            Iterator<DictionaryEntry> r = dictionarie.search( ExpressionSearchModes.EXACT,
+	            Iterator<DictionaryEntry> r = dictionary.search( ExpressionSearchModes.EXACT,
 	                                                       searchParameters);
 	            while (r.hasNext()) {
 	                try {
@@ -80,8 +82,8 @@ public class TextAnnotationCompleter {
 	                    boolean translationMatches = false;
 	                    if (anno.getTranslation() != null) {
 	                        for ( int j=0; j<de.getTranslationRomCount(); j++) {
-	                            for ( int k=0; j<de.getTranslationCrmCount( j); k++) {
-	                                for ( int l=0; j<de.getTranslationSynonymCount( j, k); l++) {
+                                for (int k = 0; k < de.getTranslationCrmCount(j); k++) {
+                                    for (int l = 0; l < de.getTranslationSynonymCount(j, k); l++) {
 	                                    if (anno.getTranslation().equals
 	                                        ( de.getTranslation( j, k, l))) {
 	                                        translationMatches = true;
@@ -95,21 +97,28 @@ public class TextAnnotationCompleter {
 	                        }
 	                    }
 
-	                    // use this entry to complete anno
-	                    try {
-	                        anno.setTranslation( de.getTranslation( 0, 0, 0));
-	                    } catch (IllegalArgumentException ex) {
-	                        // No translations, just reading. Try next dictionary entry.
-	                        continue;
+                        if (de.getTranslationRomCount() > 0) {
+                            boolean priorityEntry = de.getTranslationAttributes(0, 0, 0).containsKey(PRIORITY, true);
+
+                            if (priorityEntry || anno.getTranslation() == null) {
+                                // use this entry to complete anno
+                                anno.setTranslation(de.getTranslation(0, 0, 0));
+                                anno.setDictionaryFormReading(de.getReading(0));
+                            }
+
+                            if (priorityEntry) {
+                                break;
+                            } // else: continue to search for a priority entry
 	                    }
-	                    anno.setDictionaryFormReading( de.getReading( 0));
-	                    return anno;
-	                } catch (SearchException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
+                    } catch (SearchException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
 	            }
-	        } catch (SearchException ex) { LOGGER.log(Level.SEVERE, ex.getMessage(), ex); }
+            } catch (SearchException ex) {
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            }
         }
 
-        // no dictionary entry found, return anno unchanged.
         return anno;
     }
 } // class TextAnnotationCompleter

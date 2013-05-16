@@ -9,10 +9,11 @@
             <action type="update">JGloss now requires at least Java 7.</action>
             <action type="add">Support for EDICT2 dictionary format.</action>
             <action type="update">The dictionary lookup dialog now performs searches immediately (no more search button).</action>
+            <action type="add">Priority entries are now preferred for annotations.</action>
             <action type="add">An empty JGloss document now shows a panel with the most imporant actions.</action>
             <action type="add">Opening JGloss 1 documents is now supported.</action>
             <action type="update">Maven is now used for build and site generation.</action>
-            <action type="update">The search options are no longer stored in the preferences.</action>
+            <action type="removed">The search options are no longer stored in the preferences.</action>
             <action type="removed">Removed platex export templates. The Latex-CJK templates work just as well.</action>
             <action type="removed">Removed compact view option because it never worked properly.</action>
             <action type="fix">Fixed search history.</action>
