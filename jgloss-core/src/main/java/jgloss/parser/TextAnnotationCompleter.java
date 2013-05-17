@@ -52,6 +52,7 @@ public class TextAnnotationCompleter {
 	        return anno;
         }
 
+        boolean translationSetFromDictionary = false;
         searchParameters[0] = anno.getDictionaryForm();
         for (Dictionary dictionary : dictionaries) {
 	        try {
@@ -79,22 +80,23 @@ public class TextAnnotationCompleter {
 
 	                    // if a translation is given in anno, test if any of the translations of this
 	                    // de matches it
-	                    boolean translationMatches = false;
-	                    if (anno.getTranslation() != null) {
-	                        for ( int j=0; j<de.getTranslationRomCount(); j++) {
-                                for (int k = 0; k < de.getTranslationCrmCount(j); k++) {
-                                    for (int l = 0; l < de.getTranslationSynonymCount(j, k); l++) {
-	                                    if (anno.getTranslation().equals
-	                                        ( de.getTranslation( j, k, l))) {
-	                                        translationMatches = true;
-	                                        break;
-	                                    }
-	                                }
-	                            }
-	                        }
-	                        if (!translationMatches) {
-	                            continue;
-	                        }
+                        if (!translationSetFromDictionary) {
+                            boolean translationMatches = false;
+                            if (anno.getTranslation() != null) {
+                                for (int j = 0; j < de.getTranslationRomCount(); j++) {
+                                    for (int k = 0; k < de.getTranslationCrmCount(j); k++) {
+                                        for (int l = 0; l < de.getTranslationSynonymCount(j, k); l++) {
+                                            if (anno.getTranslation().equals(de.getTranslation(j, k, l))) {
+                                                translationMatches = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (!translationMatches) {
+                                    continue;
+                                }
+                            }
 	                    }
 
                         if (de.getTranslationRomCount() > 0) {
@@ -102,6 +104,7 @@ public class TextAnnotationCompleter {
 
                             if (priorityEntry || anno.getTranslation() == null) {
                                 // use this entry to complete anno
+                                translationSetFromDictionary = true;
                                 anno.setTranslation(de.getTranslation(0, 0, 0));
                                 anno.setDictionaryFormReading(de.getReading(0));
                             }
