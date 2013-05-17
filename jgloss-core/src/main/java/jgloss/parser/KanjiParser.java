@@ -46,7 +46,7 @@ import jgloss.util.UTF8ResourceBundleControl;
  * consists of katakana characters, it will be looked up immediately and the result added
  * to the annotation list. If it is a kanji word, if the following
  * character is the reading annotation start delimiter,  all following characters until the
- * reading annotation end delimiter are treated as reading for the word. 
+ * reading annotation end delimiter are treated as reading for the word.
  * Hiragana characters directly following the word or the reading annotation will be used as possible
  * verb/adjective inflections. The <CODE>createAnnotations</CODE> method will then be called
  * with this word/reading/hiragana tuple.
@@ -71,7 +71,7 @@ public class KanjiParser extends AbstractParser {
     private Object[] searchParameters;
     private StringBuilder searchKey;
 
-    private final static String PARSER_NAME = 
+    private final static String PARSER_NAME =
         ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl())
         .getString( "parser.kanji.name");
 
@@ -99,7 +99,7 @@ public class KanjiParser extends AbstractParser {
 
     /**
      * Creates a new parser which will use the given dictionaries.
-     * 
+     *
      * @param dictionaries The dictionaries used for word lookups.
      * @param exclusions Set of words which should not be annotated. May be <CODE>null</CODE>.
      * @param cacheLookups <CODE>true</CODE> if dictionary lookups should be cached.
@@ -128,7 +128,7 @@ public class KanjiParser extends AbstractParser {
 	public List<TextAnnotation> parse( char[] text, int start, int length) throws SearchException {
         int end = start + length;
         List<TextAnnotation> out = new ArrayList<TextAnnotation>( length/3);
-        
+
         final byte OUTSIDE = 0;
         final byte IN_KATAKANA = 1;
         final byte IN_KANJI = 2;
@@ -144,8 +144,8 @@ public class KanjiParser extends AbstractParser {
             if (Thread.interrupted()) {
 	            throw new ParsingInterruptedException();
             }
-            
-            if (ignoreNewlines && 
+
+            if (ignoreNewlines &&
                 (text[i]==0x0a || text[i]==0x0d)) {
 	            continue;
             }
@@ -160,8 +160,8 @@ public class KanjiParser extends AbstractParser {
                     mode = IN_KANJI;
                 }
                 wordStart = i;
-                break;     
-                
+                break;
+
             case IN_KATAKANA: // currently in Katakana word
                 if (ub != Character.UnicodeBlock.KATAKANA) {
                     createAnnotations( wordStart, word.toString(),
@@ -208,7 +208,7 @@ public class KanjiParser extends AbstractParser {
                     }
                 }
                 break;
-                
+
             case IN_INFLECTION: // currently in possible inflection
                 if (ub != Character.UnicodeBlock.HIRAGANA) {
                     boolean result = createAnnotations( wordStart, word.toString(),
@@ -244,12 +244,12 @@ public class KanjiParser extends AbstractParser {
                 }
                 break;
             }
-            
+
             if (mode==IN_KANJI || mode==IN_KATAKANA) {
                 word.append( text[i]);
             }
         }
-        
+
         // look up last word in buffer
         if (mode==IN_KATAKANA || mode==IN_KANJI) {
 	        createAnnotations( wordStart, word.toString(), true, true, out);
@@ -271,13 +271,13 @@ public class KanjiParser extends AbstractParser {
         return out;
     }
 
-    private boolean createAnnotations( int wordStart, String word, boolean tryPrefixes, 
+    private boolean createAnnotations( int wordStart, String word, boolean tryPrefixes,
                                        boolean trySuffixes, List<TextAnnotation> out) throws SearchException {
         return createAnnotations( wordStart, word, null, tryPrefixes, trySuffixes, out);
     }
 
     /**
-     * Finds all translations for a word. 
+     * Finds all translations for a word.
      * <P>If <CODE>inflections</CODE> is not <CODE>null</CODE>, this will first look up
      * all conjugations with an inflected form which is a prefix of <CODE>inflection</CODE>
      * (this includes the plain form). The dictionaries will then be searched for words
@@ -295,7 +295,7 @@ public class KanjiParser extends AbstractParser {
      * objects.
      * </P>
      *
-     * @param wordStart Offset of the search word in the text containing word. 
+     * @param wordStart Offset of the search word in the text containing word.
      * @param word The word to look up.
      * @param inflection String of hiragana characters which might contain a verb/adjective inflection.
      *                   May be <CODE>null</CODE>.
@@ -327,17 +327,14 @@ public class KanjiParser extends AbstractParser {
                         return true;
                     }
                 }
-                
+
                 for (Dictionary dictionary : dictionaries) {
                     for (Conjugation conjugation : conjugations) {
                         String dictionaryWord = word +
                             conjugation.getDictionaryForm();
                         if (hasMatch( dictionary, dictionaryWord)) {
-                            String conjugatedForm = word +
-                                conjugation.getConjugatedForm();
                             annotations.add( new TextAnnotation
-                                             ( wordStart, word.length() + 
-                                               conjugatedForm.length(),
+                                            (wordStart, word.length() + conjugation.getConjugatedForm().length(),
                                                null, dictionaryWord, null, conjugation.getType()));
                             if (firstOccurrenceOnly) {
 	                            annotatedWords.add( dictionaryWord);
@@ -347,7 +344,7 @@ public class KanjiParser extends AbstractParser {
                     }
                 }
             }
-            
+
             // try to find exact match without conjugation
             if (ignoreWord( word)) {
                 return true;
@@ -397,7 +394,7 @@ public class KanjiParser extends AbstractParser {
 				else {
 	                matchlength = 1; // skip first char and look up remainder
                 }
-                    
+
                 // continue search with suffix of word
                 if (trySuffixes) {
                     word = word.substring( matchlength);
