@@ -574,6 +574,14 @@ public class JGlossEditorKit extends HTMLEditorKit {
             super(elem);
         }
 
+        @Override
+        public float getAlignment(int axis) {
+            if (axis == Y_AXIS) {
+                return 1.0f;
+            }
+            return super.getAlignment(axis);
+        }
+
     } // class BaseView
 
     /**
