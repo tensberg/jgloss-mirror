@@ -14,6 +14,6 @@ To start JGloss, double-click on _jgloss-...-jar-with-dependencies.jar_ or
 on the command-line type
 `java -jar jgloss-...-jar-with-dependencies.jar`
 
-(c) 2001-2013 Michael Koch <tensberg@gmx.net>
+(C) 2001-2013 Michael Koch <tensberg@gmx.net>
 
 Parts of JGloss code (C) 2002 Eric Crahen

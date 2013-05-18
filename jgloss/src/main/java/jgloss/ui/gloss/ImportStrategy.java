@@ -13,7 +13,7 @@ import jgloss.parser.Parser;
 import jgloss.parser.ReadingAnnotationFilter;
 
 /*
- * Copyright (C) 2001-2012 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2013 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
