@@ -456,6 +456,12 @@
                         <localCheckout>true</localCheckout>
                     </configuration>
                 </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.scm</groupId>
+                    <artifactId>maven-scm-providers-git</artifactId>
+                    <version>1.9-SNAPSHOT</version>
+                </plugin>
         	</plugins>
 		</pluginManagement>
 
