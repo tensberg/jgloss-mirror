@@ -455,9 +455,15 @@
                     <configuration>
                         <localCheckout>true</localCheckout>
                     </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-scm-plugin</artifactId>
+                    <version>1.8.1</version>
                     <dependencies>
                         <dependency>
-                            <groupId>org.apache.maven.scm</groupId>
+                        <groupId>org.apache.maven.scm</groupId>
                             <artifactId>maven-scm-providers-git</artifactId>
                             <version>1.9-SNAPSHOT</version>
                         </dependency>
