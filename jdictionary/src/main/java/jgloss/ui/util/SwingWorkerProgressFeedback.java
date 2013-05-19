@@ -149,7 +149,10 @@ public class SwingWorkerProgressFeedback implements PropertyChangeListener {
         }
         progressDialog = new ProgressDialog(feedbackWindow, cancelAction);
         progressDialog.setMessage(message);
-        progressDialog.setProgress(worker.getProgress());
+        int currentProgress = worker.getProgress();
+        if (currentProgress > 0) {
+            progressDialog.setProgress(currentProgress);
+        }
         progressDialog.setVisible(true);
     }
 
