@@ -41,7 +41,9 @@
         <description xml:lang="de">Freies japanisch-deutsches Wörterbuch.</description>
         <description xml:lang="en">Free Japanese/German dictionary.</description>
         <download>
-            <url>http://localhost/downloads/wadokudict2_20120701.zip</url>
+            <!-- The dictionary is repackaged as zip because JGloss does not support
+                 the original .tar.bz2 format. -->
+            <url>http://jgloss.sf.net/downloads/wadokudict2_20121222.zip</url>
             <compression>zip</compression>
             <dictionaryFile>wadokudict2</dictionaryFile>
         </download>
