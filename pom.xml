@@ -68,7 +68,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <codequality.version>1-SNAPSHOT</codequality.version>
+        <codequality.version>1</codequality.version>
         <buildTimestamp>${maven.build.timestamp}</buildTimestamp><!-- used in index.html.vm -->
         
         <siteDirectory>/snapshot</siteDirectory>
