@@ -46,7 +46,7 @@ import net.miginfocom.swing.MigLayout;
 public class ProgressDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
-    private final JLabel message = new JLabel( "", SwingConstants.CENTER);
+    private final JLabel message = new JLabel(" ", SwingConstants.CENTER);
 
     private final JProgressBar progress = new JProgressBar();
 
@@ -60,16 +60,15 @@ public class ProgressDialog extends JDialog {
         setModalityType(APPLICATION_MODAL);
         setTitle( JGloss.MESSAGES.getString( "dictionaries.loading.title"));
 
-        JPanel content = new JPanel(new MigLayout(new LC().fillX().wrapAfter(1)));
-        content.add(message, "grow");
-        content.add(progress, "grow");
+        JPanel content = new JPanel(new MigLayout(new LC().fillX().wrapAfter(1).minWidth("450").width("450")));
+        content.add(message, "growx");
+        content.add(progress, "growx");
         progress.setIndeterminate(true);
         if (cancelAction != null) {
             content.add(new JButton(cancelAction));
         }
         setContentPane(content);
         pack();
-        setSize(450, getPreferredSize().height);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation( WindowConstants.DO_NOTHING_ON_CLOSE);
     }
