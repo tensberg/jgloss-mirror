@@ -22,11 +22,11 @@ Download
   stellen wollen, aber nicht das (zu) einfache Textlesen von JGloss.
 
 *-----------------------------------------------------------------------------------------+---------------------------------+
-{{{http://prdownloads.sourceforge.net/jgloss/jgloss-${project.version}.zip}jgloss-${project.version}.zip}}          | ZIP Archiv der Anwendung.
+{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}.zip}jgloss-${project.version}.zip}}          | ZIP archive of the application.
 *-----------------------------------------------------------------------------------------+---------------------------------+
-{{{http://prdownloads.sourceforge.net/jgloss/jdictionary-${project.version}.zip}jdictionary-${project.version}.zip}}| ZIP Archiv mit nur der Wörterbuchfunktion.
+{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jdictionary-${project.version}.zip}jdictionary-${project.version}.zip}}| ZIP archive of only the dictionary lookup program.
 *-----------------------------------------------------------------------------------------+---------------------------------+
-{{{http://prdownloads.sourceforge.net/jgloss/jgloss-${project.version}-src.zip}jgloss-${project.version}-src.zip}}  | ZIP Archiv des Quellcodes.
+{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}-src.zip}jgloss-${project.version}-src.zip}}  | ZIP archive of the source code.
 *-----------------------------------------------------------------------------------------+---------------------------------+
 
 
