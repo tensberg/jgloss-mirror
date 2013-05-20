@@ -454,6 +454,9 @@
                     <version>2.4.1</version>
                     <configuration>
                         <localCheckout>true</localCheckout>
+                        <releaseProfiles>
+                            include-docbook,include-all-site-locales,staging
+                        </releaseProfiles>
                     </configuration>
                 </plugin>
         	</plugins>
@@ -737,5 +740,12 @@
 	           </plugins>
 	       </build>
 	   </profile>
+       
+       <profile>
+           <id>staging</id>
+           <properties>
+               <siteDirectory>/staging</siteDirectory>
+           </properties>
+       </profile>
 	</profiles>
 </project>
