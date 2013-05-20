@@ -458,6 +458,19 @@
                             include-docbook,include-all-site-locales,staging
                         </releaseProfiles>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-scm-plugin</artifactId>
+                            <version>1.9-SCM-709-SNAPSHOT</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-scm-plugin</artifactId>
+                    <version>1.9-SCM-709-SNAPSHOT</version>
                 </plugin>
         	</plugins>
 		</pluginManagement>
