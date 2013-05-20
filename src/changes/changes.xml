@@ -5,7 +5,7 @@
         <title>JGloss Changes</title>
     </properties>
     <body>
-        <release version="2.1.0" date="not yet released">
+        <release version="2.1.0" date="2013-05-20">
             <action type="update">JGloss now requires at least Java 7.</action>
             <action type="add">Support for EDICT2 dictionary format.</action>
             <action type="update">The dictionary lookup dialog now performs searches immediately (no more search button).</action>
