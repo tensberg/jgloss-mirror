@@ -6,6 +6,7 @@
     </properties>
     <body>
         <release version="2.1.1" date="not yet released">
+            <action type="add">Added PGP code signing of downloads.</action>
         </release>
         <release version="2.1.0" date="2013-05-20">
             <action type="update">JGloss now requires at least Java 7.</action>
