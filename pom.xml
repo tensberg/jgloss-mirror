@@ -72,6 +72,7 @@
         <buildTimestamp>${maven.build.timestamp}</buildTimestamp><!-- used in index.html.vm -->
         
         <siteDirectory>/snapshot</siteDirectory>
+        <siteUploadDirectory>${siteDirectory}</siteUploadDirectory>
 
         <!-- 
             The Japanese font is used when generating JGloss docbook PDF.
@@ -765,7 +766,8 @@
        <profile>
            <id>staging</id>
            <properties>
-               <siteDirectory>/staging</siteDirectory>
+               <siteDirectory>/</siteDirectory>
+               <siteUploadDirectory>/staging</siteUploadDirectory>
            </properties>
        </profile>
 	</profiles>
