@@ -44,12 +44,10 @@
                             </jnlp>
         					<pack200>true</pack200>
                             <sign>
-                                <keystore>${keystore}</keystore>
-                                <keypass>${keypass}</keypass>
-                                <storepass>${storepass}</storepass>
-                                <alias>jgloss</alias>
-
-                                <dnameCn>test</dnameCn>
+                                <keystore>${jarsigner.keystore}</keystore>
+                                <keypass>${jarsigner.keypass}</keypass>
+                                <storepass>${jarsigner.storepass}</storepass>
+                                <alias>${jarsigner.alias}</alias>
 
                                 <verify>true</verify>
 
