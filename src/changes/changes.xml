@@ -5,7 +5,7 @@
         <title>JGloss Changes</title>
     </properties>
     <body>
-        <release version="2.1.1" date="not yet released">
+        <release version="2.1.1" date="2013-06-16">
             <action type="add">The JGloss web start files are now signed with an official certificate as "Open Source Developer, Michael Koch".</action>
             <action type="add">JGloss download files and Maven artefacts are now PGP signed.</action>
             <action type="add">Added home page links to help menu and empty document page.</action>
