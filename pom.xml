@@ -554,7 +554,7 @@
 		<site>
 			<id>jgloss.sf.net</id>
 			<name>SourceForge JGloss Homepage</name>
-			<url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/${siteDirectory}</url>
+			<url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/${siteUploadDirectory}</url>
 		</site>
 	</distributionManagement>
 	
