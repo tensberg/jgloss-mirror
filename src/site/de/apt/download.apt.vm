@@ -21,13 +21,15 @@ Download
   Sie können sie z. B. verwenden wenn Sie ihren Sprachschülern eine Wörterbuchanwendung zur Verfügung
   stellen wollen, aber nicht das (zu) einfache Textlesen von JGloss.
 
-*-----------------------------------------------------------------------------------------+---------------------------------+
-{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}.zip}jgloss-${project.version}.zip}}          | ZIP archive of the application.
-*-----------------------------------------------------------------------------------------+---------------------------------+
-{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jdictionary-${project.version}.zip}jdictionary-${project.version}.zip}}| ZIP archive of only the dictionary lookup program.
-*-----------------------------------------------------------------------------------------+---------------------------------+
-{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}-src.zip}jgloss-${project.version}-src.zip}}  | ZIP archive of the source code.
-*-----------------------------------------------------------------------------------------+---------------------------------+
+  Die Dateien sind mit Schlüssel-ID 6E639488 »Michael Koch (Code Signing Key) \<tensberg@gmx.net\>« signiert.
+
+*-----------------------------------------------------------------------------------------+---------------------------------+---------------------------------+
+{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}.zip}jgloss-${project.version}.zip}} | ZIP-Archiv der Anwendung. | {{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}.zip.asc}PGP Signatur}}
+*-----------------------------------------------------------------------------------------+---------------------------------+---------------------------------+
+{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jdictionary-${project.version}.zip}jdictionary-${project.version}.zip}} | ZIP-Archiv mit nur dem Wörterbuchprogramm. |{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jdictionary-${project.version}.zip.asc}PGP Signatur}}
+*-----------------------------------------------------------------------------------------+---------------------------------+---------------------------------+
+{{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}-src.zip}jgloss-${project.version}-src.zip}} | ZIP-Archiv mit dem Quellcode. | {{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}-src.zip.asc}PGP Signatur}}
+*-----------------------------------------------------------------------------------------+---------------------------------+---------------------------------+
 
 
 * Java
