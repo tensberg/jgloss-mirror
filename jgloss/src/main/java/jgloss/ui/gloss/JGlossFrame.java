@@ -21,6 +21,9 @@
  */
 
 package jgloss.ui.gloss;
+
+import static jgloss.ui.util.UIUtilities.createMenuItem;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -112,6 +115,7 @@ import jgloss.ui.html.JGlossEditor;
 import jgloss.ui.html.JGlossEditorKit;
 import jgloss.ui.html.JGlossHTMLDoc;
 import jgloss.ui.html.SelectedAnnotationHighlighter;
+import jgloss.ui.util.HyperlinkAction;
 import jgloss.ui.util.UIUtilities;
 import jgloss.ui.util.XCVManager;
 
@@ -559,7 +563,10 @@ public class JGlossFrame extends JPanel implements ActionListener, ListSelection
 
         menu.add(UIUtilities.createMenuItem(actions.showWelcomeDialog));
         menu.addSeparator();
-
+        menu.add(createMenuItem(new HyperlinkAction("main.menu.homepage")));
+        menu.add(createMenuItem(new HyperlinkAction("main.menu.usersguide")));
+        menu.add(createMenuItem(new HyperlinkAction("main.menu.changes")));
+        menu.addSeparator();
         aboutItem = UIUtilities.createMenuItem( AboutFrame.getShowAction());
         menu.add( aboutItem);
         return menu;

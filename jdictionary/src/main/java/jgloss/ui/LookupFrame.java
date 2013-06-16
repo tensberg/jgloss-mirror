@@ -22,6 +22,7 @@
 
 package jgloss.ui;
 
+import static jgloss.ui.util.UIUtilities.createMenuItem;
 import static jgloss.ui.util.UIUtilities.fitToScreen;
 
 import java.awt.BorderLayout;
@@ -49,6 +50,7 @@ import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.dictionary.attribute.ReferenceAttributeValue;
 import jgloss.dictionary.attribute.SearchReference;
+import jgloss.ui.util.HyperlinkAction;
 import jgloss.ui.util.UIUtilities;
 import jgloss.ui.util.XCVManager;
 
@@ -63,32 +65,32 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOGGER = Logger.getLogger(LookupFrame.class.getPackage().getName());
-	
+
 	private final LookupConfigPanel config;
     private LookupModel model;
     private final AsynchronousLookupEngine engine;
     private final LookupResultList list;
-    
+
     private final Dimension preferredSize;
 
     private final LookupHistory lookupHistory = new LookupHistory(this);
-    
+
     private JFrame legendFrame;
     private AttributeLegend legend;
 
 	private final SearchOnModelChangeListener searchOnModelChange = new SearchOnModelChangeListener(this);
-	
+
 	private final PerformSearchPreconditions performSearchPreconditions = new PerformSearchPreconditions();
 
     public LookupFrame( LookupModel _model) {
         super( JGloss.MESSAGES.getString( "wordlookup.title"));
         setIconImages(JGlossLogo.ALL_LOGO_SIZES);
-        
+
         getContentPane().setLayout( new BorderLayout());
         JPanel center = new JPanel();
         center.setLayout( new BorderLayout());
         getContentPane().add( center, BorderLayout.CENTER);
-        
+
         model = _model;
         list = new LookupResultList();
         engine = new AsynchronousLookupEngine(list);
@@ -140,10 +142,14 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
         editMenu.addSeparator();
         editMenu.add( UIUtilities.createMenuItem( PreferencesFrame.SHOW_ACTION));
-        bar.add( editMenu);           
+        bar.add( editMenu);
 
         menu = new JMenu( JGloss.MESSAGES.getString( "main.menu.help"));
-        menu.add(UIUtilities.createMenuItem(AboutFrame.getShowAction()));
+        menu.add(createMenuItem(new HyperlinkAction("main.menu.homepage")));
+        menu.add(createMenuItem(new HyperlinkAction("main.menu.usersguide")));
+        menu.add(createMenuItem(new HyperlinkAction("main.menu.changes")));
+        menu.addSeparator();
+        menu.add(createMenuItem(AboutFrame.getShowAction()));
         bar.add( menu);
 
         setJMenuBar( bar);
@@ -156,7 +162,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
                         JGloss.PREFS.getInt( Preferences.WORDLOOKUP_WIDTH, 0)),
               Math.max( super.getPreferredSize().height + 150,
                         JGloss.PREFS.getInt( Preferences.WORDLOOKUP_HEIGHT, 0)));
-        
+
         addComponentListener( new ComponentAdapter() {
                 @Override
 				public void componentResized( ComponentEvent e) {
@@ -186,7 +192,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
         getContentPane().add( toolbar, BorderLayout.NORTH);
 
         setSize( getPreferredSize());
-        
+
         model.addLookupChangeListener(searchOnModelChange);
     }
 
@@ -258,7 +264,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     private void followReference( String type, String refKey) {
         if (LookupResultHyperlinker.REFERENCE_PROTOCOL.equals( type)) {
-            ReferenceAttributeValue ref = (ReferenceAttributeValue) 
+            ReferenceAttributeValue ref = (ReferenceAttributeValue)
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
             if (ref instanceof SearchReference) {
             	model.followReference((SearchReference) ref);
@@ -293,7 +299,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
 
     void showHistoryItem( HistoryItem hi) {
         model = hi.getLookupModel().clone();
-        
+
         // ignore model changes triggered by setModel
         model.removeLookupChangeListener(searchOnModelChange);
         config.setModel( model);
@@ -302,7 +308,7 @@ public class LookupFrame extends JFrame implements ActionListener, HyperlinkList
     }
 
     private HistoryItem createHistoryItem() {
-        return new HistoryItem( model.clone(), 
+        return new HistoryItem( model.clone(),
                                 list.saveViewState());
     }
 } // class LookupFrame
