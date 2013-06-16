@@ -6,7 +6,8 @@
     </properties>
     <body>
         <release version="2.1.1" date="not yet released">
-            <action type="add">Added PGP code signing of downloads.</action>
+            <action type="add">The JGloss web start files are now signed with an official certificate as "Open Source Developer, Michael Koch".</action>
+            <action type="add">JGloss download files and Maven artefacts are now PGP signed.</action>
         </release>
         <release version="2.1.0" date="2013-05-20">
             <action type="update">JGloss now requires at least Java 7.</action>
