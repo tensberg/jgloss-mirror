@@ -42,7 +42,7 @@ body {
         })();
     /* ]]> */</script>
 </head>
-<body style="padding-top: 50px; ">
+<body style="padding-top: 50px; " itemscope itemtype="http://schema.org/Product">
 
 	<div class="container">
         
@@ -54,9 +54,11 @@ body {
         </div>
         
         <div class="hero-unit">
+            <p itemprop="name" style="display: none;">JGloss</p>
+
             <a href="../webstart/jnlp/jgloss.jnlp"><img
-                src="../images/jgloss-logo.png" alt="JGloss logo" width="175"
-                height="100" /></a>
+                src="../images/jgloss-logo.png" alt="JGloss" width="175"
+                height="100" itemprop="image" /></a>
 
 			<ul class="nav nav-pills nav-border pull-right" style="margin: 5pt;">
 				<li >
@@ -83,7 +85,7 @@ body {
 				</li>
 			</ul>
 
-			<ul>
+			<ul itemprop="description">
 			    <li>Annotiere japanische Texte automatisch mit Lesungen und Übersetzungen.</li>
                 <li>Exportiere das annotierte Dokument und die Vokabelliste.</li>
                 <li>Unterstützt Wadoku Jiten und EDICT Wörterbücher.</li>

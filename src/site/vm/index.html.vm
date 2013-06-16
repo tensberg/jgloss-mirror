@@ -42,7 +42,7 @@ body {
         })();
     /* ]]> */</script>
 </head>
-<body style="padding-top: 50px; ">
+<body style="padding-top: 50px; " itemscope itemtype="http://schema.org/Product">
 
     <div class="container">
         
@@ -55,9 +55,11 @@ body {
 
         <div class="hero-unit">
 
+            <p itemprop="name" style="display: none;">JGloss</p>
+
             <a href="webstart/jnlp/jgloss.jnlp"><img
-                src="images/jgloss-logo.png" alt="JGloss logo" width="175"
-                height="100" /></a>
+                src="images/jgloss-logo.png" alt="JGloss" width="175"
+                height="100" itemprop="image"/></a>
 
 			<ul class="nav nav-pills nav-border pull-right" style="margin: 5pt;">
 				<li >
@@ -84,7 +86,7 @@ body {
 				</li>
 			</ul>
 
-			<ul>
+			<ul itemprop="description">
 				<li>Automatically annotate Japanese text with readings and
 					translations.</li>
 				<li>Export the annotated document and vocabulary list.</li>
