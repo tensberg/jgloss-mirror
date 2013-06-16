@@ -134,7 +134,7 @@ body {
 		<footer>
 #set ( $currentYear = ${project.properties.buildTimestamp.substring(0,4)} )
 			<p>
-                Aktuelle Version: ${project.version} - Zuletzt veröffentlicht: ${project.properties.buildTimestamp}
+                Aktuelle Version: ${project.version} - <a href="changes-report.html">Änderungen</a> - Zuletzt veröffentlicht: ${project.properties.buildTimestamp}
                 <span class="pull-right">&copy; ${project.inceptionYear}-${currentYear} ${project.organization.name}.</span>
             </p>
 
