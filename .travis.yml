@@ -1,5 +1,5 @@
 language: java
 before_install:
-  - "sudo apt-get install -y ttf-takao-mincho"
+  - "sudo apt-get install -y ttf-takao-mincho xfonts-mathml"
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
