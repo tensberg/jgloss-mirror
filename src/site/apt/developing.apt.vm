@@ -6,6 +6,10 @@
  it yourself. All you need is knowledge of the Java programming language and
  a few tools.
 
+ Current state of the JGloss continuous integration build at {{{http://travis-ci.org/tensberg/jgloss-mirror}Travis CI}}:
+
+[http://travis-ci.org/tensberg/jgloss-mirror.png?branch=master] State of the CI Build.
+
 Prerequisites
 
    * {{{http://git-scm.com/}Git}} distributed version control system.

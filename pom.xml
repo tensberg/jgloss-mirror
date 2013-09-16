@@ -19,7 +19,12 @@
         <connection>scm:git:git://git.code.sf.net/p/jgloss/code</connection>
         <developerConnection>scm:git:ssh://git.code.sf.net/p/jgloss/code</developerConnection>
 	  <tag>HEAD</tag>
-  </scm>
+    </scm>
+    
+    <ciManagement>
+        <system>Travis</system>
+        <url>http://travis-ci.org/tensberg/jgloss-mirror</url>
+    </ciManagement>
     
     <organization>
         <name>the JGloss developers</name>
@@ -568,6 +573,7 @@
 					<reportSet>
 						<reports>
                             <report>index</report>
+                            <report>cim</report>
 							<report>dependencies</report>
 							<report>dependency-convergence</report>
 							<report>dependency-management</report>
