@@ -6,3 +6,4 @@ bin
 .ruleset
 target
 *~
+testbuild-keystore

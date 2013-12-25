@@ -16,9 +16,11 @@
 	</description>
 
     <properties>
-        <keystore>testbuild-keystore</keystore>
-        <keypass>testpass</keypass>
-        <storepass>testpass</storepass>
+        <jarsigner.keystore>testbuild-keystore</jarsigner.keystore>
+        <jarsigner.keypass>testpass</jarsigner.keypass>
+        <jarsigner.storepass>testpass</jarsigner.storepass>
+        <jarsigner.alias>testkey</jarsigner.alias>
+        <codebase>${project.url}/jnlp</codebase>
     </properties>
 
 	<build>
@@ -35,14 +37,20 @@
 						</goals>
 						<configuration>
                             <workDirectory>${project.build.directory}/site/jnlp</workDirectory>
-                            <codebase>${project.url}/jnlp</codebase>
+                            <codebase>${codebase}</codebase>
                             <makeArchive>false</makeArchive>
                             <jnlp>
-                                <inputTemplate>src/main/jnlp/jgloss.vm</inputTemplate>
+                                <inputTemplate>jgloss.vm</inputTemplate>
                                 <outputFile>jgloss.jnlp</outputFile>
                                 <mainClass>jgloss.JGlossApp</mainClass>
                             </jnlp>
-        					<pack200>true</pack200>
+        					<pack200>
+                                <enabled>true</enabled>
+                            </pack200>
+                            <updateManifestEntries>
+                                <Permissions>all-permissions</Permissions>
+                                <Codebase>${codebase}</Codebase>
+                            </updateManifestEntries>
                             <sign>
                                 <keystore>${jarsigner.keystore}</keystore>
                                 <keypass>${jarsigner.keypass}</keypass>
@@ -53,7 +61,7 @@
 
                                 <keystoreConfig>
                                   <delete>false</delete>
-                                  <gen>true</gen>
+                                  <gen>false</gen>
                                 </keystoreConfig>
                              </sign>
 						</configuration>
