@@ -44,6 +44,8 @@
                                 <outputFile>jgloss.jnlp</outputFile>
                                 <mainClass>jgloss.JGlossApp</mainClass>
                             </jnlp>
+                            <outputJarVersions>true</outputJarVersions>
+                            <gzip>true</gzip>
         					<pack200>
                                 <enabled>true</enabled>
                             </pack200>
