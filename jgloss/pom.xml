@@ -36,6 +36,9 @@
 						<manifest>
 							<mainClass>${mainClass}</mainClass>
 						</manifest>
+                        <manifestEntries>
+                            <Application-Name>JGloss</Application-Name>
+                        </manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>

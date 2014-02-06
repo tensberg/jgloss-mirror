@@ -46,7 +46,10 @@
 						<manifest>
 							<mainClass>${mainClass}</mainClass>
 						</manifest>
-					</archive>
+                        <manifestEntries>
+                            <Application-Name>JDictionary</Application-Name>
+                        </manifestEntries>
+                    </archive>
 				</configuration>
 			</plugin>
             
