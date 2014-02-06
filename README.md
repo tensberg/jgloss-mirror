@@ -1,4 +1,4 @@
-JGloss 2.1.0
+JGloss 2.1.2
 ============
 
 JGloss homepage: http://jgloss.sourceforge.net/
@@ -14,6 +14,6 @@ To start JGloss, double-click on _jgloss-...-jar-with-dependencies.jar_ or
 on the command-line type
 `java -jar jgloss-...-jar-with-dependencies.jar`
 
-(C) 2001-2013 Michael Koch <tensberg@gmx.net>
+(C) 2001-2014 Michael Koch <tensberg@gmx.net>
 
 Parts of JGloss code (C) 2002 Eric Crahen
