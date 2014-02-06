@@ -2,7 +2,8 @@
 <jnlp
     spec="$jnlpspec"
     codebase="$jnlpCodebase"
-    href="$outputFile">
+    href="$outputFile"
+    version="${project.version}">
   <information>
     <title>JGloss</title>
     <vendor>The JGloss Developers</vendor>
@@ -23,7 +24,7 @@
   </security>
   <resources>
     <j2se version="1.7+"/>
-     $dependencies
+        $dependencies
   </resources>
   <application-desc main-class="$mainClass"/>
 </jnlp>
