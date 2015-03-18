@@ -21,7 +21,8 @@ Download
   Sie können sie z. B. verwenden wenn Sie ihren Sprachschülern eine Wörterbuchanwendung zur Verfügung
   stellen wollen, aber nicht das (zu) einfache Textlesen von JGloss.
 
-  Die Dateien sind mit Schlüssel-ID 6E639488 »Michael Koch (Code Signing Key) \<tensberg@gmx.net\>« signiert.
+  Die Dateien sind mit Schlüssel-ID 47C53835 »Michael Koch (Code Signing Key) \<tensberg@gmx.net\>« signiert.
+  (Ältere Releases sind mit Schlüssel-ID 6E639488 signiert.)
 
 *-----------------------------------------------------------------------------------------+---------------------------------+---------------------------------+
 {{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}.zip}jgloss-${project.version}.zip}} | ZIP-Archiv der Anwendung. | {{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}.zip.asc}PGP Signatur}}

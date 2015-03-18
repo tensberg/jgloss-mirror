@@ -21,7 +21,8 @@ Download
   You can use this if for example you want to offer your language students a dictionary lookup program,
   but not the (too) easy text parsing of the full JGloss.
 
-  The files are signed with key id 6E639488 »Michael Koch (Code Signing Key) \<tensberg@gmx.net\>«.
+  The files are signed with key id 47C53835 »Michael Koch (Code Signing Key) \<tensberg@gmx.net\>«. (Older
+  releases were signed with key id 6E639488.)
 
 *-----------------------------------------------------------------------------------------+---------------------------------+---------------------------------+
 {{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}.zip}jgloss-${project.version}.zip}} | ZIP archive of the application. | {{{http://sourceforge.net/projects/jgloss/files/JGloss%202/${project.version}/jgloss-${project.version}.zip.asc}PGP signature}}
