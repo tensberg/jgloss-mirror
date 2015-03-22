@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- JGloss User's Guide Copyright (C) 2001-2014 Michael Koch
+<!-- JGloss User's Guide Copyright (C) 2001-2015 Michael Koch
 
  This file is part of JGloss.
 
@@ -30,10 +30,10 @@
         </author>
         <edition>2.1</edition>
         <copyright>
-            <year>2001-2014</year>
+            <year>2001-2015</year>
             <holder>Michael Koch</holder>
         </copyright>
-        <pubdate>2014</pubdate>
+        <pubdate>2015</pubdate>
     </info>
 
     <chapter>
