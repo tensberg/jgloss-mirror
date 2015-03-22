@@ -116,7 +116,7 @@ public class JGlossEditorKit extends HTMLEditorKit {
      * Standard style for rendering JGloss documents. Used instead of the usual
      * HTML style sheet.
      */
-    private static StyleSheet jglossStyleSheet = null;
+    private StyleSheet jglossStyleSheet = null;
 
     /**
      * Factory which creates views for elements in the JGloss document.

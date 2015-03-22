@@ -31,7 +31,7 @@ import jgloss.ui.gloss.JGlossFrameModel;
 import org.w3c.dom.Element;
 
 class DateTimeParameter extends AbstractParameter {
-    private static final DateFormat DATETIME_FORMAT = 
+    private final DateFormat dateTimeFormat =
         DateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.SHORT);
 
     DateTimeParameter( Element elem) {
@@ -40,6 +40,6 @@ class DateTimeParameter extends AbstractParameter {
 
     @Override
 	public Object getValue( JGlossFrameModel source, URL systemId) {
-        return DATETIME_FORMAT.format( new Date( System.currentTimeMillis()));
+        return dateTimeFormat.format(new Date(System.currentTimeMillis()));
     }
 } // class DateTimeParameter

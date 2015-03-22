@@ -87,9 +87,14 @@ public class AnnotationTags extends HTML.Tag {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
     /**
      * Returns the unique instance of the annotation tag which is equal to the HTML tag.
-     * Unfortunately, the set of tags used by the method <CODE>getTag</CODE> in class 
+     * Unfortunately, the set of tags used by the method <CODE>getTag</CODE> in class
      * <CODE>javax.swing.text.html.HTML</CODE> cannot be extended for the annotation tags.
      * Some classes, like <CODE>DocumentParser</CODE> in <CODE>javax.swing.text.html.parser</CODE>
      * will create instances of <CODE>HTML.UnknownTag</CODE> for all tags not in the set.

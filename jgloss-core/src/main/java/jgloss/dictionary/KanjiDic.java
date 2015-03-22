@@ -585,15 +585,30 @@ public class KanjiDic implements Dictionary {
     }
 
     @Override
-	public boolean equals( Object o) {
-        try {
-            return new File(((KanjiDic) o).dicfile).equals( new File( dicfile));
-        } catch (Exception ex) {
-            // NullPointer or ClassCast
-            return false;
-        }
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((dicfile == null) ? 0 : dicfile.hashCode());
+        return result;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        KanjiDic other = (KanjiDic) obj;
+        if (dicfile == null) {
+            if (other.dicfile != null)
+                return false;
+        } else if (!dicfile.equals(other.dicfile))
+            return false;
+        return true;
+    }
+    
     protected class EntryListIterator implements Iterator<DictionaryEntry> {
         protected Iterator<String> entries;
         

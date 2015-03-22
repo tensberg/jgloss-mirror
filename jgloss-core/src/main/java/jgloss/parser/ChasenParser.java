@@ -41,14 +41,14 @@ import jgloss.util.UTF8ResourceBundleControl;
  * @author Michael Koch
  */
 public class ChasenParser extends AbstractParser {
-    private final static String PARSER_NAME = 
+    private final static String PARSER_NAME =
         ResourceBundle.getBundle( "messages-parser", new UTF8ResourceBundleControl()).getString( "parser.chasen.name");
 
     /**
      * Command line parameter passed to chasen. Detemines the output format.
      */
     private final static String CHASEN_ARGS = "-F %m\\t%H\\t%Tn\\t%Fn\\t%M\\t%Y1\\t%y1\\n";
-    
+
     /**
      * Chasen instance used to parse text.
      */
@@ -84,7 +84,7 @@ public class ChasenParser extends AbstractParser {
 
     @Override
 	public List<TextAnnotation> parse( char[] text, int start, int length) throws SearchException {
-        
+
         // the parsePosition cannot be correct since the text was converted to HTML!
         parsePosition = start;
 
@@ -108,12 +108,12 @@ public class ChasenParser extends AbstractParser {
                     result.discard();
                     throw new ParsingInterruptedException();
                 }
-                
+
                 // chasen skips spaces, so we have to adjust parsePosition here
                 while (parsePosition<end && text[parsePosition]==' ') {
 	                parsePosition++;
                 }
-                
+
                 Object resultLine = result.next();
                 if (resultLine.equals( Chasen.EOS)) { // end of line in input text
                     parsePosition++;
@@ -145,7 +145,7 @@ public class ChasenParser extends AbstractParser {
                                                   constructGrammaticalType( partOfSpeech,
                                                                             inflectionType,
                                                                             inflectedForm)));
-                        
+
                         if (firstOccurrenceOnly) {
 	                        annotatedWords.add( surfaceBase);
                         }
@@ -191,9 +191,9 @@ public class ChasenParser extends AbstractParser {
             out.append( '\u3001');
             out.append( inflectedForm);
         }
-        
+
         return out.toString();
-    }                                          
+    }
 
     /**
      * Ends the chasen application and clears the lookup cache.
@@ -215,7 +215,8 @@ public class ChasenParser extends AbstractParser {
      * Overridden to terminate a chasen process if it is still running.
      */
     @Override
-	protected void finalize() {
+    protected void finalize() throws Throwable {
         reset();
+        super.finalize();
     }
 } // class ChasenParser
