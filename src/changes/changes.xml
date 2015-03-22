@@ -6,6 +6,7 @@
     </properties>
     <body>
         <release version="2.1.2" date="not yet released">
+            <action type="update">Delete multiple entries at once in the exclusion list dialog.</action>
             <action type="add">Support the new web start security attributes introduced by Oracle JRE 7u45.</action>
         </release>
         <release version="2.1.1" date="2013-06-16">

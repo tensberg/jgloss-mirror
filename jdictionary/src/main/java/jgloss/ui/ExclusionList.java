@@ -63,6 +63,8 @@ import jgloss.Preferences;
 import jgloss.ui.util.UIUtilities;
 import jgloss.util.CharacterEncodingDetector;
 
+import org.fest.util.VisibleForTesting;
+
 /**
  * Panel which allows the user to manage the list of excluded words used for document parsing.
  * There exists
@@ -136,7 +138,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         // construct the dictionaries list editor
         exclusionList = new JList<String>();
         exclusionList.setModel(new DefaultListModel<String>());
-        exclusionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        exclusionList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         // update display if user changed font
         UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                 @Override
@@ -160,21 +162,15 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         final Action remove = new AbstractAction() {
             private static final long serialVersionUID = 1L;
 
-				@Override
-				public void actionPerformed( ActionEvent e) {
-                    int i = exclusionList.getSelectedIndex();
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 DefaultListModel<String> m = (DefaultListModel<String>) exclusionList.getModel();
-                    m.remove( i);
-                    changed = true;
-                    if (i < m.getSize()) {
-	                    exclusionList.setSelectedIndex( i);
-                    } else if (m.getSize() > 0) {
-	                    exclusionList.setSelectedIndex( m.getSize()-1);
-                    } else {
-	                    this.setEnabled( false);
-                    }
-                }
-            };
+                ListSelectionModel selectionModel = exclusionList.getSelectionModel();
+                removeSelection(m, selectionModel);
+                changed = true;
+                setEnabled(false);
+            }
+        };
         remove.setEnabled( false);
         UIUtilities.initAction( remove, "exclusions.button.remove");
         final Action export = new AbstractAction() {
@@ -474,5 +470,24 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                 ((DefaultListModel<String>) exclusionList.getModel()).addElement(word);
             }
         }
+    }
+
+    @VisibleForTesting
+    static void removeSelection(DefaultListModel<String> listModel, ListSelectionModel selectionModel) {
+        int selectionEnd = listModel.getSize() - 1;
+        int selectionStart;
+        while (selectionEnd >= 0) {
+            if (selectionModel.isSelectedIndex(selectionEnd)) {
+                selectionStart = selectionEnd - 1;
+                while (selectionStart >= 0 && selectionModel.isSelectedIndex(selectionStart)) {
+                    selectionStart--;
+                }
+                listModel.removeRange(selectionStart + 1, selectionEnd);
+                selectionEnd = selectionStart;
+            } else {
+                selectionEnd--;
+            }
+        }
+        selectionModel.clearSelection();
     }
 } // class Dictionaries
