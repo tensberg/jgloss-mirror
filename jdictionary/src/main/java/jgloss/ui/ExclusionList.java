@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2013 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2015 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -73,7 +73,7 @@ import jgloss.util.CharacterEncodingDetector;
  */
 public class ExclusionList extends JPanel implements PreferencesPanel {
 	private static final Logger LOGGER = Logger.getLogger(ExclusionList.class.getPackage().getName());
-	
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -90,12 +90,12 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     /**
      * The widget which displays the excluded words.
      */
-    private final JList exclusionList;
+    private final JList<String> exclusionList;
     /**
      * Flag if the content of the JList was changed.
      */
     private boolean changed;
-    
+
     /**
      * Returns the single application-wide instance.
      *
@@ -134,13 +134,13 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
 
         exclusions = new HashSet<String>( 101);
         // construct the dictionaries list editor
-        exclusionList = new JList();
-        exclusionList.setModel( new DefaultListModel());
-        exclusionList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
+        exclusionList = new JList<String>();
+        exclusionList.setModel(new DefaultListModel<String>());
+        exclusionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         // update display if user changed font
         UIManager.getDefaults().addPropertyChangeListener( new java.beans.PropertyChangeListener() {
                 @Override
-				public void propertyChange( java.beans.PropertyChangeEvent e) { 
+				public void propertyChange( java.beans.PropertyChangeEvent e) {
                     if (e.getPropertyName().equals( "List.font")) {
                         exclusionList.setFont( (Font) e.getNewValue());
                     }
@@ -163,7 +163,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
 				@Override
 				public void actionPerformed( ActionEvent e) {
                     int i = exclusionList.getSelectedIndex();
-                    DefaultListModel m = (DefaultListModel) exclusionList.getModel();
+                DefaultListModel<String> m = (DefaultListModel<String>) exclusionList.getModel();
                     m.remove( i);
                     changed = true;
                     if (i < m.getSize()) {
@@ -256,11 +256,11 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     @Override
 	public void savePreferences() {
         if (changed) {
-            DefaultListModel m = (DefaultListModel) exclusionList.getModel();
+            DefaultListModel<String> m = (DefaultListModel<String>) exclusionList.getModel();
             synchronized (exclusions) {
                 exclusions.clear();
                 for ( int i=0; i<m.size(); i++) {
-	                exclusions.add( (String) m.get( i));
+	                exclusions.add( m.get( i));
                 }
             }
             saveExclusionList( getExclusionListFile());
@@ -273,7 +273,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      */
     @Override
 	public void loadPreferences() {
-        DefaultListModel m = (DefaultListModel) exclusionList.getModel();
+        DefaultListModel<String> m = (DefaultListModel<String>) exclusionList.getModel();
         m.removeAllElements();
         String[] exclusionArray = new String[exclusions.size()];
         exclusions.toArray(exclusionArray);
@@ -295,7 +295,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
               ( "exclusions.add"), JGloss.MESSAGES.getString
               ( "exclusions.add.title"), JOptionPane.PLAIN_MESSAGE);
         if (word!=null && word.length()>0) {
-            DefaultListModel m = (DefaultListModel) exclusionList.getModel();
+            DefaultListModel<String> m = (DefaultListModel<String>) exclusionList.getModel();
             if (!m.contains( word)) {
                 m.addElement( word);
                 changed = true;
@@ -324,7 +324,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     private void loadExclusionList( String filename) {
         try {
             BufferedReader r = new BufferedReader( new InputStreamReader
-                ( new FileInputStream( filename), 
+                ( new FileInputStream( filename),
                   JGloss.PREFS.getString( Preferences.EXCLUSIONS_ENCODING)));
             Set<String> newExclusions = new HashSet<String>( 1001);
             String line;
@@ -352,7 +352,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     private void saveExclusionList( String filename) {
         try {
             BufferedWriter w = new BufferedWriter( new OutputStreamWriter
-                ( new FileOutputStream( filename), 
+                ( new FileOutputStream( filename),
                   JGloss.PREFS.getString( Preferences.EXCLUSIONS_ENCODING)));
             for (String exclusion : exclusions) {
                 w.write( exclusion, 0, exclusion.length());
@@ -393,7 +393,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showConfirmDialog
                     ( SwingUtilities.getRoot( box), JGloss.messages.getString
-                      ( "error.export.exception", new Object[] 
+                      ( "error.export.exception", new Object[]
                           { f.getSelectedFile(), ex.getClass().getName(),
                             ex.getLocalizedMessage() }),
                       JGloss.messages.getString( "error.export.title"),
@@ -420,7 +420,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         if (r == JFileChooser.APPROVE_OPTION) {
 	        try {
 	            JGloss.getApplication().setCurrentDir( f.getCurrentDirectory().getAbsolutePath());
-	            DefaultListModel m = new DefaultListModel();
+                DefaultListModel<String> m = new DefaultListModel<String>();
 	            BufferedReader reader = new BufferedReader
 	                ( CharacterEncodingDetector.getReader
 	                  ( new FileInputStream( f.getSelectedFile().getAbsolutePath())));
@@ -438,7 +438,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
 	            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
 	            JOptionPane.showConfirmDialog
 	                ( SwingUtilities.getRoot( box), JGloss.MESSAGES.getString
-	                  ( "error.import.exception", new Object[] 
+	                  ( "error.import.exception", new Object[]
 	                      { f.getSelectedFile(), ex.getClass().getName(),
 	                        ex.getLocalizedMessage() }),
 	                  JGloss.MESSAGES.getString( "error.import.title"),
@@ -459,7 +459,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                 String filename = getExclusionListFile();
                 try {
                     BufferedWriter w = new BufferedWriter( new OutputStreamWriter
-                        ( new FileOutputStream( filename, true), 
+                        ( new FileOutputStream( filename, true),
                           JGloss.PREFS.getString( Preferences.EXCLUSIONS_ENCODING)));
                     w.write( word, 0, word.length());
                     w.newLine();
@@ -471,7 +471,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
                           JGloss.MESSAGES.getString( "error.exclusions.save.title"),
                           JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
                 }
-                ((DefaultListModel) exclusionList.getModel()).addElement( word);
+                ((DefaultListModel<String>) exclusionList.getModel()).addElement(word);
             }
         }
     }
