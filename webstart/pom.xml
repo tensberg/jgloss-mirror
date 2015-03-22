@@ -58,6 +58,7 @@
                                 <keypass>${jarsigner.keypass}</keypass>
                                 <storepass>${jarsigner.storepass}</storepass>
                                 <alias>${jarsigner.alias}</alias>
+                                <tsaLocation>https://timestamp.geotrust.com/tsa</tsaLocation>
 
                                 <verify>true</verify>
 
