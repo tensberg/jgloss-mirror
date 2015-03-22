@@ -63,8 +63,6 @@ import jgloss.Preferences;
 import jgloss.ui.util.UIUtilities;
 import jgloss.util.CharacterEncodingDetector;
 
-import org.fest.util.VisibleForTesting;
-
 /**
  * Panel which allows the user to manage the list of excluded words used for document parsing.
  * There exists
@@ -472,7 +470,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
         }
     }
 
-    @VisibleForTesting
+    // visible for testing
     static void removeSelection(DefaultListModel<String> listModel, ListSelectionModel selectionModel) {
         int selectionEnd = listModel.getSize() - 1;
         int selectionStart;
