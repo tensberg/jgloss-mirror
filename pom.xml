@@ -87,7 +87,6 @@
         <japanesefont.dir>/usr/share/fonts/truetype/takao-mincho/</japanesefont.dir><!-- Directory where the font configured above is stored. -->
         
         <version.javadoc>2.10.2</version.javadoc>
-        <version.jacoco>0.7.4.201502262128</version.jacoco>
 	</properties>
 
 	<modules>
@@ -270,18 +269,6 @@
                     </execution>
                 </executions>
             </plugin>
-            
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                  <execution>
-                    <goals>
-                      <goal>prepare-agent</goal>
-                    </goals>
-                  </execution>
-                </executions>
-            </plugin>
 		</plugins>
 
 		<pluginManagement>
@@ -396,12 +383,6 @@
                     <groupId>com.agilejava.docbkx</groupId>
                     <artifactId>docbkx-fop-support</artifactId>
                     <version>2.0.14</version>
-                </plugin>
-                
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${version.jacoco}</version>
                 </plugin>
                 
                 <plugin>
@@ -555,11 +536,6 @@
                     </reportSet>
                 </reportSets>
 			</plugin>
-            <plugin>
-              <groupId>org.jacoco</groupId>
-              <artifactId>jacoco-maven-plugin</artifactId>
-              <version>${version.jacoco}</version>
-            </plugin>
 			<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
@@ -736,6 +712,50 @@
                    </plugin>
                </plugins>
            </build>
-       </profile>
+           </profile>
+    
+        <profile>
+            <!-- moved to profile because deployment of the report to SourceForge is slow -->
+            <id>report-testcoverage</id>
+    
+            <properties>
+                <version.jacoco>0.7.4.201502262128</version.jacoco>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+    
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>jacoco-maven-plugin</artifactId>
+                            <version>${version.jacoco}</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+    
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${version.jacoco}</version>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
 	</profiles>
 </project>
