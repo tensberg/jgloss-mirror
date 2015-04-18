@@ -50,7 +50,7 @@ import jgloss.util.CharacterEncodingDetector;
  */
 public class Chasen {
 	private static final Logger LOGGER = Logger.getLogger(Chasen.class.getPackage().getName());
-	
+
     /**
      * End of input line marker.
      */
@@ -71,7 +71,7 @@ public class Chasen {
          */
         private String nextLine;
         /**
-         * Contains the parsed result of a line of output of chasen. Returned by a call to 
+         * Contains the parsed result of a line of output of chasen. Returned by a call to
          * {@link #next() next}.
          */
         private final List<String> nextBuffer = new ArrayList<String>( 10);
@@ -112,7 +112,7 @@ public class Chasen {
          */
         public Object next() throws NoSuchElementException {
             if (nextLine == null) {
-	            throw new NoSuchElementException();
+                throw new NoSuchElementException();
             }
 
             String currentLine = nextLine; // line returned by this call to next()
@@ -125,9 +125,9 @@ public class Chasen {
 
             // handle special markers
             if (currentLine.equals( EOS)) {
-	            return EOS;
+                return EOS;
             } else if (currentLine.equals( EOP)) {
-	            return EOP;
+                return EOP;
             }
 
             if (separator != '\0') {
@@ -136,18 +136,18 @@ public class Chasen {
                     // split result line at user-defined separator
                     int to = currentLine.indexOf( separator, from);
                     if (to == -1) {
-	                    to = currentLine.length();
+                        to = currentLine.length();
                     }
                     nextBuffer.add( currentLine.substring( from, to));
                     from = to + 1;
                 } while (from < currentLine.length());
                 if (from == currentLine.length()) {
-                   // special case: ChaSen output ends with separator char
-                   // last field of output is the empty string
-                   nextBuffer.add("");
-               }
-           } else {
-	            nextBuffer.add( currentLine);
+                    // special case: ChaSen output ends with separator char
+                    // last field of output is the empty string
+                    nextBuffer.add("");
+                }
+            } else {
+                nextBuffer.add(currentLine);
             }
 
             return nextBuffer;
@@ -169,7 +169,7 @@ public class Chasen {
                 	LOGGER.log(SEVERE, ex.getMessage(), ex);
                 }
             }
-            else { 
+            else {
                 try {
                     nextLine = chasenOut.readLine();
                     if (EOS.equals( nextLine)) {
@@ -211,7 +211,7 @@ public class Chasen {
 
     /**
      * Cache used by {@link #isChasenExecutable(String) isChasenExecutable} to store the
-     * name of the last succesfully tested chasen executable. 
+     * name of the last succesfully tested chasen executable.
      */
     private static String lastChasenExecutable = null;
 
@@ -272,9 +272,9 @@ public class Chasen {
 
         // The test is done by
         // calling the program with the "-V" (for version) option.
-        
+
         Process p = null;
-        
+
         try {
             p = Runtime.getRuntime().exec( chasenExecutable + " -V");
         } catch (IOException ex) {
@@ -285,7 +285,7 @@ public class Chasen {
             return false;
         }
 
-        try 
+        try
         {
             waitForProcess( p, 3000l);
 
@@ -312,7 +312,7 @@ public class Chasen {
             return false;
         }
     }
-    
+
     /**
      * Starts a new chasen process using the default executable, no arguments and '\t' as field
      * separator.
@@ -335,7 +335,7 @@ public class Chasen {
      * @param args Parameters passed to chasen. This can be used to customize the output format. Currently,
      *             this implementation does not work with the "-j" (japanese sentence mode) flag.
      * @param separator Separator char used in the format string to separate entry fields. If the
-     *                  separator char is set to '\0', the list returned by 
+     *                  separator char is set to '\0', the list returned by
      *                  {@link Chasen.Result#next() next} will contain the complete result line as
      *                  only entry.
      * @exception IOException If the chasen process can't be started.
@@ -403,7 +403,7 @@ public class Chasen {
         chasenIn.write( (char) 0x0a); // chasen will start parsing when end of line is encountered
         expectedEOS++; // for the previous 0x0a
         chasenIn.flush();
-        
+
         result.init( expectedEOS);
 
         return result;
@@ -444,7 +444,7 @@ public class Chasen {
 
     /**
      * Test which character encoding ChaSen uses for its input and output streams. On
-     * Linux this will probably be EUC-JP and Shift-JIS on Windows. 
+     * Linux this will probably be EUC-JP and Shift-JIS on Windows.
      * The test is only done the first time the method is called, the result is
      * cached and reused on further calls.
      *
@@ -489,7 +489,7 @@ public class Chasen {
 
     /**
      * Wait for a process to terminate. When the method returns normally, the process has terminated.
-     * If the process does not terminate in time, the method throws an 
+     * If the process does not terminate in time, the method throws an
      * <code>InterruptedException</code>.
      */
     private final static void waitForProcess( Process process, long time) throws InterruptedException {
@@ -502,7 +502,7 @@ public class Chasen {
                     currentThread.interrupt();
                 }
             }, time);
-        
+
         process.waitFor(); // will be interrupted by timer if needed
         timer.cancel(); // normal termination of process, no interruption needed
         // clear the interrupted flag if it has been set between the last two calls

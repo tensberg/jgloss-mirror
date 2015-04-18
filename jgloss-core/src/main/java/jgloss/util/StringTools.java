@@ -33,6 +33,31 @@ import java.util.StringTokenizer;
  * @author Michael Koch
  */
 public class StringTools {
+
+    /**
+     * @return <code>true</code> if <code>string</code> is either
+     *         <code>null</code> or its length is 0.
+     */
+    public static boolean nullOrEmpty(String string) {
+        return string == null || string.length() == 0;
+    }
+
+    /**
+     * @return <code>first</code> if it is not <code>null</code> or empty,
+     *         <code>second</code> otherwise.
+     */
+    public static String firstNonEmpty(String first, String second) {
+        return nullOrEmpty(first) ? second : first;
+    }
+
+    /**
+     * @return <code>null</code> if the given string is <code>null</code> or
+     *         empty.
+     */
+    public static String emptyToNull(String string) {
+        return nullOrEmpty(string) ? null : string;
+    }
+
     /**
      * Returns the unicode block of a character. The test is optimized to work faster than
      * <CODE>Character.UnicodeBlock.of</CODE> for Japanese characters, but will work slower
@@ -107,7 +132,7 @@ public class StringTools {
 	        return out.toString();
         }
     }
-    
+
     /**
      * Determines if a char is a katakana special char, as used by <code>ignoreSpecialChars</code>
      * of {@link #toHiragana(String,boolean) toHiragana}.
@@ -124,7 +149,7 @@ public class StringTools {
     public static String toKatakana( String s) {
         return toKatakana( s, true);
     }
-    
+
     /**
      * Returns a new string with all hiragana characters in the original string converted to
      * katakana.
@@ -157,7 +182,7 @@ public class StringTools {
     }
 
     /**
-     * Test if a string contains any kanji characters. The test is done using the 
+     * Test if a string contains any kanji characters. The test is done using the
      * {@link #isKanji(char) isKanji} method.
      */
     public static boolean containsKanji( String word) {
@@ -171,7 +196,7 @@ public class StringTools {
     }
 
     /**
-     * Split a kanji/kana compound word in kanji and kana parts. Calls 
+     * Split a kanji/kana compound word in kanji and kana parts. Calls
      * {@link #splitWordReading(String,String,String) splitWordReading( word, word, reading)}.
      */
     public static String[][] splitWordReading( String word, String reading) {
@@ -264,11 +289,11 @@ public class StringTools {
 
             kStart = hEnd;
             hStart = hEnd+1;
-        } while (kStart<baseWord.length() && 
+        } while (kStart<baseWord.length() &&
                  kStart<inflectedWord.length()); // inflected word might be shorter than base word
 
         String[][] out = result.toArray( new String[result.size()][]);
-        
+
         return out;
     }
 
@@ -280,22 +305,22 @@ public class StringTools {
         return !isKana( c) ||
             // handle special case with infix katakana 'ke', which is read as 'ka' or 'ga'
             // when used as counter or in place names, as in ikkagetsu or Sakuragaoka
-            (c=='\u30f6' || c=='\u30b1') && 
-            pos>0 && isKanji( text.charAt( pos-1)) && 
+            (c=='\u30f6' || c=='\u30b1') &&
+            pos>0 && isKanji( text.charAt( pos-1)) &&
             pos+1<text.length() && isKanji( text.charAt( pos+1));
     }
 
     /**
      * Character array containing the characters representing the numbers 0-15 in hexadecimal notation.
      */
-    private static final char[] HEX_CHARS = new char[] { 
+    private static final char[] HEX_CHARS = new char[] {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'a', 'b', 'c', 'd', 'e', 'f'
     };
 
     /**
      * Return the unicode escape string for a character. The unicode escape string is
-     * Backslash-u, followed by a 4-digit hexadecimal string representing the unicode value 
+     * Backslash-u, followed by a 4-digit hexadecimal string representing the unicode value
      * of the character.
      *
      * @see #unicodeUnescape(String)
@@ -395,7 +420,7 @@ public class StringTools {
 				return new Iterator<String>() {
 
 					private final StringTokenizer tokenizer = new StringTokenizer(string, delimiter);
-					
+
 					@Override
                     public boolean hasNext() {
 	                    return tokenizer.hasMoreTokens();
@@ -410,13 +435,13 @@ public class StringTools {
                     public void remove() {
 	                    throw new UnsupportedOperationException("remote is not supported");
                     }
-					
+
 				};
             }
-    		
+
     	};
     }
-    
+
     private StringTools() {
     }
 } // class StringTools

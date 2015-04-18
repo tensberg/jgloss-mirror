@@ -21,6 +21,10 @@
 
 package jgloss.parser;
 
+import static jgloss.util.StringTools.emptyToNull;
+import static jgloss.util.StringTools.firstNonEmpty;
+import static jgloss.util.StringTools.toHiragana;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +34,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import jgloss.dictionary.SearchException;
-import jgloss.util.StringTools;
 import jgloss.util.UTF8ResourceBundleControl;
 
 /**
@@ -134,9 +137,9 @@ public class ChasenParser extends AbstractParser {
                     }
                     String inflectionType = resultList.get( 2);
                     String inflectedForm = resultList.get( 3);
-                    String surfaceBase = resultList.get( 4);
-                    String readingBase = StringTools.toHiragana( resultList.get( 5));
-                    String readingInflected = StringTools.toHiragana( resultList.get( 6));
+                    String surfaceBase = firstNonEmpty(resultList.get(4), surfaceInflected);
+                    String readingBase = emptyToNull(toHiragana(resultList.get(5)));
+                    String readingInflected = emptyToNull(toHiragana(resultList.get(6)));
 
                     if (!ignoreWord( surfaceBase)) {
                         annotations.add

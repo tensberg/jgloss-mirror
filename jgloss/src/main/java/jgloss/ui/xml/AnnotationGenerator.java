@@ -25,6 +25,7 @@ package jgloss.ui.xml;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import jgloss.JGloss;
@@ -159,94 +160,101 @@ class AnnotationGenerator extends DefaultHandler {
 
         int lastEnd = start; // index one after the end of the last annotation
         for (TextAnnotation annotation : annotations) {
-            TextAnnotation completedAnnotation = taCompleter.complete(annotation);
+            taCompleter.complete(annotation);
             // handle text between annotations
-            if (completedAnnotation.getStart() > lastEnd) {
-	            parent.characters( c, lastEnd, completedAnnotation.getStart() - lastEnd);
+            if (annotation.getStart() > lastEnd) {
+                parent.characters(c, lastEnd, annotation.getStart() - lastEnd);
             }
-            lastEnd = completedAnnotation.getStart() + completedAnnotation.getLength();
+            lastEnd = annotation.getStart() + annotation.getLength();
 
-            String annotatedWord = new String( c, completedAnnotation.getStart(), completedAnnotation.getLength());
-
-            // start annotation element
-            AttributesImpl annoAtts = new AttributesImpl();
-            if (completedAnnotation.getTranslation() != null) {
-	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TRANSLATION,
-	                            CDATA, shortenIfNeeded(completedAnnotation.getTranslation()));
-            }
-            if (completedAnnotation.getGrammaticalType() != null) {
-	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TYPE,
-                                       CDATA, completedAnnotation.getGrammaticalType());
-            }
-            if (!annotatedWord.equals( completedAnnotation.getDictionaryForm())) {
-	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE,
-                                       CDATA, completedAnnotation.getDictionaryForm());
-            }
-
-            // generate reading elements for kanji substrings
-            String[][] parts;
-            try {
-                parts = StringTools.splitWordReading( annotatedWord,
-                                                      completedAnnotation.getDictionaryForm(),
-                                                      completedAnnotation.getDictionaryFormReading());
-            } catch (StringIndexOutOfBoundsException ex) {
-                LOGGER.severe( "Warning: unparseable word/reading: " +
-                                    annotatedWord + "/" + completedAnnotation.getDictionaryForm() + "/" +
-                                    completedAnnotation.getDictionaryFormReading());
-                parts = new String[][] { { annotatedWord } };
-            }
-
-            if (completedAnnotation.getReading() == null) {
-                // derive inflected reading from splitWordReading
-                StringBuilder inflectedReading = new StringBuilder( 64);
-                for (String[] part : parts) {
-                    if (part.length == 1) {
-	                    inflectedReading.append( part[0]);
-                    } else {
-	                    inflectedReading.append( part[1]);
-                    }
-                }
-                completedAnnotation.setReading( inflectedReading.toString());
-            }
-
-            if (!completedAnnotation.getReading().equals( completedAnnotation.getDictionaryFormReading())) {
-	            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE_READING,
-                                       CDATA, completedAnnotation.getDictionaryFormReading());
-            }
-
-            parent.startElement( "", "", JGlossDocument.Elements.ANNOTATION, annoAtts);
-            int partPosition = completedAnnotation.getStart(); // position of part substring in c array
-            for (String[] part : parts) {
-                if (part.length == 2) {
-                    // reading annotation
-
-                    // if the reading of a kanji substring is not known, it is set
-                    // to the kanji substring itself
-                    String thisReading = part[1].equals( part[0]) ?
-                        "" : part[1];
-                    readingAtts.setValue( 0, thisReading);
-
-                    parent.startElement( "", "", JGlossDocument.Elements.RBASE, readingAtts);
-                }
-
-                // add the reading base, or part without reading
-                parent.characters( c, partPosition, part[0].length());
-                partPosition += part[0].length();
-
-                if (part.length == 2) {
-                    // end reading element
-                    parent.endElement( "", "", JGlossDocument.Elements.RBASE);
-                }
-            }
-
-            // end annotation element
-            parent.endElement( "", "", JGlossDocument.Elements.ANNOTATION);
+            createAnnotationElement(c, annotation);
         }
 
         // handle remaining unannotated text
         if (lastEnd < start+length) {
 	        parent.characters( c, lastEnd, start+length-lastEnd);
         }
+    }
+
+    private void createAnnotationElement(char[] c, TextAnnotation annotation) throws SAXException {
+        String annotatedWord = new String(c, annotation.getStart(), annotation.getLength());
+        AttributesImpl annoAtts = new AttributesImpl();
+        if (annotation.getTranslation() != null) {
+            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TRANSLATION,
+                            CDATA, shortenIfNeeded(annotation.getTranslation()));
+        }
+        if (annotation.getGrammaticalType() != null) {
+            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.TYPE,
+                                   CDATA, annotation.getGrammaticalType());
+        }
+        if (!annotatedWord.equals( annotation.getDictionaryForm())) {
+            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE,
+                                   CDATA, annotation.getDictionaryForm());
+        }
+
+        // generate reading elements for kanji substrings
+        String[][] parts;
+        String dictionaryFormReading = annotation.getDictionaryFormReading();
+        if (dictionaryFormReading != null) {
+            try {
+                parts = StringTools.splitWordReading(annotatedWord, annotation.getDictionaryForm(),
+                                dictionaryFormReading);
+            } catch (StringIndexOutOfBoundsException ex) {
+                LOGGER.severe("Warning: unparseable word/reading: " +
+                                annotatedWord + "/" + annotation.getDictionaryForm() + "/" +
+                                annotation.getDictionaryFormReading());
+                parts = new String[][] { { annotatedWord } };
+            }
+
+            String reading = annotation.getReading();
+            if (reading == null) {
+                // derive inflected reading from splitWordReading
+                StringBuilder inflectedReading = new StringBuilder(64);
+                for (String[] part : parts) {
+                    if (part.length == 1) {
+                        inflectedReading.append(part[0]);
+                    } else {
+                        inflectedReading.append(part[1]);
+                    }
+                }
+                annotation.setReading(inflectedReading.toString());
+            }
+        } else {
+            parts = new String[][] { { annotatedWord } };
+        }
+
+        if (!Objects.equals(annotation.getReading(), annotation.getDictionaryFormReading())) {
+            annoAtts.addAttribute( "", "", JGlossDocument.Attributes.BASE_READING,
+                                   CDATA, annotation.getDictionaryFormReading());
+        }
+
+        parent.startElement( "", "", JGlossDocument.Elements.ANNOTATION, annoAtts);
+        int partPosition = annotation.getStart(); // position of part substring in c array
+        for (String[] part : parts) {
+            if (part.length == 2) {
+                // reading annotation
+
+                // if the reading of a kanji substring is not known, it is set
+                // to the kanji substring itself
+                String thisReading = part[1].equals( part[0]) ?
+                    "" : part[1];
+                readingAtts.setValue( 0, thisReading);
+
+                parent.startElement( "", "", JGlossDocument.Elements.RBASE, readingAtts);
+            }
+
+            // add the reading base, or part without reading
+            parent.characters( c, partPosition, part[0].length());
+            partPosition += part[0].length();
+
+            if (part.length == 2) {
+                // end reading element
+                parent.endElement( "", "", JGlossDocument.Elements.RBASE);
+            }
+        }
+
+        // end annotation element
+        parent.endElement( "", "", JGlossDocument.Elements.ANNOTATION);
     }
 
     private String shortenIfNeeded(String translation) {

@@ -34,6 +34,10 @@ import jgloss.dictionary.ExpressionSearchModes;
 import jgloss.dictionary.SearchException;
 import jgloss.dictionary.SearchFieldSelection;
 
+/**
+ * Supplement a text annotation with translations for the annotated word. Use
+ * this with parsers which does not generate annotations with translations.
+ */
 public class TextAnnotationCompleter {
 	private static final Logger LOGGER = Logger.getLogger(TextAnnotationCompleter.class.getPackage().getName());
 
@@ -46,10 +50,14 @@ public class TextAnnotationCompleter {
         searchParameters[1] = new SearchFieldSelection( true, true, false, true, false);
     }
 
-    public TextAnnotation complete( TextAnnotation anno) {
+    /**
+     * Add translation for the annotated word to the given annotation. Does
+     * nothing if the given annotation already contains a translation.
+     */
+    public void complete(TextAnnotation anno) {
         if (anno.getDictionaryFormReading() != null &&
             anno.getTranslation() != null) {
-	        return anno;
+            return;
         }
 
         boolean translationSetFromDictionary = false;
@@ -121,7 +129,5 @@ public class TextAnnotationCompleter {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
-
-        return anno;
     }
 } // class TextAnnotationCompleter
