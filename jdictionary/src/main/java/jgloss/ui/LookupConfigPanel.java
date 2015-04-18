@@ -23,7 +23,6 @@
 package jgloss.ui;
 
 import static jgloss.ui.SetDistanceListener.DISTANCE_FORMAT;
-import static jgloss.util.ObjectUtils.isEqual;
 
 import java.awt.Component;
 import java.awt.EventQueue;
@@ -35,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -338,7 +338,7 @@ public class LookupConfigPanel extends JPanel implements View<LookupModel>, Look
     public LookupModel getModel() { return model; }
 
     public final void setModel( LookupModel _model) {
-        if (isEqual(model, _model)) {
+        if (Objects.equals(model, _model)) {
 	        return;
         }
 
