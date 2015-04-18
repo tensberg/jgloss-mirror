@@ -13,12 +13,12 @@
 	<name>JGloss</name>
 	<url>http://jgloss.sourceforge.net${siteDirectory}</url>
     <inceptionYear>2001</inceptionYear>
-    
-	<scm>
-		<url>http://sourceforge.net/p/jgloss/code/</url>
+
+    <scm>
+        <url>http://sourceforge.net/p/jgloss/code/</url>
         <connection>scm:git:git://git.code.sf.net/p/jgloss/code</connection>
         <developerConnection>scm:git:ssh://git.code.sf.net/p/jgloss/code</developerConnection>
-	  <tag>HEAD</tag>
+        <tag>HEAD</tag>
     </scm>
     
     <ciManagement>
@@ -489,6 +489,14 @@
             <name>tensberg-maven-JGloss</name>
             <url>https://api.bintray.com/maven/tensberg/maven/JGloss</url>
         </repository>
+        
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>jgloss-snapshots</id>
+            <name>JGloss snapshots repository</name>
+            <url>sftp://web.sourceforge.net/home/project-web/jgloss/htdocs/m2repo/snapshots</url>
+            <layout>default</layout>
+        </snapshotRepository>
 
 		<site>
 			<id>jgloss.sf.net</id>
