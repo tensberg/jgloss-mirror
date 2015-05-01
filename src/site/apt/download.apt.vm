@@ -58,3 +58,19 @@ Dictionaries
       is an extensive Japanese-German dictionary. The dictionary is available for download
       in {{{http://www.wadoku.de/wiki/display/WAD/Downloads+und+Links}EDICT2 format here}}.
 
+Exclusion Lists
+
+  When importing a text, you can choose a list of words which should not be annotated. This is the
+  exclusion list. You can use this to skip words which you have already learned. Here are word lists
+  based on the Kanji of the levels of the 
+  {{{http://en.wikipedia.org/wiki/Japanese-Language_Proficiency_Test}Japanese-Language Proficiency Test}}.
+  
+*-------------------------------------------*
+{{{./wordlists/wordlist_joyo.txt}Joyo Kanji}}
+{{{./wordlists/wordlist_n2.txt}Level N2}}
+{{{./wordlists/wordlist_n3.txt}Level N3}}
+{{{./wordlists/wordlist_n4.txt}Level N4}}
+{{{./wordlists/wordlist_n5.txt}Level N5}}
+*-------------------------------------------*
+  
+  Thanks to Dominik Klein for contributing the lists.

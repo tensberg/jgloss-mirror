@@ -57,3 +57,21 @@ Wörterbücher
     * Das {{{http://www.wadoku.de/}Wadoku Jiten}} ist ein umfangreiches Japanisch-Deutsches Wörterbuch.
       Das Wörterbuch kann {{{http://www.wadoku.de/wiki/display/WAD/Downloads+und+Links}hier im EDICT2-Format}}
       heruntergeladen werden.
+
+Ausschlusslisten
+
+  Beim Importieren eines Texts können Sie eine Liste mit Wörtern auswählen, die nicht annotiert werden:
+  die Ausschlussliste. Damit können Sie Wörter auslassen, die Sie bereits gelernt haben. Hier sind
+  Wortlisten, die auf den Kanji der Level des  
+  {{{http://de.wikipedia.org/wiki/Japanese_Language_Proficiency_Test}Japanese Language Proficiency Test}}
+  basieren.
+  
+*-------------------------------------------*
+{{{./wordlists/wordlist_joyo.txt}Joyo Kanji}}
+{{{./wordlists/wordlist_n2.txt}Level N2}}
+{{{./wordlists/wordlist_n3.txt}Level N3}}
+{{{./wordlists/wordlist_n4.txt}Level N4}}
+{{{./wordlists/wordlist_n5.txt}Level N5}}
+*-------------------------------------------*
+  
+  Vielen Dank an Dominik Klein für das Erstellen der Listen.
