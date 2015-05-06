@@ -22,11 +22,32 @@
 package jgloss.ui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
  */
-public class ExclusionsModel {
-    private final List<ExclusionResource> exclusionResources = new ArrayList<>();
+public class Exclusions {
+
+    private final List<ExclusionResourceLoader> exclusionResources = new ArrayList<>();
+
+    public int size() {
+        return exclusionResources.size();
+    }
+
+    public ExclusionResource getExclusionResource(int index) {
+        return exclusionResources.get(index).getExclusionResource();
+    }
+
+    public Set<String> getExclusions() {
+        Set<String> exclusions = new HashSet<>();
+        for (ExclusionResourceLoader exclusionResource : exclusionResources) {
+            if (exclusionResource.getExclusionResource().isEnabled()) {
+                exclusions.addAll(exclusionResource.loadExclusions());
+            }
+        }
+        return exclusions;
+    }
 }

@@ -9,7 +9,7 @@ import javax.swing.ListSelectionModel;
 import org.junit.Test;
 
 
-public class ExclusionListTest {
+public class ExclusionPanelTest {
     @Test
     public void testRemoveSelectionRemoveSingleEntry() {
         DefaultListModel<String> listModel = new DefaultListModel<String>();
@@ -17,7 +17,7 @@ public class ExclusionListTest {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         selectionModel.setSelectionInterval(0, 0);
-        ExclusionList.removeSelection(listModel, selectionModel);
+        ExclusionPanel.removeSelection(listModel, selectionModel);
         assertThat(listModel.size()).isEqualTo(0);
         assertThat(selectionModel.getMinSelectionIndex()).isEqualTo(-1);
     }
@@ -33,7 +33,7 @@ public class ExclusionListTest {
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         selectionModel.addSelectionInterval(0, 0);
         selectionModel.addSelectionInterval(2, 3);
-        ExclusionList.removeSelection(listModel, selectionModel);
+        ExclusionPanel.removeSelection(listModel, selectionModel);
         assertThat(listModel.size()).isEqualTo(1);
         assertThat(listModel.get(0)).isEqualTo("bar");
         assertThat(selectionModel.getMinSelectionIndex()).isEqualTo(-1);

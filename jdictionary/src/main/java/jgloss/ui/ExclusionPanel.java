@@ -22,6 +22,8 @@
 
 package jgloss.ui;
 
+import static jgloss.ui.util.SwingWorkerProgressFeedback.showProgress;
+
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -52,6 +54,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -60,6 +63,7 @@ import javax.swing.event.ListSelectionListener;
 
 import jgloss.JGloss;
 import jgloss.Preferences;
+import jgloss.ui.util.JGlossWorker;
 import jgloss.ui.util.UIUtilities;
 import jgloss.util.CharacterEncodingDetector;
 
@@ -71,39 +75,30 @@ import jgloss.util.CharacterEncodingDetector;
  *
  * @author Michael Koch
  */
-public class ExclusionList extends JPanel implements PreferencesPanel {
-	private static final Logger LOGGER = Logger.getLogger(ExclusionList.class.getPackage().getName());
+public class ExclusionPanel extends JPanel implements PreferencesPanel {
+	private static final Logger LOGGER = Logger.getLogger(ExclusionPanel.class.getPackage().getName());
 
 	private static final long serialVersionUID = 1L;
 
 	/**
      * The single application-wide instance.
      */
-    private static ExclusionList box;
+    private static ExclusionPanel box;
 
+    private final Exclusions exclusions = new Exclusions();
     /**
-     * The set of excluded words. The contents of the set may not be the same as
-     * displayed in the <CODE>exclusionList</CODE> if the user has not yet applied
-     * the changes.
+     * The widget which displays the configured exclusion lists.
      */
-    private Set<String> exclusions;
-    /**
-     * The widget which displays the excluded words.
-     */
-    private final JList<String> exclusionList;
-    /**
-     * Flag if the content of the JList was changed.
-     */
-    private boolean changed;
+    private final JTable exclusionTable;
 
     /**
      * Returns the single application-wide instance.
      *
      * @return The Dictionaries component.
      */
-    public static ExclusionList getInstance() {
+    public static ExclusionPanel getInstance() {
         if (box == null) {
-	        box = new ExclusionList();
+	        box = new ExclusionPanel();
         }
         return box;
     }
@@ -115,8 +110,17 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
      *
      * @return Array of currently active dictionaries.
      */
-    public static Set<String> getExclusions() {
-        return getInstance().exclusions;
+    public Set<String> getExclusions(Component feedbackComponent) {
+        JGlossWorker<Set<String>, Void> worker = new JGlossWorker<Set<String>, Void>() {
+
+            @Override
+            protected Set<String> doInBackground() {
+                return exclusions.getExclusions();
+            }
+        };
+        showProgress(worker, feedbackComponent);
+        worker.execute();
+        return worker.get();
     }
 
     /**
@@ -129,7 +133,7 @@ public class ExclusionList extends JPanel implements PreferencesPanel {
     /**
      * Creates a new instance of dictionaries.
      */
-    private ExclusionList() {
+    private ExclusionPanel() {
         setLayout( new GridBagLayout());
 
         exclusions = new HashSet<String>( 101);

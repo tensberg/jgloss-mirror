@@ -32,7 +32,7 @@ import jgloss.parser.ChasenParser;
 import jgloss.parser.KanjiParser;
 import jgloss.parser.NullParser;
 import jgloss.ui.Dictionaries;
-import jgloss.ui.ExclusionList;
+import jgloss.ui.ExclusionPanel;
 import jgloss.ui.GeneralDialog;
 import jgloss.ui.LookupFrame;
 import jgloss.ui.ParserSelector;
@@ -111,7 +111,7 @@ public class JGlossApp extends JGloss {
         return new PreferencesPanel[] { GeneralDialog.getInstance(),
                                         DocumentStyleDialog.getDocumentStyleDialog(),
                                         Dictionaries.getInstance(),
-                                        ExclusionList.getInstance() };
+                                        ExclusionPanel.getInstance() };
     }
 
     @Override

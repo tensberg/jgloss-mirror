@@ -31,6 +31,10 @@ public class ExclusionResource {
 
     private URL location;
 
+    private boolean enabled;
+
+    private boolean editable;
+
     public String getName() {
         return name;
     }
@@ -47,4 +51,19 @@ public class ExclusionResource {
         this.location = location;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
 }

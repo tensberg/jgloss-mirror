@@ -47,7 +47,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Element;
 
 import jgloss.JGloss;
-import jgloss.ui.ExclusionList;
+import jgloss.ui.ExclusionPanel;
 import jgloss.ui.annotation.Annotation;
 import jgloss.ui.annotation.AnnotationListModel;
 import jgloss.ui.html.JGlossHTMLDoc;
@@ -427,7 +427,7 @@ public class AnnotationList extends JList<Annotation> implements MouseListener, 
                 StringTools.isKatakana( dictionaryWord.charAt( 0)) ||
                 StringTools.isKatakana( word.charAt( 0)) &&
                 StringTools.isHiragana( dictionaryWord.charAt( 0))) {
-	            ExclusionList.addWord( word);
+	            ExclusionPanel.addWord( word);
             }
         }
 
@@ -443,9 +443,9 @@ public class AnnotationList extends JList<Annotation> implements MouseListener, 
         }
 
         if (!isKana || selection.getDictionaryFormReading().length()==0) {
-	        ExclusionList.addWord( dictionaryWord);
+	        ExclusionPanel.addWord( dictionaryWord);
         } else {
-	        ExclusionList.addWord( selection.getDictionaryFormReading());
+	        ExclusionPanel.addWord( selection.getDictionaryFormReading());
         }
     }
 

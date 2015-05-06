@@ -32,7 +32,7 @@ import java.io.StringReader;
 import jgloss.JGloss;
 import jgloss.Preferences;
 import jgloss.ui.Dictionaries;
-import jgloss.ui.ExclusionList;
+import jgloss.ui.ExclusionPanel;
 import jgloss.ui.GeneralDialog;
 import jgloss.util.CharacterEncodingDetector;
 
@@ -52,7 +52,7 @@ class ImportClipboardStrategy extends ImportStrategy {
                 ( Preferences.IMPORTCLIPBOARD_DETECTPARAGRAPHS, true), 
                 GeneralDialog.getInstance().createReadingAnnotationFilter(), 
                 GeneralDialog.getInstance().createImportClipboardParser
-                    ( Dictionaries.getInstance().getDictionaries(), ExclusionList.getExclusions()));
+                    ( Dictionaries.getInstance().getDictionaries(), ExclusionPanel.getExclusions()));
     }
 
     @Override

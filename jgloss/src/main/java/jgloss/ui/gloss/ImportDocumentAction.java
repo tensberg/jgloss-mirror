@@ -26,7 +26,7 @@ import java.awt.event.ActionEvent;
 
 import jgloss.parser.Parser;
 import jgloss.ui.Dictionaries;
-import jgloss.ui.ExclusionList;
+import jgloss.ui.ExclusionPanel;
 import jgloss.ui.ImportDialog;
 import jgloss.ui.util.UIUtilities;
 
@@ -74,6 +74,6 @@ class ImportDocumentAction extends DocumentAction {
 
     private Parser createParser(ImportDialog dialog) {
         return dialog.createParser(Dictionaries.getInstance().getDictionaries(),
-                ExclusionList.getExclusions());
+                ExclusionPanel.getExclusions());
     }
 }
