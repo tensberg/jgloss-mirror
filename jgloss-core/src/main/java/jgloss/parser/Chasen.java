@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2013 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2002-2015 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Timer;
@@ -276,7 +277,7 @@ public class Chasen {
         Process p = null;
 
         try {
-            p = Runtime.getRuntime().exec( chasenExecutable + " -V");
+            p = new ProcessBuilder(chasenExecutable, "-V").start();
         } catch (IOException ex) {
             // specified program probably doesn't exist
             LOGGER.log(INFO, "cannot start chasen executable {0}", chasenExecutable);
@@ -318,13 +319,13 @@ public class Chasen {
      * separator.
      */
     public Chasen() throws IOException {
-        this( defaultChasenExecutable, "", '\t');
+        this(defaultChasenExecutable, new String[0], '\t');
     }
 
     /**
      * Starts a new chasen process with the specified parameters, using the default executable.
      */
-    public Chasen( String args, char separator) throws IOException {
+    public Chasen(String[] args, char separator) throws IOException {
         this( defaultChasenExecutable, args, separator);
     }
 
@@ -340,13 +341,18 @@ public class Chasen {
      *                  only entry.
      * @exception IOException If the chasen process can't be started.
      */
-    public Chasen( String chasenExecutable, String args, char separator) throws IOException {
+    public Chasen(String chasenExecutable, String[] args, char separator) throws IOException {
         // Initialize platform encoding if not done already. This avoids running chasen
         // twice at the same time.
         this.separator = separator;
         String encoding = getChasenPlatformEncoding( chasenExecutable);
-        chasen = Runtime.getRuntime().exec( chasenExecutable + " " + args,
-                                            new String[] { "LANG=ja", "LC_ALL=ja_JP" });
+        List<String> commands = new ArrayList<>(args.length + 1);
+        commands.add(chasenExecutable);
+        commands.addAll(Arrays.asList(args));
+        ProcessBuilder chasenProcessBuilder = new ProcessBuilder(commands);
+        chasenProcessBuilder.environment().put("LANG", "ja");
+        chasenProcessBuilder.environment().put("LC_ALL", "ja_JP");
+        chasen = chasenProcessBuilder.start();
         chasenOut = new BufferedReader( new InputStreamReader
             ( chasen.getInputStream(), encoding));
         chasenIn = new BufferedWriter( new OutputStreamWriter
@@ -461,7 +467,7 @@ public class Chasen {
         // and checking the encoding of the output.
 
         try {
-            Process chasen = Runtime.getRuntime().exec( chasenExecutable + " -lf");
+            Process chasen = new ProcessBuilder(new String[] { chasenExecutable, "-lf" }).start();
             InputStreamReader reader = CharacterEncodingDetector.getReader( chasen.getInputStream());
             platformEncoding = reader.getEncoding();
 

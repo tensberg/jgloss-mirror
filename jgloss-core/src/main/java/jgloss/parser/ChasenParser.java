@@ -50,7 +50,7 @@ public class ChasenParser extends AbstractParser {
     /**
      * Command line parameter passed to chasen. Detemines the output format.
      */
-    private final static String CHASEN_ARGS = "-F %m\\t%H\\t%Tn\\t%Fn\\t%M\\t%Y1\\t%y1\\n";
+    private final static String[] CHASEN_ARGS = new String[] { "-F", "%m\\t%H\\t%Tn\\t%Fn\\t%M\\t%Y1\\t%y1\\n" };
 
     /**
      * Chasen instance used to parse text.
