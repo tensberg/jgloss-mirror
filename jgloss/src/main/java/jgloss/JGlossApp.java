@@ -98,10 +98,19 @@ public class JGlossApp extends JGloss {
         // set default location of the chasen executable if this is the first start of JGloss
         String chasen = PREFS.getString( Preferences.CHASEN_LOCATION);
         if (chasen==null || chasen.length()==0) {
-	        PREFS.set( Preferences.CHASEN_LOCATION, MESSAGES.getString
-                       ( File.separatorChar=='\\' ?
-                         "chasen.location.windows" :
-                         "chasen.location.unix"));
+            String defaultChasenLocationKey;
+            String osName = System.getProperty("os.name");
+            if (osName.startsWith("Windows")) {
+                String osArch = System.getProperty("os.arch");
+                if ("x86".equals(osArch)) {
+                    defaultChasenLocationKey = "windows";
+                } else {
+                    defaultChasenLocationKey = "windows64";
+                }
+            } else {
+                defaultChasenLocationKey = "unix";
+            }
+            PREFS.set(Preferences.CHASEN_LOCATION, MESSAGES.getString("chasen.location." + defaultChasenLocationKey));
         }
         Chasen.setDefaultExecutable( JGloss.PREFS.getString( Preferences.CHASEN_LOCATION));
     }

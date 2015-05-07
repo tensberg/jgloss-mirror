@@ -208,7 +208,7 @@ public class Chasen {
      * Path to the default chasen executable. This will be used if the path is not supplied in
      * the constructor.
      */
-    private static String defaultChasenExecutable = "/usr/local/bin/chasen";
+    private static String defaultChasenExecutable = "/usr/bin/chasen";
 
     /**
      * Cache used by {@link #isChasenExecutable(String) isChasenExecutable} to store the
