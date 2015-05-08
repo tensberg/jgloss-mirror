@@ -53,13 +53,12 @@ JGloss Informations-Links
 Dank
 
   Viele Ideen in JGloss stammen aus Jim Breen's Arbeit, insbesondere dem 
-  {{{http://www.dgs.monash.edu.au/~jwb/wwwjdic.html}WWWJDIC}} und dem
+  {{{http://www.csse.monash.edu.au/~jwb/cgi-bin/wwwjdic.cgi?1C}WWWJDIC}} und dem
   {{{http://www.csse.monash.edu.au/~jwb/xjdic/}XJDIC}}.
   Der Kanji-Parser basiert auf
-  {{{ftp://ftp.monash.edu.au/pub/nihongo/www-jdict.ps.gz}Ideen aus dem WWWJDIC}}.
+  {{{ftp://ftp.edrdg.org/pub/Nihongo/www-jdict.ps.gz}Ideen aus dem WWWJDIC}}.
   Die Zeichencode-Erkennung benutzt Code von Yasuhiro Tonooka's kcc (Kanji Code Converter).
   Die französische Übersetzung hat Alexandre Beraud erstellt. Heinrich Künsting 
   hat beim Erstellen der LaTeX Exportvorlagen geholfen und das LaTeX-CJK Listen-Template
   geschrieben.
-  Einige der Dateiauswahl-Icons entstammen dem
-  {{{http://artists.kde.org}KDE project}}.
+  Einige der Dateiauswahl-Icons entstammen dem {{{https://www.kde.org}KDE project}}.

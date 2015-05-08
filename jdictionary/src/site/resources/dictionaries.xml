@@ -8,9 +8,9 @@
             <compression>gzip</compression>
             <dictionaryFile>edict2</dictionaryFile>
         </download>
-        <homepage>http://www.csse.monash.edu.au/~jwb/edict_doc.html</homepage>
+        <homepage>http://www.edrdg.org/jmdict/edict.html</homepage>
         <copyright>
-            <year>2010</year>
+            <year>2015</year>
             <by>The Electronic Dictionary Research and Development Group</by>
         </copyright>
         <languages>
@@ -43,14 +43,14 @@
         <download>
             <!-- The dictionary is repackaged as zip because JGloss does not support
                  the original .tar.bz2 format. -->
-            <url>http://jgloss.sf.net/downloads/wadokudict2_20121222.zip</url>
+            <url>http://jgloss.sf.net/downloads/wadokudict2_20150104.zip</url>
             <compression>zip</compression>
             <dictionaryFile>wadokudict2</dictionaryFile>
         </download>
         <homepage>http://www.wadoku.de/wiki/display/WAD/WadokuWiki</homepage>
         <license>http://www.wadoku.de/wiki/x/ZQE</license>
         <copyright>            
-            <year>2012</year>
+            <year>2015</year>
             <by>Ulrich Apel und weitere Miturheber</by>
         </copyright>
         <languages>

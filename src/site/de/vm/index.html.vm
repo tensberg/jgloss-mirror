@@ -104,9 +104,9 @@ body {
 			<div class="span4">
 				<h2><a href="details.html#Dictionaries">Wörterbücher &raquo;</a></h2>
 				<p>
-                    JGloss unterstützt das populäre <a href="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDICT2</a> Wörterbuch-Dateiformat.
+                    JGloss unterstützt das populäre <a href="http://www.edrdg.org/jmdict/edict.html">EDICT2</a> Wörterbuch-Dateiformat.
                     Nutzbare Wörterbücher sind unter anderem das Japanisch-Englische 
-                    <a href="http://www.csse.monash.edu.au/~jwb/edict.html">EDICT</a> selbst, 
+                    <a href="http://www.edrdg.org/jmdict/edict.html">EDICT</a> selbst, 
                     das Japanisch-Deutsche <a href="http://www.wadoku.de/">Wadoku Jiten</a>, und viele andere. Das
                     <a href="http://www.csse.monash.edu.au/~jwb/kanjidic.html">Kanjidic</a> Wörterbuchformat wird auch unterstützt.
                 </p>

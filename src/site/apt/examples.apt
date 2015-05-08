@@ -17,7 +17,7 @@ Examples
   Kenji Miyazawa and his stories is here}}. An
   {{{http://www.kenji-world.net/english/download/works/goose.html}
   English translation of "Kari no Douji"}} is available there.
-  {{{./karinodouji/kari.jgloss.zip}Here}} is the JGloss file from which the following
+  {{{./karinodouji/kari.jgloss}Here}} is the JGloss file from which the following
   documents where generated. 
 
   First an {{{./karinodouji/kari.html}example of the HTML export function}}. The generated

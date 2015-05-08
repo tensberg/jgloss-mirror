@@ -106,9 +106,9 @@ body {
 			<div class="span4">
 				<h2><a href="details.html#Dictionaries">Dictionaries &raquo;</a></h2>
 				<p>
-                    JGloss supports the popular <a href="http://www.csse.monash.edu.au/~jwb/edict_doc.html">EDICT2</a> dictionary file format.
+                    JGloss supports the popular <a href="http://www.edrdg.org/jmdict/edict.html">EDICT2</a> dictionary file format.
                     Available dictionaries include the Japanese-English 
-                    <a href="http://www.csse.monash.edu.au/~jwb/edict.html">EDICT</a> itself, 
+                    <a href="http://www.edrdg.org/jmdict/edict.html">EDICT</a> itself, 
                     the Japanese-German <a href="http://www.wadoku.de/">Wadoku Jiten</a>, and many others. The
                     <a href="http://www.csse.monash.edu.au/~jwb/kanjidic.html">Kanjidic</a> dictionary format is also supported.
                 </p>
