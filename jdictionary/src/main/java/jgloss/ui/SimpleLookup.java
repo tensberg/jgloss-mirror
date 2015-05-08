@@ -60,7 +60,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
      * stored in a weak reference. When the model is garbage collected, the listener is
      * removed from the {@link Dictionaries Dictionaries} listener list.
      */
-    private static class WeakDictionaryChangeListener 
+    private static class WeakDictionaryChangeListener
         implements DictionaryListChangeListener {
         private final WeakReference<LookupModel> modelRef;
 
@@ -87,7 +87,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
             }
         }
     } // class WeakDictionaryChangeListener
-    
+
     private static class SearchOnTextChangeListener implements DocumentListener {
 
     	private final Timer delayedActionTimer;
@@ -113,32 +113,34 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         }
 
     }
-   
+
     private static final long serialVersionUID = 1L;
-    
+
     private static final String STYLE_SHEET = "/data/lookup-minimal.css";
-    
+
     private final JTextField expression;
-    private final LookupModel model;
-    
+    private final LookupModel modelPrototype;
+
     private final AsynchronousLookupEngine engine;
     private final LookupResultProxy lookupResultProxy;
     private final LookupResultList list;
-    
+
+    private String lastSearchExpression;
+
     public SimpleLookup( Component[] additionalControls, LookupResultHyperlinker hyperlinker) {
-        model = new LookupModel
+        modelPrototype = new LookupModel
             ( Arrays.asList( new SearchMode[] { ExpressionSearchModes.EXACT,
                                             ExpressionSearchModes.PREFIX,
                                             ExpressionSearchModes.ANY }),
               Arrays.asList( Dictionaries.getInstance().getDictionaries()),
               Collections.<LookupResultFilter> emptyList());
         Dictionaries.getInstance().addDictionaryListChangeListener
-            ( new WeakDictionaryChangeListener( model));
-        model.selectAllDictionaries( true);
-        model.selectSearchField( DictionaryEntryField.WORD, true);
-        model.selectSearchField( DictionaryEntryField.READING, true);
-        model.selectSearchField( DictionaryEntryField.TRANSLATION, true);
-        model.selectMatchMode( MatchMode.FIELD, true);
+            ( new WeakDictionaryChangeListener( modelPrototype));
+        modelPrototype.selectAllDictionaries( true);
+        modelPrototype.selectSearchField( DictionaryEntryField.WORD, true);
+        modelPrototype.selectSearchField( DictionaryEntryField.READING, true);
+        modelPrototype.selectSearchField( DictionaryEntryField.TRANSLATION, true);
+        modelPrototype.selectMatchMode( MatchMode.FIELD, true);
 
         setLayout( new BorderLayout());
 
@@ -155,7 +157,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         expandableC.weightx = 1.0f;
 
         expression = new JTextField();
-        JLabel expressionDescription = 
+        JLabel expressionDescription =
             new JLabel( JGloss.MESSAGES.getString( "wordlookup.enterexpression"));
         expressionDescription.setDisplayedMnemonic
             ( JGloss.MESSAGES.getString( "wordlookup.enterexpression.mk").charAt( 0));
@@ -183,7 +185,7 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
         this.add( list, BorderLayout.CENTER);
         lookupResultProxy = new LookupResultProxy(list);
         engine = new AsynchronousLookupEngine( lookupResultProxy);
-        
+
         expression.getDocument().addDocumentListener(new SearchOnTextChangeListener(this));
     }
 
@@ -192,32 +194,34 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
     }
 
     public void search( String text) {
-        if (text == null || text.length()==0) {
+        if (text == null || text.length() == 0 || text.equals(lastSearchExpression)) {
 	        return;
         }
+
+        lastSearchExpression = text;
 
         if (!text.equals(expression.getText())) {
         	expression.setText( text);
         }
 
-        final LookupModel modelClone = model.clone();
-        modelClone.setSearchExpression( text);
+        final LookupModel model = modelPrototype.clone();
+        model.setSearchExpression( text);
 
         // Try a lookup with each search mode until at least one entry is found.
         // To do this in asynchronous search mode, a runnable is created which is executed
         // after a search ends. If the search did not find any results, the runnable selects
         // the next search mode and repeats the search.
-        final Iterator<SearchMode> searchModes = Arrays.asList(modelClone.getSearchModes()).iterator();
-        modelClone.selectSearchMode(searchModes.next());
-        engine.doLookup( modelClone, new Runnable() {
-                @Override
-				public void run() {
-                    if (list.getEntryCount() == 0 && searchModes.hasNext()) {
-                    	model.selectSearchMode(searchModes.next());
-                    	engine.doLookup( modelClone, this);
-                    }
+        final Iterator<SearchMode> searchModes = Arrays.asList(model.getSearchModes()).iterator();
+        model.selectSearchMode(searchModes.next());
+        engine.doLookup( model, new Runnable() {
+            @Override
+            public void run() {
+                if (list.getEntryCount() == 0 && searchModes.hasNext()) {
+                    model.selectSearchMode(searchModes.next());
+                    engine.doLookup(model, this);
                 }
-            });
+            }
+        });
     }
 
     public void addHyperlinkListener( HyperlinkListener listener) {
@@ -251,20 +255,20 @@ public class SimpleLookup extends JPanel implements ActionListener, HyperlinkLis
     /**
      * Return the component used to display the lookup result.
      */
-    public LookupResultList getLookupResultList() { 
+    public LookupResultList getLookupResultList() {
         return list;
     }
 
     protected void followReference( String type, String refKey) {
         if (LookupResultHyperlinker.REFERENCE_PROTOCOL.equals( type)) {
-            ReferenceAttributeValue ref = (ReferenceAttributeValue) 
+            ReferenceAttributeValue ref = (ReferenceAttributeValue)
                 ((HyperlinkAttributeFormatter.ReferencedAttribute) list.getReference( refKey)).getValue();
             if (ref instanceof SearchReference) {
             	SearchReference searchRef = (SearchReference) ref;
-            	model.selectAllDictionaries(false);
-            	model.selectDictionary(searchRef.getDictionary());
-            	model.setSearchExpression(searchRef.getReference());
-            	model.setSearchFieldSelection(searchRef.getSearchFieldSelection());
+            	modelPrototype.selectAllDictionaries(false);
+            	modelPrototype.selectDictionary(searchRef.getDictionary());
+            	modelPrototype.setSearchExpression(searchRef.getReference());
+            	modelPrototype.setSearchFieldSelection(searchRef.getSearchFieldSelection());
             } else {
             	throw new IllegalArgumentException("unsupported reference type " + ref);
             }
