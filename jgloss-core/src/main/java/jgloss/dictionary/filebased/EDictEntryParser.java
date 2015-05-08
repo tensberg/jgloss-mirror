@@ -58,12 +58,18 @@ class EDictEntryParser implements EntryParser {
 	private static final Logger LOGGER = Logger.getLogger(EDictEntryParser.class.getPackage().getName());
 
     /**
-     * Match an EDICT entry. Group 1 is the word(s), group 2 the (optional) reading(s) and group 3
-     * the translations. The optional last group is a reference to the corresponding JMDict entry.
-     * This entry is currently not used and skipped
+     * Match an EDICT entry. Group 1 is the word(s), group 2 the (optional)
+     * reading(s), group 3 the (optional) grammatical form and group 4 the
+     * translations. The optional last group is a reference to the corresponding
+     * JMDict entry. This entry is currently not used and skipped.
      */
-    private static final Pattern ENTRY_PATTERN = Pattern.compile
-        ( "(\\S+)(?:\\s\\[(.+?)\\])?\\s/(.+?)/(EntL.+/)?");
+    private static final Pattern ENTRY_PATTERN = Pattern.compile("(\\S+)(?:\\s\\[(.+?)\\])?\\s(?:[^/]+?)?\\s?/(.+?)/(EntL.+/)?");
+
+    private static final int GROUP_WORDS = 1;
+
+    private static final int GROUP_READINGS = 2;
+
+    private static final int GROUP_TRANSLATION = 3;
 
     /**
      * Match a string in brackets at the beginning of a string. Group 1 matches all numbers, which is the ROM marker.
@@ -84,7 +90,7 @@ class EDictEntryParser implements EntryParser {
 			public String getPriority() { return "_P_"; }
             @Override
 			public int compareTo( Priority p) {
-                if (p == PRIORITY_VALUE) { 
+                if (p == PRIORITY_VALUE) {
 	                return 0;
                 } else {
 	                throw new IllegalArgumentException();
@@ -148,7 +154,7 @@ class EDictEntryParser implements EntryParser {
         DefaultAttributeSet translationromA = new DefaultAttributeSet( translationA);
         roma.add( translationromA);
 
-        parseTranslations(entryMatcher.group( 3), rom, crm, generalA, baseWordA, translationA, roma, translationromA);
+        parseTranslations(entryMatcher.group(GROUP_TRANSLATION), rom, crm, generalA, baseWordA, translationA, roma, translationromA);
 
         DictionaryEntry dictionaryEntry;
         if (wordsWithMarkers.length == 1 && readingsWithMarkers.length == 1) {
@@ -300,7 +306,7 @@ class EDictEntryParser implements EntryParser {
 
 	private String[] parseReadings(Matcher entryMatcher, String[] words) {
 	    String[] readings;
-        String readingGroup = entryMatcher.group( 2);
+        String readingGroup = entryMatcher.group( GROUP_READINGS);
         if (readingGroup == null) {
 	        readings = words;
         } else {
@@ -310,7 +316,7 @@ class EDictEntryParser implements EntryParser {
     }
 
 	private String[] parseWords(Matcher entryMatcher) {
-	    return entryMatcher.group( 1).split(";");
+	    return entryMatcher.group( GROUP_WORDS).split(";");
     }
 
 	private Matcher matchEntry(String entry) {

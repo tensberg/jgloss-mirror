@@ -45,30 +45,41 @@ public class EDictEntryParserTest {
 		parser.setDictionary(dictionary);
 	}
 
-	@Test
-	public void testParseSimpleEntry() {
-		DictionaryEntry entry = parser.parseEntry("KANJI [KANA] /(general information) gloss/gloss2/.../" , TEST_OFFSET);
-		assertThat(entry).isNotNull();
-		assertThat(entry.getDictionary()).isEqualTo(dictionary);
-		assertThat(entry.getWordAlternativeCount()).isEqualTo(1);
-		assertThat(entry.getWord(0)).isEqualTo(KANJI);
-		assertThat(entry.getReadingAlternativeCount()).isEqualTo(1);
-		assertThat(entry.getReading(0)).isEqualTo(KANA);
-		assertThat(entry.getTranslationRomCount()).isEqualTo(1);
-		assertThat(entry.getTranslationCrmCount(0)).isEqualTo(3);
-		for (int i=0; i<3; i++) {
-			assertThat(entry.getTranslationSynonymCount(0, i)).isEqualTo(1);
-		}
-		assertThat(entry.getTranslation(0, 0, 0)).isEqualTo(GLOSS);
-		assertThat(entry.getTranslation(0, 1, 0)).isEqualTo(GLOSS2);
-		assertThat(entry.getTranslation(0, 2, 0)).isEqualTo(ELLIPSE);
-		List<InformationAttributeValue> explanations = entry.getTranslationAttributes().getAttribute(Attributes.EXPLANATION, false);
-		assertThat(explanations).isNotNull();
-		assertThat(explanations).hasSize(1);
-		InformationAttributeValue explanation = explanations.get(0);
-		assertThat(explanation).isNotNull();
-		assertThat(explanation.getInformation()).isEqualTo(GENERAL_INFORMATION);
-	}
+    @Test
+    public void testParseSimpleEntry() {
+        DictionaryEntry entry = parser.parseEntry("KANJI [KANA] /(general information) gloss/gloss2/.../", TEST_OFFSET);
+        verifySimpleEntry(entry);
+    }
+
+    private void verifySimpleEntry(DictionaryEntry entry) {
+        assertThat(entry).isNotNull();
+        assertThat(entry.getDictionary()).isEqualTo(dictionary);
+        assertThat(entry.getWordAlternativeCount()).isEqualTo(1);
+        assertThat(entry.getWord(0)).isEqualTo(KANJI);
+        assertThat(entry.getReadingAlternativeCount()).isEqualTo(1);
+        assertThat(entry.getReading(0)).isEqualTo(KANA);
+        assertThat(entry.getTranslationRomCount()).isEqualTo(1);
+        assertThat(entry.getTranslationCrmCount(0)).isEqualTo(3);
+        for (int i = 0; i < 3; i++) {
+            assertThat(entry.getTranslationSynonymCount(0, i)).isEqualTo(1);
+        }
+        assertThat(entry.getTranslation(0, 0, 0)).isEqualTo(GLOSS);
+        assertThat(entry.getTranslation(0, 1, 0)).isEqualTo(GLOSS2);
+        assertThat(entry.getTranslation(0, 2, 0)).isEqualTo(ELLIPSE);
+        List<InformationAttributeValue> explanations = entry.getTranslationAttributes().getAttribute(Attributes.EXPLANATION, false);
+        assertThat(explanations).isNotNull();
+        assertThat(explanations).hasSize(1);
+        InformationAttributeValue explanation = explanations.get(0);
+        assertThat(explanation).isNotNull();
+        assertThat(explanation.getInformation()).isEqualTo(GENERAL_INFORMATION);
+    }
+
+    @Test
+    public void testParseSimpleEntryWithGrammaticalForm() {
+        // grammatical form as seen in current wadokudic
+        DictionaryEntry entry = parser.parseEntry("KANJI [KANA] als Verb /(general information) gloss/gloss2/.../", TEST_OFFSET);
+        verifySimpleEntry(entry);
+    }
 
     @Test
     public void testParsePriorityEntry() {

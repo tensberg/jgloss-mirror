@@ -12,6 +12,7 @@
             <action type="update">Fix NullPointerException when importing documents with Chasen.</action>
             <action type="update">Fix Chasen start on Windows.</action>
             <action type="update">Fixed dictionary precedence in Chasen import.</action>
+            <action type="update">Handle EDICT2 extended format found in recent versions of wadokudict.</action>
         </release>
         <release version="2.1.1" date="2013-06-16">
             <action type="add">The JGloss web start files are now signed with an official certificate as "Open Source Developer, Michael Koch".</action>
