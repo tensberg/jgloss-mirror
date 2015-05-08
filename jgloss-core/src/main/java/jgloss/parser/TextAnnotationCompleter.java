@@ -119,7 +119,8 @@ public class TextAnnotationCompleter {
 
                             if (priorityEntry) {
                                 break;
-                            } // else: continue to search for a priority entry
+                            }
+                            // else: continue to search for a priority entry in this dictionary
 	                    }
                     } catch (SearchException ex) {
                         LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -127,6 +128,11 @@ public class TextAnnotationCompleter {
 	            }
             } catch (SearchException ex) {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+
+            if (translationSetFromDictionary) {
+                // a translation was found in this dictionary
+                break;
             }
         }
     }
