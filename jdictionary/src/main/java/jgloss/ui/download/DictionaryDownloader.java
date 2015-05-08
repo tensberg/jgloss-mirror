@@ -72,6 +72,7 @@ class DictionaryDownloader extends JGlossWorker<File, Void> {
     }
 
     DictionaryDownloader(Dictionary dictionary, File dictionaryDir, Dictionaries dictionaries) {
+        super("dictionarydownloader.title");
         this.dictionary = dictionary;
         this.dictionaryDir = dictionaryDir;
         this.dictionaries = dictionaries;

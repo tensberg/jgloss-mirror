@@ -71,6 +71,7 @@ public class OpenDocumentWorker extends JGlossWorker<JGlossDocument, Void> {
     }
 
     OpenDocumentWorker(JGlossFrame frame, File file) {
+        super("open.progress.title");
         this.frame = frame;
         this.file = file;
     }
@@ -82,7 +83,7 @@ public class OpenDocumentWorker extends JGlossWorker<JGlossDocument, Void> {
         JGlossDocument document;
         try {
         	inputStream = checkConvertJGloss1Doc(inputStream);
-        	
+
             document = new JGlossDocument(new InputSource(inputStream));
         } finally {
             try {
@@ -97,7 +98,7 @@ public class OpenDocumentWorker extends JGlossWorker<JGlossDocument, Void> {
 
 	private InputStream checkConvertJGloss1Doc(InputStream originalInputStream) throws IOException {
 		InputStream convertedInputStream = originalInputStream;
-		
+
 	    if (JGloss1Converter.needsConversion(originalInputStream)) {
 	    	LOGGER.log(INFO, "converting JGloss 1 document {0} to JGloss 2 format", file.getName());
 	    	try {
@@ -111,7 +112,7 @@ public class OpenDocumentWorker extends JGlossWorker<JGlossDocument, Void> {
 	    		LOGGER.log(SEVERE, "failed to convert JGloss 1 file to JGloss 2 format", ex);
 	    	}
 	    }
-	    
+
 	    return convertedInputStream;
     }
 

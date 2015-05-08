@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2013 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2015 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -35,14 +35,15 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-import jgloss.JGloss;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
-/** Modal progress dialog with a message, a progress bar and an optional cancel
+/**
+ * Modal progress dialog with a message, a progress bar and an optional cancel
  * button.
  *
- * @author Michael Koch <tensberg@gmx.net> */
+ * @author Michael Koch <tensberg@gmx.net>
+ * */
 public class ProgressDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
@@ -50,15 +51,13 @@ public class ProgressDialog extends JDialog {
 
     private final JProgressBar progress = new JProgressBar();
 
-    public ProgressDialog(Window parent) {
-        this(parent, null);
-    }
-
-    public ProgressDialog(Window parent, Action cancelAction) {
+    public ProgressDialog(Window parent, Action cancelAction, String title) {
         super(parent);
 
         setModalityType(APPLICATION_MODAL);
-        setTitle( JGloss.MESSAGES.getString( "dictionaries.loading.title"));
+        if (title != null) {
+            setTitle(title);
+        }
 
         JPanel content = new JPanel(new MigLayout(new LC().fillX().wrapAfter(1).minWidth("450").width("450")));
         content.add(message, "growx");

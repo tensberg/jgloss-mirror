@@ -32,7 +32,17 @@ import javax.swing.SwingWorker;
 public abstract class JGlossWorker<T, V> extends SwingWorker<T, V> {
     public static final String MESSAGE_PROPERTY = "message";
 
+    private final String titleKey;
+
     private String message;
+
+    protected JGlossWorker(String titleKey) {
+        this.titleKey = titleKey;
+    }
+
+    public String getTitleKey() {
+        return titleKey;
+    }
 
     public String getMessage() {
         return message;

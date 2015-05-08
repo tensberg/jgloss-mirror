@@ -38,6 +38,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
+import jgloss.JGloss;
+
 /**
  * Show progress feedback for SwingWorker background execution.
  *
@@ -64,6 +66,8 @@ public class SwingWorkerProgressFeedback implements PropertyChangeListener {
 
     private ProgressDialog progressDialog;
 
+    private final String titleKey;
+
     private String message;
 
     private Timer dialogShowTimer;
@@ -84,7 +88,11 @@ public class SwingWorkerProgressFeedback implements PropertyChangeListener {
 
         worker.addPropertyChangeListener(this);
         if (worker instanceof JGlossWorker) {
-            message = ((JGlossWorker<?, ?>) worker).getMessage();
+            JGlossWorker<?, ?> jglossWorker = (JGlossWorker<?, ?>) worker;
+            titleKey = jglossWorker.getTitleKey();
+            message = jglossWorker.getMessage();
+        } else {
+            titleKey = null;
         }
 
         if (worker.getState() == STARTED) {
@@ -147,7 +155,15 @@ public class SwingWorkerProgressFeedback implements PropertyChangeListener {
         } else {
             cancelAction = null;
         }
-        progressDialog = new ProgressDialog(feedbackWindow, cancelAction);
+
+        String title;
+        if (titleKey != null) {
+            title = JGloss.MESSAGES.getString(titleKey);
+        } else {
+            title = null;
+        }
+
+        progressDialog = new ProgressDialog(feedbackWindow, cancelAction, title);
         progressDialog.setMessage(message);
         int currentProgress = worker.getProgress();
         if (currentProgress > 0) {

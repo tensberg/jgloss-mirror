@@ -40,15 +40,16 @@ class DictionaryListLoader extends JGlossWorker<Dictionaries, Void> {
     private final URL dictionariesUrl;
 
     DictionaryListLoader(URL dictionariesUrl) {
+        super("dictionarylistloader.title");
         this.dictionariesUrl = dictionariesUrl;
         setMessage(MESSAGES.getString("dictionarylistloader.message"));
     }
-    
+
     @Override
     protected Dictionaries doInBackground() throws Exception {
         return loadDictionaries();
     }
-    
+
     Dictionaries loadDictionaries() throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Dictionaries.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

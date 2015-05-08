@@ -47,6 +47,7 @@ class DictionaryLoader extends JGlossWorker<List<LoadingFailure>, DescriptorDict
      *            be applied after the dictionaries are loaded.
      */
     DictionaryLoader(Dictionaries dictionaries, DefaultListModel<DescriptorDictionaryWrapper> model, List<String> dictionaryDescriptors, boolean applyChange) {
+        super("dictionaries.loading.title");
         this.dictionaries = dictionaries;
         this.model = model;
         this.dictionaryDescriptors = dictionaryDescriptors;

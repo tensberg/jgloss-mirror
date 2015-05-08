@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2013 Michael Koch (tensberg@gmx.net)
+ * Copyright (C) 2001-2015 Michael Koch (tensberg@gmx.net)
  *
  * This file is part of JGloss.
  *
@@ -46,6 +46,7 @@ class FontTester extends JGlossWorker<Font, Void> {
     private final StyleDialog styleDialog;
 
     FontTester(StyleDialog styleDialog) {
+        super("style.autodetect.progress.title");
         this.styleDialog = styleDialog;
     }
 

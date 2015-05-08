@@ -68,6 +68,7 @@ class ImportFromReaderWorker extends JGlossWorker<JGlossDocument, Void> implemen
 
     public ImportFromReaderWorker(JGlossFrame frame, JGlossFrameModel model, Reader documentReader, boolean detectParagraphs, ReadingAnnotationFilter filter,
             Parser parser, int length) {
+        super("import.progress.title");
         this.frame = frame;
         this.model = model;
         this.documentReader = new StopableReader(documentReader);

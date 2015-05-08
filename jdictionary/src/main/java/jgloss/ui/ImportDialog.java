@@ -98,7 +98,7 @@ public class ImportDialog extends JDialog {
      */
     @SuppressWarnings("unchecked")
     public ImportDialog(Window parent) {
-        super( parent, JGloss.MESSAGES.getString( "import.title"));
+        super(parent, JGloss.MESSAGES.getString("import.title"));
         setModal( true);
 
         JPanel main = new JPanel( new BorderLayout());
