@@ -22,8 +22,8 @@
   Dokument kann dann gedruckt oder exportiert werden um es eingehend zu bearbeiten,
   ohne ständig nach einem Papier-Wörterbuch greifen zu müssen.
 
-  JGloss ist in Java geschrieben und sollte auf jedem Computer laufen, der
-  {{{http://www.java.com/}Java 7}} unterstützt. Es kann entsprechend den Bestimmungen der 
+  JGloss ist in Java geschrieben und sollte auf jedem Computer laufen, der eine aktuelle
+  {{{http://www.java.com/}Java}}-Version unterstützt. Es kann entsprechend den Bestimmungen der 
   {{{http://www.gnu.org/licenses/licenses.html#TOCGPL}GNU General Public License}} Version 2 oder folgende
   frei kopiert werden.
 

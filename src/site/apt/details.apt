@@ -22,7 +22,7 @@ About JGloss
   without having to resort to a paper dictionary all the time.
 
   JGloss is written in Java and should work on any computer with support
-  for {{{http://www.java.com/}Java 7}}. It is distributed under the terms
+  for a recent {{{http://www.java.com/}Java}} version. It is distributed under the terms
   of the {{{http://www.gnu.org/licenses/licenses.html#TOCGPL}GNU General Public License}}.
 
 JGloss Information Links

@@ -69,7 +69,7 @@
             </para>
             <para>
                 <application>JGloss</application> is written in Java and should work on any computer with support
-                for <link xlink:href="http://www.java.com/">Java 7</link>.
+                for <link xlink:href="http://www.java.com/">Java 8 and above</link>.
             </para>
         </section>
         <section>
@@ -128,7 +128,7 @@
             <para>
                 <application>JGloss</application>
                 is a Java application. To run it, you will need a Java implementation that
-                conforms to the Java 7 specification,
+                conforms to the Java specification,
                 <abbrev>e. g.</abbrev>
                 Oracle's
                 <link xlink:href="http://java.sun.com/">

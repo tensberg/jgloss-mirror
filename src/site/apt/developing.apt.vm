@@ -16,7 +16,7 @@ Prerequisites
    
    * A Java 7 development kit ({{{http://openjdk.java.net/}OpenJDK}} or {{{http://www.oracle.com/technetwork/java/javase/downloads/index.html}Oracle JDK}}).
    
-   * {{{http://maven.apache.org/}Maven 3.0.4}} for building the project on the command-line.
+   * {{{http://maven.apache.org/}Maven 3.2.5}} for building the project on the command-line.
    
    * Using an IDE is recommended. I use {{{http://eclipse.org/}Eclipse}}, but {{{http://netbeans.org}Netbeans}} and {{{http://www.jetbrains.com/idea/}IntelliJ IDEA}} should also work.
 
