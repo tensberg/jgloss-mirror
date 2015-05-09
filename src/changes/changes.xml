@@ -5,7 +5,7 @@
         <title>JGloss Changes</title>
     </properties>
     <body>
-        <release version="2.1.2" date="not yet released">
+        <release version="2.1.2" date="2015-05-09">
             <action type="update">Updated certificate and security attributes. Java Web Start should now work without security errors.</action>
             <action type="update">Removed Java version number in most places in preparation of the Java 8 migration.</action>
             <action type="update">Delete multiple entries at once in the exclusion list dialog.</action>
